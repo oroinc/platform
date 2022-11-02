@@ -8,16 +8,16 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 class WorkflowItemListenerTest extends WorkflowTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([]);
     }
 
     public function testRemoveRelatedWorkflowItems()
     {
-        self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/ItemListenerRemoveItem');
+        $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/ItemListenerRemoveItem');
         self::assertTrue(
-            self::getSystemWorkflowRegistry()->hasActiveWorkflowsByEntityClass(WorkflowAwareEntity::class)
+            $this->getSystemWorkflowRegistry()->hasActiveWorkflowsByEntityClass(WorkflowAwareEntity::class)
         );
 
         $entity = new WorkflowAwareEntity();
@@ -29,14 +29,14 @@ class WorkflowItemListenerTest extends WorkflowTestCase
 
         self::assertInstanceOf(
             WorkflowItem::class,
-            self::getSystemWorkflowManager()->getWorkflowItem($entity, 'test_flow_item_remove')
+            $this->getSystemWorkflowManager()->getWorkflowItem($entity, 'test_flow_item_remove')
         );
 
         $em->remove($entity);
         $em->flush();
 
         self::assertNull(
-            self::getSystemWorkflowManager()->getWorkflowItem($entity, 'test_flow_item_remove'),
+            $this->getSystemWorkflowManager()->getWorkflowItem($entity, 'test_flow_item_remove'),
             'WorkflowItem for related entity should be removed after entity removal.'
         );
     }

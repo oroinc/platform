@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
+use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type that provides inputs for ACL identity and permissions.
+ */
 class AclPrivilegeType extends AbstractType
 {
     const NAME = 'oro_acl_privilege';
@@ -19,7 +23,7 @@ class AclPrivilegeType extends AbstractType
     {
         $builder->add(
             'identity',
-            new AclPrivilegeIdentityType(),
+            AclPrivilegeIdentityType::class,
             array(
                 'required' => false,
             )
@@ -56,7 +60,7 @@ class AclPrivilegeType extends AbstractType
         $resolver->setDefaults(
             array(
                 'privileges_config' => array(),
-                'data_class' => 'Oro\Bundle\SecurityBundle\Model\AclPrivilege',
+                'data_class' => AclPrivilege::class,
             )
         );
     }

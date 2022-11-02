@@ -4,14 +4,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class RefreshContextListenerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -39,11 +40,7 @@ class RefreshContextListenerTest extends WebTestCase
         $this->assertTokenEntities($entityManager, $token);
     }
 
-    /**
-     * @param EntityManager $entityManager
-     * @param TokenInterface $token
-     */
-    protected function assertTokenEntities(EntityManager $entityManager, TokenInterface $token)
+    private function assertTokenEntities(EntityManager $entityManager, TokenInterface $token): void
     {
         $unitOfWork = $entityManager->getUnitOfWork();
 
@@ -52,10 +49,10 @@ class RefreshContextListenerTest extends WebTestCase
             $unitOfWork->getEntityState($token->getUser())
         );
 
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationAwareTokenInterface) {
             $this->assertEquals(
                 UnitOfWork::STATE_MANAGED,
-                $unitOfWork->getEntityState($token->getOrganizationContext())
+                $unitOfWork->getEntityState($token->getOrganization())
             );
         }
     }
@@ -80,9 +77,7 @@ class RefreshContextListenerTest extends WebTestCase
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
         $user = new User();
-        $reflection = new \ReflectionProperty(get_class($user), 'id');
-        $reflection->setAccessible(true);
-        $reflection->setValue($user, 999);
+        ReflectionUtil::setId($user, 999);
 
         $this->getContainer()->get('security.token_storage')->getToken()->setUser($user);
 

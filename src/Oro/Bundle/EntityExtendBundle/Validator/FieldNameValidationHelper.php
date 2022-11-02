@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
-use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Doctrine\Inflector\Inflector;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -12,6 +12,9 @@ use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provide additional methods for config field name validation
+ */
 class FieldNameValidationHelper
 {
     /** @var ConfigProvider */
@@ -22,31 +25,25 @@ class FieldNameValidationHelper
 
     /** @var NewEntitiesHelper */
     protected $newEntitiesHelper;
+    private Inflector $inflector;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param NewEntitiesHelper $newEntitiesHelper
-     */
     public function __construct(
         ConfigProvider $extendConfigProvider,
         EventDispatcherInterface $eventDispatcher,
-        NewEntitiesHelper $newEntitiesHelper
+        NewEntitiesHelper $newEntitiesHelper,
+        Inflector $inflector
     ) {
         $this->extendConfigProvider = $extendConfigProvider;
         $this->eventDispatcher = $eventDispatcher;
         $this->newEntitiesHelper = $newEntitiesHelper;
+        $this->inflector = $inflector;
     }
 
     /**
      * Checks whether a field can be restored.
      * Unessential symbols, like _ or upper case letters, in a field name are ignored.
-     *
-     * @param FieldConfigModel $field
-     *
-     * @return bool
      */
-    public function canFieldBeRestored(FieldConfigModel $field)
+    public function canFieldBeRestored(FieldConfigModel $field): bool
     {
         $normalizedFieldName = $this->normalizeFieldName($field->getFieldName());
 
@@ -76,15 +73,11 @@ class FieldNameValidationHelper
     /**
      * Checks whether a field can be removed.
      * Return empty array when can remove otherwise array with validation errors
-     *
-     * @param FieldConfigModel $field
-     *
-     * @return array
      */
-    public function getRemoveFieldValidationErrors(FieldConfigModel $field)
+    public function getRemoveFieldValidationErrors(FieldConfigModel $field): array
     {
         $event = new ValidateBeforeRemoveFieldEvent($field);
-        $this->eventDispatcher->dispatch(ValidateBeforeRemoveFieldEvent::NAME, $event);
+        $this->eventDispatcher->dispatch($event, ValidateBeforeRemoveFieldEvent::NAME);
 
         return $event->getValidationMessages();
     }
@@ -92,13 +85,8 @@ class FieldNameValidationHelper
     /**
      * Finds a field by its name.
      * Unessential symbols, like _ or upper case letters, in a field name are ignored.
-     *
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return Config|null
      */
-    public function findExtendFieldConfig($className, $fieldName)
+    public function findFieldConfig(string $className, string $fieldName, bool $isAttribute = false): ?ConfigInterface
     {
         $fieldConfig = null;
 
@@ -118,12 +106,15 @@ class FieldNameValidationHelper
     /**
      * @param string $className
      * @param string $fieldName
+     * @param bool $isAttribute
      * @return array [<fieldsName>, <fieldType>] will be returned in case field found, empty array otherwise
      */
-    public function getSimilarExistingFieldData($className, $fieldName)
+    public function getSimilarExistingFieldData(string $className, string $fieldName, bool $isAttribute = false): array
     {
-        $fieldConfig = $this->findExtendFieldConfig($className, $fieldName);
-        if ($fieldConfig && $this->hasFieldNameConflict($fieldName, $fieldConfig)) {
+        $fieldConfig = $this->findFieldConfig($className, $fieldName);
+        if ($fieldConfig
+            && $this->hasFieldNameConflict($fieldName, $fieldConfig, $fieldConfig->getId()->getFieldName())
+        ) {
             /** @var FieldConfigId $id */
             $id = $fieldConfig->getId();
 
@@ -136,9 +127,6 @@ class FieldNameValidationHelper
         return $existField ? [$existField->getFieldName(), $existField->getType()] : [];
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     */
     public function registerField(FieldConfigModel $fieldConfigModel)
     {
         $key = $this->getKey($fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName());
@@ -165,13 +153,16 @@ class FieldNameValidationHelper
      * Checks whether the name of a new field conflicts with the name of existing field.
      *
      * @param string $newFieldName
-     * @param Config $existingFieldConfig
+     * @param ConfigInterface $existingFieldConfig
+     * @param string $existingFieldName
      *
      * @return bool
      */
-    protected function hasFieldNameConflict($newFieldName, Config $existingFieldConfig)
-    {
-        $existingFieldName = $existingFieldConfig->getId()->getFieldName();
+    protected function hasFieldNameConflict(
+        $newFieldName,
+        ConfigInterface $existingFieldConfig,
+        string $existingFieldName
+    ): bool {
         if (strtolower($newFieldName) === strtolower($existingFieldName)) {
             return true;
         }
@@ -186,15 +177,11 @@ class FieldNameValidationHelper
     }
 
     /**
-     * Normalizes a field name.
+     * Normalizes the given field name.
      * The normalized name is lower cased and unessential symbols, like _, are removed.
-     *
-     * @param string $fieldName
-     *
-     * @return string
      */
-    public function normalizeFieldName($fieldName)
+    public function normalizeFieldName(string $fieldName): string
     {
-        return strtolower(Inflector::classify($fieldName));
+        return strtolower($this->inflector->classify($fieldName));
     }
 }

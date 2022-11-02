@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var AccountTypeComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var accountTypeView = require('oroimap/js/app/views/account-type-view');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const accountTypeView = require('oroimap/js/app/views/account-type-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const routing = require('routing');
 
-    AccountTypeComponent = BaseComponent.extend({
+    const AccountTypeComponent = BaseComponent.extend({
         ViewType: accountTypeView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AccountTypeComponent() {
-            AccountTypeComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AccountTypeComponent(options) {
+            AccountTypeComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -26,8 +25,9 @@ define(function(require) {
         initialize: function(options) {
             this.route = _.result(options, 'route') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
+            this.originId = _.result(options, 'id') || null;
 
-            var viewConfig = this.prepareViewOptions(options);
+            const viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
             this.view.render();
 
@@ -60,9 +60,10 @@ define(function(require) {
                 method: 'POST',
                 data: {
                     type: value,
-                    formParentName: this.formParentName
+                    formParentName: this.formParentName,
+                    id: this.originId
                 },
-                success: _.bind(this.templateLoaded, this)
+                success: this.templateLoaded.bind(this)
             });
         },
 
@@ -75,7 +76,7 @@ define(function(require) {
                     type: value.type,
                     token: value.token
                 },
-                success: _.bind(this.templateLoaded, this)
+                success: this.templateLoaded.bind(this)
             });
         },
 

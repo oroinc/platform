@@ -5,6 +5,10 @@ namespace Oro\Bundle\ReportBundle\Grid;
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
+/**
+ * Enables entity pagination and grid export for report grids.
+ * Results of the builder is cached by ReportDatagridConfigurationProvider.
+ */
 class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
 {
     /**

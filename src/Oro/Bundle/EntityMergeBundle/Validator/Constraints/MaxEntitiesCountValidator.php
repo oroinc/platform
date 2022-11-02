@@ -3,10 +3,13 @@
 namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates that the number of entities is less or equals to the max limit of entities to merge.
+ */
 class MaxEntitiesCountValidator extends ConstraintValidator
 {
     /**
@@ -14,25 +17,16 @@ class MaxEntitiesCountValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof MaxEntitiesCount) {
+            throw new UnexpectedTypeException($constraint, MaxEntitiesCount::class);
+        }
         if (!$value instanceof EntityData) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, %s given',
-                    is_object($value) ? get_class($value) : gettype($value)
-                )
-            );
+            throw new UnexpectedTypeException($value, EntityData::class);
         }
 
-        /* @var EntityData $value */
         $maxEntitiesCount = $value->getMetadata()->getMaxEntitiesCount();
-        $entitiesCount    = count($value->getEntities());
-
-        if ($entitiesCount > $maxEntitiesCount) {
-            $this->context->addViolation(
-                /* @var MaxEntitiesCount $constraint */
-                $constraint->message,
-                ['{{ limit }}' => $maxEntitiesCount]
-            );
+        if (count($value->getEntities()) > $maxEntitiesCount) {
+            $this->context->addViolation($constraint->message, ['{{ limit }}' => $maxEntitiesCount]);
         }
     }
 }

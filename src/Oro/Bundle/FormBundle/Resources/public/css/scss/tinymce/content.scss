@@ -1,0 +1,84 @@
+/* @theme: admin.oro; */
+
+.mce-object {
+    border: 1px dotted $primary-100;
+    background: url('#{$global-url}/oroform/css/scss/tinymce/img/object.gif') no-repeat center $primary-800;
+}
+
+.mce-pagebreak {
+    cursor: default;
+    display: block;
+    width: 100%;
+    height: 5px;
+    border: 1px dashed $primary-400;
+    margin-top: 15px;
+    page-break-before: always;
+}
+
+.mce-item-anchor {
+    cursor: default;
+    display: inline-block;
+    user-select: all;
+    /* stylelint-disable property-no-unknown */
+    user-modify: read-only;
+    /* stylelint-enable property-no-unknown */
+    /* stylelint-disable declaration-no-important */
+    width: 9px !important;
+    height: 9px !important;
+    /* stylelint-enable declaration-no-important */
+    border: 1px dotted $primary-100;
+    background: url('#{$global-url}/oroform/css/scss/tinymce/img/anchor.gif') no-repeat center $primary-800;
+}
+
+.mce-nbsp {
+    background: $primary-700;
+}
+
+.mce-match-marker {
+    background: $primary-700;
+    color: $primary-inverse;
+}
+
+.mce-match-marker-selected {
+    background: $secondary;
+    color: $primary-inverse;
+}
+
+.mce-spellchecker-word {
+    border-bottom: 2px solid $danger;
+    cursor: default;
+}
+
+.mce-spellchecker-grammar {
+    border-bottom: 2px solid $success;
+    cursor: default;
+}
+
+.mce-item-table,
+.mce-item-table caption,
+.mce-item-table td,
+.mce-item-table th {
+    border: 1px dashed $primary-700;
+}
+
+td.mce-item-selected,
+th.mce-item-selected {
+    // stylelint-disable-next-line declaration-no-important
+    background-color: $secondary !important;
+}
+
+.mce-edit-focus {
+    outline: $primary-750 dotted 1px;
+}
+
+.email-prev-body {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid $primary;
+}
+
+@media print {
+    .mce-pagebreak {
+        border: 0;
+    }
+}

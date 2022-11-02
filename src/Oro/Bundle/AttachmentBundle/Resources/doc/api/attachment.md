@@ -26,35 +26,35 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"attachments",
-      "attributes":{  
-         "comment":"Account's background"
+{
+   "data": {
+      "type": "attachments",
+      "attributes": {
+         "comment": "Account's background"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "file":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "file": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"accounts",
-               "id":"1"
+         "target": {
+            "data": {
+               "type": "accounts",
+               "id": "1"
             }
          }
       }
@@ -67,42 +67,44 @@ Example:
 
 Edit a specific attachment record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"attachments",
-      "id":"3",
-      "attributes":{  
-         "comment":"Account's background"
+{
+   "data": {
+      "type": "attachments",
+      "id": "3",
+      "attributes": {
+         "comment": "Account's background"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "file":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "file": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"accounts",
-               "id":"1"
+         "target": {
+            "data": {
+               "type": "accounts",
+               "id": "1"
             }
          }
       }
@@ -125,29 +127,19 @@ Delete a set of attachment records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### file
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### target
 
@@ -157,7 +149,13 @@ A record which the attachment record belongs to.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 

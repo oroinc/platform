@@ -1,0 +1,16 @@
+<a href="<%- previewMetadata.download %>" class="no-hash digital-asset-filename"
+   title="<%- previewMetadata.title %>" data-role="digital-asset-filename">
+    <span class="digital-asset-filename__preview">
+        <% if (isImageType && previewMetadata.preview) { %>
+            <picture>
+                <% if (previewMetadata.preview_webp) { %>
+                <source srcset="<%- previewMetadata.preview_webp %>" type="image/webp">
+                <% } %>
+                <img src="<%- previewMetadata.preview %>" alt="<%- previewMetadata.title %>"/>
+            </picture>
+        <% } else { %>
+            <span class="<%- previewMetadata.icon %>" aria-hidden="true"></span>
+        <% } %>
+    </span>
+    <span class="digital-asset-filename__text"><%- previewMetadata.filename %></span>
+</a>

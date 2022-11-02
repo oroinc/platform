@@ -2,33 +2,33 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Defines user email configuration/email settings form
+ */
 class EmailSettingsType extends AbstractType
 {
-    /** ConfigManager */
-    protected $userConfigManager;
-
-    /** UserImapConfigSubscriber */
+    /** @var UserImapConfigSubscriber */
     protected $subscriber;
 
-    /**
-     * @param ConfigManager $userConfigManager
-     * @param UserImapConfigSubscriber $subscriber
-     */
+    /** @var OAuthManagerRegistry */
+    protected $oauthManagerRegistry;
+
     public function __construct(
-        ConfigManager            $userConfigManager,
-        UserImapConfigSubscriber $subscriber
+        UserImapConfigSubscriber $subscriber,
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
-        $this->userConfigManager = $userConfigManager;
         $this->subscriber = $subscriber;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -37,7 +37,7 @@ class EmailSettingsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => 'Oro\Bundle\UserBundle\Entity\User',
+            'data_class' => User::class,
             'ownership_disabled' => true,
             'dynamic_fields_disabled' => true,
             'label' => false,
@@ -50,7 +50,7 @@ class EmailSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->subscriber);
-        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
+        if ($this->oauthManagerRegistry->isOauthImapEnabled()) {
             $builder->add(
                 'imapAccountType',
                 ChoiceAccountType::class,

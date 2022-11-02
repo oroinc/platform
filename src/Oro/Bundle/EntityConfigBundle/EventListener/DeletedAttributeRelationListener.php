@@ -1,16 +1,20 @@
 <?php
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Doctrine's listener of 'onFlush', 'postFlush' events
+ * to produce MQ message which processor must delete attribute relations.
+ */
 class DeletedAttributeRelationListener
 {
     /**
@@ -32,17 +36,16 @@ class DeletedAttributeRelationListener
      * @var array
      */
     protected $deletedAttributes = [];
+    private Inflector $inflector;
 
-    /**
-     * @param MessageProducerInterface $messageProducer
-     * @param DeletedAttributeProviderInterface $deletedAttributeProvider
-     */
     public function __construct(
         MessageProducerInterface $messageProducer,
-        DeletedAttributeProviderInterface $deletedAttributeProvider
+        DeletedAttributeProviderInterface $deletedAttributeProvider,
+        Inflector $inflector
     ) {
         $this->messageProducer = $messageProducer;
         $this->deletedAttributeProvider = $deletedAttributeProvider;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -53,9 +56,6 @@ class DeletedAttributeRelationListener
         $this->topic = (string) $topic;
     }
 
-    /**
-     * @param OnFlushEventArgs $eventArgs
-     */
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
         $uow = $eventArgs->getEntityManager()->getUnitOfWork();
@@ -70,13 +70,13 @@ class DeletedAttributeRelationListener
                 $this->deletedAttributes[$attributeFamily->getId()][] = $attributeRelation->getEntityConfigFieldId();
             }
         }
-        
+
         foreach ($this->deletedAttributes as $attributeFamilyId => $attributeIds) {
             $attributes = $this->deletedAttributeProvider->getAttributesByIds($attributeIds);
             foreach ($attributes as &$attribute) {
-                $attribute = Inflector::camelize($attribute->getFieldName());
+                $attribute = $this->getAttributeName($attribute);
             }
-            
+
             $this->deletedAttributes[$attributeFamilyId] = $attributes;
         }
     }
@@ -116,5 +116,14 @@ class DeletedAttributeRelationListener
         }
 
         return true;
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     * @return string
+     */
+    protected function getAttributeName(FieldConfigModel $attribute): string
+    {
+        return $attribute->getFieldName();
     }
 }

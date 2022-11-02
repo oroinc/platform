@@ -1,0 +1,41 @@
+{% apply spaceless %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% set picture_attrs = picture_attrs|default({}) %}
+    {% set file = file|default(null) %}
+    {% set filter = filter|default('original') %}
+    {% set sources = sources|default(oro_filtered_picture_sources(file, filter))|default([]) %}
+    {% set img_attrs = img_attrs|default({}) %}
+    {% set img_src = img_src|default(img_attrs.src|default('')) %}
+
+    {% if not sources is iterable %}
+        {% set img_src = sources %}
+        {% set sources = [] %}
+    {% endif %}
+
+    {% if sources.src is defined and sources.sources is defined %}
+        {% set img_src = sources.src %}
+        {% set sources = sources.sources %}
+    {% endif %}
+
+    {% if not img_src %}
+        {% set img_src = (sources|last).srcset|default(sources|last|default('')) %}
+        {% set sources = sources|slice(0, -1) %}
+    {% endif %}
+
+    {% if img_src %}
+        <picture {{ UI.attributes(picture_attrs) }}>
+            {% block sources %}
+                {% for source_attrs in sources %}
+                    <source {{ UI.attributes(source_attrs) }}>
+                {% endfor %}
+            {% endblock %}
+
+            {% set img_attrs = { src: img_src }|merge(img_attrs) %}
+            {% if file %}
+                {% set img_attrs = { alt: oro_file_title(file) }|merge(img_attrs) %}
+            {% endif %}
+            <img {{ UI.attributes(img_attrs) }}>
+        </picture>
+    {% endif %}
+{% endapply %}

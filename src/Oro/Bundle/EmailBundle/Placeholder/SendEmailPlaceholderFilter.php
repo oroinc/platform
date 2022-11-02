@@ -16,9 +16,6 @@ class SendEmailPlaceholderFilter
      */
     protected $activityManager;
 
-    /**
-     * @param ActivityManager $activityManager
-     */
     public function __construct(ActivityManager $activityManager)
     {
         $this->email  = new Email();

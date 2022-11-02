@@ -6,51 +6,35 @@ use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /**
-     * @var \Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener
-     */
-    protected $listener;
+    /** @var AttributeFamilyFormViewListener */
+    private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($id) {
-                    return $id . '.trans';
-                }
-            );
+            ->willReturnCallback(function ($id) {
+                return $id . '.trans';
+            });
 
-        $this->environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->environment = $this->createMock(Environment::class);
 
         $this->listener = new AttributeFamilyFormViewListener($this->translator);
     }
 
-    /**
-     * @return array
-     */
-    public function onEditDataProvider()
+    public function onEditDataProvider(): array
     {
         return [
             'empty template' => [
@@ -82,15 +66,16 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnEdit($templateData, array $expectedScrollData)
     {
+        $formView = new FormView();
         $this->environment->expects($this->once())
             ->method('render')
             ->with(
-                'OroEntityConfigBundle:AttributeFamily:familyField.html.twig',
-                ['form' => new FormView()]
+                '@OroEntityConfig/AttributeFamily/familyField.html.twig',
+                ['form' => $formView]
             )
             ->willReturn($templateData);
 
-        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass(), new FormView());
+        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass(), $formView);
         $this->listener->onEdit($event);
 
         $this->assertEquals($expectedScrollData, $event->getScrollData()->getData());

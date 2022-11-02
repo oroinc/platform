@@ -3,8 +3,8 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Oro\Component\Action\Action\Count;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -13,64 +13,52 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class CountTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Count */
-    protected $action;
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-
         $this->action = new Count(new ContextAccessor());
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `value` is required.
-     */
     public function testInitializeArrayException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `value` is required.');
+
         $this->assertEquals($this->action, $this->action->initialize([]));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `attribute` is required.
-     */
     public function testInitializeAttributeException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `attribute` is required.');
+
         $this->assertEquals($this->action, $this->action->initialize(['value' => []]));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `attribute` must be a valid property definition.
-     */
     public function testInitializeAttributeWrongException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `attribute` must be a valid property definition.');
+
         $this->assertEquals($this->action, $this->action->initialize(['value' => [], 'attribute' => 'test']));
     }
 
     /**
      * @dataProvider objectDataProvider
-     *
-     * @param array|Collection $array
-     * @param int $count
      */
-    public function testExecute($array, $count)
+    public function testExecute(mixed $value, int $count)
     {
         $context = new StubStorage();
 
-        $this->action->initialize(['value' => $array, 'attribute' => new PropertyPath('test')]);
+        $this->action->initialize(['value' => $value, 'attribute' => new PropertyPath('test')]);
         $this->action->execute($context);
 
         $this->assertEquals(['test' => $count], $context->getValues());
     }
 
-    /**
-     * @return array
-     */
-    public function objectDataProvider()
+    public function objectDataProvider(): array
     {
         return [
             [[1, 2, 3], 3],

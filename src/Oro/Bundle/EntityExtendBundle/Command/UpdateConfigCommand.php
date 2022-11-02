@@ -1,64 +1,94 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
-use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to update extend entity config
+ * Updates extend entity config.
  */
-class UpdateConfigCommand extends ContainerAwareCommand
+class UpdateConfigCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected static $defaultName = 'oro:entity-extend:update-config';
+
+    private ExtendConfigDumper $extendConfigDumper;
+
+    public function __construct(ExtendConfigDumper $extendConfigDumper)
+    {
+        $this->extendConfigDumper = $extendConfigDumper;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:update-config')
-            ->setDescription('Prepare entity config')
             ->addOption(
                 'update-custom',
                 null,
                 InputOption::VALUE_NONE,
-                'Applies user changes that require schema update if specified'
-            )
-            ->addOption(
-                'skip-origin',
-                null,
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Origin names which will be skipped during configuration update'
+                'Apply user changes that require schema update'
             )
             ->addOption(
                 'initial-state-path',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'A path to a file contains initial states of entity configs'
-            );
+                'File containing the initial state of entity configs'
+            )
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
+            ->setDescription('Updates extend entity config.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates extend entity config.
+
+  <info>php %command.full_name%</info>
+  
+<error>This is an internal command. Please do not run it manually.</error>
+<error>Execution of this command can break the system.</error>
+
+Use the <info>--force</info> option to force the execution.
+
+Use the <info>--update-custom</info> option to apply user changes that require database schema update:
+
+  <info>php %command.full_name% --force --update-custom</info>
+
+The <info>--initial-state-path</info> option can be used to provide a path to the file
+that contains the initial state of the entity configs:
+
+  <info>php %command.full_name% --force --initial-state-path=<file-path></info>
+
+HELP
+            )
+            ->addUsage('--force --update-custom')
+            ->addUsage('--force --initial-state-path=<file-path>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
 
-        $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
+        $force = $input->getOption('force');
+        if (!$force) {
+            $output->writeln('<error>This is an internal command. Please do not run it manually.</error>');
+            $output->writeln('<error>Execution of this command can break the system.</error>');
+
+            return 1;
+        }
+
+        $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
+
+        return 0;
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return callable|null
-     */
-    protected function getFilter(InputInterface $input)
+    protected function getFilter(InputInterface $input): ?callable
     {
         $filter = null;
 
@@ -67,11 +97,6 @@ class UpdateConfigCommand extends ContainerAwareCommand
             $initialStates = unserialize(file_get_contents($initialStatePath));
             if (!empty($initialStates)) {
                 $filter = new ByInitialStateFilter($initialStates);
-            }
-        } else {
-            $skippedOrigins = (array)$input->getOption('skip-origin');
-            if (!empty($skippedOrigins)) {
-                $filter = new ByOriginFilter($skippedOrigins);
             }
         }
 

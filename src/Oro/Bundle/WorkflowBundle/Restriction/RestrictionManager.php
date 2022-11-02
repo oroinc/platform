@@ -43,10 +43,6 @@ class RestrictionManager
      */
     protected $workflowRegistry;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, DoctrineHelper $doctrineHelper)
     {
         $this->workflowRegistry = $workflowRegistry;
@@ -76,7 +72,6 @@ class RestrictionManager
      * @param array $identifiers
      *
      * @return array [['field' => $field, 'mode' => $mode, 'values' => $values, 'ids' => $ids], ...]
-     *
      */
     public function getRestrictionsByClassAndIdentifiers($entityClass, array $identifiers = [])
     {

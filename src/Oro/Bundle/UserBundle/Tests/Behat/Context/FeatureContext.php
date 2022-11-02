@@ -3,8 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -13,11 +11,10 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 class FeatureContext extends OroFeatureContext implements
-    KernelAwareContext,
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
-    use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary;
+    use FixtureLoaderDictionary, PageObjectDictionary;
 
     /**
      * @var OroMainContext
@@ -26,8 +23,6 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -43,7 +38,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmOnLoginPage()
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_security_login');
         $this->visitPath($uri);
     }
 
@@ -54,7 +49,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmLoggedOut()
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_user_security_logout');
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_security_logout');
         $this->visitPath($uri);
     }
 
@@ -101,7 +96,12 @@ class FeatureContext extends OroFeatureContext implements
         }, 5);
 
         self::assertNotNull($error, 'Expect to find error on page, but it not found');
-        self::assertEquals('Account is locked.', $error->getText());
+        self::assertEquals(
+            'Your login was unsuccessful. '.
+            'Please check your e-mail address and password before trying again. '.
+            'If you have forgotten your password, follow "Forgot your password?" link.',
+            $error->getText()
+        );
 
         $this->oroMainContext->assertPage('Login');
         $this->getSession('system_session')->stop();
@@ -121,19 +121,20 @@ class FeatureContext extends OroFeatureContext implements
         } else {
             $this->oroMainContext->pressButton('Request');
         }
-
-        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
-        $this->oroMainContext->applySkipWait();
     }
 
     /**
-     * @When /^(?:|I )confirm login$/
+     * @When /^(?:|I )open User view page with id (?P<id>[\w\s]+)/
+     *
+     * @param string $id
      */
-    public function iConfirmLogin()
+    public function openUserViewPage($id)
     {
-        $this->oroMainContext->pressButton('Log in');
+        $url = $this->getAppContainer()
+            ->get('router')
+            ->generate('oro_user_view', ['id' => $id]);
 
-        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
-        $this->oroMainContext->applySkipWait();
+        $this->visitPath($url);
+        $this->waitForAjax();
     }
 }

@@ -14,6 +14,9 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
 
+/**
+ * Replace virtual tags filters and columns with properly configured one for DataGrid
+ */
 class TagsReportExtension extends AbstractTagsExtension
 {
     /** @var TaggableHelper */
@@ -25,12 +28,6 @@ class TagsReportExtension extends AbstractTagsExtension
     /** @var JoinIdentifierHelper */
     protected $joinIdentifierHelper;
 
-    /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param TaggableHelper      $helper
-     * @param EntityRoutingHelper $entityRoutingHelper
-     */
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver,
@@ -150,7 +147,7 @@ class TagsReportExtension extends AbstractTagsExtension
             'populate_default' => true,
             'default_value' => 'Any',
             'label' => $label,
-            'enabled' => true,
+            'renderable' => true,
             'entity_class' => $entityClass
         ];
     }

@@ -1,7 +1,6 @@
 services:
     oro_api.collect_resources.processor:
         class: Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - collect_resources
@@ -43,6 +42,7 @@ services:
         arguments:
             - '@oro_api.config_loader_factory'
             - '@oro_api.config_bag_registry'
+            - '@oro_api.merge_config_helper.action'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 
@@ -53,6 +53,16 @@ services:
             - ['delete', 'delete_list', 'create', 'update']
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -120 }
+
+    oro_api.collect_resources.exclude_update_list_action:
+          class: Oro\Bundle\ApiBundle\Processor\CollectResources\ExcludeUpdateListAction
+          tags:
+              - { name: oro.api.processor, action: collect_resources, requestType: json_api, priority: -180 }
+
+    oro_api.collect_resources.force_exclude_update_list_action:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\ForceExcludeUpdateListAction
+        tags:
+            - { name: oro.api.processor, action: collect_resources, requestType: '!json_api', priority: -185 }
 
     oro_api.collect_resources.load_accessible_resources:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadAccessibleResources

@@ -2,42 +2,39 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
+/**
+ * The query builder for static segments.
+ */
 class StaticSegmentQueryBuilder implements QueryBuilderInterface
 {
-    /** @var EntityManager */
-    protected $em;
+    /** @var EntityManagerInterface */
+    private $em;
 
-    /**
-     * Constructor
-     *
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
-    public function build(Segment $segment)
+    public function build(Segment $segment): Query
     {
-        $qb = $this->getQueryBuilder($segment);
-
-        return $qb->getQuery();
+        return $this->getQueryBuilder($segment)->getQuery();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getQueryBuilder(Segment $segment)
+    public function getQueryBuilder(Segment $segment): QueryBuilder
     {
-        $repo = $this->em->getRepository('OroSegmentBundle:SegmentSnapshot');
-        $qb   = $repo->getIdentifiersSelectQueryBuilder($segment);
-
-        return $qb;
+        return $this->em->getRepository(SegmentSnapshot::class)
+            ->getIdentifiersSelectQueryBuilder($segment);
     }
 }

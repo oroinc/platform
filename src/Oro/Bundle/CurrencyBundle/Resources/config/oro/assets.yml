@@ -1,4 +1,7 @@
-assets:
-    css:
-        'orocurrency':
-            - 'bundles/orocurrency/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/orocurrency/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orocurrency/css/scss/main.scss'

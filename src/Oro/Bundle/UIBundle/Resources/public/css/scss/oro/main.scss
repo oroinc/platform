@@ -1,58 +1,55 @@
 /* @theme: admin.oro; */
 
-@import "variables";
-
-@import "app-page";
-@import "application-menu";
-@import "drag-and-drop-support";
-@import "create-select-entity";
-@import "entity";
-@import "ui-sortable";
-@import "form/form";
-@import "loading/loading-mask";
-@import "loading/loading-dots";
-@import "loading/loading-bar";
-@import "dropdown/dropdown-mask";
-@import "zoomable-area";
-@import "select2";
-@import "datepicker";
-@import "simplecolorpicker";
-@import "dialog";
-
-@import "page-toolbar";
-@import "app-header";
-
-@import "form/form-description";
-@import "form/form-signin";
-@import "form/forms";
-
-@import "footer";
-@import "fs-toolbar";
-@import "flash-messages";
-@import "alert";
-@import "inline-actions";
-@import "modal";
-@import "dropdown/dropdown-menu-collection";
-@import "error-page";
-@import "nav";
-
-@import "tab/tab";
-@import "tab/nav-tabs-content";
-@import "tab/oro-tabs";
-@import "tab/tab-collection";
-
-@import "checkbox";
-
-@import "jstree/jstree-actions";
-@import "jstree/jstree-wrapper";
-@import "jstree/jstree";
-
-@import "content-sidebar";
-@import "highlight-text";
-@import "scrollspy";
-
-@import "tooltip";
-@import "widget-picker";
-
-@import "tables";
-@import "other-scroll-container";
+@import 'app-page';
+@import 'attribute-item';
+@import 'drag-and-drop-support';
+@import 'drag-and-drop-view';
+@import 'create-select-entity';
+@import 'entity';
+@import 'ui-sortable';
+@import 'form/form';
+@import 'loading/loading-mask';
+@import 'loading/loading-dots';
+@import 'loading/loading-bar';
+@import 'dropdown/dropdown-mask';
+@import 'zoomable-area';
+@import 'select2';
+@import 'datepicker';
+@import 'simplecolorpicker';
+@import 'dialog';
+@import 'label';
+@import 'page-header';
+@import 'page-toolbar';
+@import 'app-header';
+@import 'form/form-description';
+@import 'form/form-signin';
+@import 'form/forms';
+@import 'progressbar';
+@import 'footer';
+@import 'fs-toolbar';
+@import 'flash-messages';
+@import 'inline-actions';
+@import 'error-page';
+@import 'nav';
+@import 'no-data';
+@import 'tab/tabs';
+@import 'tab/oro-tabs';
+@import 'tab/tab-collection';
+@import 'checkbox';
+@import 'checkbox-label';
+@import 'jstree/jstree-actions';
+@import 'jstree/jstree-wrapper';
+@import 'jstree/jstree';
+@import 'content-sidebar';
+@import 'highlight-text';
+@import 'scrollspy';
+@import 'widget-picker';
+@import 'tables';
+@import 'other-scroll-container';
+@import 'load-more';
+@import 'loading-indicator';
+@import 'scrolling-overlay';
+@import 'scroll-hints';
+@import 'image-preview-modal';
+@import 'social-list';
+@import 'noscript-container';

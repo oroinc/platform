@@ -1,7 +1,7 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block root %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
 
     {% set listAttributes = item.childrenAttributes %}
     {% set listAttributes = listAttributes|merge({'class': oro_menu.add_attribute_values(listAttributes, 'class', ['nav', 'nav-pills'])}) %}

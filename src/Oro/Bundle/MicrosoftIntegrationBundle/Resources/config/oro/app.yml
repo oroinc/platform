@@ -1,0 +1,14 @@
+hwi_oauth:
+    resource_owners:
+        office365:
+            type: office365
+            client_id: changeMe
+            client_secret: changeMe
+            scope: "openid offline_access profile User.Read Mail.ReadWrite"
+
+security:
+    firewalls:
+        main:
+            oauth:
+                resource_owners:
+                    office365: /login/check-office365

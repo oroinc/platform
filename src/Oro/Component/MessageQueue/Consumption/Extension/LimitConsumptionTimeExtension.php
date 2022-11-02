@@ -11,9 +11,6 @@ class LimitConsumptionTimeExtension extends AbstractExtension
      */
     protected $timeLimit;
 
-    /**
-     * @param \DateTime $timeLimit
-     */
     public function __construct(\DateTime $timeLimit)
     {
         $this->timeLimit = $timeLimit;
@@ -43,9 +40,6 @@ class LimitConsumptionTimeExtension extends AbstractExtension
         $this->checkTime($context);
     }
 
-    /**
-     * @param Context $context
-     */
     protected function checkTime(Context $context)
     {
         $now = new \DateTime();

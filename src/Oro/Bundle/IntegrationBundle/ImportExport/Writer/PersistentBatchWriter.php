@@ -2,26 +2,29 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Persists supplied data to the database within a transaction
+ */
 class PersistentBatchWriter implements
     ItemWriterInterface,
     StepExecutionAwareInterface,
     StepExecutionRestoreInterface
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EventDispatcherInterface */
@@ -39,14 +42,8 @@ class PersistentBatchWriter implements
     /** @var StepExecution|null */
     protected $previousStepExecution;
 
-    /**
-     * @param RegistryInterface        $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ContextRegistry          $contextRegistry
-     * @param LoggerInterface          $logger
-     */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
         ContextRegistry $contextRegistry,
         LoggerInterface $logger
@@ -87,14 +84,11 @@ class PersistentBatchWriter implements
             $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
 
             $event = new WriterErrorEvent($items, $jobName, $exception);
-            $this->eventDispatcher->dispatch(WriterErrorEvent::NAME, $event);
+            $this->eventDispatcher->dispatch($event, WriterErrorEvent::NAME);
 
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
-                $importContext->setValue(
-                    'error_entries_count',
-                    (int)$importContext->getValue('error_entries_count') + count($items)
-                );
+                $importContext->incrementErrorEntriesCount(count($items));
 
                 $this->logger->warning($event->getWarning());
 
@@ -110,12 +104,9 @@ class PersistentBatchWriter implements
             }
         }
 
-        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($em));
+        $this->eventDispatcher->dispatch(new WriterAfterFlushEvent($em), WriterAfterFlushEvent::NAME);
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->previousStepExecution = $this->stepExecution;
@@ -131,10 +122,6 @@ class PersistentBatchWriter implements
         $this->stepExecution = $this->previousStepExecution;
     }
 
-    /**
-     * @param array $items
-     * @param EntityManager $em
-     */
     protected function saveItems(array $items, EntityManager $em)
     {
         foreach ($items as $item) {

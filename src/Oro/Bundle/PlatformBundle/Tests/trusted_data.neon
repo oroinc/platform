@@ -1,0 +1,6 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    properties:
+        Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRepository:
+            createQueryBuilder:
+                materializedViewName: true

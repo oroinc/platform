@@ -6,24 +6,26 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all path providers.
+ */
 class ResourcePathProvidersPass implements CompilerPassInterface
 {
-    const PROVIDER_SERVICE = 'oro_layout.loader.path_provider';
-    const TAG_NAME = 'layout.resource.path_provider';
+    private const PROVIDER_SERVICE_ID = 'oro_layout.loader.path_provider';
+    private const TAG_NAME = 'layout.resource.path_provider';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition(self::PROVIDER_SERVICE)) {
-            $chainDef = $container->getDefinition(self::PROVIDER_SERVICE);
-
-            foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tag) {
-                $priority = isset($tag[0]['priority']) ? $tag[0]['priority'] : 0;
-
-                $chainDef->addMethodCall('addProvider', [new Reference($serviceId), $priority]);
-            }
+        $chainProviderDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
+        $taggedServiceIds = $container->findTaggedServiceIds(self::TAG_NAME);
+        foreach ($taggedServiceIds as $id => $attributes) {
+            $chainProviderDef->addMethodCall(
+                'addProvider',
+                [new Reference($id), $attributes[0]['priority'] ?? 0]
+            );
         }
     }
 }

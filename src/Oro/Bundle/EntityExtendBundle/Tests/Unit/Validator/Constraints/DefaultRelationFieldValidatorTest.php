@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -15,28 +15,15 @@ use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class DefaultRelationFieldValidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultRelationFieldValidatorTest extends ConstraintValidatorTestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var DefaultRelationFieldValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $extendConfigProvider = new ConfigProviderMock(
-            $configManager,
-            'extend'
-        );
-
+        $extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');
         $extendConfigProvider->addFieldConfig(self::ENTITY_CLASS, 'defaultField', 'int');
         $extendConfigProvider->addFieldConfig(
             self::ENTITY_CLASS,
@@ -78,69 +65,63 @@ class DefaultRelationFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ['without_default' => true]
         );
 
-        $this->validator = new DefaultRelationFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
+        return new DefaultRelationFieldValidator(
+            new FieldNameValidationHelper(
+                $extendConfigProvider,
+                $this->createMock(EventDispatcherInterface::class),
+                new NewEntitiesHelper(),
+                (new InflectorFactory())->build()
+            )
         );
     }
 
     /**
      * @dataProvider validateProvider
-     *
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param string $expectedValidationMessageType
      */
-    public function testValidate($fieldName, $fieldType, $expectedValidationMessageType)
-    {
+    public function testValidate(
+        string $fieldName,
+        string $fieldType,
+        ?string $expectedValidationMessageType,
+        ?string $violationFieldName = null
+    ) {
         $entity = new EntityConfigModel(self::ENTITY_CLASS);
-        $field  = new FieldConfigModel($fieldName, $fieldType);
+        $field = new FieldConfigModel($fieldName, $fieldType);
         $entity->addField($field);
-
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $this->validator->initialize($context);
 
         $constraint = new DefaultRelationField();
 
-        if ($expectedValidationMessageType) {
-            $message   = PropertyAccess::createPropertyAccessor()
-                ->getValue($constraint, $expectedValidationMessageType);
-            $violation = $this->createMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
-            $context->expects($this->once())
-                ->method('buildViolation')
-                ->with($message)
-                ->willReturn($violation);
-            $violation->expects($this->once())
-                ->method('atPath')
-                ->with('fieldName')
-                ->willReturnSelf();
-            $violation->expects($this->once())
-                ->method('addViolation');
-        } else {
-            $context->expects($this->never())
-                ->method('buildViolation');
-        }
-
         $this->validator->validate($field, $constraint);
+
+        if (null === $expectedValidationMessageType) {
+            $this->assertNoViolation();
+        } else {
+            $message = PropertyAccess::createPropertyAccessor()
+                ->getValue($constraint, $expectedValidationMessageType);
+            $this->buildViolation($message)
+                ->setParameters(['{{ value }}' => $fieldName, '{{ field }}' => $violationFieldName ?? $fieldName])
+                ->atPath('property.path.fieldName')
+                ->assertRaised();
+        }
     }
 
-    public function validateProvider()
+    public function validateProvider(): array
     {
         return [
             ['defaultAnotherField', 'int', null],
             ['defaultMany2oneRel', 'int', null],
-            ['defaultOne2ManyRel', 'int', 'duplicateRelationMessage'],
-            ['default_one_2_many_rel', 'int', 'duplicateRelationMessage'],
-            ['defaultMany2ManyRel', 'int', 'duplicateRelationMessage'],
-            ['default_many_2_many_rel', 'int', 'duplicateRelationMessage'],
+            ['defaultOne2ManyRel', 'int', 'duplicateRelationMessage', 'one2manyRel'],
+            ['default_one_2_many_rel', 'int', 'duplicateRelationMessage', 'one2manyRel'],
+            ['defaultMany2ManyRel', 'int', 'duplicateRelationMessage', 'many2manyRel'],
+            ['default_many_2_many_rel', 'int', 'duplicateRelationMessage', 'many2manyRel'],
             ['defaultOne2ManyRelWithoutDefault', 'int', null],
             ['default_one_2_many_rel_without_default', 'int', null],
             ['defaultMany2ManyRelWithoutDefault', 'int', null],
             ['default_many_2_many_rel_without_default', 'int', null],
             ['field', RelationType::MANY_TO_ONE, null],
-            ['field', RelationType::ONE_TO_MANY, 'duplicateFieldMessage'],
-            ['fieLD', RelationType::ONE_TO_MANY, 'duplicateFieldMessage'],
-            ['field', RelationType::MANY_TO_MANY, 'duplicateFieldMessage'],
-            ['fieLD', RelationType::MANY_TO_MANY, 'duplicateFieldMessage'],
+            ['field', RelationType::ONE_TO_MANY, 'duplicateFieldMessage', 'defaultField'],
+            ['fieLD', RelationType::ONE_TO_MANY, 'duplicateFieldMessage', 'defaultField'],
+            ['field', RelationType::MANY_TO_MANY, 'duplicateFieldMessage', 'defaultField'],
+            ['fieLD', RelationType::MANY_TO_MANY, 'duplicateFieldMessage', 'defaultField'],
             ['deletedField', RelationType::ONE_TO_MANY, null],
             ['deletedField', RelationType::ONE_TO_MANY, null],
             ['toBeDeletedField', RelationType::ONE_TO_MANY, null],

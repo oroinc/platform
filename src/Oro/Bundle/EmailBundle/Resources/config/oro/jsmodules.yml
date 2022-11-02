@@ -1,0 +1,47 @@
+aliases:
+    oro/datagrid/action/mark-email-mass-action$: oroemail/js/datagrid/action/mark-email-mass-action
+    oro/filter/email-string-filter: oro/filter/choice-filter
+    oro/filter/multiselect-originfolder-filter$: oroemail/js/filter/multiselect-originfolder-filter
+    oro/select2-email-recipients-component$: oroemail/js/app/components/select2-email-recipients-component
+app-modules:
+    - oroemail/js/app/modules/email-module
+configs:
+    oroemail/js/app/components/new-email-message-component: {}
+    oroemail/js/app/components/sidebar-recent-emails-component: {}
+    oroemail/js/app/unread-emails-state-holder: {}
+    oroemail/js/util/unread-email-count-cache: {}
+dynamic-imports:
+    commons:
+        - oro/select2-email-recipients-component
+        - oroemail/js/app/views/email-attachment-context-view
+        - oroemail/js/validator/email-address
+    orodatagrid:
+        - oro/datagrid/action/mark-email-mass-action
+        - oro/filter/email-string-filter
+        - oro/filter/multiselect-originfolder-filter
+    oroemail:
+        - oroemail/js/app/components/auto-response-rule-component
+        - oroemail/js/app/components/check-smtp-connection-component
+        - oroemail/js/app/components/email-attachment-component
+        - oroemail/js/app/components/email-editor-component
+        - oroemail/js/app/components/folder-tree-component
+        - oroemail/js/app/components/mark-unread-button
+        - oroemail/js/app/components/new-email-flash-message-component
+        - oroemail/js/app/components/new-email-message-component
+        - oroemail/js/app/components/user-menu-email-notification-component
+        - oroemail/js/app/views/email-attachment-link-view
+        - oroemail/js/app/views/email-body-view
+        - oroemail/js/app/views/email-field-condition-view
+        - oroemail/js/app/views/email-sync-view
+        - oroemail/js/app/views/email-template-editor-view
+        - oroemail/js/app/views/email-template-view
+        - oroemail/js/app/views/email-thread-view
+        - oroemail/js/app/views/email-translation-view
+        - oroemail/js/app/views/mailbox-update-view
+        - oroemail/js/app/views/unread-emails-counter-view
+        - oroemail/js/datagrid/auto-response-rules-extension
+        - oroemail/js/datagrid/listen-to-read-email-extension
+        - oroemail/sidebar_widgets/recent_emails/js/widget
+    tinymce.min:
+        - oroemail/js/app/components/email-variable-component
+        - oroemail/js/app/views/email-template-localization-view

@@ -6,6 +6,8 @@
 composer.lock
 /vendor
 phpunit.xml
+.phpunit.result.cache
 *~
 node_modules
 /components
+/package.json

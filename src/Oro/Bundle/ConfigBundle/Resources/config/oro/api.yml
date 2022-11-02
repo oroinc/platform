@@ -9,7 +9,7 @@ api:
 
     entities:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
-            documentation_resource:  '@OroConfigBundle/Resources/doc/api/configuration.md'
+            documentation_resource: '@OroConfigBundle/Resources/doc/api/configuration.md'
             disable_meta_properties: true
             identifier_field_names: [id]
             fields:
@@ -49,5 +49,5 @@ api:
                     data_type: datetime
                 updatedAt:
                     data_type: datetime
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false

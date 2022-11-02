@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Behat\Context;
 
 use Behat\Mink\Element\NodeElement;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -24,7 +24,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
     public function assertAddressCount($count)
     {
         $this->waitForAjax();
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         self::assertCount(
             $this->getCount($count),
@@ -43,7 +43,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
     public function assertPrimaryAddress($address)
     {
         $this->waitForAjax();
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
@@ -69,7 +69,8 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDeleteAllAddresses($field)
     {
-        $collection = $this->elementFactory->createElement('OroForm')->findField(ucfirst(Inflector::pluralize($field)));
+        $collection = $this->elementFactory->createElement('OroForm')
+            ->findField(ucfirst((new InflectorFactory())->build()->pluralize($field)));
         self::assertNotNull($collection, sprintf('Can\'t find collection field with "%s" locator', $field));
 
         /** @var NodeElement $removeButton */
@@ -86,11 +87,11 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function clickEditAddress($address)
     {
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
-            if (false !== strpos($actualAddress->getText(), $address)) {
+            if (str_contains($actualAddress->getText(), $address)) {
                 $actualAddress->find('css', '.item-edit-button')->click();
 
                 return;
@@ -108,11 +109,11 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDeleteAddress($address)
     {
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
-            if (false !== strpos($actualAddress->getText(), $address)) {
+            if (str_contains($actualAddress->getText(), $address)) {
                 $removeButton = $actualAddress->find('css', '.item-remove-button');
 
                 self::assertNotNull(

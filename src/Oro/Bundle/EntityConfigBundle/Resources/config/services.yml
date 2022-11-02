@@ -1,39 +1,54 @@
-parameters:
-    oro_entity_config.entity.entity_field.class:                Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
-    oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
-    oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
-    oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
-    oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
-    oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
-    oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
-    oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
-    oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
-    oro_entity_config.attribute.entity.attribute_group.class:   Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup
-
 services:
-    oro_entity_config.link.entity_manager:
-        tags:
-            - { name: oro_service_link, service: doctrine.orm.config_entity_manager }
-
-    oro_entity_config.link.config_manager:
-        deprecated: The "%service_id%" service is deprecated since 2.1.
-        tags:
-            - { name: oro_service_link, service: oro_entity_config.config_manager }
-
     oro_entity_config.entity_manager_bag:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag
         arguments:
             - '@doctrine'
 
+    oro_entity_config.configuration_handler:
+        class: Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler
+        public: true
+        arguments:
+            - !tagged_iterator oro_entity_config.validation.entity_config
+
+    oro_entity_config.migration.query_executor:
+        class: Oro\Bundle\EntityConfigBundle\Migration\DecoratorMigrationQueryExecutor
+        decorates: oro_migration.migrations.query_executor
+        arguments:
+            - '@.inner'
+            - '@oro_entity_config.configuration_handler'
+
     oro_entity_config.config_manager:
-        class: '%oro_entity_config.config_manager.class%'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigManager
+        public: true
         arguments:
             - '@event_dispatcher'
             - '@oro_entity_config.metadata.annotation_metadata_factory'
             - '@oro_entity_config.config_model_manager'
             - '@oro_entity_config.audit_manager'
             - '@oro_entity_config.cache'
+            - '@oro_entity_config.configuration_handler'
+
+    Oro\Bundle\EntityConfigBundle\EntityConfig\AttributeFieldConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\EntityConfigBundle\EntityConfig\AttributeEntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\EntityConfigBundle\Config\ConfigManager:
+        alias: oro_entity_config.config_manager
+
+    oro_entity_config.metadata.annotation_metadata_factory:
+        class: Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory
+        arguments:
+            - '@oro_entity_config.metadata.annotation_driver'
+
+    oro_entity_config.metadata.annotation_driver:
+        class: Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver
+        arguments:
+            - '@annotation_reader'
 
     oro_entity_config.config_model_lock_object:
         public: false
@@ -46,23 +61,27 @@ services:
             - '@oro_entity_config.config_model_lock_object'
             - '@doctrine'
             - ['oro_entity_config', 'oro_entity_config_field', 'oro_entity_config_index_value']
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_entity.database_checker }
 
     oro_entity_config.config_model_manager:
-        public: false
-        class: '%oro_entity_config.config_model_manager.class%'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
         arguments:
-            - '@oro_entity_config.link.entity_manager'
+            - '@doctrine'
             - '@oro_entity_config.config_model_lock_object'
             - '@oro_entity_config.database_checker'
 
-    oro_entity_config.attribute.config_model_manager:
+    Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager:
         alias: oro_entity_config.config_model_manager
 
+    oro_entity_config.attribute.config_model_manager:
+        alias: oro_entity_config.config_model_manager
+        public: true
+
     oro_entity_config.helper.entity_config:
-        class: '%oro_entity_config.helper.entity_config.class%'
+        class: Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
+        public: true
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@oro_security.acl.group_provider.chain'
@@ -75,14 +94,14 @@ services:
             - '@doctrine'
 
     oro_entity_config.tools.command_executor:
-        class: '%oro_entity_config.tools.command_executor.class%'
+        class: Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
+        decorates: oro_platform.command_executor
         arguments:
-            - '%kernel.project_dir%/bin/console'
-            - '%kernel.environment%'
+            - '@.inner'
             - '@oro_cache.oro_data_cache_manager'
 
     oro_entity_config.config_loader:
-        class: '%oro_entity_config.config_loader.class%'
+        class: Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_config.entity_manager_bag'
@@ -93,18 +112,19 @@ services:
         arguments:
             - '@oro_entity_config.config_cache_impl'
             - '@oro_entity_config.model_cache_impl'
+            - [] # scopes. Set by Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [setNamespace, [ 'oro_entity_config' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_config' }
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [setNamespace, [ 'oro_entity_config_model' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_config_model' }
 
     oro_entity_config.config_cache_warmer:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer
@@ -113,8 +133,8 @@ services:
             - '@oro_entity_config.cache'
             - '@oro_entity_config.config_model_lock_object'
             - '@oro_entity_config.entity_manager_bag'
-            - '@oro_entity.virtual_field_provider.chain'
-            - '@oro_entity.virtual_relation_provider.chain'
+            - '@oro_entity.virtual_field_provider'
+            - '@oro_entity.virtual_relation_provider'
 
     oro_entity_config.cache.warmer:
         public: false
@@ -125,7 +145,8 @@ services:
             - { name: kernel.cache_warmer, priority: 28 }
 
     oro_entity_config.event_listener.entityconfig_grid_listener:
-        class: '%oro_entity_config.event_listener.entityconfig_grid_listener.class%'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_datagrid.provider.resolver'
@@ -134,7 +155,7 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entityconfig-grid, method: onBuildAfter }
 
     oro_entity_config.event_listener.entityfields_grid_listener:
-        class: '%oro_entity_config.event_listener.entityfields_grid_listener.class%'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_datagrid.provider.resolver'
@@ -157,12 +178,12 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_entity_config.migration.post_up.listener:
-        class: '%oro_entity_config.migration.post_up.listener.class%'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
         arguments:
             - '@oro_entity_config.tools.command_executor'
         tags:
@@ -170,25 +191,29 @@ services:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: warmUpCache, priority: -255 }
 
     oro_entity_config.translation.helper:
-        class: 'Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper'
+        class: Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper
         arguments:
             - '@oro_translation.manager.translation'
             - '@translator.default'
 
     oro_entity_config.provider.serialized_field_provider:
-        class: 'Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider'
+        class: Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider
         arguments:
             - '@oro_entity_config.provider.extend'
 
     oro_entity_config.event_listener.attributes_datagrid:
-        class: 'Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+            - '@oro_security.acl_helper'
+            - '@security.authorization_checker'
+            - '@router'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.attributes-grid, method: onResultAfter }
 
     oro_entity_config.form.handler.config_helper_handler:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler'
+        class: Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler
         arguments:
             - '@form.factory'
             - '@session'
@@ -197,12 +222,27 @@ services:
             - '@translator'
             - '@router'
 
+    Oro\Bundle\EntityConfigBundle\Manager\AttributeManager:
+        alias: oro_entity_config.manager.attribute_manager
+
     oro_entity_config.manager.attribute_manager:
-        class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeManager'
+        class: Oro\Bundle\EntityConfigBundle\Manager\AttributeManager
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
-            - '@translator.default'
+            - '@oro_entity_config.translation.helper'
+
+    oro_entity_config.listener.attribute_manager_cache:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeManagerCacheListener
+        arguments:
+            - '@oro_entity_config.manager.attribute_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.entity.create, method: onCreateEntity }
+            - { name: kernel.event_listener, event: oro.entity_config.field.create, method: onCreateField }
+            - { name: kernel.event_listener, event: oro.entity_config.entity.update, method: onUpdateEntity }
+            - { name: kernel.event_listener, event: oro.entity_config.field.update, method: onUpdateField }
+            - { name: kernel.event_listener, event: oro.entity_config.field.rename, method: onRenameField }
 
     oro_entity_config.validator.attribute_family_groups:
         class: 'Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsValidator'
@@ -217,7 +257,7 @@ services:
             - { name: validator.constraint_validator, alias: oro_entity_config.validator.group_attributes }
 
     oro_entity_config.datagrid.attribute_group_grid_listener:
-        class: 'Oro\Bundle\EntityConfigBundle\EventListener\AttributeGroupGridListener'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeGroupGridListener
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
         tags:
@@ -238,6 +278,9 @@ services:
             - '@oro_entity_config.config.config_helper'
             - '@oro_entity_extend.form.util.field_session_storage'
 
+    Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler:
+        alias: oro_entity_config.form.handler.create_update_config_field_handler
+
     oro_entity_config.form.handler.remove_restore_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler
         arguments:
@@ -247,20 +290,27 @@ services:
             - '@session'
             - '@doctrine'
 
+    Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler:
+        alias: oro_entity_config.form.handler.remove_restore_field_handler
+
     oro_entity_config.config.config_helper:
-        class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigHelper
         arguments:
             - '@oro_entity_config.config_manager'
 
     oro_entity_config.config.attributes_config_helper:
-        class: 'Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper'
+        class: Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper
         arguments:
             - '@oro_entity_config.provider.attribute'
 
     oro_entity_config.helper.entity_config_provider_helper:
-        class: 'Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper'
+        class: Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper
+        public: true
         arguments:
             - '@oro_entity_config.config_manager'
+
+    Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper:
+        alias: oro_entity_config.helper.entity_config_provider_helper
 
     oro_entity_config.event_listener.attributes_form_view.abstract:
         class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener
@@ -270,19 +320,21 @@ services:
 
     oro_entity_config.voter.attribute_family_voter:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
-        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.manager.attribute_family_manager'
+            - '@Psr\Container\ContainerInterface'
+        calls:
+            - [setClassName, ['Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily']]
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_entity_config.manager.attribute_family_manager }
 
     oro_entity_config.form.extension.attribute_family:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_entity_config.event_listener.attribute_family_form_view.abstract:
         class: Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener
@@ -291,43 +343,50 @@ services:
             - '@translator'
 
     oro_entity_config.attribute_render_registry:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry'
+        class: Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry
+
+    Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry:
+        alias: 'oro_entity_config.attribute_render_registry'
 
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.manager.attribute_manager'
-            - '@oro_entity_config.config.attributes_config_helper'
-            - '@oro_entity_extend.form.extension.dynamic_fields_helper'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_entity_config.manager.attribute_manager }
+            - { name: container.service_subscriber, id: oro_entity_config.config.attributes_config_helper }
+            - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper }
 
     oro_entity_config.provider.extend_entity_config_provider:
-        class: 'Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider'
+        class: Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider
         arguments:
             - '@oro_entity_config.config_manager'
 
     oro_entity_config.twig.extension.dynamic_fields_attribute_decorator:
-        class: 'Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator'
+        class: Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator
         public: false
         decorates: oro_entity_extend.twig.extension.dynamic_fields
         arguments:
-            - '@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner'
-            - '@service_container'
+            - '@.inner'
+            - '@oro_platform.twig.service_locator'
 
     oro_entity_config.datagrid.attribute_family_actions_configuration:
-        class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
+        class: Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration
+        public: true
         arguments:
             - '@security.authorization_checker'
             - '@doctrine.orm.entity_manager'
 
     oro_entity_config.manager.attribute_family_manager:
-        class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager'
+        class: Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_entity_config.entity_listener.attribute_group:
         class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener
@@ -335,21 +394,26 @@ services:
         arguments:
              - "@oro_entity_config.slug.generator"
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_entity_config.attribute.entity.attribute_group.class%', event: prePersist}
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', event: prePersist}
 
     oro_entity_config.slug.generator:
-        class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+        class: Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator
+        public: true
+
+    Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator:
+        alias: oro_entity_config.slug.generator
 
     oro_entity_config.block_type.abstract_attribute_block_type_mapper:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'
+        class: Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper
         abstract: true
         arguments:
             - '@doctrine'
 
     oro_entity_config.layout.chain_attribute_block_type_mapper:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper'
+        class: Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper
         arguments:
             - '@doctrine'
+            - !tagged_iterator oro_entity_config.layout.attribute_block_type_mapper
         calls:
             - [setDefaultBlockType, ['attribute_text']]
             - [addBlockType, ['percent', 'attribute_percent']]
@@ -357,22 +421,24 @@ services:
             - [addBlockType, ['date', 'attribute_date']]
             - [addBlockType, ['datetime', 'attribute_datetime']]
             - [addBlockType, ['decimal', 'attribute_decimal']]
+            - [addBlockType, ['float', 'attribute_float']]
             - [addBlockType, ['file', 'attribute_file']]
             - [addBlockType, ['image', 'attribute_image']]
             - [addBlockType, ['boolean', 'attribute_boolean']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
-            - [addBlockType, ['html_escaped', 'attribute_html_escaped']]
-            - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
+            - [addBlockType, ['multiFile', 'attribute_multifiles']]
+            - [addBlockType, ['multiImage', 'attribute_multiimages']]
+            - [addBlockTypeUsingMetadata, ['Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue', 'attribute_localized_fallback']]
 
     oro_entity_config.layout.data_provider.attribute_config_provider:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'
+        class: Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider
         arguments:
             - '@oro_entity_config.provider.attribute'
         tags:
             - { name: layout.data_provider, alias: attribute_config }
 
     oro_entity_config.layout.data_provider.attribute_groups_tabs_options_provider:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupsTabsOptionsProvider'
+        class: Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupsTabsOptionsProvider
         arguments:
             - '@oro_entity_config.attribute_render_registry'
             - '@oro_locale.helper.localization'
@@ -380,32 +446,32 @@ services:
             - { name: layout.data_provider, alias: attribute_groups_tabs_options_provider }
 
     oro_entity_config.layout.data_provider.attachment_config_provider:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'
+        class: Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider
         arguments:
             - '@oro_entity_config.provider.attachment'
         tags:
             - { name: layout.data_provider, alias: attachment_config }
 
     oro_entity_config.event_listener.deleted_attribute_relation:
-      class: Oro\Bundle\EntityConfigBundle\EventListener\DeletedAttributeRelationListener
-      arguments:
-          - '@oro_message_queue.message_producer'
-          - '@oro_entity_config.provider.deleted_attribute'
-      calls:
-          - [setTopic, ['oro_entity_config.attribute_was_removed_from_family']]
-      tags:
-        - { name: doctrine.event_listener, event: onFlush }
-        - { name: doctrine.event_listener, event: postFlush }
+        class: Oro\Bundle\EntityConfigBundle\EventListener\DeletedAttributeRelationListener
+        arguments:
+            - '@oro_message_queue.message_producer'
+            - '@oro_entity_config.provider.deleted_attribute'
+            - '@Doctrine\Inflector\Inflector'
+        calls:
+            - [setTopic, [!php/const Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic::NAME]]
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_entity_config.async.deleted_attribute_relation:
         class: Oro\Bundle\EntityConfigBundle\Async\DeletedAttributeRelationProcessor
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@logger'
-            - '@oro_entity.database_exception_helper'
             - '@oro_entity_config.provider.deleted_attribute'
         tags:
-            - { name: oro_message_queue.client.message_processor, topicName: 'oro_entity_config.attribute_was_removed_from_family' }
+            - { name: oro_message_queue.client.message_processor, topicName: !php/const Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic::NAME }
 
     oro_entity_config.provider.deleted_attribute:
         class: Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider
@@ -416,7 +482,8 @@ services:
     oro_entity_config.provider.attribute_value:
         class: Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProvider
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
+            - '@oro_platform.provider.dbal_type_default_value'
 
     oro_entity_config.event_listener.remove_attribute_group_relation:
         class: Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener
@@ -433,20 +500,28 @@ services:
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onPostFlushConfig }
 
     oro_entity_config.provider.attribute_configuration:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
 
+    oro_entity_config.exclusion_provider.attribute:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\AttributeExclusionProvider
+        public: false
+        arguments:
+            - "@oro_entity_config.config_manager"
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_entity_config.listener.structure_options:
-        class: 'Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigStructureOptionsListener'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigStructureOptionsListener
         arguments:
             - '@oro_entity_config.provider.entity'
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
 
     oro_entity_config.event_listener.attributes_import_finish_notification_listener:
-        class: 'Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener
         lazy: true
         arguments:
             - '@oro_entity_config.websocket.attributes_import_topic_sender'
@@ -455,14 +530,15 @@ services:
             - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterAttributesImport }
 
     oro_entity_config.placeholder.attributes_import_filter:
-        class: 'Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter'
+        class: Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter
+        public: true
         arguments:
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity_config.websocket.attributes_import_topic_sender'
             - '@oro_entity_config.config_manager'
 
     oro_entity_config.websocket.attributes_import_topic_sender:
-        class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
+        class: Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender
         lazy: true
         arguments:
             - '@oro_sync.websocket_client'
@@ -470,7 +546,7 @@ services:
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:
-        class: 'Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker'
+        class: Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
@@ -480,7 +556,7 @@ services:
         class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
         arguments:
             - 'oro_entity_config.attribute_import'
-            - '@gos_web_socket.websocket.client_manipulator'
+            - '@gos_web_socket.client.manipulator'
         tags:
             - { name: gos_web_socket.topic }
 
@@ -489,4 +565,31 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }
+            - { name: kernel.event_listener, event: oro_translation.invalidate_dynamic_translation_cache, method: onInvalidateDynamicTranslationCache }
+
+    oro_entity_config.manager.attribute_group_manager:
+        class: Oro\Bundle\EntityConfigBundle\Manager\AttributeGroupManager
+        arguments:
+            - '@oro_entity_config.config_manager'
+        public: true
+
+    oro_entity_config.validator.field_config_constraints_factory:
+        class: Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory
+        arguments:
+            - !tagged_iterator { tag: 'oro_entity_config.field_config_constraints_provider', index_by: 'type' }
+
+    oro_entity_config.validator.constraints.provider.string:
+        class: Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider
+        tags:
+            - { name: oro_entity_config.field_config_constraints_provider, type: string }
+
+    oro_entity_config.tools.backup_manager.entity_config_backup_manager:
+        class: Oro\Bundle\EntityConfigBundle\Tools\BackupManager\NullEntityConfigBackupManager
+
+    Oro\Bundle\EntityConfigBundle\Cache\CleanupUnusedConfigurationsCacheWarmer:
+        arguments:
+            - '@doctrine'
+            - '@logger'
+            - '@Oro\Bundle\DistributionBundle\Handler\ApplicationState'
+        tags:
+            - { name: oro_entity_extend.warmer }

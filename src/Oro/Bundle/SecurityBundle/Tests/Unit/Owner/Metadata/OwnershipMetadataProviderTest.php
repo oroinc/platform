@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -12,33 +11,37 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
-    protected $cache;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AbstractAdapter */
+    private $cache;
 
     /** @var OwnershipMetadataProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
         $this->provider = new OwnershipMetadataProvider(
             [
@@ -108,7 +111,12 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityConfig');
 
         $this->entityClassResolver = null;
-        $this->cache = null;
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->assertEquals(new OwnershipMetadata(), $this->provider->getMetadata('UndefinedClass'));
     }
@@ -123,14 +131,19 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo(\stdClass::class))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('ownership', $this->equalTo(\stdClass::class))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->entityClassResolver = null;
-        $this->cache = null;
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->assertEquals(
             new OwnershipMetadata('USER', 'test_field', 'test_column'),
@@ -148,14 +161,19 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo(\stdClass::class))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('ownership', $this->equalTo(\stdClass::class))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->entityClassResolver = null;
-        $this->cache = null;
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->assertEquals(
             new OwnershipMetadata('ORGANIZATION', 'test_field', 'test_column', 'test_field', 'test_column'),
@@ -168,21 +186,20 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo('UndefinedClass'))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getEntityConfig');
 
-        $this->cache->expects($this->at(0))
-            ->method('fetch')
-            ->with($this->equalTo('UndefinedClass'))
-            ->will($this->returnValue(false));
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with($this->equalTo('UndefinedClass'))
-            ->will($this->returnValue(true));
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with($this->equalTo('UndefinedClass'), $this->equalTo(true));
+        $this->cache->expects(self::exactly(2))
+            ->method('get')
+            ->with('UndefinedClass')
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($cacheKey, $callback) {
+                    $item = $this->createMock(ItemInterface::class);
+                    return $callback($item);
+                }),
+                true
+            );
 
         $this->entityClassResolver = null;
 
@@ -201,11 +218,8 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $user
-     * @param bool $expectedResult
      */
-    public function testSupports($user, $expectedResult)
+    public function testSupports(?object $user, bool $expectedResult)
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -214,10 +228,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->provider->supports());
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             'without user' => [
@@ -237,14 +248,14 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider owningEntityNamesDataProvider
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $owningEntityNames must contains "organization", "business_unit" and "user" keys.
-     *
-     * @param array $owningEntityNames
      */
     public function testInvalidOwningEntityNames(array $owningEntityNames)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The $owningEntityNames must contains "organization", "business_unit" and "user" keys.'
+        );
+
         $provider = new OwnershipMetadataProvider(
             $owningEntityNames,
             $this->configManager,
@@ -255,10 +266,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $provider->getUserClass();
     }
 
-    /**
-     * @return array
-     */
-    public function owningEntityNamesDataProvider()
+    public function owningEntityNamesDataProvider(): array
     {
         return [
             [
@@ -296,12 +304,8 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMaxAccessLevelDataProvider
-     *
-     * @param $accessLevel
-     * @param $object
-     * @param $expectedResult
      */
-    public function testGetMaxAccessLevel($accessLevel, $object, $expectedResult)
+    public function testGetMaxAccessLevel(int $accessLevel, ?string $object, int $expectedResult)
     {
         if ($object && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
             $config = new Config(new EntityConfigId('ownership', \stdClass::class));
@@ -318,18 +322,20 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
                 ->method('getEntityConfig')
                 ->with('ownership', \stdClass::class)
                 ->willReturn($config);
+            $this->cache->expects(self::once())
+                ->method('get')
+                ->willReturnCallback(function ($cacheKey, $callback) {
+                    $item = $this->createMock(ItemInterface::class);
+                    return $callback($item);
+                });
         }
 
         $this->entityClassResolver = null;
-        $this->cache = null;
 
         $this->assertEquals($expectedResult, $this->provider->getMaxAccessLevel($accessLevel, $object));
     }
 
-    /**
-     * @return array
-     */
-    public function getMaxAccessLevelDataProvider()
+    public function getMaxAccessLevelDataProvider(): array
     {
         return [
             [

@@ -1,4 +1,6 @@
 oro.sidebar:
+    sticky_note_widget:
+        title: Sticky Note
     system_configuration:
         groups:
             sidebar_settings.title: 'Sidebar settings'

@@ -1,42 +1,67 @@
 services:
     Oro\Bundle\ApiBundle\Command\CacheClearCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\CacheClearCommand
+        arguments:
+            - '@oro_api.cache_manager'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DebugCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DebugCommand
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.processor_bag'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DocCacheClearCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DocCacheClearCommand
+        arguments:
+            - '@oro_api.cache_manager'
+            - '%oro_api.api_doc.views%'
+            - '%kernel.environment%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DumpCommand
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
+            - '@oro_entity.entity_class_provider.orm'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpConfigCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DumpConfigCommand
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.processor_bag'
+            - '@oro_api.config_provider'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpConfigReferenceCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DumpConfigReferenceCommand
+        arguments:
+            - '@oro_api.config_extension_registry'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ApiBundle\Command\DumpMetadataCommand:
-        public: false
-        class: Oro\Bundle\ApiBundle\Command\DumpMetadataCommand
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+            - '@oro_api.processor_bag'
+            - '@oro_api.metadata_provider'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\CleanupAsyncOperationsCommand:
+        arguments:
+            - ~ # operation lifetime. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - ~ # cleanup process timeout. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - ~ # operation timeout. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.delete_handler_registry'
         tags:
             - { name: console.command }

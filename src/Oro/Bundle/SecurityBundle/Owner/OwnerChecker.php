@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -27,7 +27,7 @@ class OwnerChecker
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var AuthorizationCheckerInterface */
@@ -42,16 +42,6 @@ class OwnerChecker
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper                     $doctrineHelper
-     * @param BusinessUnitManager                $businessUnitManager
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityOwnerAccessor                $ownerAccessor
-     * @param AuthorizationCheckerInterface      $authorizationChecker
-     * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnerTreeProvider                  $treeProvider
-     * @param AclVoter                           $aclVoter
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         BusinessUnitManager $businessUnitManager,
@@ -60,7 +50,7 @@ class OwnerChecker
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
-        AclVoter $aclVoter
+        AclVoterInterface $aclVoter
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
@@ -78,6 +68,7 @@ class OwnerChecker
      * @param object $entity
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isOwnerCanBeSet($entity)
     {
@@ -177,7 +168,6 @@ class OwnerChecker
 
         return null;
     }
-
 
     /**
      * Returns current Organization

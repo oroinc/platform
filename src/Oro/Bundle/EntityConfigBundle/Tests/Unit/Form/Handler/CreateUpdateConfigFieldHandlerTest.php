@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Handler;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
@@ -23,56 +25,35 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const FORM_ACTION = '/form/action';
-    const ENTITY_CONFIG_MODEL_ID = 789;
-    const FIELD_NAME = 'fieldName';
-    const FIELD_TYPE = 'enum';
-    const CREATE_ACTION_REDIRECT_URL = 'create_redirect_action_url';
-    const SUCCESS_MESSAGE = 'success_message';
-    const CLASS_NAME = 'class_name';
+    private const FORM_ACTION = '/form/action';
+    private const ENTITY_CONFIG_MODEL_ID = 789;
+    private const FIELD_NAME = 'fieldName';
+    private const FIELD_TYPE = 'enum';
+    private const CREATE_ACTION_REDIRECT_URL = 'create_redirect_action_url';
+    private const SUCCESS_MESSAGE = 'success_message';
+    private const CLASS_NAME = \stdClass::class;
 
-    /**
-     * @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $configHelperHandler;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $configHelper;
 
-    /**
-     * @var FieldSessionStorage|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FieldSessionStorage|\PHPUnit\Framework\MockObject\MockObject */
     private $sessionStorage;
 
-    /**
-     * @var CreateUpdateConfigFieldHandler
-     */
+    /** @var CreateUpdateConfigFieldHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configHelperHandler = $this->getMockBuilder(ConfigHelperHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configHelper = $this->getMockBuilder(ConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->sessionStorage = $this->getMockBuilder(FieldSessionStorage::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configHelperHandler = $this->createMock(ConfigHelperHandler::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->configHelper = $this->createMock(ConfigHelper::class);
+        $this->sessionStorage = $this->createMock(FieldSessionStorage::class);
 
         $this->handler = new CreateUpdateConfigFieldHandler(
             $this->configHelperHandler,
@@ -87,16 +68,10 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private function createRequest()
     {
-        return $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(Request::class);
     }
 
-    /**
-     * @param array $properties
-     * @return EntityConfigModel
-     */
-    private function createEntityConfigModel(array $properties = [])
+    private function createEntityConfigModel(array $properties = []): EntityConfigModel
     {
         $properties = array_merge(
             [
@@ -106,10 +81,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             $properties
         );
 
-        /** @var EntityConfigModel $entityConfigModel */
-        $entityConfigModel = $this->getEntity(EntityConfigModel::class, $properties);
-
-        return $entityConfigModel;
+        return $this->getEntity(EntityConfigModel::class, $properties);
     }
 
     /**
@@ -140,14 +112,12 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     ) {
         $formView = $this->createMock(FormView::class);
 
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
 
         $entityConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getEntityConfig')
             ->with($entityConfigModel, 'entity')
             ->willReturn($entityConfig);
@@ -168,8 +138,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $request = $this->createRequest();
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('isFormValidAfterSubmit')
             ->with($request, $form)
             ->willReturn(false);
@@ -177,8 +146,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $entityConfigModel = $this->createEntityConfigModel();
         $fieldConfigModel = $this->createFieldConfigModel(['entity' => $entityConfigModel]);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('createFirstStepFieldForm')
             ->with($fieldConfigModel)
             ->willReturn($form);
@@ -186,10 +154,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayResponseReturned($form, $entityConfigModel, $fieldConfigModel, $request);
     }
 
-    /**
-     * @return array
-     */
-    public function fieldNamesDataProvider()
+    public function fieldNamesDataProvider(): array
     {
         return [
             [
@@ -219,22 +184,18 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $request = $this->createRequest();
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('isFormValidAfterSubmit')
             ->with($request, $form)
             ->willReturn(true);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-
-        $formConfig
-            ->expects($this->once())
+        $formConfig->expects($this->once())
             ->method('getAttribute')
             ->with(FieldType::ORIGINAL_FIELD_NAMES_ATTRIBUTE)
             ->willReturn($originalFieldNames);
 
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
@@ -244,23 +205,18 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             'fieldName' => $fieldName
         ]);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('createFirstStepFieldForm')
             ->with($fieldConfigModel)
             ->willReturn($form);
 
-        $this->sessionStorage
-            ->expects($this->once())
+        $this->sessionStorage->expects($this->once())
             ->method('saveFieldInfo')
             ->with($entityConfigModel, $expectedFieldName, self::FIELD_TYPE);
 
-        $redirectResponse = $this->getMockBuilder(RedirectResponse::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $redirectResponse = $this->createMock(RedirectResponse::class);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('redirect')
             ->with($entityConfigModel)
             ->willReturn($redirectResponse);
@@ -277,21 +233,18 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private function expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(EntityConfigModel $entityConfigModel)
     {
-        $this->sessionStorage
-            ->expects($this->once())
+        $this->sessionStorage->expects($this->once())
             ->method('hasFieldInfo')
             ->with($entityConfigModel)
             ->willReturn(true);
 
-        $this->sessionStorage
-            ->expects($this->once())
+        $this->sessionStorage->expects($this->once())
             ->method('getFieldInfo')
             ->with($entityConfigModel)
             ->willReturn([self::FIELD_NAME, self::FIELD_TYPE]);
 
-        $extendEntityConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
+        $extendEntityConfig = new Config(new EntityConfigId('extend', self::CLASS_NAME));
+        $this->configHelper->expects($this->once())
             ->method('getEntityConfig')
             ->with($entityConfigModel, 'extend')
             ->willReturn($extendEntityConfig);
@@ -300,28 +253,24 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $fieldOptions = [
             'extend' => [
                 'is_extend' => true,
-                'origin' => ExtendScope::ORIGIN_CUSTOM,
                 'owner' => ExtendScope::OWNER_CUSTOM,
                 'state' => ExtendScope::STATE_NEW,
                 'bidirectional' => true,
             ]
         ];
 
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('createFieldOptions')
             ->with($extendEntityConfig, self::FIELD_TYPE, $additionalFieldOptions)
             ->willReturn([self::FIELD_TYPE, $fieldOptions]);
 
         $newFieldModel = $this->createFieldConfigModel();
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('createConfigFieldModel')
             ->with(self::CLASS_NAME, self::FIELD_NAME, self::FIELD_TYPE)
             ->willReturn($newFieldModel);
 
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('updateFieldConfigs')
             ->with($newFieldModel, $fieldOptions);
 
@@ -333,18 +282,14 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $request = $this->createRequest();
         $entityConfigModel = $this->createEntityConfigModel();
 
-        $this->sessionStorage
-            ->expects($this->once())
+        $this->sessionStorage->expects($this->once())
             ->method('hasFieldInfo')
             ->with($entityConfigModel)
             ->willReturn(false);
 
-        $redirectResponse = $this->getMockBuilder(RedirectResponse::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $redirectResponse = $this->createMock(RedirectResponse::class);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('redirect')
             ->with(self::CREATE_ACTION_REDIRECT_URL)
             ->willReturn($redirectResponse);
@@ -377,8 +322,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             'someKey' => 'someValue'
         ];
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('constructConfigResponse')
             ->with($newFieldModel, $form, self::FORM_ACTION)
             ->willReturn($expectedResponse);
@@ -399,27 +343,24 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $entityConfigModel = $this->createEntityConfigModel();
 
-        list($newFieldModel, $extendEntityConfig) = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
+        [$newFieldModel, $extendEntityConfig] = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
             $entityConfigModel
         );
 
         $request = $this->createRequest();
         $form = $this->createMock(FormInterface::class);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('createSecondStepFieldForm')
             ->with($newFieldModel)
             ->willReturn($form);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('isFormValidAfterSubmit')
             ->with($request, $form)
             ->willReturn(false);
 
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getEntityConfig')
             ->with($entityConfigModel, 'extend')
             ->willReturn($extendEntityConfig);
@@ -436,22 +377,15 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         FieldConfigModel $newFieldModel,
         ConfigInterface $extendEntityConfig
     ) {
-        $extendEntityConfig ->expects($this->once())
-            ->method('set')
-            ->with('upgradeable', true);
-
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($extendEntityConfig);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('flush');
 
         $redirectResponse = new RedirectResponse('some_redirect_url');
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('showSuccessMessageAndRedirect')
             ->with($newFieldModel, self::SUCCESS_MESSAGE)
             ->willReturn($redirectResponse);
@@ -463,35 +397,28 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $entityConfigModel = $this->createEntityConfigModel();
 
-        list($newFieldModel, $extendEntityConfig) = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
+        /** @var Config $extendEntityConfig */
+        [$newFieldModel, $extendEntityConfig] = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
             $entityConfigModel
         );
 
         $request = $this->createRequest();
         $form = $this->createMock(FormInterface::class);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('isFormValidAfterSubmit')
             ->with($request, $form)
             ->willReturn(true);
 
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getEntityConfig')
             ->with($entityConfigModel, 'extend')
             ->willReturn($extendEntityConfig);
 
-        $this->configHelperHandler
-            ->expects($this->once())
+        $this->configHelperHandler->expects($this->once())
             ->method('createSecondStepFieldForm')
             ->with($newFieldModel)
             ->willReturn($form);
-
-        $this->configHelperHandler
-            ->expects($this->once())
-            ->method('showClearCacheMessage')
-            ->willReturn($this->configHelperHandler);
 
         $redirectResponse = $this->expectsConfigSavingAndRedirect($newFieldModel, $extendEntityConfig);
 
@@ -504,6 +431,8 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             []
         );
 
-        $this->assertEquals($redirectResponse, $response);
+        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
+        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
+        $this->assertEquals($extendEntityConfig->get('upgradeable'), true);
     }
 }

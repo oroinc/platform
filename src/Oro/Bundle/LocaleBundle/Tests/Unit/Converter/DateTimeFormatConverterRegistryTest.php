@@ -4,82 +4,72 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateTimeFormatConverterRegistry
-     */
-    protected $registry;
+    /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $converter1;
 
-    protected function setUp()
+    /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $converter2;
+
+    /** @var DateTimeFormatConverterRegistry */
+    private $registry;
+
+    protected function setUp(): void
     {
-        $this->registry = new DateTimeFormatConverterRegistry();
-    }
+        $this->converter1 = $this->createMock(DateTimeFormatConverterInterface::class);
+        $this->converter2 = $this->createMock(DateTimeFormatConverterInterface::class);
 
-    protected function tearDown()
-    {
-        unset($this->registry);
-    }
+        $container = TestContainerBuilder::create()
+            ->add('test1', $this->converter1)
+            ->add('test2', $this->converter2)
+            ->getContainer($this);
 
-    public function testAddFormatConverter()
-    {
-        $this->assertAttributeEmpty('converters', $this->registry);
-
-        $name = 'test';
-        $converter = $this->createFormatConverter();
-        $this->registry->addFormatConverter($name, $converter);
-        $this->assertAttributeEquals(array($name => $converter), 'converters', $this->registry);
-        $this->assertCount(1, $this->registry->getFormatConverters());
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Format converter with name "test" already registered
-     */
-    public function testAddFormatConverterAlreadyRegisteredException()
-    {
-        $name = 'test';
-        $converter = $this->createFormatConverter();
-        $this->registry->addFormatConverter($name, $converter);
-        $this->registry->addFormatConverter($name, $converter);
+        $this->registry = new DateTimeFormatConverterRegistry(
+            ['test1', 'test2'],
+            $container
+        );
     }
 
     public function testGetFormatConverter()
     {
-        $name = 'test';
-        $converter = $this->createFormatConverter();
-        $this->registry->addFormatConverter($name, $converter);
-        $this->assertEquals($converter, $this->registry->getFormatConverter($name));
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->assertSame($this->converter2, $this->registry->getFormatConverter('test2'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Format converter with name "test" is not exist
-     */
-    public function testGetFormatConverterNotExistsException()
+    public function testGetFormatConverterWhenConverterNotExists()
     {
-        $name = 'test';
-        $this->registry->getFormatConverter($name);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
+
+        $this->registry->getFormatConverter('not_existing');
     }
 
-    public function getFormatConverters()
+    public function testGetFormatConverterWhenConverterNotExistsAndExistingConverterWasRequestedBefore()
     {
-        $this->assertEmpty($this->registry->getFormatConverters());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
 
-        $name = 'test';
-        $converter = $this->createFormatConverter();
-        $this->registry->addFormatConverter($name, $converter);
-        $this->assertEquals(array($name => $converter), $this->registry->getFormatConverters());
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->registry->getFormatConverter('not_existing');
     }
 
-    /**
-     * @return DateTimeFormatConverterInterface
-     */
-    protected function createFormatConverter()
+    public function getFormatConvertersWhenNoAnyConverterWasRequestedBefore()
     {
-        return $this->getMockBuilder('Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assertEquals(
+            ['test1' => $this->converter1, 'test2' => $this->converter2],
+            $this->registry->getFormatConverters()
+        );
+    }
+
+    public function getFormatConvertersWhenSomeConverterWasRequestedBefore()
+    {
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->assertEquals(
+            ['test1' => $this->converter1, 'test2' => $this->converter2],
+            $this->registry->getFormatConverters()
+        );
     }
 }

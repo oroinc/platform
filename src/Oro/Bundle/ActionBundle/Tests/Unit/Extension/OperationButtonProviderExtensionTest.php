@@ -21,96 +21,74 @@ use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 
 class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'stdClass';
-    const ENTITY_ID = 42;
-    const ROUTE_NAME = 'test_route_name';
-    const EXECUTION_ROUTE_NAME = 'test_execution_route_name';
-    const FORM_DIALOG_ROUTE_NAME = 'test_form_dialog_route_name';
-    const FORM_PAGE_ROUTE_NAME = 'test_form_page_route_name';
-    const DATAGRID_NAME = 'test_datagrid_name';
-    const REFERRER_URL = '/test/referrer/utl';
-    const GROUP = 'test_group';
+    private const ENTITY_CLASS = 'stdClass';
+    private const ENTITY_ID = 42;
+    private const ROUTE_NAME = 'test_route_name';
+    private const EXECUTION_ROUTE_NAME = 'test_execution_route_name';
+    private const FORM_DIALOG_ROUTE_NAME = 'test_form_dialog_route_name';
+    private const FORM_PAGE_ROUTE_NAME = 'test_form_page_route_name';
+    private const DATAGRID_NAME = 'test_datagrid_name';
+    private const REFERRER_URL = '/test/referrer/utl';
+    private const GROUP = 'test_group';
 
-    /** @var OperationButtonProviderExtension */
-    protected $extension;
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper */
-    protected $contextHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationRegistry */
-    protected $operationRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
-    protected $routeProvider;
+    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $operationRegistry;
 
     /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsResolver;
+    private $optionsResolver;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var OperationButtonProviderExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->operationRegistry = $this->getMockBuilder(OperationRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
+        $this->operationRegistry = $this->createMock(OperationRegistry::class);
+        $this->contextHelper = $this->createMock(ContextHelper::class);
+        $this->optionsResolver = $this->createMock(OptionsResolver::class);
 
-        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-
-        $this->routeProvider->expects($this->any())
+        $routeProvider = $this->createMock(RouteProviderInterface::class);
+        $routeProvider->expects($this->any())
             ->method('getExecutionRoute')
             ->willReturn(self::EXECUTION_ROUTE_NAME);
-
-        $this->routeProvider->expects($this->any())
+        $routeProvider->expects($this->any())
             ->method('getFormDialogRoute')
             ->willReturn(self::FORM_DIALOG_ROUTE_NAME);
-
-        $this->routeProvider->expects($this->any())
+        $routeProvider->expects($this->any())
             ->method('getFormPageRoute')
             ->willReturn(self::FORM_PAGE_ROUTE_NAME);
-
-        $this->optionsResolver = $this->createMock(OptionsResolver::class);
 
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
             $this->contextHelper,
-            $this->routeProvider,
+            $routeProvider,
             $this->optionsResolver
         );
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->routeProvider);
-    }
-
-    /**
      * @dataProvider findDataProvider
-     *
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     * @param array $expected
      */
     public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
     {
-        $this->assertOperationRegistryMethodsCalled($operations, $buttonSearchContext);
-        $this->assertContextHelperCalled();
+        $this->operationRegistry->expects($this->once())
+            ->method('find')
+            ->with(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext))
+            ->willReturn($operations);
+        $this->contextHelper->expects($this->once())
+            ->method('getActionData')
+            ->willReturn(new ActionData());
 
         $this->assertEquals($expected, $this->extension->find($buttonSearchContext));
     }
 
-    /**
-     * @return array
-     */
-    public function findDataProvider()
+    public function findDataProvider(): array
     {
-        $operation1 = $this->createOperationMock('operation1', true);
-        $operationSubstitution = $this->createOperationMock('operation_substitution', true, true);
-        $operationNotAvailable = $this->createOperationMock('operation_not_available', false);
+        $operation1 = $this->createOperation('operation1', true);
+        $operationSubstitution = $this->createOperation('operation_substitution', true, true);
+        $operationNotAvailable = $this->createOperation('operation_not_available', false);
 
         $buttonSearchContext = $this->createButtonSearchContext();
 
@@ -160,34 +138,32 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAvailableDataProvider
-     *
-     * @param OperationButton $button
-     * @param bool $expected
      */
-    public function testIsAvailable(OperationButton $button, $expected)
+    public function testIsAvailable(OperationButton $button, bool $expected)
     {
         $definition = $button->getOperation()->getDefinition();
         $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
-        $this->optionsResolver->expects($this->at(0))
+        $this->optionsResolver->expects($this->exactly(2))
             ->method('resolveOptions')
-            ->with($this->anything(), $definition->getFrontendOptions())
-            ->willReturn(['frontend' => 'resolved']);
-        $this->optionsResolver->expects($this->at(1))
-            ->method('resolveOptions')
-            ->with($this->anything(), $definition->getButtonOptions())
-            ->willReturn(['button' => 'resolved']);
+            ->withConsecutive(
+                [$this->anything(), $definition->getFrontendOptions()],
+                [$this->anything(), $definition->getButtonOptions()]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['frontend' => 'resolved'],
+                ['button' => 'resolved']
+            );
 
-        $this->assertContextHelperCalled((int)($button instanceof OperationButton));
+        $this->contextHelper->expects($this->once())
+            ->method('getActionData')
+            ->willReturn(new ActionData());
+
         $this->assertEquals($expected, $this->extension->isAvailable($button, $this->createButtonSearchContext()));
-
         $this->assertEquals(['frontend' => 'resolved'], $definition->getFrontendOptions());
         $this->assertEquals(['button' => 'resolved'], $definition->getButtonOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function isAvailableDataProvider()
+    public function isAvailableDataProvider(): array
     {
         $operationButtonAvailable = $this->createOperationButton(true);
         $operationButtonNotAvailable = $this->createOperationButton(false);
@@ -206,21 +182,25 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testIsAvailableException()
     {
-        $this->assertContextHelperCalled(1);
+        $this->contextHelper->expects($this->once())
+            ->method('getActionData')
+            ->willReturn(new ActionData());
 
-        $button = $this->createOperationButton();
+        $button = $this->createOperationButton(false);
         /** @var Operation|\PHPUnit\Framework\MockObject\MockObject $operation */
         $operation = $button->getOperation();
         $definition = $operation->getDefinition();
         $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
-        $this->optionsResolver->expects($this->at(0))
+        $this->optionsResolver->expects($this->exactly(2))
             ->method('resolveOptions')
-            ->with($this->anything(), $definition->getFrontendOptions())
-            ->willReturn(['frontend' => 'resolved']);
-        $this->optionsResolver->expects($this->at(1))
-            ->method('resolveOptions')
-            ->with($this->anything(), $definition->getButtonOptions())
-            ->willReturn(['button' => 'resolved']);
+            ->withConsecutive(
+                [$this->anything(), $definition->getFrontendOptions()],
+                [$this->anything(), $definition->getButtonOptions()]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['frontend' => 'resolved'],
+                ['button' => 'resolved']
+            );
 
         $exception = new \Exception('exception when check conditions');
 
@@ -245,7 +225,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testIsAvailableExceptionUnsupportedButton()
     {
-        $this->assertContextHelperCalled(0);
+        $this->contextHelper->expects($this->never())
+            ->method('getActionData');
 
         $stubButton = new StubButton();
 
@@ -260,35 +241,34 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testSupports()
     {
-        $this->assertTrue($this->extension->supports($this->createOperationButton()));
+        $this->assertTrue($this->extension->supports($this->createOperationButton(false)));
         $this->assertFalse($this->extension->supports($this->createMock(ButtonInterface::class)));
     }
 
-    /**
-     * @param string $name
-     * @param bool $isAvailable
-     * @param bool $withForm
-     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createOperationMock($name, $isAvailable = false, $withForm = false)
+    private function createOperation(string $name, bool $isAvailable, bool $withForm = false): Operation
     {
-        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operation = $this->createMock(Operation::class);
         $definition = new OperationDefinition();
-        $operation->expects($this->any())->method('getName')->willReturn($name);
-        $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
-        $operation->expects($this->any())->method('isEnabled')->willReturn(true);
-        $operation->expects($this->any())->method('hasForm')->willReturn($withForm);
-        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $operation->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $operation->expects($this->any())
+            ->method('isAvailable')
+            ->willReturn($isAvailable);
+        $operation->expects($this->any())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $operation->expects($this->any())
+            ->method('hasForm')
+            ->willReturn($withForm);
+        $operation->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         return $operation;
     }
 
-    /**
-     * @param bool $isOperationAvailable
-     *
-     * @return OperationButton
-     */
-    private function createOperationButton($isOperationAvailable = false)
+    private function createOperationButton(bool $isOperationAvailable): OperationButton
     {
         $buttonSearchContext = $this->createButtonSearchContext();
         $buttonContext = $this->createButtonContext($buttonSearchContext);
@@ -298,16 +278,13 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
         return new OperationButton(
             $name,
-            $this->createOperationMock($name, $isOperationAvailable),
+            $this->createOperation($name, $isOperationAvailable),
             $buttonContext,
             $data
         );
     }
 
-    /**
-     * @return ButtonSearchContext
-     */
-    private function createButtonSearchContext()
+    private function createButtonSearchContext(): ButtonSearchContext
     {
         $buttonSearchContext = new ButtonSearchContext();
 
@@ -318,13 +295,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
             ->setReferrer(self::REFERRER_URL);
     }
 
-    /**
-     * @param ButtonSearchContext $buttonSearchContext
-     * @param bool $isForm
-     *
-     * @return ButtonContext
-     */
-    private function createButtonContext(ButtonSearchContext $buttonSearchContext, $isForm = false)
+    private function createButtonContext(ButtonSearchContext $buttonSearchContext, bool $isForm = false): ButtonContext
     {
         $context = new ButtonContext();
         $context->setUnavailableHidden(true)
@@ -340,27 +311,5 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         }
 
         return $context;
-    }
-
-    /**
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     */
-    private function assertOperationRegistryMethodsCalled(array $operations, ButtonSearchContext $buttonSearchContext)
-    {
-        $this->operationRegistry->expects($this->once())
-            ->method('find')
-            ->with(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext))
-            ->willReturn($operations);
-    }
-
-    /**
-     * @param int $callsCount
-     */
-    private function assertContextHelperCalled($callsCount = 1)
-    {
-        $this->contextHelper->expects($this->exactly($callsCount))
-            ->method('getActionData')
-            ->willReturn(new ActionData());
     }
 }

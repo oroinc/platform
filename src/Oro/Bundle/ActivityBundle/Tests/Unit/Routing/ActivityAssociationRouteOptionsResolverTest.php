@@ -3,45 +3,45 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Routing;
 
 use Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Symfony\Component\Routing\Route;
 
 class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $groupingConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupingConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
-    /** @var SortableRouteCollection */
-    protected $routeCollection;
+    /** @var EnhancedRouteCollection */
+    private $routeCollection;
 
     /** @var RouteCollectionAccessor */
-    protected $routeCollectionAccessor;
+    private $routeCollectionAccessor;
 
     /** @var ActivityAssociationRouteOptionsResolver */
-    protected $routeOptionsResolver;
+    private $routeOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->groupingConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getConfigs'])
+            ->onlyMethods(['getConfigs'])
             ->getMock();
-        $this->entityAliasResolver    = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
 
         $this->routeOptionsResolver = new ActivityAssociationRouteOptionsResolver(
             $this->groupingConfigProvider,
             $this->entityAliasResolver
         );
 
-        $this->routeCollection         = new SortableRouteCollection();
+        $this->routeCollection = new EnhancedRouteCollection();
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
@@ -96,14 +96,12 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
 
         $this->entityAliasResolver->expects($this->exactly(4))
             ->method('getPluralAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Email', 'emails'],
-                    ['Test\Call', 'calls'],
-                    ['Test\Task', 'tasks'],
-                    ['Test\Event', 'events']
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Email', 'emails'],
+                ['Test\Call', 'calls'],
+                ['Test\Task', 'tasks'],
+                ['Test\Event', 'events']
+            ]);
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
@@ -112,7 +110,6 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
             $route->getRequirements()
         );
 
-        $this->routeCollection->sortByPriority();
         $this->assertEquals(
             [
                 'first_route',

@@ -3,61 +3,82 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Oro\Bundle\IntegrationBundle\DependencyInjection\IntegrationConfiguration;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use Oro\Component\Config\ResourcesContainerInterface;
 
-class SettingsProvider
+/**
+ * The provider for configuration that is loaded from "Resources/config/oro/integrations.yml" files.
+ */
+class SettingsProvider extends PhpArrayConfigProvider
 {
-    /** @var array */
-    protected $settings = [];
+    private const CONFIG_FILE = 'Resources/config/oro/integrations.yml';
 
-    /** @var ResolverInterface */
-    protected $resolver;
+    private ResolverInterface $resolver;
 
-    /**
-     * @param array             $settings
-     * @param ResolverInterface $resolver
-     */
-    public function __construct(array $settings, ResolverInterface $resolver)
+    public function __construct(string $cacheFile, bool $debug, ResolverInterface $resolver)
     {
-        $this->settings = $settings;
+        parent::__construct($cacheFile, $debug);
         $this->resolver = $resolver;
     }
 
     /**
-     * Get form fields settings
+     * Gets form fields settings.
      *
-     * @param string $name            - node name that specifies which form settings needed
-     * @param string $integrationType - integration type name for applicable check
+     * @param string $name            The name of form settings
+     * @param string $integrationType The integration type
      *
-     * @throws \LogicException
      * @return array
      */
     public function getFormSettings($name, $integrationType)
     {
-        $result = $priorities = [];
+        $result = [];
 
-        if (isset($this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])) {
-            $formData = $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name];
-
+        $config = $this->doGetConfig();
+        if (isset($config[IntegrationConfiguration::FORM_NODE][$name])) {
+            $priorities = [];
+            $formData = $config[IntegrationConfiguration::FORM_NODE][$name];
             foreach ($formData as $fieldName => $field) {
                 $field = $this->resolver->resolve($field, ['channelType' => $integrationType]);
 
                 // if applicable node not set, then applicable to all
                 if ($this->isApplicable($field, $integrationType)) {
-                    $priority           = isset($field['priority']) ? $field['priority'] : 0;
-                    $priorities[]       = $priority;
+                    $priorities[] = $field['priority'] ?? 0;
                     $result[$fieldName] = $field;
                 }
             }
 
-            array_multisort($priorities, SORT_ASC, $result);
+            \array_multisort($priorities, SORT_ASC, $result);
         }
 
         return $result;
     }
 
     /**
-     * Check whether field applicable for given integration type
+     * {@inheritdoc}
+     */
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
+    {
+        $configs = [];
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_integration_settings', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (!empty($resource->data[IntegrationConfiguration::ROOT_NODE])) {
+                $configs[] = $resource->data[IntegrationConfiguration::ROOT_NODE];
+            }
+        }
+
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new IntegrationConfiguration(),
+            $configs
+        );
+    }
+
+    /**
+     * Checks whether field applicable for given integration type.
      *
      * If applicable option no set than applicable to all types.
      * Also if there is 'true' value it means that resolver function
@@ -68,11 +89,11 @@ class SettingsProvider
      *
      * @return bool
      */
-    protected function isApplicable($field, $integrationType)
+    private function isApplicable($field, $integrationType)
     {
         return
             empty($field['applicable'])
-            || in_array(true, $field['applicable'], true)
-            || in_array($integrationType, $field['applicable'], true);
+            || \in_array(true, $field['applicable'], true)
+            || \in_array($integrationType, $field['applicable'], true);
     }
 }

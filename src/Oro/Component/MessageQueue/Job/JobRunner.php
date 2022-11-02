@@ -3,12 +3,13 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 
 /**
- * Provides possibility to run unique or delayed jobs
+ * Provides possibility to run unique or delayed jobs.
  */
 class JobRunner
 {
@@ -21,11 +22,6 @@ class JobRunner
     /** @var Job */
     private $rootJob;
 
-    /**
-     * @param JobProcessor       $jobProcessor
-     * @param ExtensionInterface $jobExtension
-     * @param Job                $rootJob
-     */
     public function __construct(JobProcessor $jobProcessor, ExtensionInterface $jobExtension, Job $rootJob = null)
     {
         $this->jobProcessor = $jobProcessor;
@@ -34,11 +30,14 @@ class JobRunner
     }
 
     /**
+     * Creates a root job and runs the $runCallback.
+     * It does not allow another job with the same name to run simultaneously.
+     *
      * @param string $ownerId
      * @param string $name
      * @param \Closure $runCallback
      *
-     * @return mixed
+     * @return mixed A value returned by the $runCallback or NULL if this closure cannot be run
      */
     public function runUnique($ownerId, $name, \Closure $runCallback)
     {
@@ -46,12 +45,12 @@ class JobRunner
         if (!$rootJob) {
             return null;
         }
+
         $this->throwIfJobIsStale($rootJob);
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
 
-        if ($rootJob->isInterrupted()) {
-            $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
+        if ($childJob->getStatus() === Job::STATUS_CANCELLED) {
             $this->jobExtension->onCancel($childJob);
 
             return null;
@@ -64,12 +63,9 @@ class JobRunner
         $this->jobExtension->onPreRunUnique($childJob);
 
         $result = $this->callbackResult($runCallback, $childJob);
-
-        if ($this->isReadyForStop($childJob)) {
-            $result
-                ? $this->jobProcessor->successChildJob($childJob)
-                : $this->jobProcessor->failChildJob($childJob);
-        }
+        $result
+            ? $this->jobProcessor->successChildJob($childJob)
+            : $this->jobProcessor->failChildJob($childJob);
 
         $this->jobExtension->onPostRunUnique($childJob, $result);
 
@@ -77,10 +73,17 @@ class JobRunner
     }
 
     /**
-     * @param string   $name
+     * Creates a delayed sub-job which runs asynchronously (sending its own message).
+     * It can only run inside another job.
+     *
+     * It is a common approach to create a delayed job simultaneously with a queue message that contains
+     * information about the job. In this case, after receiving the message, the subscribed message processor
+     * can run and perform a delayed job by running the {@see runDelayed()} method with the job data.
+     *
+     * @param string $name
      * @param \Closure $startCallback
      *
-     * @return mixed
+     * @return mixed A value returned by the $startCallback
      */
     public function createDelayed($name, \Closure $startCallback)
     {
@@ -108,23 +111,31 @@ class JobRunner
     }
 
     /**
-     * @param string   $jobId
+     * Runs a delayed sub-job.
+     * This method is used inside a processor for a message which was sent with {@see createDelayed()} method.
+     *
+     * The $runCallback closure usually returns true or false, the job status depends on the returned value.
+     * See {@link https://doc.oroinc.com/backend/mq/message-queue-jobs/#jobs-statuses} for the details.
+     *
+     * To reuse the existing processor logic in the scope of job, it may be decorated with
+     * {@see \Oro\Component\MessageQueue\Job\DelayedJobRunnerDecoratingProcessor} which will execute runDelayed(),
+     * pass the control to the given processor and then handle the result in the format applicable for runDelayed().
+     *
+     * @param string $jobId
      * @param \Closure $runCallback
      *
-     * @return mixed
-     *
-     * @throws \Exception
+     * @return mixed A value returned by the $runCallback
      */
     public function runDelayed($jobId, \Closure $runCallback)
     {
         $job = $this->jobProcessor->findJobById($jobId);
-        if (! $job) {
+        if (!$job) {
             throw JobNotFoundException::create($jobId);
         }
+
         $this->throwIfJobIsStale($job);
 
-        if ($job->getRootJob()->isInterrupted()) {
-            $this->jobProcessor->cancelAllActiveChildJobs($job->getRootJob());
+        if ($job->getStatus() === Job::STATUS_CANCELLED) {
             $this->jobExtension->onCancel($job);
 
             return null;
@@ -137,16 +148,25 @@ class JobRunner
         $this->jobExtension->onPreRunDelayed($job);
 
         $result = $this->callbackResult($runCallback, $job);
-
-        if ($this->isReadyForStop($job)) {
-            $result
-                ? $this->jobProcessor->successChildJob($job)
-                : $this->jobProcessor->failChildJob($job);
-        }
+        $result
+            ? $this->jobProcessor->successChildJob($job)
+            : $this->jobProcessor->failChildJob($job);
 
         $this->jobExtension->onPostRunDelayed($job, $result);
 
         return $result;
+    }
+
+    /**
+     * Creates and return a new instance of JobRunner that can be used in sub-jobs.
+     *
+     * @param Job $rootJob
+     *
+     * @return JobRunner
+     */
+    public function getJobRunnerForChildJob(Job $rootJob)
+    {
+        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
     }
 
     /**
@@ -163,16 +183,6 @@ class JobRunner
     }
 
     /**
-     * @param Job $rootJob
-     *
-     * @return JobRunner
-     */
-    private function getJobRunnerForChildJob(Job $rootJob)
-    {
-        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
-    }
-
-    /**
      * @param Job $job
      *
      * @return bool
@@ -183,28 +193,21 @@ class JobRunner
     }
 
     /**
-     * @param Job $job
-     *
-     * @return bool
-     */
-    private function isReadyForStop(Job $job)
-    {
-        return !$job->getStoppedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED;
-    }
-
-    /**
      * @param \Closure $runCallback
      * @param Job $job
      *
      * @return mixed
-     *
-     * @throws \Exception
      */
-    private function callbackResult($runCallback, $job)
+    private function callbackResult(\Closure $runCallback, Job $job)
     {
         $jobRunner = $this->getJobRunnerForChildJob($job->getRootJob());
         try {
-            $result = call_user_func($runCallback, $jobRunner, $job);
+            return $runCallback($jobRunner, $job);
+        } catch (JobRedeliveryException $e) {
+            // do not break execution when only redelivery needed.
+            $this->jobProcessor->failAndRedeliveryChildJob($job);
+
+            throw $e;
         } catch (\Throwable $e) {
             $this->jobProcessor->failAndRedeliveryChildJob($job);
             $this->jobExtension->onError($job);
@@ -214,7 +217,5 @@ class JobRunner
                 $job->getId()
             ), 0, $e);
         }
-
-        return $result;
     }
 }

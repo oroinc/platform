@@ -26,8 +26,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function removeOldSchema(Schema $schema)

@@ -25,7 +25,9 @@ oro:
             expand_all:
                 label: Expand All
                 tooltip: Expand all emails in the thread
-        to: To
+        to.label: To
+        cc.label: Cc
+        bcc.label: Bcc
         form:
             attach: 'Attach'
             no_attachments: 'No available attachments'

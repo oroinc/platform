@@ -4,97 +4,66 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConsumeMessagesCommand */
-    private $command;
+    private QueueConsumer|\PHPUnit\Framework\MockObject\MockObject $consumer;
 
-    /** @var Container */
-    private $container;
+    private ConsumeMessagesCommand $command;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $consumer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumer = $this->createMock(QueueConsumer::class);
 
-        $this->command = new ConsumeMessagesCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.consumption.queue_consumer', $this->consumer);
-        $this->command->setContainer($this->container);
+        $this->command = new ConsumeMessagesCommand($this->consumer);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:transport:consume', $this->command->getName());
+        self::assertEquals('oro:message-queue:transport:consume', $this->command->getName());
     }
 
-    public function testShouldHaveExpectedOptions()
+    public function testShouldHaveExpectedOptions(): void
     {
         $options = $this->command->getDefinition()->getOptions();
 
-        $this->assertCount(3, $options);
-        $this->assertArrayHasKey('memory-limit', $options);
-        $this->assertArrayHasKey('message-limit', $options);
-        $this->assertArrayHasKey('time-limit', $options);
+        self::assertCount(5, $options);
+        self::assertArrayHasKey('memory-limit', $options);
+        self::assertArrayHasKey('message-limit', $options);
+        self::assertArrayHasKey('time-limit', $options);
+        self::assertArrayHasKey('object-limit', $options);
+        self::assertArrayHasKey('gc-limit', $options);
     }
 
-    public function testShouldHaveExpectedAttributes()
+    public function testShouldHaveExpectedAttributes(): void
     {
         $arguments = $this->command->getDefinition()->getArguments();
 
-        $this->assertCount(2, $arguments);
-        $this->assertArrayHasKey('processor-service', $arguments);
-        $this->assertArrayHasKey('queue', $arguments);
+        self::assertCount(2, $arguments);
+        self::assertArrayHasKey('processor-service', $arguments);
+        self::assertArrayHasKey('queue', $arguments);
     }
 
-    public function testShouldThrowExceptionIfProcessorInstanceHasWrongClass()
+    public function testShouldExecuteConsumption(): void
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Invalid message processor service given.'.
-            ' It must be an instance of Oro\Component\MessageQueue\Consumption\MessageProcessorInterface but stdClass');
-
-        $this->container->set('processor-service', new \stdClass());
-
-        $tester = new CommandTester($this->command);
-        $tester->execute([
-            'queue' => 'queue-name',
-            'processor-service' => 'processor-service'
-        ]);
-    }
-
-    public function testShouldExecuteConsumption()
-    {
-        $processor = $this->createMock(MessageProcessorInterface::class);
-
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('close');
 
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('bind')
-            ->with('queue-name', $this->identicalTo($processor));
-        $this->consumer->expects($this->once())
+            ->with('queue-name', 'processor-service');
+        $this->consumer->expects(self::once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class));
-        $this->consumer->expects($this->once())
+            ->with(self::isInstanceOf(ChainExtension::class));
+        $this->consumer->expects(self::once())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        $this->container->set('processor-service', $processor);
+            ->willReturn($connection);
 
         $tester = new CommandTester($this->command);
-        $tester->execute([
-            'queue' => 'queue-name',
-            'processor-service' => 'processor-service'
-        ]);
+        $tester->execute(['queue' => 'queue-name', 'processor-service' => 'processor-service']);
     }
 }

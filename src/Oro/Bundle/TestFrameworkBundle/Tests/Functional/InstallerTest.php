@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class InstallerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -39,15 +39,16 @@ class InstallerTest extends WebTestCase
         $eventDispatcher->removeListener(MigrationEvents::POST_UP, $closure);
     }
 
-    /**
-     * @param MigrationsLoader $loader
-     */
-    protected function assertMigrations(MigrationsLoader $loader)
+    private function assertMigrations(MigrationsLoader $loader): void
     {
         $notCoveredMigrations = [];
         $migrationStates = $loader->getMigrations();
         foreach ($migrationStates as $migrationState) {
             if (is_a($migrationState->getMigration(), UpdateBundleVersionMigration::class)) {
+                continue;
+            }
+
+            if (strpos(get_class($migrationState->getMigration()), 'ACME\\Bundle\\') === 0) {
                 continue;
             }
 

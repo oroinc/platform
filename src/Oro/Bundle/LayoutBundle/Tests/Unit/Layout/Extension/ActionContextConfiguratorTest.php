@@ -8,9 +8,9 @@ use Oro\Component\Layout\LayoutContext;
 class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new ActionContextConfigurator();
     }
@@ -29,7 +29,7 @@ class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $action = 'index';
 
-        $context           = new LayoutContext();
+        $context = new LayoutContext();
         $context['action'] = $action;
 
         $this->contextConfigurator->configureContext($context);

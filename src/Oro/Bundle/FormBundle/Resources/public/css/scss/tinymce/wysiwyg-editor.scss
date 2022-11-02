@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+@import '~@oroinc/bootstrap/scss/reboot';
+@import '~@oroinc/bootstrap/scss/type';
+
+body {
+    margin: 1rem;
+
+    background-color: $primary-inverse;
+    // stylelint-disable-next-line property-no-unknown
+    scrollbar-3dlight-color: $primary-900;
+    scrollbar-arrow-color: $primary-400;
+    scrollbar-base-color: $primary-900;
+    scrollbar-darkshadow-color: $primary-750;
+    scrollbar-face-color: $primary-800;
+    scrollbar-highlight-color: $primary-900;
+    scrollbar-shadow-color: $primary-900;
+    scrollbar-track-color: $primary-860;
+
+    &[contenteditable='false'] {
+        cursor: not-allowed;
+        background-color: $primary-830;
+    }
+}
+
+ul,
+ol {
+    padding-left: 16px;
+}

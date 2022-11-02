@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ScopeBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\FormScopeCriteriaResolver;
 use Symfony\Component\Form\AbstractType;
@@ -43,9 +43,6 @@ class ScopedDataType extends AbstractType
         return self::NAME;
     }
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -113,9 +110,6 @@ class ScopedDataType extends AbstractType
         $view->vars[self::SCOPES_OPTION] = $form->getConfig()->getOption(self::SCOPES_OPTION);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -127,9 +121,6 @@ class ScopedDataType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         if (!is_array($event->getData())) {

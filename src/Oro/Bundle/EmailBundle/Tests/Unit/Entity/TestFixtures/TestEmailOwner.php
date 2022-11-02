@@ -7,17 +7,19 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class TestEmailOwner implements EmailOwnerInterface
 {
-    /** @var int */
-    protected $id;
+    protected ?int $id = null;
 
-    /** @var string */
-    protected $firstName;
+    protected ?string $firstName = null;
 
-    /** @var string */
-    protected $lastName;
+    protected ?string $lastName = null;
 
-    /** @var OrganizationInterface */
-    protected $organization = null;
+    protected ?OrganizationInterface $organization = null;
+
+    protected ?string $primaryEmail = null;
+
+    protected ?string $homeEmail = null;
+
+    protected array $emailFields = ['primaryEmail', 'homeEmail'];
 
     public function __construct($id = null, $firstName = null)
     {
@@ -31,14 +33,14 @@ class TestEmailOwner implements EmailOwnerInterface
         }
     }
 
-    public function getClass()
-    {
-        return 'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner';
-    }
-
     public function getEmailFields()
     {
-        return ['primaryEmail', 'homeEmail'];
+        return $this->emailFields;
+    }
+
+    public function setEmailFields(array $emailFields): void
+    {
+        $this->emailFields = $emailFields;
     }
 
     public function getId()
@@ -46,18 +48,56 @@ class TestEmailOwner implements EmailOwnerInterface
         return $this->id;
     }
 
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    public function getLastName()
+    public function setFirstName(?string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
     {
         return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
     }
 
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    public function getPrimaryEmail(): ?string
+    {
+        return $this->primaryEmail;
+    }
+
+    public function setPrimaryEmail(string $primaryEmail): self
+    {
+        $this->primaryEmail = $primaryEmail;
+
+        return $this;
+    }
+
+    public function getHomeEmail(): ?string
+    {
+        return $this->homeEmail;
+    }
+
+    public function setHomeEmail(string $homeEmail): self
+    {
+        $this->homeEmail = $homeEmail;
+
+        return $this;
     }
 }

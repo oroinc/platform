@@ -17,7 +17,7 @@ class ListContextTest extends \PHPUnit\Framework\TestCase
     /** @var ListContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -33,6 +33,6 @@ class ListContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setTotalCountCallback($totalCountCallback);
         self::assertEquals($totalCountCallback, $this->context->getTotalCountCallback());
-        self::assertEquals($totalCountCallback, $this->context->get(ListContext::TOTAL_COUNT_CALLBACK));
+        self::assertEquals($totalCountCallback, $this->context->get('totalCountCallback'));
     }
 }

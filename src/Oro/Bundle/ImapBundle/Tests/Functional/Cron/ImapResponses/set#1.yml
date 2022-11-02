@@ -6,6 +6,7 @@ log_info:
     - 'Updated 0 row(s).'
     - 'Finding an email origin ...'
     - 'Found " ()" email origin. Id: '
+    - 'Refresh the folders.'
     - 'Get folders enabled for sync...'
     - 'Got 0 folder(s)'
     - 'Got 1 folder(s)'
@@ -13,4 +14,4 @@ log_info:
     - 'Exit because all origins have been synchronised.'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~

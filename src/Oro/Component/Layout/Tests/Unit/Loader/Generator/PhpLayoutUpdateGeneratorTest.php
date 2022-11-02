@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
@@ -9,52 +10,46 @@ use Oro\Component\Layout\Tests\Unit\Loader\Stubs\StubConditionVisitor;
 
 class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PhpLayoutUpdateGenerator */
-    protected $generator;
+    private PhpLayoutUpdateGenerator $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new PhpLayoutUpdateGenerator();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->generator);
     }
 
     // @codingStandardsIgnoreStart
     /**
      * @dataProvider sourceCodeProvider
-     *
-     * @param string $code
      */
-    public function testGenerate($code)
+    public function testGenerate(string $code)
     {
         $data = new GeneratorData($code, 'testfilename.php');
 
-        $this->assertSame(
-<<<CLASS
+        self::assertSame(
+            <<<'CODE'
 <?php
 
 /**
  * Filename: testfilename.php
  */
-
-class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
-    {
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
         echo 123;
     }
 }
-CLASS
+
+CODE
             ,
             $this->generator->generate('testClassName', $data)
         );
     }
     // @codingStandardsIgnoreEnd
 
-    public function sourceCodeProvider()
+    public function sourceCodeProvider(): array
     {
         return [
             'should take whole code given' => ['$code' => 'echo 123;'],
@@ -67,24 +62,27 @@ CLASS
     // @codingStandardsIgnoreStart
     public function testShouldCompileConditions()
     {
-        $this->assertSame(
-<<<CLASS
+        self::assertSame(
+            <<<'CODE'
 <?php
 
-class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
-    {
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
         if (true) {
             echo 123;
         }
     }
 }
-CLASS
+
+CODE
             ,
             $this->generator->generate(
                 'testClassName',
-                new GeneratorData('echo 123;'),
+                new GeneratorData('    echo 123;'), // current implementation does not track indentation levels
                 new VisitorCollection([new StubConditionVisitor()])
             )
         );

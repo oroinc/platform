@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -14,22 +16,27 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDecisionMakerTest
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
+    private $tokenAccessor;
+
+    /** @var OwnershipMetadataProviderStub */
+    private $metadataProvider;
+
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 
@@ -46,26 +53,24 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             $this->metadataProvider->getUserClass(),
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider $treeProvider */
-        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $treeProvider = $this->createMock(OwnerTreeProvider::class);
         $treeProvider->expects($this->any())
             ->method('getTree')
-            ->will($this->returnValue($this->tree));
+            ->willReturn($this->tree);
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
             new ObjectIdAccessor($doctrineHelper),
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, (new InflectorFactory())->build()),
             $this->metadataProvider,
             $this->tokenAccessor
         );
@@ -75,94 +80,64 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     {
         $this->assertFalse($this->decisionMaker->isOrganization(null));
         $this->assertFalse($this->decisionMaker->isOrganization('test'));
-        $this->assertFalse($this->decisionMaker->isOrganization(new User('')));
-        $this->assertTrue($this->decisionMaker->isOrganization(new Organization('')));
-        $this->assertTrue(
-            $this->decisionMaker->isOrganization(
-                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization')
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            )
-        );
+        $this->assertFalse($this->decisionMaker->isOrganization(new User()));
+        $this->assertTrue($this->decisionMaker->isOrganization(new Organization()));
+        $this->assertTrue($this->decisionMaker->isOrganization($this->createMock(Organization::class)));
     }
 
     public function testIsBusinessUnit()
     {
         $this->assertFalse($this->decisionMaker->isBusinessUnit(null));
         $this->assertFalse($this->decisionMaker->isBusinessUnit('test'));
-        $this->assertFalse($this->decisionMaker->isBusinessUnit(new User('')));
-        $this->assertTrue($this->decisionMaker->isBusinessUnit(new BusinessUnit('')));
-        $this->assertTrue(
-            $this->decisionMaker->isBusinessUnit(
-                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit')
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            )
-        );
+        $this->assertFalse($this->decisionMaker->isBusinessUnit(new User()));
+        $this->assertTrue($this->decisionMaker->isBusinessUnit(new BusinessUnit()));
+        $this->assertTrue($this->decisionMaker->isBusinessUnit($this->createMock(BusinessUnit::class)));
     }
 
     public function testIsUser()
     {
         $this->assertFalse($this->decisionMaker->isUser(null));
         $this->assertFalse($this->decisionMaker->isUser('test'));
-        $this->assertFalse($this->decisionMaker->isUser(new BusinessUnit('')));
-        $this->assertTrue($this->decisionMaker->isUser(new User('')));
-        $this->assertTrue(
-            $this->decisionMaker->isUser(
-                $this->getMockBuilder('Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User')
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            )
-        );
+        $this->assertFalse($this->decisionMaker->isUser(new BusinessUnit()));
+        $this->assertTrue($this->decisionMaker->isUser(new User()));
+        $this->assertTrue($this->decisionMaker->isUser($this->createMock(User::class)));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithOrganizationNullUser()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithOrganization(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithOrganizationNullObject()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithOrganization($user, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithBusinessUnitNullUser()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithBusinessUnit(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithBusinessUnitNullObject()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithBusinessUnit($user, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithUserNullUser()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithUser(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithUserNullObject()
     {
+        $this->expectException(InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithUser($user, null);
     }
@@ -219,7 +194,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
 
@@ -245,7 +220,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
@@ -278,7 +253,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
         );
 
@@ -363,7 +338,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
 
@@ -389,7 +364,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
@@ -426,7 +401,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
         );
 
@@ -476,7 +451,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
 
@@ -502,7 +477,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
@@ -535,7 +510,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->buildTestTree();
 
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
         );
 
@@ -563,11 +538,8 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $user
-     * @param bool $expectedResult
      */
-    public function testSupports($user, $expectedResult)
+    public function testSupports(?object $user, bool $expectedResult)
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -576,10 +548,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertEquals($expectedResult, $this->decisionMaker->supports());
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             'without user' => [

@@ -2,26 +2,31 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * This controller covers CRUD functionality for Business Unit entity.
  * @Route("/business_unit")
  */
-class BusinessUnitController extends Controller
+class BusinessUnitController extends AbstractController
 {
     /**
      * Create business_unit form
      *
      * @Route("/create", name="oro_business_unit_create")
-     * @Template("OroOrganizationBundle:BusinessUnit:update.html.twig")
+     * @Template("@OroOrganization/BusinessUnit/update.html.twig")
      * @Acl(
      *      id="oro_business_unit_create",
      *      type="entity",
@@ -29,9 +34,9 @@ class BusinessUnitController extends Controller
      *      permission="CREATE"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new BusinessUnit());
+        return $this->update(new BusinessUnit(), $request);
     }
 
     /**
@@ -46,12 +51,10 @@ class BusinessUnitController extends Controller
      */
     public function viewAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
+        return [
+            'entity'       => $entity,
+            'allow_delete' => $this->isDeleteGranted($entity)
+        ];
     }
 
     /**
@@ -60,19 +63,13 @@ class BusinessUnitController extends Controller
      *      name="oro_business_unit_search",
      *      requirements={"organizationId"="\d+"}
      * )
-     * Acl(
-     *      id="oro_business_unit_view",
-     *      type="action",
-     *      class="OroOrganizationBundle:BusinessUnit",
-     *      permission="VIEW"
-     * )
      */
     public function searchAction($organizationId)
     {
         $businessUnits = [];
         if ($organizationId) {
-            $businessUnits = $this->get('oro_organization.business_unit_manager')
-                ->getBusinessUnitRepo()
+            $businessUnits = $this->getDoctrine()
+                ->getRepository(BusinessUnit::class)
                 ->getOrganizationBusinessUnitsTree($organizationId);
         }
 
@@ -91,9 +88,9 @@ class BusinessUnitController extends Controller
      *      permission="EDIT"
      * )
      */
-    public function updateAction(BusinessUnit $entity)
+    public function updateAction(BusinessUnit $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -106,37 +103,32 @@ class BusinessUnitController extends Controller
      * @AclAncestor("oro_business_unit_view")
      * @Template()
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_organization.business_unit.entity.class')
-        );
+        return ['entity_class' => BusinessUnit::class];
     }
 
     /**
      * @param BusinessUnit $entity
+     * @param Request $request
      * @return array
      */
-    protected function update(BusinessUnit $entity)
+    private function update(BusinessUnit $entity, Request $request)
     {
-        if ($this->get('oro_organization.form.handler.business_unit')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        if ($this->get(BusinessUnitHandler::class)->process($entity)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.business_unit.controller.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.business_unit.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
-        return array(
-            'entity' => $entity,
-            'form' => $this->get('oro_organization.form.business_unit')->createView(),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete' =>
-                $entity->getId() &&
-                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
+        return [
+            'entity'       => $entity,
+            'form'         => $this->get('oro_organization.form.business_unit')->createView(),
+            'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
+        ];
     }
 
     /**
@@ -146,9 +138,7 @@ class BusinessUnitController extends Controller
      */
     public function infoAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
-        );
+        return ['entity' => $entity];
     }
 
     /**
@@ -158,8 +148,30 @@ class BusinessUnitController extends Controller
      */
     public function usersAction(BusinessUnit $entity)
     {
-        return array(
-            'entity' => $entity,
+        return ['entity' => $entity];
+    }
+
+    private function isDeleteGranted(BusinessUnit $entity): bool
+    {
+        return $this->get(EntityDeleteHandlerRegistry::class)
+            ->getHandler(BusinessUnit::class)
+            ->isDeleteGranted($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                EntityDeleteHandlerRegistry::class,
+                BusinessUnitHandler::class,
+                'oro_organization.form.business_unit' => Form::class,
+            ]
         );
     }
 }

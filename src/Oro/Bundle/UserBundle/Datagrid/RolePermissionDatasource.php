@@ -17,8 +17,11 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The datasource for a datagrid of role permissions.
+ */
 class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
     /** @var PermissionManager */
@@ -30,13 +33,6 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var AbstractRole */
     protected $role;
 
-    /**
-     * @param TranslatorInterface           $translator
-     * @param PermissionManager             $permissionManager
-     * @param AclRoleHandler                $aclRoleHandler
-     * @param RolePrivilegeCategoryProvider $categoryProvider
-     * @param ConfigManager                 $configEntityManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,
@@ -65,7 +61,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     {
         $gridData = [];
         $allPrivileges = $this->preparePrivileges($this->role, 'entity');
-        $categories = $this->categoryProvider->getPermissionCategories();
+        $categories = $this->categoryProvider->getCategories();
 
         foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */
@@ -158,7 +154,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         $permissionName,
         AclPermission $permission
     ) {
-        $permissionLabel = $permissionEntity->getLabel() ? $permissionEntity->getLabel() : $permissionName;
+        $permissionLabel = $permissionEntity->getLabel() ?: $permissionName;
         $permissionLabel = $this->translator->trans($permissionLabel);
 
         $permissionDescription = '';

@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
-use Prophecy\Argument;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -15,90 +14,98 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var ConfigSubscriber
-     */
-    protected $subscriber;
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var FormEvent
-     */
-    protected $event;
+    /** @var ConfigSubscriber */
+    private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->prophesize(ConfigManager::class);
-        $this->subscriber = new ConfigSubscriber($this->configManager->reveal());
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->subscriber = new ConfigSubscriber($this->configManager);
 
-        $this->event = $this->prophesize(FormEvent::class);
+        $this->event = $this->createMock(FormEvent::class);
     }
 
     public function testPreSubmit()
     {
+        $data = ['oro_user___level' => ['use_parent_scope_value' => true]];
+
         $form = $this->prepareForm(new IntegerType());
-        $this->event->getForm()->willReturn($form->reveal());
+        $this->event->expects(self::any())
+            ->method('getForm')
+            ->willReturn($form);
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn($data);
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('oro_user.level', true)
+            ->willReturn(20);
+        $this->event->expects(self::once())
+            ->method('setData')
+            ->with(\array_merge_recursive($data, [
+                'oro_user___level' => ['value' => 20]
+            ]));
 
-        $data = [
-            'oro_user___level' => [
-                'use_parent_scope_value' => true,
-            ]
-        ];
-
-        $this->configManager->get('oro_user.level', true)->willReturn(20);
-
-        $this->event->getData()->willReturn($data);
-        $data['oro_user___level']['value'] = 20;
-        $this->event->setData($data)->shouldBeCalled();
-
-        $this->subscriber->preSubmit($this->event->reveal());
+        $this->subscriber->preSubmit($this->event);
     }
 
     public function testPreSubmitConfigFileType()
     {
-        $transformer = $this->prophesize(ConfigFileDataTransformer::class);
+        $data = ['oro_user___level' => ['use_parent_scope_value' => true,]];
 
-        $form = $this->prepareForm(new ConfigFileType($transformer->reveal()));
-        $this->event->getForm()->willReturn($form->reveal());
+        $transformer = $this->createMock(ConfigFileDataTransformer::class);
+        $form = $this->prepareForm(new ConfigFileType($transformer));
+        $this->event->expects(self::any())
+            ->method('getForm')
+            ->willReturn($form);
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn($data);
+        $this->event->expects(self::once())
+            ->method('setData')
+            ->with(\array_merge_recursive($data, [
+                'oro_user___level' => ['value' => [
+                    'file' => null,
+                    'emptyFile' => true
+                ]]
+            ]));
 
-        $data = [
-            'oro_user___level' => [
-                'use_parent_scope_value' => true,
-            ]
-        ];
-
-        $this->configManager->get('oro_user.level', true)->willReturn(20);
-
-        $this->event->getData()->willReturn($data);
-        $data['oro_user___level']['value'] = [
-            'file' => null,
-            'emptyFile' => true
-        ];
-        $this->event->setData($data)->shouldBeCalled();
-
-        $this->subscriber->preSubmit($this->event->reveal());
+        $this->subscriber->preSubmit($this->event);
     }
 
     private function prepareForm($innerType)
     {
-        $resolvedType = $this->prophesize(ResolvedFormTypeInterface::class);
-        $resolvedType->getInnerType()->willReturn($innerType);
+        $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
+        $resolvedType->expects(self::any())
+            ->method('getInnerType')
+            ->willReturn($innerType);
 
-        $config = $this->prophesize(FormConfigInterface::class);
-        $config->getType()->willReturn($resolvedType->reveal());
+        $config = $this->createMock(FormConfigInterface::class);
+        $config->expects(self::any())
+            ->method('getType')
+            ->willReturn($resolvedType);
 
-        $valueForm = $this->prophesize(FormInterface::class);
-        $valueForm->getConfig()->willReturn($config->reveal());
+        $valueForm = $this->createMock(FormInterface::class);
+        $valueForm->expects(self::any())
+            ->method('getConfig')
+            ->willReturn($config);
 
-        $childForm = $this->prophesize(FormInterface::class);
-        $childForm->get('value')->willReturn($valueForm->reveal());
+        $childForm = $this->createMock(FormInterface::class);
+        $childForm->expects(self::any())
+            ->method('get')
+            ->with('value')
+            ->willReturn($valueForm);
 
-        $form = $this->prophesize(FormInterface::class);
-        $form->get(Argument::any())->willReturn($childForm->reveal());
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('get')
+            ->willReturn($childForm);
 
         return $form;
     }

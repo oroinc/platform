@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class StrategyEvent extends Event
 {
@@ -26,11 +26,6 @@ class StrategyEvent extends Event
      */
     protected $context;
 
-    /**
-     * @param StrategyInterface $strategy
-     * @param $entity
-     * @param ContextInterface $context
-     */
     public function __construct(StrategyInterface $strategy, $entity, ContextInterface $context)
     {
         $this->entity = $entity;

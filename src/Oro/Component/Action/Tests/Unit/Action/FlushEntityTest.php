@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\FlushEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -13,49 +13,40 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FlushEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var FlushEntity */
+    private $action;
 
-    /**
-     * @var FlushEntity
-     */
-    protected $action;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action = new FlushEntity($this->contextAccessor, $this->registry);
-        /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->registry = $this->createMock(ManagerRegistry::class);
+
+        $this->action = new FlushEntity(new ContextAccessor(), $this->registry);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
+    }
+
+    public function testExecuteWithoutEntity()
+    {
+        $context = new ActionData(['data' => null]);
+        $this->registry->expects($this->never())
+            ->method($this->anything());
+
+        $this->action->initialize([]);
+        $this->action->execute($context);
     }
 
     /**
      * @dataProvider executeDataProvider
-     * @param array $data
-     * @param array $options
-     * @param mixed $entity
-     * @param bool $flushException
      */
-    public function testExecute(array $data, array $options, $entity, $flushException = false)
+    public function testExecute(array $data, array $options, object $entity, bool $flushException = false)
     {
         $context = new ActionData($data);
         $this->assertEntityManagerCalled($entity, $flushException);
 
         if ($flushException) {
-            $this->expectException('\Exception');
+            $this->expectException(\Exception::class);
             $this->expectExceptionMessage('Flush exception');
         }
 
@@ -63,10 +54,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         $entity = new \stdClass();
 
@@ -95,26 +83,27 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param mixed $entity
-     * @param bool $throwException
-     */
-    protected function assertEntityManagerCalled($entity, $throwException = false)
+    private function assertEntityManagerCalled(object $entity, bool $throwException)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager $entityManager */
-        $entityManager = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-        $entityManager->expects($this->once())->method('beginTransaction');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())
+            ->method('beginTransaction');
 
         if ($throwException) {
             $entityManager->expects($this->once())
                 ->method('flush')
                 ->willThrowException(new \Exception('Flush exception'));
-            $entityManager->expects($this->once())->method('rollback');
+            $entityManager->expects($this->once())
+                ->method('rollback');
         } else {
-            $entityManager->expects($this->once())->method('persist');
-            $entityManager->expects($this->once())->method('flush');
-            $entityManager->expects($this->once())->method('refresh');
-            $entityManager->expects($this->once())->method('commit');
+            $entityManager->expects($this->once())
+                ->method('persist');
+            $entityManager->expects($this->once())
+                ->method('flush');
+            $entityManager->expects($this->once())
+                ->method('refresh');
+            $entityManager->expects($this->once())
+                ->method('commit');
         }
 
         $this->registry->expects($this->once())

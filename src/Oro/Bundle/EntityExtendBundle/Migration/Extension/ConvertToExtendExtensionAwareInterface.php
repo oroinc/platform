@@ -10,8 +10,6 @@ interface ConvertToExtendExtensionAwareInterface
 {
     /**
      * Sets the ExtendExtension
-     *
-     * @param ConvertToExtendExtension $convertToExtendExtension
      */
     public function setConvertToExtendExtension(ConvertToExtendExtension $convertToExtendExtension);
 }

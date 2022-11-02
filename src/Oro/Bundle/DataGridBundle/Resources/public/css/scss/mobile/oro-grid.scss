@@ -1,20 +1,11 @@
 /* @theme: admin.oro; */
 
-.grid-views {
-    margin: 0;
-}
-
-.inner-grid .grid-views {
-    margin-#{$start}: 10px;
-}
-
-.responsive-cell .inner-grid .grid-views {
-    margin-#{$start}: 0;
-}
+/* stylelint-disable property-no-unknown, property-no-vendor-prefix */
 
 .grid-scrollable-container {
     width: auto;
 
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
+    touch-action: auto;
 }

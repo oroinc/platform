@@ -4,12 +4,13 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Autocomplete;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -18,51 +19,58 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchIndexer;
+
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
+
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
+
     /** @var AssignedToOrganizationUsersHandler */
-    protected $handler;
+    private $handler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $searchIndexer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $attachmentManager = $this->createMock(AttachmentManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->searchIndexer = $this->createMock(Indexer::class);
         $this->repository = $this->createMock(EntityRepository::class);
-        $metadata = $this->createMock(ClassMetadata::class);
 
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(User::class)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->manager = $this->createMock(ObjectManager::class);
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(User::class)
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
         $this->manager->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
 
-        $this->handler = new AssignedToOrganizationUsersHandler($attachmentManager, User::class, []);
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(User::class)
+            ->willReturn('user');
+
+        $pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
+
+        $this->handler = new AssignedToOrganizationUsersHandler($pictureSourcesProvider, User::class, []);
         $this->handler->setTokenAccessor($this->tokenAccessor);
-        $this->handler->initSearchIndexer($this->searchIndexer, [User::class => ['alias' => 'user']]);
+        $this->handler->initSearchIndexer($this->searchIndexer, $searchMappingProvider);
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
     }
 
@@ -78,12 +86,9 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getSimpleSearchQuery')
             ->with('test', 0, 11, 'user')
             ->willReturn($query);
-        $this->searchIndexer->expects($this->at(1))
+        $this->searchIndexer->expects($this->exactly(2))
             ->method('setIsAllowedApplyAcl')
-            ->with(false);
-        $this->searchIndexer->expects($this->at(3))
-            ->method('setIsAllowedApplyAcl')
-            ->with(true);
+            ->withConsecutive([false], [true]);
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($query)
@@ -108,12 +113,9 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getSimpleSearchQuery')
             ->with('test', 0, 11, 'user')
             ->willReturn($query);
-        $this->searchIndexer->expects($this->at(1))
+        $this->searchIndexer->expects($this->exactly(2))
             ->method('setIsAllowedApplyAcl')
-            ->with(false);
-        $this->searchIndexer->expects($this->at(3))
-            ->method('setIsAllowedApplyAcl')
-            ->with(true);
+            ->withConsecutive([false], [true]);
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($query)

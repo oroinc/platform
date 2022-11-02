@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
+/**
+ * Step key template.
+ */
 class StepTemplate extends WorkflowTemplate
 {
     const NAME = 'step';
@@ -9,7 +12,7 @@ class StepTemplate extends WorkflowTemplate
     /**
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return parent::getTemplate() . '.step.{{ step_name }}';
     }

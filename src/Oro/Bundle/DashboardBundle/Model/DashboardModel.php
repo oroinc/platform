@@ -8,9 +8,12 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Represents Dashboard model.
+ */
 class DashboardModel implements EntityModelInterface
 {
-    const DEFAULT_TEMPLATE = 'OroDashboardBundle:Index:default.html.twig';
+    const DEFAULT_TEMPLATE = '@OroDashboard/Index/default.html.twig';
 
     /**
      * @var Dashboard
@@ -27,11 +30,6 @@ class DashboardModel implements EntityModelInterface
      */
     protected $widgets;
 
-    /**
-     * @param Dashboard $dashboard
-     * @param Collection $widgets
-     * @param array $config
-     */
     public function __construct(Dashboard $dashboard, Collection $widgets, array $config)
     {
         $this->entity  = $dashboard;

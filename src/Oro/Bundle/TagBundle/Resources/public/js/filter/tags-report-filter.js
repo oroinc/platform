@@ -3,8 +3,6 @@ define(
     function(_, DictionaryFilter) {
         'use strict';
 
-        var TagsReportFilter;
-
         /**
          * Multiple select filter: filter values as multiple select options
          *
@@ -12,32 +10,32 @@ define(
          * @class   oro.filter.TagsReportFilter
          * @extends oro.filter.DictionaryFilter
          */
-        TagsReportFilter = DictionaryFilter.extend({
+        const TagsReportFilter = DictionaryFilter.extend({
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             criteriaValueSelectors: {
                 type: 'select[name="tag_part"]'
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
-            constructor: function TagsReportFilter() {
-                TagsReportFilter.__super__.constructor.apply(this, arguments);
+            constructor: function TagsReportFilter(options) {
+                TagsReportFilter.__super__.constructor.call(this, options);
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             initialize: function(options) {
                 this.entityClass = this.filterParams.entityClass.replace(/\\/g, '_');
-                TagsReportFilter.__super__.initialize.apply(this, arguments);
+                TagsReportFilter.__super__.initialize.call(this, options);
             },
 
             _readDOMValue: function() {
-                var value = TagsReportFilter.__super__._readDOMValue.apply(this, arguments);
+                const value = TagsReportFilter.__super__._readDOMValue.call(this);
                 return _.extend(value, {entity_class: this.entityClass});
             }
         });

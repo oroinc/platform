@@ -7,6 +7,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
 
+/**
+ * Compiled sequence of property names or array indices
+ */
 final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
     /** @var string */
@@ -78,7 +81,7 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
      *
      * @return PropertyPathIteratorInterface
      */
-    public function getIterator()
+    public function getIterator(): PropertyPathIteratorInterface
     {
         return new PropertyPathIterator($this);
     }

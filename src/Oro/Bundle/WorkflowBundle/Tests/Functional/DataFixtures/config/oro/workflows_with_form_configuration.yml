@@ -29,7 +29,7 @@ workflows:
                             parameters: ~
                     configuration:
                         handler: 'default'
-                        template: 'OroWorkflowBundle:actions:update.html.twig'
+                        template: '@OroWorkflow/actions/update.html.twig'
                         data_provider: 'transition_page_form'
                         data_attribute: 'data_value_one'
                 form_type: 'Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType'

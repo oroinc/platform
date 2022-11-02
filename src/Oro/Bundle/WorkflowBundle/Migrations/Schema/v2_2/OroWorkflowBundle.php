@@ -8,7 +8,6 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterfac
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14\SplitGroupsToIndividualFieldsQuery;
 
 class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
 {
@@ -34,7 +33,11 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         ]);
 
         $queries->addQuery(new SplitGroupsToIndividualFieldsQuery());
-        $queries->addPostQuery(sprintf('ALTER TABLE %s DROP COLUMN %s', self::TABLE_NAME, 'groups'));
+        $queries->addPostQuery(sprintf(
+            'ALTER TABLE %s DROP COLUMN %s',
+            self::TABLE_NAME,
+            $this->platform->quoteSingleIdentifier('groups')
+        ));
     }
 
     /**
@@ -50,9 +53,6 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addIndex(Schema $schema)
     {
         $table = $schema->getTable('oro_workflow_item');

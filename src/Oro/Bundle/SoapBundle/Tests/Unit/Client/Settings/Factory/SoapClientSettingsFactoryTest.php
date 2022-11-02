@@ -4,9 +4,8 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Client\Settings\Factory;
 
 use Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory;
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettings;
-use PHPUnit\Framework\TestCase;
 
-class SoapClientSettingsFactoryTest extends TestCase
+class SoapClientSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
@@ -14,7 +13,7 @@ class SoapClientSettingsFactoryTest extends TestCase
         $methodName = 'method';
         $soapOptions = ['1', '2'];
 
-        static::assertEquals(
+        self::assertEquals(
             new SoapClientSettings($wsdlFilePath, $methodName, $soapOptions),
             (new SoapClientSettingsFactory())->create($wsdlFilePath, $methodName, $soapOptions)
         );

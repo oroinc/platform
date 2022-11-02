@@ -1,0 +1,9 @@
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oroform/js/extend/validate': {
+        useTopmostLabelMixin: true
+    },
+    'oroform/js/extend/tinymce': {
+        baseURL: asset('build/_static/_/node_modules/tinymce')|split('?', 2)[0]
+    }
+}) }}

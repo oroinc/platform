@@ -2,150 +2,94 @@
 
 namespace Oro\Bundle\ActionBundle\Configuration;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
-use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\Merger\ConfigurationMerger;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Component\Config\ResourcesContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
- * Provides an entry point for configuration of operations.
+ * The provider for actions configuration
+ * that is loaded from "Resources/config/oro/actions.yml" files.
  */
-class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
+class ConfigurationProvider extends PhpArrayConfigProvider implements ConfigurationProviderInterface
 {
-    const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
+    private const CONFIG_FILE = 'Resources/config/oro/actions.yml';
 
-    /** @var ConfigurationLoader */
-    protected $configurationLoader;
-
-    /** @var ConfigurationDefinitionInterface */
-    protected $configurationDefinition;
-
-    /** @var ConfigurationValidatorInterface */
-    protected $validator;
-
-    /** @var CacheProvider */
-    protected $cache;
-
-    /** @var array */
-    protected $rawConfiguration;
-
-    /** @var array */
-    protected $kernelBundles;
-
-    /** @var array */
-    protected $processedConfigs = [];
-
-    /** @var string */
-    protected $rootNode;
+    private Container $container;
 
     /**
-     * @param ConfigurationLoader $configurationLoader
-     * @param ConfigurationDefinitionInterface $configurationDefinition
-     * @param ConfigurationValidatorInterface $validator
-     * @param CacheProvider $cache
-     * @param array $rawConfiguration
-     * @param array $kernelBundles
-     * @param string $rootNode
+     * @param string $cacheFile
+     * @param bool $debug
+     * @param Container $container
      */
-    public function __construct(
-        ConfigurationLoader $configurationLoader,
-        ConfigurationDefinitionInterface $configurationDefinition,
-        ConfigurationValidatorInterface $validator,
-        CacheProvider $cache,
-        array $rawConfiguration,
-        array $kernelBundles,
-        $rootNode
-    ) {
-        $this->configurationLoader = $configurationLoader;
-        $this->configurationDefinition = $configurationDefinition;
-        $this->validator = $validator;
-        $this->cache = $cache;
-        $this->rawConfiguration = $rawConfiguration;
-        $this->kernelBundles = array_values($kernelBundles);
-        $this->rootNode = $rootNode;
+    public function __construct(string $cacheFile, bool $debug, Container $container)
+    {
+        parent::__construct($cacheFile, $debug);
+        $this->container = $container;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function getConfiguration(): array
     {
-        $this->cache->save($this->rootNode, $this->resolveConfiguration());
+        return $this->doGetConfig();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function warmUpResourceCache(ContainerBuilder $containerBuilder)
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        $this->cache->save($this->rootNode, $this->resolveConfiguration(null, $containerBuilder));
-    }
+        $mergedConfig = [];
+        $rawConfigs = $this->getRawConfigs($resourcesContainer);
+        $bundles = $this->getBundles();
+        foreach ($rawConfigs as $sectionName => $configs) {
+            $merger = new ConfigurationMerger($bundles);
+            $mergedConfig[$sectionName] = $merger->mergeConfiguration(
+                $this->container->getParameterBag()->resolveValue($configs)
+            );
+        }
+        $this->checkConfiguration($mergedConfig);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function clearCache()
-    {
-        $this->cache->delete($this->rootNode);
-    }
-
-    /**
-     * @param bool $ignoreCache
-     * @param Collection $errors
-     * @return array
-     * @throws InvalidConfigurationException
-     */
-    public function getConfiguration($ignoreCache = false, Collection $errors = null)
-    {
-        if ($ignoreCache) {
-            $configuration = $this->resolveConfiguration($errors);
-        } else {
-            $configuration = $this->cache->fetch($this->rootNode);
-            if (false === $configuration) {
-                $configuration = $this->resolveConfiguration($errors);
-                $this->cache->save($this->rootNode, $configuration);
-            }
+        if (empty($mergedConfig)) {
+            return [];
         }
 
-        return $configuration;
-    }
-
-    /**
-     * @param Collection $errors
-     * @param ContainerBuilder $containerBuilder
-     * @return array
-     * @throws InvalidConfigurationException
-     */
-    protected function resolveConfiguration(Collection $errors = null, ContainerBuilder $containerBuilder = null)
-    {
-        $rawConfiguration = $this->configurationLoader->loadConfiguration(
-            self::CONFIG_FILE_PATH,
-            'oro_action',
-            $this->rootNode,
-            $containerBuilder
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new Configuration(),
+            [$mergedConfig]
         );
-        $rawConfiguration = array_merge($this->rawConfiguration, $rawConfiguration);
+    }
 
-        $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($rawConfiguration);
-        $data = [];
+    protected function getBundles(): array
+    {
+        return CumulativeResourceManager::getInstance()->getBundles();
+    }
 
-        $this->checkConfiguration($configs);
-
-        try {
-            if (!empty($configs)) {
-                $data = $this->configurationDefinition->processConfiguration($configs);
-
-                $this->validator->validate($data, $errors);
+    /**
+     * @param ResourcesContainerInterface $resourcesContainer
+     *
+     * @return array [section name => [bundle class => config, ...], ...]
+     */
+    private function getRawConfigs(ResourcesContainerInterface $resourcesContainer): array
+    {
+        $result = [];
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_action', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            foreach ($resource->data as $sectionName => $config) {
+                if (\is_array($config)) {
+                    $result[$sectionName][$resource->bundleClass] = $config;
+                }
             }
-        } catch (InvalidConfigurationException $e) {
-            throw new InvalidConfigurationException(sprintf('Can\'t parse configuration. %s', $e->getMessage()));
         }
 
-        return $data;
+        return $result;
     }
 
     /**
@@ -154,9 +98,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      *
      * @param mixed $config
      */
-    private function checkConfiguration(&$config)
+    private function checkConfiguration(&$config): void
     {
-        if (is_array($config)) {
+        if (\is_array($config)) {
             $new = [];
 
             foreach ($config as $key => $value) {
@@ -167,8 +111,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
             }
 
             $config = $new;
-        } elseif (is_string($config)) {
-            $config = str_replace('%%', '%', $config);
+        } elseif (\is_string($config)) {
+            $config = \str_replace('%%', '%', $config);
         }
     }
 }

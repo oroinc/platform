@@ -44,12 +44,6 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
      */
     protected $oldClassNames = [];
 
-    /**
-     * @param Schema                          $schema
-     * @param ActivityExtension               $activityExtension
-     * @param ExtendExtension                 $extendExtension
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         Schema $schema,
         ActivityExtension $activityExtension,
@@ -187,7 +181,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $sql, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $params, $types);
+            $this->connection->executeStatement($sql, $params, $types);
         }
 
         unset($noteEntityConfig['data']['extend']['schema']['relation'][$noteAssociationName]);
@@ -214,7 +208,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $sql, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $params, $types);
+            $this->connection->executeStatement($sql, $params, $types);
         }
     }
 
@@ -232,7 +226,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         foreach ($queries as $sql) {
             $this->logQuery($logger, $sql);
             if (!$dryRun) {
-                $this->connection->executeUpdate($sql);
+                $this->connection->executeStatement($sql);
             }
         }
     }
@@ -258,7 +252,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $sql);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql);
+            $this->connection->executeStatement($sql);
         }
 
         $schemaManager = $this->connection->getSchemaManager();
@@ -271,7 +265,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         $sql = sprintf('ALTER TABLE %s DROP COLUMN %s', self::NOTE_TABLE, $noteAssociationColumnName);
         $this->logQuery($logger, $sql);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql);
+            $this->connection->executeStatement($sql);
         }
     }
 

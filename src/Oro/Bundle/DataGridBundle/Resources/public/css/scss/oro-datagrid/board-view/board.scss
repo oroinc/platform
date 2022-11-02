@@ -24,6 +24,7 @@
 
 .board-header {
     display: flex;
+    overflow: hidden;
 }
 
 .board-column-header {
@@ -32,50 +33,11 @@
     padding: $oro-datagrid-board-column-header-offset;
 
     font-size: $oro-datagrid-board-column-header-font-size;
-    font-weight: bold;
+    font-weight: font-weight('bold');
     text-align: center;
 
-    border-top-#{$start}-radius: $oro-datagrid-radius;
-    border-top-#{$end}-radius: $oro-datagrid-radius;
-}
-
-&.with-floating-header {
-    .board-column-header {
-        position: relative;
-
-        &:after {
-            position: absolute;
-            top: 100%;
-            #{$end}: 0;
-            #{$start}: 0;
-            z-index: 2;
-
-            height: 20px;
-            margin: 0 $oro-datagrid-base-offset;
-
-            background-image: $oro-datagrid-board-column-header-blur;
-            filter: blur(10px);
-
-            content: '';
-        }
-
-        &.empty:after {
-            content: none;
-        }
-    }
-}
-
-.board-column-header,
-.board-column {
-    /* these items should have same min-width and margins */
-    min-width: $oro-datagrid-board-column-width;
-    margin-#{$start}: $oro-datagrid-board-column-offset;
-
-    background-color: $oro-datagrid-board-column-header-background-color;
-
-    &:first-child {
-        margin-#{$start}: 0;
-    }
+    border-top-left-radius: $oro-datagrid-radius;
+    border-top-right-radius: $oro-datagrid-radius;
 }
 
 .board-column {
@@ -88,6 +50,19 @@
     }
 }
 
+.board-column-header,
+.board-column {
+    /* these items should have same min-width and margins */
+    min-width: $oro-datagrid-board-column-width;
+    margin-left: $oro-datagrid-board-column-offset;
+
+    background-color: $oro-datagrid-board-column-header-background-color;
+
+    &:first-child {
+        margin-left: 0;
+    }
+}
+
 .board-card-placeholder {
     margin-top: $oro-datagrid-base-offset;
     padding: $oro-datagrid-placeholder-offset;
@@ -97,8 +72,42 @@
     border: $oro-datagrid-placeholder-border;
 }
 
+&.with-floating-header {
+    .board-column-header {
+        position: relative;
+
+        &::after {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: 0;
+            z-index: 2;
+
+            height: 20px;
+            margin: 0 $oro-datagrid-base-offset;
+
+            background-image: $oro-datagrid-board-column-header-blur;
+            filter: blur(10px);
+
+            content: '';
+
+            pointer-events: none;
+        }
+
+        &.empty::after {
+            content: none;
+        }
+    }
+}
+
 .board-column-title {
     @include text-line-truncate();
+
+    [data-grid-header-cell-text] {
+        display: inline-block;
+
+        @include text-line-truncate();
+    }
 }
 
 .board-body-loading-message {
@@ -108,7 +117,7 @@
 
     background-color: $oro-datagrid-board-loading-message-background-color;
 
-    &:before {
+    &::before {
         display: block;
         margin: 0 auto;
 
@@ -124,6 +133,7 @@
 
 @media print {
     .board-body {
+        // stylelint-disable-next-line declaration-no-important
         max-height: none !important;
     }
 }

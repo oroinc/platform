@@ -4,13 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer\Stub;
 
 class Entity
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     public $first;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     public $second;
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
@@ -15,6 +16,7 @@ use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -24,38 +26,24 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  */
 class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $formOptionsAssembler;
+    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $formOptionsAssembler;
 
-    /**
-     * @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $conditionFactory;
+    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $conditionFactory;
 
-    /**
-     * @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $actionFactory;
+    /** @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
-    /**
-     * @var TransitionAssembler
-     */
-    protected $assembler;
+    /** @var TransitionAssembler */
+    private $assembler;
 
-    /**
-     * @var array
-     */
-    protected static $actions = [
+    private static $actions = [
         'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
         'actions' => [['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]],
     ];
 
-    /**
-     * @var array
-     */
-    protected static $transitionDefinitions = [
+    private static $transitionDefinitions = [
         'empty_definition' => [],
         'with_preactions' => [
             'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
@@ -81,51 +69,31 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var FormOptionsConfigurationAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formConfigurationAssembler;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['assemble'])
-            ->getMock();
-
+        $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
-
-        $this->formConfigurationAssembler = $this->getMockBuilder(FormOptionsConfigurationAssembler::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['assemble'])
-            ->getMock();
-
-        /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver */
-        $optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
             $this->actionFactory,
-            $this->formConfigurationAssembler,
-            $optionsResolver
+            $this->createMock(FormOptionsConfigurationAssembler::class),
+            $this->createMock(TransitionOptionsResolver::class)
         );
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider missedTransitionDefinitionDataProvider
-     *
-     * @param array $configuration
      */
-    public function testAssembleNoRequiredTransitionDefinitionException($configuration)
+    public function testAssembleNoRequiredTransitionDefinitionException(array $configuration)
     {
+        $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
     }
 
-    /**
-     * @return array
-     */
-    public function missedTransitionDefinitionDataProvider()
+    public function missedTransitionDefinitionDataProvider(): array
     {
         return [
             'no options' => [
@@ -152,20 +120,15 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectTransitionDefinitionDataProvider
-     *
-     * @param array $configuration
      */
-    public function testUnknownTransitionDefinitionAssembler($configuration)
+    public function testUnknownTransitionDefinitionAssembler(array $configuration)
     {
+        $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
     }
 
-    /**
-     * @return array
-     */
-    public function incorrectTransitionDefinitionDataProvider()
+    public function incorrectTransitionDefinitionDataProvider(): array
     {
         return [
             'definitions as null' => [
@@ -190,13 +153,11 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectStepsDataProvider
-     *
-     * @param array $steps
      */
-    public function testUnknownStepException($steps)
+    public function testUnknownStepException(array $steps)
     {
+        $this->expectException(AssemblerException::class);
         $configuration = [
             'transitions' => [
                 'test_transition' => [
@@ -212,17 +173,14 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble($configuration, $steps, []);
     }
 
-    /**
-     * @return array
-     */
-    public function incorrectStepsDataProvider()
+    public function incorrectStepsDataProvider(): array
     {
         return [
             'no steps' => [
                 []
             ],
             'unknown step' => [
-                ['known' => $this->createStep()]
+                ['known' => $this->createMock(Step::class)]
             ]
         ];
     }
@@ -230,20 +188,18 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationDataProvider
      *
-     * @param array $configuration
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testAssemble(array $configuration)
     {
-        $steps = ['target_step' => $this->createStep()];
-        $attributes = ['attribute' => $this->createAttribute()];
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
 
         $expectedPreAction = null;
         $expectedCondition = null;
-        $expectedPreCondition = $this->createCondition();
+        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
         $expectedPostAction = null;
         $defaultAclPrecondition = [];
         $preConditions = [];
@@ -262,7 +218,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        $transitionDefinition = $this->getOption($fullConfiguration, 'transition_definitions', []);
+        $transitionDefinition = $fullConfiguration['transition_definitions'] ?? [];
+        $transitionDefinition = $transitionDefinition[$configuration['transition_definition']] ?? [];
 
         if (isset($transitionDefinition['preconditions'])) {
             if ($defaultAclPrecondition) {
@@ -276,58 +233,47 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 $preConditions = $transitionDefinition['preconditions'];
             }
         }
-        $count = 0;
 
+        $createConditionExpectations = [];
+        $createConditionExpectationResults = [];
         if ($preConditions) {
-            $this->conditionFactory->expects($this->at($count))
-                ->method('create')
-                ->with(ConfigurableCondition::ALIAS, $preConditions)
-                ->will($this->returnValue($expectedPreCondition));
-            $count++;
+            $createConditionExpectations[] = [ConfigurableCondition::ALIAS, $preConditions];
+            $createConditionExpectationResults[] = $expectedPreCondition;
         }
-        $this->conditionFactory->expects($this->at($count))
-            ->method('create')
-            ->with(
-                ConfigurableCondition::ALIAS,
-                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
-            )
-            ->will($this->returnValue($expectedPreCondition));
-        $count++;
-
+        $createConditionExpectations[] = [
+            ConfigurableCondition::ALIAS,
+            ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
+        ];
+        $createConditionExpectationResults[] = $expectedPreCondition;
         if (array_key_exists('conditions', $transitionDefinition)) {
-            $expectedCondition = $this->createCondition();
-            $this->conditionFactory->expects($this->at($count))
-                ->method('create')
-                ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
-                ->will($this->returnValue($expectedCondition));
+            $expectedCondition = $this->createMock(ExpressionInterface::class);
+            $createConditionExpectations[] = [ConfigurableCondition::ALIAS, $transitionDefinition['conditions']];
+            $createConditionExpectationResults[] = $expectedCondition;
         }
+        $this->conditionFactory->expects($this->exactly(count($createConditionExpectations)))
+            ->method('create')
+            ->withConsecutive(...$createConditionExpectations)
+            ->willReturnOnConsecutiveCalls(...$createConditionExpectationResults);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
             ->with(ConfigurableAction::ALIAS, self::isType('array'))
-            ->willReturnCallback(
-                function ($type, $config) use (&$expectedPreAction, &$expectedPostAction) {
-                    $action = $this->createAction();
-
-                    if ($config === self::$actions['preactions']) {
-                        $expectedPreAction = $action;
-                    }
-
-                    if ($config === self::$actions['actions']) {
-                        $expectedPostAction = $action;
-                    }
-
-                    return $action;
+            ->willReturnCallback(function ($type, $config) use (&$expectedPreAction, &$expectedPostAction) {
+                $action = $this->createMock(ActionInterface::class);
+                if ($config === self::$actions['preactions']) {
+                    $expectedPreAction = $action;
                 }
-            );
+                if ($config === self::$actions['actions']) {
+                    $expectedPostAction = $action;
+                }
+
+                return $action;
+            });
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
-            ->with(
-                isset($configuration['form_options']) ? $configuration['form_options'] : [],
-                $attributes
-            )
-            ->will($this->returnArgument(0));
+            ->with($configuration['form_options'] ?? [], $attributes)
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             $fullConfiguration,
@@ -345,7 +291,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $configuration
         );
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $this->assertCount(1, $transitions);
         $this->assertTrue($transitions->containsKey('test_transition'));
 
@@ -354,11 +300,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
         $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
 
-        $expectedDisplayType = WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
-
-        if (isset($configuration['display_type'])) {
-            $expectedDisplayType = $configuration['display_type'];
-        }
+        $expectedDisplayType = $configuration['display_type']
+            ?? WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
 
         $this->assertEquals($expectedDisplayType, $actualTransition->getDisplayType(), 'Incorrect display type');
         $this->assertEquals(
@@ -400,25 +343,22 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expectedActionConfig
-     *
      * @dataProvider assembleWithDestinationProvider
      */
     public function testAssembleAndDestination(array $configuration, array $expectedActionConfig)
     {
-        $steps = ['target_step' => $this->createStep()];
+        $steps = ['target_step' => $this->createMock(Step::class)];
 
-        $this->formOptionsAssembler->expects($this->once())->method('assemble')->willReturn([]);
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
+            ->willReturn([]);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
             ->with(ConfigurableAction::ALIAS, $this->isType('array'))
-            ->willReturnCallback(
-                function ($type, $config) use ($expectedActionConfig) {
-                    $this->assertEquals($expectedActionConfig, $config);
-                }
-            );
+            ->willReturnCallback(function ($type, $config) use ($expectedActionConfig) {
+                $this->assertEquals($expectedActionConfig, $config);
+            });
 
         $assemblerConfig = [
             'transitions' => [
@@ -430,10 +370,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble($assemblerConfig, $steps, []);
     }
 
-    /**
-     * @return array
-     */
-    public function assembleWithDestinationProvider()
+    public function assembleWithDestinationProvider(): array
     {
         return [
             'without destination' => [
@@ -469,12 +406,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $templateType
-     * @param array $configuration
-     * @param $actualTransition
-     */
-    protected function assertTemplate($templateType, $configuration, $actualTransition)
+    private function assertTemplate(string $templateType, array $configuration, object $actualTransition): void
     {
         $configKey = $templateType . '_template';
         $getter = 'get' . ucfirst($templateType) . 'Template';
@@ -488,10 +420,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             'empty_definition' => [
@@ -605,25 +535,33 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
         $transitionDefinition = self::$transitionDefinitions['with_condition'];
 
-        $steps = ['target_step' => $this->createStep()];
-        $attributes = ['attribute' => $this->createAttribute()];
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
 
-        $expectedCondition = $expectedPreCondition = $this->createCondition();
+        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
+        $expectedCondition = $this->createMock(ExpressionInterface::class);
 
-        $this->conditionFactory->expects($this->at(0))->method('create')
-            ->with(
-                ConfigurableCondition::ALIAS,
-                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
+        $this->conditionFactory->expects($this->exactly(2))
+            ->method('create')
+            ->withConsecutive(
+                [
+                    ConfigurableCondition::ALIAS,
+                    ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
+                ],
+                [
+                    ConfigurableCondition::ALIAS,
+                    $transitionDefinition['conditions']
+                ]
             )
-            ->will($this->returnValue($expectedPreCondition));
-        $this->conditionFactory->expects($this->at(1))->method('create')
-            ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
-            ->will($this->returnValue($expectedCondition));
-        $this->conditionFactory->expects($this->exactly(2))->method('create');
+            ->willReturnOnConsecutiveCalls(
+                $expectedPreCondition,
+                $expectedCondition
+            );
 
-        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
             ->with([], $attributes, 'transition', 'test_transition')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             [
@@ -636,7 +574,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $attributes
         );
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $this->assertCount(1, $transitions);
         $this->assertTrue($transitions->containsKey('test_transition'));
 
@@ -677,6 +615,9 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($actualTransition->getAction());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testAssembleWithFullDefinition()
     {
         $configuration = [
@@ -690,10 +631,12 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
         $transitionDefinition = self::$transitionDefinitions['full_definition'];
 
-        $steps = ['target_step' => $this->createStep()];
-        $attributes = ['attribute' => $this->createAttribute()];
-        $expectedPreAction = $expectedPostAction = null;
-        $expectedCondition = $expectedPreCondition = $this->createCondition();
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
+        $expectedPostAction = null;
+        $expectedPreAction = $expectedPostAction;
+        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
+        $expectedCondition = $this->createMock(ExpressionInterface::class);
 
         $preConditions = [
             '@and' => [
@@ -706,19 +649,22 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 ]]
             ]
         ];
-        $this->conditionFactory->expects($this->at(0))->method('create')
-            ->with(ConfigurableCondition::ALIAS, $preConditions)
-            ->will($this->returnValue($expectedPreCondition));
-        $this->conditionFactory->expects($this->at(1))->method('create')
-            ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
-            ->will($this->returnValue($expectedCondition));
-        $this->conditionFactory->expects($this->exactly(2))->method('create');
+        $this->conditionFactory->expects($this->exactly(2))
+            ->method('create')
+            ->withConsecutive(
+                [ConfigurableCondition::ALIAS, $preConditions],
+                [ConfigurableCondition::ALIAS, $transitionDefinition['conditions']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $expectedPreCondition,
+                $expectedCondition
+            );
 
         $this->actionFactory->expects($this->exactly(2))
             ->method('create')
             ->with(ConfigurableAction::ALIAS, self::isType('array'))
             ->willReturnCallback(function ($type, $config) use (&$expectedPreAction, &$expectedPostAction) {
-                $action = $this->createAction();
+                $action = $this->createMock(ActionInterface::class);
                 if ($config === self::$actions['preactions']) {
                     $expectedPreAction = $action;
                 }
@@ -729,9 +675,10 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 return $action;
             });
 
-        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
             ->with([], $attributes, 'transition', 'test_transition')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             [
@@ -744,7 +691,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $attributes
         );
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $this->assertCount(1, $transitions);
         $this->assertTrue($transitions->containsKey('test_transition'));
 
@@ -784,19 +731,20 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             'step_to' => 'target_step',
             'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1']
         ];
-        $steps = ['target_step' => $this->createStep()];
-        $attributes = ['attribute' => $this->createAttribute()];
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
 
         $this->actionFactory->expects($this->exactly(2))
             ->method('create')
             ->with(ConfigurableAction::ALIAS, self::isType('array'))
             ->willReturnCallback(function () {
-                return $this->createAction();
+                return $this->createMock(ActionInterface::class);
             });
 
-        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
             ->with([], $attributes, 'transition', 'test_transition')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             [
@@ -817,7 +765,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $attributes
         );
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $this->assertCount(1, $transitions);
         $this->assertTrue($transitions->containsKey('test_transition'));
 
@@ -839,10 +787,10 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             'is_start' => true,
         ];
 
-        $steps = ['target_step' => $this->createStep()];
-        $attributes = ['attribute' => $this->createAttribute()];
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
 
-        $expectedPreCondition = $this->createCondition();
+        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
 
         $preConditions = [
             '@and' => [
@@ -856,14 +804,15 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->conditionFactory->expects($this->once())
             ->method('create')
             ->with(ConfigurableCondition::ALIAS, $preConditions)
-            ->will($this->returnValue($expectedPreCondition));
+            ->willReturn($expectedPreCondition);
 
-        $this->actionFactory->expects($this->never())->method('create');
+        $this->actionFactory->expects($this->never())
+            ->method('create');
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
             ->with([], $attributes, 'transition', 'test_transition')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             [
@@ -879,7 +828,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $attributes
         );
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $this->assertCount(1, $transitions);
         $this->assertTrue($transitions->containsKey('test_transition'));
 
@@ -913,15 +862,12 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider assembleWithFrontendOptions
-     *
-     * @param array $transitionDefinition
-     * @param array $expectedFrontendOptions
      */
     public function testAssembleWithFrontendOptions(array $transitionDefinition, array $expectedFrontendOptions)
     {
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             [
@@ -933,7 +879,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                'step1' => $this->createStep(),
+                'step1' => $this->createMock(Step::class),
             ],
             []
         );
@@ -941,10 +887,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFrontendOptions, $transitions['transition']->getFrontendOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function assembleWithFrontendOptions()
+    public function assembleWithFrontendOptions(): array
     {
         return [
             'without message' => [
@@ -1003,51 +946,5 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Step
-     */
-    protected function createStep()
-    {
-        return $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Attribute
-     */
-    protected function createAttribute()
-    {
-        return $this->getMockBuilder(Attribute::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExpressionInterface
-     */
-    protected function createCondition()
-    {
-        return $this->createMock(ExpressionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ActionInterface
-     */
-    protected function createAction()
-    {
-        return $this->createMock(ActionInterface::class);
-    }
-
-    /**
-     * @param array $options
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getOption(array $options, $key, $default = null)
-    {
-        if (isset($options[$key])) {
-            return $options[$key];
-        }
-        return $default;
     }
 }

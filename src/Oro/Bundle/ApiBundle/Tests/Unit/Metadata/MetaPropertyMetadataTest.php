@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
@@ -79,6 +82,21 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testToArrayHiddenProperty()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+        $propertyMetadata->setName('testName');
+        $propertyMetadata->setHidden();
+
+        self::assertEquals(
+            [
+                'name'   => 'testName',
+                'hidden' => true
+            ],
+            $propertyMetadata->toArray()
+        );
+    }
+
     public function testNameInConstructor()
     {
         $propertyMetadata = new MetaPropertyMetadata('name');
@@ -139,6 +157,19 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         $propertyMetadata->setDirection(true, true);
         self::assertTrue($propertyMetadata->isInput());
         self::assertTrue($propertyMetadata->isOutput());
+    }
+
+    public function testHidden()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+
+        self::assertFalse($propertyMetadata->isHidden());
+        self::assertTrue($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
+        $propertyMetadata->setHidden();
+        self::assertTrue($propertyMetadata->isHidden());
+        self::assertFalse($propertyMetadata->isInput());
+        self::assertFalse($propertyMetadata->isOutput());
     }
 
     public function testResultName()

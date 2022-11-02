@@ -6,18 +6,25 @@ services:
         class: 'Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider'
         public: false
 
-    oro_message_queue.job.storage:
-        class: 'Oro\Component\MessageQueue\Job\JobStorage'
+    oro_message_queue.job.manager:
+        class: 'Oro\Bundle\MessageQueueBundle\Job\JobManager'
         arguments:
-            - '@doctrine'
-            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_message_queue.job.unique_job_handler'
+            - '@event_dispatcher'
+
+    oro_message_queue.job.unique_job_handler:
+        class: 'Oro\Component\MessageQueue\Job\UniqueJobHandler'
+        arguments:
             - '%oro_message_queue.job.unique_job_table_name%'
 
     oro_message_queue.job.processor:
         class: 'Oro\Component\MessageQueue\Job\JobProcessor'
+        public: true
         arguments:
-            - '@oro_message_queue.job.storage'
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.manager'
+            - '@doctrine'
+            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
         calls:
             - ['setJobConfigurationProvider', ['@oro_message_queue.job.configuration_provider']]
 
@@ -32,15 +39,17 @@ services:
         class: 'Oro\Component\MessageQueue\Job\Extension\ChainExtension'
         public: false
         arguments:
-            - []
+            - !tagged_iterator oro_message_queue.job.extension
 
     oro_message_queue.job.root_job_status_calculator:
         class: 'Oro\Component\MessageQueue\Job\RootJobStatusCalculator'
         public: false
         arguments:
-            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.manager'
             - '@oro_message_queue.checker.job_status_checker'
             - '@oro_message_queue.status_calculator.status_calculator_resolver'
+            - '@oro_message_queue.client.message_producer'
+            - '@doctrine'
 
     oro_message_queue.checker.job_status_checker:
         class: 'Oro\Component\MessageQueue\Checker\JobStatusChecker'
@@ -63,7 +72,8 @@ services:
         parent: oro_message_queue.status_calculator.abstract_status_calculator
         public: false
         arguments:
-            - '@oro_message_queue.job.storage'
+            - '@doctrine'
+            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
 
     oro_message_queue.status_calculator.status_calculator_resolver:
         class: 'Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver'
@@ -72,29 +82,12 @@ services:
             - '@oro_message_queue.status_calculator.collection_calculator'
             - '@oro_message_queue.status_calculator.query_calculator'
 
-    oro_message_queue.job.calculate_root_job_status_processor:
-        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor'
-        arguments:
-            - '@oro_message_queue.job.storage'
-            - '@oro_message_queue.job.root_job_status_calculator'
-            - '@oro_message_queue.client.message_producer'
-            - '@logger'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_message_queue.job.calculate_root_job_progress_processor:
-        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobProgressProcessor'
-        arguments:
-            - '@oro_message_queue.job.storage'
-            - '@logger'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
     oro_message_queue.job.dependent_job_processor:
         class: 'Oro\Component\MessageQueue\Job\DependentJobMessageProcessor'
         arguments:
-            - '@oro_message_queue.job.storage'
             - '@oro_message_queue.client.message_producer'
+            - '@doctrine'
+            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -103,10 +96,11 @@ services:
         class: 'Oro\Component\MessageQueue\Job\DependentJobService'
         public: false
         arguments:
-            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.manager'
 
     oro_message_queue.job.grid.root_job_action_configuration:
         class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'
+        public: true
 
     oro_message_queue.job.security_aware_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareJobExtension'
@@ -114,7 +108,7 @@ services:
         arguments:
             - '@security.token_storage'
             - '@oro_security.token_serializer'
-            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.manager'
         tags:
             - { name: oro_message_queue.job.extension }
 
@@ -122,6 +116,13 @@ services:
         class: 'Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension'
         public: false
         arguments:
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.root_job_status_calculator'
+        tags:
+            - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.job.out_of_memory_job_extension:
+        class: 'Oro\Component\MessageQueue\Job\Extension\OutOfMemoryJobExtension'
+        arguments:
+            - '@oro_message_queue.job.processor'
         tags:
             - { name: oro_message_queue.job.extension }

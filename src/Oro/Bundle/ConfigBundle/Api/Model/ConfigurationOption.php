@@ -2,128 +2,80 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Model;
 
+/**
+ * Represents a system configuration option.
+ */
 class ConfigurationOption
 {
-    /** @var string */
-    protected $scope;
+    private string $scope;
+    private string $key;
+    private ?string $dataType = null;
+    private mixed $value = null;
+    private ?\DateTime $createdAt = null;
+    private ?\DateTime $updatedAt = null;
 
-    /** @var string */
-    protected $key;
-
-    /** @var string */
-    protected $dataType;
-
-    /** @var mixed */
-    protected $value;
-
-    /** @var \DateTime|null */
-    protected $createdAt;
-
-    /** @var \DateTime|null */
-    protected $updatedAt;
-
-    /**
-     * @param string $scope
-     * @param string $key
-     */
-    public function __construct($scope, $key)
+    public function __construct(string $scope, string $key)
     {
         $this->scope = $scope;
         $this->key = $key;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    /**
-     * @param string $key
-     */
-    public function setKey($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScope()
+    public function getScope(): string
     {
         return $this->scope;
     }
 
-    /**
-     * @param string $scope
-     */
-    public function setScope($scope)
+    public function setScope(string $scope): void
     {
         $this->scope = $scope;
     }
 
-    /**
-     * @return string
-     */
-    public function getDataType()
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    public function setKey(string $key): void
+    {
+        $this->key = $key;
+    }
+
+    public function getDataType(): ?string
     {
         return $this->dataType;
     }
 
-    /**
-     * @param string $dataType
-     */
-    public function setDataType($dataType)
+    public function setDataType(?string $dataType): void
     {
         $this->dataType = $dataType;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setValue($value)
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getCreatedAt()
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTime|null $createdAt
-     */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @param \DateTime|null $updatedAt
-     */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }

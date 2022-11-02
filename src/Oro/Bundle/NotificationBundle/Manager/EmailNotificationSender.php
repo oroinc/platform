@@ -4,7 +4,8 @@ namespace Oro\Bundle\NotificationBundle\Manager;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -24,10 +25,6 @@ class EmailNotificationSender
      */
     private $notificationSettings;
 
-    /**
-     * @param NotificationSettings $notificationSettings
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(NotificationSettings $notificationSettings, MessageProducerInterface $producer)
     {
         $this->notificationSettings = $notificationSettings;
@@ -37,31 +34,24 @@ class EmailNotificationSender
     /**
      * Sends ordinary notification.
      *
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     public function send(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
     {
-        $this->sendNotification($notification, $template, Topics::SEND_NOTIFICATION_EMAIL);
+        $this->sendNotification($notification, $template, SendEmailNotificationTopic::getName());
     }
 
     /**
      * Sends mass notification.
      *
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     public function sendMass(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
     {
-        $this->sendNotification($notification, $template, Topics::SEND_MASS_NOTIFICATION_EMAIL);
+        $this->sendNotification($notification, $template, SendMassEmailNotificationTopic::getName());
     }
 
     /**
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
-     * @param string $topic
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     private function sendNotification(
@@ -74,18 +64,12 @@ class EmailNotificationSender
             : $this->notificationSettings->getSender();
 
         foreach ($notification->getRecipients() as $recipient) {
-            $email = $recipient->getEmail();
-            // added RFC 822 check to avoid consumer fail
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                continue;
-            }
-
             $messageParams = [
-                'sender'      => $sender->toArray(),
-                'toEmail'     => $email,
-                'subject'     => $template->getSubject(),
-                'body'        => $template->getContent(),
-                'contentType' => $template->getType()
+                'from' => $sender->toString(),
+                'toEmail' => $recipient->getEmail(),
+                'subject' => $template->getSubject(),
+                'body' => $template->getContent(),
+                'contentType' => $template->getType(),
             ];
 
             $this->producer->send($topic, $messageParams);

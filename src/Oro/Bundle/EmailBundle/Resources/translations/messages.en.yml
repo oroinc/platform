@@ -22,12 +22,18 @@ oro:
             job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
         recent_emails_widget:
+            title: Recent emails
             no_subject: "no subject"
+
+        feature:
+            label: Email Settings
+            description: Enables the user email management settings, including the configuration of personal and system mailboxes, email threads, and email attachment settings.
+
         form:
             choose_template:                     Choose a Template
             add_signature:                       Add Signature
-            attach_file:                         Attach file
-            from_record:                         From record
+            attach_file:                         Attach File
+            from_record:                         From Record
             upload:                              Upload
             attach:                              Attach
             no_attachments:                      No available attachments
@@ -36,9 +42,9 @@ oro:
 
             tooltip:
                 attachment_sync:
-                    enable: Enable loading attachments on email sync.
-                    max_size: Maximum sync attachment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
-                    preview_limit: Limit to show preview for attachments (thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
+                    enable: Select the option to enable attachments loading while synchronizing emails.
+                    max_size: Max sync attachment size in Mb. Attachments that exceed the defined size cannot be downloaded. Set to 0 to remove limitations.
+                    preview_limit: A limit to show preview for attachments (a thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
 
@@ -66,8 +72,10 @@ oro:
                     label: Username
                 password:
                     label: Password
+                check_saved_connection:
+                    label: Check Connection (Saved Settings)
                 check_connection:
-                  label: Check SMTP Connection
+                    label: Check Connection (New Settings)
 
             signature_configuration:
                 label: Signature
@@ -114,6 +122,11 @@ oro:
             show_recent_emails_in_user_bar:
                 label: Show recent emails
 
+            attachment:
+                max_size:
+                    label: Maximum Attachment Size, Mb
+                    tooltip: Max allowed attachment size to upload in Mb. Attachments that exceed the size limit are not uploaded. Set to 0 to remove limitations.
+
             attachment_sync:
                 enable:
                     label: Enable attachment sync
@@ -124,11 +137,12 @@ oro:
 
             sanitize_html:
                 label: Enable HTML purifier
-                tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
+                tooltip: Disable HTML Purifier to enable users to paste any HTML code into a template or an email body editor without tag stripping.
 
         emailtemplate:
             entity_label:        Email Template
             entity_plural_label: Email Templates
+            entity_grid_all_view_label: All %entity_plural_label%
             edit_entity:         Edit email template "%name%"
             clone_entity:        Clone email template
             entity_description:  Represent email template
@@ -143,9 +157,13 @@ oro:
             entity_name.label:   Entity name
             entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
-            translations.label:  Translations
+            translations.label: Email Template Translations
             organization.label:  Organization
             visible.label:       Visible
+
+            sections:
+                general: General
+                template_data: Template Data
 
             # sections for email template variables
             variables:
@@ -167,13 +185,35 @@ oro:
             user_first_name:     First name of logged in user
             user_last_name:      Last name of logged in user
             user_full_name:      Full name of logged in user
-            app_short_name:      Short name of application #@deprecated since 1.4 Provider\SystemVariablesProvider
-            app_full_name:       Full name of application  #@deprecated since 1.4 Provider\SystemVariablesProvider
             app_url:             Application URL
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
             siganture:           Signature (|oro_html_strip_tags should be removed to allow usage of it's html view)
+
+            # errors
+            failed_to_compile: This email template can't be used
+            feature:
+                manage:
+                    label: Email Template Management
+                    description: Enables creating and managing personalized email templates.
+        emailtemplatetranslation:
+            entity_label: 'Email Template Translations'
+            entity_plural_label: 'Email Template Translations'
+            entity_grid_all_view_label: 'All %entity_plural_label%'
+
+            id.label: 'Id'
+            subject.label: 'Subject'
+            subject_fallback.label: 'Fallback subject'
+            content.label: 'Content'
+            content_fallback.label: 'Fallback content'
+            localization.label: 'Localization'
+            template.label: 'Template'
+
+            form:
+                default_localization: 'Default'
+                use_parent_localization: 'Use %name% (Parent Localization)'
+                use_default_localization: 'Use Default Localization'
 
         attachment:
             copy_to_record: Copy to Record
@@ -260,6 +300,7 @@ oro:
         email_body.label:         Body
         entity_label:             Email
         entity_plural_label:      Emails
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:       Email message
         id.label:                 Id
         importance.label:         Importance
@@ -291,6 +332,7 @@ oro:
         show_details.tooltip:     Show details
         show_details.label:       Email details
         contexts:
+            label:                Contexts
             tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
@@ -321,9 +363,11 @@ oro:
         load_more_emails:         "%quantity% older messages"
 
         emailuser:
-            entity_label:             Email-User Relation
-            entity_plural_label:      Email-User Relations
+            entity_label:             User Emails
+            entity_plural_label:      User Emails
+            entity_grid_all_view_label: All %entity_plural_label%
             email.label:              Email
+            email.aria_label:         "Opens a default email client to write an email to %email%"
             folder.label:             Folder
             id.label:                 Id
             organization.label:       Organization
@@ -334,9 +378,13 @@ oro:
             folders.label:            Folders
             origin.label:             Email Origin
             unsynced_flag_count.label: Unsynced Flag Count
+            is_email_private:
+                label:                Private
+                description:          Determinates if the email public or private
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:                 Id
             label.label:              Mailbox Label
             general.label:            General
@@ -360,6 +408,7 @@ oro:
             process_settings.label: Process Settings
         autoresponserule:
             entity_plural_label: Autoresponse Rules
+            entity_grid_all_view_label: All %entity_plural_label%
             name.label:          Name
             active.label:        Active
             status.label:        Status
@@ -383,6 +432,22 @@ oro:
                 success: Email sync completed.
                 error: Email sync failed.
                 processing: Email sync has started. Please wait, the grid will be updated after it is complete...
+        sync_alert:
+            system_origin:
+                common: There was an issue when syncing one of the system mailboxes. Please check <a href="%settings_url%">system mailboxes</a>.
+                auth: There was an issue connecting to your email server when syncing one of the system mailboxes. Please check connection settings.
+                switch_folder: There was an issue switching the folder when syncing one of the system mailboxes. Please check synced folders.
+                sync: There was an issue synchronizing emails when syncing one of the system mailboxes.
+            auth:
+                full: There was an issue connecting to your email server during the sync. Please check <a href="%settings_url%">connection settings</a>.
+                short: There was an issue connecting to your email server during the sync. Please check connection settings.
+            switch_folder:
+                full: There was an issue when switching a folder during email synchronization. Please check the synced folders on the <a href="%settings_url%">connection settings</a> page.
+                short: There was an issue when switching a folder during email synchronization. Please check the synced folders.
+            sync: There was an issue with email synchronization. Please contact your administrator.
+
+        permission:
+            view_private.label: View private
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

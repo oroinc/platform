@@ -1,12 +1,12 @@
 {% extends 'form_div_layout.html.twig' %}
 
 {% block form_row %}
-    {% spaceless %}
-        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
+    {% apply spaceless %}
+        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}{% if group_attr.class is defined %} {{ group_attr.class }}{% endif %}"{% if group_attr is defined %}{{ block('group_attributes') }}{% endif %}>
             {% if hint|default() and hint_position|default() == 'above' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
-            {% if label is not sameas(false) %}
+            {% if label is not same as(false) %}
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
                 </div>
@@ -22,17 +22,22 @@
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_row %}
 
+{% block group_attributes %}
+    {%- for n, v in group_attr %}
+        {%- if v is same as(true) %} {{ n }}="{{ n }}"
+        {%- elseif n is not same as('class') and v is not same as(false) %} {{ n }}="{{ v }}"
+        {%- endif %}
+    {%- endfor -%}
+{% endblock group_attributes %}
+
 {% block hint_attributes %}
-    {{- " " -}}
-    {%- for attrname, attrvalue in hint_attr -%}
-        {%- if attrvalue is same as(true) -%}
-            {{- attrname }}="{{ attrname }}"
-        {%- elseif attrvalue is not same as(false) -%}
-            {{- attrname }}="{{ attrvalue }}"
-        {%- endif -%}
+    {%- for n, v in hint_attr %}
+        {%- if v is same as(true) %} {{ n }}="{{ n }}"
+        {%- elseif v is not same as(false) %} {{ n }}="{{ v }}"
+        {%- endif %}
     {%- endfor -%}
 {% endblock hint_attributes %}
 
@@ -51,23 +56,27 @@
 {% endblock widget_container_attributes %}
 
 {% block form_errors %}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% if errors|length > 0 %}
             {% if form.parent %}
                 {% set combinedError = '' %}
+                {% set newErrors = [] %}
                 {% for error in errors %}
-                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
+                    {% if error.message not in newErrors %}
+                        {% set newErrors = newErrors|merge([error.message]) %}
+                    {% endif %}
                 {% endfor %}
+                {% set combinedError = newErrors|join('; ') %}
                 <span class="validation-failed"><span><span>{{ combinedError }}</span></span></span>
             {% else %}
                 {{ parent() }}
             {% endif %}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_errors %}
 
 {% block date_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set type = 'text' %}
         {% if widget == 'single_text' %}
             {{ block('form_widget_simple')|raw }}
@@ -80,26 +89,27 @@
                 })|raw }}
             </div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock date_widget %}
 
 {% block choice_widget_expanded %}
-    {% spaceless %}
-        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
+    {% apply spaceless %}
+        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal choice-widget-expanded' : 'horizontal choice-widget-expanded'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
+        {% set attr = attr|merge({'class': attr.class|split(' ')|array_unique|join(' ')}) %}
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
-                <div class="oro-clearfix">
+                <div class="choice-widget-expanded__item">
                     {{ form_widget(child) }}
                     {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false, 'translatable_label' : translatable_options is defined ? translatable_options : true }) }}
                 </div>
             {% endfor %}
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock choice_widget_expanded %}
 
 {% block choice_widget_options %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% for group_label, choice in options %}
             {% if choice is iterable %}
                 <optgroup label="{{ translatable_groups is defined and not translatable_groups ? group_label : group_label|trans({}, translation_domain) }}">
@@ -111,29 +121,29 @@
                 <option {{ block('choice_widget_option_attributes') }} value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{% if (configs.is_safe is defined and configs.is_safe) %}{{ label|raw }}{% else %}{{ label }}{% endif %}</option>
             {% endif %}
         {% endfor %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock choice_widget_options %}
 
 {% block choice_widget_option_attributes %}
-{% spaceless %}
+{% apply spaceless %}
     {% if choice.attr is defined and choice.attr|length > 0 %}
         {% for attrname, attrvalue in choice.attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endblock choice_widget_option_attributes %}
 
 {% block collection_render %}
-    {% spaceless %}
-        {% from 'OroUIBundle::macros.html.twig' import collection_prototype as collection  %}
+    {% apply spaceless %}
+        {% from '@OroUI/macros.html.twig' import collection_prototype as collection  %}
         <div class="row-oro">
             <div class="collection-fields-list" data-prototype="{{ collection(subform)|escape }}">
                 {% for field in subform.children %}
                     {{ collection(field) }}
                 {% endfor %}
             </div>
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="fa-plus"></i>{{ 'Add'|trans }}</a>
+            <a class="btn add-list-item" href="#"><i class="fa-plus"></i>{{ 'Add'|trans }}</a>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block _oro_entity_config_config_field_type_widget %}

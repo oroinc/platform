@@ -2,41 +2,46 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * EntityExtendBundle controller.
+ * Updates the database schema and all related caches to reflect changes made in extended entities.
+ *
  * @Route("/entity/extend")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  */
-class ApplyController extends Controller
+class ApplyController
 {
+    /** @var EntityExtendUpdateHandlerInterface */
+    private $entityExtendUpdateHandler;
+
+    public function __construct(EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler)
+    {
+        $this->entityExtendUpdateHandler = $entityExtendUpdateHandler;
+    }
+
     /**
      * @Route(
      *      "/update/{id}",
      *      name="oro_entityextend_update",
      *      defaults={"id"=0}
      * )
-     * Acl(
-     *      id="oro_entityextend_update",
-     *      label="oro.entity_extend.action.apply_changes",
-     *      type="action",
-     *      group_name=""
-     * )
      */
-    public function updateAction()
+    public function updateAction(): JsonResponse
     {
-        /** @var EntityProcessor $entityProcessor */
-        $entityProcessor = $this->get('oro_entity_extend.extend.entity_processor');
-
-        if (!$entityProcessor->updateDatabase(true, true)) {
-            throw new HttpException(500, 'Update failed');
+        $result = $this->entityExtendUpdateHandler->update();
+        if ($result->isSuccessful()) {
+            return new JsonResponse();
         }
 
-        return new Response();
+        $responseData = [];
+        $failureMessage = $result->getFailureMessage();
+        if ($failureMessage) {
+            $responseData['message'] = $failureMessage;
+        }
+
+        return new JsonResponse($responseData, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

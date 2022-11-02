@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Logger;
 
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -34,23 +35,15 @@ trait LoggerAwareTraitTestTrait
 
         $this->assertTrue($loggerAwareObjectReflection->hasProperty('logger'));
 
-        $loggerPropertyReflection = new \ReflectionProperty(
-            get_class($this->loggerAwareObject),
-            'logger'
-        );
-        $loggerPropertyReflection->setAccessible(true);
-
         $this->assertInstanceOf(LoggerInterface::class, $this->loggerMock);
-
         $this->assertSame(
             $this->loggerMock,
-            $loggerPropertyReflection->getValue($this->loggerAwareObject)
+            ReflectionUtil::getPropertyValue($this->loggerAwareObject, 'logger')
         );
     }
 
     /**
      * Be sure to call this method in the setUp() method of the testCase class
-     * @param LoggerAwareInterface $testedObject
      */
     protected function setUpLoggerMock(LoggerAwareInterface $testedObject)
     {

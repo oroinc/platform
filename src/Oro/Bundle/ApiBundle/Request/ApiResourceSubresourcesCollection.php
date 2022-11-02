@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents a collection of Data API sub-resources for all entities.
+ * Represents a collection of API sub-resources for all entities.
  */
 class ApiResourceSubresourcesCollection implements \Countable, \IteratorAggregate
 {
@@ -36,8 +36,6 @@ class ApiResourceSubresourcesCollection implements \Countable, \IteratorAggregat
 
     /**
      * Adds a resource to the collection.
-     *
-     * @param ApiResourceSubresources $resource
      *
      * @throws \InvalidArgumentException if a resource for the same entity already exists in the collection
      */
@@ -102,7 +100,7 @@ class ApiResourceSubresourcesCollection implements \Countable, \IteratorAggregat
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->resources);
     }
@@ -110,7 +108,7 @@ class ApiResourceSubresourcesCollection implements \Countable, \IteratorAggregat
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->resources);
     }

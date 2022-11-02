@@ -2,192 +2,157 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ChainExclusionProvider */
-    protected $chainProvider;
+    private ChainExclusionProvider $chainProvider;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
-    protected $providers = [];
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    private array $providers = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->chainProvider = new ChainExclusionProvider();
+        $highPriorityProvider = $this->createMock(ExclusionProviderInterface::class);
+        $lowPriorityProvider = $this->createMock(ExclusionProviderInterface::class);
 
-        $highPriorityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface')
-            ->setMockClassName('HighPriorityExclusionProvider')
-            ->getMock();
-        $lowPriorityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface')
-            ->setMockClassName('LowPriorityExclusionProvider')
-            ->getMock();
-
-        $this->chainProvider->addProvider($highPriorityProvider);
+        $this->chainProvider = new ChainExclusionProvider(new \ArrayIterator([$highPriorityProvider]));
         $this->chainProvider->addProvider($lowPriorityProvider);
 
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
     }
 
-    public function testIsIgnoredEntityByLowPriorityProvider()
+    public function testIsIgnoredEntityByLowPriorityProvider(): void
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredEntity')
             ->with('testClass')
-            ->will($this->returnValue(true));
-        $this->providers[1]
-            ->expects($this->never())
+            ->willReturn(true);
+        $this->providers[1]->expects(self::never())
             ->method('isIgnoredEntity');
 
-        $this->assertTrue($this->chainProvider->isIgnoredEntity('testClass'));
+        self::assertTrue($this->chainProvider->isIgnoredEntity('testClass'));
     }
 
-    public function testIsIgnoredEntityByHighPriorityProvider()
+    public function testIsIgnoredEntityByHighPriorityProvider(): void
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredEntity')
             ->with('testClass')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredEntity')
             ->with('testClass')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->assertTrue($this->chainProvider->isIgnoredEntity('testClass'));
+        self::assertTrue($this->chainProvider->isIgnoredEntity('testClass'));
     }
 
-    public function testIsIgnoredEntityNone()
+    public function testIsIgnoredEntityNone(): void
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredEntity')
             ->with('testClass')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredEntity')
             ->with('testClass')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->assertFalse($this->chainProvider->isIgnoredEntity('testClass'));
+        self::assertFalse($this->chainProvider->isIgnoredEntity('testClass'));
     }
 
-    public function testIsIgnoredFieldByLowPriorityProvider()
+    public function testIsIgnoredFieldByLowPriorityProvider(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredField')
             ->with($this->identicalTo($metadata), 'fieldName')
-            ->will($this->returnValue(true));
-        $this->providers[1]
-            ->expects($this->never())
+            ->willReturn(true);
+        $this->providers[1]->expects(self::never())
             ->method('isIgnoredField');
 
-        $this->assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
+        self::assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
     }
 
-    public function testIsIgnoredFieldByHighPriorityProvider()
+    public function testIsIgnoredFieldByHighPriorityProvider(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredField')
             ->with($this->identicalTo($metadata), 'fieldName')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredField')
             ->with($this->identicalTo($metadata), 'fieldName')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
+        self::assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
     }
 
-    public function testIsIgnoredFieldNone()
+    public function testIsIgnoredFieldNone(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredField')
             ->with($this->identicalTo($metadata), 'fieldName')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredField')
             ->with($this->identicalTo($metadata), 'fieldName')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->assertFalse($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
+        self::assertFalse($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
     }
 
-    public function testIsIgnoredRelationByLowPriorityProvider()
+    public function testIsIgnoredRelationByLowPriorityProvider(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($this->identicalTo($metadata), 'associationName')
-            ->will($this->returnValue(true));
-        $this->providers[1]
-            ->expects($this->never())
+            ->willReturn(true);
+        $this->providers[1]->expects(self::never())
             ->method('isIgnoredRelation');
 
-        $this->assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
+        self::assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
     }
 
-    public function testIsIgnoredRelationByHighPriorityProvider()
+    public function testIsIgnoredRelationByHighPriorityProvider(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($this->identicalTo($metadata), 'associationName')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($this->identicalTo($metadata), 'associationName')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
+        self::assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
     }
 
-    public function testIsIgnoredRelationNone()
+    public function testIsIgnoredRelationNone(): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($this->identicalTo($metadata), 'associationName')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($this->identicalTo($metadata), 'associationName')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->assertFalse($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
+        self::assertFalse($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
     }
 }

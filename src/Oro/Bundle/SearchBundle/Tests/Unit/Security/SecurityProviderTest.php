@@ -8,16 +8,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SecurityProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
+
+    /** @var EntitySecurityMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entitySecurityMetadataProvider;
+
     /** @var SecurityProvider */
-    protected $provider;
+    private $provider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entitySecurityMetadataProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entitySecurityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
@@ -33,7 +33,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
         $this->entitySecurityMetadataProvider->expects($this->once())
             ->method('isProtectedEntity')
             ->with('someClass')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->provider->isProtectedEntity('someClass');
     }
 
@@ -42,7 +42,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', 'someClass')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->provider->isGranted('VIEW', 'someClass');
     }
 }

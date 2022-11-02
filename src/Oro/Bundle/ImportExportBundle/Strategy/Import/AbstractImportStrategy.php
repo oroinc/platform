@@ -14,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Abstract class for the import strategy implementations.
+ */
 abstract class AbstractImportStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
     /**
@@ -46,12 +49,6 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      */
     protected $context;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ImportStrategyHelper $strategyHelper
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ImportStrategyHelper $strategyHelper,
@@ -67,7 +64,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     /**
      * {@inheritdoc}
      */
-    public function setEntityName($entityName)
+    public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
     }
@@ -87,7 +84,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     protected function beforeProcessEntity($entity)
     {
         $event = new StrategyEvent($this, $entity, $this->context);
-        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_BEFORE, $event);
+        $this->eventDispatcher->dispatch($event, StrategyEvent::PROCESS_BEFORE);
         return $event->getEntity();
     }
 
@@ -98,7 +95,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     protected function afterProcessEntity($entity)
     {
         $event = new StrategyEvent($this, $entity, $this->context);
-        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_AFTER, $event);
+        $this->eventDispatcher->dispatch($event, StrategyEvent::PROCESS_AFTER);
         return $event->getEntity();
     }
 
@@ -151,14 +148,13 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
                 $value = $this->findExistingEntity($value);
             }
 
-            if ($value !== null ||
-                $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)
-            ) {
+            if ($value !== null || $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)) {
                 continue;
             }
 
             unset($identityValues[$fieldName]);
         }
+        unset($value);
 
         return $this->findEntityByIdentityValues($entityName, $identityValues);
     }

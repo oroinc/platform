@@ -1,44 +1,43 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Displays available actions.
+ */
 class DebugActionCommand extends AbstractDebugCommand
 {
-    const COMMAND_NAME = 'oro:debug:action';
-    const ARGUMENT_NAME = 'action-name';
-    const FACTORY_SERVICE_ID = 'oro_action.action_factory';
+    public const ARGUMENT_NAME = 'action-name';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:debug:action';
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Displays current "actions" for an application')
-            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'An "action" name')
+        $this
+            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Action name')
+            ->setDescription('Displays available actions.')
             ->setHelp(
-                <<<'EOF'
-The <info>%command.name%</info> displays the configured 'actions':
+                <<<'HELP'
+The <info>%command.name%</info> command displays available actions.
 
   <info>php %command.full_name%</info>
-EOF
-            );
+
+To get information about a specific action, specify its name:
+
+  <info>php %command.full_name% <action></info>
+  <info>php %command.full_name% flash_message</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFactoryServiceId()
-    {
-        return self::FACTORY_SERVICE_ID;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getArgumentName()
+    protected function getArgumentName(): string
     {
         return self::ARGUMENT_NAME;
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -12,69 +13,45 @@ class SimpleFilterFactory implements FilterFactoryInterface
     private const SUPPORTED_OPERATORS_OPTION = 'supported_operators';
 
     /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    private $propertyAccessor;
 
     /** @var FilterOperatorRegistry */
-    protected $filterOperatorRegistry;
+    private $filterOperatorRegistry;
 
     /** @var array [filter type => [class name, parameters], ...] */
-    protected $filters = [];
+    private $filters = [];
 
-    /** @var array [filter type => [factory service, factory method, parameters], ...] */
-    protected $factories = [];
+    /** @var array [filter type => [factory service id, factory method, parameters], ...] */
+    private $factories = [];
+
+    /** @var ContainerInterface */
+    private $factoryContainer;
 
     /**
+     * @param array                     $filters         [filter type => [class name, params], ...]
+     * @param array                     $filterFactories [filter type => [service id, method name, params], ...]
+     * @param ContainerInterface        $filterFactoryContainer
      * @param PropertyAccessorInterface $propertyAccessor
      * @param FilterOperatorRegistry    $filterOperatorRegistry
      */
     public function __construct(
+        array $filters,
+        array $filterFactories,
+        ContainerInterface $filterFactoryContainer,
         PropertyAccessorInterface $propertyAccessor,
         FilterOperatorRegistry $filterOperatorRegistry
     ) {
+        $this->filters = $filters;
+        $this->factories = $filterFactories;
+        $this->factoryContainer = $filterFactoryContainer;
         $this->propertyAccessor = $propertyAccessor;
         $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
     /**
-     * Registers a filter.
-     *
-     * @param string $filterType      The type of a filter.
-     * @param string $filterClassName The class name of a filter. Should extents StandaloneFilter.
-     * @param array  $parameters      Additional parameters for the filter. [property name => value, ...]
-     */
-    public function addFilter($filterType, $filterClassName, array $parameters = [])
-    {
-        $this->filters[$filterType] = [$filterClassName, $parameters];
-    }
-
-    /**
-     * Registers a factory that should be used to create a filter.
-     *
-     * @param string $filterType    The type of a filter.
-     * @param object $factory       The instance of a factory.
-     * @param string $factoryMethod The name of a factory method.
-     * @param array  $parameters    Additional parameters for the filter. [property name => value, ...]
-     */
-    public function addFilterFactory($filterType, $factory, $factoryMethod, array $parameters = [])
-    {
-        $refl = new \ReflectionClass($factory);
-        if (!$refl->hasMethod($factoryMethod)
-            || !$refl->getMethod($factoryMethod)->isPublic()
-            || 1 !== $refl->getMethod($factoryMethod)->getNumberOfParameters()
-        ) {
-            throw new \InvalidArgumentException(\sprintf(
-                'The "%s($dataType)" public method must be declared in the "%s" class.',
-                $factoryMethod,
-                get_class($factory)
-            ));
-        }
-        $this->factories[$filterType] = [$factory, $factoryMethod, $parameters];
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function createFilter($filterType, array $options = [])
+    public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {
         if (!isset($this->factories[$filterType]) && !isset($this->filters[$filterType])) {
             return null;
@@ -103,31 +80,29 @@ class SimpleFilterFactory implements FilterFactoryInterface
         return $filter;
     }
 
-    /**
-     * @param string $filterType
-     * @param string $dataType
-     *
-     * @return object
-     */
-    protected function instantiateFilter($filterType, $dataType)
+    private function instantiateFilter(string $filterType, string $dataType): StandaloneFilter
     {
         if (isset($this->factories[$filterType])) {
-            list($factory, $factoryMethod) = $this->factories[$filterType];
-
-            return $factory->$factoryMethod($dataType);
+            list($factoryId, $factoryMethod) = $this->factories[$filterType];
+            $factory = $this->factoryContainer->get($factoryId);
+            $filter = $factory->$factoryMethod($dataType);
+        } else {
+            $filterClass = $this->filters[$filterType][0];
+            $filter = new $filterClass($dataType);
+        }
+        if (!$filter instanceof StandaloneFilter) {
+            throw new \LogicException(\sprintf(
+                'The filter "%s" must be an instance of %s, got %s.',
+                $filterType,
+                StandaloneFilter::class,
+                get_class($filter)
+            ));
         }
 
-        $filterClass = $this->filters[$filterType][0];
-
-        return new $filterClass($dataType);
+        return $filter;
     }
 
-    /**
-     * @param string $filterType
-     *
-     * @return array
-     */
-    protected function getFilterParameters($filterType)
+    private function getFilterParameters(string $filterType): array
     {
         if (isset($this->factories[$filterType])) {
             return $this->factories[$filterType][2];

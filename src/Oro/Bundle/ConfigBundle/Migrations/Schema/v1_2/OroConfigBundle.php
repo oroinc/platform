@@ -31,9 +31,6 @@ class OroConfigBundle implements Migration, NameGeneratorAwareInterface
         $this->updateConfigForeignKey($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function updateConfigForeignKey(Schema $schema)
     {
         $table = $schema->getTable('oro_config_value');

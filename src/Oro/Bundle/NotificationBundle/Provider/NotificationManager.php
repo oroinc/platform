@@ -2,72 +2,42 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class NotificationManager
+/**
+ * Provides a functionality to handle notification events by all registered notification event handlers.
+ */
+class NotificationManager implements ResetInterface
 {
-    /**
-     * @var EventHandlerInterface[] handlers
-     */
-    protected $handlers;
+    private const RULES_CACHE_KEY = 'rules';
 
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
+    private iterable $handlers;
+    private ManagerRegistry $doctrine;
+    private CacheInterface $cache;
+    private ?array $notificationRules = null;
 
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
-     */
-    protected $notificationRules;
-
-    public function __construct(ObjectManager $em, $className)
+    public function __construct(iterable $handlers, CacheInterface $cache, ManagerRegistry $doctrine)
     {
-        $this->handlers = array();
-        $this->em = $em;
-        $this->className = $className;
-        $this->notificationRules = $this->em->getRepository($this->className)
-            ->getRules();
+        $this->handlers = $handlers;
+        $this->cache = $cache;
+        $this->doctrine = $doctrine;
     }
 
     /**
-     * Add handler to list
-     *
-     * @param EventHandlerInterface $handler
+     * Process the given event by handlers.
      */
-    public function addHandler(EventHandlerInterface $handler)
+    public function process(NotificationEvent $event, string $eventName): NotificationEvent
     {
-        $this->handlers[] = $handler;
-    }
-
-    /**
-     * Process events with handlers
-     *
-     * @param NotificationEvent $event
-     * @param string $eventName
-     * @return NotificationEvent
-     */
-    public function process(NotificationEvent $event, $eventName)
-    {
-        $entity = $event->getEntity();
-
-        // select rules by entity name and event name
-        $notificationRules = $this->getRulesByCriteria(ClassUtils::getClass($entity), $eventName);
-
-        if (!$notificationRules->isEmpty()) {
-            /** @var EventHandlerInterface $handler */
+        $notificationRules = $this->getRulesByCriteria(ClassUtils::getClass($event->getEntity()), $eventName);
+        if (!empty($notificationRules)) {
             foreach ($this->handlers as $handler) {
                 $handler->handle($event, $notificationRules);
-
                 if ($event->isPropagationStopped()) {
                     break;
                 }
@@ -78,29 +48,87 @@ class NotificationManager
     }
 
     /**
-     * Return list of handlers
-     *
-     * @return EventHandlerInterface[]
+     * Clears all internal caches.
      */
-    public function getHandlers()
+    public function clearCache(): void
     {
-        return $this->handlers;
+        $this->reset();
+        $this->cache->delete(self::RULES_CACHE_KEY);
+    }
+
+    public function reset(): void
+    {
+        $this->notificationRules = null;
+    }
+
+    private function getRulesByCriteria(string $entityName, string $eventName): array
+    {
+        $filteredRules = [];
+        if ($this->hasRules($entityName, $eventName)) {
+            $rules = $this->getRules();
+            foreach ($rules as $rule) {
+                if ($rule->getEntityName() === $entityName && $rule->getEventName() === $eventName) {
+                    $filteredRules[] = $rule;
+                }
+            }
+        }
+
+        return $filteredRules;
+    }
+
+    private function hasRules(string $entityName, string $eventName): bool
+    {
+        $ruleMap = $this->cache->get(self::RULES_CACHE_KEY, function () {
+            return $this->loadRuleMap();
+        });
+
+        return
+            isset($ruleMap[$entityName])
+            && in_array($eventName, $ruleMap[$entityName], true);
     }
 
     /**
-     * Filter rules by criteria
-     *
-     * @param string $entityName
-     * @param string $eventName
-     * @return \Doctrine\Common\Collections\Collection|ArrayCollection
+     * @return array [entity name => [event name, ...], ...]
      */
-    protected function getRulesByCriteria($entityName, $eventName)
+    private function loadRuleMap(): array
     {
-        return $this->notificationRules->filter(
-            function (EmailNotification $item) use ($entityName, $eventName) {
-                return $item->getEntityName() == $entityName
-                    && $item->getEvent()->getName() == $eventName;
-            }
-        );
+        $data = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->from(EmailNotification::class, 'e')
+            ->distinct()
+            ->select('e.entityName, e.eventName')
+            ->getQuery()
+            ->getArrayResult();
+
+        $ruleMap = [];
+        foreach ($data as $row) {
+            $ruleMap[$row['entityName']][] = $row['eventName'];
+        }
+
+        return $ruleMap;
+    }
+
+    private function getRules(): array
+    {
+        if (null === $this->notificationRules) {
+            $this->notificationRules = $this->loadRules();
+        }
+
+        return $this->notificationRules;
+    }
+
+    private function loadRules(): array
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->from(EmailNotification::class, 'e')
+            ->select('e')
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManagerForClass(EmailNotification::class);
     }
 }

@@ -3,9 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Event;
 
 use Doctrine\Common\EventArgs;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides possibility to disable some event listeners.
+ */
 class OroEventManager extends ContainerAwareEventManager
 {
     /**
@@ -23,9 +26,6 @@ class OroEventManager extends ContainerAwareEventManager
      */
     protected $serviceContainer;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
@@ -98,15 +98,13 @@ class OroEventManager extends ContainerAwareEventManager
     protected function preDispatch($event)
     {
         $listeners = $this->getListeners($event);
-        foreach ($listeners as $listener) {
-            $unmodifiedListener = $listener;
-            if (is_string($listener)) {
-                $listener = $this->serviceContainer->get($listener);
-            }
-
+        foreach ($listeners as $hash => $listener) {
             if (!$this->isListenerEnabled($listener)) {
                 $this->disabledListeners[$event][] = $listener;
-                $this->removeEventListener($event, $unmodifiedListener);
+                $this->removeEventListener(
+                    $event,
+                    str_starts_with($hash, '_service_') ? substr($hash, \strlen('_service_')) : $listener
+                );
             }
         }
     }

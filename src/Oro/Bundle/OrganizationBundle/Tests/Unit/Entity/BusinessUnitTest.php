@@ -7,14 +7,15 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BusinessUnitTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BusinessUnit
-     */
-    protected $unit;
+    /** @var BusinessUnit */
+    private $unit;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->unit = new BusinessUnit();
     }
@@ -98,7 +99,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $businessUnit = new BusinessUnit();
         $user  = new User();
 
-        $businessUnit->setUsers(new ArrayCollection(array($user)));
+        $businessUnit->setUsers(new ArrayCollection([$user]));
 
         $this->assertContains($user, $businessUnit->getUsers());
 

@@ -2,39 +2,28 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Transformer;
 
+use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 
 class TagTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TagTransformer
-     */
-    protected $transformer;
+    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $manager;
+    /** @var TagTransformer */
+    private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->manager = $this->createMock(TagManager::class);
+
         $this->transformer = new TagTransformer($this->manager);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->manager);
-        unset($this->transformer);
     }
 
     /**
      * @dataProvider valueReverseTransformProvider
-     * @param $value
-     * @param $tags
      */
-    public function testReverseTransform($value, $tags)
+    public function testReverseTransform(string $value, array $tags)
     {
         $this->manager->expects($this->once())
             ->method('loadOrCreateTags')
@@ -43,10 +32,7 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform($value);
     }
 
-    /**
-     * @return array
-     */
-    public function valueReverseTransformProvider()
+    public function valueReverseTransformProvider(): array
     {
         return [
             [
@@ -58,19 +44,13 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueTransformProvider
-     *
-     * @param $expected
-     * @param $value
      */
-    public function testTransform($expected, $value)
+    public function testTransform(string $expected, array $value)
     {
         $this->assertEquals($expected, $this->transformer->transform($value));
     }
 
-    /**
-     * @return array
-     */
-    public function valueTransformProvider()
+    public function valueTransformProvider(): array
     {
         return [
             [

@@ -6,28 +6,26 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const DIMENSION_ORIGINAL = 'product_original';
-    const DIMENSION_LARGE = 'product_large';
-    const DIMENSION_SMALL = 'product_small';
-    const DIMENSION_CUSTOM = 'product_custom';
+    private const DIMENSION_ORIGINAL = 'product_original';
+    private const DIMENSION_LARGE = 'product_large';
+    private const DIMENSION_SMALL = 'product_small';
+    private const DIMENSION_CUSTOM = 'product_custom';
 
-    /**
-     * @var ImageTypeProvider
-     */
-    protected $provider;
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $themeManager;
 
-    /**
-     * @var ThemeManager
-     */
-    protected $themeManager;
+    /** @var ImageTypeProvider */
+    private $provider;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->themeManager = $this->prophesize('Oro\Component\Layout\Extension\Theme\Model\ThemeManager');
-        $this->provider = new ImageTypeProvider($this->themeManager->reveal());
+        $this->themeManager = $this->createMock(ThemeManager::class);
+
+        $this->provider = new ImageTypeProvider($this->themeManager);
     }
 
     public function testGetImageTypes()
@@ -40,24 +38,24 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
 
         $imageTypes = $this->provider->getImageTypes();
 
-        $this->assertCount(2, $imageTypes);
-        $this->assertValidImageType($imageTypes['main'], 'main', 'Main', 1, $theme1MainDimensions);
-        $this->assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, $theme2ListingDimensions);
-        $this->assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
+        self::assertCount(2, $imageTypes);
+        self::assertValidImageType($imageTypes['main'], 'main', 'Main', 1, $theme1MainDimensions);
+        self::assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, $theme2ListingDimensions);
+        self::assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testInvalidConfig()
     {
-        $this->themeManager->getAllThemes()->willReturn([
-            $this->prepareTheme('theme1', [
-                'main' => ['Main', 1, ['non_existing_dimension']],
-            ], [
-                self::DIMENSION_SMALL => [50, 50]
-            ])
-        ]);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->themeManager->expects(self::any())
+            ->method('getAllThemes')
+            ->willReturn([
+                $this->prepareTheme('theme1', [
+                    'main' => ['Main', 1, ['non_existing_dimension']],
+                ], [
+                    self::DIMENSION_SMALL => [50, 50]
+                ])
+            ]);
 
         $this->provider->getImageTypes();
     }
@@ -73,19 +71,13 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         $dimensions = $this->provider->getImageDimensions();
 
         $dimensionLarge = $dimensions[self::DIMENSION_LARGE];
-        $this->assertCount(4, $dimensions);
-        $this->assertEquals(400, $dimensionLarge->getWidth());
-        $this->assertEquals(400, $dimensionLarge->getHeight());
-        $this->assertTrue($dimensionLarge->getOption('option1'));
+        self::assertCount(4, $dimensions);
+        self::assertEquals(400, $dimensionLarge->getWidth());
+        self::assertEquals(400, $dimensionLarge->getHeight());
+        self::assertTrue($dimensionLarge->getOption('option1'));
     }
 
-    /**
-     * @param string $name
-     * @param array $imageTypes
-     * @param array $dimensions
-     * @return Theme
-     */
-    private function prepareTheme($name, array $imageTypes, array $dimensions)
+    private function prepareTheme(string $name, array $imageTypes, array $dimensions): Theme
     {
         $config = [
             'images' => [
@@ -95,7 +87,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         ];
 
         foreach ($imageTypes as $key => $imageType) {
-            list($label, $maxNumber, $dimensionNames) = $imageType;
+            [$label, $maxNumber, $dimensionNames] = $imageType;
             $config['images']['types'][$key] = [
                 'label' => $label,
                 'dimensions' => $dimensionNames,
@@ -103,12 +95,12 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
             ];
         }
 
-        foreach ($dimensions as $name => $dimension) {
-            list($width, $height) = $dimension;
-            $config['images']['dimensions'][$name] = ['width' => $width, 'height' => $height];
+        foreach ($dimensions as $dimensionName => $dimension) {
+            [$width, $height] = $dimension;
+            $config['images']['dimensions'][$dimensionName] = ['width' => $width, 'height' => $height];
 
             if (isset($dimension[2])) {
-                $config['images']['dimensions'][$name]['options'] = $dimension[2];
+                $config['images']['dimensions'][$dimensionName]['options'] = $dimension[2];
             }
         }
 
@@ -118,55 +110,50 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         return $theme;
     }
 
-    /**
-     * @param ThemeImageType $imageType
-     * @param string $name
-     * @param string $label
-     * @param int $maxNumber
-     * @param array $dimensions
-     */
-    private function assertValidImageType(ThemeImageType $imageType, $name, $label, $maxNumber, array $dimensions)
-    {
-        $this->assertEquals($name, $imageType->getName());
-        $this->assertEquals($label, $imageType->getLabel());
-        $this->assertEquals($maxNumber, $imageType->getMaxNumber());
-        $this->assertCount(count($dimensions), $imageType->getDimensions());
-        $this->assertEquals($dimensions, array_keys($imageType->getDimensions()));
+    private static function assertValidImageType(
+        ThemeImageType $imageType,
+        string $name,
+        string $label,
+        int $maxNumber,
+        array $dimensions
+    ): void {
+        self::assertEquals($name, $imageType->getName());
+        self::assertEquals($label, $imageType->getLabel());
+        self::assertEquals($maxNumber, $imageType->getMaxNumber());
+        self::assertCount(count($dimensions), $imageType->getDimensions());
+        self::assertEquals($dimensions, array_keys($imageType->getDimensions()));
     }
 
-    /**
-     * @param array $theme1MainDimensions
-     * @param array $theme1ListingDimensions
-     * @param array $theme2ListingDimensions
-     */
     private function prepareThemeManager(
         array $theme1MainDimensions,
         array $theme1ListingDimensions,
         array $theme2ListingDimensions
-    ) {
-        $this->themeManager->getAllThemes()->willReturn([
-            $this->prepareTheme(
-                'theme1',
-                [
-                    'main' => ['Main', 1, $theme1MainDimensions],
-                    'listing' => ['Listing', 3, $theme1ListingDimensions],
-                ],
-                [
-                    self::DIMENSION_ORIGINAL => [null, null],
-                    self::DIMENSION_LARGE => [400, 400, ['option1' => true]],
-                    self::DIMENSION_SMALL => [50, 50],
-                ]
-            ),
-            $this->prepareTheme(
-                'theme2',
-                [
-                    'listing' => ['Listing', 5, $theme2ListingDimensions],
-                ],
-                [
-                    self::DIMENSION_CUSTOM => [88, 88],
-                ]
-            ),
-            $this->prepareTheme('theme3', [], [])
-        ]);
+    ): void {
+        $this->themeManager->expects(self::any())
+            ->method('getAllThemes')
+            ->willReturn([
+                $this->prepareTheme(
+                    'theme1',
+                    [
+                        'main' => ['Main', 1, $theme1MainDimensions],
+                        'listing' => ['Listing', 3, $theme1ListingDimensions],
+                    ],
+                    [
+                        self::DIMENSION_ORIGINAL => [null, null],
+                        self::DIMENSION_LARGE => [400, 400, ['option1' => true]],
+                        self::DIMENSION_SMALL => [50, 50],
+                    ]
+                ),
+                $this->prepareTheme(
+                    'theme2',
+                    [
+                        'listing' => ['Listing', 5, $theme2ListingDimensions],
+                    ],
+                    [
+                        self::DIMENSION_CUSTOM => [88, 88],
+                    ]
+                ),
+                $this->prepareTheme('theme3', [], [])
+            ]);
     }
 }

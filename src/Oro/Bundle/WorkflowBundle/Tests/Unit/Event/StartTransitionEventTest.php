@@ -3,39 +3,27 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class StartTransitionEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $transition;
+    /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
+    private $transition;
 
-    /**
-     * @var array
-     */
-    protected $routeParameters;
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var array */
+    private $routeParameters;
 
-    /**
-     * @var StartTransitionEvent
-     */
-    protected $event;
+    /** @var StartTransitionEvent */
+    private $event;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->transition = $this->createMock(Transition::class);
+        $this->workflow = $this->createMock(Workflow::class);
         $this->routeParameters = [];
 
         $this->event = new StartTransitionEvent($this->workflow, $this->transition, $this->routeParameters);

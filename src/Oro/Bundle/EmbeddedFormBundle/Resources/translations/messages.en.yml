@@ -3,6 +3,7 @@ oro:
         css.label:           CSS
         entity_label:        Embedded Form
         entity_plural_label: Embedded Forms
+        entity_grid_all_view_label: All %entity_plural_label%
         form_type.label:     Form Type
         id.label:            ID
         title.label:         Title
@@ -17,7 +18,7 @@ oro:
                 label:          Inline code
                 description: >
                     Note: Using this method of embedding will interfere with your site's CSS.
-                    You might need to change the form CSS.<br />
+                    You might need to change the form CSS.<br>
                     You should also check the Allowed Domains section and add all known domains
                     that are hosting your form.
         no_types_available:     The embedded form cannot be created as no form types are available.
@@ -25,7 +26,7 @@ oro:
         success_message:
             label: Success message
             default: Form has been submitted successfully
-            description: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
+            description: This message will appear after submitting the form.<br>Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
 
         allowed_domains:
             label: Allowed Domains
@@ -38,3 +39,8 @@ oro:
             saved_message: Form has been saved successfully
         css:
             description: Only CSS is allowed.
+
+        feature:
+            manage:
+                label: Embedded Form Management
+                description: Enables the creation and management of embedded forms, which are added to a third-party website to enable communication between the third-party website users and the Oro application.

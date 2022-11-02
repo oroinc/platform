@@ -16,7 +16,7 @@ api:
                 delete: false
 
         Oro\Bundle\EntityBundle\Model\EntityStructure:
-            documentation_resource:  '@OroEntityBundle/Resources/doc/api/entity_structure.md'
+            documentation_resource: '@OroEntityBundle/Resources/doc/api/entity_structure.md'
             disable_meta_properties: true
             identifier_field_names: [id]
             fields:
@@ -35,7 +35,7 @@ api:
                 icon:
                     data_type: string
                 fields:
-                    data_type: array
+                    data_type: objects
                     target_class: Oro\Bundle\EntityBundle\Model\EntityFieldStructure
                     target_type: collection
                     fields:
@@ -50,14 +50,12 @@ api:
                         relatedEntityName:
                             data_type: string
                         options:
-                            data_type: array
+                            data_type: object
                 options:
-                    data_type: array
+                    data_type: object
                 routes:
-                    data_type: array
+                    data_type: object
             actions:
-#            TODO: "Get" should be uncommented after BAP-15804
-#                get: false
                 get_list:
                     page_size: -1 # disable paging
                     disable_sorting: true

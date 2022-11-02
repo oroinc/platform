@@ -1,0 +1,7 @@
+app-modules:
+    - orodataaudit/js/app/modules/entity-filter-preset-module
+dynamic-imports:
+    commons:
+        - orodataaudit/js/app/components/segment-component-extension
+        - orodataaudit/js/app/views/data-audit-condition-view
+        - orodataaudit/js/audit-filter

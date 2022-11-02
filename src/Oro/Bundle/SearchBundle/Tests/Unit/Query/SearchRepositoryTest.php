@@ -9,22 +9,23 @@ use Oro\Bundle\SearchBundle\Query\SearchRepository;
 
 class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchRepository */
-    protected $repository;
-
     /** @var QueryFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryFactory;
+    private $queryFactory;
 
     /** @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mappingProvider;
+    private $mappingProvider;
 
-    protected function setUp()
+    /** @var SearchRepository */
+    private $repository;
+
+    protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(QueryFactoryInterface::class);
         $this->mappingProvider = $this->getMockBuilder(AbstractSearchMappingProvider::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntityAlias'])
+            ->onlyMethods(['getEntityAlias'])
             ->getMockForAbstractClass();
+
         $this->repository = new SearchRepository($this->queryFactory, $this->mappingProvider);
     }
 
@@ -32,14 +33,14 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->createMock(SearchQueryInterface::class);
 
-        $this->queryFactory->expects($this->once())
+        $this->queryFactory->expects(self::once())
             ->method('create')
             ->with([])
             ->willReturn($query);
-        $this->mappingProvider->expects($this->never())
-            ->method($this->anything());
+        $this->mappingProvider->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertEquals($query, $this->repository->createQuery());
+        self::assertEquals($query, $this->repository->createQuery());
     }
 
     public function testCreateQueryWithEntity()
@@ -48,49 +49,45 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
         $entityAlias = 'test_class';
 
         $query = $this->createMock(SearchQueryInterface::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setFrom')
             ->with($entityAlias);
 
-        $this->queryFactory->expects($this->once())
+        $this->queryFactory->expects(self::once())
             ->method('create')
             ->with([])
             ->willReturn($query);
 
-        $this->mappingProvider->expects($this->once())
+        $this->mappingProvider->expects(self::once())
             ->method('getEntityAlias')
             ->with($entityClass)
             ->willReturn($entityAlias);
 
         $this->repository->setEntityName($entityClass);
-        $this->assertEquals($query, $this->repository->createQuery());
+        self::assertEquals($query, $this->repository->createQuery());
     }
 
     public function testSetEntityName()
     {
-        $entityClass = 'TestClass';
-
-        $this->assertAttributeEmpty('entityName', $this->repository);
-        $this->repository->setEntityName($entityClass);
-        $this->assertAttributeEquals($entityClass, 'entityName', $this->repository);
+        self::assertEmpty($this->repository->getEntityName());
+        $this->repository->setEntityName('TestClass');
+        self::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
     public function testGetEntityName()
     {
-        $entityClass = 'TestClass';
-
-        $this->assertNull($this->repository->getEntityName());
-        $this->repository->setEntityName($entityClass);
-        $this->assertEquals($entityClass, $this->repository->getEntityName());
+        self::assertNull($this->repository->getEntityName());
+        $this->repository->setEntityName('TestClass');
+        self::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
     public function testGetQueryFactory()
     {
-        $this->assertEquals($this->queryFactory, $this->repository->getQueryFactory());
+        self::assertEquals($this->queryFactory, $this->repository->getQueryFactory());
     }
 
     public function testGetMappingProvider()
     {
-        $this->assertEquals($this->mappingProvider, $this->repository->getMappingProvider());
+        self::assertEquals($this->mappingProvider, $this->repository->getMappingProvider());
     }
 }

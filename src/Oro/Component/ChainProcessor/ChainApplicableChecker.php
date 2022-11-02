@@ -22,15 +22,13 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->checkers);
     }
 
     /**
      * Adds a checker to the chain
-     *
-     * @param ApplicableCheckerInterface $checker
      */
     public function addChecker(ApplicableCheckerInterface $checker)
     {

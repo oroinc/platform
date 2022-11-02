@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle;
 
-use Guzzle\Http\Message\Response as GuzzleResponse;
+use GuzzleHttp\Utils;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Extended response class for the Guzzle REST Client
+ */
 class GuzzleRestResponse implements RestResponseInterface
 {
     /**
-     * @var GuzzleResponse
+     * @var ResponseInterface
      */
     protected $response;
 
@@ -17,11 +21,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     protected $requestUrl;
 
-    /**
-     * @param GuzzleResponse $response
-     * @param string $requestUrl
-     */
-    public function __construct(GuzzleResponse $response, $requestUrl = null)
+    public function __construct(ResponseInterface $response, string $requestUrl = null)
     {
         $this->response = $response;
         $this->requestUrl = $requestUrl;
@@ -38,26 +38,14 @@ class GuzzleRestResponse implements RestResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
-    {
-        try {
-            $result = (string)$this->response;
-        } catch (\Exception $exception) {
-            throw GuzzleRestException::createFromException($exception);
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBodyAsString()
     {
         try {
-            $result = $this->response->getBody(true);
+            $result = (string)$this->response->getBody();
         } catch (\Exception $exception) {
             throw GuzzleRestException::createFromException($exception);
         }
+
         return $result;
     }
 
@@ -67,19 +55,6 @@ class GuzzleRestResponse implements RestResponseInterface
     public function getStatusCode()
     {
         return $this->response->getStatusCode();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessage()
-    {
-        try {
-            $result = $this->response->getMessage();
-        } catch (\Exception $exception) {
-            throw GuzzleRestException::createFromException($exception);
-        }
-        return $result;
     }
 
     /**
@@ -119,7 +94,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isClientError()
     {
-        return $this->response->isClientError();
+        return $this->getStatusCode() >= 400 && $this->getStatusCode() < 500;
     }
 
     /**
@@ -127,7 +102,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isError()
     {
-        return $this->response->isError();
+        return $this->isClientError() || $this->isServerError();
     }
 
     /**
@@ -135,7 +110,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isInformational()
     {
-        return $this->response->isInformational();
+        return $this->getStatusCode() < 200;
     }
 
     /**
@@ -143,7 +118,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isRedirect()
     {
-        return $this->response->isRedirect();
+        return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
     }
 
     /**
@@ -151,7 +126,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isServerError()
     {
-        return $this->response->isServerError();
+        return $this->getStatusCode() >= 500 && $this->getStatusCode() < 600;
     }
 
     /**
@@ -159,7 +134,7 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function isSuccessful()
     {
-        return $this->response->isSuccessful();
+        return ($this->getStatusCode() >= 200 && $this->getStatusCode() < 300) || $this->getStatusCode() == 304;
     }
 
     /**
@@ -167,16 +142,11 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function json()
     {
-        try {
-            $result = $this->response->json();
-        } catch (\Exception $exception) {
-            throw GuzzleRestException::createFromException($exception);
-        }
-        return $result;
+        return Utils::jsonDecode($this->getBodyAsString(), true);
     }
 
     /**
-     * @return GuzzleResponse
+     * @return ResponseInterface
      */
     public function getSourceResponse()
     {

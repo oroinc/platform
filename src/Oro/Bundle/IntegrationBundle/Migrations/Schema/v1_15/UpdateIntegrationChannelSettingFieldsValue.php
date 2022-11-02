@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_15;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Component\Config\Common\ConfigObject;
@@ -43,7 +43,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
         $this->logQuery($logger, $query);
         $result = $this->connection->fetchAll($query);
 
-        $oldType = Type::getType(Type::OBJECT);
+        $oldType = Type::getType(Types::OBJECT);
         $newType = Type::getType(ConfigObjectType::TYPE);
         $platform = $this->connection->getDatabasePlatform();
 
@@ -71,7 +71,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
 
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
 
@@ -99,7 +99,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
 
         $this->logQuery($logger, $updateSql);
         if (!$dryRun) {
-            $this->connection->executeUpdate($updateSql);
+            $this->connection->executeStatement($updateSql);
         }
     }
 

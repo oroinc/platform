@@ -7,19 +7,14 @@ use Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider;
 
 class DefaultCurrencyConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['get'])
-            ->getMock();
-
-        $this->configManager->method('get')
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->configManager->expects($this->any())
+            ->method('get')
             ->with('oro_currency.default_currency')
             ->willReturn('USD');
     }

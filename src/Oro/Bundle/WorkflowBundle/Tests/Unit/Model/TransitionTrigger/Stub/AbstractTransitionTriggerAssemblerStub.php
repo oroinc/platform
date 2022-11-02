@@ -8,9 +8,7 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\AbstractTransitionTriggerA
 
 class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAssembler
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $canAssemble;
 
     /**
@@ -29,9 +27,6 @@ class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAs
         return $this->canAssemble;
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     protected function verifyTrigger(BaseTransitionTrigger $trigger)
     {
         //void

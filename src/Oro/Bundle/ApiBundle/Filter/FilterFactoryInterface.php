@@ -18,5 +18,5 @@ interface FilterFactoryInterface
      *
      * @return StandaloneFilter|null
      */
-    public function createFilter($filterType, array $options = []);
+    public function createFilter(string $filterType, array $options = []): ?StandaloneFilter;
 }

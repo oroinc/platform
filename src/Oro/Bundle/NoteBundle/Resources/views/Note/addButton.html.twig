@@ -1,3 +1,5 @@
+{% import '@OroUI/macros.html.twig' as UI %}
+
 {{ UI.clientButton({
     'dataUrl': path(
         'oro_note_create', {
@@ -20,7 +22,8 @@
                 'allowMinimize': true,
                 'dblclick': 'maximize',
                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                'width': 1000
+                'width': 1000,
+                'minWidth': 'expanded'
             }
         }
     }

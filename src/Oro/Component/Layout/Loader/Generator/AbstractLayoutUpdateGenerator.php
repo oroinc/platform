@@ -1,98 +1,83 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
+use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
+use Oro\Component\PhpUtils\ClassGenerator;
 
+/**
+ * Base class for generators of layout updates.
+ */
 abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInterface
 {
-    /** @var VisitorCollection */
-    private $visitorCollection;
+    private ?VisitorCollection $visitorCollection = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate($className, GeneratorData $data, VisitorCollection $visitorCollection = null)
-    {
-        $this->visitorCollection = $visitorCollection ?: new VisitorCollection();
+    public function generate(
+        string $className,
+        GeneratorData $data,
+        ?VisitorCollection $visitorCollection = null
+    ): string {
+        $this->visitorCollection = $visitorCollection ?? new VisitorCollection();
 
         $this->prepare($data, $this->visitorCollection);
         $this->validate($data);
 
-        $class        = PhpClass::create($className);
+        $class = new ClassGenerator($className);
         $visitContext = new VisitContext($class);
 
         if ($data->getFilename()) {
-            $writer = $visitContext->createWriter();
-            $writer
-                ->writeln('/**')
-                ->writeln(' * Filename: '.$data->getFilename())
-                ->writeln(' */');
-
-            $class->setDocblock($writer->getContent());
+            $class->addComment('Filename: '.$data->getFilename());
         }
 
-        $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateInterface');
+        $class->addImplement(LayoutUpdateInterface::class);
 
-        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
+        $method = $class->addMethod(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
 
-        $manipulatorParameter = PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR);
-        $manipulatorParameter->setType('Oro\Component\Layout\LayoutManipulatorInterface');
-        $method->addParameter($manipulatorParameter);
+        $method->addParameter(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR)
+            ->setType(LayoutManipulatorInterface::class);
 
-        $layoutItemParameter = PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM);
-        $layoutItemParameter->setType('Oro\Component\Layout\LayoutItemInterface');
-        $method->addParameter($layoutItemParameter);
+        $method->addParameter(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM)
+            ->setType(LayoutItemInterface::class);
 
         /** @var VisitorInterface $condition */
         foreach ($this->visitorCollection as $condition) {
             $condition->startVisit($visitContext);
         }
 
-        $writer = $visitContext->getUpdateMethodWriter();
-        $writer->writeLn(trim($this->doGenerateBody($data)));
+        $visitContext->appendToUpdateMethodBody($this->doGenerateBody($data));
 
         /** @var VisitorInterface $condition */
         foreach ($this->visitorCollection as $condition) {
             $condition->endVisit($visitContext);
         }
 
-        $method->setBody($writer->getContent());
-        $class->setMethod($method);
+        $method->setBody($visitContext->getUpdateMethodBody());
 
-        $strategy = new DefaultGeneratorStrategy();
-
-        return "<?php\n\n".$strategy->generate($class);
+        return "<?php\n\n" . $class->print();
     }
 
-    /**
-     * @return VisitorCollection
-     */
-    public function getVisitorCollection()
+    public function getVisitorCollection(): ?VisitorCollection
     {
         return $this->visitorCollection;
     }
 
     /**
      * Performs code generation itself based on source data given
-     *
-     * @param GeneratorData $data
      */
-    abstract protected function doGenerateBody(GeneratorData $data);
+    abstract protected function doGenerateBody(GeneratorData $data): string;
 
     /**
      * Do preparation of data and visitor collection based on resource data.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param GeneratorData     $data
-     * @param VisitorCollection $visitorCollection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
+    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection): void
     {
     }
 
@@ -100,9 +85,9 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
      * Validates given resource data. Should throw exception if error found.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param GeneratorData $data
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function validate(GeneratorData $data)
+    protected function validate(GeneratorData $data): void
     {
     }
 }

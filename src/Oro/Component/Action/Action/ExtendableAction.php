@@ -25,7 +25,7 @@ class ExtendableAction extends AbstractAction
                 continue;
             }
 
-            $this->eventDispatcher->dispatch($eventName, $event);
+            $this->eventDispatcher->dispatch($event, $eventName);
         }
     }
 

@@ -1,0 +1,28 @@
+entity_config:
+    attachment:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#attachment
+        field:
+            items:
+                use_dam:
+                    options:
+                        value_type: boolean
+                        allowed_type: [file, image, multiFile, multiImage]
+                        create_only: true
+                        required_property:
+                            code: is_stored_externally
+                            value: false
+                    form:
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                Yes: true
+                                No: false
+                            placeholder: false
+                            block: general
+                            subblock: properties
+                            label: oro.digitalasset.entity_config.attachment.field.items.use_dam.label
+                            tooltip: oro.digitalasset.entity_config.attachment.field.items.use_dam.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No

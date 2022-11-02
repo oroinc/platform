@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
@@ -11,12 +11,10 @@ use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Sends reminde notification emails.
+ * Sends reminder notification emails.
  */
 class EmailSendProcessor implements SendProcessorInterface
 {
-    const NAME = 'email';
-
     /**
      * @var EmailNotificationManager
      */
@@ -42,11 +40,6 @@ class EmailSendProcessor implements SendProcessorInterface
      */
     protected $eventDispatcher;
 
-    /**
-     * @param EmailNotificationManager $emailNotificationManager
-     * @param TemplateEmailNotification $emailNotification
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
         TemplateEmailNotification $emailNotification,
@@ -78,15 +71,13 @@ class EmailSendProcessor implements SendProcessorInterface
 
     /**
      * Send reminder using email
-     *
-     * @param Reminder $reminder
      */
     public function sendReminderEmail(Reminder $reminder)
     {
         $event = new SendReminderEmailEvent($reminder);
         $this->eventDispatcher->dispatch(
-            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
-            $event
+            $event,
+            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND
         );
         $this->emailNotification->setReminder($reminder);
 
@@ -98,14 +89,6 @@ class EmailSendProcessor implements SendProcessorInterface
             $reminder->setState(Reminder::STATE_FAIL);
             $reminder->setFailureException($exception);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

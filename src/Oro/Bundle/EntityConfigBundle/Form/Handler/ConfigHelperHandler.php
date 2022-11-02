@@ -7,19 +7,22 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Encapsulate a logic for config form handlers
  */
 class ConfigHelperHandler
 {
+    use RequestHandlerTrait;
+
     /** @var FormFactoryInterface */
     private $formFactory;
 
@@ -38,12 +41,6 @@ class ConfigHelperHandler
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param Session $session
-     * @param Router $router
-     * @param ConfigHelper $configHelper
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         Session $session,
@@ -68,8 +65,15 @@ class ConfigHelperHandler
     public function isFormValidAfterSubmit(Request $request, FormInterface $form)
     {
         if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
+            $isPartialSubmit = !empty($request->get($form->getName())[ConfigType::PARTIAL_SUBMIT]);
+            $this->submitPostPutRequest($form, $request, !$isPartialSubmit);
+
             if ($form->isSubmitted() && $form->isValid()) {
+                if ($isPartialSubmit) {
+                    // Form is submitted partially, so it cannot be fully valid.
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -118,23 +122,6 @@ class ConfigHelperHandler
     }
 
     /**
-     * @return $this
-     */
-    public function showClearCacheMessage()
-    {
-        $message = $this->translator->trans(
-            'oro.translation.translation.rebuild_cache_required',
-            [
-                '%path%' => $this->generateUrl('oro_translation_translation_index')
-            ]
-        );
-
-        $this->session->getFlashBag()->add('warning', $message);
-
-        return $this;
-    }
-
-    /**
      * @param ConfigModel|string $entityOrUrl
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -158,23 +145,7 @@ class ConfigHelperHandler
             'field' => $fieldConfigModel,
             'form' => $form->createView(),
             'formAction' => $formAction,
-            'require_js' => $this->configHelper->getExtendRequireJsModules()
+            'jsmodules' => $this->configHelper->getExtendJsModules()
         ];
-    }
-
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * @param string $route         The name of the route
-     * @param mixed  $parameters    An array of parameters
-     * @param int    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
-     *
-     * @return string The generated URL
-     *
-     * @see UrlGeneratorInterface
-     */
-    private function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
-    {
-        return $this->urlGenerator->generate($route, $parameters, $referenceType);
     }
 }

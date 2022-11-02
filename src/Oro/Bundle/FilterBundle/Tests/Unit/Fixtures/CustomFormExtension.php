@@ -7,10 +7,8 @@ use Symfony\Component\Form\FormTypeInterface;
 
 class CustomFormExtension extends AbstractExtension
 {
-    /**
-     * @var FormTypeInterface[] An array of FormTypeInterface instances
-     */
-    protected $initialTypes = array();
+    /** @var FormTypeInterface[] */
+    protected $initialTypes = [];
 
     public function __construct(array $initialTypes)
     {

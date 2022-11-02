@@ -8,23 +8,25 @@ use Oro\Bundle\EntityBundle\Exception\IncorrectEntityException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Validates user entity fields to be editable inline in grid.
+ */
 class UserGridFieldValidator implements CustomGridFieldValidatorInterface
 {
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $accessor;
 
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
-    public function __construct(TokenAccessorInterface $tokenAccessor)
-    {
+    public function __construct(
+        TokenAccessorInterface $tokenAccessor,
+        PropertyAccessorInterface $accessor
+    ) {
         $this->tokenAccessor = $tokenAccessor;
+        $this->accessor = $accessor;
     }
 
     /**
@@ -62,24 +64,12 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
     public function hasField($entity, $fieldName)
     {
         try {
-            $this->getPropertyAccessor()->isWritable($entity, $fieldName);
+            $this->accessor->isWritable($entity, $fieldName);
         } catch (InvalidArgumentException $e) {
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (null === $this->accessor) {
-            $this->accessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->accessor;
     }
 
     /**

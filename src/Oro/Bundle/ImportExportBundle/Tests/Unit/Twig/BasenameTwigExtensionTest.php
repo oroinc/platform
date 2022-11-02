@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension;
 use PHPUnit\Framework\TestCase;
+use Twig\TwigFilter;
 
 class BasenameTwigExtensionTest extends TestCase
 {
@@ -13,7 +14,7 @@ class BasenameTwigExtensionTest extends TestCase
 
         static::assertEquals(
             [
-                new \Twig_SimpleFilter('basename', [$extension, 'basenameFilter'])
+                new TwigFilter('basename', [$extension, 'basenameFilter'])
             ],
             $extension->getFilters()
         );

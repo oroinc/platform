@@ -30,7 +30,7 @@ abstract class AbstractResendHandler extends AbstractHandler
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return $this->isResendRequired($record);
     }
@@ -38,7 +38,7 @@ abstract class AbstractResendHandler extends AbstractHandler
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         if ($this->isResendRequired($record)) {
             /**

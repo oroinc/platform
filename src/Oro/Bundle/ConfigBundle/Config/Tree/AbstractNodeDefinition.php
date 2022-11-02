@@ -32,7 +32,6 @@ abstract class AbstractNodeDefinition
      * @param int $priority
      *
      * @return $this
-     *
      */
     public function setPriority($priority)
     {

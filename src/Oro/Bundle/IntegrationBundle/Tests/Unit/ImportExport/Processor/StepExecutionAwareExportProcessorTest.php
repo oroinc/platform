@@ -2,49 +2,37 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Processor;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\ExportProcessorTest;
 use Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareExportProcessor;
 
 class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
 {
-    /**
-     * @var StepExecutionAwareExportProcessor
-     */
+    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepExecution;
+
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
+
+    /** @var StepExecutionAwareExportProcessor */
     protected $processor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|StepExecution
-     */
-    protected $stepExecution;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry
-     */
-    protected $contextRegistry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
         $this->processor = new StepExecutionAwareExportProcessor();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing ContextRegistry
-     */
     public function testSetStepExecutionWithoutContextRegistry()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing ContextRegistry');
+
         $this->processor->setStepExecution($this->stepExecution);
     }
 
@@ -52,9 +40,9 @@ class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
     {
         $this->processor->setContextRegistry($this->contextRegistry);
 
-        $this->contextRegistry->expects($this->once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
         $this->processor->setStepExecution($this->stepExecution);
     }

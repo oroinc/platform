@@ -2,32 +2,24 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflowItem;
+    /** @var DefaultValuesListener */
+    private $listener;
 
-    /**
-     * @var DefaultValuesListener
-     */
-    protected $listener;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
 
         $this->listener = new DefaultValuesListener($this->contextAccessor);
     }
@@ -41,28 +33,22 @@ class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetDefaultValues()
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $defaultValues = array('test' => 'value');
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $defaultValues = ['test' => 'value'];
 
         $this->contextAccessor->expects($this->once())
             ->method('getValue')
             ->with($workflowItem, 'value')
-            ->will($this->returnValue('testValue'));
+            ->willReturn('testValue');
 
-        $data = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $data = $this->createMock(WorkflowData::class);
         $data->expects($this->once())
             ->method('set')
             ->with('test', 'testValue');
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
 
         $this->listener->initialize($workflowItem, $defaultValues);
         $this->listener->setDefaultValues($event);

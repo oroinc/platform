@@ -27,10 +27,6 @@ class RestrictionsExtension extends AbstractExtension
     /** @var string|null */
     protected $entityClassName;
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     * @param RestrictionManager  $restrictionManager
-     */
     public function __construct(
         EntityClassResolver $entityClassResolver,
         RestrictionManager $restrictionManager
@@ -137,7 +133,6 @@ class RestrictionsExtension extends AbstractExtension
      * @param        $restrictionColumnId
      *
      * @return array
-     *
      */
     protected function addRestrictionsToData(array  $rows, array $restrictions, $identifier, $restrictionColumnId)
     {

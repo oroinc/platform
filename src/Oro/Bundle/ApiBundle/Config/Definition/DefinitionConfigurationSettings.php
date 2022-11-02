@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 /**
- * The implementation of the settings for nested builders for "entities" and "relations" configuration sections.
+ * The implementation of the settings for nested builder for "entities" configuration section.
  */
 class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
 {
@@ -13,9 +13,6 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /** @var array [section path => callback[], ...] */
     private $additionalConfigureCallbacks = [];
 
-    /**
-     * @param ConfigurationSettingsInterface $settings
-     */
     public function __construct(ConfigurationSettingsInterface $settings)
     {
         $this->settings = $settings;

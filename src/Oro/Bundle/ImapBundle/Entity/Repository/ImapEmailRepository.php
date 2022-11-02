@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
+/**
+ * Doctrine repository for ImapEmail entity.
+ */
 class ImapEmailRepository extends EntityRepository
 {
     /**
@@ -26,32 +28,6 @@ class ImapEmailRepository extends EntityRepository
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
             ->setParameter('uids', $uids);
-    }
-
-    /**
-     * Get last email sequence uid by folder
-     *
-     * @param ImapEmailFolder $imapFolder
-     *
-     * @return int
-     */
-    public function findLastUidByFolder(ImapEmailFolder $imapFolder)
-    {
-        try {
-            $lastUid = $this->createQueryBuilder('ie')
-                ->select('ie.uid')
-                ->innerJoin('ie.imapFolder', 'if')
-                ->where('if = :imapFolder')
-                ->setParameter('imapFolder', $imapFolder)
-                ->orderBy('ie.uid', 'DESC')
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getSingleScalarResult();
-
-            return $lastUid;
-        } catch (NoResultException $e) {
-            return 0;
-        }
     }
 
     /**
@@ -150,7 +126,7 @@ class ImapEmailRepository extends EntityRepository
 
         if ($date) {
             $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
-                ->setParameter('date', $date);
+                ->setParameter('date', $date, Types::DATETIME_MUTABLE);
         }
         $emailUserIds = $qb->getQuery()->getArrayResult();
 

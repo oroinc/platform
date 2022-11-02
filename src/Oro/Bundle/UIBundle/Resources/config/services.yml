@@ -1,85 +1,80 @@
-parameters:
-    oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
-    oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
-
-    oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
-    oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
-
-    oro_ui.label_provider.action_button.class:             Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
-    oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
-    oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
-    oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
-    oro_ui.widget_provider.update_actions.class:           Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
-    oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
-
-    oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
-
-    oro_ui.config_settings.listener.class:                 Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
-
-    oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
-    oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
-
-    oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
-
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
-        class: '%oro_ui.placeholder.provider.class%'
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
         arguments:
-            - '%oro_ui.placeholders%'
+            - '@oro_ui.placeholder.configuration.provider'
             - '@oro_ui.placeholder.resolver'
             - '@security.authorization_checker'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
-        class: '%oro_ui.placeholder.resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
         arguments:
             - '@service_container'
 
     oro_ui.placeholder.filter:
-        class: '%oro_ui.placeholder.filter.class%'
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
+        public: true
+
+    oro_ui.placeholder.configuration.provider:
+        class: Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/placeholders.php'
+            - '%kernel.debug%'
 
     # Other services
     oro_ui.router:
-        class: '%oro_ui.router.class%'
+        class: Oro\Bundle\UIBundle\Route\Router
+        public: true
         arguments:
             - '@request_stack'
             - '@router'
             - '@security.authorization_checker'
 
+    Oro\Bundle\UIBundle\Route\Router:
+        alias:  oro_ui.router
+
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
+        public: true
         arguments:
             - '@oro_ui.dynamic_asset_version.cache'
 
     oro_ui.dynamic_asset_version.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_dynamic_asset_version' }
+
+    oro_ui.templating.template_name_parser:
+        class: Symfony\Component\Templating\TemplateNameParser
 
     oro_ui.view.listener:
         class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
+            - { name: container.service_subscriber, id: 'oro_ui.templating.template_name_parser', key: Symfony\Component\Templating\TemplateNameParser }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
         class: Oro\Bundle\UIBundle\EventListener\ContentProviderListener
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.config_settings.listener:
-        class: '%oro_ui.config_settings.listener.class%'
+        class: Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
         tags:
             - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_ui.application_url, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
-        class: '%oro_ui.format_converter.date_time.jquery_ui.class%'
+        class: Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -88,118 +83,299 @@ services:
 
     oro_ui.label_provider.action_button.abstract:
         abstract: true
-        class: '%oro_ui.label_provider.action_button.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
         arguments:
             - '@translator'
 
     oro_ui.label_provider.action_button_group:
-        class: '%oro_ui.label_provider.action_button_group.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
         arguments:
             - '@translator'
 
     oro_ui.widget_provider.action_button.abstract:
         abstract: true
-        class: '%oro_ui.widget_provider.action_button.class%'
+        class: Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
         arguments:
             - '@oro_ui.placeholder.provider'
 
     oro_ui.widget_provider.view_actions:
-        class: '%oro_ui.widget_provider.view_actions.class%'
+        class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+        public: true
         arguments:
+            - [] # providers
+            - ~ # service locator
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - '%oro_ui.widget_provider.view_actions.page_type%'
+            - ~ # page type
 
     oro_ui.widget_provider.update_actions:
-        class: '%oro_ui.widget_provider.update_actions.class%'
+        class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+        public: true
         arguments:
+            - [] # providers
+            - ~ # service locator
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - '%oro_ui.widget_provider.update_actions.page_type%'
+            - ~ # page type
 
     oro_ui.content_provider.manager:
-        class: '%oro_ui.content_provider.manager.class%'
+        class: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
+        arguments:
+            - !abstract '$providerNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
+            - !abstract '$providerContainer defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
+            - !abstract '$enabledProviderNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
+
+    oro_ui.content_provider.manager.twig:
+        class: Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
 
     oro_ui.provider.widget_context:
-        class: '%oro_ui.provider.widget_context.class%'
+        class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider
         arguments:
             - '@request_stack'
 
+    oro_ui.cache.purifier_config_warmer:
+        class: Oro\Bundle\UIBundle\Cache\HTMLPurifierConfigCacheWarmer
+        arguments:
+            - '@oro_ui.html_tag_helper'
+            - '@oro_form.provider.html_tag_provider'
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_ui.html_tag_helper:
-        class: '%oro_ui.html_tag_helper.class%'
+        class: Oro\Bundle\UIBundle\Tools\HtmlTagHelper
         arguments:
             - '@oro_form.provider.html_tag_provider'
-            - '%kernel.cache_dir%'
+            - '%kernel.cache_dir%/oro/html_purifier'
+        calls:
+            - ['setTranslator', ['@translator']]
+            # Additional div attributes
+            - ['setAttribute', ['div', 'role', 'Text']]
+            - ['setAttribute', ['div', 'aria-label', 'Text']]
+            - ['setAttribute', ['div', 'aria-labelledby', 'Text']]
+            - ['setAttribute', ['div', 'aria-orientation', 'Enum#horizontal,vertical']]
+            - ['setAttribute', ['div', 'aria-valuenow', 'Number']]
+            - ['setAttribute', ['div', 'aria-valuemin', 'Number']]
+            - ['setAttribute', ['div', 'aria-valuemax', 'Number']]
+            - ['setAttribute', ['div', 'aria-live', 'Text']]
+            - ['setAttribute', ['div', 'aria-atomic', 'Bool']]
+            - ['setAttribute', ['div', 'aria-hidden', 'Bool']]
+            - ['setAttribute', ['div', 'data-spy', 'Text']]
+            - ['setAttribute', ['div', 'data-ride', 'Text']]
+            - ['setAttribute', ['div', 'data-interval', 'Number']]
+            - ['setAttribute', ['div', 'data-parent', 'Text']]
+            - ['setAttribute', ['div', 'data-target', 'Text']]
+            - ['setAttribute', ['div', 'data-title', 'Text']]
+            - ['setAttribute', ['div', 'data-type', 'Text']]
+            - ['setAttribute', ['div', 'data-offset', 'Number']]
+            - ['setAttribute', ['div', 'data-delay', 'Number']]
+            - ['setAttribute', ['div', 'data-autohide', 'Bool']]
+            - ['setAttribute', ['div', 'tabindex', 'Text']]
+             # span attributes
+            - ['setAttribute', ['span', 'title', 'CDATA']]
+            - ['setAttribute', ['span', 'role', 'Text']]
+            - ['setAttribute', ['span', 'aria-hidden', 'Bool']]
+            - ['setAttribute', ['span', 'data-toggle', 'Text']]
+            - ['setAttribute', ['span', 'data-content', 'Text']]
+            - ['setAttribute', ['span', 'data-title', 'Text']]
+            - ['setAttribute', ['span', 'data-type', 'Text']]
+            - ['setAttribute', ['span', 'tabindex', 'Text']]
+            # button attributes
+            - ['setAttribute', ['button', 'id', 'ID']]
+            - ['setAttribute', ['button', 'type', 'CDATA']]
+            - ['setAttribute', ['button', 'title', 'CDATA']]
+            - ['setAttribute', ['button', 'aria-label', 'Text']]
+            - ['setAttribute', ['button', 'aria-haspopup', 'Bool']]
+            - ['setAttribute', ['button', 'aria-expanded', 'Bool']]
+            - ['setAttribute', ['button', 'aria-labelledby', 'Text']]
+            - ['setAttribute', ['button', 'aria-controls', 'Text']]
+            - ['setAttribute', ['button', 'data-dismiss', 'Text']]
+            - ['setAttribute', ['button', 'data-toggle', 'Text']]
+            - ['setAttribute', ['button', 'data-target', 'Text']]
+            - ['setAttribute', ['button', 'data-display', 'Text']]
+            - ['setAttribute', ['button', 'data-content', 'Text']]
+            - ['setAttribute', ['button', 'data-container', 'Text']]
+            - ['setAttribute', ['button', 'data-placement', 'Enum#top,bottom,left,right']]
+            - ['setAttribute', ['button', 'disabled', 'Bool']]
+            # style attributes
+            - ['setAttribute', ['style', 'type', 'Enum#text/css']]
+            - ['setAttribute', ['style', 'media', 'CDATA']]
+            # img attributes
+            - ['setAttribute', ['img', 'usemap', 'CDATA']]
+            - ['setAttribute', ['img', 'ismap', 'Bool']]
+            # nav attributes
+            - ['setAttribute', ['nav', 'aria-label', 'Text']]
+            # map attributes
+            - ['setAttribute', ['map', 'id', 'ID']]
+            - ['setAttribute', ['map', 'name', 'CDATA']]
+            # Ul attributes
+            - ['setAttribute', ['ul', 'role', 'Text']]
+            # li attributes
+            - ['setAttribute', ['li', 'aria-current', 'Text']]
+            - ['setAttribute', ['li', 'aria-selected', 'Bool']]
+            - ['setAttribute', ['li', 'data-target', 'Text']]
+            - ['setAttribute', ['li', 'data-slide-to', 'Text']]
+            # cite attributes
+            - ['setAttribute', ['cite', 'title', 'Text']]
+            # a attributes
+            - ['setAttribute', ['a', 'target', 'Text']]
+            - ['setAttribute', ['a', 'title', 'Text']]
+            - ['setAttribute', ['a', 'role', 'Text']]
+            - ['setAttribute', ['a', 'data-action', 'Text']]
+            - ['setAttribute', ['a', 'data-toggle', 'Text']]
+            - ['setAttribute', ['a', 'data-slide', 'Text']]
+            - ['setAttribute', ['a', 'data-trigger', 'Text']]
+            - ['setAttribute', ['a', 'aria-label', 'Text']]
+            - ['setAttribute', ['a', 'aria-disabled', 'Enum#true,false']]
+            - ['setAttribute', ['a', 'aria-expanded', 'Bool']]
+            - ['setAttribute', ['a', 'aria-controls', 'Text']]
+            - ['setAttribute', ['a', 'aria-haspopup', 'Bool']]
+            - ['setAttribute', ['a', 'aria-selected', 'Bool']]
+            - ['setAttribute', ['a', 'data-content', 'Text']]
+            - ['setAttribute', ['a', 'tabindex', 'Text']]
+            - ['setAttribute', ['a', 'data-placement', 'Enum#top,bottom,left,right']]
+            # area attributes
+            - ['setAttribute', ['area', 'id', 'ID']]
+            - ['setAttribute', ['area', 'name', 'CDATA']]
+            - ['setAttribute', ['area', 'title', 'Text']]
+            - ['setAttribute', ['area', 'alt', 'Text']]
+            - ['setAttribute', ['area', 'coords', 'CDATA']]
+            - ['setAttribute', ['area', 'accesskey', 'Character']]
+            - ['setAttribute', ['area', 'nohref', 'Bool']]
+            - ['setAttribute', ['area', 'href', 'URI']]
+            - ['setAttribute', ['area', 'shape', 'Enum#rect,circle,poly,default']]
+            - ['setAttribute', ['area', 'target', 'Enum#_blank,_self,_target,_top']]
+            - ['setAttribute', ['area', 'tabindex', 'Text']]
+            # video attributes
+            - ['setAttribute', ['video', 'allowfullscreen', 'Bool']]
+            - ['setAttribute', ['video', 'autoplay', 'Bool']]
+            - ['setAttribute', ['video', 'controls', 'Bool']]
+            - ['setAttribute', ['video', 'loop', 'Bool']]
+            - ['setAttribute', ['video', 'poster', 'URI']]
+            # iframe
+            - ['setAttribute', ['iframe', 'allow', 'Text']]
+            # Set Custom Elements
+            - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['map', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['area', 'Inline', 'Empty', 'Common', true]]
+            - ['setElement', ['figure', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['picture', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['source', 'Inline', 'Empty', 'Common', true]]
+            - ['setElement', ['figcaption', 'Inline', 'Flow', 'Common', true]]
 
     oro_ui.flash_message_helper:
-        class: 'Oro\Bundle\UIBundle\Tools\FlashMessageHelper'
+        class: Oro\Bundle\UIBundle\Tools\FlashMessageHelper
         arguments:
             - '@session'
             - '@translator'
             - '@oro_ui.html_tag_helper'
 
+    Oro\Bundle\UIBundle\Tools\FlashMessageHelper:
+        alias: 'oro_ui.flash_message_helper'
+
     oro_ui.user_agent_provider:
-        class: '%oro_ui.user_agent_provider.class%'
+        class: Oro\Bundle\UIBundle\Provider\UserAgentProvider
         arguments:
             - '@request_stack'
 
     oro_ui.formatter:
-        class: '%oro_ui.formatter.class%'
+        class: Oro\Bundle\UIBundle\Formatter\FormatterManager
+        arguments:
+            - ~ # formatters. Set by Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass
+            - [] # typesMap. Set by Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass
+
+    oro_ui.controller_class_provider:
+        class: Oro\Bundle\UIBundle\Provider\ControllerClassProvider
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/controllers.php'
+            - '%kernel.debug%'
+            - '@router'
+            - '@service_container'
+            - '@logger'
+
+    oro_ui.controller_class_provider.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        arguments:
+            - '@oro_ui.controller_class_provider'
+        tags:
+            - { name: kernel.cache_warmer, priority: 250 }
 
     oro_ui.config_extension.feature:
-        class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }
 
-    twig.extension.text:
-        class: Twig_Extensions_Extension_Text
-        public: false
-        tags:
-           - { name: twig.extension }
-
     oro_ui.twig.extension.formatter:
         class: Oro\Bundle\UIBundle\Twig\FormatExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_ui.twig.tab_extension:
         class: Oro\Bundle\UIBundle\Twig\TabExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_ui.twig.html_tag:
         class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_ui.twig.placeholder_extension:
         class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_ui.twig.ui_extension:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_ui.validator.move_to_child:
-        class: 'Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator'
+        class: Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator
         arguments:
             - '@translator'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_ui.provider.url_without_front_controller:
+        class: Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider
+        arguments:
+            - '@router'
+
+    oro_ui.consumption_extension.request_context:
+        class: Oro\Bundle\UIBundle\Consumption\Extension\ConsumptionExtension
+        arguments:
+            - '@router.request_context'
+            - '@oro_config.manager'
+            - !tagged_iterator { tag: 'app.handler', default_index_method: 'getIndex' }
+        tags:
+            - { name: oro_message_queue.consumption.extension }
+
+    oro_ui.event_listener.symfony_debug_toolbar_replace:
+        class: Oro\Bundle\UIBundle\EventListener\SymfonyDebugToolbarReplaceListener
+        arguments:
+            - '@kernel'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }
+
+    oro_ui.tools.url_helper:
+        class: Oro\Bundle\UIBundle\Tools\UrlHelper
+        arguments:
+            - '@url_helper'
+            - '@request_stack'
+            - '@?request_context'

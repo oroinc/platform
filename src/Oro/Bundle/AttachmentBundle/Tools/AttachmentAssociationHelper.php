@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tools;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides a method to check whether attachments are enabled for a specific entity type.
+ */
 class AttachmentAssociationHelper
 {
-    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
+    private ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -30,7 +28,7 @@ class AttachmentAssociationHelper
      *
      * @return bool
      */
-    public function isAttachmentAssociationEnabled($entityClass, $accessible = true)
+    public function isAttachmentAssociationEnabled(string $entityClass, bool $accessible = true): bool
     {
         if (!$this->configManager->hasConfig($entityClass)) {
             return false;
@@ -47,20 +45,16 @@ class AttachmentAssociationHelper
     /**
      * Check if an association between a given entity type and attachments is ready to be used in a business logic.
      * It means that the association should exist and should not be marked as deleted.
-     *
-     * @param string $entityClass The target entity class
-     *
-     * @return bool
      */
-    protected function isAttachmentAssociationAccessible($entityClass)
+    private function isAttachmentAssociationAccessible(string $entityClass): bool
     {
         $associationName = ExtendHelper::buildAssociationName($entityClass);
-        if (!$this->configManager->hasConfig(self::ATTACHMENT_ENTITY, $associationName)) {
+        if (!$this->configManager->hasConfig(Attachment::class, $associationName)) {
             return false;
         }
 
         return ExtendHelper::isFieldAccessible(
-            $this->configManager->getFieldConfig('extend', self::ATTACHMENT_ENTITY, $associationName)
+            $this->configManager->getFieldConfig('extend', Attachment::class, $associationName)
         );
     }
 }

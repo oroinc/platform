@@ -19,7 +19,7 @@ Feature: User menu
     Given I click My Emails in user menu
     And I should be on User Emails page
     And there is no records in grid
-    When I follow "Compose"
+    When I click "Compose"
     And fill form with:
       | Subject | Test mail for me              |
       | To      | John                          |
@@ -27,6 +27,14 @@ Feature: User menu
     And click "Send"
     Then I should see "The email was sent" flash message
     And number of records should be 1
+
+  Scenario: User menu update
+    When I go to System/User Management/Users
+    And click edit "John" in grid
+    And fill form with:
+      | Name Prefix | Mr.              |
+    And click "Save and Close"
+    Then I should see "Mr. John Doe" in the "UserMenu" element
 
   Scenario: Logout
     Given I click Logout in user menu

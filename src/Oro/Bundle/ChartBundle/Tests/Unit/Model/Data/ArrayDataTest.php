@@ -8,7 +8,7 @@ class ArrayDataTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {
-        $arrayData = array('foo' => 'bar');
+        $arrayData = ['foo' => 'bar'];
         $data = new ArrayData($arrayData);
         $this->assertEquals($arrayData, $data->toArray());
     }

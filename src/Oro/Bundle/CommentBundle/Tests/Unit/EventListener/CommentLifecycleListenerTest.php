@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -12,37 +13,26 @@ use Oro\Bundle\UserBundle\Entity\User;
 class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommentLifecycleListener */
-    protected $subscriber;
+    private $subscriber;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->subscriber = new CommentLifecycleListener($this->tokenAccessor);
     }
 
-    protected function tearDown()
-    {
-        unset($this->tokenAccessor);
-        unset($this->subscriber);
-    }
-
     /**
-     * @param object $entity
-     * @param bool   $mockUser
-     * @param bool   $detachedUser
-     * @param bool   $reloadUser
-     *
      * @dataProvider prePersistAndPreUpdateDataProvider
      */
     public function testPreUpdate(
-        $entity,
-        $mockUser = false,
-        $detachedUser = null,
-        $reloadUser = null
+        object $entity,
+        bool $mockUser = false,
+        bool $detachedUser = null,
+        bool $reloadUser = null
     ) {
         $oldUser = new User();
         $oldUser->setFirstName('oldUser');
@@ -55,31 +45,29 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
             $newUser->setFirstName('newUser');
         }
 
-        $this->mockSecurityContext($newUser);
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
+            ->willReturn($newUser);
 
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->setMethods(['propertyChanged', 'getEntityState'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $unitOfWork = $this->createMock(UnitOfWork::class);
 
         $entityManager = $this->getEntityManagerMock($reloadUser, $newUser);
         $entityManager->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
 
-        $callIndex = 0;
         if (null !== $detachedUser) {
-            $unitOfWork->expects($this->once(++$callIndex))
+            $unitOfWork->expects($this->once())
                 ->method('getEntityState')
                 ->with($newUser)
-                ->will($this->returnValue($detachedUser ? UnitOfWork::STATE_DETACHED : UnitOfWork::STATE_MANAGED));
+                ->willReturn($detachedUser ? UnitOfWork::STATE_DETACHED : UnitOfWork::STATE_MANAGED);
         }
-        $unitOfWork->expects($this->once(++$callIndex))
+        $unitOfWork->expects($this->once())
             ->method('propertyChanged')
             ->with($entity, 'updatedBy', $oldUser, $newUser);
 
-        $changeSet = array();
-        $args      = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+        $changeSet = [];
+        $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
 
         $this->subscriber->preUpdate($entity, $args);
 
@@ -90,10 +78,7 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function prePersistAndPreUpdateDataProvider()
+    public function prePersistAndPreUpdateDataProvider(): array
     {
         return [
             'with a user'     => [
@@ -112,34 +97,20 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param User|null $user
+     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function mockSecurityContext($user = null)
+    private function getEntityManagerMock(bool $reloadUser = false, User $newUser = null)
     {
-        $this->tokenAccessor->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue($user));
-    }
-
-    /**
-     * @param bool   $reloadUser
-     * @param object $newUser
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityManagerMock($reloadUser = false, $newUser = null)
-    {
-        $result = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getUnitOfWork', 'find'))
-            ->disableOriginalConstructor()
-            ->getMock();
+        $result = $this->createMock(EntityManager::class);
 
         if ($reloadUser) {
-            $result->expects($this->once())->method('find')
+            $result->expects($this->once())
+                ->method('find')
                 ->with('OroUserBundle:User')
-                ->will($this->returnValue($newUser));
+                ->willReturn($newUser);
         } else {
-            $result->expects($this->never())->method('find');
+            $result->expects($this->never())
+                ->method('find');
         }
 
         return $result;

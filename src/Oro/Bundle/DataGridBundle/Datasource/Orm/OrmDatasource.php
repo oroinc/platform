@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Allows to create datagrids from ORM queries.
  */
-class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterface
+class OrmDatasource implements DatasourceInterface, BindParametersInterface
 {
     const TYPE = 'orm';
 
@@ -45,28 +45,27 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var ParameterBinderInterface */
+    /** @var ParameterBinder */
     protected $parameterBinder;
 
     /** @var QueryHintResolver */
     protected $queryHintResolver;
 
-    /**
-     * @param ConfigProcessorInterface $processor
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ParameterBinderInterface $parameterBinder
-     * @param QueryHintResolver        $queryHintResolver
-     */
+    /** @var QueryExecutorInterface */
+    private $queryExecutor;
+
     public function __construct(
         ConfigProcessorInterface $processor,
         EventDispatcherInterface $eventDispatcher,
-        ParameterBinderInterface $parameterBinder,
-        QueryHintResolver $queryHintResolver
+        ParameterBinder $parameterBinder,
+        QueryHintResolver $queryHintResolver,
+        QueryExecutorInterface $queryExecutor
     ) {
-        $this->configProcessor   = $processor;
-        $this->eventDispatcher   = $eventDispatcher;
-        $this->parameterBinder   = $parameterBinder;
+        $this->configProcessor = $processor;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->parameterBinder = $parameterBinder;
         $this->queryHintResolver = $queryHintResolver;
+        $this->queryExecutor = $queryExecutor;
     }
 
     /**
@@ -87,30 +86,46 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
      */
     public function getResults()
     {
+        $query = $this->getResultsQuery();
+
+        $rows = $this->queryExecutor->execute($this->datagrid, $query);
+        $records = [];
+        foreach ($rows as $row) {
+            $records[] = new ResultRecord($row);
+        }
+
+        $event = new OrmResultAfter($this->datagrid, $records, $query);
+        $this->eventDispatcher->dispatch($event, OrmResultAfter::NAME);
+
+        return $event->getRecords();
+    }
+
+    public function getResultsQuery(): Query
+    {
         $this->eventDispatcher->dispatch(
-            OrmResultBeforeQuery::NAME,
-            new OrmResultBeforeQuery($this->datagrid, $this->qb)
+            new OrmResultBeforeQuery($this->datagrid, $this->qb),
+            OrmResultBeforeQuery::NAME
         );
 
         $query = $this->qb->getQuery();
+        $this->queryHintResolver->resolveHints($query, $this->queryHints ?? []);
 
-        $this->queryHintResolver->resolveHints(
-            $query,
-            null !== $this->queryHints ? $this->queryHints : []
-        );
+        $this->eventDispatcher->dispatch(new OrmResultBefore($this->datagrid, $query), OrmResultBefore::NAME);
 
-        $event = new OrmResultBefore($this->datagrid, $query);
-        $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
+        return $query;
+    }
 
-        $results = $event->getQuery()->execute();
-        $rows    = [];
-        foreach ($results as $result) {
-            $rows[] = new ResultRecord($result);
-        }
-        $event = new OrmResultAfter($this->datagrid, $rows, $query);
-        $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
+    public function getRootEntityName(): string
+    {
+        return $this->getQueryBuilder()->getRootEntities()[0];
+    }
 
-        return $event->getRecords();
+    /**
+     * Gets datagrid this datasource belongs to.
+     */
+    public function getDatagrid(): DatagridInterface
+    {
+        return $this->datagrid;
     }
 
     /**
@@ -141,6 +156,11 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         return $this->qb;
     }
 
+    public function getQueryHints(): ?array
+    {
+        return $this->queryHints;
+    }
+
     /**
      * Set QueryBuilder
      *
@@ -157,23 +177,14 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
 
     /**
      * {@inheritdoc}
-     *  @deprecated since 2.0.
      */
-    public function getParameterBinder()
-    {
-        return $this->parameterBinder;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function bindParameters(array $datasourceToDatagridParameters, $append = true)
+    public function bindParameters(array $datasourceToDatagridParameters, bool $append = true): void
     {
         if (!$this->datagrid) {
             throw new BadMethodCallException('Method is not allowed when datasource is not processed.');
         }
 
-        return $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
+        $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
     }
 
     public function __clone()
@@ -182,9 +193,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->countQb = $this->countQb ? clone $this->countQb : null;
     }
 
-    /**
-     * @param array $config
-     */
     protected function processConfigs(array $config)
     {
         $this->qb = $this->configProcessor->processQuery($config);

@@ -7,15 +7,15 @@ use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator;
 class ProtocolValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider safeProtocolDataProvider
+     * @dataProvider protocolDataProvider
      */
-    public function testIsSafeProtocol($isSafe, $path)
+    public function testIsSupportedProtocol($isSupported, $protocol)
     {
         $validator = new ProtocolValidator();
-        self::assertEquals($isSafe, $validator->isSupportedProtocol($path));
+        self::assertEquals($isSupported, $validator->isSupportedProtocol($protocol));
     }
 
-    public function safeProtocolDataProvider()
+    public function protocolDataProvider(): array
     {
         return [
             [true, 'file'],

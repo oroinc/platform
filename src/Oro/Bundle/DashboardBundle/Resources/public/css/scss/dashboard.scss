@@ -1,9 +1,15 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, no-descending-specificity */
+
 .dashboard-selector-container {
+    // stylelint-disable-next-line declaration-no-important
+    text-align: left !important;
+
     label {
-        padding-top: 4px;
-        padding-#{$end}: 10px;
+        padding-top: 6px;
+        padding-right: 10px;
+        margin-bottom: 0;
     }
 
     select {
@@ -13,25 +19,21 @@
     label,
     select,
     .selector {
-        float: #{$start};
+        float: left;
     }
+
+    @include selector-width();
 }
 
 .ui-dialog .form-horizontal {
     .widget-sort-by {
         .control-group .controls {
-            margin-#{$start}: 0;
+            margin-left: 0;
 
             select {
                 max-width: 280px;
             }
         }
-    }
-
-    .widget-query-filter .collapse-action {
-        padding-top: 4px;
-
-        display: inline-block;
     }
 }
 
@@ -46,11 +48,11 @@
     .responsive-section:not(.responsive-small) {
         .dashboard-column {
             &:first-child {
-                padding-#{$end}: $content-padding-small;
+                padding-right: $content-padding-small;
             }
 
             &:last-child {
-                padding-#{$start}: $content-padding-small;
+                padding-left: $content-padding-small;
             }
         }
     }
@@ -90,41 +92,31 @@
 
         .widget-header {
             min-height: 44px;
-            padding: 3px 0 2px;
+            padding: $dashboard-widget-header-padding;
 
             display: flex;
+            align-items: center;
 
             .dropdown-menu {
                 min-width: 100px;
             }
         }
 
-        .actions-container {
-            margin-top: 4px;
-
-            .collapse-action {
-                .collapse-action-icon {
-                    @include fa-icon($dashboard-action-icon);
-                }
-
-                &.collapsed .collapse-action-icon {
-                    @include fa-icon($dashboard-action-icon-collapsed);
-                }
-            }
-        }
-
-        .default-actions-container {
-            display: none;
-        }
-
         .widget-actions-container,
         .default-actions-container {
+            line-height: 1;
             white-space: nowrap;
         }
 
         .default-actions-container {
+            display: none;
+
             .action-wrapper {
-                padding: 0 3px;
+                padding: 0 6px;
+
+                &:last-child {
+                    border-right: none;
+                }
 
                 > a {
                     padding: 10px 8px;
@@ -133,11 +125,9 @@
         }
 
         .widget-actions-container {
-            margin: side-values(10px 0 8px 0);
-
             .action-wrapper {
-                padding: 0 2px;
-                margin-#{$start}: 14px;
+                padding: $dashboard-action-padding;
+                margin-left: 14px;
             }
         }
 
@@ -145,24 +135,21 @@
             cursor: move;
         }
 
-        .default-actions-container {
-            .action-wrapper:last-child {
-                border-#{$end}: none;
-            }
-        }
-
         .widget-title {
-            padding: 6px 0 0;
+            padding: 0;
 
             color: $dashboard-widget-title-color;
             font-size: 18px;
+            line-height: normal;
             text-overflow: ellipsis;
             white-space: nowrap;
 
             flex: 1;
             overflow: hidden;
 
-            &:before {
+            align-self: center;
+
+            &::before {
                 min-height: 40px;
 
                 content: '';
@@ -171,7 +158,7 @@
         }
 
         .row-fluid {
-            padding: 22px 24px;
+            padding: $dashboard-widget-content-padding;
 
             border-top: $dashboard-container-border;
         }
@@ -180,25 +167,30 @@
             margin-top: 0;
 
             .other-scroll-container {
-                margin: 10px 0;
+                margin-bottom: $dashboard-container-other-scroll-container-offset;
             }
         }
 
         .widget-config-data {
-            margin-#{$end}: 10px;
+            margin-right: 10px;
+            position: relative;
+            top: $dashboard-widget-config-data-shift;
 
-            font-size: $base-font-size - 1px;
+            font-size: $dashboard-widget-config-data-font-size;
+            line-height: $dashboard-widget-config-data-line-height;
 
             color: $dashboard-widget-config-data-color;
         }
     }
 
     .hidden-empty-text {
+        /* stylelint-disable declaration-no-important */
         height: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
 
         overflow: hidden !important;
+        /* stylelint-enable declaration-no-important */
         visibility: hidden;
     }
 
@@ -215,21 +207,13 @@
         border-radius: 3px;
     }
 
-    .dashboard-widget.collapsed {
-        overflow: hidden;
-
-        .row-fluid {
-            border-top: none;
-        }
-    }
-
     .collapse-expand-action-container {
-        padding: side-values(0 2px 0 6px);
+        padding: $dashboard-action-padding;
     }
 }
 
 .dashboard-link {
-    font-weight: normal;
+    font-weight: font-weight('normal');
 }
 
 .chart-container {
@@ -243,14 +227,16 @@
         margin: 0 auto;
     }
 
-    & > .clearfix {
+    > .clearfix {
         margin: 0 auto;
 
         .chart-legend {
             position: relative;
 
+            // stylelint-disable-next-line declaration-no-important
             height: auto !important;
-            min-width: 250px; // to wrap legend event if it's empty yet
+            // to wrap legend event if it's empty yet
+            min-width: 250px;
             padding-bottom: 20px;
 
             table {
@@ -260,7 +246,7 @@
                 bottom: 0;
                 right: 0;
 
-                margin: side-values(auto 0 auto 30px);
+                margin: auto 0 auto 30px;
                 width: 90%;
                 height: auto;
 
@@ -290,18 +276,21 @@
 }
 
 .chart-legend table {
+    // stylelint-disable-next-line declaration-no-important
     font-size: 13px !important;
 
     .flotr-legend-color-box > div {
+        // stylelint-disable-next-line declaration-no-important
         border: 0 !important;
 
-        & > div {
+        > div {
+            // stylelint-disable-next-line declaration-no-important
             border: 0 !important;
         }
     }
 
     .flotr-legend-label {
-        padding-#{$start}: 10px;
+        padding-left: 10px;
     }
 }
 
@@ -314,9 +303,9 @@
 .funnel-data {
     h5 {
         margin-bottom: 5px;
-        margin-#{$start}: 25px;
+        margin-left: 25px;
 
-        &:first-letter {
+        &::first-letter {
             text-transform: uppercase;
         }
     }
@@ -332,17 +321,39 @@
 
 .widget-configuration {
     .items-selector-widget {
-        margin-#{$end}: 20px;
+        margin-right: $content-padding;
+    }
+
+    .widget-title-container {
+        display: flex;
+
+        .control-group {
+            &.control-group-checkbox {
+                > .control-label {
+                    width: $dashboard-widget-title-widget-control-label-width;
+                    min-width: $dashboard-widget-title-widget-control-label-min-width;
+                }
+
+                > .controls {
+                    margin-left: $dashboard-widget-title-widget-controls-offset-start;
+                }
+            }
+        }
     }
 
     .widget-title-widget {
-        margin-#{$end}: 20px;
+        width: $dashboard-widget-title-widget-width;
+        margin-right: $content-padding;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
 
-        float: #{$start};
+    .widget-title-input {
+        width: $dashboard-widget-title-input-width;
     }
 
     .date-range-filter {
-        & > div > .control-group {
+        > div > .control-group {
             margin-bottom: 0;
         }
 
@@ -366,10 +377,6 @@
         }
     }
 
-    .filter-criteria {
-        padding: 0;
-    }
-
     .controls .horizontal {
         padding: 0;
     }
@@ -377,14 +384,14 @@
     table {
         .action-column,
         .action-cell {
-            width: 86px;
+            min-width: $dashboard-widget-configuration-action-cell-min-width;
         }
 
         &.scrollable {
             tbody {
                 height: 120px;
 
-                border-#{$start}: $dashboard-widget-configuration-border;
+                border-left: $dashboard-widget-configuration-border;
 
                 display: block;
             }
@@ -398,52 +405,78 @@
             }
 
             &.table-bordered td:first-child {
-                border-#{$start}: none;
+                border-left: none;
             }
         }
     }
 
     .widget-date-widget {
-        margin: side-values(4px 0 10px);
+        margin: 4px 0 10px;
     }
 
     .widget-date-input-widget {
-        input[type="text"] {
+        input[type='text'] {
             max-width: 110px;
+        }
+    }
+
+    .query-filter-row {
+        display: inline-block;
+
+        padding-top: $form-horizontal-control-label-offset;
+
+        line-height: $form-horizontal-control-label-line-height;
+
+        .dashboard-query-filter {
+            padding-top: $content-padding-small;
         }
     }
 }
 
 .widget-content.widget-configuration {
-    .table input[type="checkbox"] {
-        margin: side-values(0 0 1px 0);
+    .table input[type='checkbox'] {
+        margin: 0 0 1px;
     }
 }
 
 .dashboard-widget-items {
-    margin-bottom: 10px;
+    flex-wrap: wrap;
 
-    .control-group.controls {
-        width: 445px;
+    .controls.items-table-container {
+        flex-basis: 100%;
+
+        .items-selector-widget {
+            margin-bottom: $dashboard-configuration-items-table-margin-y * .5;
+        }
+
+        .actions-wrap {
+            float: left;
+            margin-bottom: $dashboard-configuration-items-table-margin-y;
+
+            @include clearfix();
+        }
     }
 
-    .mobile-version & {
-        .controls {
-            width: initial;
-        }
+    .btn-group + .btn-group {
+        margin-left: $dashboard-widget-configuration-buttons-space;
+    }
 
-        .action-column {
-            width: 116px;
+    .widget-items-item-row .action-cell {
+        @include clearfix();
 
-            text-align: center;
-        }
+        .btn-icon:not(.btn) {
+            display: block;
+            color: $dashboard-configuration-items-btn-color;
+            float: left;
 
-        .action-cell .btn {
-            padding: 0 4px;
+            &:active,
+            &:hover {
+                color: $dashboard-configuration-items-btn-active-color;
+            }
         }
     }
 }
 
 .ui-dialog .form-horizontal .control-group .conditions-group .controls {
-    margin-#{$start}: 0;
+    margin-left: 0;
 }

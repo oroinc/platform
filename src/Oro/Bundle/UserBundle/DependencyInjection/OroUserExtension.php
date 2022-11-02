@@ -10,22 +10,14 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroUserExtension extends Extension implements PrependExtensionInterface
 {
-    const ALIAS = 'oro_user';
-
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -34,11 +26,18 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
         $loader->load('importexport.yml');
         $loader->load('mass_actions.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
 
         $container->setParameter('oro_user.reset.ttl', $config['reset']['ttl']);
         $container->setParameter('oro_user.privileges', $config['privileges']);
+        $container->setParameter('oro_user.login_sources', $config['login_sources']);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**
@@ -48,13 +47,5 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
     {
         /** @var ExtendedContainerBuilder $container */
         SecurityExtensionHelper::makeFirewallLatest($container, 'main');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAlias()
-    {
-        return self::ALIAS;
     }
 }

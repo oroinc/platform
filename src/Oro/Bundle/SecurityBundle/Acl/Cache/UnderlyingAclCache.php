@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 /**
@@ -10,33 +11,28 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  */
 class UnderlyingAclCache
 {
-    /** @var CacheProvider */
-    protected $cache;
+    protected CacheItemPoolInterface $cache;
 
     /**
      * Local storage of loaded entity underlying OIDs batches
-     *
-     * @var array
      */
-    protected $entityBatches = [];
+    protected array $entityBatches = [];
 
     /**
      * Local storage of loaded underlying OIDs batches
-     *
-     * @var array
      */
-    protected $loadedBatches = [];
+    protected array $loadedBatches = [];
 
     /**
-     * @var int How many ids will be stored in one batch
+     * How many ids will be stored in one batch
      */
-    protected $batchSize = 1000;
+    protected int $batchSize = 1000;
 
     /**
-     * @param CacheProvider $cacheProvider
+     * @param CacheItemPoolInterface $cacheProvider
      * @param int           $batchSize
      */
-    public function __construct(CacheProvider $cacheProvider, $batchSize = 1000)
+    public function __construct(CacheItemPoolInterface $cacheProvider, int $batchSize = 1000)
     {
         $this->cache = $cacheProvider;
         $this->batchSize = $batchSize;
@@ -44,15 +40,14 @@ class UnderlyingAclCache
 
     /**
      * Caches underlying OID
-     *
-     * @param ObjectIdentityInterface $oid
      */
-    public function cacheUnderlying(ObjectIdentityInterface $oid)
+    public function cacheUnderlying(ObjectIdentityInterface $oid): void
     {
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
-        
+        $batchCacheItem = $this->cache->getItem($this->normalizeCacheKey($batchKey));
+
         if (!array_key_exists($type, $this->entityBatches)) {
             $this->entityBatches[$type] = [];
         }
@@ -60,10 +55,7 @@ class UnderlyingAclCache
         if (!array_key_exists($type, $this->loadedBatches)
             || !array_key_exists($batchNumber, $this->loadedBatches[$type])
         ) {
-            $batch = $this->cache->fetch($batchKey);
-            if (false === $batch) {
-                $batch = [];
-            }
+            $batch = $batchCacheItem->isHit() ? $batchCacheItem->get() : [];
             $this->loadedBatches[$type][$batchNumber] = $batch;
         }
 
@@ -73,35 +65,24 @@ class UnderlyingAclCache
         //check if we have full underlyied batch
         if (count($this->loadedBatches[$type][$batchNumber]) === $this->batchSize) {
             $this->entityBatches[$type][$batchNumber] = true;
-            $this->cache->save($type, $this->entityBatches[$type]);
+            $cacheItem = $this->cache->getItem($this->normalizeCacheKey($type))->set($this->entityBatches[$type]);
+            $this->cache->save($cacheItem);
         }
 
-        $this->cache->save($batchKey, $this->loadedBatches[$type][$batchNumber]);
+        $batchCacheItem->set($this->loadedBatches[$type][$batchNumber]);
+        $this->cache->save($batchCacheItem);
     }
 
-    /**
-     * Checks if given OID is underlying
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return bool
-     */
-    public function isUnderlying(ObjectIdentityInterface $oid)
+    public function isUnderlying(ObjectIdentityInterface $oid): bool
     {
-        if (!$this->isDigitIdentifier($oid)) {
-            return false;
-        }
-
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
-        
+
         // check if batches info loaded and load it
         if (!array_key_exists($type, $this->entityBatches)) {
-            $batch = $this->cache->fetch($type);
-            if (false === $batch) {
-                $batch = [];
-            }
+            $cacheItem = $this->cache->getItem($this->normalizeCacheKey($type));
+            $batch = $cacheItem->isHit() ? $cacheItem->get() : [];
             $this->entityBatches[$type] = $batch;
         }
 
@@ -115,10 +96,8 @@ class UnderlyingAclCache
             $this->loadedBatches[$type] = [];
         }
         if (!array_key_exists($batchNumber, $this->loadedBatches[$type])) {
-            $batch = $this->cache->fetch($batchKey);
-            if (false === $batch) {
-                $batch = [];
-            }
+            $batchCacheItem = $this->cache->getItem($this->normalizeCacheKey($batchKey));
+            $batch = $batchCacheItem->isHit() ? $batchCacheItem->get() : [];
             $this->loadedBatches[$type][$batchNumber] = $batch;
         }
 
@@ -127,13 +106,11 @@ class UnderlyingAclCache
 
     /**
      * Removes OID info from the cache
-     *
-     * @param ObjectIdentityInterface $oid
      */
-    public function evictFromCache(ObjectIdentityInterface $oid)
+    public function evictFromCache(ObjectIdentityInterface $oid): void
     {
         if (!$this->isDigitIdentifier($oid)) {
-            $this->cache->delete($this->getUnderlyingDataKeyByIdentity($oid));
+            $this->cache->deleteItem($this->normalizeCacheKey($this->getUnderlyingDataKeyByIdentity($oid)));
         } else {
             $batchNumber = $this->getBatchNumber($oid);
             $type = $oid->getType();
@@ -141,78 +118,65 @@ class UnderlyingAclCache
             if (array_key_exists($type, $this->entityBatches)) {
                 unset($this->entityBatches[$type]);
             }
-            $this->cache->delete($type);
+            $this->cache->deleteItem($this->normalizeCacheKey($type));
 
             if (array_key_exists($type, $this->loadedBatches)
                 && array_key_exists($batchNumber, $this->loadedBatches[$type])
             ) {
                 unset($this->loadedBatches[$type][$batchNumber]);
             }
-            $this->cache->delete($this->getBatchCacheKey($oid));
+            $this->cache->deleteItem($this->normalizeCacheKey($this->getBatchCacheKey($oid)));
         }
     }
 
     /**
      * Clear all underlying OIDs cache
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 
     /**
      * Returns batch number for given OID
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return int
      */
-    protected function getBatchNumber(ObjectIdentityInterface $oid)
+    protected function getBatchNumber(ObjectIdentityInterface $oid): int
     {
         $identifier = $oid->getIdentifier();
-        /**
-         * We can't correctly calculate batch number in case when "id" is not an integer,
-         * so we put this entities to the single batch
-         */
+
         if (!$this->isDigitIdentifier($oid)) {
-            return 1;
+            $identifier = crc32($identifier);
         }
+
         return (int)floor($identifier / $this->batchSize) + 1;
     }
 
     /**
      * Returns batch cache key
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return string
      */
-    protected function getBatchCacheKey(ObjectIdentityInterface $oid)
+    protected function getBatchCacheKey(ObjectIdentityInterface $oid): string
     {
         return $oid->getType() . '_' . $this->getBatchNumber($oid);
     }
 
     /**
-     * Returns the key for the object identity.
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return string
+     * Returns the key for the object identity
      */
-    protected function getUnderlyingDataKeyByIdentity(ObjectIdentityInterface $oid)
+    protected function getUnderlyingDataKeyByIdentity(ObjectIdentityInterface $oid): string
     {
         return $oid->getType() . '_' . $oid->getIdentifier();
     }
 
     /**
      * Check if OID identifier contains only digits
-     *
-     * @param  ObjectIdentityInterface $oid
-     *
-     * @return boolean
      */
-    protected function isDigitIdentifier(ObjectIdentityInterface $oid)
+    protected function isDigitIdentifier(ObjectIdentityInterface $oid): bool
     {
         return is_int($oid->getIdentifier()) || ctype_digit($oid->getIdentifier());
+    }
+
+    private function normalizeCacheKey(string $key): string
+    {
+        return UniversalCacheKeyGenerator::normalizeCacheKey($key);
     }
 }

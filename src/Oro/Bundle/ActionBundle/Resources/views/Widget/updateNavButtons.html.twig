@@ -1,9 +1,15 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set params = oro_action_widget_parameters()|merge({'group': 'update_navButtons'}) %}
 
-{% include 'OroActionBundle:Widget:_widget.html.twig' %}
+{% set buttons %}
+    {% include '@OroAction/Widget/_widget.html.twig' %}
+{% endset %}
 
-{% if oro_action_has_buttons(params) %}
-    {{ UI.buttonSeparator() }}
+{%- if buttons|trim|length -%}
+    {{ buttons }}
+
+    {% if oro_action_has_buttons(params) %}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
 {% endif %}

@@ -11,9 +11,6 @@ interface QueryHintResolverInterface
 {
     /**
      * Resolves query hints
-     *
-     * @param Query $query
-     * @param array $hints
      */
     public function resolveHints(Query $query, array $hints = []);
 }

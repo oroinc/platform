@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+/**
+ * Base native query write for batch jobs.
+ */
 abstract class AbstractNativeQueryWriter implements ItemWriterInterface
 {
     const QUERY_BUILDER = 'query_builder';

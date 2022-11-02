@@ -1,57 +1,53 @@
-define(function(require) {
-    'use strict';
+import ConditionalNode from 'oroexpressionlanguage/js/library/node/conditional-node';
+import ConstantNode from 'oroexpressionlanguage/js/library/node/constant-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var ConditionalNode = require('oroexpressionlanguage/js/library/node/conditional-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/conditional-node', () => {
+    let compiler;
 
-    describe('oroexpressionlanguage/js/library/node/conditional-node', function() {
-        var compiler;
+    beforeEach(() => {
+        compiler = new Compiler({});
+    });
 
-        beforeEach(function() {
-            compiler = new Compiler({});
+    describe('then case', () => {
+        let conditionalNode;
+
+        beforeEach(() => {
+            conditionalNode = new ConditionalNode(
+                new ConstantNode(true),
+                new ConstantNode(1),
+                new ConstantNode(2)
+            );
         });
 
-        describe('then case', function() {
-            var conditionalNode;
-
-            beforeEach(function() {
-                conditionalNode = new ConditionalNode(
-                    new ConstantNode(true),
-                    new ConstantNode(1),
-                    new ConstantNode(2)
-                );
-            });
-
-            it('evaluation', function() {
-                expect(conditionalNode.evaluate()).toEqual(1);
-            });
-
-            it('compilation', function() {
-                conditionalNode.compile(compiler);
-                expect(compiler.getSource()).toBe('((true) ? (1) : (2))');
-            });
+        it('evaluation', () => {
+            expect(conditionalNode.evaluate()).toEqual(1);
         });
 
-        describe('else case', function() {
-            var conditionalNode;
+        it('compilation', () => {
+            conditionalNode.compile(compiler);
+            expect(compiler.getSource()).toBe('((true) ? (1) : (2))');
+        });
+    });
 
-            beforeEach(function() {
-                conditionalNode = new ConditionalNode(
-                    new ConstantNode(false),
-                    new ConstantNode(1),
-                    new ConstantNode(2)
-                );
-            });
+    describe('else case', () => {
+        let conditionalNode;
 
-            it('evaluation', function() {
-                expect(conditionalNode.evaluate()).toEqual(2);
-            });
+        beforeEach(() => {
+            conditionalNode = new ConditionalNode(
+                new ConstantNode(false),
+                new ConstantNode(1),
+                new ConstantNode(2)
+            );
+        });
 
-            it('compilation', function() {
-                conditionalNode.compile(compiler);
-                expect(compiler.getSource()).toBe('((false) ? (1) : (2))');
-            });
+        it('evaluation', () => {
+            expect(conditionalNode.evaluate()).toEqual(2);
+        });
+
+        it('compilation', () => {
+            conditionalNode.compile(compiler);
+            expect(compiler.getSource()).toBe('((false) ? (1) : (2))');
         });
     });
 });

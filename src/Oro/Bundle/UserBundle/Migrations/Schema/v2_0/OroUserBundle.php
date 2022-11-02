@@ -16,9 +16,6 @@ class OroUserBundle implements Migration
         self::addEmailUserIndexes($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addEmailUserIndexes(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

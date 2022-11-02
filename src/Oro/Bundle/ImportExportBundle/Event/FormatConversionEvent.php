@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FormatConversionEvent extends Event
 {
@@ -12,10 +12,6 @@ class FormatConversionEvent extends Event
     /** @var array */
     protected $result = [];
 
-    /**
-     * @param array $record
-     * @param array $result
-     */
     public function __construct(array $record, array $result = [])
     {
         $this->record = $record;

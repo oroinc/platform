@@ -26,19 +26,19 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"userroles",
-      "attributes":{  
-         "extend_description":"A guest role",
-         "role":"IS_AUTHENTICATED_AT_FIRST",
-         "label":"Guest"
+{
+   "data": {
+      "type": "userroles",
+      "attributes": {
+         "extend_description": "A guest role",
+         "role": "IS_AUTHENTICATED_AT_FIRST",
+         "label": "Guest"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -51,26 +51,28 @@ Example:
 
 Edit a specific user role record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"userroles",
-      "id":"10",
-      "attributes":{  
-         "extend_description":"A guest role new",
-         "role":"IS_AUTHENTICATED_AT_FIRST",
-         "label":"Guest"
+{
+   "data": {
+      "type": "userroles",
+      "id": "10",
+      "attributes": {
+         "extend_description": "A guest role new",
+         "role": "IS_AUTHENTICATED_AT_FIRST",
+         "label": "Guest"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -99,15 +101,7 @@ Delete a collection of user roles.
 
 {@inheritdoc}
 
-**The required field**
-
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
+**The required field.**
 
 ## SUBRESOURCES
 
@@ -205,3 +199,18 @@ Example:
 #### delete_relationship
 
 Remove user records from a specific user role record.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}

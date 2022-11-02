@@ -2,90 +2,103 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
-use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
+use Behat\Behat\Context\Initializer\ContextInitializer;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;
+use Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\ContextServiceEnvironmentHandler;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected static $path1;
-    protected static $path2;
+    use TempDirExtension;
 
-    /**
-     * @beforeClass
-     */
-    public static function createPaths()
+    private string $tempDir;
+
+    private array $sharedContexts = [OroMainContext::class];
+
+    protected function setUp(): void
     {
-        self::$path1 = sys_get_temp_dir().'/bundle1';
-        self::$path2 = sys_get_temp_dir().'/bundle2';
-        mkdir(self::$path1.'/Tests/Behat', 0777, true);
-        mkdir(self::$path2.'/Tests/Behat', 0777, true);
+        $this->tempDir = $this->getTempDir('behat');
+        mkdir($this->tempDir . '/bundle1/Tests/Behat', 0777, true);
+        mkdir($this->tempDir . '/bundle2/Tests/Behat', 0777, true);
     }
-
-    /**
-     * @var array
-     */
-    protected $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
 
     /**
      * @dataProvider processBundleAutoloadProvider
-     * @param array $suiteConfig
-     * @param array $bundlesConfig
-     * @param array $expectedSuiteConfig
      */
-    public function testProcessBundleAutoload(array $suiteConfig, array $bundlesConfig, array $expectedSuiteConfig)
-    {
+    public function testProcessBundleAutoload(
+        array $suiteConfig,
+        array $bundlesConfig,
+        array $expectedSuiteConfig
+    ): void {
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
 
-        $config = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
+        $config = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
 
         $config = $this->processConfig($config);
 
-        $extension = $this
-            ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
-            ->setMethods(['hasValidPaths', 'hasDirectory'])
+        $extension = $this->getMockBuilder(OroTestFrameworkExtension::class)
+            ->onlyMethods(['hasValidPaths'])
             ->getMock();
-        $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
+        $extension->expects(self::any())
+            ->method('hasValidPaths')
+            ->willReturn(true);
         $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
         $extension->process($containerBuilder);
 
-        $this->assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
+        self::assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $containerBuilder = $this->getContainerBuilder([]);
-        $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
+        $sharedContexts = [OroMainContext::class];
 
-        $config = ['oro_test' => [
-            'shared_contexts' => $sharedContexts,
-        ]];
+        $config = [
+            'oro_test' => [
+                'shared_contexts' => $sharedContexts,
+            ],
+        ];
 
         $config = $this->processConfig($config);
 
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $config);
 
-        $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
+        self::assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
     }
 
-    public function testGetConfigKey()
+    public function testGetConfigKey(): void
     {
         $extension = new OroTestFrameworkExtension();
-        $this->assertEquals('oro_test', $extension->getConfigKey());
+        self::assertEquals('oro_test', $extension->getConfigKey());
     }
 
-    public function processBundleAutoloadProvider()
+    public function processBundleAutoloadProvider(): array
     {
         return [
             'All bundle was configured' => [
@@ -151,7 +164,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                     'OroFormBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/Features'],
                         ],
                     ],
@@ -167,14 +180,14 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                     'OroBaseBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/var/www/OroBaseBundle/Features'],
                         ],
                     ],
                     'OroExtendBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/var/www/OroExtendBundle/Features'],
                         ],
                     ],
@@ -183,30 +196,31 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Configuration with "MyElement" key is already defined
-     */
-    public function testExceptionForElementsWithSameName()
+    public function testExceptionForElementsWithSameName(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Configuration with "MyElement" key is already defined');
+
         $config = [
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
         ];
-        $configExtension = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
-        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config));
-        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config));
+        $configExtension = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
+        file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config));
+        file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config));
 
         $bundlesConfig = [
-            ['name' => 'OroBundle1', 'path' => self::$path1],
-            ['name' => 'OroBundle2', 'path' => self::$path2],
+            ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2'],
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
@@ -216,13 +230,13 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->process($containerBuilder);
     }
 
-    public function testMergeElements()
+    public function testMergeElements(): void
     {
         $config1 = [
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement1' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
@@ -231,26 +245,31 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement2' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
         ];
-        $configExtension = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
-        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config1));
-        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config2));
+        $configExtension = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
+        file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config1));
+        file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config2));
 
         $bundlesConfig = [
-            ['name' => 'OroBundle1', 'path' => self::$path1],
-            ['name' => 'OroBundle2', 'path' => self::$path2],
+            ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2'],
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', []);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
         $extension->process($containerBuilder);
 
         $elementFactoryDefinition = $containerBuilder->getDefinition('oro_element_factory');
@@ -261,79 +280,126 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertArrayHasKey('MyElement2', $elements);
     }
 
-    /**
-     * @param array $bundlesConfig
-     * @return ContainerBuilder
-     */
-    private function getContainerBuilder(array $bundlesConfig)
+    private function getContainerBuilder(array $bundlesConfig): ContainerBuilder
     {
         $containerBuilder = new ContainerBuilder();
 
-        $kernel = new KernelStub($bundlesConfig);
+        $kernel = new KernelStub($this->getTempDir('test_kernel_logs'), $bundlesConfig);
         $kernel->getContainer()->set(
             'oro_entity.entity_alias_resolver',
-            $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            $this->getMockBuilder(EntityAliasResolver::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
         $kernel->getContainer()->set(
             'oro_security.owner.metadata_provider.chain',
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
+            $this->getMockBuilder(OwnershipMetadataProviderInterface::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
         $kernel->getContainer()->set('logger', new NullLogger());
         $kernel->getContainer()->set(
             'oro_message_queue.consumption.cache_state',
-            $this->getMockBuilder('Oro\Bundle\MessageQueueBundle\Consumption\CacheState')
+            $this->getMockBuilder(CacheState::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
         $kernel->getContainer()->setParameter('kernel.secret', 'secret');
 
-        $containerBuilder->set('symfony2_extension.kernel', $kernel);
-        $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
+        $containerBuilder->set('fob_symfony.kernel', $kernel);
+        $containerBuilder->set('oro_behat_extension.suite.oro_suite_generator', new OroSuiteGenerator($kernel));
         $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
-        $containerBuilder->setDefinition('symfony2_extension.context_initializer.kernel_aware', new Definition());
+        $containerBuilder->setDefinition('fob_symfony.kernel_orchestrator', new Definition());
 
         return $containerBuilder;
     }
 
-    /**
-     * @return array
-     */
-    private function processConfig(array $config = [])
+    private function updateNelmioServiceDefinitions(ContainerBuilder $containerBuilder): void
     {
-        $tree = new TreeBuilder();
+        $nelmioServices = [
+            'nelmio_alice.file_parser.registry',
+            'nelmio_alice.fixture_builder.denormalizer.flag_parser.registry',
+            'nelmio_alice.fixture_builder.denormalizer.fixture.registry_denormalizer',
+            'nelmio_alice.generator.resolver.parameter.registry',
+            'nelmio_alice.generator.resolver.value.registry',
+            'nelmio_alice.generator.instantiator.registry',
+            'nelmio_alice.generator.caller.registry',
+        ];
+
+        foreach ($nelmioServices as $nelmioService) {
+            $containerBuilder->getDefinition($nelmioService)->addArgument([]);
+        }
+
+        $containerBuilder->setDefinition('property_accessor', new Definition(PropertyAccessor::class));
+        $containerBuilder->setDefinition('file_locator', new Definition(FileLocator::class));
+    }
+
+    private function processConfig(array $config = []): array
+    {
+        $tree = new TreeBuilder('oro_test');
         $extension = new OroTestFrameworkExtension();
-        $root = $tree->root('oro_test');
-        $extension->configure($root);
+        $extension->configure($tree->getRootNode());
 
         $processor = new Processor();
 
         return $processor->process($tree->buildTree(), $config);
     }
 
-    public function __destruct()
+    public function testProcessContextInitializers(): void
     {
-        self::delTree(self::$path1);
-        self::delTree(self::$path2);
-        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.OroWebDriverCurlService::LOG_FILE;
-        if (is_file($log)) {
-            unlink($log);
-        }
+        $containerBuilder = $this->getContainerBuilder([]);
+        $containerBuilder->setParameter('suite.configurations', []);
+
+        $className = $this->getMockClass(ContextInitializer::class);
+        $contextInitializerDef = new Definition($this->getMockClass(ContextInitializer::class));
+        $contextInitializerDef->addTag(ContextExtension::INITIALIZER_TAG);
+        $containerBuilder->setDefinition($className, $contextInitializerDef);
+
+        $envHandlerId = 'oro_test.environment.handler.context_service_environment_handler';
+        $envHandlerDef = new Definition(ContextServiceEnvironmentHandler::class);
+        $containerBuilder->setDefinition($envHandlerId, $envHandlerDef);
+
+        $config = $this->processConfig(['oro_test' => ['shared_contexts' => $this->sharedContexts]]);
+
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
+        $extension->process($containerBuilder);
+
+        self::assertEquals(
+            [
+                ['registerContextInitializer', [new Reference($className)]],
+                ['registerContextInitializer', [new Reference('oro_behat_page_object_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_session_alias_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_browser_tab_manager_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_fixture_loader_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_test.processor.message_queue_initializer')]],
+                ['registerContextInitializer', [new Reference(AppKernelInitializer::class)]],
+            ],
+            $containerBuilder->getDefinition($envHandlerId)
+                ->getMethodCalls()
+        );
     }
 
-    public static function delTree($dir)
+    public function testProcessResolveClassPass(): void
     {
-        if (!is_dir($dir)) {
-            return;
-        }
+        $containerBuilder = $this->getContainerBuilder([]);
+        $containerBuilder->setParameter('suite.configurations', []);
 
-        $files = array_diff(scandir($dir), array('.','..'));
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
-        }
-        return rmdir($dir);
+        $sampleServiceDef = new Definition(\stdClass::class);
+        $containerBuilder->setDefinition(\stdClass::class, $sampleServiceDef);
+
+        $config = $this->processConfig(['oro_test' => ['shared_contexts' => $this->sharedContexts]]);
+
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
+        $extension->process($containerBuilder);
+
+        self::assertEquals(\stdClass::class, $containerBuilder->getDefinition(\stdClass::class)->getClass());
     }
 }

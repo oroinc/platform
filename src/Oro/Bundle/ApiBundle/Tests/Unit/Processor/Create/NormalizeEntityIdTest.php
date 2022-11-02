@@ -4,8 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Create\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -18,7 +20,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     /** @var NormalizeEntityId */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +37,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     /**
      * {@inheritdoc}
      */
-    protected function createContext()
+    protected function createContext(): FormContext
     {
         return new CreateContext($this->configProvider, $this->metadataProvider);
     }
@@ -53,7 +55,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityHasIdentifierGenerator()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->context->setClassName('Test\Class');
@@ -68,7 +70,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcess()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setClassName('Test\Class');
@@ -83,11 +85,12 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(123, $this->context->getId());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessForInvalidId()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setClassName('Test\Class');
@@ -108,6 +111,30 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
                     ->setInnerException(new \Exception('some error'))
             ],
             $this->context->getErrors()
+        );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForNotResolvedId()
+    {
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setHasIdentifierGenerator(false);
+
+        $this->context->setClassName('Test\Class');
+        $this->context->setId('test');
+        $this->context->setMetadata($metadata);
+
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with($this->context->getId(), self::identicalTo($metadata))
+            ->willReturn(null);
+
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getId());
+        self::assertEquals(
+            ['id' => new NotResolvedIdentifier('test', 'Test\Class')],
+            $this->context->getNotResolvedIdentifiers()
         );
     }
 }

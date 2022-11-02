@@ -3,7 +3,6 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -28,8 +27,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -47,8 +45,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -66,8 +63,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -129,7 +125,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($this->createMock(LoggerInterface::class));
         $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
+        $context->setMessageProcessorName('sample_processor');
 
         return $context;
     }

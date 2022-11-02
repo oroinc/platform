@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -15,13 +14,17 @@ use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ImportExportTagsSubscriber implements EventSubscriberInterface
+/**
+ * Saves tagging entities during import.
+ */
+class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface
 {
-    /** @var ServiceLink */
-    protected $tagManagerLink;
+    /** @var ContainerInterface */
+    protected $container;
 
     /** @var object[] */
     protected $pendingTaggedObjects = [];
@@ -32,12 +35,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /** @var object */
     protected $importedEntity;
 
-    /**
-     * @param ServiceLink $tagManagerLink
-     */
-    public function __construct(ServiceLink $tagManagerLink)
+    private ?TagImportManager $tagImportManager = null;
+
+    public function __construct(ContainerInterface $container)
     {
-        $this->tagManagerLink = $tagManagerLink;
+        $this->container = $container;
     }
 
     /**
@@ -58,8 +60,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Stores currently imported entity for later use
-     *
-     * @param StrategyEvent $event
      */
     public function beforeImport(StrategyEvent $event)
     {
@@ -69,8 +69,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /**
      * Checks if the entity is the same object as before import
      * (in case it is not - update tags)
-     *
-     * @param StrategyEvent $event
      */
     public function afterImport(StrategyEvent $event)
     {
@@ -90,17 +88,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $this->importedEntity = null;
     }
 
-    /**
-     * @param AfterEntityPageLoadedEvent $event
-     */
     public function updateEntityResults(AfterEntityPageLoadedEvent $event)
     {
         $this->getTagImportManager()->loadTags($event->getRows());
     }
 
-    /**
-     * @param DenormalizeEntityEvent $event
-     */
     public function denormalizeEntity(DenormalizeEntityEvent $event)
     {
         $object = $event->getObject();
@@ -118,8 +110,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Prepare taggable objects to save their tags
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -148,8 +138,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Saves tagging during import
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
@@ -168,24 +156,18 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $args->getEntityManager()->flush();
     }
 
-    /**
-     * @param NormalizeEntityEvent $event
-     */
     public function normalizeEntity(NormalizeEntityEvent $event)
     {
         if (!$event->isFullData() || !$this->getTagImportManager()->isTaggable($event->getObject())) {
             return;
         }
 
-        $event->setResultField(
+        $event->setResultFieldValue(
             TagImportManager::TAGS_FIELD,
             $this->getTagImportManager()->normalizeTags($this->getTagImportManager()->getTags($event->getObject()))
         );
     }
 
-    /**
-     * @param LoadEntityRulesAndBackendHeadersEvent $event
-     */
     public function loadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
         if (!$event->isFullData() ||
@@ -203,13 +185,10 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
             )
         );
 
-        list($name, $rule) = $this->getTagImportManager()->createTagRule($event->getConvertDelimiter());
+        [$name, $rule] = $this->getTagImportManager()->createTagRule($event->getConvertDelimiter());
         $event->setRule($name, $rule);
     }
 
-    /**
-     * @param LoadTemplateFixturesEvent $event
-     */
     public function addTagsIntoFixtures(LoadTemplateFixturesEvent $event)
     {
         foreach ($event->getEntities() as $entityRecords) {
@@ -220,7 +199,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
                 }
 
                 $tags = $this->getTagImportManager()->getTags($entity);
-                if (($tags instanceof Countable || is_array($tags)) && count($tags)) {
+                if (($tags instanceof \Countable || is_array($tags)) && count($tags)) {
                     continue;
                 }
 
@@ -236,10 +215,21 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return TagImportManager
+     * {@inheritDoc}
      */
-    protected function getTagImportManager()
+    public static function getSubscribedServices()
     {
-        return $this->tagManagerLink->getService();
+        return [
+            'oro_tag.tag_import.manager' => TagImportManager::class
+        ];
+    }
+
+    protected function getTagImportManager(): TagImportManager
+    {
+        if (null === $this->tagImportManager) {
+            $this->tagImportManager = $this->container->get('oro_tag.tag_import.manager');
+        }
+
+        return $this->tagImportManager;
     }
 }

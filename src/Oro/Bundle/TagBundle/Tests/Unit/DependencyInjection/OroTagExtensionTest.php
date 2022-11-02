@@ -2,16 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\TagBundle\Controller\Api\Rest\TagController;
+use Oro\Bundle\TagBundle\Controller\Api\Rest\TaggableController;
+use Oro\Bundle\TagBundle\Controller\Api\Rest\TaxonomyController;
 use Oro\Bundle\TagBundle\DependencyInjection\OroTagExtension;
+use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
-class OroTagExtensionTest extends \PHPUnit\Framework\TestCase
+class OroTagExtensionTest extends ExtensionTestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
-        $extension = new OroTagExtension();
-        $configs = array();
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->loadExtension(new OroTagExtension());
 
-        $extension->load($configs, $container);
+        $expectedDefinitions = [
+            TagController::class,
+            TaggableController::class,
+            TaxonomyController::class,
+        ];
+
+        $this->assertDefinitionsLoaded($expectedDefinitions);
     }
 }

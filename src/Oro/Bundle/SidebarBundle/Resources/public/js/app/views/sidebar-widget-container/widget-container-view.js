@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var WidgetContainerView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var constants = require('orosidebar/js/sidebar-constants');
-    var IconView = require('orosidebar/js/app/views/sidebar-widget-container/widget-container-icon-view');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const constants = require('orosidebar/js/sidebar-constants');
+    const IconView = require('orosidebar/js/app/views/sidebar-widget-container/widget-container-icon-view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WidgetContainerView = BaseView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget-container/widget-container.html'),
+    const WidgetContainerView = BaseView.extend({
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget-container/widget-container.html'),
 
         className: function() {
-            var classes = ['sidebar-widget', this.model.get('cssClass')];
+            const classes = ['sidebar-widget', this.model.get('cssClass')];
             return _.compact(classes).join(' ');
         },
 
@@ -39,18 +38,19 @@ define(function(require) {
             'end-loading model': 'onLoadingEnd',
 
             'layout:reposition mediator': 'adjustMaxHeight',
-            'widget_dialog:open mediator': 'onWidgetDialogOpen'
+            'widget_dialog:open mediator': 'onWidgetDialogOpen',
+            'updatePosition': 'updatePosition'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetContainerView(options) {
             WidgetContainerView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (this.subviews.length) {
@@ -68,7 +68,7 @@ define(function(require) {
                 this.initSubviews();
             } else {
                 this.subviews.forEach(function(view) {
-                    var viewRole = view.$el.data('role');
+                    const viewRole = view.$el.data('role');
                     this.$('[data-role="' + viewRole + '"]').replaceWith(view.$el);
                 }.bind(this));
             }
@@ -77,21 +77,25 @@ define(function(require) {
         },
 
         initSubviews: function() {
-            var contentView = new this.model.module.ContentView({
+            const contentView = new this.model.module.ContentView({
                 autoRender: true,
                 model: this.model,
                 el: this.$('[data-role="sidebar-widget-content"]')
             });
             this.subview('contentView', contentView);
 
-            var widgetIconView = new IconView({
+            if (contentView.listenToUpdatePosition) {
+                this.listenTo(this, 'updatePosition', contentView.onUpdatePosition.bind(contentView));
+            }
+
+            const widgetIconView = new IconView({
                 autoRender: true,
                 model: this.model,
                 el: this.$('[data-role="sidebar-widget-icon"]')
             });
             this.subview('widgetIconView', widgetIconView);
 
-            var headerIconView = new IconView({
+            const headerIconView = new IconView({
                 autoRender: true,
                 model: this.model,
                 el: this.$('[data-role="sidebar-widget-header-icon"]')
@@ -100,18 +104,20 @@ define(function(require) {
         },
 
         onModelChange: function(model) {
-            var ignoreAttrs = ['highlighted', 'iconClass', 'icon', 'itemsCounter', 'state', 'position'];
-            var changedAttrs = _.keys(model.changedAttributes());
+            const ignoreAttrs = ['highlighted', 'iconClass', 'icon', 'itemsCounter', 'state', 'position'];
+            const changedAttrs = _.keys(model.changedAttributes());
             if (_.difference(changedAttrs, ignoreAttrs).length) {
                 this.render();
+                this.trigger('updatePosition');
             }
         },
 
         updateState: function() {
-            var isPoppedUp = this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER;
-            var isExpanded = isPoppedUp || this.model.get('state') === constants.WIDGET_MAXIMIZED;
+            const isPoppedUp = this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER;
+            const isExpanded = isPoppedUp || this.model.get('state') === constants.WIDGET_MAXIMIZED;
             this.$el.toggleClass('poppedup', isPoppedUp);
             this.$el.toggleClass('expanded', isExpanded);
+            this.trigger('updatePosition');
         },
 
         updateHighlight: function() {
@@ -119,7 +125,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = WidgetContainerView.__super__.getTemplateData.call(this);
+            const data = WidgetContainerView.__super__.getTemplateData.call(this);
             if (this.model.module.titleTemplate) {
                 data.title = this.model.module.titleTemplate(data);
             }
@@ -127,18 +133,18 @@ define(function(require) {
         },
 
         adjustMaxHeight: function() {
-            var rect;
-            var contentMargin;
-            var $content;
-            var windowHeight;
-            var contentView = this.subview('contentView');
+            let rect;
+            let contentMargin;
+            let $content;
+            let windowHeight;
+            const contentView = this.subview('contentView');
             if (contentView) {
                 $content = contentView.$el;
                 windowHeight = $('html').height();
                 if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
                     rect = $content[0].getBoundingClientRect();
                     contentMargin = $content.outerHeight(true) - rect.height;
-                    $content.css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                    $content.css('max-height', windowHeight - rect.top - contentMargin);
                 } else {
                     $content.css('max-height', 'none');
                 }
@@ -153,7 +159,7 @@ define(function(require) {
 
         onClickRefresh: function(e) {
             e.preventDefault();
-            var contentView = this.subview('contentView');
+            const contentView = this.subview('contentView');
             if (contentView) {
                 contentView.trigger('refresh');
             }
@@ -180,7 +186,7 @@ define(function(require) {
                 return;
             }
             this.model.toggleHoverState();
-            this.adjustMaxHeight();
+            this.trigger('updatePosition');
         },
 
         onWidgetDialogOpen: function() {
@@ -194,6 +200,17 @@ define(function(require) {
         onLoadingEnd: function() {
             this.$('[data-role="sidebar-widget-header-icon"]').removeClass('loading');
             this.adjustMaxHeight();
+        },
+
+        updatePosition: function() {
+            if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER ||
+                this.model.get('state') === constants.WIDGET_MAXIMIZED
+            ) {
+                this.$('[data-role="sidebar-widget-popup-wrapper"]').css({
+                    top: this.$el.offset().top + this.$el.outerHeight()
+                });
+                this.adjustMaxHeight();
+            }
         }
     });
 

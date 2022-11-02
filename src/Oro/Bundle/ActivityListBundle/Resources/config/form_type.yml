@@ -1,8 +1,5 @@
-parameters:
-    oro_activity_list.form.type.activity_list_filter.class: Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType
-
 services:
     oro_activity_list.form.type.activity_list_filter:
-        class: '%oro_activity_list.form.type.activity_list_filter.class%'
+        class: Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType
         tags:
             - { name: form.type, alias: oro_type_activity_list_filter }

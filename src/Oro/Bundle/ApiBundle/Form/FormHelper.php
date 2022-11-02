@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,7 +17,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Provides a set of reusable utility methods to simplify
- * creation and configuration of FormBuilder for forms used in Data API actions,
+ * creation and configuration of FormBuilder for forms used in API actions,
  * such as "create", "update",
  * "update_subresource", "add_subresource" and "delete_subresource",
  * "update_relationship", "add_relationship" and "delete_relationship".
@@ -26,23 +29,23 @@ class FormHelper
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    /** @var DataTypeGuesser */
+    private $dataTypeGuesser;
+
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param FormFactoryInterface      $formFactory
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param ContainerInterface        $container
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
+        DataTypeGuesser $dataTypeGuesser,
         PropertyAccessorInterface $propertyAccessor,
         ContainerInterface $container
     ) {
         $this->formFactory = $formFactory;
+        $this->dataTypeGuesser = $dataTypeGuesser;
         $this->propertyAccessor = $propertyAccessor;
         $this->container = $container;
     }
@@ -63,10 +66,10 @@ class FormHelper
     public function createFormBuilder($formType, $data, array $options, array $eventSubscribers = null)
     {
         $formBuilder = $this->formFactory->createNamedBuilder(
-            null,
+            '',
             $formType,
             $data,
-            \array_merge($this->getFormDefaultOptions(), $options)
+            array_merge($this->getFormDefaultOptions(), $options)
         );
         $formBuilder->setDataMapper(new PropertyPathMapper($this->propertyAccessor));
         if (!empty($eventSubscribers)) {
@@ -78,16 +81,22 @@ class FormHelper
 
     /**
      * Adds all entity fields to the given form.
-     *
-     * @param FormBuilderInterface   $formBuilder
-     * @param EntityMetadata         $entityMetadata
-     * @param EntityDefinitionConfig $entityConfig
      */
     public function addFormFields(
         FormBuilderInterface $formBuilder,
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $entityConfig
     ) {
+        $metaProperties = $entityMetadata->getMetaProperties();
+        foreach ($metaProperties as $name => $metaProperty) {
+            if (!$metaProperty->isInput()) {
+                continue;
+            }
+            if (ConfigUtil::CLASS_NAME === ($metaProperty->getPropertyPath() ?? $name)) {
+                continue;
+            }
+            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $metaProperty);
+        }
         $fields = $entityMetadata->getFields();
         foreach ($fields as $name => $field) {
             if (!$field->isInput()) {
@@ -112,21 +121,46 @@ class FormHelper
      * @param EntityDefinitionFieldConfig $fieldConfig
      * @param PropertyMetadata            $fieldMetadata
      * @param array                       $options
+     * @param bool                        $allowGuessType
      *
      * @return FormBuilderInterface
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addFormField(
         FormBuilderInterface $formBuilder,
         $fieldName,
         EntityDefinitionFieldConfig $fieldConfig,
         PropertyMetadata $fieldMetadata,
-        array $options = []
+        array $options = [],
+        bool $allowGuessType = false
     ) {
-        $fieldFormBuilder = $formBuilder->add(
-            $fieldName,
-            $fieldConfig->getFormType(),
-            \array_replace($options, $this->getFormFieldOptions($fieldMetadata, $fieldConfig))
-        );
+        $formType = $fieldConfig->getFormType();
+        /**
+         * Ignore configured form options for associations that are represented as fields
+         * to avoid collisions between configured and guessed form options.
+         * For these associations the options merging is performed by form type guessers.
+         * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForArrayAssociation
+         * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForCollapsedArrayAssociation
+         */
+        $configuredOptions = $this->getFormFieldOptions($fieldMetadata, $fieldConfig);
+        if ($configuredOptions
+            && (
+                null !== $formType
+                || !DataType::isAssociationAsField($fieldConfig->getDataType())
+                || false === ($configuredOptions['mapped'] ?? true)
+            )) {
+            $options = array_replace($options, $configuredOptions);
+        }
+        if (null === $formType && $allowGuessType) {
+            $dataType = $fieldMetadata->getDataType();
+            if ($dataType) {
+                $guess = $this->dataTypeGuesser->guessType($dataType);
+                $formType = $guess->getType();
+                $options = array_replace($guess->getOptions(), $options);
+            }
+        }
+        $fieldFormBuilder = $formBuilder->add($fieldName, $formType, $options);
 
         $targetConfig = $fieldConfig->getTargetEntity();
         if (null !== $targetConfig) {
@@ -163,10 +197,7 @@ class FormHelper
      */
     private function getFormFieldOptions(PropertyMetadata $property, EntityDefinitionFieldConfig $config)
     {
-        $options = $config->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
+        $options = $config->getFormOptions() ?? [];
         if (!\array_key_exists('property_path', $options)) {
             $propertyPath = $property->getPropertyPath();
             if (!$propertyPath) {
@@ -179,10 +210,6 @@ class FormHelper
         return $options;
     }
 
-    /**
-     * @param FormBuilderInterface $formBuilder
-     * @param array                $eventSubscribers
-     */
     private function addFormEventSubscribers(FormBuilderInterface $formBuilder, array $eventSubscribers)
     {
         foreach ($eventSubscribers as $eventSubscriber) {

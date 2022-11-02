@@ -1,34 +1,22 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var TabItemView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var config = module.config();
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         className: 'nav-item',
         templateClassName: 'nav-link'
     }, config);
 
-    TabItemView = BaseView.extend({
+    const TabItemView = BaseView.extend({
         tagName: 'li',
 
         className: config.className,
 
-        template: _.template('<a  href="#"\n' +
-            'id="<%- uniqueId %>" ' +
-            'class="'+ config.templateClassName +'<% if(obj.active) { %> active<% } %>"' +
-            'role="tab" ' +
-            'data-tab-link ' +
-            'data-toggle="tab" ' +
-            'aria-controls="<% if(obj.controlTabPanel) { %><%- controlTabPanel %><% } else { %><%- id %><% } %>" ' +
-            'aria-selected="<% if(obj.active) { %>true<% } else { %>false<% } %>"' +
-            '>' +
-            '    <%- label %>' +
-            '</a>'),
+        template: require('tpl-loader!oroui/templates/tab-collection-item.html'),
 
         listen: {
             'change:active model': 'updateStates',
@@ -36,34 +24,42 @@ define(function(require) {
         },
 
         events: {
-            'click [data-tab-link]': 'onSelect'
+            'shown.bs.tab': 'onTabShown',
+            'click': 'onTabClick'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TabItemView() {
-            TabItemView.__super__.constructor.apply(this, arguments);
+        constructor: function TabItemView(options) {
+            TabItemView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            TabItemView.__super__.initialize.apply(this, arguments);
+            TabItemView.__super__.initialize.call(this, options);
 
             this.updateStates();
         },
 
         updateStates: function() {
             this.$el.toggleClass('changed', !!this.model.get('changed'));
-
+            const $tab = this.$('[role="tab"]');
+            if ($tab.attr('aria-selected') !== String(this.model.get('active'))) {
+                $tab.attr('aria-selected', this.model.get('active'));
+            }
             if (this.model.get('active')) {
-                var tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
+                const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }
         },
 
-        onSelect: function() {
+        onTabShown: function(e) {
             this.model.set('active', true);
             this.model.trigger('select', this.model);
+        },
+
+        onTabClick: function(e) {
+            this.model.trigger('click', this.model);
         }
     });
 

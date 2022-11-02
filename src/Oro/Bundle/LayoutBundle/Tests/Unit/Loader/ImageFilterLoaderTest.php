@@ -4,106 +4,140 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
-use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
-use Prophecy\Argument;
 
 class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    const PRODUCT_ORIGINAL = 'product_original';
-    const PRODUCT_LARGE = 'product_large';
-    const PRODUCT_SMALL = 'product_small';
-    const PRODUCT_GALLERY_MAIN = 'product_gallery_main';
-    const LARGE_SIZE = 378;
-    const SMALL_SIZE = 56;
+    private const PRODUCT_ORIGINAL = 'product_original';
+    private const PRODUCT_ORIGINAL_WITH_FORMAT = 'product_original_with_format';
+    private const PRODUCT_LARGE = 'product_large';
+    private const PRODUCT_SMALL = 'product_small';
+    private const PRODUCT_GALLERY_MAIN = 'product_gallery_main';
+    private const LARGE_SIZE = 378;
+    private const SMALL_SIZE = 56;
 
-    /**
-     * @var ImageFilterLoader
-     */
-    protected $imageFilterLoader;
+    private ImageFilterLoader $imageFilterLoader;
 
-    /**
-     * @var ImageTypeProvider
-     */
-    protected $imageTypeProvider;
+    private ImageTypeProvider|\PHPUnit\Framework\MockObject\MockObject $imageTypeProvider;
 
-    /**
-     * @var FilterConfiguration
-     */
-    protected $filterConfig;
+    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
 
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->imageTypeProvider = $this->prophesize(ImageTypeProvider::class);
-        $this->filterConfig = $this->prophesize(FilterConfiguration::class);
-        $this->doctrineHelper = $this->prophesize(DoctrineHelper::class);
+        $this->imageTypeProvider = $this->createMock(ImageTypeProvider::class);
+        $this->filterConfig = $this->createMock(FilterConfiguration::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->imageFilterLoader = new ImageFilterLoader(
-            $this->imageTypeProvider->reveal(),
-            $this->filterConfig->reveal(),
-            $this->doctrineHelper->reveal()
+            $this->imageTypeProvider,
+            $this->filterConfig,
+            $doctrineHelper
         );
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $productOriginal = new ThemeImageTypeDimension(self::PRODUCT_ORIGINAL, null, null);
+        $productOriginalWithFormat = new ThemeImageTypeDimension(
+            self::PRODUCT_ORIGINAL_WITH_FORMAT,
+            null,
+            null,
+            ['format' => 'formatValue']
+        );
         $productLarge = new ThemeImageTypeDimension(self::PRODUCT_LARGE, self::LARGE_SIZE, self::LARGE_SIZE);
         $productSmall = new ThemeImageTypeDimension(self::PRODUCT_SMALL, self::SMALL_SIZE, self::SMALL_SIZE);
         $productGalleryMain = new ThemeImageTypeDimension(
             self::PRODUCT_GALLERY_MAIN,
             self::SMALL_SIZE,
-            Configuration::AUTO
+            ThemeConfiguration::AUTO
         );
 
-        $customFilterProvider1 = $this->prophesize(CustomImageFilterProviderInterface::class);
-        $customFilterProvider1->isApplicable(Argument::any())->willReturn(true);
-        $customFilterProvider1->getFilterConfig()->willReturn(['customFilterData']);
-        $customFilterProvider2 = $this->prophesize(CustomImageFilterProviderInterface::class);
-        $customFilterProvider2->isApplicable(Argument::any())->willReturn(false);
-        $customFilterProvider2->getFilterConfig()->shouldNotBeCalled([]);
+        $customFilterProvider1 = $this->createMock(CustomImageFilterProviderInterface::class);
+        $customFilterProvider1->expects(self::any())
+            ->method('isApplicable')
+            ->willReturn(true);
+        $customFilterProvider1->expects(self::any())
+            ->method('getFilterConfig')
+            ->willReturn(['customFilterData']);
+        $customFilterProvider2 = $this->createMock(CustomImageFilterProviderInterface::class);
+        $customFilterProvider2->expects(self::any())
+            ->method('isApplicable')
+            ->willReturn(false);
+        $customFilterProvider2->expects(self::never())
+            ->method('getFilterConfig');
 
-        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider1->reveal());
-        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider2->reveal());
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider1);
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider2);
 
-        $this->imageTypeProvider->getImageDimensions()->willReturn([
-            self::PRODUCT_ORIGINAL => $productOriginal,
-            self::PRODUCT_LARGE => $productLarge,
-            self::PRODUCT_SMALL => $productSmall,
-            self::PRODUCT_GALLERY_MAIN => $productGalleryMain
-        ]);
+        $this->imageTypeProvider->expects(self::any())
+            ->method('getImageDimensions')
+            ->willReturn([
+                self::PRODUCT_ORIGINAL => $productOriginal,
+                self::PRODUCT_LARGE => $productLarge,
+                self::PRODUCT_SMALL => $productSmall,
+                self::PRODUCT_GALLERY_MAIN => $productGalleryMain,
+                self::PRODUCT_ORIGINAL_WITH_FORMAT => $productOriginalWithFormat,
+            ]);
 
-        $this->filterConfig->set(self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData())->shouldBeCalledTimes(1);
-        $this->filterConfig
-            ->set(self::PRODUCT_LARGE, $this->prepareFilterDataForResize(self::LARGE_SIZE, self::LARGE_SIZE))
-            ->shouldBeCalledTimes(1);
-        $this->filterConfig
-            ->set(self::PRODUCT_SMALL, $this->prepareFilterDataForResize(self::SMALL_SIZE, self::SMALL_SIZE))
-            ->shouldBeCalledTimes(1);
-        $this->filterConfig
-            ->set(self::PRODUCT_GALLERY_MAIN, $this->prepareFilterDataForResizeWithAuto(
-                self::SMALL_SIZE,
-                Configuration::AUTO
-            ))->shouldBeCalledTimes(1);
+        $this->filterConfig->expects(self::exactly(5))
+            ->method('set')
+            ->withConsecutive(
+                [self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData()],
+                [self::PRODUCT_LARGE, $this->prepareFilterDataForResize(self::LARGE_SIZE, self::LARGE_SIZE)],
+                [self::PRODUCT_SMALL, $this->prepareFilterDataForResize(self::SMALL_SIZE, self::SMALL_SIZE)],
+                [
+                    self::PRODUCT_GALLERY_MAIN,
+                    $this->prepareFilterDataForResizeWithAuto(self::SMALL_SIZE, ThemeConfiguration::AUTO)
+                ],
+                [self::PRODUCT_ORIGINAL_WITH_FORMAT, $this->prepareFilterDataForFormat('formatValue')],
+            );
 
         $this->imageFilterLoader->load();
     }
 
-    /**
-     * @param int $width
-     * @param int $height
-     * @return array
-     */
-    private function prepareFilterDataForResize($width, $height)
+    public function testLoadWhenNoNewCustomImageFilterProviderAdded(): void
+    {
+        $this->imageTypeProvider->expects(self::exactly(2))
+            ->method('getImageDimensions')
+            ->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        $customFilterProvider = $this->createMock(CustomImageFilterProviderInterface::class);
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider);
+
+        $this->imageFilterLoader->load();
+    }
+
+    public function testForceLoad(): void
+    {
+        $this->imageTypeProvider->expects(self::exactly(2))
+            ->method('getImageDimensions')
+            ->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        // Try to force load configuration again when nothing has changed
+        $this->imageFilterLoader->forceLoad();
+    }
+
+    public function testLoadWhenNewCustomImageFilterProviderAdded(): void
+    {
+        $this->imageTypeProvider->expects(self::once())
+            ->method('getImageDimensions')
+            ->willReturn([]);
+
+        $this->imageFilterLoader->load();
+
+        // Try to load configuration again when nothing has changed
+        $this->imageFilterLoader->load();
+    }
+
+    private function prepareFilterDataForResize(int $width, int $height): array
     {
         $resizeFiltersData = [
             'thumbnail' => [
@@ -120,18 +154,13 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
     }
 
-    /**
-     * @param mixed $width
-     * @param mixed $height
-     * @return array
-     */
-    private function prepareFilterDataForResizeWithAuto($width, $height)
+    private function prepareFilterDataForResizeWithAuto(mixed $width, mixed $height): array
     {
         $resizeFiltersData = [
             'scale' => [
                 'dim' => [
-                    Configuration::AUTO === $width ? null : $width,
-                    Configuration::AUTO === $height? null : $height
+                    ThemeConfiguration::AUTO === $width ? null : $width,
+                    ThemeConfiguration::AUTO === $height ? null : $height
                 ]
             ]
         ];
@@ -139,10 +168,12 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
     }
 
-    /**
-     * @return array
-     */
-    private function prepareBaseFilterData()
+    private function prepareFilterDataForFormat(string $format): array
+    {
+        return array_merge($this->prepareBaseFilterData(), ['format' => $format]);
+    }
+
+    private function prepareBaseFilterData(): array
     {
         return [
             'quality' => ImageFilterLoader::IMAGE_QUALITY,

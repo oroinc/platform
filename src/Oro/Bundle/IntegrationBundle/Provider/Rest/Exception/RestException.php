@@ -5,6 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Exception;
 use Oro\Bundle\IntegrationBundle\Exception\TransportException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 
+/**
+ * An exception that represents REST integration transport errors
+ */
 class RestException extends TransportException
 {
     /**
@@ -56,9 +59,6 @@ class RestException extends TransportException
         return $result;
     }
 
-    /**
-     * @param RestResponseInterface $response
-     */
     public function setResponse(RestResponseInterface $response)
     {
         $this->response = $response;

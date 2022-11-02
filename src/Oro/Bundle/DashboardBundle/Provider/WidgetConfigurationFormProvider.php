@@ -21,10 +21,6 @@ class WidgetConfigurationFormProvider
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @param ConfigProvider       $configProvider
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(
         ConfigProvider $configProvider,
         FormFactoryInterface $formFactory

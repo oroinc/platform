@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class RouteCollectionEvent extends Event
 {
@@ -15,9 +15,6 @@ class RouteCollectionEvent extends Event
      */
     protected $collection;
 
-    /**
-     * @param RouteCollection $collection
-     */
     public function __construct(RouteCollection $collection)
     {
         $this->collection = $collection;

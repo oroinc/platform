@@ -6,17 +6,13 @@ use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 
 class NotificationEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \stdClass
-     */
-    protected $entity;
+    /** @var \stdClass */
+    private $entity;
 
-    /**
-     * @var NotificationEvent
-     */
-    protected $event;
+    /** @var NotificationEvent */
+    private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new \stdClass();
         $this->event = new NotificationEvent($this->entity);

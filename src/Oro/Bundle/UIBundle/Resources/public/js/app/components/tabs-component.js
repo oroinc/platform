@@ -1,32 +1,40 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var TabsComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    let config = require('module-config').default(module.id);
 
-    TabsComponent = BaseComponent.extend({
+    config = _.extend({
+        useDropdown: true,
+        dropdownText: _.__('oro.ui.tab_view_more')
+    }, config);
+
+    const TabsComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
         options: {
-            useDropdown: false,
+            useDropdown: config.useDropdown,
             elements: {
                 tabsContainer: ['el', 'ul:first'],
-                tabs: ['tabsContainer', 'li.tab'],
-                dropdown: ['tabsContainer', 'li.dropdown'],
+                tabs: ['tabsContainer', 'li.tab, li.nav-item:not("[data-dropdown], .pull-right")'],
+                pullRightTabs: ['tabsContainer', 'li.nav-item.pull-right'],
+                dropdown: ['tabsContainer', 'li[data-dropdown]'],
                 dropdownMenu: ['dropdown', 'ul.dropdown-menu'],
                 dropdownToggle: ['dropdown', 'a.dropdown-toggle'],
-                dropdownToggleLabel: ['dropdownToggle', 'span'],
-                visibleTabs: ['tabsContainer', '>li.tab'],
-                hiddenTabs: ['dropdownMenu', '>li.tab']
+                dropdownToggleLabel: ['dropdownToggle', '[data-dropdown-label]'],
+                visibleTabs: ['tabsContainer', '>li.tab, >li.nav-item:not("[data-dropdown], .pull-right")'],
+                hiddenTabs: ['dropdownMenu', '>li:not("[data-helper-element]")']
             },
             tabClass: 'nav-item',
             tabLinkClass: 'nav-link',
             dropdownItemClass: '',
-            dropdownItemLinkClass: 'dropdown-item'
+            dropdownItemLinkClass: 'dropdown-item',
+            dropdownTemplate: require('tpl-loader!oroui/templates/dropdown-control.html'),
+            dropdownText: config.dropdownText
         },
 
         /**
@@ -43,23 +51,39 @@ define(function(require) {
         /**
          * @property {Number}
          */
-        dropdownContainerWidth: 0,
+        tabsContainerWidth: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TabsComponent() {
-            TabsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function TabsComponent(options) {
+            this.updateStateOfHiddenTabs = this.updateStateOfHiddenTabs.bind(this);
+            TabsComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            TabsComponent.__super__.initialize.apply(this, arguments);
+            TabsComponent.__super__.initialize.call(this, options);
 
             this.options = $.extend(true, {}, this.options, options || {});
             this.$el = options._sourceElement;
+
+            if (this.options.useDropdown) {
+                const $firstPullRightTab = this.$el.find(`${this.options.elements.pullRightTabs[1]}:first`);
+                if ($firstPullRightTab.length) {
+                    $firstPullRightTab.before(this.options.dropdownTemplate({
+                        label: this.options.dropdownText
+                    }));
+                } else {
+                    this.$el
+                        .find(this.options.elements.tabsContainer[1])
+                        .append(this.options.dropdownTemplate({
+                            label: this.options.dropdownText
+                        }));
+                }
+            }
 
             this.initElements();
 
@@ -69,17 +93,16 @@ define(function(require) {
         },
 
         initElements: function() {
-            var self = this;
             this.$elements = {
                 el: this.$el
             };
             _.each(this.options.elements, function(element, name) {
                 if (_.isArray(element)) {
-                    self.$elements[name] = self.$elements[element[0]].find(element[1]);
+                    this.$elements[name] = this.$elements[element[0]].find(element[1]);
                 } else {
-                    self.$elements[name] = $(element);
+                    this.$elements[name] = $(element);
                 }
-            });
+            }.bind(this));
         },
 
         /**
@@ -90,6 +113,14 @@ define(function(require) {
             return this.$elements[name];
         },
 
+        /**
+         * @param {String} name
+         * @returns {Boolean}
+         */
+        hasElement: function(name) {
+            return this.$elements && name in this.$elements;
+        },
+
         dropdownInit: function() {
             this.getElement('dropdownToggleLabel').data(
                 'dropdownDefaultLabel',
@@ -98,69 +129,92 @@ define(function(require) {
             this.dropdownInitTabs();
 
             this.dropdownUpdate();
-            this.getElement('tabsContainer').css('overflow', 'visible');
+            this.getElement('tabsContainer').addClass('responsive-tabs');
+            this.toggleDropdown();
 
-            mediator.on('layout:reposition', this.dropdownUpdate, this);
+            mediator.on('layout:reposition', _.debounce(this.dropdownUpdate.bind(this), 50));
         },
 
         dropdownInitTabs: function() {
-            var self = this;
-            this.getElement('tabs').each(function() {
-                var $tab = $(this);
-                $tab.data('dropdownOuterWidth', $tab.outerWidth(true));
-
-                $tab.on('shown.bs.tab', function(e) {
+            this.saveDropdownOuterWidth();
+            this.getElement('tabs').each(function(index, tab) {
+                $(tab).on('shown.bs.tab', function(e) {
                     // fix bug, 'active' class doesn't removed from dropdown tabs
-                    $(e.relatedTarget).removeClass('active');
-                    self.dropdownUpdateLabel();
-                });
+                    this.getElement('tabsContainer').find('a').not(e.target).removeClass('active');
+                    this.dropdownUpdateLabel();
+                    this.getElement('dropdown').trigger('tohide.bs.dropdown');
+                }.bind(this));
+            }.bind(this));
+
+            $(document).on('shown.bs.collapse', this.updateStateOfHiddenTabs);
+        },
+
+        updateStateOfHiddenTabs: function() {
+            // Once update width of tabs if they were hide
+            if (this.hasElement('tabs') && this.getElement('tabs').data('dropdownOuterWidth') <= 0) {
+                this.saveDropdownOuterWidth();
+                this.dropdownUpdate();
+            }
+        },
+
+        saveDropdownOuterWidth: function() {
+            this.getElement('tabs').each(function(index, tab) {
+                const $tab = $(tab);
+
+                $tab.data('dropdownOuterWidth', $tab.find(':first-child').outerWidth(true));
             });
         },
 
         dropdownUpdate: function() {
-            var self = this;
-            var $tabsContainer = this.getElement('tabsContainer');
-            var dropdownContainerWidth = $tabsContainer.width();
-            if (!$tabsContainer.is(':visible') || this.dropdownContainerWidth === dropdownContainerWidth) {
+            if (this.disposed) {
                 return;
             }
-            this.dropdownContainerWidth = dropdownContainerWidth;
+            const self = this;
+            const $tabsContainer = this.getElement('tabsContainer');
+            let tabsContainerWidth = $tabsContainer.width();
+            if (!$tabsContainer.is(':visible') || this.tabsContainerWidth === tabsContainerWidth) {
+                return;
+            }
+            this.tabsContainerWidth = tabsContainerWidth;
 
-            var visibleWidth = this.dropdownVisibleWidth();
-            var dropdownWidth = this.getElement('dropdown').outerWidth(true);
-            var updated = false;
+            let visibleWidth = this.dropdownVisibleWidth();
+            const dropdownWidth = this.getElement('dropdown').outerWidth(true);
+            const pullRightTabsWidth = this.getElement('pullRightTabs').find(':first-child').outerWidth(true) || 0;
+            let updated = false;
 
             if (
-                dropdownContainerWidth < visibleWidth ||
-                (this.getElement('hiddenTabs').length > 0 && dropdownContainerWidth < visibleWidth + dropdownWidth)
+                tabsContainerWidth < visibleWidth + pullRightTabsWidth || (
+                    this.getElement('hiddenTabs').length > 0 &&
+                    tabsContainerWidth < visibleWidth + dropdownWidth + pullRightTabsWidth
+                )
             ) {
-                dropdownContainerWidth -= dropdownWidth;
+                tabsContainerWidth -= dropdownWidth + pullRightTabsWidth;
 
                 $.each(this.getElement('visibleTabs').get().reverse(), function() {
-                    var $tab = $(this);
+                    const $tab = $(this);
                     visibleWidth -= $tab.data('dropdownOuterWidth');
                     $tab.prependTo(self.getElement('dropdownMenu'));
 
                     self.turnToDropdownItem($tab);
 
                     updated = true;
-                    if (dropdownContainerWidth >= visibleWidth) {
+                    if (tabsContainerWidth >= visibleWidth) {
                         return false;
                     }
                 });
             } else {
-                var showAll = false;
-                if (dropdownContainerWidth >= visibleWidth + this.dropdownHiddenWidth()) {
+                let showAll = false;
+                if (tabsContainerWidth >= visibleWidth + this.dropdownHiddenWidth() + pullRightTabsWidth) {
                     showAll = true;
                 } else {
-                    dropdownContainerWidth -= dropdownWidth;
+                    tabsContainerWidth -= dropdownWidth + pullRightTabsWidth;
                 }
 
                 this.getElement('hiddenTabs').each(function(i) {
-                    var $tab = $(this);
+                    const $tab = $(this);
                     if (!showAll) {
                         visibleWidth += $tab.data('dropdownOuterWidth');
-                        if (dropdownContainerWidth < visibleWidth || i === 0 && $tab.hasClass('active')) {
+                        if (tabsContainerWidth < visibleWidth || i === 0 && $tab.hasClass('active')) {
                             return false;
                         }
                     }
@@ -173,19 +227,23 @@ define(function(require) {
 
             if (updated) {
                 this.initElements();
-                if (this.getElement('hiddenTabs').length > 0) {
-                    this.getElement('dropdown').show();
-                } else {
-                    this.getElement('dropdown').hide();
-                }
+                this.toggleDropdown();
                 this.dropdownUpdateLabel();
+            }
+        },
+
+        toggleDropdown: function() {
+            if (this.getElement('hiddenTabs').length) {
+                this.getElement('dropdown').show();
+            } else {
+                this.getElement('dropdown').hide();
             }
         },
 
         turnToDropdownItem: function($item) {
             $item.removeClass(this.options.tabClass)
                 .addClass(this.options.dropdownItemClass)
-                .find('a')
+                .find('> a')
                 .removeClass(this.options.tabLinkClass)
                 .addClass(this.options.dropdownItemLinkClass);
         },
@@ -193,22 +251,30 @@ define(function(require) {
         turnToNavItem: function($item) {
             $item.removeClass(this.options.dropdownItemClass)
                 .addClass(this.options.tabClass)
-                .find('a')
+                .find('> a')
                 .removeClass(this.options.dropdownItemLinkClass)
                 .addClass(this.options.tabLinkClass);
         },
 
         dropdownUpdateLabel: function() {
-            var hiddenActive = this.getElement('hiddenTabs').filter('.active');
-            var currentLabel = this.getElement('dropdownToggleLabel').html();
-            var neededLabel = this.getElement('dropdownToggleLabel').data('dropdownDefaultLabel');
-            if (hiddenActive.length > 0) {
-                neededLabel = hiddenActive.find('a').html();
-            }
+            const $dropdownToggleLabel = this.getElement('dropdownToggleLabel');
+            const hiddenActive = this.getElement('hiddenTabs').find('a').filter('.active');
+            const defaultLabel = $dropdownToggleLabel.data('dropdownDefaultLabel');
+            const currentLabel = $dropdownToggleLabel.html();
+            const neededLabel = hiddenActive.length > 0 ? hiddenActive.html() : defaultLabel;
+            const roleAttr = hiddenActive.length > 0 ? hiddenActive.data('role') : null;
 
             if (currentLabel !== neededLabel) {
-                this.getElement('dropdownToggleLabel').html(neededLabel);
-                this.dropdownContainerWidth = 0;
+                $dropdownToggleLabel.html(neededLabel);
+                $dropdownToggleLabel.attr('data-role', roleAttr);
+
+                if (neededLabel !== defaultLabel) {
+                    $dropdownToggleLabel.closest('a').addClass('active');
+                } else {
+                    $dropdownToggleLabel.closest('a').removeClass('active');
+                }
+
+                this.tabsContainerWidth = 0;
                 this.dropdownUpdate();
             }
         },
@@ -217,7 +283,7 @@ define(function(require) {
          * @returns {Number}
          */
         dropdownVisibleWidth: function() {
-            var width = 0;
+            let width = 0;
             this.getElement('visibleTabs').each(function() {
                 width += $(this).data('dropdownOuterWidth');
             });
@@ -228,11 +294,24 @@ define(function(require) {
          * @returns {Number}
          */
         dropdownHiddenWidth: function() {
-            var width = 0;
+            let width = 0;
             this.getElement('hiddenTabs').each(function() {
                 width += $(this).data('dropdownOuterWidth');
             });
             return width;
+        },
+
+        /**
+         * Disposes the component
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            mediator.off(null, null, this);
+            $(document).off('shown.bs.collapse', this.updateStateOfHiddenTabs);
+            TabsComponent.__super__.dispose.call(this);
         }
     });
 

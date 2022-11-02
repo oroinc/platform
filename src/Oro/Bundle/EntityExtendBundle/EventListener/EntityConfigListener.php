@@ -3,17 +3,28 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreSetRequireUpdateEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Updates entity config state on actions with entities and fields
+ */
 class EntityConfigListener
 {
-    /**
-     * @param PreFlushConfigEvent $event
-     */
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('extend');
@@ -23,10 +34,18 @@ class EntityConfigListener
 
         $configManager = $event->getConfigManager();
         $changeSet     = $configManager->getConfigChangeSet($config);
+
+        $preSetRequireUpdateEvent = new PreSetRequireUpdateEvent($event->getConfigs(), $configManager);
+        $this->eventDispatcher->dispatch(
+            $preSetRequireUpdateEvent,
+            Events::PRE_SET_REQUIRE_UPDATE
+        );
+
         // synchronize field state with entity state, when custom field state changed
         if (isset($changeSet['state'])
             && $changeSet['state'][1] !== ExtendScope::STATE_ACTIVE
             && $config->is('owner', ExtendScope::OWNER_CUSTOM)
+            && $preSetRequireUpdateEvent->isUpdateRequired()
         ) {
             $entityConfig = $configManager->getEntityConfig('extend', $config->getId()->getClassName());
             if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {
@@ -36,12 +55,13 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param EntityConfigEvent $event
-     */
     public function updateEntity(EntityConfigEvent $event)
     {
         $className       = $event->getClassName();
+        if (!class_exists($className)) {
+            # Skip processing if the entity is a custom or enum and the cache file is not generated yet
+            return;
+        }
         $parentClassName = get_parent_class($className);
         if (!$parentClassName) {
             return;
@@ -75,9 +95,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param FieldConfigEvent $event
-     */
     public function createField(FieldConfigEvent $event)
     {
         $configManager = $event->getConfigManager();
@@ -88,9 +105,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param RenameFieldEvent $event
-     */
     public function renameField(RenameFieldEvent $event)
     {
         $configManager = $event->getConfigManager();

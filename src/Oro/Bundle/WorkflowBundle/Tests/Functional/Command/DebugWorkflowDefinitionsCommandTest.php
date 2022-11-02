@@ -4,39 +4,40 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
         $this->loadFixtures([
-            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
-            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups',
+            LoadWorkflowDefinitions::class,
+            LoadWorkflowDefinitionsWithGroups::class,
         ]);
     }
 
-    public function testExecuteWithoutArgument()
+    public function testExecuteWithoutArgument(): void
     {
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME);
+        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName());
 
         /** @var TranslatorInterface $translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = self::getContainer()->get('translator');
 
         /** @var WorkflowDefinition $workflow */
         foreach ($workflows as $workflow) {
-            $this->assertContains($workflow->getName(), $result);
-            $this->assertContains(
+            static::assertStringContainsString($workflow->getName(), $result);
+            static::assertStringContainsString(
                 $translator->trans(
                     $workflow->getLabel(),
                     [],
@@ -44,92 +45,195 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 ),
                 $result
             );
-            $this->assertContains($workflow->getRelatedEntity(), $result);
+            static::assertStringContainsString($workflow->getRelatedEntity(), $result);
         }
     }
 
     /**
-     * @param string $workflowName
-     * @param bool $exists
-     *
      * @dataProvider executeDataProvider
      */
-    public function testExecuteWithArgument($workflowName, $exists = true)
+    public function testExecuteWithArgument(string $workflowName): void
     {
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName], false);
+        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
-        if ($exists) {
-            $this->assertNotContains('No workflow definitions found.', $result);
+        static::assertStringNotContainsString('No workflow definitions found.', $result);
 
-            $workflowConfiguration = Yaml::parse($result);
-            $workflowConfiguration = $this->getContainer()
-                ->get('oro_workflow.configuration.config.workflow_list')
-                ->processConfiguration($workflowConfiguration);
+        $workflowConfiguration = Yaml::parse($result);
+        $workflowConfiguration = self::getContainer()
+            ->get('oro_workflow.configuration.config.workflow_list')
+            ->processConfiguration($workflowConfiguration);
 
-            $workflowDefinitions = $this->getContainer()
-                ->get('oro_workflow.configuration.builder.workflow_definition')
-                ->buildFromConfiguration($workflowConfiguration);
+        $workflowDefinitions = self::getContainer()
+            ->get('oro_workflow.configuration.builder.workflow_definition')
+            ->buildFromConfiguration($workflowConfiguration);
 
-            $this->assertCount(1, $workflowDefinitions);
+        self::assertCount(1, $workflowDefinitions);
 
-            /** @var WorkflowDefinition $workflowDefinition */
-            $workflowDefinition = reset($workflowDefinitions);
+        /** @var WorkflowDefinition $workflowDefinition */
+        $workflowDefinition = reset($workflowDefinitions);
 
-            $this->assertEquals($initialWorkflow->getName(), $workflowDefinition->getName());
-            $this->assertEquals($initialWorkflow->getLabel(), $workflowDefinition->getLabel());
-            $this->assertEquals($initialWorkflow->getRelatedEntity(), $workflowDefinition->getRelatedEntity());
+        $workflowConfiguration = reset($workflowConfiguration);
 
-            if ($initialWorkflow->getStartStep()) {
-                $this->assertNotNull($workflowDefinition->getStartStep());
-                $this->assertEquals(
-                    $initialWorkflow->getStartStep()->getName(),
-                    $workflowDefinition->getStartStep()->getName()
-                );
-            }
+        self::assertEquals($initialWorkflow->getName(), $workflowDefinition->getName());
+        self::assertEquals($initialWorkflow->getLabel(), $workflowDefinition->getLabel());
+        self::assertEquals($initialWorkflow->getRelatedEntity(), $workflowDefinition->getRelatedEntity());
 
-            $this->assertEquals($initialWorkflow->getConfiguration(), $workflowDefinition->getConfiguration());
-            $this->assertEquals(
-                $initialWorkflow->isStepsDisplayOrdered(),
-                $workflowDefinition->isStepsDisplayOrdered()
+        if ($initialWorkflow->getStartStep()) {
+            self::assertNotNull($workflowDefinition->getStartStep());
+            self::assertEquals(
+                $initialWorkflow->getStartStep()->getName(),
+                $workflowDefinition->getStartStep()->getName()
             );
-
-            $this->assertEquals($initialWorkflow->getPriority(), $workflowDefinition->getPriority());
-            $this->assertEquals($initialWorkflow->isActive(), $workflowDefinition->isActive());
-            $this->assertEquals(
-                $initialWorkflow->getExclusiveActiveGroups(),
-                $workflowDefinition->getExclusiveActiveGroups()
-            );
-            $this->assertEquals(
-                $initialWorkflow->getExclusiveRecordGroups(),
-                $workflowDefinition->getExclusiveRecordGroups()
-            );
-        } else {
-            $this->assertContains('No workflow definitions found.', $result);
         }
+
+        self::assertEquals($initialWorkflow->getConfiguration(), $workflowDefinition->getConfiguration());
+        self::assertEquals(
+            $initialWorkflow->isStepsDisplayOrdered(),
+            $workflowDefinition->isStepsDisplayOrdered()
+        );
+
+        self::assertEquals($initialWorkflow->getPriority(), $workflowDefinition->getPriority());
+        self::assertEquals($initialWorkflow->isActive(), $workflowDefinition->isActive());
+        self::assertEquals(
+            $initialWorkflow->getExclusiveActiveGroups(),
+            $workflowDefinition->getExclusiveActiveGroups()
+        );
+        self::assertEquals(
+            $initialWorkflow->getExclusiveRecordGroups(),
+            $workflowDefinition->getExclusiveRecordGroups()
+        );
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_ENTITIES, $workflowConfiguration);
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_ROUTES, $workflowConfiguration);
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_DATAGRIDS, $workflowConfiguration);
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
-            [LoadWorkflowDefinitions::NO_START_STEP, true],
-            [LoadWorkflowDefinitions::WITH_START_STEP, true],
-            [uniqid(), false],
-            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1, true],
-            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2, true],
+            [LoadWorkflowDefinitions::NO_START_STEP],
+            [LoadWorkflowDefinitions::WITH_START_STEP],
+            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1],
+            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2],
         ];
     }
 
     /**
-     * @return WorkflowDefinitionRepository
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getWorkflowDefinitionRepository()
+    public function testExecuteDumpNotContainsLabels(): void
     {
-        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
+        $workflowName = 'test_flow_transition_with_condition';
+
+        /** @var WorkflowDefinition $initialWorkflow */
+        $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
+
+        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
+
+        static::assertStringNotContainsString('No workflow definitions found.', $result);
+
+        $workflowConfiguration = Yaml::parse($result);
+        $workflowConfiguration = self::getContainer()
+            ->get('oro_workflow.configuration.config.workflow_list')
+            ->processConfiguration($workflowConfiguration);
+
+        $workflowDefinitions = self::getContainer()
+            ->get('oro_workflow.configuration.builder.workflow_definition')
+            ->buildFromConfiguration($workflowConfiguration);
+
+        self::assertCount(1, $workflowDefinitions);
+
+        /** @var WorkflowDefinition $workflowDefinition */
+        $workflowDefinition = reset($workflowDefinitions);
+
+        $workflowConfiguration = reset($workflowConfiguration);
+
+        self::assertEquals($initialWorkflow->getName(), $workflowDefinition->getName());
+        self::assertEquals($initialWorkflow->getLabel(), $workflowDefinition->getLabel());
+        self::assertEquals($initialWorkflow->getRelatedEntity(), $workflowDefinition->getRelatedEntity());
+
+        if ($initialWorkflow->getStartStep()) {
+            self::assertNotNull($workflowDefinition->getStartStep());
+            self::assertEquals(
+                $initialWorkflow->getStartStep()->getName(),
+                $workflowDefinition->getStartStep()->getName()
+            );
+        }
+
+        self::assertEquals($initialWorkflow->getConfiguration(), $workflowDefinition->getConfiguration());
+        self::assertEquals(
+            $initialWorkflow->isStepsDisplayOrdered(),
+            $workflowDefinition->isStepsDisplayOrdered()
+        );
+
+        self::assertEquals($initialWorkflow->getPriority(), $workflowDefinition->getPriority());
+        self::assertEquals($initialWorkflow->isActive(), $workflowDefinition->isActive());
+        self::assertEquals(
+            $initialWorkflow->getExclusiveActiveGroups(),
+            $workflowDefinition->getExclusiveActiveGroups()
+        );
+        self::assertEquals(
+            $initialWorkflow->getExclusiveRecordGroups(),
+            $workflowDefinition->getExclusiveRecordGroups()
+        );
+
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_ENTITIES, $workflowConfiguration);
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_ROUTES, $workflowConfiguration);
+        self::assertArrayNotHasKey(WorkflowConfiguration::NODE_INIT_DATAGRIDS, $workflowConfiguration);
+
+        // Checks that workflow parameters containing translation keys are removed.
+        self::assertArrayNotHasKey(
+            'label',
+            $workflowConfiguration[WorkflowConfiguration::NODE_STEPS]['starting_point']
+        );
+        self::assertArrayNotHasKey(
+            'label',
+            $workflowConfiguration[WorkflowConfiguration::NODE_ATTRIBUTES]['sample_attribute']
+        );
+        self::assertArrayNotHasKey(
+            'label',
+            $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITIONS]['starting_point_transition']
+        );
+        self::assertArrayNotHasKey(
+            'message',
+            $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITIONS]['starting_point_transition']
+        );
+        self::assertArrayNotHasKey(
+            'button_label',
+            $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITIONS]['starting_point_transition']
+        );
+        self::assertArrayNotHasKey(
+            'button_title',
+            $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITIONS]['starting_point_transition']
+        );
+        $variables =& $workflowConfiguration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+        self::assertArrayNotHasKey(
+            'label',
+            $variables[WorkflowConfiguration::NODE_VARIABLES]['var1']
+        );
+
+        $transitionDefs =& $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS];
+        self::assertArrayHasKey(
+            'message',
+            $transitionDefs['second_point_transition_definition']['conditions']['@and'][0]['@equal']
+        );
+        self::assertEquals(
+            'custom.test.message',
+            $transitionDefs['second_point_transition_definition']['conditions']['@and'][0]['@equal']['message']
+        );
+    }
+
+    public function testExecuteWithArgumentWhenWorkflowNotExists(): void
+    {
+        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), ['missing_workflow'], false);
+
+        static::assertStringContainsString('No workflow definitions found.', $result);
+    }
+
+    private function getWorkflowDefinitionRepository(): WorkflowDefinitionRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
     }
 }

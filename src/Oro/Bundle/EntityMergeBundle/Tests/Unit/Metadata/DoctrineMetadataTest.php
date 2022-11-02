@@ -3,23 +3,17 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 
 class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Namespace\Entity';
+    private const CLASS_NAME = 'Namespace\Entity';
 
-    /**
-     * @var array
-     */
-    protected $options;
+    /** @var DoctrineMetadata */
+    private $doctrineMetadata;
 
-    /**
-     * @var DoctrineMetadata
-     */
-    protected $doctrineMetadata;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineMetadata = new DoctrineMetadata();
     }
@@ -31,12 +25,11 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFieldName, $this->doctrineMetadata->getFieldName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "fieldName" not exists
-     */
     public function testGetFieldNameFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "fieldName" not exists');
+
         $this->doctrineMetadata->getFieldName();
     }
 

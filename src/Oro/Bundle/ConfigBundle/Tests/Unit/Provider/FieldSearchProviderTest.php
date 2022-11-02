@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,7 +25,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configBag = $this->createMock(ConfigBag::class);
         $this->translate = $this->createMock(TranslatorInterface::class);

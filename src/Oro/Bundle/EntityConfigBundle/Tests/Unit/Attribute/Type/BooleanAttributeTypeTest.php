@@ -14,11 +14,6 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         return new BooleanAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('boolean', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -26,34 +21,52 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
     {
         yield [
             'isSearchable' => false,
-            'isFilterable' => false,
+            'isFilterable' => true,
             'isSortable' => true
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSearchableValue()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSearchableValue($this->attribute, true, $this->localization);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetFilterableValue()
     {
-        $this->getAttributeType()->getFilterableValue($this->attribute, true, $this->localization);
+        $type = $this->getAttributeType();
+
+        $this->assertSame(
+            BooleanAttributeType::FALSE_VALUE,
+            $type->getFilterableValue($this->attribute, false, $this->localization)
+        );
+        $this->assertSame(
+            BooleanAttributeType::TRUE_VALUE,
+            $type->getFilterableValue($this->attribute, true, $this->localization)
+        );
+    }
+
+    public function testGetFilterableNull()
+    {
+        $this->assertSame(
+            BooleanAttributeType::FALSE_VALUE,
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
     }
 
     public function testGetSortableValue()
     {
         $type = $this->getAttributeType();
 
-        $this->assertSame(0, $type->getSortableValue($this->attribute, false, $this->localization));
-        $this->assertSame(1, $type->getSortableValue($this->attribute, true, $this->localization));
+        $this->assertSame(
+            BooleanAttributeType::FALSE_VALUE,
+            $type->getSortableValue($this->attribute, false, $this->localization)
+        );
+        $this->assertSame(
+            BooleanAttributeType::TRUE_VALUE,
+            $type->getSortableValue($this->attribute, true, $this->localization)
+        );
     }
 }

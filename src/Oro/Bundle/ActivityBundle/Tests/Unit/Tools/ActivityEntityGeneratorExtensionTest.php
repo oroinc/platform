@@ -1,29 +1,28 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Tools;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\PhpUtils\ClassGenerator;
 
 class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $groupingConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupingConfigProvider;
 
     /** @var ActivityEntityGeneratorExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->extension = new ActivityEntityGeneratorExtension($this->groupingConfigProvider);
     }
@@ -37,50 +36,44 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
         $config->set('groups', [ActivityScope::GROUP_ACTIVITY]);
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
+            ->willReturn(true);
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertTrue(
-            $this->extension->supports($schema)
-        );
+        self::assertTrue($this->extension->supports($schema));
     }
 
     public function testSupportsForNotConfigurableEntity()
     {
-        $this->groupingConfigProvider->expects($this->once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue(false));
-        $this->groupingConfigProvider->expects($this->never())
+            ->willReturn(false);
+        $this->groupingConfigProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testSupportsForEntityNotIncludedInAnyGroup()
     {
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
+            ->willReturn(true);
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testSupportsForNotActivityEntity()
@@ -88,18 +81,16 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
         $config->set('groups', ['another_group']);
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
+            ->willReturn(true);
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testGenerate()
@@ -150,13 +141,15 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
+        $class->addMethod('__construct')
+            ->addComment('Making sure that existing methods are not removed by the code generation');
+        $class->addMethod('someExistingMethod')
+            ->addComment('Making sure that existing methods are not removed by the code generation');
 
         $this->extension->generate($schema, $class);
-        $strategy     = new DefaultGeneratorStrategy();
-        $classBody    = $strategy->generate($class);
-        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/generationResult.txt');
+        $expectedBody = \file_get_contents(__DIR__ . '/Fixtures/generationResult.txt');
 
-        $this->assertEquals(trim($expectedBody), $classBody);
+        self::assertEquals($expectedBody, $class->print());
     }
 }

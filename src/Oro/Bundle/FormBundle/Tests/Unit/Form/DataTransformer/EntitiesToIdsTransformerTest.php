@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
@@ -9,498 +9,316 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestEntity;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
 {
-
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /**
-     * @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $classMetadata;
-    /**
-     * @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
+
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
-    /**
-     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $queryBuilder;
-    /**
-     * @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $query;
+
+    protected function setUp(): void
+    {
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
+        $this->repository = $this->createMock(EntityRepository::class);
+
+        $this->entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($this->classMetadata);
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(TestEntity::class)
+            ->willReturn($this->repository);
+    }
+
+    private function getTransformer($property, $queryBuilderCallback): EntitiesToIdsTransformer
+    {
+        return new EntitiesToIdsTransformer(
+            $this->entityManager,
+            TestEntity::class,
+            $property,
+            $queryBuilderCallback
+        );
+    }
+
+    private function createEntityList(string $property, array $values): array
+    {
+        $result = [];
+        foreach ($values as $value) {
+            $entity = new TestEntity();
+            ReflectionUtil::setPropertyValue($entity, $property, $value);
+
+            $result[] = $entity;
+        }
+
+        return $result;
+    }
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param string $property
-     * @param mixed $value
-     * @param mixed $expectedValue
      */
-    public function testTransform($property, $value, $expectedValue)
+    public function testTransform(string $property, array $value, array $expectedValue)
     {
-        $transformer = new EntitiesToIdsTransformer($this->getMockEntityManager(), 'TestClass', $property, null);
+        $transformer = $this->getTransformer($property, null);
         $this->assertEquals($expectedValue, $transformer->transform($value));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
-        return array(
-            'default' => array(
+        return [
+            'default'       => [
                 'id',
-                $this->createMockEntityList('id', array(1, 2, 3, 4)),
-                array(1, 2, 3, 4)
-            ),
-            'code property' => array(
-                'code',
-                $this->createMockEntityList('code', array('a', 'b', 'c')),
-                array('a', 'b', 'c')
-            ),
-            'empty' => array(
+                $this->createEntityList('id', [1, 2, 3, 4]),
+                [1, 2, 3, 4]
+            ],
+            'code property' => [
+                'name',
+                $this->createEntityList('name', ['a', 'b', 'c']),
+                ['a', 'b', 'c']
+            ],
+            'empty'         => [
                 'id',
-                array(),
-                array()
-            ),
-        );
+                [],
+                []
+            ],
+        ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
     public function testTransformFailsWhenValueInNotAnArray()
     {
-        $transformer = new EntitiesToIdsTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
+        $transformer = $this->getTransformer('id', null);
         $transformer->transform('invalid value');
     }
 
-    /**
-     * @dataProvider reverseTransformDataProvider
-     *
-     * @param $className
-     * @param $property
-     * @param $queryBuilderCallback
-     * @param $value
-     * @param $expectedValue
-     * @param array $expectedCalls
-     */
-    public function testReverseTransform(
-        $className,
-        $property,
-        $queryBuilderCallback,
-        $value,
-        $expectedValue,
-        array $expectedCalls
-    ) {
-        foreach ($expectedCalls as $key => $calls) {
-            $this->addMockExpectedCalls($key, $calls);
-        }
+    public function testReverseTransformForEmptyArray()
+    {
+        $transformer = $this->getTransformer('id', null);
+        $this->assertSame([], $transformer->reverseTransform([]));
+    }
 
-        $transformer = new EntitiesToIdsTransformer(
-            $this->getMockEntityManager(),
-            $className,
-            $property,
-            $queryBuilderCallback
-        );
+    public function testReverseTransformDefault()
+    {
+        $value = [1, 2, 3, 4];
+        $expectedValue = $this->createEntityList('id', [1, 2, 3, 4]);
 
-        ;
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $this->classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('ids', $value)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $transformer = $this->getTransformer(null, null);
         $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 
-    /**
-     * @return array
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function reverseTransformDataProvider()
+    public function testReverseTransformWithCustomProperty()
     {
-        $self = $this;
-        $entitiesId1234 = $this->createMockEntityList('id', array(1, 2, 3, 4));
-        $entitiesCodeAbc = $this->createMockEntityList('code', array('a', 'b', 'c'));
-        return array(
-            'default' => array(
-                'className' => 'TestClass',
-                'property' => null,
-                'qb_callback' => null,
-                'value' => array(1, 2, 3, 4),
-                'expected' => $entitiesId1234,
-                'expectedCalls' => array(
-                    'entityManager' => array(
-                        array('getClassMetadata', array('TestClass'), array('self', 'getMockClassMetadata')),
-                        array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
-                    ),
-                    'classMetadata' => array(
-                        array('getSingleIdentifierFieldName', array(), 'id'),
-                    ),
-                    'repository' => array(
-                        array('createQueryBuilder', array('e'), array('self', 'getMockQueryBuilder')),
-                    ),
-                    'queryBuilder' => array(
-                        array('where', array('e.id IN (:ids)'), array('self', 'getMockQueryBuilder')),
-                        array('setParameter', array('ids'), array(1, 2, 3, 4)),
-                        array('getQuery', array(), array('self', 'getMockQuery')),
-                    ),
-                    'query' => array(
-                        array(
-                            'execute',
-                            array(),
-                            $entitiesId1234
-                        ),
-                    )
-                )
-            ),
-            'empty' => array(
-                'className' => 'TestClass',
-                'property' => 'id',
-                'qb_callback' => null,
-                'value' => array(),
-                'expected' => array(),
-                'expectedCalls' => array(
-                    'entityManager' => array(),
-                    'classMetadata' => array(),
-                    'repository' => array(),
-                    'queryBuilder' => array(),
-                    'query' => array()
-                )
-            ),
-            'custom property' => array(
-                'className' => 'TestClass',
-                'property' => 'code',
-                'qb_callback' => null,
-                'value' => array('a', 'b', 'c'),
-                'expected' => $entitiesCodeAbc,
-                'expectedCalls' => array(
-                    'entityManager' => array(
-                        array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
-                    ),
-                    'classMetadata' => array(),
-                    'repository' => array(
-                        array('createQueryBuilder', array('e'), array('self', 'getMockQueryBuilder')),
-                    ),
-                    'queryBuilder' => array(
-                        array('where', array('e.code IN (:ids)'), array('self', 'getMockQueryBuilder')),
-                        array('setParameter', array('ids'), array(1, 2, 3, 4)),
-                        array('getQuery', array(), array('self', 'getMockQuery')),
-                    ),
-                    'query' => array(
-                        array(
-                            'execute',
-                            array(),
-                            $entitiesCodeAbc
-                        ),
-                    )
-                )
-            ),
-            'custom query builder callback' => array(
-                'className' => 'TestClass',
-                'property' => null,
-                'qb_callback' => function ($repository, array $ids) use ($self) {
-                    $result = $repository->createQueryBuilder('o');
-                    $result->where('o.id IN (:values)')->setParameter('values', $ids);
-                    return $result;
-                },
-                'value' => array(1, 2, 3, 4),
-                'expected' => $entitiesId1234,
-                'expectedCalls' => array(
-                    'entityManager' => array(
-                        array('getClassMetadata', array('TestClass'), array('self', 'getMockClassMetadata')),
-                        array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
-                    ),
-                    'classMetadata' => array(
-                        array('getSingleIdentifierFieldName', array(), 'id'),
-                    ),
-                    'repository' => array(
-                        array('createQueryBuilder', array('o'), array('self', 'getMockQueryBuilder')),
-                    ),
-                    'queryBuilder' => array(
-                        array('where', array('o.id IN (:values)'), array('self', 'getMockQueryBuilder')),
-                        array('setParameter', array('values'), array(1, 2, 3, 4)),
-                        array('getQuery', array(), array('self', 'getMockQuery')),
-                    ),
-                    'query' => array(
-                        array(
-                            'execute',
-                            array(),
-                            $entitiesId1234
-                        ),
-                    )
-                )
-            ),
-        );
+        $value = ['a', 'b', 'c'];
+        $expectedValue = $this->createEntityList('name', ['a', 'b', 'c']);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $this->classMetadata->expects($this->never())
+            ->method('getSingleIdentifierFieldName');
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.name IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('ids', $value)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $transformer = $this->getTransformer('name', null);
+        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 
-    /**
-     * @dataProvider reverseTransformFailsDataProvider
-     *
-     * @param mixed $className
-     * @param mixed $property
-     * @param mixed $queryBuilderCallback
-     * @param mixed $value
-     * @param string $expectedException
-     * @param string $expectedExceptionMessage
-     * @param array $expectedCalls
-     */
-    public function testReverseTransformFails(
-        $className,
-        $property,
-        $queryBuilderCallback,
-        $value,
-        $expectedException,
-        $expectedExceptionMessage,
-        array $expectedCalls
-    ) {
-        foreach ($expectedCalls as $key => $calls) {
-            $this->addMockExpectedCalls($key, $calls);
-        }
+    public function testReverseTransformWithCustomQueryBuilderCallback()
+    {
+        $value = [1, 2, 3, 4];
+        $expectedValue = $this->createEntityList('id', [1, 2, 3, 4]);
 
-        $transformer = new EntitiesToIdsTransformer(
-            $this->getMockEntityManager(),
-            $className,
-            $property,
-            $queryBuilderCallback
-        );
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->expectException($expectedException);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('o')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('o.id IN (:values)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('values', $value)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $transformer = $this->getTransformer(null, function ($repository, array $ids) {
+            $result = $repository->createQueryBuilder('o');
+            $result
+                ->where('o.id IN (:values)')
+                ->setParameter('values', $ids);
+
+            return $result;
+        });
+        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformForNotArray()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
+        $transformer = $this->getTransformer('id', null);
+        $transformer->reverseTransform('1,2,3,4,5');
+    }
+
+    public function testReverseTransformWhenEntitiesCountMismatchIdsCount()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Could not find all entities for the given IDs');
+
+        $value = [1, 2, 3, 4, 5];
+        $loadedEntities = $this->createEntityList('id', [1, 2, 3, 4]);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $this->classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('ids', $value)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn($loadedEntities);
+
+        $transformer = $this->getTransformer(null, null);
         $transformer->reverseTransform($value);
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformFailsDataProvider()
+    public function testReverseTransformWithInvalidQueryBuilderCallback()
     {
-        $entitiesId1234 = $this->createMockEntityList('id', array(1, 2, 3, 4));
-        return array(
-            'not array' => array(
-                'className' => 'TestClass',
-                'property' => 'id',
-                'qb_callback' => null,
-                'value' => '1,2,3,4,5',
-                'exception' => 'Symfony\Component\Form\Exception\UnexpectedTypeException',
-                'exception_message' => 'Expected argument of type "array", "string" given',
-                'expectedCalls' => array(
-                    'entityManager' => array(),
-                    'classMetadata' => array(),
-                    'repository' => array(),
-                    'queryBuilder' => array(),
-                )
-            ),
-            'entities count mismatch ids count' => array(
-                'className' => 'TestClass',
-                'property' => 'id',
-                'qb_callback' => null,
-                'value' => array(1, 2, 3, 4, 5),
-                'exception' => 'Symfony\Component\Form\Exception\TransformationFailedException',
-                'exception_message' => 'Could not find all entities for the given IDs',
-                'expectedCalls' => array(
-                    'entityManager' => array(
-                        array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
-                    ),
-                    'classMetadata' => array(),
-                    'repository' => array(
-                        array('createQueryBuilder', array('e'), array('self', 'getMockQueryBuilder')),
-                    ),
-                    'queryBuilder' => array(
-                        array('where', array('e.id IN (:ids)'), array('self', 'getMockQueryBuilder')),
-                        array('setParameter', array('ids'), array(1, 2, 3, 4, 5)),
-                        array('getQuery', array(), array('self', 'getMockQuery')),
-                    ),
-                    'query' => array(
-                        array('execute', array(), $entitiesId1234),
-                    )
-                )
-            ),
-            'invalid query builder callback' => array(
-                'className' => 'TestClass',
-                'property' => 'id',
-                'qb_callback' => function () {
-                    return new \stdClass();
-                },
-                'value' => array(1, 2, 3, 4),
-                'exception' => 'Symfony\Component\Form\Exception\UnexpectedTypeException',
-                'exception_message' => 'Expected argument of type "Doctrine\ORM\QueryBuilder", "stdClass" given',
-                'expectedCalls' => array(
-                    'entityManager' => array(
-                        array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
-                    ),
-                    'classMetadata' => array(),
-                    'repository' => array(),
-                    'queryBuilder' => array(),
-                    'query' => array()
-                )
-            )
-        );
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "stdClass" given');
+
+        $this->classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $transformer = $this->getTransformer(null, function () {
+            return new \stdClass();
+        });
+        $transformer->reverseTransform([1, 2, 3, 4]);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FormBundle\Form\Exception\FormException
-     * @expectedExceptionMessage Cannot get id property path of entity. "TestClass" has composite primary key.
-     */
     public function testCreateFailsWhenCannotGetIdProperty()
     {
-        $className = 'TestClass';
+        $this->expectException(FormException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Cannot get id property path of entity. "%s" has composite primary key.',
+            TestEntity::class
+        ));
 
-        $classMetadata = $this->getMockClassMetadata();
-        $classMetadata->expects($this->once())->method('getSingleIdentifierFieldName')
-            ->will($this->throwException(new MappingException()));
+        $this->classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willThrowException(new MappingException());
 
-        $em = $this->getMockEntityManager();
-        $em->expects($this->once())->method('getClassMetadata')
-            ->with($className)->will($this->returnValue($classMetadata));
+        $this->entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($this->classMetadata);
 
-        new EntitiesToIdsTransformer($em, $className, null, null);
+        $this->getTransformer(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "callable", "array" given
-     */
     public function testCreateFailsWhenQueryBuilderCallbackIsNotCallable()
     {
-        new EntitiesToIdsTransformer($this->getMockEntityManager(), 'TestClass', 'id', array());
-    }
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "callable", "array" given');
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|string $mock
-     * @param array $expectedCalls
-     */
-    private function addMockExpectedCalls($mock, array $expectedCalls)
-    {
-        if (is_string($mock)) {
-            $mockGetter = 'getMock' . ucfirst($mock);
-            $mock = $this->$mockGetter($mock);
-        }
-        $index = 0;
-        if ($expectedCalls) {
-            foreach ($expectedCalls as $expectedCall) {
-                list($method, $arguments, $result) = $expectedCall;
-
-                if (is_callable($result)) {
-                    $result = call_user_func($result);
-                }
-
-                $methodExpectation = $mock->expects($this->at($index++))->method($method);
-                $methodExpectation = call_user_func_array(array($methodExpectation, 'with'), $arguments);
-                $methodExpectation->will($this->returnValue($result));
-            }
-        } else {
-            $mock->expects($this->never())->method($this->anything());
-        }
-    }
-
-    /**
-     * Create list of mocked entities by id property name and values
-     *
-     * @param string $property
-     * @param array $values
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
-     */
-    private function createMockEntityList($property, array $values)
-    {
-        $result = array();
-        foreach ($values as $value) {
-            $result[] = $this->createMockEntity($property, $value);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Create mock entity by id property name and value
-     *
-     * @param string $property
-     * @param mixed $value
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createMockEntity($property, $value)
-    {
-        $getter = 'get' . ucfirst($property);
-        $result = $this->createPartialMock(\ArrayObject::class, array($getter));
-        $result->expects($this->any())->method($getter)->will($this->returnValue($value));
-
-        return $result;
-    }
-
-    /**
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getClassMetadata', 'getRepository'))
-                ->getMockForAbstractClass();
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockClassMetadata()
-    {
-        if (!$this->classMetadata) {
-            $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getSingleIdentifierFieldName'))
-                ->getMockForAbstractClass();
-        }
-
-        return $this->classMetadata;
-    }
-
-    /**
-     * @return EntityRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockRepository()
-    {
-        if (!$this->repository) {
-            $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-                ->disableOriginalConstructor()
-                ->setMethods(array('createQueryBuilder'))
-                ->getMockForAbstractClass();
-        }
-
-        return $this->repository;
-    }
-
-    /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockQueryBuilder()
-    {
-        if (!$this->queryBuilder) {
-            $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->setMethods(array('where', 'setParameter', 'getQuery'))
-                ->getMockForAbstractClass();
-        }
-
-        return $this->queryBuilder;
-    }
-
-    /**
-     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockQuery()
-    {
-        if (!$this->query) {
-            $this->query= $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-                ->disableOriginalConstructor()
-                ->setMethods(array('execute'))
-                ->getMockForAbstractClass();
-        }
-
-        return $this->query;
+        $this->getTransformer('id', []);
     }
 }

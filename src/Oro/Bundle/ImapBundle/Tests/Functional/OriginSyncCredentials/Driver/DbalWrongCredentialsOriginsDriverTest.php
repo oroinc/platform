@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Functional\OriginSyncCredentials\Driver;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver\DbalWrongCredentialsOriginsDriver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -19,7 +20,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -83,13 +84,14 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOrigins()
     {
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $origin = new UserEmailOrigin();
         $origin->setMailboxName('test');
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($origin);
-        $em->flush($origin);
+        $em->flush();
 
         $doctrine->getConnection()->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $origin->getId()]);
 
@@ -103,6 +105,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithPassedId()
     {
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();
@@ -111,7 +114,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $systemOrigin = new UserEmailOrigin();
         $systemOrigin->setMailboxName('system');
 
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($userOrigin);
         $em->persist($systemOrigin);
         $em->flush();
@@ -125,6 +128,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithoutPassedId()
     {
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();
@@ -133,7 +137,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $systemOrigin = new UserEmailOrigin();
         $systemOrigin->setMailboxName('system');
 
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($userOrigin);
         $em->persist($systemOrigin);
         $em->flush();

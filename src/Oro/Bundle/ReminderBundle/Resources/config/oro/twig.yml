@@ -1,2 +1,2 @@
 bundles:
-    - OroReminderBundle:Form:fields.html.twig
+    - '@OroReminder/Form/fields.html.twig'

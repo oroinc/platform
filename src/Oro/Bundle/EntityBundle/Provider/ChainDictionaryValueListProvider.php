@@ -4,43 +4,20 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Provides information about dictionaries.
+ */
 class ChainDictionaryValueListProvider
 {
-    /** @var array */
+    /** @var iterable|DictionaryValueListProviderInterface[] */
     private $providers;
 
-    /** @var DictionaryValueListProviderInterface[] */
-    private $sorted;
-
     /**
-     * Registers the provider in the chain.
-     *
-     * @param DictionaryValueListProviderInterface $provider
-     * @param int                                  $priority
+     * @param iterable|DictionaryValueListProviderInterface[] $providers
      */
-    public function addProvider(DictionaryValueListProviderInterface $provider, $priority = 0)
+    public function __construct(iterable $providers)
     {
-        $this->providers[$priority][] = $provider;
-        $this->sorted                 = null;
-    }
-
-    /**
-     * Returns the registered providers sorted by priority.
-     *
-     * @return DictionaryValueListProviderInterface[]
-     */
-    protected function getProviders()
-    {
-        if (null === $this->sorted) {
-            if (empty($this->providers)) {
-                $this->sorted = [];
-            } else {
-                krsort($this->providers);
-                $this->sorted = call_user_func_array('array_merge', $this->providers);
-            }
-        }
-
-        return $this->sorted;
+        $this->providers = $providers;
     }
 
     /**
@@ -56,8 +33,7 @@ class ChainDictionaryValueListProvider
             return null;
         }
 
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getSerializationConfig($className);
             }
@@ -79,8 +55,7 @@ class ChainDictionaryValueListProvider
             return null;
         }
 
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getValueListQueryBuilder($className);
             }
@@ -97,12 +72,16 @@ class ChainDictionaryValueListProvider
     public function getSupportedEntityClasses()
     {
         $supportedClasses = [];
-
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
-            $supportedClasses = array_merge($supportedClasses, $provider->getSupportedEntityClasses());
+        foreach ($this->providers as $provider) {
+            $classes = $provider->getSupportedEntityClasses();
+            if ($classes) {
+                $supportedClasses[] = $classes;
+            }
+        }
+        if ($supportedClasses) {
+            $supportedClasses = array_unique(array_merge(...$supportedClasses));
         }
 
-        return array_unique($supportedClasses);
+        return $supportedClasses;
     }
 }

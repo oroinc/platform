@@ -6,6 +6,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Locates and parses workflow configuration files.
+ */
 class WorkflowConfigurationProvider
 {
     /** @var WorkflowListConfiguration */
@@ -20,12 +23,6 @@ class WorkflowConfigurationProvider
     /** @var WorkflowConfigurationImportsProcessor */
     private $importsProcessor;
 
-    /**
-     * @param WorkflowListConfiguration $configuration
-     * @param WorkflowConfigFinderBuilder $finderBuilder
-     * @param ConfigFileReaderInterface $reader
-     * @param WorkflowConfigurationImportsProcessor $configurationImportsProcessor
-     */
     public function __construct(
         WorkflowListConfiguration $configuration,
         WorkflowConfigFinderBuilder $finderBuilder,
@@ -82,10 +79,6 @@ class WorkflowConfigurationProvider
         return $configs;
     }
 
-    /**
-     * @param array $directories
-     * @return Finder
-     */
     private function getConfigFiles(array $directories): Finder
     {
         $finder = $this->finderBuilder->create();
@@ -94,7 +87,7 @@ class WorkflowConfigurationProvider
                 function ($file) use ($directories) {
                     foreach ($directories as $allowedDirectory) {
                         if ($allowedDirectory &&
-                            strpos($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR) === 0
+                            str_starts_with($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR)
                         ) {
                             return true;
                         }

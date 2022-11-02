@@ -4,10 +4,13 @@ namespace Oro\Bundle\EntityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
+ * Represents a field that value can be a scalar, an array
+ * or it can retrieved from another source if it does not have own value.
  * @ORM\Table(name="oro_entity_fallback_value")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository")
  * @Config()
  */
 class EntityFieldFallbackValue
@@ -18,16 +21,19 @@ class EntityFieldFallbackValue
     const FALLBACK_ARRAY_FIELD = 'arrayValue';
     const FALLBACK_PARENT_FIELD = 'fallback';
 
-    const PAGE_TEMPLATE = 'pageTemplate';
-
-    public static $specialRelations = [self::PAGE_TEMPLATE];
-
     /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 
@@ -35,6 +41,13 @@ class EntityFieldFallbackValue
      * @var string
      *
      * @ORM\Column(name="fallback", type="string", length=64, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $fallback;
 
@@ -42,6 +55,13 @@ class EntityFieldFallbackValue
      * @var mixed
      *
      * @ORM\Column(name="scalar_value", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $scalarValue;
 
@@ -49,6 +69,13 @@ class EntityFieldFallbackValue
      * @var array
      *
      * @ORM\Column(name="array_value", type="array", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $arrayValue;
 
@@ -127,5 +154,10 @@ class EntityFieldFallbackValue
         }
 
         return $this->arrayValue;
+    }
+
+    public function __clone()
+    {
+        $this->id = null;
     }
 }

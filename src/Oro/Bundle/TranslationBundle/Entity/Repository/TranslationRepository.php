@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
+/**
+ * The repository for Translation entity.
+ */
 class TranslationRepository extends EntityRepository
 {
     /**
@@ -54,9 +57,9 @@ class TranslationRepository extends EntityRepository
                     $queryBuilder->expr()->eq('k.domain', ':domain')
                 )
             )
-            ->setParameter('code', $locale, Type::STRING)
-            ->setParameter('key', $key, Type::STRING)
-            ->setParameter('domain', $domain, Type::STRING)
+            ->setParameter('code', $locale, Types::STRING)
+            ->setParameter('key', $key, Types::STRING)
+            ->setParameter('domain', $domain, Types::STRING)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -89,32 +92,32 @@ class TranslationRepository extends EntityRepository
             ->execute();
     }
 
-    /**
-     * @param string $languageCode
-     * @param string $domain
-     *
-     * @return array [['id' => '...', 'value' => '...', 'key' => '...', 'domain' => '...', 'code' => '...'], ...]
-     */
-    public function findAllByLanguageAndDomain($languageCode, $domain)
-    {
+    public function findAllByLanguageAndScopes(
+        string $languageCode,
+        array $scopes = []
+    ) {
         $qb = $this->createQueryBuilder('t');
-        $qb->distinct(true)
+        $qb->distinct()
             ->select('t.id, t.value, k.key, k.domain, l.code')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
-            ->where(
+            ->setParameter('code', $languageCode);
+
+        if (count($scopes)) {
+            $qb->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('l.code', ':code'),
-                    $qb->expr()->gt('t.scope', ':scope'),
-                    $qb->expr()->eq('k.domain', ':domain')
+                    $qb->expr()->in('t.scope', ':scopes'),
                 )
             )
-            ->setParameter('code', $languageCode)
-            ->setParameter('domain', $domain, Type::STRING)
-            ->setParameter('scope', Translation::SCOPE_SYSTEM);
+                ->setParameter('scopes', $scopes);
+        } else {
+            $qb->where($qb->expr()->eq('l.code', ':code'));
+        }
 
         return $qb->getQuery()->getArrayResult();
     }
+
 
     /**
      * @param int $languageId

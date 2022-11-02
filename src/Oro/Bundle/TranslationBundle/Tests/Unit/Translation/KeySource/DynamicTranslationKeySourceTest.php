@@ -7,16 +7,6 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
 class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DynamicTranslationKeySource
-     */
-    private $dynamicSource;
-
-    protected function setUp()
-    {
-        $this->dynamicSource = new DynamicTranslationKeySource();
-    }
-
     public function testNonConfiguredCalls()
     {
         $this->expectException(\LogicException::class);
@@ -24,14 +14,18 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
             'Can\'t build source without template. Please configure source by ->configure($template) method.'
         );
 
-        $this->dynamicSource->getTemplate();
+        $dynamicSource = new DynamicTranslationKeySource();
+        $dynamicSource->getTemplate();
     }
 
     public function testMergedConfiguredData()
     {
-        $dynamicSource = new DynamicTranslationKeySource(['a' => 1, 'c' => 42]);
         $template = $this->createMock(TranslationKeyTemplateInterface::class);
-        $template->expects($this->once())->method('getRequiredKeys')->willReturn([]);
+        $template->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn([]);
+
+        $dynamicSource = new DynamicTranslationKeySource(['a' => 1, 'c' => 42]);
         $dynamicSource->configure($template, ['b' => 2, 'a' => 3]);
 
         $this->assertEquals(
@@ -52,16 +46,27 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         );
 
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
-        $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn(['some_key']);
-        $this->dynamicSource->configure($templateMock, ['some_other_key' => 'someValue']);
+        $templateMock->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn(['some_key']);
+
+        $dynamicSource = new DynamicTranslationKeySource();
+        $dynamicSource->configure($templateMock, ['some_other_key' => 'someValue']);
     }
 
     public function testGetTemplate()
     {
         $template = $this->createMock(TranslationKeyTemplateInterface::class);
-        $template->expects($this->once())->method('getRequiredKeys')->willReturn([]);
-        $template->expects($this->once())->method('getTemplate')->willReturn('template string');
-        $this->dynamicSource->configure($template);
-        $this->assertEquals('template string', $this->dynamicSource->getTemplate());
+        $template->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn([]);
+        $template->expects($this->once())
+            ->method('getTemplate')
+            ->willReturn('template string');
+
+        $dynamicSource = new DynamicTranslationKeySource();
+        $dynamicSource->configure($template);
+
+        $this->assertEquals('template string', $dynamicSource->getTemplate());
     }
 }

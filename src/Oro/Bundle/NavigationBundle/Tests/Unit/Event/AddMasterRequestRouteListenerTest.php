@@ -4,60 +4,50 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class AddMasterRequestRouteListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddMasterRequestRouteListener
-     */
-    protected $listener;
+    private AddMasterRequestRouteListener $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new AddMasterRequestRouteListener();
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $route = 'foo';
 
         $masterRequestEvent = $this->createMasterRequestEvent($route);
 
         $this->listener->onKernelRequest($masterRequestEvent);
-        $this->assertTrue($masterRequestEvent->getRequest()->attributes->has('_master_request_route'));
-        $this->assertEquals($route, $masterRequestEvent->getRequest()->attributes->get('_master_request_route'));
+        self::assertTrue($masterRequestEvent->getRequest()->attributes->has('_master_request_route'));
+        self::assertEquals($route, $masterRequestEvent->getRequest()->attributes->get('_master_request_route'));
 
         $subRequestEvent = $this->createSubRequestEvent($route);
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertTrue($subRequestEvent->getRequest()->attributes->has('_master_request_route'));
-        $this->assertEquals($route, $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
+        self::assertTrue($subRequestEvent->getRequest()->attributes->has('_master_request_route'));
+        self::assertEquals($route, $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
     }
 
-    /**
-     * @param string $route
-     * @return GetResponseEvent
-     */
-    protected function createMasterRequestEvent($route)
+    protected function createMasterRequestEvent(string $route): RequestEvent
     {
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
-        return new GetResponseEvent(
+        return new RequestEvent(
             $kernel,
             new Request([], [], ['_route' => $route]),
             HttpKernelInterface::MASTER_REQUEST
         );
     }
 
-    /**
-     * @return GetResponseEvent
-     */
-    protected function createSubRequestEvent()
+    private function createSubRequestEvent(): RequestEvent
     {
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
-        return new GetResponseEvent(
+        return new RequestEvent(
             $kernel,
             new Request(),
             HttpKernelInterface::SUB_REQUEST

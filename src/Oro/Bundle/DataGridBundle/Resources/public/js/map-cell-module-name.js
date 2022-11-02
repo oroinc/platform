@@ -1,8 +1,8 @@
 define(function() {
     'use strict';
 
-    var moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell';
-    var types = {
+    const moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell';
+    const types = {
         'integer': 'number',
         'decimal': 'number',
         'percent': 'number',

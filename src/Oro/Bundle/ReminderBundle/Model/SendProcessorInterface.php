@@ -11,8 +11,6 @@ interface SendProcessorInterface
 {
     /**
      * Push reminder to process queue
-     *
-     * @param Reminder $reminder
      */
     public function push(Reminder $reminder);
 
@@ -22,16 +20,9 @@ interface SendProcessorInterface
     public function process();
 
     /**
-     * Gets unique name of processor
-     *
-     * @param string
-     */
-    public function getName();
-
-    /**
      * Gets label of processor
      *
-     * @param string
+     * @return string
      */
     public function getLabel();
 }

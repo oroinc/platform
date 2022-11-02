@@ -42,13 +42,6 @@ class Operation
     /** @var array */
     private $formOptions;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     * @param ConditionFactory $conditionFactory
-     * @param AttributeAssembler $attributeAssembler
-     * @param FormOptionsAssembler $formOptionsAssembler
-     * @param OperationDefinition $definition
-     */
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
@@ -87,9 +80,6 @@ class Operation
         return $this->definition;
     }
 
-    /**
-     * @param ActionData $data
-     */
     public function init(ActionData $data)
     {
         $this->executeActions($data, OperationDefinition::FORM_INIT);

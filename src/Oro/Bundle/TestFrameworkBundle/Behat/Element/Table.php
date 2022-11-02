@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Element\NodeElement;
-
+/**
+ * Table element representation
+ */
 class Table extends Element
 {
     const TABLE_HEADER_ELEMENT = 'TableHeader';
+    const TABLE_ROW_STRICT_ELEMENT = 'TableRowStrict';
     const TABLE_ROW_ELEMENT = 'TableRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
     const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';
@@ -31,11 +33,12 @@ class Table extends Element
      * Get Element tr by row content
      *
      * @param string $content Any content that can identify row
+     * @param bool $failIfNotFound
      * @return TableRow tr element of table
      */
-    public function getRowByContent($content)
+    public function getRowByContent($content, $failIfNotFound = true)
     {
-        return $this->getRowByContentElement($content, static::TABLE_ROW_ELEMENT);
+        return $this->getRowByContentElement($content, static::TABLE_ROW_ELEMENT, $failIfNotFound);
     }
 
     public function assertNoRecords()
@@ -48,7 +51,7 @@ class Table extends Element
      */
     public function getRows()
     {
-        return $this->getRowElements(static::TABLE_ROW_ELEMENT);
+        return $this->getRowElements(static::TABLE_ROW_STRICT_ELEMENT);
     }
 
     /**
@@ -57,21 +60,34 @@ class Table extends Element
      */
     public function getRowElements($elementName)
     {
-        return array_map(function (NodeElement $element) use ($elementName) {
-            return $this->elementFactory->wrapElement($elementName, $element);
-        }, $this->findAll('xpath', 'child::tbody/child::tr'));
+        return array_map(function (TableRow $row) {
+            $row->setOwner($this);
+
+            return $row;
+        }, $this->getElements($elementName));
     }
 
     /**
      * @param string $content Any content that can identify row
      * @param string $elementName
-     * @return TableRow
+     * @param bool $failIfNotFound
+     * @return TableRow|null
      */
-    public function getRowByContentElement($content, $elementName)
+    public function getRowByContentElement($content, $elementName, $failIfNotFound = true)
     {
-        /** @var TableRow $row */
-        $row = $this->findElementContains($elementName, $content);
-        self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+        /** @var TableRow|null $row */
+        $row = $this->spin(function () use ($elementName, $content) {
+            $element = $this->findElementContains($elementName, $content);
+
+            return $element->isIsset() ? $element : false;
+        }, 2);
+
+        if ($failIfNotFound) {
+            self::assertNotNull($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+        }
+        if ($row) {
+            $row->setOwner($this);
+        }
 
         return $row;
     }

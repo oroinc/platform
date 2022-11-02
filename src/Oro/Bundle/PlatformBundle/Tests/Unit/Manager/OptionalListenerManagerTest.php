@@ -4,34 +4,27 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
+use Symfony\Component\DependencyInjection\Container;
 
 class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OptionalListenerManager
-     */
-    protected $manager;
+    /** @var array */
+    private $testListeners;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var array
-     */
-    protected $testListeners;
+    /** @var OptionalListenerManager */
+    private $manager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->testListeners = [
             'test.listener1',
             'test.listener2',
             'test.listener3',
         ];
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->container = $this->createMock(Container::class);
 
         $this->manager = new OptionalListenerManager($this->testListeners, $this->container);
     }
@@ -44,35 +37,34 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
     public function testDisableListener()
     {
         $testListener = new TestListener();
-        $testListener->enabled = false;
+        $testListener->resetEnabled();
         $listenerId = 'test.listener2';
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
-            ->will($this->returnValue($testListener));
+            ->willReturn($testListener);
         $this->manager->disableListener($listenerId);
-        $this->assertFalse($testListener->enabled);
+        $this->assertFalse($testListener->getEnabled());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Listener "test.bad_listener" does not exist or not optional
-     */
     public function testDisableNonExistsListener()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Listener "test.bad_listener" does not exist or not optional');
+
         $this->manager->disableListener('test.bad_listener');
     }
 
     public function testDisableOneListener()
     {
         $testListener = new TestListener();
-        $testListener->enabled = false;
+        $testListener->resetEnabled();
         $listenerId = 'test.listener3';
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
-            ->will($this->returnValue($testListener));
+            ->willReturn($testListener);
         $this->manager->disableListeners([$listenerId]);
-        $this->assertFalse($testListener->enabled);
+        $this->assertFalse($testListener->getEnabled());
     }
 }

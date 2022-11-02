@@ -12,9 +12,6 @@ class FormFactoryProcessor implements ProcessorInterface
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    /**
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(FormFactoryInterface $formFactory)
     {
         $this->formFactory = $formFactory;

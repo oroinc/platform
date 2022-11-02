@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -10,38 +10,34 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for Attachment entity.
+ */
 class AttachmentApiEntityManager extends ApiEntityManager
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    protected AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    protected AttachmentManager $attachmentManager;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
-    /** @var array|null */
-    protected $attachmentTargets;
+    private FileApiEntityManager $fileApiEntityManager;
 
-    /**
-     * @param string                        $class
-     * @param ObjectManager                 $om
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param AttachmentManager             $attachmentManager
-     * @param DoctrineHelper                $doctrineHelper
-     */
+    protected ?array $attachmentTargets = null;
+
     public function __construct(
-        $class,
+        string $class,
         ObjectManager $om,
         AuthorizationCheckerInterface $authorizationChecker,
         AttachmentManager $attachmentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        FileApiEntityManager $fileApiEntityManager
     ) {
         parent::__construct($class, $om);
         $this->authorizationChecker = $authorizationChecker;
         $this->attachmentManager = $attachmentManager;
         $this->doctrineHelper = $doctrineHelper;
+        $this->fileApiEntityManager = $fileApiEntityManager;
     }
 
     /**
@@ -70,8 +66,8 @@ class AttachmentApiEntityManager extends ApiEntityManager
                 'organization' => ['fields' => 'name'],
                 'file'         => ['fields' => 'id']
             ],
-            'post_serialize' => function (array &$result) {
-                $this->postSerializeAttachment($result);
+            'post_serialize' => function (array $result) {
+                return $this->postSerializeAttachment($result);
             }
         ];
 
@@ -85,17 +81,10 @@ class AttachmentApiEntityManager extends ApiEntityManager
         return $config;
     }
 
-    /**
-     * @param array $result
-     */
-    protected function postSerializeAttachment(array &$result)
+    protected function postSerializeAttachment(array $result): array
     {
         if (!empty($result['file'])) {
-            $result['file'] = $this->attachmentManager->getFileRestApiUrl(
-                $result['file']['id'],
-                $this->class,
-                $result['id']
-            );
+            $result['file'] = $this->fileApiEntityManager->getFileRestApiUrl($result['file']['id']);
         }
 
         // move all attachment association fields into 'target' field
@@ -113,6 +102,8 @@ class AttachmentApiEntityManager extends ApiEntityManager
         foreach ($attachmentTargets as $targetClass => $fieldName) {
             unset($result[$fieldName]);
         }
+
+        return $result;
     }
 
     /**

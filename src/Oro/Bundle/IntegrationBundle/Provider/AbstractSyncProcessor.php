@@ -16,7 +16,13 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAwareInterface
+/**
+ * Sync processor default implementation
+ */
+abstract class AbstractSyncProcessor implements
+    SyncProcessorInterface,
+    LoggerAwareInterface,
+    LoggerStrategyAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -32,13 +38,6 @@ abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAw
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param ProcessorRegistry        $processorRegistry
-     * @param Executor                 $jobExecutor
-     * @param TypesRegistry            $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerStrategy|null      $logger
-     */
     public function __construct(
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
@@ -54,9 +53,7 @@ abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAw
     }
 
     /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
+     * {@inheritdoc}
      */
     public function getLoggerStrategy()
     {
@@ -145,7 +142,7 @@ abstract class AbstractSyncProcessor implements SyncProcessorInterface, LoggerAw
     protected function dispatchSyncEvent($eventName, $jobName, array $configuration, JobResult $jobResult = null)
     {
         $event = new SyncEvent($jobName, $configuration, $jobResult);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         return $event;
     }

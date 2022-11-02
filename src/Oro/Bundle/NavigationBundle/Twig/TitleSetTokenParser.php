@@ -2,26 +2,27 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
+use Twig\Node\Node;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+
 /**
- * Class TitleSetTokenParser
  * Used for compiling {% oro_title_set(array) %} tag
- *
- * @package Oro\Bundle\NavigationBundle\Twig
  */
-class TitleSetTokenParser extends \Twig_TokenParser
+class TitleSetTokenParser extends AbstractTokenParser
 {
     /**
      * Parses a token and returns a node.
      *
-     * @param  \Twig_Token         $token A Twig_Token instance
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     * @param  Token $token A Token instance
+     * @return Node  A Node instance
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $lineno = $token->getLine();
 
         $expr = $this->parser->getExpressionParser()->parseArguments();
-        $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
+        $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
         return new TitleNode($expr, $lineno);
     }

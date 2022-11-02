@@ -3,34 +3,30 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
+use Twig\Template;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
-    /**
-     * @var TwigRendererEngine
-     */
-    protected $twigRendererEngine;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /**
-     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $environment;
+    /** @var TwigRendererEngine */
+    private $twigRendererEngine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
+
         $this->twigRendererEngine = $this->createRendererEngine();
     }
 
     public function testRenderBlock()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects(self::once())
             ->method('get')
             ->with('oro_layout.debug_block_info')
@@ -38,22 +34,15 @@ class TwigRendererEngineTest extends RendererEngineTest
 
         $this->twigRendererEngine->setConfigManager($configManager);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
-        $view = $this->createMock('Symfony\Component\Form\FormView');
+        $view = $this->createMock(FormView::class);
         $view->vars['cache_key'] = 'cache_key';
-        $template = $this->createMock('\Twig_Template');
+        $template = $this->createMock(Template::class);
         $template->expects($this->once())
             ->method('getTemplateName')
-            ->will($this->returnValue('theme'));
+            ->willReturn('theme');
 
-        $class = new \ReflectionClass(BaseTwigRendererEngine::class);
-        $property = $class->getProperty('template');
-        $property->setAccessible(true);
-        $property->setValue($this->twigRendererEngine, $template);
-
-        $property = $class->getProperty('resources');
-        $property->setAccessible(true);
-        $property->setValue($this->twigRendererEngine, ['cache_key' => []]);
+        ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'template', $template);
+        ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'resources', ['cache_key' => []]);
 
         $variables = ['id' => 'root'];
         $result = array_merge(
@@ -69,7 +58,7 @@ class TwigRendererEngineTest extends RendererEngineTest
         $this->environment->expects($this->once())
             ->method('mergeGlobals')
             ->with($result)
-            ->will($this->returnValue([$template, 'root']));
+            ->willReturn([$template, 'root']);
 
         $this->twigRendererEngine->renderBlock($view, [$template, 'root'], 'root', $variables);
     }

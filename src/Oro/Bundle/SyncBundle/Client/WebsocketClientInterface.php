@@ -12,14 +12,8 @@ interface WebsocketClientInterface
      */
     public function connect(): ?string;
 
-    /**
-     * @return bool
-     */
     public function disconnect(): bool;
 
-    /**
-     * @return bool
-     */
     public function isConnected(): bool;
 
     /**
@@ -32,20 +26,8 @@ interface WebsocketClientInterface
      */
     public function publish(string $topicUri, $payload, array $exclude = [], array $eligible = []): bool;
 
-    /**
-     * @param string $prefix
-     * @param string $uri
-     *
-     * @return bool
-     */
     public function prefix(string $prefix, string $uri): bool;
 
-    /**
-     * @param string $procUri
-     * @param array  $arguments
-     *
-     * @return bool
-     */
     public function call(string $procUri, array $arguments = []): bool;
 
     /**

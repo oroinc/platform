@@ -10,7 +10,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDataAccessor */
     private $entityDataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityDataAccessor = new EntityDataAccessor();
     }

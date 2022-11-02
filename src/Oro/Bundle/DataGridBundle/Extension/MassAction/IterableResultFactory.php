@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -25,9 +27,6 @@ class IterableResultFactory implements IterableResultFactoryInterface
      */
     private $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
@@ -66,6 +65,9 @@ class IterableResultFactory implements IterableResultFactoryInterface
 
         $identifierField = $this->getIdentifierField($actionConfiguration);
         $objectIdentifier = $this->getObjectIdentifier($actionConfiguration);
+        //Query may have aggregation and sort criteria by non aggregated columns
+        //which will cause fatal error, so let's replace it to the predictable criteria
+        $qb->orderBy($identifierField, Criteria::ASC);
 
         if ($selectedItems->getValues()) {
             $valueWhereCondition =
@@ -74,6 +76,11 @@ class IterableResultFactory implements IterableResultFactoryInterface
                     : $qb->expr()->notIn($identifierField, ':values');
             $qb->andWhere($valueWhereCondition);
             $qb->setParameter('values', $selectedItems->getValues());
+        }
+
+        if (!$this->isIdentifierFieldPresent($qb, $identifierField)) {
+            $qb->addSelect($identifierField);
+            $qb->addGroupBy($identifierField);
         }
 
         if ($objectIdentifier) {
@@ -85,6 +92,24 @@ class IterableResultFactory implements IterableResultFactoryInterface
         }
 
         return $this->getIterableResult($qb);
+    }
+
+    private function isIdentifierFieldPresent(QueryBuilder $queryBuilder, string $identifierField): bool
+    {
+        $identifierFieldFound = false;
+        /** @var Expr\Select[] $selectDqlParts */
+        $selectDqlParts = $queryBuilder->getDQLPart('select');
+        $as = ' as ';
+        foreach ($selectDqlParts as $selectDqlPart) {
+            foreach ($selectDqlPart->getParts() as $part) {
+                if (in_array($identifierField, explode($as, str_ireplace($as, $as, $part)), true)) {
+                    $identifierFieldFound = true;
+                    break;
+                }
+            }
+        }
+
+        return $identifierFieldFound;
     }
 
     /**

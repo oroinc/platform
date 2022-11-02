@@ -14,18 +14,11 @@ class CommentLifecycleListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param Comment            $entity
-     * @param LifecycleEventArgs $args
-     */
     public function preUpdate(Comment $entity, LifecycleEventArgs $args)
     {
         $this->setUpdatedProperties($entity, $args->getEntityManager(), true);

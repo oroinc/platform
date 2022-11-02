@@ -2,111 +2,109 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Filter;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
-
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datasourceAdapter;
+    private $datasourceAdapter;
 
     /** @var ExpressionBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $expressionBuilder;
+    private $expressionBuilder;
 
     /** @var WorkflowTranslationFilter */
-    protected $filter;
+    private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
         $this->datasourceAdapter = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilderInterface::class);
 
         $this->filter = new WorkflowTranslationFilter(
-            $this->formFactory,
+            $this->createMock(FormFactoryInterface::class),
             new FilterUtility(),
+            $this->createMock(ManagerRegistry::class),
             $this->translationHelper
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->formFactory, $this->generator, $this->translationHelper, $this->filter);
     }
 
     public function testInit()
     {
         $this->filter->init('test', []);
-        $this->assertAttributeEquals(
+
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
+
+        $choiceLabel = $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label'];
+        unset($params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label']);
+        self::assertEquals(
             [
-                FilterUtility::FORM_OPTIONS_KEY => [
+                FilterUtility::FORM_OPTIONS_KEY  => [
                     'field_options' => [
-                        'class' => WorkflowDefinition::class,
-                        'multiple' => false,
-                        'choice_label' => [$this->filter, 'getLabel'],
+                        'class'                => WorkflowDefinition::class,
+                        'multiple'             => false,
                         'translatable_options' => false
-                    ],
+                    ]
                 ],
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                FilterUtility::FRONTEND_TYPE_KEY => 'choice'
             ],
-            'params',
-            $this->filter
+            $params
         );
+
+        $definition = new WorkflowDefinition();
+        $definition->setLabel('label');
+        $this->translationHelper->expects(self::once())
+            ->method('findTranslation')
+            ->with('label')
+            ->willReturn('translated-label');
+
+        self::assertIsCallable($choiceLabel);
+        self::assertEquals('translated-label', $choiceLabel($definition));
     }
 
     public function testApply()
     {
         $definition = (new WorkflowDefinition())->setName('definition1');
 
-        $this->datasourceAdapter->expects($this->at(0))->method('generateParameterName')
-            ->with('key')
-            ->willReturn('keyParameter');
+        $this->datasourceAdapter->expects(self::exactly(2))
+            ->method('generateParameterName')
+            ->withConsecutive(['key'], ['domain'])
+            ->willReturnOnConsecutiveCalls('keyParameter', 'domainParameter');
+        $this->datasourceAdapter->expects(self::exactly(3))
+            ->method('expr')
+            ->willReturn($this->expressionBuilder);
 
-        $this->datasourceAdapter->expects($this->at(1))->method('generateParameterName')
-            ->with('domain')
-            ->willReturn('domainParameter');
-
-        $this->datasourceAdapter->expects($this->exactly(3))->method('expr')->willReturn($this->expressionBuilder);
-
-        $this->expressionBuilder->expects($this->at(0))->method('eq')
+        $this->expressionBuilder->expects(self::once())
+            ->method('eq')
             ->with('translationKey.domain', 'domainParameter', true)
             ->willReturn('expr1');
-
-        $this->expressionBuilder->expects($this->at(1))->method('like')
+        $this->expressionBuilder->expects(self::once())
+            ->method('like')
             ->with('translationKey.key', 'keyParameter', true)
             ->willReturn('expr2');
-
-        $this->expressionBuilder->expects($this->at(2))->method('andX')
+        $this->expressionBuilder->expects(self::once())
+            ->method('andX')
             ->with('expr1', 'expr2')
             ->willReturn('expr3');
 
-        $this->datasourceAdapter->expects($this->at(5))
+        $this->datasourceAdapter->expects(self::exactly(2))
             ->method('setParameter')
-            ->with('keyParameter', 'oro.workflow.definition1%');
-
-        $this->datasourceAdapter->expects($this->at(6))
-            ->method('setParameter')
-            ->with('domainParameter', 'workflows');
-
-        $this->datasourceAdapter->expects($this->at(7))
+            ->withConsecutive(
+                ['keyParameter', 'oro.workflow.definition1%'],
+                ['domainParameter', 'workflows']
+            );
+        $this->datasourceAdapter->expects(self::once())
             ->method('addRestriction')
             ->with('expr3', FilterUtility::CONDITION_AND, false);
 

@@ -14,15 +14,15 @@ use Oro\Component\DependencyInjection\ServiceLink;
 class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $nameFormatter;
+    private $nameFormatter;
 
     /** @var DQLNameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dqlNameFormatter;
+    private $dqlNameFormatter;
 
     /** @var EntityNameProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->nameFormatter = $this->createMock(NameFormatter::class);
 
@@ -119,11 +119,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $code
-     * @return Localization
-     */
-    protected function getLocalization($code)
+    private function getLocalization(string $code): Localization
     {
         $language = new Language();
         $language->setCode($code);

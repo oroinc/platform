@@ -4,8 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * ClientCreatedAfterEvent is an event which called when new client is created
@@ -31,10 +31,6 @@ class ClientCreatedAfterEvent extends Event
      */
     protected $additionalParameterBag;
 
-    /**
-     * @param RestClientInterface            $client
-     * @param RestTransportSettingsInterface $transportEntity
-     */
     public function __construct(
         RestClientInterface $client,
         RestTransportSettingsInterface $transportEntity
@@ -51,9 +47,6 @@ class ClientCreatedAfterEvent extends Event
         return $this->client;
     }
 
-    /**
-     * @param RestClientInterface $client
-     */
     public function setClient(RestClientInterface $client)
     {
         $this->client = $client;

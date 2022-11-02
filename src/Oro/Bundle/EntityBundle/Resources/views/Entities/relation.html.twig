@@ -1,5 +1,5 @@
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-<div class="widget-content grid-widget-content">
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+<div class="widget-content">
     {% set gridName = oro_datagrid_build_fullname('entity-relation-grid', entity_name ~ '-' ~  field_name) %}
 
     {% set gridParams = {
@@ -12,17 +12,13 @@
         'id': id
     } %}
 
-    <style type="text/css">
-        .grid-widget-content .grid, .grid-widget-content .table{margin-bottom: 0;}
-    </style>
-
     {% block content %}
         {{ dataGrid.renderGrid(gridName, gridParams) }}
         <input type="hidden" name="appendRelation" id="appendRelation" value="{{ app.request.get('added') }}" />
         <input type="hidden" name="removeRelation" id="removeRelation" value="{{ app.request.get('removed') }}" />
     {% endblock %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set extraData = [] %}
     {% for fieldName in relation.get('target_grid') %}
@@ -41,7 +37,7 @@
             removedVal: '#removeRelation',
             columnName: 'assigned',
             fieldTitles: relation.get('target_title'),
-            entityName: entity_class|replace('\\', '_'),
+            entityName: entity_class|replace({'\\':'_'}),
             fieldName: field_name,
             extraData: extraData,
             link: 'oro_entity_detailed'

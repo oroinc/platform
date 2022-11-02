@@ -3,59 +3,54 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Builder;
 
 use Oro\Bundle\FormBundle\Form\Builder\DataBlockBuilder;
+use Oro\Bundle\FormBundle\Form\Builder\TemplateRendererInterface;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
 class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormFactory
-     */
-    private $factory;
+    private FormFactoryInterface $formFactory;
 
-    /**
-     * @var DataBlockBuilder
-     */
-    private $builder;
+    private DataBlockBuilder $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->factory = Forms::createFormFactoryBuilder()
+        $this->formFactory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
 
-        $templateRenderer = $this->createMock('Oro\Bundle\FormBundle\Form\Builder\TemplateRendererInterface');
-        $templateRenderer->expects($this->any())
+        $templateRenderer = $this->createMock(TemplateRendererInterface::class);
+        $templateRenderer->expects(self::any())
             ->method('render')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->builder = new DataBlockBuilder($templateRenderer, 'form');
     }
 
-    public function testOverride()
+    public function testOverride(): void
     {
-        $formOptions    = [
+        $formOptions = [
             'block_config' => [
-                'first'  => [
-                    'priority'  => 20,
+                'first' => [
+                    'priority' => 20,
                     'subblocks' => [
-                        'first'  => [
-                            'priority' => 20
+                        'first' => [
+                            'priority' => 20,
                         ],
                         'second' => [
-                            'priority' => 10
+                            'priority' => 10,
                         ],
                     ],
                 ],
                 'second' => [
                     'priority' => 10,
-                ]
-            ]
+                ],
+            ],
         ];
-        $formItems      = [
+        $formItems = [
             'item1' => ['block' => 'first', 'subblock' => 'first'],
             'item2' => [
                 'block' => 'first',
@@ -64,74 +59,122 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                     'first' => [
                         'subblocks' => [
                             'second' => [
-                                'priority' => 30
+                                'priority' => 30,
                             ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'item3' => [
-                'block'        => 'second',
-                'subblock'     => 'first',
+                'block' => 'second',
+                'subblock' => 'first',
                 'block_config' => [
                     'second' => [
-                        'title' => 'Changed Second'
-                    ]
-                ]
+                        'title' => 'Changed Second',
+                    ],
+                ],
             ],
         ];
         $expectedBlocks = [
-            'First'  => [
+            'First' => [
                 'second' => ['item2'],
-                'first'  => ['item1'],
+                'first' => ['item1'],
             ],
             'Changed Second' => [
                 'first' => ['item3'],
             ],
         ];
 
-        $formBuilder = $this->factory->createNamedBuilder('test', FormType::class, null, $formOptions);
+        $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
         $this->buildForm($formBuilder, $formItems);
         $formView = $formBuilder->getForm()->createView();
 
         $result = $this->builder->build($formView);
 
         $expected = $this->getBlocks($expectedBlocks);
-        $this->assertEquals($expected, $result->toArray());
+        self::assertEquals($expected, $result->toArray());
+    }
+
+    public function testBuildWhenAlreadyRendered(): void
+    {
+        $formOptions = [
+            'block_config' => [
+                'first' => [
+                    'priority' => 20,
+                    'subblocks' => [
+                        'first' => [
+                            'priority' => 20,
+                        ],
+                        'second' => [
+                            'priority' => 10,
+                        ],
+                        'third' => [
+                            'priority' => 5,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $formItems = [
+            'item1' => ['block' => 'first', 'subblock' => 'first'],
+            'item2' => ['block' => 'first', 'subblock' => 'second'],
+        ];
+        $expectedBlocks = [
+            'First' => [
+                'first' => ['item1'],
+                'second' => ['item2'],
+                'third' => [['item3', 'item3_2']],
+            ],
+        ];
+
+        $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
+        $this->buildForm($formBuilder, $formItems);
+        $item3FormBuilder = $this->formFactory->createNamedBuilder('item3');
+        $item3FormBuilder->add('item3_1', null, ['block' => 'first', 'subblock' => 'third']);
+        $item3FormBuilder->add('item3_2', null, ['block' => 'first', 'subblock' => 'third']);
+        $formBuilder->add($item3FormBuilder);
+
+        $formView = $formBuilder->getForm()->createView();
+        $formView['item3']['item3_1']->setRendered();
+
+        $result = $this->builder->build($formView);
+
+        $expected = $this->getBlocks($expectedBlocks);
+        self::assertEquals($expected, $result->toArray());
     }
 
     /**
      * @dataProvider layoutProvider
      */
-    public function testLayout($formOptions, $formItems, $expectedBlocks)
+    public function testLayout($formOptions, $formItems, $expectedBlocks): void
     {
-        $formBuilder = $this->factory->createNamedBuilder('test', FormType::class, null, $formOptions);
+        $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
         $this->buildForm($formBuilder, $formItems);
         $formView = $formBuilder->getForm()->createView();
 
         $result = $this->builder->build($formView);
 
         $expected = $this->getBlocks($expectedBlocks);
-        $this->assertEquals($expected, $result->toArray());
+        self::assertEquals($expected, $result->toArray());
     }
 
-    public function layoutProvider()
+    public function layoutProvider(): array
     {
         return [
             [
                 [
                     'block_config' => [
-                        'first'  => [
-                            'priority'  => 1,
+                        'first' => [
+                            'priority' => 1,
                             'subblocks' => [
-                                'first'  => null,
+                                'first' => null,
                                 'second' => null,
                             ],
                         ],
                         'second' => [
                             'priority' => 2,
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 [
                     'item1' => ['block' => 'first', 'subblock' => 'second'],
@@ -147,27 +190,27 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                     'Second' => [
                         'item3__subblock' => ['item3'],
                     ],
-                    'First'  => [
-                        'first'  => ['item2', 'item7'],
+                    'First' => [
+                        'first' => ['item2', 'item7'],
                         'second' => ['item1'],
                     ],
-                    'Third'  => [
+                    'Third' => [
                         'item4__subblock' => ['item4'],
-                        'first'           => ['item5', 'item6'],
+                        'first' => ['item5', 'item6'],
                     ],
-                ]
+                ],
             ],
         ];
     }
 
-    protected function buildForm(FormBuilderInterface $formBuilder, array $items = [])
+    private function buildForm(FormBuilderInterface $formBuilder, array $items = []): void
     {
-        foreach ($items as $name => $options) {
-            $formBuilder->add($name, null, $options);
+        foreach ($items as $child => $options) {
+            $formBuilder->add($child, null, $options);
         }
     }
 
-    protected function getBlocks(array $blocks = [])
+    private function getBlocks(array $blocks = []): array
     {
         $result = [];
         foreach ($blocks as $title => $subBlocks) {
@@ -177,7 +220,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    protected function getBlock($title, array $subBlocks = [])
+    private function getBlock($title, array $subBlocks = []): array
     {
         $sb = [];
         foreach ($subBlocks as $code => $itemNames) {
@@ -185,30 +228,35 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
         }
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => null,
-            'class'       => null,
-            'subblocks'   => $sb
+            'class' => null,
+            'subblocks' => $sb,
         ];
     }
 
-    protected function getSubBlock($code, array $itemNames = [])
+    private function getSubBlock($code, array $itemNames = []): array
     {
         return [
-            'code'        => $code,
-            'title'       => null,
+            'code' => $code,
+            'title' => null,
             'description' => null,
-            'data'        => $this->getData($itemNames),
-            'useSpan'     => true,
-            'tooltip'     => null
+            'descriptionStyle' => null,
+            'data' => $this->getData($itemNames),
+            'useSpan' => true,
+            'tooltip' => null,
         ];
     }
 
-    protected function getData(array $itemNames = [])
+    private function getData(array $itemNames = []): array
     {
         $data = [];
         foreach ($itemNames as $itemName) {
-            $data[] = sprintf('{{ form_row(form.children[\'%s\']) }}', $itemName);
+            $itemName = (array)$itemName;
+            $data[end($itemName)] = sprintf(
+                '{{ form_row(form.%s) }}',
+                implode('.', array_map(static fn (string $name) => "children['$name']", $itemName))
+            );
         }
 
         return $data;

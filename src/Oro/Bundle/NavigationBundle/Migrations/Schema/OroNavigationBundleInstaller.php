@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_10';
     }
 
     /**
@@ -42,15 +42,13 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_history table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationHistoryTable(Schema $schema)
     {
         $table = $schema->createTable('oro_navigation_history');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('url', 'string', ['length' => 1023]);
+        $table->addColumn('url', 'string', ['length' => 8190]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('visited_at', 'datetime', []);
         $table->addColumn('visit_count', 'integer', []);
@@ -68,8 +66,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_item table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationItemTable(Schema $schema)
     {
@@ -77,7 +73,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('type', 'string', ['length' => 10]);
-        $table->addColumn('url', 'string', ['length' => 1023]);
+        $table->addColumn('url', 'string', ['length' => 8190]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('position', 'smallint', []);
         $table->addColumn('created_at', 'datetime', []);
@@ -91,14 +87,14 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_item_pinbar table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationItemPinbarTable(Schema $schema)
     {
         $table = $schema->createTable('oro_navigation_item_pinbar');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('title', 'string', ['length' => 255, 'notnull' => true]);
+        $table->addColumn('title_short', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('maximized', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['item_id'], 'UNIQ_54973433126F525E');
@@ -106,15 +102,13 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_pagestate table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationPageStateTable(Schema $schema)
     {
         $table = $schema->createTable('oro_navigation_pagestate');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('page_id', 'string', ['length' => 4000]);
+        $table->addColumn('page_id', 'string', ['length' => 10920]);
         $table->addColumn('page_hash', 'string', ['length' => 32]);
         $table->addColumn('data', 'text', []);
         $table->addColumn('created_at', 'datetime', []);
@@ -126,8 +120,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_menu_upd
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationMenuUpdateTable(Schema $schema)
     {
@@ -135,7 +127,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('key', 'string', ['length' => 100]);
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
-        $table->addColumn('uri', 'string', ['length' => 1023, 'notnull' => false]);
+        $table->addColumn('uri', 'string', ['length' => 8190, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_active', 'boolean', []);
@@ -149,8 +141,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Create oro_navigation_menu_upd_title table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationMenuUpdateTitleTable(Schema $schema)
     {
@@ -161,11 +151,8 @@ class OroNavigationBundleInstaller implements Installation
         $table->addUniqueIndex(['localized_value_id']);
     }
 
-
     /**
      * Create `oro_navigation_menu_upd_descr` table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationMenuUpdateDescriptionTable(Schema $schema)
     {
@@ -178,8 +165,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add oro_navigation_history foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationHistoryForeignKeys(Schema $schema)
     {
@@ -200,8 +185,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add oro_navigation_item foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationItemForeignKeys(Schema $schema)
     {
@@ -222,8 +205,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add oro_navigation_item_pinbar foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationItemPinbarForeignKeys(Schema $schema)
     {
@@ -238,8 +219,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add oro_navigation_pagestate foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationPageStateForeignKeys(Schema $schema)
     {
@@ -254,8 +233,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add oro_navigation_menu_upd_title foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationMenuUpdateTitleForeignKeys(Schema $schema)
     {
@@ -276,8 +253,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add `oro_navigation_menu_upd_descr` foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationMenuUpdateDescriptionForeignKeys(Schema $schema)
     {
@@ -298,8 +273,6 @@ class OroNavigationBundleInstaller implements Installation
 
     /**
      * Add `oro_navigation_menu_upd` foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationMenuUpdateForeignKeys(Schema $schema)
     {

@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    var NotBlank = {
+    const NotBlank = {
         message: 'This value should not be blank.',
         payload: null
     };
 
-    var getField = function(name, element, params) {
-        var namePart = '[' + name + ']';
+    const getField = function(name, element, params) {
+        let namePart = '[' + name + ']';
 
         // Take into account parent's form name to distinguish between two different addresses for the same form
         if (params.parentFormName) {
@@ -20,9 +20,9 @@ define(function(require) {
         return $(element).closest('form').find('[name*="' + namePart + '"]');
     };
 
-    var updateValidationData = function(fields, params, silent) {
+    const updateValidationData = function(fields, params, silent) {
         _.each(fields, function($field, name) {
-            var validationData = $field.data('validation') || {};
+            const validationData = $field.data('validation') || {};
 
             if (!params) {
                 delete validationData.NotBlank;
@@ -39,7 +39,7 @@ define(function(require) {
         });
     };
 
-    var validate = function(fields, params, silent) {
+    const validate = function(fields, params, silent) {
         if ((fields.firstName.val() && fields.lastName.val()) || fields.organization.val()) {
             return true;
         } else {
@@ -47,7 +47,7 @@ define(function(require) {
         }
     };
 
-    var resetValidate = function(fields, params, silent) {
+    const resetValidate = function(fields, params, silent) {
         updateValidationData(fields, null, silent);
         validate(fields, params, silent);
     };
@@ -55,8 +55,8 @@ define(function(require) {
     return [
         'Oro\\Bundle\\AddressBundle\\Validator\\Constraints\\NameOrOrganization',
         function(value, element, params) {
-            var event = 'change.NameOrOrganization' + (params.parentFormName ? params.parentFormName : '');
-            var fields = {
+            const event = 'change.NameOrOrganization' + (params.parentFormName ? params.parentFormName : '');
+            const fields = {
                 firstName: getField('firstName', element, params),
                 lastName: getField('lastName', element, params),
                 organization: getField('organization', element, params)

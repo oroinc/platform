@@ -2,7 +2,8 @@
 
 .page-toolbar {
     padding: 0;
-    background-color: #fff;
+    min-height: $page-toolbar-min-height;
+    background-color: $page-toolbar-background-color;
     display: flex;
     align-items: center;
 

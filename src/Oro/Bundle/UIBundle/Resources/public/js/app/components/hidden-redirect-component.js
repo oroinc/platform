@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var HiddenRedirectComponent;
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @export oroui/js/app/components/hidden-redirect-component
      * @extends oroui.app.components.base.Component
      * @class oroui.app.components.HiddenRedirectComponent
      */
-    HiddenRedirectComponent = BaseComponent.extend({
+    const HiddenRedirectComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -30,14 +29,14 @@ define(function(require) {
         showLoading: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function HiddenRedirectComponent() {
-            HiddenRedirectComponent.__super__.constructor.apply(this, arguments);
+        constructor: function HiddenRedirectComponent(options) {
+            HiddenRedirectComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.element = options._sourceElement;
@@ -53,14 +52,14 @@ define(function(require) {
                 this.showLoading = options.showLoading;
             }
 
-            var self = this;
+            const self = this;
             this.element.on('click.' + this.cid, function(e) {
                 self._showLoading();
 
                 e.preventDefault();
 
                 if (mediator.execute('isPageStateChanged')) {
-                    var confirmModal = self.createModal();
+                    const confirmModal = self.createModal();
                     confirmModal.once('ok', function() {
                         self.saveAndRedirect();
                         setTimeout(function() {
@@ -89,37 +88,35 @@ define(function(require) {
         },
 
         saveAndRedirect: function() {
-            var form = $('form[data-collect=true]');
-            var actionInput = form.find('input[name="input_action"]');
-            var _this = this;
+            const form = $('form[data-collect=true]');
+            const actionInput = form.find('input[name="input_action"]');
             $.ajax({
                 url: this.element.attr('href'),
-                type: 'GET',
-                success: function(response) {
-                    _this._hideLoading();
+                type: this.element.data('request-method') || 'GET',
+                success: response => {
+                    this._hideLoading();
                     actionInput.val(JSON.stringify({
                         redirectUrl: response.url
                     }));
                     form.trigger('submit');
                 },
-                error: function(xhr) {
-                    _this._hideLoading();
+                error: xhr => {
+                    this._hideLoading();
                 }
             });
         },
 
         startRedirect: function() {
             mediator.execute('showLoading');
-            var _this = this;
             $.ajax({
                 url: this.element.attr('href'),
-                type: 'GET',
-                success: function(response) {
-                    _this._hideLoading();
-                    _this._processResponse(response.url, response.message);
+                type: this.element.data('request-method') || 'GET',
+                success: response => {
+                    this._hideLoading();
+                    this._processResponse(response.url, response.message);
                 },
-                error: function(xhr) {
-                    _this._hideLoading();
+                error: xhr => {
+                    this._hideLoading();
                 }
             });
         },
@@ -131,12 +128,12 @@ define(function(require) {
                 okText: __('Save'),
                 className: 'modal modal-primary',
                 cancelText: __('Cancel'),
-                template: require('tpl!oroui/templates/three-buttons-modal.html')
+                template: require('tpl-loader!oroui/templates/three-buttons-modal.html')
             });
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed || !this.element) {
@@ -155,7 +152,7 @@ define(function(require) {
         _processResponse: function(url, message) {
             if (url) {
                 if (message) {
-                    var self = this;
+                    const self = this;
                     mediator.once('page:afterChange', function() {
                         self._showMessage(self.type, message);
                     });

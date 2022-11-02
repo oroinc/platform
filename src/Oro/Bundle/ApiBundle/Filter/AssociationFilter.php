@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -15,22 +16,19 @@ abstract class AssociationFilter extends ComparisonFilter implements
     RequestAwareFilterInterface
 {
     /** @var RequestType */
-    protected $requestType;
+    private $requestType;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
      * {@inheritdoc}
      */
-    public function setRequestType(RequestType $requestType)
+    public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function setValueNormalizer(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -39,9 +37,14 @@ abstract class AssociationFilter extends ComparisonFilter implements
     /**
      * {@inheritdoc}
      */
-    public function getFilterValueName()
+    public function getFilterValueName(): string
     {
         return 'type';
+    }
+
+    protected function getRequestType(): RequestType
+    {
+        return $this->requestType;
     }
 
     /**
@@ -51,12 +54,13 @@ abstract class AssociationFilter extends ComparisonFilter implements
     {
         $result = [];
 
-        $prefix = $this->field . '.';
+        $field = $this->getField();
+        $prefix = $field . '.';
         /** @var FilterValue $filterValue */
         foreach ($filterValues as $filterKey => $filterValue) {
             $path = $filterValue->getPath();
-            if (0 === \strpos($path, $prefix)) {
-                $filterValueName = \substr($path, \strlen($this->field) + 1);
+            if (str_starts_with($path, $prefix)) {
+                $filterValueName = substr($path, \strlen($field) + 1);
                 if (empty($filterValueName)) {
                     throw new InvalidFilterValueKeyException(
                         'The target type of an association is not specified.',
@@ -65,7 +69,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
                 }
                 if ($this->getFilterValueName() === $filterValueName) {
                     throw new InvalidFilterValueKeyException(
-                        \sprintf(
+                        sprintf(
                             'Replace "%s" placeholder with the target type of an association.',
                             $this->getFilterValueName()
                         ),
@@ -73,7 +77,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
                     );
                 }
                 $result[] = $filterKey;
-            } elseif ($path === $this->field) {
+            } elseif ($path === $field) {
                 throw new InvalidFilterValueKeyException(
                     'The target type of an association is not specified.',
                     $filterValue
@@ -84,30 +88,22 @@ abstract class AssociationFilter extends ComparisonFilter implements
         return $result;
     }
 
-    /**
-     * @param string $entityType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType)
+    protected function getEntityClass(string $entityType): string
     {
         return $this->valueNormalizer->normalizeValue(
             $entityType,
             DataType::ENTITY_CLASS,
-            $this->requestType
+            $this->getRequestType()
         );
     }
 
-    /**
-     * @param string $field
-     * @param string $path
-     */
-    protected function assertFilterValuePath($field, $path)
+    protected function assertFilterValuePath(string $field, string $path): void
     {
-        if (0 !== \strpos($path, $field . '.')) {
-            throw new \InvalidArgumentException(
-                \sprintf('The filter value path must starts with "%s".', $field)
-            );
+        if (!str_starts_with($path, $field . '.')) {
+            throw new \InvalidArgumentException(sprintf(
+                'The filter value path must starts with "%s".',
+                $field
+            ));
         }
     }
 }

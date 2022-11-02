@@ -1,0 +1,22 @@
+{% set userName = null %}
+{% if app.user %}
+    {% set userName = app.user.username %}
+{% endif %}
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oroui/js/app': {
+        baseUrl: app.request.getSchemeAndHttpHost(),
+        headerId: oro_hash_navigation_header(),
+        userName: userName,
+        root: app.request.getBaseURL() ~ '\/',
+        startRouteName: app.request.attributes.get('_master_request_route'),
+        debug: app.debug ? true : false,
+        skipRouting: '[data-nohash=true], .no-hash',
+        controllerPath: 'controllers/',
+        controllerSuffix: '-controller',
+        trailing: null
+    },
+    'oroui/js/extend/scriptjs': {
+        bundlesPath: asset('bundles/')|split('?', 2)[0],
+    }
+}) }}

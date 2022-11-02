@@ -3,40 +3,35 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
- * Represents an adapter to ORM data source
+ * The adapter to an ORM data source.
  */
 class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
-    /**
-     * @var QueryBuilder
-     */
+    private const GENERATED_PARAMETERS_PREFIX = '_gpnp';
+
+    /** @var QueryBuilder */
     protected $qb;
 
-    /**
-     * @var QueryBuilderTools
-     */
+    /** @var QueryBuilderTools */
     protected $qbTools;
 
-    /**
-     * @var OrmExpressionBuilder
-     */
+    /** @var OrmExpressionBuilder */
     private $expressionBuilder;
 
-    /**
-     * @param QueryBuilder $qb
-     */
+    /** @var string[] */
+    private $parameterNames = [];
+
     public function __construct(QueryBuilder $qb)
     {
         $this->qb = $qb;
         $this->qbTools = new QueryBuilderTools($this->qb->getDQLPart('select'));
-
-        $this->expressionBuilder = null;
     }
 
     /**
@@ -97,7 +92,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function expr()
     {
-        if ($this->expressionBuilder === null) {
+        if (null === $this->expressionBuilder) {
             $this->expressionBuilder = new OrmExpressionBuilder($this->qb->expr());
         }
 
@@ -117,7 +112,37 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function generateParameterName($filterName)
     {
-        return preg_replace('#[^a-z0-9]#i', '', $filterName) . mt_rand();
+        if (!array_key_exists($filterName, $this->parameterNames)) {
+            $this->parameterNames[$filterName] = 0;
+        }
+
+        $usedParameterNames = [];
+        /** @var Parameter $parameter */
+        foreach ($this->qb->getParameters() as $parameter) {
+            $usedParameterNames[$parameter->getName()] = true;
+        }
+
+        return $this->generateUniqueParameterName($filterName, $usedParameterNames);
+    }
+
+    /**
+     * Generates an unique parameter name for a query.
+     *
+     * @param string $filterName
+     * @param array $usedParameterNames
+     * @return string
+     */
+    private function generateUniqueParameterName($filterName, array $usedParameterNames)
+    {
+        $parameterName = self::GENERATED_PARAMETERS_PREFIX
+            . preg_replace('#[^a-z0-9]#i', '', $filterName)
+            . ++$this->parameterNames[$filterName];
+
+        if (!empty($usedParameterNames[$parameterName])) {
+            return $this->generateUniqueParameterName($filterName, $usedParameterNames);
+        }
+
+        return $parameterName;
     }
 
     /**
@@ -129,7 +154,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Returns a QueryBuilder object used to modify this data source
+     * Returns a QueryBuilder object used to modify this data source.
      *
      * @return QueryBuilder
      */
@@ -139,7 +164,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Creates new instance of QueryBuilder object
+     * Creates new instance of QueryBuilder object.
      *
      * @return QueryBuilder
      */

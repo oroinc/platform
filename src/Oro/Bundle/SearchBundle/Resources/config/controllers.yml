@@ -1,0 +1,7 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\SearchBundle\Controller\SearchController:
+        arguments:
+            - '@oro_search.search_result_provider'

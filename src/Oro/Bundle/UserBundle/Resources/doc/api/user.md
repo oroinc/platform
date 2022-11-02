@@ -26,26 +26,27 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"users",
-      "attributes":{  
-         "username":"testapiuser",
-         "email":"testuser@oroinc.com",
-         "firstName":"Bob",
-         "lastName":"Fedeson"
+{
+   "data": {
+      "type": "users",
+      "attributes": {
+         "username": "testapiuser",
+         "email": "testuser@oroinc.com",
+         "firstName": "Bob",
+         "lastName": "Fedeson",
+         "password": "Password000!"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -58,57 +59,58 @@ Example:
 
 Edit a specific user record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"users",
-      "id":"54",
-      "attributes":{  
-         "phone":"455-78-54",
-         "title":"administrator",
-         "password_expires_at":"2017-01-01T00:00:00Z",
-         "middleName":"Karl",
-         "birthday":"1964-07-05",
-         "enabled":true
+{
+   "data": {
+      "type": "users",
+      "id": "54",
+      "attributes": {
+         "phone": "455-78-54",
+         "title": "administrator",
+         "middleName": "Karl",
+         "birthday": "1964-07-05",
+         "enabled": true
       },
-      "relationships":{  
-         "businessUnits":{  
-            "data":[  
-               {  
-                  "type":"businessunits",
-                  "id":"1"
+      "relationships": {
+         "businessUnits": {
+            "data": [
+               {
+                  "type": "businessunits",
+                  "id": "1"
                }
             ]
          },
-         "roles":{  
-            "data":[  
-               {  
-                  "type":"userroles",
-                  "id":"3"
+         "userRoles": {
+            "data": [
+               {
+                  "type": "userroles",
+                  "id": "3"
                }
             ]
          },
-         "organizations":{  
-            "data":[  
-               {  
-                  "type":"organizations",
-                  "id":"1"
+         "organizations": {
+            "data": [
+               {
+                  "type": "organizations",
+                  "id": "1"
                },
-               {  
-                  "type":"organizations",
-                  "id":"2"
+               {
+                  "type": "organizations",
+                  "id": "2"
                }
             ]
          },
-         "auth_status":{  
-            "data":{  
-               "type":"authstatuses",
-               "id":"active"
+         "auth_status": {
+            "data": {
+               "type": "userauthstatuses",
+               "id": "active"
             }
          }
       }
@@ -131,27 +133,24 @@ Delete a collection of user records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### emails
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
+
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
 
 #### create, update
 
 An array of email addresses.
 
-Format of data: [{"email": first@email.com}, {"email": second@email.com}]
+The **email** property is a string contains an email address.
 
-Data should contain full collection of email addresses of the business customer.
+Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
+
+**Note:**
+Data should contain all of email addresses of the user.
 
 ### username
 
@@ -159,15 +158,13 @@ Data should contain full collection of email addresses of the business customer.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### email
 
@@ -175,15 +172,13 @@ Data should contain full collection of email addresses of the business customer.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### firstName
 
@@ -191,15 +186,13 @@ Data should contain full collection of email addresses of the business customer.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### lastName
 
@@ -207,15 +200,45 @@ Data should contain full collection of email addresses of the business customer.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
+**This field must not be empty, if it is passed.**
 
-*This field is **required** and must remain defined.*
+### passwordChangedAt
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### passwordRequestedAt
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### loginCount
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### lastLogin
+
+#### create, update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
 
 ## SUBRESOURCES
 
@@ -306,6 +329,21 @@ Example:
 
 Remove the business units that a specific user has access to.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "businessunits",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### groups
 
 #### get_subresource
@@ -365,6 +403,21 @@ Example:
 #### delete_relationship
 
 Remove the groups that a specific user belongs to.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "usergroups",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
 
 ### organization
 
@@ -461,6 +514,21 @@ Example:
 
 Remove the organizations that a specific user has access to.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "organizations",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### owner
 
 #### get_subresource
@@ -488,7 +556,7 @@ Example:
 ```
 {@/request}
 
-### roles
+### userRoles
 
 #### get_subresource
 
@@ -540,6 +608,21 @@ Example:
 
 Remove the roles that are assigned to a specific user.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "userroles",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### auth_status
 
 #### get_subresource
@@ -560,7 +643,7 @@ Example:
 ```JSON
 {
   "data": {
-    "type": "authstatuses",
+    "type": "userauthstatuses",
     "id": "active"
   }
 }

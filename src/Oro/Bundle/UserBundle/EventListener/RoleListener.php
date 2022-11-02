@@ -2,91 +2,59 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Oro\Bundle\UserBundle\Entity\Role;
 
+/**
+ * Updates the security identity name for changed role.
+ * Generates unique name for the newly created role without explicitly specified role name.
+ */
 class RoleListener
 {
-    /**
-     * @var ServiceLink
-     */
-    protected $aclSidManagerLink;
+    private const ROLE_UPDATE_MAX_ATTEMPTS = 10;
+    private const ROLE_FIELD_NAME = 'role';
 
-    /**
-     * @param ServiceLink $aclSidManagerLink
-     */
-    public function __construct(ServiceLink $aclSidManagerLink)
+    private AclSidManager $aclSidManager;
+
+    public function __construct(AclSidManager $aclSidManager)
     {
-        $this->aclSidManagerLink = $aclSidManagerLink;
+        $this->aclSidManager = $aclSidManager;
     }
 
-    /**
-     * @param PreUpdateEventArgs $eventArgs
-     */
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    public function preUpdate(AbstractRole $role, PreUpdateEventArgs $eventArgs): void
     {
-        if ($eventArgs->getEntity() instanceof RoleInterface && $eventArgs->hasChangedField('role')) {
-            $oldRoleName = $eventArgs->getOldValue('role');
-            $newRoleName = $eventArgs->getNewValue('role');
-            /** @var $aclSidManager AclSidManager */
-            $aclSidManager = $this->aclSidManagerLink->getService();
-            $aclSidManager->updateSid($aclSidManager->getSid($newRoleName), $oldRoleName);
+        if ($eventArgs->hasChangedField(self::ROLE_FIELD_NAME)) {
+            $oldRoleName = $eventArgs->getOldValue(self::ROLE_FIELD_NAME);
+            $newRoleName = $eventArgs->getNewValue(self::ROLE_FIELD_NAME);
+            $this->aclSidManager->updateSid($this->aclSidManager->getSid($newRoleName), $oldRoleName);
         }
     }
 
-    /**
-     * Pre persist event listener
-     *
-     * @param LifecycleEventArgs $args
-     * @throws \LogicException
-     */
-    public function prePersist(LifecycleEventArgs $args)
-    {
-        $entity = $args->getEntity();
-
-        if ($entity instanceof AbstractRole) {
-            /**
-             * @var integer $count
-             * count of attempts to set unique role, maximum 10 else exception
-             */
-            $count = 1;
-            $repository = $args->getEntityManager()->getRepository('OroUserBundle:Role');
-            do {
-                $updateRequired = !$this->updateRole($entity, $repository) && $count < 10;
-                $count++;
-            } while ($updateRequired);
-
-            if ($count > 10) {
-                throw new \LogicException('10 attempts to generate unique role are failed.');
-            }
-        }
-    }
-
-    /**
-     * Update role field.
-     *
-     * @param AbstractRole $role
-     * @param ObjectRepository $repository
-     * @return bool
-     */
-    protected function updateRole(AbstractRole $role, ObjectRepository $repository)
+    public function prePersist(AbstractRole $role, LifecycleEventArgs $eventArgs): void
     {
         if ($role->getRole()) {
-            return true;
+            return;
         }
 
-        $roleValue = $role->generateUniqueRole();
-        if ($repository->findOneBy(['role' => $roleValue])) {
-            return false;
+        $repository = $eventArgs->getEntityManager()->getRepository(Role::class);
+        $attemptCount = 0;
+        do {
+            $attemptCount++;
+            $roleName = $role->generateUniqueRole();
+            if (null === $repository->findOneBy([self::ROLE_FIELD_NAME => $roleName])) {
+                $role->setRole($roleName, false);
+                break;
+            }
+        } while ($attemptCount < self::ROLE_UPDATE_MAX_ATTEMPTS);
+
+        if (self::ROLE_UPDATE_MAX_ATTEMPTS === $attemptCount) {
+            throw new \LogicException(sprintf(
+                '%d attempts to generate unique role are failed.',
+                self::ROLE_UPDATE_MAX_ATTEMPTS
+            ));
         }
-
-        $role->setRole($roleValue, false);
-
-        return true;
     }
 }

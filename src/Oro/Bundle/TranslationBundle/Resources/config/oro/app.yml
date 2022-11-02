@@ -1,6 +1,3 @@
-framework:
-    assets:
-        packages:
-            translations:
-                version: '%assets_version%'
-                version_format: '%%s?translations_version=%%s'
+oro_translation:
+    package_names:
+        - Oro

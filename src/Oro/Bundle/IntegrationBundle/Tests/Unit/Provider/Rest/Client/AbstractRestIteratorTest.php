@@ -1,25 +1,23 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
+namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client;
+
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\AbstractRestIterator;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 
 class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $client;
+    /** @var RestClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $client;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $iterator;
+    /** @var AbstractRestIterator|\PHPUnit\Framework\MockObject\MockObject */
+    private $iterator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->client = $this->createMock('Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface');
-        $this->iterator = $this->transport = $this->getMockBuilder(
-            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\AbstractRestIterator'
-        )->setConstructorArgs([$this->client])
+        $this->client = $this->createMock(RestClientInterface::class);
+        $this->iterator = $this->getMockBuilder(AbstractRestIterator::class)
+            ->setConstructorArgs([$this->client])
             ->getMockForAbstractClass();
     }
 
@@ -28,10 +26,9 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorForeach(array $expectations, array $expectedItems)
     {
-        $this->expectIteratorCalls($expectations);
+        $this->expectIteratorCalls($expectations, count($expectedItems) > 0);
 
-        $actualItems = array();
-
+        $actualItems = [];
         foreach ($this->iterator as $key => $value) {
             $actualItems[$key] = $value;
         }
@@ -44,10 +41,9 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorWhile(array $expectations, array $expectedItems)
     {
-        $this->expectIteratorCalls($expectations);
+        $this->expectIteratorCalls($expectations, count($expectedItems) > 0);
 
-        $actualItems = array();
-
+        $actualItems = [];
         while ($this->iterator->valid()) {
             $actualItems[$this->iterator->key()] = $this->iterator->current();
             $this->iterator->next();
@@ -58,42 +54,63 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider iteratorDataProvider
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testIterateTwice(array $expectations, array $expectedItems)
     {
-        $this->expectIteratorCalls($expectations);
+        $loadPageReturns = [];
+        $rowsDataParameters = [];
+        $rowsDataReturns = [];
+        $totalCountDataParameters = [];
+        $totalCountDataReturns = [];
+        for ($i = 0; $i < 2; $i++) {
+            foreach ($expectations as $data) {
+                $expectedData = $data['data'] ? ['foo' => 'bar'] : null;
+                $loadPageReturns[] = $expectedData;
+                if ($data['data']) {
+                    $rowsDataParameters[] = [$expectedData];
+                    $rowsDataReturns[] = $data['rows'];
+                    $totalCountDataParameters[] = [$expectedData];
+                    $totalCountDataReturns[] = $data['totalCount'];
+                }
+            }
+            if (count($expectedItems) > 0) {
+                $loadPageReturns[] = false;
+            }
+        }
+        $this->setIteratorExpects(
+            $loadPageReturns,
+            $rowsDataParameters,
+            $rowsDataReturns,
+            $totalCountDataParameters,
+            $totalCountDataReturns
+        );
 
-        $actualItems = array();
-
+        $actualItems = [];
         $this->iterator->rewind();
         while ($this->iterator->valid()) {
             $actualItems[$this->iterator->key()] = $this->iterator->current();
             $this->iterator->next();
         }
-
         $this->assertEquals($expectedItems, $actualItems);
 
-        $this->expectIteratorCalls($expectations);
-
-        $actualItems = array();
-
+        $actualItems = [];
         $this->iterator->rewind();
         while ($this->iterator->valid()) {
             $actualItems[$this->iterator->key()] = $this->iterator->current();
             $this->iterator->next();
         }
-
         $this->assertEquals($expectedItems, $actualItems);
     }
 
-    public function iteratorDataProvider()
+    public function iteratorDataProvider(): array
     {
         return [
             'two pages, 7 records' => [
-                'expectations' => [
+                'expectations'  => [
                     [
-                        'data' => true,
-                        'rows' => [
+                        'data'       => true,
+                        'rows'       => [
                             ['id' => 1],
                             ['id' => 2],
                             ['id' => 3],
@@ -102,8 +119,8 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
                         'totalCount' => 7,
                     ],
                     [
-                        'data' => true,
-                        'rows' => [
+                        'data'       => true,
+                        'rows'       => [
                             ['id' => 5],
                             ['id' => 6],
                             ['id' => 7],
@@ -121,18 +138,18 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
                     ['id' => 7],
                 ],
             ],
-            'empty results' => [
-                'expectations' => [
+            'empty results'        => [
+                'expectations'  => [
                     [
-                        'data' => true,
-                        'rows' => [],
+                        'data'       => true,
+                        'rows'       => [],
                         'totalCount' => 0,
                     ]
                 ],
                 'expectedItems' => []
             ],
-            'empty response' => [
-                'expectations' => [
+            'empty response'       => [
+                'expectations'  => [
                     [
                         'data' => false,
                     ]
@@ -152,14 +169,14 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCount, $this->iterator->count());
     }
 
-    public function countDataProvider()
+    public function countDataProvider(): array
     {
-        return array(
-            'normal' => array(
-                'expectations' => [
+        return [
+            'normal'         => [
+                'expectations'  => [
                     [
-                        'data' => true,
-                        'rows' => [
+                        'data'       => true,
+                        'rows'       => [
                             ['id' => 1],
                             ['id' => 2],
                             ['id' => 3],
@@ -169,44 +186,69 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'expectedCount' => 7,
-            ),
-            'empty response' => array(
-                'expectations' => [
+            ],
+            'empty response' => [
+                'expectations'  => [
                     [
                         'data' => false,
                     ],
                 ],
                 'expectedCount' => 0,
-            ),
+            ],
+        ];
+    }
+
+    private function expectIteratorCalls(array $expectations, bool $loadLastPage = false): void
+    {
+        $loadPageReturns = [];
+        $rowsDataParameters = [];
+        $rowsDataReturns = [];
+        $totalCountDataParameters = [];
+        $totalCountDataReturns = [];
+        foreach ($expectations as $data) {
+            $expectedData = $data['data'] ? ['foo' => 'bar'] : null;
+            $loadPageReturns[] = $expectedData;
+            if ($data['data']) {
+                $rowsDataParameters[] = [$expectedData];
+                $rowsDataReturns[] = $data['rows'];
+                $totalCountDataParameters[] = [$expectedData];
+                $totalCountDataReturns[] = $data['totalCount'];
+            }
+        }
+        if ($loadLastPage) {
+            $loadPageReturns[] = false;
+        }
+        $this->setIteratorExpects(
+            $loadPageReturns,
+            $rowsDataParameters,
+            $rowsDataReturns,
+            $totalCountDataParameters,
+            $totalCountDataReturns
         );
     }
 
-    /**
-     * @param array $expectations
-     * @return int
-     */
-    protected function expectIteratorCalls(array $expectations)
-    {
-        $index = 0;
-        foreach ($expectations as $data) {
-            $expectedData = $data['data'] ? ['foo' => 'bar'] : null;
-
-            $this->iterator->expects($this->at($index++))
-                ->method('loadPage')
-                ->with($this->client)
-                ->will($this->returnValue($expectedData));
-
-            if ($data['data']) {
-                $this->iterator->expects($this->at($index++))
-                    ->method('getRowsFromPageData')
-                    ->with($expectedData)
-                    ->will($this->returnValue($data['rows']));
-
-                $this->iterator->expects($this->at($index++))
-                    ->method('getTotalCountFromPageData')
-                    ->with($expectedData)
-                    ->will($this->returnValue($data['totalCount']));
-            }
+    private function setIteratorExpects(
+        array $loadPageReturns,
+        array $rowsDataParameters,
+        array $rowsDataReturns,
+        array $totalCountDataParameters,
+        array $totalCountDataReturns
+    ): void {
+        $this->iterator->expects($this->exactly(count($loadPageReturns)))
+            ->method('loadPage')
+            ->with($this->client)
+            ->willReturnOnConsecutiveCalls(...$loadPageReturns);
+        if ($rowsDataParameters) {
+            $this->iterator->expects($this->exactly(count($rowsDataParameters)))
+                ->method('getRowsFromPageData')
+                ->withConsecutive(...$rowsDataParameters)
+                ->willReturnOnConsecutiveCalls(...$rowsDataReturns);
+        }
+        if ($totalCountDataParameters) {
+            $this->iterator->expects($this->exactly(count($totalCountDataParameters)))
+                ->method('getTotalCountFromPageData')
+                ->withConsecutive(...$totalCountDataParameters)
+                ->willReturnOnConsecutiveCalls(...$totalCountDataReturns);
         }
     }
 }

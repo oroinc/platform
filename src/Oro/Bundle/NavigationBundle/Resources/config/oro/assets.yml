@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oronavigation':
-          - 'bundles/oronavigation/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oronavigation/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oronavigation/css/scss/main.scss'

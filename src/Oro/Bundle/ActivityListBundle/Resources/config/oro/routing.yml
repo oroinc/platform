@@ -3,25 +3,65 @@ oro_activity_list_bundle:
     type:         annotation
     prefix:       /
 
-oro_activity_list_bundle_api:
-    resource: "@OroActivityListBundle/Controller/Api/Rest/ActivityListController.php"
-    type:     rest
-    prefix:   api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version: latest
 
 #
-# REST actions
+# OLD REST API ROUTES
 #
+
 oro_activity_list_api_get_list:
-    path: api/rest/{version}/activitylist/{entityClass}/{entityId}.{_format}
-    defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:cget, _format: json, version: latest}
+    path: '/api/rest/{version}/activitylist/{entityClass}/{entityId}.{_format}'
     methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        entityId: \d+
+        _format: json
+        version: latest|v1
 
 oro_activity_list_api_get_item:
-    path: api/rest/{version}/activitylist/{entityId}.{_format}
-    defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:getActivityListItem, _format: json, version: latest}
+    path: '/api/rest/{version}/activitylist/{entityId}.{_format}'
     methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::getActivityListItemAction'
+        _format: json
+        version: latest
+    requirements:
+        entityId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_activitylist_activity_list_item:
+    path: '/api/rest/{version}/activitylists/{entityId}/activity/list/item.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::getActivityListItemAction'
+        _format: json
+        version: latest
+    requirements:
+        entityId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_activitylists:
+    path: '/api/rest/{version}/activitylists/{entityClass}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_activitylist_activity_list_option:
+    path: '/api/rest/{version}/activitylist/activity/list/option.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::getActivityListOptionAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

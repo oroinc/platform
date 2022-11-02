@@ -14,7 +14,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
      */
     private $map;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->map = new PermissionMap(
             TestHelper::get($this)->createAclExtensionSelector()
@@ -47,53 +47,81 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
      */
     public static function getMasksProvider()
     {
-        return array(
-            array(new TestEntity(), 'VIEW', array(
-                1 << 0,
-                1 << 1,
-                1 << 2,
-                1 << 3,
-                1 << 4
-            )),
-            array(new TestEntity(), 'CREATE', array(
-                1 << 5,
-                1 << 6,
-                1 << 7,
-                1 << 8,
-                1 << 9
-            )),
-            array(new TestEntity(), 'EDIT', array(
-                1 << 10,
-                1 << 11,
-                1 << 12,
-                1 << 13,
-                1 << 14
-            )),
-            array(new TestEntity(), 'DELETE', array(
-                32768 + (1 << 0),
-                32768 + (1 << 1),
-                32768 + (1 << 2),
-                32768 + (1 << 3),
-                32768 + (1 << 4)
-            )),
-            array(new TestEntity(), 'ASSIGN', array(
-                32768 + (1 << 5),
-                32768 + (1 << 6),
-                32768 + (1 << 7),
-                32768 + (1 << 8),
-                32768 + (1 << 9)
-            )),
-            array(new TestEntity(), 'PERMIT', array(
-                32768 + (1 << 10),
-                32768 + (1 << 11),
-                32768 + (1 << 12),
-                32768 + (1 << 13),
-                32768 + (1 << 14)
-            )),
-            array('action: test', 'EXECUTE', array(
-                ActionMaskBuilder::MASK_EXECUTE,
-            )),
-        );
+        return [
+            'VIEW' => [
+                new TestEntity(),
+                'VIEW',
+                [
+                    1 << 0,
+                    1 << 1,
+                    1 << 2,
+                    1 << 3,
+                    1 << 4
+                ]
+            ],
+            'CREATE' => [
+                new TestEntity(),
+                'CREATE',
+                [
+                    1 << 5,
+                    1 << 6,
+                    1 << 7,
+                    1 << 8,
+                    1 << 9
+                ]
+            ],
+            'EDIT' => [
+                new TestEntity(),
+                'EDIT',
+                [
+                    1 << 10,
+                    1 << 11,
+                    1 << 12,
+                    1 << 13,
+                    1 << 14
+                ]
+            ],
+            'DELETE' => [
+                new TestEntity(),
+                'DELETE',
+                [
+                    1 << 15,
+                    1 << 16,
+                    1 << 17,
+                    1 << 18,
+                    1 << 19
+                ]
+            ],
+            'ASSIGN' => [
+                new TestEntity(),
+                'ASSIGN',
+                [
+                    1 << 20,
+                    1 << 21,
+                    1 << 22,
+                    1 << 23,
+                    1 << 24
+                ]
+            ],
+            'PERMIT' => [
+                new TestEntity(),
+                'PERMIT',
+                [
+                    33554432 + (1 << 0),
+                    33554432 + (1 << 1),
+                    33554432 + (1 << 2),
+                    33554432 + (1 << 3),
+                    33554432 + (1 << 4)
+                ]
+            ],
+            'EXECUTE' => [
+                'action: test',
+                'EXECUTE',
+                [
+                    ActionMaskBuilder::MASK_EXECUTE,
+                ]
+            ],
+        ];
     }
 
     /**
@@ -101,15 +129,15 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
      */
     public static function containsProvider()
     {
-        return array(
-            array('VIEW', true),
-            array('EDIT', true),
-            array('CREATE', true),
-            array('DELETE', true),
-            array('ASSIGN', true),
-            array('PERMIT', true),
-            array('EXECUTE', true),
-            array('OTHER', false),
-        );
+        return [
+            ['VIEW', true],
+            ['EDIT', true],
+            ['CREATE', true],
+            ['DELETE', true],
+            ['ASSIGN', true],
+            ['PERMIT', true],
+            ['EXECUTE', true],
+            ['OTHER', false],
+        ];
     }
 }

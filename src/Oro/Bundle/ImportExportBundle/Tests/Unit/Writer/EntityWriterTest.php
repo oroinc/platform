@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Doctrine\DBAL\Driver\AbstractDriverException;
-use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
+use Doctrine\DBAL\Exception\DeadlockException;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -13,100 +13,72 @@ use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class EntityWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDetachFixer */
+    /** @var EntityDetachFixer|\PHPUnit\Framework\MockObject\MockObject */
     protected $detachFixer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseExceptionHelper */
-    protected $databaseExceptionHelper;
 
     /** @var EntityWriter */
     protected $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->detachFixer = $this->createMock(EntityDetachFixer::class);
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->entityManager));
-
-        $this->detachFixer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->databaseExceptionHelper = $this->createMock(DatabaseExceptionHelper::class);
-
-        $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+            ->willReturn($this->entityManager);
 
         $this->writer = new EntityWriter(
             $this->doctrineHelper,
             $this->detachFixer,
-            $this->contextRegistry,
-            $this->databaseExceptionHelper
+            $this->contextRegistry
         );
     }
 
     /**
-     * @param array $configuration
-     *
      * @dataProvider configurationProvider
      */
-    public function testWrite($configuration)
+    public function testWrite(array $configuration)
     {
         $fooItem = $this->createMock(\stdClass::class);
         $barItem = $this->createMock(\ArrayObject::class);
 
-        $this->detachFixer->expects($this->at(0))
+        $this->detachFixer->expects($this->exactly(2))
             ->method('fixEntityAssociationFields')
-            ->with($fooItem, 1);
+            ->withConsecutive([$fooItem, 1], [$barItem, 1]);
 
-        $this->detachFixer->expects($this->at(1))
-            ->method('fixEntityAssociationFields')
-            ->with($barItem, 1);
-
-        $this->entityManager->expects($this->at(0))
+        $this->entityManager->expects($this->exactly(2))
             ->method('persist')
-            ->with($fooItem);
+            ->withConsecutive([$fooItem], [$barItem]);
 
-        $this->entityManager->expects($this->at(1))
-            ->method('persist')
-            ->with($barItem);
-
-        $this->entityManager->expects($this->at(2))
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
-            $this->entityManager->expects($this->at(3))
+            $this->entityManager->expects($this->once())
                 ->method('clear');
         }
 
@@ -130,10 +102,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('flush')
             ->willThrowException(new \Exception());
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
@@ -143,61 +112,9 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
-
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('getDriverException');
-
-        $this->expectException(\Exception::class);
-
-        $this->writer->write([$item]);
-    }
-
-    public function testWriteDatabaseExceptionNotDeadlock()
-    {
-        $exception = new \Exception();
-        $item = $this->createMock(\stdClass::class);
-
-        $this->detachFixer->expects($this->once())
-            ->method('fixEntityAssociationFields')
-            ->with($item, 1);
-
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($item);
-
-        $this->entityManager->expects($this->once())
-            ->method('flush')
-            ->willThrowException($exception);
-
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())
-            ->method('getConfiguration')
-            ->willReturn(['entityName' => \stdClass::class]);
-
-        $this->contextRegistry->expects($this->once())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
-
-        $this->writer->setStepExecution($stepExecution);
-
-        $driverException = $this->createMock(AbstractDriverException::class);
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('getDriverException')
-            ->with($exception)
-            ->willReturn($driverException);
-
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('isDeadlock')
-            ->willReturn(false);
 
         $this->expectException(\Exception::class);
 
@@ -206,7 +123,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testWriteDatabaseExceptionDeadlock()
     {
-        $exception = new \Exception();
+        $exception = $this->createMock(DeadlockException::class);
         $item = $this->createMock(\stdClass::class);
 
         $this->detachFixer->expects($this->once())
@@ -221,10 +138,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('flush')
             ->willThrowException($exception);
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
@@ -234,19 +148,9 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry->expects($this->any())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
-
-        $driverException = $this->createMock(AbstractDriverException::class);
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('getDriverException')
-            ->with($exception)
-            ->willReturn($driverException);
-
-        $this->databaseExceptionHelper->expects($this->once())
-            ->method('isDeadlock')
-            ->willReturn(true);
 
         $context->expects($this->once())
             ->method('setValue')
@@ -255,26 +159,22 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([$item]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage entityName not resolved
-     */
     public function testMissingClassName()
     {
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('entityName not resolved');
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $stepExecution = $this->createMock(StepExecution::class);
+
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write([]);
@@ -282,20 +182,17 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testClassResolvedOnce()
     {
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue(['entityName' => '\stdClass']));
+            ->willReturn(['entityName' => \stdClass::class]);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write([]);
@@ -304,16 +201,13 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([]);
     }
 
-    /**
-     * @return array
-     */
-    public function configurationProvider()
+    public function configurationProvider(): array
     {
         return [
             'no clear flag'    => [[]],
             'clear flag false' => [[EntityWriter::SKIP_CLEAR => false]],
             'clear flag true'  => [[EntityWriter::SKIP_CLEAR => true]],
-            'className from config'  => [[EntityWriter::SKIP_CLEAR => true, 'entityName' => '\stdClass']],
+            'className from config'  => [[EntityWriter::SKIP_CLEAR => true, 'entityName' => \stdClass::class]],
         ];
     }
 }

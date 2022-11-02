@@ -2,28 +2,31 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider;
 
 class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    protected $registry;
-    protected $emailRecipientsHelper;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    protected $emailRecipientsProvider;
+    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailRecipientsHelper;
 
-    public function setUp()
+    /** @var EmailRecipientsProvider */
+    private $emailRecipientsProvider;
+
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
 
         $this->emailRecipientsProvider = new EmailRecipientsProvider(
-            $this->registry,
+            $this->doctrine,
             $this->emailRecipientsHelper
         );
     }
@@ -33,24 +36,22 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRecipients(EmailRecipientsProviderArgs $args, array $recipients)
     {
-        $userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userRepository = $this->createMock(UserRepository::class);
 
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
-            ->with('OroUserBundle:User')
-            ->will($this->returnValue($userRepository));
+            ->with(User::class)
+            ->willReturn($userRepository);
 
         $this->emailRecipientsHelper->expects($this->once())
             ->method('getRecipients')
-            ->with($args, $userRepository, 'u', 'Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($recipients));
+            ->with($args, $userRepository, 'u', User::class)
+            ->willReturn($recipients);
 
         $this->assertEquals($recipients, $this->emailRecipientsProvider->getRecipients($args));
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [

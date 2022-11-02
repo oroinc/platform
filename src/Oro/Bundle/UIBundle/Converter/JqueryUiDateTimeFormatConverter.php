@@ -4,6 +4,9 @@ namespace Oro\Bundle\UIBundle\Converter;
 
 use Oro\Bundle\LocaleBundle\Converter\AbstractDateTimeFormatConverter;
 
+/**
+ * Converts date time to JqueryUi format.
+ */
 class JqueryUiDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
     const NAME = 'jquery_ui';
@@ -17,7 +20,7 @@ class JqueryUiDateTimeFormatConverter extends AbstractDateTimeFormatConverter
      *
      * @var array
      */
-    protected $formatMatch = array(
+    protected $formatMatch = [
         'yyyy'  => 'yy', // long year
         'yy'    => 'y',  // short year
         'y'     => 'yy', // long year
@@ -57,13 +60,5 @@ class JqueryUiDateTimeFormatConverter extends AbstractDateTimeFormatConverter
         'VVV'   => 'z',  // timezone as defined by timezoneList
         'VV'    => 'z',  // timezone as defined by timezoneList
         'V'     => 'z',  // timezone as defined by timezoneList
-    );
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function convertFormat($format)
-    {
-        return str_replace(array('"', '\''), '', parent::convertFormat($format));
-    }
+    ];
 }

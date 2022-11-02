@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper;
 use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
@@ -17,63 +18,48 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|MailboxNameHelper */
-    protected $mailboxNameHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MailboxRepository */
-    protected $mailboxRepository;
+    private $mailboxNameHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $originRepository;
+    private $originRepository;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AbstractQuery */
-    protected $originQuery;
+    private $originQuery;
 
     /** @var OriginFolderFilterProvider */
-    protected $originFolderFilterProvider;
+    private $originFolderFilterProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->mailboxRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->originQuery = $this->createMock(AbstractQuery::class);
 
-        $this->originQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
-
-        $originQb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $originQb = $this->createMock(QueryBuilder::class);
         $originQb->expects($this->any())
             ->method('select')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $originQb->expects($this->any())
             ->method('leftJoin')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $originQb->expects($this->any())
             ->method('andWhere')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $originQb->expects($this->any())
             ->method('setParameters')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $originQb->expects($this->any())
             ->method('getQuery')
-            ->will($this->returnValue($this->originQuery));
+            ->willReturn($this->originQuery);
 
-        $this->originRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->setMethods(['createQueryBuilder', 'findAvailableMailboxes'])
-            ->getMock();
+        $this->originRepository = $this->createMock(MailboxRepository::class);
         $this->originRepository->expects($this->any())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($originQb));
+            ->willReturn($originQb);
 
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -90,7 +76,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->originRepository));
+            ->willReturn($this->originRepository);
 
         $this->originQuery->expects($this->once())
             ->method('getResult')
@@ -134,7 +120,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->originRepository));
+            ->willReturn($this->originRepository);
 
         $this->originQuery->expects($this->once())
             ->method('getResult')
@@ -196,7 +182,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->originRepository));
+            ->willReturn($this->originRepository);
 
         $this->originQuery->expects($this->once())
             ->method('getResult')

@@ -6,4 +6,4 @@ placeholders:
             items: ~
     items:
         oro_activities:
-            action: OroActivityBundle:Activity:activities
+            action: Oro\Bundle\ActivityBundle\Controller\ActivityController::activitiesAction

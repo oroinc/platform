@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ReportBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -14,10 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("report")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Report entity.
  */
-class ReportController extends RestController implements ClassResourceInterface
+class ReportController extends RestController
 {
     /**
      * Remove report.
@@ -36,7 +32,7 @@ class ReportController extends RestController implements ClassResourceInterface
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

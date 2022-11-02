@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Event;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class OrmResultBeforeQuery extends Event implements GridEventInterface
 {
@@ -16,10 +16,6 @@ class OrmResultBeforeQuery extends Event implements GridEventInterface
     /** @var QueryBuilder */
     protected $qb;
 
-    /**
-     * @param DatagridInterface $datagrid
-     * @param QueryBuilder $qb
-     */
     public function __construct(DatagridInterface $datagrid, QueryBuilder $qb)
     {
         $this->datagrid = $datagrid;

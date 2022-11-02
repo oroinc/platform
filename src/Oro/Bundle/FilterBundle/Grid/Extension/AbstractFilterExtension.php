@@ -6,14 +6,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
+use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Updates datagrid metadata object with:
@@ -26,46 +27,36 @@ abstract class AbstractFilterExtension extends AbstractExtension
     public const FILTER_ROOT_PARAM = '_filter';
     public const MINIFIED_FILTER_PARAM = 'f';
 
-    /** @var FilterInterface[] */
-    protected $filters = [];
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var ConfigurationProvider */
+    /** @var RawConfigurationProvider */
     protected $configurationProvider;
+
+    /** @var FilterBagInterface */
+    protected $filterBag;
+
+    protected DatagridFiltersProviderInterface $filtersProvider;
+
+    protected FiltersMetadataProvider $filtersMetadataProvider;
 
     /** @var DatagridStateProviderInterface */
     protected $filtersStateProvider;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     * @param DatagridStateProviderInterface $filtersStateProvider
-     * @param TranslatorInterface $translator
-     */
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
+
     public function __construct(
-        ConfigurationProvider $configurationProvider,
+        RawConfigurationProvider $configurationProvider,
+        FilterBagInterface $filterBag,
+        DatagridFiltersProviderInterface $datagridFiltersProvider,
+        FiltersMetadataProvider $filtersMetadataProvider,
         DatagridStateProviderInterface $filtersStateProvider,
-        TranslatorInterface $translator
+        FilterExecutionContext $filterExecutionContext
     ) {
         $this->configurationProvider = $configurationProvider;
+        $this->filterBag = $filterBag;
+        $this->filtersProvider = $datagridFiltersProvider;
+        $this->filtersMetadataProvider = $filtersMetadataProvider;
         $this->filtersStateProvider = $filtersStateProvider;
-        $this->translator = $translator;
-    }
-
-    /**
-     * Add filter to array of available filters
-     *
-     * @param string $name
-     * @param FilterInterface $filter
-     *
-     * @return $this
-     */
-    public function addFilter($name, FilterInterface $filter)
-    {
-        $this->filters[$name] = $filter;
-
-        return $this;
+        $this->filterExecutionContext = $filterExecutionContext;
     }
 
     /**
@@ -77,7 +68,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
 
         // Validates extension configuration and passes default values back to config.
         $filtersNormalized = $this->validateConfiguration(
-            new Configuration(array_keys($this->filters)),
+            new Configuration($this->filterBag->getFilterNames()),
             ['filters' => $filters]
         );
 
@@ -90,10 +81,14 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metadata)
     {
-        $filters = $this->getFiltersToApply($config);
+        $filters = $this->filtersProvider->getDatagridFilters($config);
 
         $this->updateState($filters, $config, $metadata);
-        $this->updateMetadata($filters, $config, $metadata);
+
+        $metadata->offsetAddToArray(
+            'filters',
+            $this->filtersMetadataProvider->getMetadataForFilters($filters, $config)
+        );
 
         $metadata->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }
@@ -111,7 +106,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH, []);
 
         foreach ($filtersConfig as $filterName => $filterConfig) {
-            if (!empty($filterConfig[PropertyInterface::DISABLED_KEY])) {
+            if (!empty($filterConfig[FilterUtility::DISABLED_KEY])) {
                 // Skips disabled filter.
                 continue;
             }
@@ -140,7 +135,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
     {
         $filterType = $filterConfig[FilterUtility::TYPE_KEY];
 
-        $filter = $this->filters[$filterType];
+        $filter = $this->filterBag->getFilter($filterType);
         $filter->init($filterName, $filterConfig);
 
         // Ensures filter is "somewhat-stateless" across datagrids.
@@ -192,11 +187,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
             ->offsetAddToArray('state', ['filters' => $filtersState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     *
-     * @return bool
-     */
     protected function isLazy(MetadataObject $metadata): bool
     {
         return (bool)$metadata->offsetGetOr(MetadataObject::LAZY_KEY, true);
@@ -205,11 +195,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /**
      * Submits filter form with filter state (i.e. value).
      * Works with cloned form to ensure filter is stateless.
-     *
-     * @param FilterInterface $filter
-     * @param array $filterState
-     *
-     * @return FormInterface
      */
     protected function submitFilter(FilterInterface $filter, array $filterState): FormInterface
     {
@@ -217,55 +202,5 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $filterForm->submit($filterState);
 
         return $filterForm;
-    }
-
-    /**
-     * @param FilterInterface[] $filters
-     * @param DatagridConfiguration $config
-     * @param MetadataObject $metadata
-     */
-    protected function updateMetadata(
-        array $filters,
-        DatagridConfiguration $config,
-        MetadataObject $metadata
-    ): void {
-        $rawConfig = $this->configurationProvider->isApplicable($config->getName())
-            ? $this->configurationProvider->getRawConfiguration($config->getName())
-            : [];
-
-        $filtersMetadata = [];
-        foreach ($filters as $filter) {
-            $filterMetadata = $filter->getMetadata();
-            $label = $filterMetadata['label'] ?? '';
-
-            $filtersMetadata[] = array_merge(
-                $filterMetadata,
-                [
-                    'label' => !empty($filterMetadata[FilterUtility::TRANSLATABLE_KEY])
-                        ? $this->translator->trans($label)
-                        : $label,
-                    'cacheId' => $this->getFilterCacheId($rawConfig, $filterMetadata),
-                ]
-            );
-        }
-
-        $metadata->offsetAddToArray('filters', $filtersMetadata);
-    }
-
-    /**
-     * @param array $rawGridConfig
-     * @param array $filterMetadata
-     *
-     * @return string|null
-     */
-    protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata): ?string
-    {
-        if (empty($filterMetadata['lazy'])) {
-            return null;
-        }
-
-        $rawOptions = ArrayUtil::getIn($rawGridConfig, ['filters', 'columns', $filterMetadata['name'], 'options']);
-
-        return $rawOptions ? md5(serialize($rawOptions)) : null;
     }
 }

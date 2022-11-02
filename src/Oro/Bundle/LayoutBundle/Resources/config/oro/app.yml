@@ -1,0 +1,6 @@
+framework:
+  cache:
+    pools:
+      cache.oro_layout.render:
+        adapter: cache.adapter.filesystem
+        tags: true

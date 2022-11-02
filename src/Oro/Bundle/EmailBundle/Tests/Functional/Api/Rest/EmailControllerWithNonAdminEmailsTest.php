@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailControllerWithNonAdminEmailsTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([LoadEmailData::class]);
@@ -16,7 +16,7 @@ class EmailControllerWithNonAdminEmailsTest extends WebTestCase
     public function testCget()
     {
         $url = $this->getUrl('oro_api_get_emails');
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
 
         $emails = $this->getJsonResponseContent($this->client->getResponse(), 200);
 

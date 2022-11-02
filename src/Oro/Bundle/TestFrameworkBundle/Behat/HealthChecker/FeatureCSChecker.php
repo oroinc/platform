@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker;
 
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
-use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 
 /**
  * Feature code style checker
@@ -25,14 +24,10 @@ class FeatureCSChecker implements HealthCheckerInterface
         return [
             BeforeFeatureTested::BEFORE => [
                 ['checkFeatureName'],
-                ['checkFeatureDescription']
             ],
         ];
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function checkFeatureName(BeforeFeatureTested $event)
     {
         $featureTitle = $event->getFeature()->getTitle();
@@ -69,16 +64,6 @@ class FeatureCSChecker implements HealthCheckerInterface
     public function getName()
     {
         return 'cs';
-    }
-
-    /**
-     * @param BeforeFeatureTested $event
-     */
-    public function checkFeatureDescription(BeforeFeatureTested $event)
-    {
-        if (!$event->getFeature()->getDescription()) {
-            $this->errors[] = sprintf('Feature "%s" should have description', $event->getFeature()->getFile());
-        }
     }
 
     /**

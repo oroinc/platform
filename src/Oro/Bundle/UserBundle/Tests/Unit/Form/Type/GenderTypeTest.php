@@ -1,8 +1,10 @@
 <?php
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\GenderType;
 use Oro\Bundle\UserBundle\Model\Gender;
+use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -10,42 +12,28 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class GenderTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var array
-     */
-    protected $genderChoices = [
+    /** @var array */
+    private $genderChoices = [
         'Male' => Gender::MALE,
         'Female' => Gender::FEMALE,
     ];
 
-    /**
-     * @var GenderType
-     */
-    protected $type;
+    /** @var GenderType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $genderProvider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\GenderProvider')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getChoices'))
-            ->getMock();
+        $genderProvider = $this->createMock(GenderProvider::class);
         $genderProvider->expects($this->any())
             ->method('getChoices')
-            ->will($this->returnValue($this->genderChoices));
+            ->willReturn($this->genderChoices);
 
         $this->type = new GenderType($genderProvider);
         parent::setUp();
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->type);
-    }
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -73,7 +61,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         $this->assertNotEmpty($view->vars['placeholder']);
         $this->assertNotEmpty($view->vars['choices']);
 
-        $actualChoices = array();
+        $actualChoices = [];
         /** @var ChoiceView $choiceView */
         foreach ($view->vars['choices'] as $choiceView) {
             $actualChoices[$choiceView->value] = $choiceView->label;

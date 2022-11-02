@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -15,6 +16,9 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Allows to remove IMAP emails.
+ */
 class ImapEmailRemoveManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -22,9 +26,6 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->em = $doctrine->getManager();
@@ -33,17 +34,16 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
     /**
      * Remove emails which was removed in remote account
      *
+     * @param EmailFolder      $imapFolder
+     * @param EmailFolder      $folder
      * @param ImapEmailManager $manager
-     * @param array $imapFolders
      */
     public function removeRemotelyRemovedEmails($imapFolder, $folder, $manager)
     {
         $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
             $existingUids = $manager->getEmailUIDs();
 
-            $staleImapEmailsQb = $this
-                ->em
-                ->getRepository('OroImapBundle:ImapEmail')
+            $staleImapEmailsQb = $this->em->getRepository(ImapEmail::class)
                 ->createQueryBuilder('ie');
             $staleImapEmailsQb
                 ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
@@ -76,7 +76,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                 $email = $imapEmail->getEmail();
                 $email->getEmailUsers()
                     ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
-                        $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
+                        $existsEmails = $this->em->getRepository(ImapEmail::class)
                             ->findBy(['email' => $imapEmail->getEmail()]);
 
                         $emailUser->removeFolder($folder);
@@ -93,17 +93,15 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
 
     /**
      * Deletes all empty outdated folders
-     *
-     * @param EmailOrigin $origin
      */
     public function cleanupOutdatedFolders(EmailOrigin $origin)
     {
         $this->logger->info('Removing empty outdated folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
         $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
-        $folders     = new ArrayCollection();
+        $folders = new ArrayCollection();
 
         /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {
@@ -150,8 +148,6 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
 
     /**
      * Removes an email from a folder linked to the given IMAP email object
-     *
-     * @param ImapEmail $imapEmail
      */
     protected function removeImapEmailReference(ImapEmail $imapEmail)
     {

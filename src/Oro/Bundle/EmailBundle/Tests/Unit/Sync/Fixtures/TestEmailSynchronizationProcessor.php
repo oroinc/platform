@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationBag;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
 class TestEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
@@ -18,7 +19,7 @@ class TestEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
     }
 
-    public function process(EmailOrigin $origin, $syncStartTime)
+    public function process(EmailOrigin $origin, $syncStartTime, EmailSyncNotificationBag $notificationBag)
     {
     }
 }

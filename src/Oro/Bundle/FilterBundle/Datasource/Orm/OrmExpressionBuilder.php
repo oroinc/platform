@@ -6,6 +6,11 @@ use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Expr\Coalesce;
 
+/**
+ * Filter expression builder for ORM.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
     /** @var Expr */
@@ -14,9 +19,6 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     /** @var bool */
     protected $caseInsensitive;
 
-    /**
-     * @param Expr $expr
-     */
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;
@@ -69,8 +71,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     public function neq($x, $y, $withParam = false)
     {
         /*
-         * TODO: the correct expression cannot be used due a bud described in
-         * This problem still exists in doctrine 2.5, in the case when we try equals expression
+         * The correct expression cannot be used due a bug in doctrine 2.5, in the case when we try equals expression
          * with IS NULL.
          * An example of DQL which fails:
          * SELECT u.id FROM OroUserBundle:User u
@@ -188,8 +189,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     public function notLike($x, $y, $withParam = false)
     {
         /*
-         * TODO: the correct expression cannot be used due a workaround
-         * This problem still exists in doctrine 2.5, in the case when we try equals expression
+         * The correct expression cannot be used due a bug in doctrine 2.5, in the case when we try equals expression
          * with IS NULL. See neq method.
          *
          * Also we cannot use NOT (x LIKE y) due a bug in AclHelper, so we have to use NOT LIKE operator.

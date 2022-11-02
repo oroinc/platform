@@ -29,14 +29,6 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     /** @var SelectedFieldsProviderInterface */
     private $selectedFieldsProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param DatagridGuesser $datagridGuesser
-     * @param FieldsHelper $fieldsHelper
-     * @param DoctrineHelper $doctrineHelper
-     * @param SelectedFieldsProviderInterface $selectedFieldsProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         EntityClassResolver $entityClassResolver,
@@ -109,7 +101,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         parent::prepareColumnOptions($field, $columnOptions);
 
         if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
-            $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
+            $columnOptions[DatagridGuesser::FILTER]['renderable'] = true;
         }
     }
 
@@ -172,11 +164,6 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         return $fieldsConfigIds;
     }
 
-    /**
-     * @param string $entityName
-     *
-     * @return bool
-     */
     private function canHaveAttributes(string $entityName): bool
     {
         $entityClassName = $this->entityClassResolver->getEntityClass($entityName);
@@ -216,20 +203,11 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         return array_filter($fieldConfigModels);
     }
 
-    /**
-     * @return AttributeFamilyRepository
-     */
     private function getAttributeFamilyRepository(): AttributeFamilyRepository
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(AttributeFamily::class);
     }
 
-    /**
-     * @param array $fieldConfigsIds
-     * @param array $selectedFields
-     *
-     * @return array
-     */
     private function filterRelevant(array $fieldConfigsIds, array $selectedFields): array
     {
         return array_filter(

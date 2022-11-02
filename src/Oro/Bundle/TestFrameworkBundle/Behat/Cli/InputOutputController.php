@@ -3,20 +3,27 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\MessageQueueIsolationSubscriber;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\TestIsolationSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Testwork console controller
+ */
 class InputOutputController implements Controller
 {
-    /** @var  TestIsolationSubscriber */
-    protected $testIsolationSubscriber;
+    private TestIsolationSubscriber $testIsolationSubscriber;
+    private MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber;
 
-    public function __construct(TestIsolationSubscriber $testIsolationSubscriber)
-    {
+    public function __construct(
+        TestIsolationSubscriber $testIsolationSubscriber,
+        MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber
+    ) {
         $this->testIsolationSubscriber = $testIsolationSubscriber;
+        $this->messageQueueIsolationSubscriber = $messageQueueIsolationSubscriber;
     }
 
     /**
@@ -29,8 +36,15 @@ class InputOutputController implements Controller
                 '--skip-isolators',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                '',
-                'database,cache,message-queue,inital_message_queue,doctrine,import_export'
+                "Comma separated list of isolator tags to skip. If the value is not provided, all are skipped. \n".
+                '(available isolator tags are: <comment>'.implode(',', $this->getIsolatorTags()).'</comment>)',
+                false
+            )
+            ->addOption(
+                '--skip-isolators-but-load-fixtures',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip all isolators except the "doctrine" that loads data fixtures'
             );
     }
 
@@ -39,16 +53,37 @@ class InputOutputController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var bool $skip */
-        $skip = $input->getOption('dry-run');
-        $skipIsolators = false === $input->hasParameterOption('--skip-isolators')
-            ? ''
-            : $input->getOption('skip-isolators');
+        // $input->getOption('skip-isolators') returns:
+        //  - null - when the option is provided without the value
+        //  - false - when the option is not provided
+        $skipAllIsolators = $input->getOption('skip-isolators') === null || $input->getOption('dry-run');
 
-        $skipIsolators = array_map('trim', explode(',', $skipIsolators));
+        if ($input->getOption('skip-isolators')) {
+            $skipIsolatorsTags = array_map('trim', explode(',', $input->getOption('skip-isolators')));
+        } else {
+            $skipIsolatorsTags = [];
+        }
+
+        if ($input->getOption('skip-isolators-but-load-fixtures')) {
+            $skipAllIsolators = false;
+            $skipIsolatorsTags = array_diff($this->getIsolatorTags(), ['doctrine']);
+        }
+
         $this->testIsolationSubscriber->setInput($input);
         $this->testIsolationSubscriber->setOutput($output);
-        $this->testIsolationSubscriber->setSkip($skip);
-        $this->testIsolationSubscriber->setSkipIsolators($skipIsolators);
+        $this->testIsolationSubscriber->skipIsolatorsTags($skipIsolatorsTags);
+        if ($skipAllIsolators) {
+            $this->testIsolationSubscriber->skip();
+        }
+
+        $this->messageQueueIsolationSubscriber->setOutput($output);
+        if ($skipAllIsolators || in_array(MessageQueueIsolationSubscriber::TAG, $skipIsolatorsTags)) {
+            $this->messageQueueIsolationSubscriber->skip();
+        }
+    }
+
+    private function getIsolatorTags(): array
+    {
+        return [...$this->testIsolationSubscriber->getIsolatorsTags(), MessageQueueIsolationSubscriber::TAG];
     }
 }

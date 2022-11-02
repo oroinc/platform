@@ -16,9 +16,6 @@ class ConfigHandler
      */
     protected $manager;
 
-    /**
-     * @param ConfigManager $manager
-     */
     public function __construct(ConfigManager $manager)
     {
         $this->manager = $manager;

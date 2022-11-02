@@ -2,60 +2,47 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailManagerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var EmailThreadManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailThreadManager;
+
+    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailThreadProvider;
+
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
     /** @var EmailManager */
-    protected $manager;
+    private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $emailThreadManager;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $emailThreadProvider;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $queryBuilder;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $mailboxManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['getQuery', 'getResult'])
-            ->getMock();
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(['getRepository', 'getEmailUserByThreadId', 'flush', 'persist'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailThreadManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->em = $this->createMock(EntityManager::class);
+        $this->emailThreadManager = $this->createMock(EmailThreadManager::class);
+        $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailboxManager->expects($this->any())
+        $mailboxManager = $this->createMock(MailboxManager::class);
+        $mailboxManager->expects($this->any())
             ->method('findAvailableMailboxIds')
             ->willReturn([]);
 
@@ -64,26 +51,25 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
             $this->emailThreadManager,
             $this->emailThreadProvider,
             $this->tokenAccessor,
-            $this->mailboxManager
+            $mailboxManager
         );
     }
 
     /**
      * @dataProvider dataProvider
-     *
-     * @param bool $isSeen
-     * @param bool $newSeen
-     * @param bool $seen
-     * @param bool $flush
-     * @param int $calls
-     * @param int $flushCalls
      */
-    public function testSetEmailSeenChanges($isSeen, $newSeen, $seen, $flush, $calls, $flushCalls)
-    {
-        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+    public function testSetEmailSeenChanges(
+        bool $isSeen,
+        bool $newSeen,
+        bool $seen,
+        bool $flush,
+        int $calls,
+        int $flushCalls
+    ) {
+        $emailUser = $this->createMock(EmailUser::class);
         $emailUser->expects($this->once())
             ->method('isSeen')
-            ->will($this->returnValue($isSeen));
+            ->willReturn($isSeen);
         $emailUser->expects($this->exactly($calls))
             ->method('setSeen')
             ->with($newSeen);
@@ -93,7 +79,7 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->setEmailUserSeen($emailUser, $seen, $flush);
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'unseen when seen with flush' => [
@@ -141,10 +127,10 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetEmailSeenChangesDefs()
     {
-        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser = $this->createMock(EmailUser::class);
         $emailUser->expects($this->once())
             ->method('isSeen')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $emailUser->expects($this->once())
             ->method('setSeen')
             ->with(true);
@@ -158,150 +144,114 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
     {
         $threadArray = [new EmailUser()];
 
-        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['getEmail', 'getThread', 'getId', 'setSeen', 'isSeen', 'getOwner'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $emailUser = $this->createMock(EmailUser::class);
+        $email = $this->createMock(Email::class);
+        $emailThread = $this->createMock(EmailThread::class);
         $emailUser->expects($this->exactly(2))
             ->method('getEmail')
-            ->will($this->returnSelf());
-
-        $emailUser->expects($this->exactly(2))
+            ->willReturn($email);
+        $email->expects($this->exactly(2))
             ->method('getThread')
-            ->will($this->returnSelf());
-
-        $emailUser->expects($this->once())
+            ->willReturn($emailThread);
+        $emailThread->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue(1));
-
+            ->willReturn(1);
         $emailUser->expects($this->once())
             ->method('setSeen')
             ->with(false);
         $emailUser->expects($this->exactly(2))
             ->method('isSeen')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $emailUser->expects($this->exactly(2))
             ->method('getOwner')
-            ->will($this->returnValue(true));
+            ->willReturn(new User());
+
         $this->em->expects($this->once())
             ->method('flush');
         $this->em->expects($this->exactly(2))
             ->method('persist');
 
-        $this->queryBuilder->expects($this->once())
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $qb->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($this->queryBuilder));
-
-        $this->queryBuilder->expects($this->once())
+            ->willReturn($query);
+        $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($threadArray));
+            ->willReturn($threadArray);
 
+        $repository = $this->createMock(EmailUserRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($this->em));
-
-        $this->em->expects($this->once())
+            ->with('OroEmailBundle:EmailUser')
+            ->willReturn($repository);
+        $repository->expects($this->once())
             ->method('getEmailUserByThreadId')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($qb);
 
         $this->manager->toggleEmailUserSeen($emailUser);
     }
 
     public function testMarkAllEmailsAsSeenEmpty()
     {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = $this->createMock(User::class);
+        $organization = $this->createMock(Organization::class);
 
-        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([]);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
-            ->setMethods(
-                [
-                    'createQueryBuilder',
-                    'andWhere',
-                    'setParameter',
-                    'getQuery',
-                    'execute',
-                    'expr',
-                    'eq',
-                    'getResult',
-                    'andX'
-                ]
-            )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(2))->method('andWhere')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(3))->method('setParameter')->will($this->returnValue($repository));
-        $repository->expects($this->once())->method('getQuery')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(4))->method('expr')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(3))->method('eq')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(1))->method('andX')->will($this->returnValue($repository));
-
+        $repository = $this->createMock(EmailUserRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($repository));
-
+            ->with('OroEmailBundle:EmailUser')
+            ->willReturn($repository);
         $repository->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue([]));
+            ->method('findUnseenUserEmail')
+            ->willReturn($qb);
 
         $this->manager->markAllEmailsAsSeen($user, $organization);
     }
 
     /**
      * @dataProvider dataSeenProvider
-     *
-     * @param bool $isSeen
-     * @param int $setSeenCalls
      */
-    public function testMarkAllEmailsAsSeen($isSeen, $setSeenCalls)
+    public function testMarkAllEmailsAsSeen(bool $isSeen, int $setSeenCalls)
     {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = $this->createMock(User::class);
+        $organization = $this->createMock(Organization::class);
 
-        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser = $this->createMock(EmailUser::class);
         $emailUser->expects($this->once())
             ->method('isSeen')
-            ->will($this->returnValue($isSeen));
+            ->willReturn($isSeen);
         $emailUser->expects($this->exactly($setSeenCalls))
             ->method('setSeen')
             ->with(true);
         $this->em->expects($this->once())
             ->method('flush');
 
-        $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
-            ->setMethods(
-                ['createQueryBuilder', 'getQuery', 'getResult', 'findUnseenUserEmail']
-            )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([$emailUser]);
 
+        $repository = $this->createMock(EmailUserRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($repository));
-
+            ->willReturn($repository);
         $repository->expects($this->once())
             ->method('findUnseenUserEmail')
-            ->will($this->returnValue($repository));
-
-        $repository->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($repository));
-
-        $repository->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue([$emailUser]));
+            ->willReturn($qb);
 
         $this->manager->markAllEmailsAsSeen($user, $organization);
     }
@@ -331,17 +281,12 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->willReturn($organization);
-        $emailUsersRepo = $this
-            ->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailUsersRepo
-            ->expects($this->once())
+        $emailUsersRepo = $this->createMock(EmailUserRepository::class);
+        $emailUsersRepo->expects($this->once())
             ->method('getAllEmailUsersByEmail')
             ->with($email, $user, $organization, false)
             ->willReturn($emailUsers);
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getRepository')
             ->with('OroEmailBundle:EmailUser')
             ->willReturn($emailUsersRepo);
@@ -349,14 +294,14 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->setSeenStatus($email, true);
 
         array_map(
-            function (EmailUser $emailUser) use ($email) {
+            function (EmailUser $emailUser) {
                 $this->assertTrue($emailUser->isSeen());
             },
             $emailUsers
         );
     }
 
-    public function dataSeenProvider()
+    public function dataSeenProvider(): array
     {
         return [
             'seen' => [

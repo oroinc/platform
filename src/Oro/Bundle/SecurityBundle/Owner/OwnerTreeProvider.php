@@ -2,40 +2,31 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
+/**
+ * The provider for owner tree.
+ */
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+    private OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
-
-    /**
-     * @param ManagerRegistry                    $doctrine
-     * @param DatabaseChecker                    $databaseChecker
-     * @param CacheProvider                      $cache
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param TokenStorageInterface              $tokenStorage
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         DatabaseChecker $databaseChecker,
-        CacheProvider $cache,
+        CacheInterface $cache,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         TokenStorageInterface $tokenStorage
     ) {
@@ -45,10 +36,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports()
+    public function supports(): bool
     {
         $token = $this->tokenStorage->getToken();
         if (null === $token) {
@@ -58,14 +46,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         return $token->getUser() instanceof User;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function fillTree(OwnerTreeBuilderInterface $tree)
+    protected function fillTree(OwnerTreeBuilderInterface $tree): void
     {
-        $ownershipMetadataProvider = $this->getOwnershipMetadataProvider();
-        $userClass = $ownershipMetadataProvider->getUserClass();
-        $businessUnitClass = $ownershipMetadataProvider->getBusinessUnitClass();
+        $userClass = $this->ownershipMetadataProvider->getUserClass();
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
         $connection = $this->getManagerForClass($userClass)->getConnection();
 
         list($businessUnits, $columnMap) = $this->executeQuery(
@@ -80,16 +64,19 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
                 ->addOrderBy('ORD, parentId', 'ASC')
                 ->getQuery()
         );
+
+        $businessUnitRelations = [];
+
         foreach ($businessUnits as $businessUnit) {
             $orgId = $this->getId($businessUnit, $columnMap['orgId']);
             if (null !== $orgId) {
                 $buId = $this->getId($businessUnit, $columnMap['id']);
                 $tree->addBusinessUnit($buId, $orgId);
-                $tree->addBusinessUnitRelation($buId, $this->getId($businessUnit, $columnMap['parentId']));
+                $businessUnitRelations[$buId] = $this->getId($businessUnit, $columnMap['parentId']);
             }
         }
 
-        $tree->buildTree();
+        $this->setSubordinateBusinessUnitIds($tree, $this->buildTree($businessUnitRelations, $businessUnitClass));
 
         list($users, $columnMap) = $this->executeQuery(
             $connection,
@@ -125,26 +112,17 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         }
     }
 
-    /**
-     * @param array  $item
-     * @param string $property
-     *
-     * @return int|null
-     */
-    protected function getId($item, $property)
+    private function getId(array $item, string $property): ?int
     {
         $id = $item[$property];
+        if (null !== $id) {
+            $id = (int)$id;
+        }
 
-        return null !== $id ? (int)$id : null;
+        return $id;
     }
 
-    /**
-     * @param Connection $connection
-     * @param Query      $query
-     *
-     * @return array [rows, columnMap]
-     */
-    protected function executeQuery(Connection $connection, Query $query)
+    private function executeQuery(Connection $connection, Query $query): array
     {
         $parsedQuery = QueryUtil::parseQuery($query);
 
@@ -154,31 +132,20 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         ];
     }
 
-    /**
-     * @param string $className
-     *
-     * @return EntityManager
-     */
-    protected function getManagerForClass($className)
+    protected function setSubordinateBusinessUnitIds(OwnerTreeBuilderInterface $tree, $businessUnits): void
+    {
+        foreach ($businessUnits as $parentId => $businessUnitIds) {
+            $tree->setSubordinateBusinessUnitIds($parentId, $businessUnitIds);
+        }
+    }
+
+    private function getManagerForClass(string $className): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($className);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityRepository
-     */
-    protected function getRepository($entityClass)
+    private function getRepository(string $entityClass): EntityRepository
     {
         return $this->getManagerForClass($entityClass)->getRepository($entityClass);
-    }
-
-    /**
-     * @return OwnershipMetadataProviderInterface
-     */
-    protected function getOwnershipMetadataProvider()
-    {
-        return $this->ownershipMetadataProvider;
     }
 }

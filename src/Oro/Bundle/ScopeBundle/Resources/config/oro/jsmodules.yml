@@ -1,0 +1,3 @@
+dynamic-imports:
+    commons:
+        - oroscope/js/app/views/scope-toggle-view

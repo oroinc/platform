@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var EnumValuesView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    require('jquery-ui/widgets/sortable');
 
-    EnumValuesView = BaseView.extend({
+    const EnumValuesView = BaseView.extend({
         /**
          * @type {boolean}
          */
@@ -20,19 +19,19 @@ define(function(require) {
             'click [data-name="clear-default"]': 'clearDefault',
             'content:remove': function() {
                 // execute right after content removed
-                _.defer(_.bind(this.updateClearDefault, this));
+                _.defer(this.updateClearDefault.bind(this));
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EnumValuesView() {
-            EnumValuesView.__super__.constructor.apply(this, arguments);
+        constructor: function EnumValuesView(options) {
+            EnumValuesView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['multiple']));
@@ -48,7 +47,7 @@ define(function(require) {
         },
 
         reindexValues: function() {
-            var index = 1;
+            let index = 1;
             this.$('[name$="[priority]"]').each(function() {
                 $(this).val(index++);
             });
@@ -60,14 +59,14 @@ define(function(require) {
                 tolerance: 'pointer',
                 delay: 100,
                 containment: 'parent',
-                stop: _.bind(this.reindexValues, this)
+                stop: this.reindexValues.bind(this)
             });
         },
 
         onIsDefaultClick: function(e) {
             if (!this.multiple) {
                 this.$('[name$="[is_default]"]').each(function() {
-                    var el = this;
+                    const el = this;
                     if (el.checked && el !== e.currentTarget) {
                         el.checked = false;
                     }
@@ -78,7 +77,7 @@ define(function(require) {
 
         clearDefault: function() {
             this.$('[name$="[is_default]"]').each(function() {
-                var el = this;
+                const el = this;
                 el.checked = false;
             });
             this.updateClearDefault();
@@ -90,7 +89,7 @@ define(function(require) {
         },
 
         updateClearDefault: function() {
-            var hasDefault = this.$('[name$="[is_default]"]:checked').length > 0;
+            const hasDefault = this.$('[name$="[is_default]"]:checked').length > 0;
             this.$('[data-name="clear-default"]').toggleClass('disabled', !hasDefault);
         }
     });

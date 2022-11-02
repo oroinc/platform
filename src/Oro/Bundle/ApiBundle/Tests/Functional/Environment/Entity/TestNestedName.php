@@ -4,59 +4,47 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 class TestNestedName
 {
-    /** @var string */
-    protected $firstName;
+    private ?string $firstName;
+    private ?string $lastName;
+    private ?\DateTimeInterface $contactedAt;
 
-    /** @var string */
-    protected $lastName;
-
-    /**
-     * @param string|null $firstName
-     * @param string|null $lastName
-     */
-    public function __construct($firstName = null, $lastName = null)
-    {
+    public function __construct(
+        string $firstName = null,
+        string $lastName = null,
+        \DateTimeInterface $contactedAt = null
+    ) {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+        $this->contactedAt = $contactedAt;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    /**
-     * @param string $firstName
-     *
-     * @return self
-     */
-    public function setFirstName($firstName)
+    public function setFirstName(?string $firstName): void
     {
         $this->firstName = $firstName;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string $lastName
-     *
-     * @return self
-     */
-    public function setLastName($lastName)
+    public function setLastName(?string $lastName): void
     {
         $this->lastName = $lastName;
+    }
 
-        return $this;
+    public function getContactedAt(): ?\DateTimeInterface
+    {
+        return $this->contactedAt;
+    }
+
+    public function setContactedAt(?\DateTimeInterface $contactedAt): void
+    {
+        $this->contactedAt = $contactedAt;
     }
 }

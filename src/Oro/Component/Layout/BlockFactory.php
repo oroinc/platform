@@ -4,9 +4,13 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Symfony\Component\ExpressionLanguage\Expression;
 
+/**
+ * The factory to create layout block view.
+ */
 class BlockFactory implements BlockFactoryInterface
 {
     /** @var LayoutRegistryInterface */
@@ -39,11 +43,6 @@ class BlockFactory implements BlockFactoryInterface
     /** @var Block */
     protected $block;
 
-    /**
-     * @param LayoutRegistryInterface            $registry
-     * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param ExpressionProcessor                $expressionProcessor
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         DeferredLayoutManipulatorInterface $layoutManipulator,
@@ -78,9 +77,6 @@ class BlockFactory implements BlockFactoryInterface
 
     /**
      * Initializes the state of this factory
-     *
-     * @param RawLayout        $rawLayout
-     * @param ContextInterface $context
      */
     protected function initializeState(RawLayout $rawLayout, ContextInterface $context)
     {
@@ -294,8 +290,6 @@ class BlockFactory implements BlockFactoryInterface
 
     /**
      * Processes expressions that don't work with data
-     *
-     * @param Options $options
      */
     protected function processExpressions(Options $options)
     {
@@ -354,7 +348,15 @@ class BlockFactory implements BlockFactoryInterface
     protected function setBlockResolvedOptions($id, $blockType, $options, $types)
     {
         // resolve options
-        $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
+        try {
+            $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
+        } catch (\Throwable $e) {
+            throw new InvalidArgumentException(sprintf(
+                'Cannot resolve options for the block "%s". Reason: %s',
+                $id,
+                $e->getMessage()
+            ), $e->getCode(), $e);
+        }
 
         $this->processExpressions($resolvedOptions);
         $resolvedOptions = $this->resolveValueBags($resolvedOptions);

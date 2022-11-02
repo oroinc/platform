@@ -2,33 +2,22 @@
 
 namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
+/**
+ * An interface for providers of layout theme resources.
+ */
 interface ResourceProviderInterface
 {
     /**
-     * @return array
+     * Gets all resources.
      */
-    public function getResources();
+    public function getResources(): array;
 
     /**
-     * Load resources using container builder
+     * Filters applicable resources by paths.
      *
-     * @param ContainerBuilder $container The container builder
-     *                                    If NULL the loaded resources will not be registered in the container
-     *                                    and as result will not be monitored for changes
-     * @param array $resources
+     * @param string[] $paths
      *
      * @return array
      */
-    public function loadResources(ContainerBuilder $container = null, array $resources = []);
-    
-    /**
-     * Filters applicable resources by paths
-     *
-     * @param array $paths
-     *
-     * @return array
-     */
-    public function findApplicableResources(array $paths);
+    public function findApplicableResources(array $paths): array;
 }

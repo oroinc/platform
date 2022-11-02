@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
-use Doctrine\ORM\NoResultException;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -18,76 +17,86 @@ use Symfony\Component\Security\Core\Security;
  */
 class ContextListener
 {
-    /** @var ContainerInterface */
-    private $container;
+    private TokenStorageInterface $tokenStorage;
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    private ManagerRegistry $doctrine;
+
+    private LoggerInterface $logger;
+
+    public function __construct(
+        TokenStorageInterface $tokenStorage,
+        ManagerRegistry $doctrine,
+        LoggerInterface $logger
+    ) {
+        $this->tokenStorage = $tokenStorage;
+        $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
      * Refresh organization context in token
-     *
-     * @param GetResponseEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
-        $tokenStorage = $this->getTokenStorage();
-        $token = $tokenStorage->getToken();
-        if ($token instanceof OrganizationContextTokenInterface && $token->getOrganizationContext()) {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
+            return;
+        }
+
+        $organization = $token->getOrganization();
+        if (null === $organization) {
+            return;
+        }
+
+        $isAccessGranted = false;
+        $organization = $this->refreshOrganization($organization);
+        if (null !== $organization) {
+            $token->setOrganization($organization);
+
             $user = $token->getUser();
-            if ($user instanceof AbstractUser) {
-                $organizationAccessDenied = true;
-                $organizationId = $token->getOrganizationContext()->getId();
-                /** @var Organization[] $organizations */
-                $organizations = $user->getOrganizations(true);
-                foreach ($organizations as $organization) {
-                    if ($organizationId === $organization->getId()) {
-                        $token->setOrganizationContext($organization);
-                        $organizationAccessDenied = false;
-                        break;
-                    }
-                }
-                if ($organizationAccessDenied) {
-                    $exception = new OrganizationAccessDeniedException();
-                    $exception->setOrganizationName($token->getOrganizationContext()->getName());
-                    $exception->setToken($token);
-                    $session = $event->getRequest()->getSession();
-                    if ($session) {
-                        $session->set(Security::AUTHENTICATION_ERROR, $exception);
-                    }
-                    $tokenStorage->setToken(null);
-                    throw $exception;
-                }
-            } else {
-                try {
-                    $token->setOrganizationContext(
-                        $this->getOrganizationManager()->getOrganizationById($token->getOrganizationContext()->getId())
-                    );
-                } catch (NoResultException $e) {
-                    $token->setAuthenticated(false);
-                }
+            if (!$user instanceof AbstractUser || $user->isBelongToOrganization($organization, true)) {
+                $isAccessGranted = true;
             }
+        }
+
+        if (!$isAccessGranted) {
+            $this->denyAccess($event);
         }
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
-    protected function getTokenStorage()
+    private function refreshOrganization(Organization $organization): ?Organization
     {
-        return $this->container->get('security.token_storage');
+        $organizationId = $organization->getId();
+
+        $organization = $this->doctrine->getManagerForClass(Organization::class)
+            ->find(Organization::class, $organizationId);
+
+        if (null === $organization) {
+            $this->logger->error(sprintf('Could not find organization by id %s', $organizationId));
+        }
+
+        return $organization;
     }
 
     /**
-     * @return OrganizationManager
+     * @throws OrganizationAccessDeniedException
      */
-    protected function getOrganizationManager()
+    private function denyAccess(RequestEvent $event): void
     {
-        return $this->container->get('oro_organization.organization_manager');
+        /** @var OrganizationAwareTokenInterface $token */
+        $token = $this->tokenStorage->getToken();
+
+        $this->tokenStorage->setToken(null);
+
+        $exception = new OrganizationAccessDeniedException();
+        $exception->setOrganizationName($token->getOrganization()->getName());
+        $exception->setToken($token);
+
+        $request = $event->getRequest();
+        if ($request->hasSession()) {
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+        }
+
+        throw $exception;
     }
 }

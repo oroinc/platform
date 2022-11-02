@@ -9,32 +9,30 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 class RestrictHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RestrictHelper */
-    protected $helper;
+    private $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->helper = new RestrictHelper();
-        parent::setUp();
     }
 
     /**
      * @dataProvider restrictOperationsByGroupDataProvider
-     * @param array $operationsValues
-     * @param string|array|null|bool $definedGroups
-     * @param string[] $expectedOperations
      */
-    public function testRestrictOperationsByGroup($operationsValues, $definedGroups, $expectedOperations)
-    {
+    public function testRestrictOperationsByGroup(
+        array $operationsValues,
+        mixed $definedGroups,
+        array $expectedOperations
+    ) {
         /** @var Operation[] $operations */
         $operations = [];
         foreach ($operationsValues as $operationName => $buttonOptions) {
-            /** @var \PHPUnit\Framework\MockObject\MockObject|Operation $operation */
-            $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $operation = $this->createMock(Operation::class);
             $operationDefinition = new OperationDefinition();
             $operationDefinition->setButtonOptions($buttonOptions);
-            $operation->expects($this->any())->method('getDefinition')->willReturn($operationDefinition);
+            $operation->expects($this->any())
+                ->method('getDefinition')
+                ->willReturn($operationDefinition);
             $operations[$operationName] = $operation;
         }
 
@@ -52,10 +50,7 @@ class RestrictHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function restrictOperationsByGroupDataProvider()
+    public function restrictOperationsByGroupDataProvider(): array
     {
         return [
             'groupIsString' => [

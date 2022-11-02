@@ -7,8 +7,6 @@ use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 
 class IntegrationTypeWithIcon implements IntegrationInterface, IconAwareIntegrationInterface
 {
-    const TYPE = 'type1';
-
     /**
      * {@inheritdoc}
      */

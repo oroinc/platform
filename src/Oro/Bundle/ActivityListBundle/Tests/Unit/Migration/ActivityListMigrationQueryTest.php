@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery;
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -14,39 +20,34 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListMigrationQuery */
-    protected $migrationQuery;
+    private $migrationQuery;
 
     /** @var Schema */
-    protected $schema;
+    private $schema;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var ActivityListExtension */
-    protected $activityListExtension;
+    private $activityListExtension;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataHelper;
+    private $metadataHelper;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->schema                = new Schema();
+        $this->schema = new Schema();
         $this->activityListExtension = new ActivityListExtension();
-        $this->nameGenerator         = new ExtendDbIdentifierNameGenerator();
+        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
-        $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->provider = $this->createMock(ActivityListChainProvider::class);
+        $this->metadataHelper = $this->createMock(EntityMetadataHelper::class);
 
         $this->metadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
@@ -56,13 +57,11 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
                         return ['Acme\TestBundle\Entity\Test'];
                     }
 
-                    return ['Oro\Bundle\ActivityListBundle\Entity\ActivityList'];
+                    return [ActivityList::class];
                 }
             );
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->migrationQuery = new ActivityListMigrationQuery(
             $this->schema,
@@ -76,13 +75,11 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
     public function testRunActivityLists()
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
 
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->will($this->returnValue(new MySqlPlatform()));
+            ->willReturn(new MySqlPlatform());
         $this->migrationQuery->setConnection($connection);
 
         $table = $this->schema->createTable('acme_test');
@@ -93,10 +90,8 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
 
-        $extendOptionsManager = new ExtendOptionsManager();
-        $entityMetadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
+        $entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $extendExtension = new ExtendExtension($extendOptionsManager, $entityMetadataHelper, new PropertyConfigBag([]));
         $extendExtension->setNameGenerator($this->nameGenerator);
         $this->activityListExtension->setExtendExtension($extendExtension);
@@ -117,7 +112,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
                         return ['Acme\TestBundle\Entity\Test'];
                     }
 
-                    return ['Oro\Bundle\ActivityListBundle\Entity\ActivityList'];
+                    return [ActivityList::class];
                 }
             );
 
@@ -125,7 +120,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             'CREATE TABLE oro_rel_c3990ba6784dd132527c89 (activitylist_id INT NOT NULL, test_id INT NOT NULL, '
             . 'INDEX IDX_53682E3596EB1108 (activitylist_id), INDEX IDX_53682E351E5D0459 (test_id), '
-            . 'PRIMARY KEY(activitylist_id, test_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci '
+            . 'PRIMARY KEY(activitylist_id, test_id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` '
             . 'ENGINE = InnoDB',
             $log[0]
         );

@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
 <div class="widget-content comment-list {{ containerExtraClass }}">
     {% set options = {
@@ -13,4 +13,4 @@
          data-page-component-options="{{ options|json_encode }}">
     </div>
 </div>
-{% include 'OroCommentBundle:Comment/js:list.html.twig' with {'id': 'template-activity-item-comment'} %}
+{% include '@OroComment/Comment/js/list.html.twig' with {'id': 'template-activity-item-comment'} %}

@@ -15,32 +15,22 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
-    /**
-     * @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject */
     private $enumSynchronizer;
 
-    /**
-     * @var EntityFieldStateChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityFieldStateChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $stateChecker;
 
-    /**
-     * @var EntityFieldWriter
-     */
+    /** @var EntityFieldWriter */
     private $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);
@@ -64,30 +54,13 @@ class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
             'enum',
             [
                 'enum_options' => [
-                    0 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID'
-                    ],
-                    1 => [
-                        'id' => '',
-                        'label' => 'Option Two'
-                    ],
-                    2 => [
-                        'id' => '',
-                        'label' => 'Option Three'
-                    ],
-                    3 => [
-                        'id' => '',
-                        'label' => 'option two'
-                    ],
-                    4 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID 2'
-                    ],
-                    5 => [
-                        'id' => 'test_id_2',
-                        'label' => 'Test ID 2'
-                    ],
+                    0 => ['id' => 'test_id', 'label' => 'Test ID'],
+                    1 => ['id' => '', 'label' => 'Option Two'],
+                    2 => ['id' => '', 'label' => 'Option Three'],
+                    3 => ['id' => '', 'label' => 'option two'],
+                    4 => ['id' => 'test_id', 'label' => 'Test ID 2'],
+                    5 => ['id' => 'test_id_2', 'label' => 'Test ID 2'],
+                    6 => ['id' => '', 'label' => 'Option Two']
                 ]
             ]
         );
@@ -132,22 +105,11 @@ class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
             ->with(
                 ExtendHelper::buildEnumValueClassName($enumCode),
                 [
-                    0 => [
-                        'id' => 'test_id',
-                        'label' => 'Test ID'
-                    ],
-                    1 => [
-                        'id' => '',
-                        'label' => 'Option Two'
-                    ],
-                    2 => [
-                        'id' => '',
-                        'label' => 'Option Three'
-                    ],
-                    5 => [
-                        'id' => 'test_id_2',
-                        'label' => 'Test ID 2'
-                    ],
+                    0 => ['id' => 'test_id','label' => 'Test ID'],
+                    1 => ['id' => '','label' => 'Option Two'],
+                    2 => ['id' => '','label' => 'Option Three'],
+                    3 => ['id' => '', 'label' => 'option two'],
+                    5 => ['id' => 'test_id_2','label' => 'Test ID 2']
                 ],
                 'fr'
             );

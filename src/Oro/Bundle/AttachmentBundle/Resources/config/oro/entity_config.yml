@@ -1,5 +1,6 @@
 entity_config:
     attachment:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#attachment
         entity:
             form:
                 block_config:
@@ -8,11 +9,9 @@ entity_config:
                         priority:           0
 
             items:
-                # indicates whether attachments can be added to the entity or not
-                enabled: # boolean
+                enabled:
                     options:
                         priority:           100
-                        default_value:      false
                         require_schema_update: true
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
@@ -21,12 +20,15 @@ entity_config:
                             required:       true
                             label:          oro.attachment.enabled
                             association_class: 'OroAttachmentBundle:Attachment'
-
-                # the max size in megabytes of attached file
-                maxsize: # integer
+                maxsize:
                     options:
                         priority:           90
-                        default_value:      1
+                    constraints:
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:            1
+                              max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
                         options:
@@ -34,27 +36,22 @@ entity_config:
                             required:       false
                             label:          oro.attachment.maxsize
                             association_class: 'OroAttachmentBundle:Attachment'
-
-                # the list of all allowed MIME types for attachments
-                mimetypes: # string (actually MIME types are delimited by \n symbol)
+                mimetypes:
                     options:
                         priority:           80
+                    constraints:
+                        - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:
-                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+                        type:               Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
                         options:
                             block:          attachments
                             required:       false
                             label:          oro.attachment.mimetypes
-                            association_class: 'OroAttachmentBundle:Attachment'
                             tooltip:        oro.attachment.mimetypes.tooltip
-
-                # this attribute can be used to prohibit changing the attachment association state (no matter whether
-                # it is enabled or not) for the entity
-                # if TRUE than the current state cannot be changed
-                immutable: # boolean
+                immutable:
                     options:
                         auditable:          false
-
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#attachment
         field:
             items:
                 attachment:
@@ -66,37 +63,63 @@ entity_config:
                         options:
                             block:          general
                             subblock:       properties
-
-                # the max size in megabytes of uploaded file
-                maxsize: # integer
+                is_stored_externally:
+                    options:
+                        value_type:         boolean
+                        default_value:      false
+                        allowed_type:       [file, image, multiFile, multiImage]
+                        create_only:        true
+                    form:
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                No:         false
+                                Yes:        true
+                            placeholder:    false
+                            block:          general
+                            subblock:       properties
+                            label:          oro.attachment.config.is_stored_externally.label
+                            tooltip:        oro.attachment.config.is_stored_externally.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No
+                maxsize:
                     options:
                         value_type:         integer
-                        allowed_type:       [file, image]
+                        allowed_type:       [file, image, multiFile, multiImage]
+                        required_property:
+                            code: is_stored_externally
+                            value: false
                     constraints:
                         - NotBlank:         ~
                         - Type:             integer
                         - Range:
-                            min:            1
+                              min:            1
+                              max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.file_size.label
                             block:          general
                             subblock:       properties
-                            empty_data:     1
                             tooltip:        oro.attachment.max_size.tooltip
-
-                # the thubnail picture width in pixels
-                width: # integer
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 3
+                width:
                     options:
                         value_type:         integer
-                        allowed_type:       [image]
+                        allowed_type:       [image, multiImage]
                     constraints:
-                        - Type:
-                            type:           int
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:          1
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.thumb_width.label
@@ -104,17 +127,21 @@ entity_config:
                             subblock:       properties
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_width.tooltip
-
-                # the thubnail picture height in pixels
-                height: # integer
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 32
+                height:
                     options:
                         value_type:         integer
-                        allowed_type:       [image]
+                        allowed_type:       [image, multiImage]
                     constraints:
-                        - Type:
-                            type:           int
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:          1
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.thumb_height.label
@@ -122,15 +149,45 @@ entity_config:
                             subblock:       properties
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_height.tooltip
-
-                # the list of all allowed MIME types for attachments
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 32
                 mimetypes:
+                    options:
+                        allowed_type:       [file, image, multiFile, multiImage]
+                    constraints:
+                        - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:
-                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+                        type:               Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
                         options:
                             block:          general
                             subblock:       properties
                             required:       false
                             label:          oro.attachment.mimetypes
-                            association_class: 'OroAttachmentBundle:Attachment'
                             tooltip:        oro.attachment.mimetypes.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: "image/png"
+                max_number_of_files:
+                    options:
+                        value_type:         integer
+                        allowed_type:       [multiFile, multiImage]
+                    constraints:
+                        - Type:             integer
+                        - Range:
+                              min:          1
+                              max:          32767
+                    form:
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
+                        options:
+                            required:       false
+                            label:          oro.attachment.config.max_number_of_files.label
+                            block:          general
+                            subblock:       properties
+                            tooltip:        oro.attachment.config.max_number_of_files.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 3

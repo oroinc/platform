@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
 <div class="widget-content activity-list {{ containerExtraClass }}">
     {% set pager = {
@@ -17,7 +17,7 @@
             <div class="filter-box">
                 <div class="filter-container"></div>
             </div>
-            <div class="pagination" role="navigation">
+            <div class="pagination">
                 {% set direction = oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
                 {% set prevButtonText = direction ? 'oro.activitylist.pagination.newer'|trans : 'oro.activitylist.pagination.older'|trans %}
                 {% set nextButtonText = direction ? 'oro.activitylist.pagination.older'|trans : 'oro.activitylist.pagination.newer'|trans %}
@@ -26,7 +26,8 @@
                         data-action-name="goto_previous"
                         class="btn pagination-previous"
                         title="{{ prevButtonText }}"
-                        {% if pager.current == 1 %}disabled={% endif %}
+                        {% if pager.current == 1 %}disabled{% endif %}
+                        type="button"
                 >
                     <span class="fa-chevron-left" aria-hidden="true"></span>
                     {{ prevButtonText }}
@@ -35,6 +36,7 @@
                         data-action-name="goto_next"
                         class="btn icon-end pagination-next"
                         title="{{ nextButtonText }}"
+                        type="button"
                 >
                     {{ nextButtonText }}
                     <span class="fa-chevron-right" aria-hidden="true"></span>
@@ -86,12 +88,12 @@
             <div class="container-fluid accordion"
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
-            {% include 'OroActivityListBundle:ActivityList:js/list.html.twig' with {'id': 'template-activity-list'} %}
-            {% include 'OroActivityListBundle:ActivityList:js/view.html.twig' with {'id': 'template-activity-item'} %}
+            {% include '@OroActivityList/ActivityList/js/list.html.twig' with {'id': 'template-activity-list'} %}
+            {% include '@OroActivityList/ActivityList/js/view.html.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}
-            {% include 'OroCommentBundle:Comment/js:list.html.twig' with {'id': 'template-activity-item-comment'} %}
+            {% include '@OroComment/Comment/js/list.html.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
 
         {% placeholder oro_activity_list_after with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}

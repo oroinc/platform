@@ -3,8 +3,11 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -20,7 +23,8 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements Conta
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
         $user = $userManager->createUser();
         $user->setUsername('duplicated_email1')
@@ -30,8 +34,8 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements Conta
             ->setLastName('Towards')
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addUserRole($role)
             ->setEnabled(true);
-
         $userManager->updateUser($user);
 
         $user2 = $userManager->createUser();
@@ -42,8 +46,8 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements Conta
             ->setLastName('Backwards')
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addUserRole($role)
             ->setEnabled(true);
-
         $userManager->updateUser($user2);
 
         /** @var EntityManager $manager */

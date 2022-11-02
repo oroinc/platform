@@ -2,22 +2,21 @@
 define(function(require) {
     'use strict';
 
-    var GoogleMapsView;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var messenger = require('oroui/js/messenger');
-    var $ = Backbone.$;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const messenger = require('oroui/js/messenger');
+    const $ = Backbone.$;
 
     /**
      * @export  oroaddress/js/mapservice/googlemaps
      * @class   oroaddress.mapservice.Googlemaps
      * @extends BaseView
      */
-    GoogleMapsView = BaseView.extend({
+    const GoogleMapsView = BaseView.extend({
         options: {
             mapOptions: {
                 zoom: 17,
@@ -26,7 +25,6 @@ define(function(require) {
                 zoomControl: true
             },
             apiVersion: '3.exp',
-            sensor: false,
             apiKey: null,
             showWeather: true
         },
@@ -44,14 +42,14 @@ define(function(require) {
         loadingMask: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function GoogleMapsView() {
-            GoogleMapsView.__super__.constructor.apply(this, arguments);
+        constructor: function GoogleMapsView(options) {
+            GoogleMapsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {},
@@ -59,10 +57,13 @@ define(function(require) {
                 this.options
             );
 
-            this.$mapContainer = $('<div class="map-visual"/>')
+            this.$viewContainer = $('<div class="map-visual-container"/>')
                 .appendTo(this.$el);
 
-            this.loadingMask = new LoadingMaskView({container: this.$el});
+            this.$mapContainer = $('<div class="map-visual"/>')
+                .appendTo(this.$viewContainer);
+
+            this.loadingMask = new LoadingMaskView({container: this.$viewContainer});
 
             if (options.address) {
                 this.updateMap(options.address.address, options.address.label);
@@ -88,8 +89,8 @@ define(function(require) {
         },
 
         _initMap: function(location) {
-            var weatherLayer;
-            var cloudLayer;
+            let weatherLayer;
+            let cloudLayer;
             this.removeErrorMessage();
             this._initMapOptions();
             this.map = new google.maps.Map(
@@ -104,8 +105,8 @@ define(function(require) {
             });
 
             if (this.options.showWeather) {
-                var temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
-                var windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
+                const temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
+                const windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
                 weatherLayer = new google.maps.weather.WeatherLayer({
                     temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
                     windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
@@ -126,35 +127,37 @@ define(function(require) {
         },
 
         loadGoogleMaps: function() {
-            var googleMapsSettings = 'sensor=' + (this.options.sensor ? 'true' : 'false');
-
-            if (this.options.showWeather) {
-                googleMapsSettings += '&libraries=weather';
-            }
+            const data = {};
 
             if (this.options.apiKey) {
-                googleMapsSettings += '&key=' + this.options.apiKey;
+                data.key = this.options.apiKey;
+            } else {
+                this.mapsLoadExecuted = false;
+                this.addErrorMessage();
+                this.loadingMask.hide();
+                return;
+            }
+
+            if (this.options.showWeather) {
+                data.libraries = 'weather';
             }
 
             $.ajax({
-                url: window.location.protocol + '//www.google.com/jsapi',
+                url: `${location.protocol}//maps.googleapis.com/maps/api/js`,
+                data,
                 dataType: 'script',
                 cache: true,
-                success: _.bind(function() {
-                    google.load('maps', this.options.apiVersion, {
-                        other_params: googleMapsSettings,
-                        callback: _.bind(this.onGoogleMapsInit, this)
-                    });
-
+                success: () => {
+                    this.onGoogleMapsInit();
                     this.mapsLoadExecuted = false;
-                }, this),
+                },
                 errorHandlerMessage: false,
                 error: this.mapLocationUnknown.bind(this)
             });
         },
 
         updateMap: function(address, label) {
-            var timeoutId;
+            let timeoutId;
 
             this.loadingMask.show();
             this.removeErrorMessage();
@@ -180,7 +183,7 @@ define(function(require) {
                 if (this.isEmptyFunction(this.getGeocoder().geocode)) {
                     return this.checkRenderMap();
                 }
-                this.getGeocoder().geocode({address: address}, _.bind(function(results, status) {
+                this.getGeocoder().geocode({address: address}, (results, status) => {
                     clearTimeout(timeoutId);
                     if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
@@ -189,9 +192,9 @@ define(function(require) {
                     } else {
                         this.mapLocationUnknown();
                     }
-                }, this));
+                });
 
-                timeoutId = _.delay(_.bind(this.checkRenderMap, this), this.mapRespondingTimeout);
+                timeoutId = _.delay(this.checkRenderMap.bind(this), this.mapRespondingTimeout);
             }
         },
 
@@ -257,7 +260,7 @@ define(function(require) {
                 type || 'warning',
                 message || __('map.unknown.unavailable'),
                 {
-                    container: this.$el,
+                    container: this.$viewContainer,
                     hideCloseButton: true,
                     insertMethod: 'prependTo'
                 }
@@ -269,7 +272,7 @@ define(function(require) {
                 return;
             }
             messenger.clear(this.errorMessage.namespace, {
-                container: this.$el
+                container: this.$viewContainer
             });
 
             delete this.errorMessage;

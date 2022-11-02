@@ -1,70 +1,47 @@
 <?php
+
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldBeConstructed()
+    public function testShouldBuildForm()
     {
-        new EmbeddedFormType();
-    }
-
-    /**
-     * @test
-     */
-    public function shouldBuildForm()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject | FormBuilderInterface $builder */
-        $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
-        $builder->expects($this->at(0))
+        $builder = $this->createMock(FormBuilder::class);
+        $builder->expects($this->exactly(5))
             ->method('add')
-            ->with('title', TextType::class)
-            ->will($this->returnSelf());
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('formType', AvailableEmbeddedFormType::class)
-            ->will($this->returnSelf());
-        $builder->expects($this->at(2))
-            ->method('add')
-            ->with('css', TextareaType::class)
-            ->will($this->returnSelf());
-        $builder->expects($this->at(3))
-            ->method('add')
-            ->with('successMessage', TextareaType::class)
-            ->will($this->returnSelf());
+            ->withConsecutive(
+                ['title', TextType::class],
+                ['formType', AvailableEmbeddedFormType::class],
+                ['css', TextareaType::class],
+                ['successMessage', TextareaType::class],
+                ['allowedDomains', TextareaType::class]
+            )
+            ->willReturnSelf();
 
         $formType = new EmbeddedFormType();
         $formType->buildForm($builder, []);
     }
 
-    /**
-     * @test
-     */
-    public function shouldConfigureOptions()
+    public function testShouldConfigureOptions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject | OptionsResolver $resolver */
-        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm']);
+            ->with(['data_class' => EmbeddedForm::class]);
 
         $formType = new EmbeddedFormType();
         $formType->configureOptions($resolver);
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnFormName()
+    public function testShouldReturnFormName()
     {
         $formType = new EmbeddedFormType();
 

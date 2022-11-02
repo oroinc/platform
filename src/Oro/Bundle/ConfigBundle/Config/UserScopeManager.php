@@ -10,72 +10,53 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class UserScopeManager extends AbstractScopeManager
 {
-    /** @var TokenStorageInterface */
-    protected $securityContext;
-
-    /** @var int */
-    protected $scopeId;
+    protected TokenStorageInterface $securityContext;
+    protected ?int $scopeId = null;
 
     /**
      * Sets the security context
-     *
-     * @param TokenStorageInterface $securityContext
      */
-    public function setSecurityContext(TokenStorageInterface $securityContext)
+    public function setSecurityContext(TokenStorageInterface $securityContext): void
     {
         $this->securityContext = $securityContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopedEntityName()
+    public function getScopedEntityName(): string
     {
         return 'user';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopeId()
+    public function getScopeId(): ?int
     {
         $this->ensureScopeIdInitialized();
 
         return $this->scopeId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setScopeId($scopeId)
+    public function setScopeId(int $scopeId): void
     {
         $this->dispatchScopeIdChangeEvent();
 
         $this->scopeId = $scopeId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function isSupportedScopeEntity($entity)
+    protected function isSupportedScopeEntity($entity): bool
     {
         return $entity instanceof User;
     }
 
-    /**
-     * @param User $entity
-     *
-     * {@inheritdoc}
-     */
-    protected function getScopeEntityIdValue($entity)
+    protected function getScopeEntityIdValue($entity): mixed
     {
-        return $entity->getId();
+        if ($entity instanceof User) {
+            return $entity->getId();
+        }
+        throw new \LogicException(sprintf('"%s" is not supported.', \get_class($entity)));
     }
 
     /**
      * Makes sure that the scope id is set
      */
-    protected function ensureScopeIdInitialized()
+    protected function ensureScopeIdInitialized(): void
     {
         if (!$this->scopeId) {
             $scopeId = 0;

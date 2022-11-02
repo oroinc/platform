@@ -22,7 +22,7 @@ class ValidateEntityIdExists implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
-        if (empty($entityId) && $context->hasIdentifierFields()) {
+        if ((null === $entityId || '' === $entityId) && $context->hasIdentifierFields()) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_ID,

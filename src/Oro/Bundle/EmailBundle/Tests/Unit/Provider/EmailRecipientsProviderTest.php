@@ -3,36 +3,36 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    protected $emailRecipientsHelper;
+    /** @var EmailRecipientsProvider */
+    private $emailRecipientsProvider;
 
-    protected $emailRecipientsProvider;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 return $id;
-            }));
+            });
 
-        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailRecipientsHelper->expects($this->any())
+        $emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
+        $emailRecipientsHelper->expects($this->any())
             ->method('createRecipientData')
-            ->will($this->returnCallback(function (Recipient $recipient) {
+            ->willReturnCallback(function (Recipient $recipient) {
                 return [
                     'id'   => $recipient->getName(),
                     'text' => $recipient->getName(),
                 ];
-            }));
+            });
 
-        $this->emailRecipientsProvider = new EmailRecipientsProvider($translator, $this->emailRecipientsHelper);
+        $this->emailRecipientsProvider = new EmailRecipientsProvider($translator, $emailRecipientsHelper);
     }
 
     public function testGetEmailRecipientsShouldReturnEmptyArrayIfThereAreNoProviders()
@@ -43,7 +43,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testGetEmailRecipients(array $providers, array $expectedRecipients, $limit = 100)
+    public function testGetEmailRecipients(array $providers, array $expectedRecipients, int $limit = 100)
     {
         $this->emailRecipientsProvider->setProviders($providers);
 
@@ -51,7 +51,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRecipients, $actualRecipients);
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [
@@ -142,22 +142,18 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string    $section
-     * @param array     $provided
-     * @param int       $recipientExactly
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createProvider($section, array $provided, $recipientExactly = 1)
-    {
-        $provider = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface');
+    private function createProvider(
+        string $section,
+        array $provided,
+        int $recipientExactly = 1
+    ): EmailRecipientsProviderInterface {
+        $provider = $this->createMock(EmailRecipientsProviderInterface::class);
         $provider->expects($this->any())
             ->method('getSection')
-            ->will($this->returnValue($section));
+            ->willReturn($section);
         $provider->expects($this->exactly($recipientExactly))
             ->method('getRecipients')
-            ->will($this->returnValue($provided));
+            ->willReturn($provided);
 
         return $provider;
     }

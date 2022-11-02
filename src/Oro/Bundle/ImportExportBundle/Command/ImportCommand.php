@@ -1,74 +1,114 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command;
 
-use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class ImportCommand extends ContainerAwareCommand
+/**
+ * Imports data from a CSV file.
+ */
+class ImportCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:import:file';
+
+    private ProcessorRegistry $processorRegistry;
+    private ConnectorRegistry $connectorRegistry;
+    private MessageProducerInterface $messageProducer;
+    private FileManager $fileManager;
+    private UserManager $userManger;
+
+    public function __construct(
+        ProcessorRegistry $processorRegistry,
+        ConnectorRegistry $connectorRegistry,
+        MessageProducerInterface $messageProducer,
+        FileManager $fileManager,
+        UserManager $userManger
+    ) {
+        $this->processorRegistry = $processorRegistry;
+        $this->connectorRegistry = $connectorRegistry;
+        $this->messageProducer = $messageProducer;
+        $this->fileManager = $fileManager;
+        $this->userManger = $userManger;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:import:file')
-            ->setDescription(
-                'Import data from specified file for specified entity. The import log is sent to the provided email.'
+            ->addArgument('file', InputArgument::REQUIRED, 'CSV file name')
+            ->addOption('jobName', null, InputOption::VALUE_REQUIRED, 'Import job name')
+            ->addOption('processor', null, InputOption::VALUE_REQUIRED, 'Import processor name')
+            ->addOption('validation', null, InputOption::VALUE_NONE, 'Only validate data instead of import')
+            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Email to send the import log to')
+            ->setDescription('Imports data from a CSV file.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command imports data from a CSV file.
+This command only schedules the job by adding a message to the message queue, so ensure
+that the message consumer processes (<info>oro:message-queue:consume</info>) are running
+for data to be imported.
+
+  <info>php %command.full_name% --email=<email> <file></info>
+
+The <info>--email</info> option should be the email address of the owner of the new records
+(unless a different owner is specified in the data file). This user will also
+receive the import log after the import is finished:
+
+The <info>--jobName</info> and <info>--processor</info> options should be used in non-interactive mode
+to provide names of the job and import processor that can handle data import:
+
+  <info>php %command.full_name% --email=<email> --jobName=<job> --processor=<processor> <file></info>
+
+In interactive mode the job and import processor can be selected from a list.
+
+The <info>--validation</info> option can be used to validate the data instead of importing it:
+
+  <info>php %command.full_name% --validate --email=<email> --jobName=<job> --processor=<processor> <file></info>
+
+HELP
             )
-            ->addArgument(
-                'file',
-                InputArgument::REQUIRED,
-                'File name, to import CSV data from'
-            )
-            ->addOption(
-                'jobName',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Name of Import Job.'
-            )
-            ->addOption(
-                'validation',
-                null,
-                InputOption::VALUE_NONE,
-                'If adding this option then validation will be performed instead of import'
-            )
-            ->addOption(
-                'processor',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Name of the import processor.'
-            )
-            ->addOption(
-                'email',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Email to send the log after the import is completed'
-            );
+            ->addUsage('--email=<email> --jobName=<job> --processor=<processor> <file>')
+            ->addUsage('--validation --email=<email> --jobName=<job> --processor=<processor> <file>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (! is_file($sourceFile = $input->getArgument('file'))) {
             throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
         }
 
+        $email = $input->getOption('email');
+
+        if ($email === null) {
+            throw new \InvalidArgumentException('The --email option is required.');
+        }
+
+        $importOwner = $this->userManger->findUserByEmail((string) $email);
+        if (!$importOwner instanceof User) {
+            throw new \InvalidArgumentException(sprintf('Invalid email. There is no user with %s email!', $email));
+        }
+
         $originFileName = basename($sourceFile);
         $fileName = FileManager::generateUniqueFileName(pathinfo($sourceFile, PATHINFO_EXTENSION));
-        $this->getFileManager()->writeFileToStorage($sourceFile, $fileName);
+        $this->fileManager->writeFileToStorage($sourceFile, $fileName);
 
         $processor = $input->getOption('validation') ?
             ProcessorRegistry::TYPE_IMPORT_VALIDATION :
@@ -81,51 +121,45 @@ class ImportCommand extends ContainerAwareCommand
         );
 
         $jobName = $this->handleJobName($input, $output, $processor);
-        $email = $input->getOption('email');
 
-        if ($input->getOption('validation') && ! $email) {
-            throw new \InvalidArgumentException('Email is required for the validation!');
-        }
+        $this->messageProducer->send(
+            PreImportTopic::getName(),
+            [
+                'fileName' => $fileName,
+                'originFileName' => $originFileName,
+                'userId' => $importOwner->getId(),
+                'jobName' =>  $jobName,
+                'processorAlias' => $processorAlias,
+                'process' => $processor,
+            ]
+        );
 
-        $this->getMessageProducer()->send(Topics::PRE_CLI_IMPORT, [
-            'fileName' => $fileName,
-            'originFileName' => $originFileName,
-            'notifyEmail' => $email,
-            'jobName' =>  $jobName,
-            'processorAlias' => $processorAlias,
-            'process' => $processor,
-        ]);
-        
         if ($email) {
             $output->writeln('Scheduled successfully. The result will be sent to the email');
         } else {
             $output->writeln('Scheduled successfully.');
         }
+
+        return 0;
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param string          $type
-     * @return string
      * @throws \InvalidArgumentException
      */
     private function handleProcessorName(
         InputInterface $input,
         OutputInterface $output,
-        $type = ProcessorRegistry::TYPE_IMPORT
-    ) {
-        $option = 'processor';
+        string $type = ProcessorRegistry::TYPE_IMPORT
+    ): string {
+        $label = ucwords(str_replace('-', ' ', 'processor'));
 
-        $label = ucwords(str_replace('-', ' ', $option));
-
-        if ($input->getOption($option) &&
-            $this->getProcessorRegistry()->hasProcessor($type, $input->getOption($option))
+        if ($input->getOption('processor') &&
+            $this->processorRegistry->hasProcessor($type, $input->getOption('processor'))
         ) {
-            return $input->getOption($option);
+            return $input->getOption('processor');
         }
 
-        $processors = $this->getProcessorRegistry()->getProcessorsByType($type);
+        $processors = $this->processorRegistry->getProcessorsByType($type);
 
         if (!$processors) {
             throw new \InvalidArgumentException('No configured processors');
@@ -134,68 +168,27 @@ class ImportCommand extends ContainerAwareCommand
         $processorNames = array_keys($processors);
         if (!$input->getOption('no-interaction')) {
             $question = new ChoiceQuestion(sprintf('<question>Choose %s: </question>', $label), $processorNames);
-            $selectedProcessorName = $this->getHelper('question')->ask($input, $output, $question);
-
-            return $selectedProcessorName;
+            return $this->getHelper('question')->ask($input, $output, $question);
         }
 
         throw new \InvalidArgumentException(sprintf('Missing %s', $label));
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param string $type
-     * @return string
-     */
     private function handleJobName(
         InputInterface $input,
         OutputInterface $output,
-        $type = ProcessorRegistry::TYPE_IMPORT
-    ) {
+        string $type = ProcessorRegistry::TYPE_IMPORT
+    ): string {
         $jobName = $input->getOption('jobName');
-        $jobNames = array_keys($this->getConnectorRegistry()->getJobs($type)['oro_importexport']);
+        $jobNames = array_keys($this->connectorRegistry->getJobs($type)['oro_importexport']);
         if ($jobName && in_array($jobName, $jobNames)) {
             return $jobName;
         }
         if (!$input->getOption('no-interaction')) {
             $question = new ChoiceQuestion('<question>Choose Job: </question>', $jobNames);
-            $selectedJobName = $this->getHelper('question')->ask($input, $output, $question);
-
-            return $selectedJobName;
+            return $this->getHelper('question')->ask($input, $output, $question);
         }
 
         throw new \InvalidArgumentException('Missing "jobName" option.');
-    }
-
-    /**
-     * @return ProcessorRegistry
-     */
-    private function getProcessorRegistry()
-    {
-        return $this->getContainer()->get('oro_importexport.processor.registry');
-    }
-    /**
-     * @return ConnectorRegistry
-     */
-    private function getConnectorRegistry()
-    {
-        return $this->getContainer()->get('akeneo_batch.connectors');
-    }
-
-    /**
-     * @return MessageProducerInterface
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
-     * @return FileManager
-     */
-    protected function getFileManager()
-    {
-        return $this->getContainer()->get('oro_importexport.file.file_manager');
     }
 }

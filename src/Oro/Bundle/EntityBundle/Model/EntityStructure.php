@@ -2,52 +2,47 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
+/**
+ * Represents detailed information about an entity type.
+ */
 class EntityStructure
 {
-    /**
-     * This field required for JSON API
-     *
-     * @var string
-     */
-    protected $id;
+    /** @var string */
+    private $id;
 
     /** @var string */
-    protected $label;
+    private $label;
 
     /** @var string */
-    protected $pluralLabel;
+    private $pluralLabel;
 
     /** @var string */
-    protected $alias;
+    private $alias;
 
     /** @var string */
-    protected $pluralAlias;
+    private $pluralAlias;
 
     /** @var string */
-    protected $className;
+    private $className;
 
     /** @var string */
-    protected $icon;
+    private $icon;
 
-    /** @var array|EntityFieldStructure[] */
-    protected $fields = [];
+    /** @var EntityFieldStructure[] */
+    private $fields = [];
 
     /** @var array */
-    protected $options = [];
+    private $options = [];
 
     /** @var array */
-    protected $routes = [];
+    private $routes = [];
 
     /**
-     * @param $id
-     *
-     * @return $this
+     * @param string $id
      */
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -68,14 +63,10 @@ class EntityStructure
 
     /**
      * @param string $alias
-     *
-     * @return $this
      */
     public function setAlias($alias)
     {
         $this->alias = $alias;
-
-        return $this;
     }
 
     /**
@@ -88,14 +79,10 @@ class EntityStructure
 
     /**
      * @param string $pluralAlias
-     *
-     * @return $this
      */
     public function setPluralAlias($pluralAlias)
     {
         $this->pluralAlias = $pluralAlias;
-
-        return $this;
     }
 
     /**
@@ -108,18 +95,14 @@ class EntityStructure
 
     /**
      * @param string $className
-     *
-     * @return $this
      */
     public function setClassName($className)
     {
         $this->className = $className;
-
-        return $this;
     }
 
     /**
-     * @return array|EntityFieldStructure[]
+     * @return EntityFieldStructure[]
      */
     public function getFields()
     {
@@ -127,31 +110,19 @@ class EntityStructure
     }
 
     /**
-     * @param array|EntityFieldStructure[] $fields
-     *
-     * @return $this
+     * @param EntityFieldStructure[] $fields
      */
     public function setFields(array $fields)
     {
         $this->fields = [];
-
         foreach ($fields as $field) {
             $this->addField($field);
         }
-
-        return $this;
     }
 
-    /**
-     * @param EntityFieldStructure $field
-     *
-     * @return $this
-     */
     public function addField(EntityFieldStructure $field)
     {
         $this->fields[] = $field;
-
-        return $this;
     }
 
     /**
@@ -164,7 +135,7 @@ class EntityStructure
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function addOption($name, $value)
     {
@@ -205,14 +176,10 @@ class EntityStructure
 
     /**
      * @param string $label
-     *
-     * @return $this
      */
     public function setLabel($label)
     {
         $this->label = $label;
-
-        return $this;
     }
 
     /**
@@ -225,14 +192,10 @@ class EntityStructure
 
     /**
      * @param string $pluralLabel
-     *
-     * @return $this
      */
     public function setPluralLabel($pluralLabel)
     {
         $this->pluralLabel = $pluralLabel;
-
-        return $this;
     }
 
     /**
@@ -245,14 +208,10 @@ class EntityStructure
 
     /**
      * @param string $icon
-     *
-     * @return $this
      */
     public function setIcon($icon)
     {
         $this->icon = $icon;
-
-        return $this;
     }
 
     /**
@@ -265,13 +224,41 @@ class EntityStructure
 
     /**
      * @param array $routes
-     *
-     * @return $this
      */
     public function setRoutes($routes)
     {
         $this->routes = $routes;
+    }
 
-        return $this;
+    public function __serialize(): array
+    {
+        return [
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->id,
+            $this->className,
+            $this->label,
+            $this->pluralLabel,
+            $this->alias,
+            $this->pluralAlias,
+            $this->icon,
+            $this->routes,
+            $this->options,
+            $this->fields
+        ] = $serialized;
     }
 }

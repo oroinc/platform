@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -21,39 +21,28 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeProvider;
 
+    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $originalUrlProvider;
+
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $applicationProvider;
+
+    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
+    protected $optionsResolver;
+
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $destinationPageResolver;
-
-    /** @var  CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $applicationProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
-    protected $optionsResolver;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-        $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->extension = $this->createExtension();
         $this->extension->setApplicationProvider($this->applicationProvider);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->workflowRegistry, $this->routeProvider, $this->extension, $this->applicationProvider);
     }
 
     /**
@@ -66,12 +55,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
      */
     abstract protected function createExtension();
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ButtonContext
-     */
-    protected function getButtonContext($entityClass)
+    protected function getButtonContext(string $entityClass): ButtonContext
     {
         $context = new ButtonContext();
         $context->setEntity($entityClass)
@@ -81,13 +65,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         return $context;
     }
 
-    /**
-     * @param array $transitions
-     * @param string $method
-     *
-     * @return TransitionManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getTransitionManager(array $transitions, $method)
+    protected function getTransitionManager(array $transitions, string $method): TransitionManager
     {
         $manager = $this->createMock(TransitionManager::class);
         $manager->expects($this->any())
@@ -97,12 +75,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         return $manager;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Transition
-     */
-    protected function getTransition($name)
+    protected function getTransition(string $name): Transition
     {
         $transition = new Transition($this->optionsResolver);
 

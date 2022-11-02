@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 /**
  * Provides detailed information about entities and fields.
@@ -10,27 +10,22 @@ use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 class EntityWithFieldsProvider
 {
     /** @var EntityFieldProvider */
-    protected $fieldProvider;
+    private $fieldProvider;
 
     /** @var EntityProvider */
-    protected $entityProvider;
+    private $entityProvider;
 
-    /** @var EntityConfigHelper */
-    protected $configHelper;
+    /** @var ConfigManager */
+    private $configManager;
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     * @param EntityProvider      $entityProvider
-     * @param EntityConfigHelper  $configHelper
-     */
     public function __construct(
         EntityFieldProvider $fieldProvider,
         EntityProvider $entityProvider,
-        EntityConfigHelper $configHelper
+        ConfigManager $configManager
     ) {
         $this->fieldProvider = $fieldProvider;
         $this->entityProvider = $entityProvider;
-        $this->configHelper = $configHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -129,19 +124,29 @@ class EntityWithFieldsProvider
         $withRoutes = false
     ) {
         $currentClassName = $entity['name'];
-        $entity['fields'] = $this->fieldProvider->getFields(
-            $currentClassName,
-            $withRelations,
-            $withVirtualFields,
-            false,
-            $withUnidirectional,
-            $applyExclusions,
-            $translate
-        );
+        $options = $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $options |= $applyExclusions ? EntityFieldProvider::OPTION_APPLY_EXCLUSIONS : 0;
+        $options |= $translate ? EntityFieldProvider::OPTION_TRANSLATE : 0;
+
+        $entity['fields'] = $this->fieldProvider->getEntityFields($currentClassName, $options);
         if ($withRoutes) {
-            $entity['routes'] = $this->configHelper->getAvailableRoutes($currentClassName);
+            $entity['routes'] = $this->getAvailableRoutes($currentClassName);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array
+     */
+    private function getAvailableRoutes($className)
+    {
+        $metadata = $this->configManager->getEntityMetadata($className);
+
+        return null !== $metadata ? $metadata->getRoutes() : [];
     }
 }

@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -22,70 +22,48 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowRegistry;
+    private $workflowRegistry;
 
     /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routeProvider;
+    private $routeProvider;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $destinationPageResolver;
+    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $originalUrlProvider;
 
     /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $applicationProvider;
+    private $applicationProvider;
 
     /** @var DatagridStartTransitionButtonProviderExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
         $this->extension = new DatagridStartTransitionButtonProviderExtension(
-            $this->doctrineHelper,
             $this->workflowRegistry,
             $this->routeProvider,
-            $this->destinationPageResolver
+            $this->originalUrlProvider,
+            $this->doctrineHelper
         );
         $this->extension->setApplicationProvider($this->applicationProvider);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->workflowRegistry,
-            $this->routeProvider,
-            $this->extension,
-            $this->doctrineHelper,
-            $this->destinationPageResolver
-        );
-    }
-
-    /**
      * @dataProvider findDataProvider
-     *
-     * @param bool $expected
-     * @param WorkflowDefinition $workflowDefinition
-     * @param ButtonSearchContext $searchContext
-     * @param string $application
      */
     public function testFind(
-        $expected,
+        bool $expected,
         WorkflowDefinition $workflowDefinition,
         ButtonSearchContext $searchContext,
-        $application = CurrentApplicationProviderInterface::DEFAULT_APPLICATION
+        string $application = CurrentApplicationProviderInterface::DEFAULT_APPLICATION
     ) {
         $transition = $this->createStartTransition();
 
@@ -95,17 +73,25 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
             ->willReturn(new ArrayCollection([$transition]));
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($workflowDefinition);
-        $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($workflowDefinition);
+        $workflow->expects($this->any())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
 
         $this->workflowRegistry->expects($this->any())
             ->method('getActiveWorkflows')
             ->willReturn(new ArrayCollection([$workflow]));
 
-        $this->applicationProvider->expects($this->any())->method('getCurrentApplication')->willReturn($application);
+        $this->applicationProvider->expects($this->any())
+            ->method('getCurrentApplication')
+            ->willReturn($application);
 
         if ($expected) {
-            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+            $this->originalUrlProvider->expects($this->once())
+                ->method('getOriginalUrl')
+                ->willReturn('example.com');
 
             $buttonContext = (new ButtonContext())
                 ->setEntity($searchContext->getEntityClass())
@@ -113,7 +99,8 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
                 ->setDatagridName($searchContext->getDatagrid());
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
+            $this->originalUrlProvider->expects($this->never())
+                ->method('getOriginalUrl');
 
             $buttons = [];
         }
@@ -124,10 +111,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    /**
-     * @return \Generator
-     */
-    public function findDataProvider()
+    public function findDataProvider(): \Generator
     {
         $wd1 = $this->createWorkflowDefinition('entity1');
         $wd2 = $this->createWorkflowDefinition('entity1', ['datagrid1']);
@@ -166,26 +150,26 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
 
     /**
      * @dataProvider isAvailableDataProvider
-     *
-     * @param Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow
-     * @param ButtonSearchContext $searchContext
-     * @param bool $expected
      */
-    public function testIsAvailable(Workflow $workflow, ButtonSearchContext $searchContext, $expected)
+    public function testIsAvailable(Workflow $workflow, ButtonSearchContext $searchContext, bool $expected)
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflow->expects($this->once())->method('createWorkflowItem')->willReturn($workflowItem);
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
+        $workflow->expects($this->once())
+            ->method('createWorkflowItem')
+            ->willReturn($workflowItem);
         $button = $this->createMock(StartTransitionButton::class);
-        $button->expects($this->any())->method('getWorkflow')->willReturn($workflow);
-        $button->expects($this->any())->method('getTransition')->willReturn($this->createStartTransition());
+        $button->expects($this->any())
+            ->method('getWorkflow')
+            ->willReturn($workflow);
+        $button->expects($this->any())
+            ->method('getTransition')
+            ->willReturn($this->createStartTransition());
 
         $this->assertSame($expected, $this->extension->isAvailable($button, $searchContext));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function isAvailableDataProvider()
+    public function isAvailableDataProvider(): \Generator
     {
         yield 'is not available' => [
             'workflow' => $this->createWorkflow(false, false),
@@ -212,53 +196,41 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
         ];
     }
 
-    /**
-     * @param bool $isStartAvailable
-     * @param bool $isStarted
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    public function createWorkflow($isStartAvailable, $isStarted)
+    public function createWorkflow(bool $isStartAvailable, bool $isStarted): Workflow
     {
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('isStartTransitionAvailable')->willReturn($isStartAvailable);
-        $workflow->expects($this->any())->method('getWorkflowItemByEntityId')
+        $workflow->expects($this->any())
+            ->method('isStartTransitionAvailable')
+            ->willReturn($isStartAvailable);
+        $workflow->expects($this->any())
+            ->method('getWorkflowItemByEntityId')
             ->willReturn($isStarted ? new WorkflowItem() : null);
 
         return $workflow;
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed $entityId
-     * @param string $datagrid
-     *
-     * @return ButtonSearchContext
-     */
-    private function createSearchContext($entityClass, $entityId, $datagrid)
+    private function createSearchContext(string $entityClass, mixed $entityId, string $datagrid): ButtonSearchContext
     {
         return (new ButtonSearchContext())->setEntity($entityClass, $entityId)->setDatagrid($datagrid);
     }
 
-    /**
-     * @param $relatedEntity
-     * @param array $datagrids
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|WorkflowDefinition
-     */
-    private function createWorkflowDefinition($relatedEntity, array  $datagrids = [])
+    private function createWorkflowDefinition(string $relatedEntity, array  $datagrids = []): WorkflowDefinition
     {
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
-        $workflowDefinition->expects($this->any())->method('getDatagrids')->willReturn($datagrids);
-        $workflowDefinition->expects($this->any())->method('getRelatedEntity')->willReturn($relatedEntity);
-        $workflowDefinition->expects($this->any())->method('getExclusiveRecordGroups')->willReturn([]);
+        $workflowDefinition->expects($this->any())
+            ->method('getDatagrids')
+            ->willReturn($datagrids);
+        $workflowDefinition->expects($this->any())
+            ->method('getRelatedEntity')
+            ->willReturn($relatedEntity);
+        $workflowDefinition->expects($this->any())
+            ->method('getExclusiveRecordGroups')
+            ->willReturn([]);
 
         return $workflowDefinition;
     }
 
-    /**
-     * @return Transition
-     */
-    private function createStartTransition()
+    private function createStartTransition(): Transition
     {
         $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
 

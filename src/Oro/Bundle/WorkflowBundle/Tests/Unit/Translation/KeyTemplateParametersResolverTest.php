@@ -4,36 +4,26 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var KeyTemplateParametersResolver */
-    protected $resolver;
+    private $resolver;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->resolver = new KeyTemplateParametersResolver($this->translator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->translator, $this->workflowManager, $this->transitionManager, $this->workflow, $this->resolver);
-    }
-
     public function testResolveTemplateParametersWithoutParameters()
     {
-        $this->translator->expects($this->never())->method('trans');
+        $this->translator->expects($this->never())
+            ->method('trans');
 
         $this->assertEquals([], $this->resolver->resolveTemplateParameters([]));
     }
@@ -44,7 +34,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->exactly(5))
             ->method('trans')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['oro.workflow.workflow1.label', [], $domain, null, 'Workflow Label1'],
                 ['oro.workflow.workflow1.transition.transition1.label', [], $domain, null, 'Transition Label1'],
                 [
@@ -56,7 +46,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
                 ],
                 ['oro.workflow.workflow1.step.step1.label', [], $domain, null, 'Step Label1'],
                 ['oro.workflow.workflow1.attribute.attribute1.label', [], $domain, null, 'Workflow Attribute Label1'],
-            ]));
+            ]);
 
         $this->assertEquals(
             [

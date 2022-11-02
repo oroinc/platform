@@ -1,5 +1,32 @@
-{% if title is defined %}
-    <div class="pull-left">
-        <h1 class="oro-subtitle">{{ title }}</h1>
+<div class="row">
+    {% if title is defined %}
+        <div class="pull-left-extra">
+            <h1 class="page-title__entity-title">{{ title }}</h1>
+        </div>
+    {% endif %}
+    {% if titleButtonsBlock is defined and titleButtonsBlock|trim is not empty %}
+        <div class="pull-right title-buttons-container">
+            {{ titleButtonsBlock }}
+        </div>
+    {% endif %}
+</div>
+<div class="row inline-info">
+    {% if pageStatsBlock is defined and pageStatsBlock|trim is not empty %}
+    <div class="pull-left-extra">
+        <div class="clearfix">
+            <ul class="inline">
+                {{ pageStatsBlock }}
+            </ul>
+        </div>
     </div>
-{% endif %}
+    {% endif %}
+    {% if pageActionsBlock is defined and pageActionsBlock|trim is not empty %}
+    <div class="pull-right page-title__entity-info-state">
+        <div class="inline-decorate-container">
+            <ul class="inline-decorate">
+                {{ pageActionsBlock }}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>

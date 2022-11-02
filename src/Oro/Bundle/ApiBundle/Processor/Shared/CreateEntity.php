@@ -28,11 +28,6 @@ class CreateEntity implements ProcessorInterface
     /** @var EntityInstantiator */
     protected $entityInstantiator;
 
-    /**
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityLoader       $entityLoader
-     * @param EntityInstantiator $entityInstantiator
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,

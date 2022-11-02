@@ -5,7 +5,9 @@
         display: none;
     }
 
+    /* stylelint-disable selector-max-compound-selectors */
     .table.grid tbody tr:first-child td {
         border-top: 0 none;
     }
+    /* stylelint-enable selector-max-compound-selectors */
 }

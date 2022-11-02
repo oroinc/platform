@@ -18,9 +18,6 @@ class UniqueKeyCollectionType extends AbstractType
      */
     protected $entityProvider;
 
-    /**
-     * @param ConfigProvider $entityProvider
-     */
     public function __construct(ConfigProvider $entityProvider)
     {
         $this->entityProvider = $entityProvider;

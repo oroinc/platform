@@ -5,91 +5,63 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Enables DynamicFieldsExtension for the "custom-entity-grid" to add custom fields to this grid.
+ * Provides a method to build URLs to be used to view, update and delete a custom entities.
+ */
 class CustomEntityGridListener
 {
-    /** @var Router */
-    protected $router;
-
+    private UrlGeneratorInterface $urlGenerator;
+    private EntityClassNameHelper $entityClassNameHelper;
     /** @var DatagridInterface[] */
-    protected $visitedDatagrids = array();
+    private array $visitedDatagrids = [];
 
-    /**
-     * @param Router $router
-     */
-    public function __construct(Router $router)
+    public function __construct(UrlGeneratorInterface $urlGenerator, EntityClassNameHelper $entityClassNameHelper)
     {
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
-    public function onBuildBefore(BuildBefore $event)
+    public function onBuildBefore(BuildBefore $event): void
     {
         $datagrid = $event->getDatagrid();
-        $config   = $event->getConfig();
+        $config = $event->getConfig();
 
-        // remember the current datagrid to further usage in getLinkProperty method
-        $this->addVisitedDatagrid($datagrid);
+        // remember the current datagrid to further usage in getLinkProperty() method
+        $this->visitedDatagrids[$datagrid->getName()] = $datagrid;
 
         // enable DynamicFieldsExtension to add custom fields
         $config->setExtendedEntityClassName($datagrid->getParameters()->get('class_name'));
     }
 
-    /**
-     * @param string $gridName
-     * @param string $keyName
-     * @param array  $node
-     *
-     * @return callable
-     */
-    public function getLinkProperty($gridName, $keyName, $node)
+    public function getLinkProperty(string $gridName, string $keyName, array $node): callable
     {
         if (!isset($node['route'])) {
-            return false;
+            throw new \InvalidArgumentException(sprintf(
+                'Cannot build callable fo grid "%s" because the "route" option is mandatory.',
+                $gridName
+            ));
         }
 
-        $router = $this->router;
-        $route  = $node['route'];
+        $route = $node['route'];
 
-        return function (ResultRecord $record) use ($gridName, $router, $route) {
-            $datagrid  = $this->getVisitedDatagrid($gridName);
-            $className = $datagrid->getParameters()->get('class_name');
-            return $router->generate(
+        return function (ResultRecord $record) use ($gridName, $route) {
+            if (!isset($this->visitedDatagrids[$gridName])) {
+                throw new \InvalidArgumentException(sprintf('Cannot get instance of grid "%s".', $gridName));
+            }
+
+            return $this->urlGenerator->generate(
                 $route,
                 [
-                    'entityName' => str_replace('\\', '_', $className),
-                    'id' => $record->getValue('id')
+                    'entityName' => $this->entityClassNameHelper->getUrlSafeClassName(
+                        $this->visitedDatagrids[$gridName]->getParameters()->get('class_name')
+                    ),
+                    'id'         => $record->getValue('id')
                 ]
             );
         };
-    }
-
-    /**
-     * @param DatagridInterface $datagrid
-     */
-    protected function addVisitedDatagrid(DatagridInterface $datagrid)
-    {
-        $this->visitedDatagrids[$datagrid->getName()] = $datagrid;
-    }
-
-    /**
-     * @param string $gridName
-     *
-     * @return DatagridInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function getVisitedDatagrid($gridName)
-    {
-        if (!isset($this->visitedDatagrids[$gridName])) {
-            throw new \InvalidArgumentException(
-                sprintf('Can\'t get instance of grid "%s".', $gridName)
-            );
-        }
-
-        return $this->visitedDatagrids[$gridName];
     }
 }

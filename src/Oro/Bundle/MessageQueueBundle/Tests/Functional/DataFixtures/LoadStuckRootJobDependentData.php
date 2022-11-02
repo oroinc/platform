@@ -3,10 +3,10 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\DependentMessageProcessorStub;
+use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,7 +29,7 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
      */
     public function load(ObjectManager $manager)
     {
-        $jobName = DependentMessageProcessorStub::TEST_JOB_NAME;
+        $jobName = DependentMessageProcessor::TEST_JOB_NAME;
 
         $rootJob = new Job();
         $rootJob->setOwnerId('oro.5b9252b531a7a6.89501276');
@@ -69,7 +69,7 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
             $connection->getTableName()
         );
 
-        $dbal->executeUpdate(
+        $dbal->executeStatement(
             $sql,
             [
                 'body' => [
@@ -81,8 +81,6 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
                 ],
                 'properties' => [
                     'oro.message_queue.client.topic_name' => 'oro.message_queue.test_topic',
-                    'oro.message_queue.client.processor_name' =>
-                        'oro_message_queue.async.dependent_message_processor.stub',
                     'oro.message_queue.client.queue_name' => 'oro.default',
                 ],
                 'redelivered' => false,
@@ -90,12 +88,12 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
                 'priority' => 2,
             ],
             [
-                'body' => Type::JSON_ARRAY,
-                'headers' => Type::JSON_ARRAY,
-                'properties' => Type::JSON_ARRAY,
-                'redelivered' => Type::BOOLEAN,
-                'queue' => Type::TEXT,
-                'priority' => Type::SMALLINT,
+                'body' => Types::JSON_ARRAY,
+                'headers' => Types::JSON_ARRAY,
+                'properties' => Types::JSON_ARRAY,
+                'redelivered' => Types::BOOLEAN,
+                'queue' => Types::TEXT,
+                'priority' => Types::SMALLINT,
             ]
         );
     }
@@ -105,7 +103,7 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
      */
     private function createConnection()
     {
-        $dbal = $this->container->get('doctrine.dbal.default_connection');
+        $dbal = $this->container->get('doctrine.dbal.message_queue_connection');
 
         return new DbalConnection($dbal, 'oro_message_queue');
     }

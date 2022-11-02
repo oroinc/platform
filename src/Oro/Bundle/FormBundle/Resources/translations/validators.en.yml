@@ -1,9 +1,10 @@
 "This value is not a valid time.": "This value is not a valid time."
 "This value should be entity class or alias.": "This value should be entity class or alias."
 "The entity was not found.": "The entity was not found."
+"This value should be an integer number.": "This value should be an integer number."
 oro:
     form:
-        extra_fields: 'This form should not contain extra fields: "{{ extra_fields }}"'
+        extra_fields: 'This form should not contain extra fields: {{ extra_fields }}.'
         number:
             min: "]-Inf,Inf[The value have not to be less than {{ limit }}."
             max:  "]-Inf,Inf[The value have not to be more than {{ limit }}."
@@ -13,4 +14,6 @@ oro:
             invalid: "This value is not a valid datetime."
             min: "The value have to not be earlier than {{ limit }}."
             max:  "The value have to not be later than {{ limit }}."
+        regexp_syntax:
+            error: 'This value is not a valid regular expression. Reason: {{ reason }}'
 

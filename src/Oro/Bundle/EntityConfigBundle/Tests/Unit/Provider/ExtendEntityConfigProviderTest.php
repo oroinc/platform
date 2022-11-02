@@ -25,25 +25,13 @@ class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->extendEntityConfigProvider = new ExtendEntityConfigProvider($this->configManager);
-
-        $this->attributeProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->extendProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->enumProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeProvider = $this->createMock(ConfigProvider::class);
+        $this->extendProvider = $this->createMock(ConfigProvider::class);
+        $this->enumProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->any())
             ->method('getProvider')

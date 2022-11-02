@@ -32,7 +32,6 @@ Example:
     "id": "1",
     "attributes": {
       "code": "default_family",
-      "entityClass": "Oro\\Bundle\\ProductBundle\\Entity\\Product",
       "isEnabled": true
     },
     "relationships": {
@@ -64,9 +63,7 @@ Example:
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 
@@ -203,7 +200,7 @@ Retrieve ID of image records assigned to a specific attribute family record.
 
 #### update_relationship
 
-Replace image assigned to a specific attribute family record
+Replace image assigned to a specific attribute family record.
 
 {@request:json_api}
 Example:

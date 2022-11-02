@@ -5,59 +5,51 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Twig;
 use Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var BackLinkExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('router', $this->router)
-            ->add('translator', $this->translator)
+            ->add(RouterInterface::class, $this->router)
+            ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
         $this->extension = new BackLinkExtension($container);
     }
 
-    public function testShouldReturnName()
-    {
-        $this->assertEquals(
-            'oro_embedded_form_back_link_extension',
-            $this->extension->getName()
-        );
-    }
-
     public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
     {
-        $id = uniqid('id');
-        $url = uniqid('url');
-        $text = uniqid('text');
-        $translatedText = uniqid('translatedText');
+        $id = 'test_id';
+        $url = 'test_url';
+        $text = 'test text';
+        $translatedText = 'test translated text';
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedString = 'Before link <a href="' . $url . '">' . $translatedText . '</a> After link';
 
         $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
-            ->will($this->returnValue($url));
+            ->willReturn($url);
         $this->translator->expects($this->once())
             ->method('trans')
             ->with($text)
-            ->will($this->returnValue($translatedText));
+            ->willReturn($translatedText);
 
         $this->assertEquals(
             $expectedString,
@@ -67,18 +59,18 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReplacePlaceholderWithReloadLinkAndLinkText()
     {
-        $text = uniqid('text');
-        $translatedText = uniqid('translatedText');
+        $text = 'test text';
+        $translatedText = 'test translated text';
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedLink = '<a href="#" onclick="window.location.reload(true); return false;">'
-                        . $translatedText
-                        . '</a>';
+            . $translatedText
+            . '</a>';
         $expectedString = 'Before link ' . $expectedLink . ' After link';
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->with($text)
-            ->will($this->returnValue($translatedText));
+            ->willReturn($translatedText);
 
         $this->assertEquals(
             $expectedString,
@@ -88,19 +80,19 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText()
     {
-        $id = uniqid('id');
-        $url = uniqid('url');
+        $id = 'test_id';
+        $url = 'test_url';
         $originalString = 'Before link {back_link} After link';
         $expectedString = 'Before link <a href="' . $url . '">Back</a> After link';
 
         $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
-            ->will($this->returnValue($url));
+            ->willReturn($url);
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.embeddedform.back_link_default_text')
-            ->will($this->returnValue('Back'));
+            ->willReturn('Back');
 
         $this->assertEquals(
             $expectedString,
@@ -110,11 +102,11 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnOriginalStringWhenNoPlaceholderProvided()
     {
-        $originalString = uniqid('any string');
+        $originalString = 'any string';
 
         $this->assertEquals(
             $originalString,
-            self::callTwigFilter($this->extension, 'back_link', [$originalString, uniqid('id')])
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, 'test_id'])
         );
     }
 }

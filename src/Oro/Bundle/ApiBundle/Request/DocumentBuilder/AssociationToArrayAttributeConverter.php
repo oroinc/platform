@@ -4,51 +4,57 @@ namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataProvider;
 
+/**
+ * Provides methods to build array representation of associations.
+ */
 class AssociationToArrayAttributeConverter
 {
     /** @var ObjectAccessorInterface */
-    protected $objectAccessor;
+    private $objectAccessor;
 
-    /**
-     * @param ObjectAccessorInterface $objectAccessor
-     */
-    public function __construct(ObjectAccessorInterface $objectAccessor)
-    {
+    /** @var TargetMetadataProvider */
+    private $targetMetadataProvider;
+
+    public function __construct(
+        ObjectAccessorInterface $objectAccessor,
+        TargetMetadataProvider $targetMetadataProvider
+    ) {
         $this->objectAccessor = $objectAccessor;
+        $this->targetMetadataProvider = $targetMetadataProvider;
     }
 
     /**
      * @param mixed                    $object
      * @param AssociationMetadata|null $association
      *
-     * @return array
+     * @return mixed The result can be an array, a scalar or NULL
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function convertObjectToArray($object, AssociationMetadata $association = null)
     {
-        if (null === $object || is_scalar($object)) {
+        if (null === $object || \is_scalar($object)) {
             return $object;
         }
 
         if (null === $association) {
             $result = $this->objectAccessor->toArray($object);
         } else {
-            $metadata = $association->getTargetMetadata();
+            $metadata = $this->targetMetadataProvider->getAssociationTargetMetadata($object, $association);
             if (null === $metadata) {
                 $result = $this->objectAccessor->toArray($object);
             } else {
                 $data = $this->objectAccessor->toArray($object);
                 if ($metadata->hasIdentifierFieldsOnly()) {
                     $idFieldNames = $metadata->getIdentifierFieldNames();
-                    if (1 === count($idFieldNames)) {
-                        $fieldName = reset($idFieldNames);
-                        $result = array_key_exists($fieldName, $data)
-                            ? $data[$fieldName]
-                            : null;
+                    if (1 === \count($idFieldNames)) {
+                        $fieldName = \reset($idFieldNames);
+                        $result = $data[$fieldName] ?? null;
                     } else {
                         $result = [];
                         foreach ($idFieldNames as $fieldName) {
-                            if (array_key_exists($fieldName, $data)) {
+                            if (\array_key_exists($fieldName, $data)) {
                                 $result[$fieldName] = $data[$fieldName];
                             }
                         }
@@ -59,9 +65,9 @@ class AssociationToArrayAttributeConverter
                     $this->addAttributes($result, $data, $metadata);
                     $this->addRelationships($result, $data, $metadata);
                     if ($association->isCollapsed()) {
-                        $count = count($result);
+                        $count = \count($result);
                         if (1 === $count) {
-                            $result = reset($result);
+                            $result = \reset($result);
                         } elseif (1 === $count) {
                             $result = null;
                         }
@@ -79,7 +85,7 @@ class AssociationToArrayAttributeConverter
      *
      * @return array
      */
-    public function convertCollectionToArray($collection, AssociationMetadata $association = null)
+    public function convertCollectionToArray($collection, AssociationMetadata $association = null): array
     {
         $result = [];
         foreach ($collection as $object) {
@@ -89,49 +95,32 @@ class AssociationToArrayAttributeConverter
         return $result;
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
-    protected function addMeta(array &$result, array $data, EntityMetadata $metadata)
+    private function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
             $resultName = $property->getResultName();
-            if (array_key_exists($name, $data)) {
+            if (\array_key_exists($name, $data)) {
                 $result[$resultName] = $data[$name];
             }
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
-    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata)
+    private function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
-            $result[$name] = array_key_exists($name, $data)
-                ? $data[$name]
-                : null;
+            $result[$name] = $data[$name] ?? null;
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
-    protected function addRelationships(array &$result, array $data, EntityMetadata $metadata)
+    private function addRelationships(array &$result, array $data, EntityMetadata $metadata): void
     {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             $value = null;
             $isCollection = $association->isCollection();
-            if (array_key_exists($name, $data)) {
+            if (\array_key_exists($name, $data)) {
                 $val = $data[$name];
                 if (!$this->isEmptyRelationship($val, $isCollection)) {
                     $value = $isCollection
@@ -152,7 +141,7 @@ class AssociationToArrayAttributeConverter
      *
      * @return bool
      */
-    protected function isEmptyRelationship($value, $isCollection)
+    private function isEmptyRelationship($value, bool $isCollection): bool
     {
         return $isCollection
             ? empty($value)

@@ -8,24 +8,35 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
+    private const INCLUDE_ID_META = 'includeId';
+    private const INCLUDE_ID_PROPERTY = '__include_id__';
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
+
+    /** @var ParameterBag */
+    private $sharedData;
 
     /** @var LoadNormalizedIncludedEntities */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
+
+        $this->sharedData = new ParameterBag();
+        $this->sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
@@ -54,12 +65,12 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
@@ -68,7 +79,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')
@@ -77,43 +88,48 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->setResult($includedEntity);
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
         $expectedGetContext->setMetadata($getMetadata);
 
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult) {
-                    self::assertEquals($expectedGetContext, $context);
+            ->willReturnCallback(function (GetContext $context) use ($expectedGetContext, $getResult) {
+                self::assertEquals($expectedGetContext, $context);
 
-                    $context->setResult($getResult);
-                }
-            );
+                $context->setResult($getResult);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
         self::assertSame(
-            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            array_merge($getResult, [self::INCLUDE_ID_PROPERTY => $includedEntityId]),
             $includedEntityData->getNormalizedData()
         );
         $metadata = $includedEntityData->getMetadata();
         self::assertSame($getMetadata, $metadata);
-        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertTrue($metadata->hasMetaProperty(self::INCLUDE_ID_PROPERTY));
         self::assertEquals(
-            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
-            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+            self::INCLUDE_ID_META,
+            $metadata->getMetaProperty(self::INCLUDE_ID_PROPERTY)->getResultName()
         );
     }
 
@@ -128,12 +144,12 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0, true);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
@@ -142,7 +158,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')
@@ -151,42 +167,47 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
         $expectedGetContext->setMetadata($getMetadata);
 
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult) {
-                    self::assertEquals($expectedGetContext, $context);
+            ->willReturnCallback(function (GetContext $context) use ($expectedGetContext, $getResult) {
+                self::assertEquals($expectedGetContext, $context);
 
-                    $context->setResult($getResult);
-                }
-            );
+                $context->setResult($getResult);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
         self::assertSame(
-            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            array_merge($getResult, [self::INCLUDE_ID_PROPERTY => $includedEntityId]),
             $includedEntityData->getNormalizedData()
         );
         $metadata = $includedEntityData->getMetadata();
         self::assertSame($getMetadata, $metadata);
-        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertTrue($metadata->hasMetaProperty(self::INCLUDE_ID_PROPERTY));
         self::assertEquals(
-            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
-            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+            self::INCLUDE_ID_META,
+            $metadata->getMetaProperty(self::INCLUDE_ID_PROPERTY)->getResultName()
         );
     }
 
@@ -202,7 +223,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0, true);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 
@@ -211,7 +232,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
-            ->with(ApiActions::GET)
+            ->with(ApiAction::GET)
             ->willReturn($getProcessor);
         $getProcessor->expects(self::once())
             ->method('createContext')
@@ -220,11 +241,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($getError) {
-                    $context->addError($getError);
-                }
-            );
+            ->willReturnCallback(function (GetContext $context) use ($getError) {
+                $context->addError($getError);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);

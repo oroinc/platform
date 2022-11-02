@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    const SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
+
     /**
      * Provides access to entity_select search API.
      *
@@ -13,10 +15,7 @@ define(function(require) {
      *
      * @exports EntitySelectSearchApiAccessor
      */
-    var EntitySelectSearchApiAccessor;
-    var SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
-
-    EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @lends EntitySelectSearchApiAccessor.prototype */{
+    const EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @lends EntitySelectSearchApiAccessor.prototype */{
         initialize: function(options) {
             if (!options) {
                 options = {};

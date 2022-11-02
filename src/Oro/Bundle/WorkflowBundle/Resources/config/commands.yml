@@ -1,48 +1,56 @@
 services:
-    Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand
-        tags:
-            - { name: console.command }
 
-    Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command
+    Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand:
+        arguments:
+            - '@doctrine'
+            - '@translator'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_workflow.helper.translation'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.process.process_handler'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_workflow.handler.transition_cron_trigger'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand
+        arguments:
+            - '@oro_workflow.configuration.provider.process_config'
+            - '@oro_workflow.process.configurator'
+            - '@oro_workflow.cache.process_trigger'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand
+        arguments:
+            - '@oro_workflow.configuration.provider.workflow_config'
+            - '@oro_workflow.handler.workflow_definition'
+            - '@oro_workflow.configuration.builder.workflow_definition'
+            - '@doctrine'
         tags:
             - { name: console.command }
 
     Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand:
-        public: false
-        class: Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.manager'
         tags:
             - { name: console.command }

@@ -8,7 +8,7 @@ processes:
             exclude_definitions: [entity_manager_cleanup]
             actions_configuration:
                 - '@call_service_method':
-                    service: oro_workflow.entity_manager_clearer_stub
+                    service: oro_workflow.tests.entity_manager_clearer_stub
                     method: clear
     triggers:
         entity_manager_cleanup:

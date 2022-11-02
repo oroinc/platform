@@ -2,45 +2,42 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Updates a title and an URL for Email entity.
+ */
 class PrepareContextTitleListener
 {
-    /** @var Router */
-    protected $router;
+    private UrlGeneratorInterface $urlGenerator;
+    private ManagerRegistry $doctrine;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(
-        Router $router,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->router = $router;
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(UrlGeneratorInterface $urlGenerator, ManagerRegistry $doctrine)
+    {
+        $this->urlGenerator = $urlGenerator;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * Correct link and title for email context by EmailUser entity index
-     *
-     * @param PrepareContextTitleEvent $event
-     */
-    public function prepareEmailContextTitleEvent(PrepareContextTitleEvent $event)
+    public function prepareContextTitle(PrepareContextTitleEvent $event): void
     {
-        if ($event->getTargetClass() === Email::ENTITY_CLASS) {
-            $item = $event->getItem();
-            /** @var Email $email */
-            $email = $this->doctrineHelper->getEntity(Email::ENTITY_CLASS, $item['targetId']);
-            $item['title'] = $email->getSubject();
-            $item['link'] = $this->router->generate('oro_email_thread_view', ['id' => $item['targetId']], true);
-            $event->setItem($item);
+        if ($event->getTargetClass() !== Email::class) {
+            return;
         }
+
+        $item = $event->getItem();
+        $emailId = $item['targetId'];
+        /** @var Email $email */
+        $email = $this->doctrine->getManagerForClass(Email::class)
+            ->find(Email::class, $emailId);
+        $item['title'] = $email->getSubject();
+        $item['link'] = $this->urlGenerator->generate(
+            'oro_email_thread_view',
+            ['id' => $emailId],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $event->setItem($item);
     }
 }

@@ -3,36 +3,51 @@
 namespace Oro\Bundle\EntityConfigBundle\Voter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class AttributeFamilyVoter extends AbstractEntityVoter
+/**
+ * Prevents removal of non deletable attribute families.
+ */
+class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
     const ATTRIBUTE_DELETE = 'delete';
 
-    /** @var AttributeFamilyManager */
-    private $familyManager;
+    /** {@inheritDoc} */
+    protected $supportedAttributes = [self::ATTRIBUTE_DELETE];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param AttributeFamilyManager $familyManager
-     */
-    public function __construct(DoctrineHelper $doctrineHelper, AttributeFamilyManager $familyManager)
+    private ContainerInterface $container;
+
+    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
     {
         parent::__construct($doctrineHelper);
-        $this->supportedAttributes = [self::ATTRIBUTE_DELETE];
-        $this->className = AttributeFamily::class;
-        $this->familyManager = $familyManager;
+        $this->container = $container;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_config.manager.attribute_family_manager' => AttributeFamilyManager::class
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        return $this->familyManager->isAttributeFamilyDeletable($identifier) ?
+        return $this->getAttributeFamilyManager()->isAttributeFamilyDeletable($identifier) ?
             self::ACCESS_ABSTAIN :
             self::ACCESS_DENIED;
+    }
+
+    private function getAttributeFamilyManager(): AttributeFamilyManager
+    {
+        return $this->container->get('oro_entity_config.manager.attribute_family_manager');
     }
 }

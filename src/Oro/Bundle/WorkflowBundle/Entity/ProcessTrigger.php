@@ -21,9 +21,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },
@@ -57,7 +54,7 @@ class ProcessTrigger implements EventTriggerInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="field", type="string", length=255, nullable=true)
+     * @ORM\Column(name="field", type="string", length=150, nullable=true)
      */
     protected $field;
 

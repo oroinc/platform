@@ -2,103 +2,60 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionTriggerHandlerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
-class TransitionTriggerProcessor implements MessageProcessorInterface
+/**
+ * Processes the workflow transition trigger.
+ */
+class TransitionTriggerProcessor implements MessageProcessorInterface, LoggerAwareInterface
 {
-    const CRON_TOPIC_NAME = 'oro_message_queue.transition_trigger_cron_message';
-    const EVENT_TOPIC_NAME = 'oro_message_queue.transition_trigger_event_message';
+    use LoggerAwareTrait;
 
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
     /** @var TransitionTriggerHandlerInterface */
     protected $handler;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param LoggerInterface $logger
-     * @param TransitionTriggerHandlerInterface $handler
-     */
-    public function __construct(
-        ManagerRegistry $registry,
-        LoggerInterface $logger,
-        TransitionTriggerHandlerInterface $handler
-    ) {
+    public function __construct(ManagerRegistry $registry, TransitionTriggerHandlerInterface $handler)
+    {
         $this->registry = $registry;
-        $this->logger = $logger;
         $this->handler = $handler;
+        $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $result = self::ACK;
-
-        try {
-            $triggerMessage = $this->createTransitionTriggerMessage($message);
-            $trigger = $this->resolveTrigger($triggerMessage->getTriggerId());
-
-            if (!$this->handler->process($trigger, $triggerMessage)) {
-                $this->logger->warning(
-                    'Transition not allowed.',
-                    ['trigger' => $trigger]
-                );
-
-                $result = self::REJECT;
-            }
-        } catch (\Exception $e) {
+        $triggerMessage = TransitionTriggerMessage::createFromArray($message->getBody());
+        $trigger = $this->registry
+            ->getManagerForClass(BaseTransitionTrigger::class)
+            ->find(BaseTransitionTrigger::class, $triggerMessage->getTriggerId());
+        if (!$trigger) {
             $this->logger->error(
-                'Queue message could not be processed.',
-                ['exception' => $e]
+                'Transition trigger #{id} is not found',
+                ['id' => $triggerMessage->getTriggerId()]
             );
 
-            $result = self::REJECT;
+            return self::REJECT;
         }
 
-        return $result;
-    }
+        if (!$this->handler->process($trigger, $triggerMessage)) {
+            $this->logger->warning(
+                'Transition not allowed',
+                ['trigger' => $trigger]
+            );
 
-    /**
-     * @param MessageInterface $message
-     * @return TransitionTriggerMessage
-     * @throws \InvalidArgumentException
-     */
-    protected function createTransitionTriggerMessage(MessageInterface $message)
-    {
-        return TransitionTriggerMessage::createFromJson($message->getBody());
-    }
-
-    /**
-     * @param int $id
-     * @return BaseTransitionTrigger|null
-     * @throws \InvalidArgumentException|EntityNotFoundException
-     */
-    protected function resolveTrigger($id)
-    {
-        if ((int)$id < 1) {
-            throw new \InvalidArgumentException('Message should contain valid transition trigger id');
+            return self::REJECT;
         }
 
-        $entity = $this->registry->getManagerForClass(BaseTransitionTrigger::class)
-            ->find(BaseTransitionTrigger::class, $id);
-
-        if (!$entity) {
-            throw new EntityNotFoundException(sprintf('Transition trigger entity with identifier %s not found', $id));
-        }
-
-        return $entity;
+        return self::ACK;
     }
 }

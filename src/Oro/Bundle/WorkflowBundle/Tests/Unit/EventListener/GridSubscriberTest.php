@@ -3,39 +3,34 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\DatagridBundle\Event\OrmResultBeforeQuery;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber;
 
 class GridSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GridsSubscriber|\PHPUnit\Framework\MockObject\MockObject */
-    protected $gridSubscriber;
+    private $gridSubscriber;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featurechecker;
+    private $featurechecker;
 
     /** @var QueryBuilder */
-    protected $queryBuilder;
+    private $queryBuilder;
 
     /** @var OrmResultBeforeQuery|\PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
+    private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featurechecker = $this->createMock(FeatureChecker::class);
         $this->gridSubscriber = new GridsSubscriber($this->featurechecker);
 
         $this->queryBuilder = $this->getQueryBuilder();
 
-        $this->event = $this->getMockBuilder(OrmResultBeforeQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getQueryBuilder'])
-            ->getMock();
+        $this->event = $this->createMock(OrmResultBeforeQuery::class);
 
         $this->event->expects($this->any())
             ->method('getQueryBuilder')
@@ -101,24 +96,13 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', (string) $this->queryBuilder->getDQLPart('where'));
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder()
+    private function getQueryBuilder(): QueryBuilder
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getExpressionBuilder')
-            ->willReturn(new \Doctrine\ORM\Query\Expr());
+            ->willReturn(new Expr());
 
         return new QueryBuilder($em);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->featurechecker, $this->gridSubscriber, $this->event, $this->queryBuilder);
     }
 }

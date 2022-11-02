@@ -8,16 +8,14 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
+/**
+ * The adapter to a search index data source.
+ */
 class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
-    /**
-     * @var SearchQueryInterface
-     */
+    /** @var SearchQueryInterface */
     private $searchQuery;
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function __construct(SearchQueryInterface $query)
     {
         $this->searchQuery = $query;

@@ -1,13 +1,12 @@
 entity_config:
     comment:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config#comment
         entity:
             items:
-                # indicates whether the entity can have comments or not
-                enabled: # boolean
+                enabled:
                     options:
                         require_schema_update: true
                         priority:              10
-                        default_value:         false
                     form:
                         type: Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
                         options:
@@ -15,10 +14,6 @@ entity_config:
                             required:          true
                             label:             oro.comment.enabled
                             association_class: 'OroCommentBundle:Comment'
-
-                # this attribute can be used to prohibit changing the comment association state (no matter whether
-                # it is enabled or not) for the entity
-                # if TRUE than the current state cannot be changed
-                immutable: # boolean
+                immutable:
                     options:
                         auditable: false

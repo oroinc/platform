@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController;
 use Oro\Bundle\ActivityListBundle\DependencyInjection\OroActivityListExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
-class OroActivityListExtensionTest extends \PHPUnit\Framework\TestCase
+class OroActivityListExtensionTest extends ExtensionTestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
-        $configuration = new ContainerBuilder();
-        $loader = new OroActivityListExtension();
-        $loader->load([], $configuration);
-        $this->assertTrue($configuration instanceof ContainerBuilder);
+        $this->loadExtension(new OroActivityListExtension());
+
+        $expectedDefinitions = [
+            ActivityListController::class,
+        ];
+
+        $this->assertDefinitionsLoaded($expectedDefinitions);
     }
 }

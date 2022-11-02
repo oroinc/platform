@@ -14,9 +14,6 @@ class NormalizeExpressionVisitor extends ExpressionVisitor
     /** @var array */
     protected $placeholders;
 
-    /**
-     * @param array $placeholders
-     */
     public function __construct(array $placeholders)
     {
         $this->placeholders = $placeholders;

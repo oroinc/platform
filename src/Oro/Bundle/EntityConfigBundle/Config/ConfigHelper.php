@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provide helpful methods to work with entity and field configs.
+ */
 class ConfigHelper
 {
     /**
@@ -14,9 +17,6 @@ class ConfigHelper
      */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -25,12 +25,12 @@ class ConfigHelper
     /**
      * @return array
      */
-    public function getExtendRequireJsModules()
+    public function getExtendJsModules()
     {
         return $this->configManager
             ->getProvider('extend')
             ->getPropertyConfig()
-            ->getRequireJsModules();
+            ->getJsModules();
     }
 
     /**
@@ -100,6 +100,18 @@ class ConfigHelper
     }
 
     /**
+     * @param FieldConfigModel $fieldModel
+     * @param array $options
+     */
+    public function addToFieldConfigModel(FieldConfigModel $fieldModel, $options)
+    {
+        foreach ($options as $scope => $scopeValues) {
+            $scopeValues = array_merge($scopeValues, $fieldModel->toArray($scope));
+            $fieldModel->fromArray($scope, $scopeValues);
+        }
+    }
+
+    /**
      * @param EntityConfigModel $entityConfigModel
      * @param string $scope
      * @return ConfigInterface
@@ -142,7 +154,6 @@ class ConfigHelper
         $fieldOptions = [
             'extend' => [
                 'is_extend' => true,
-                'origin' => ExtendScope::ORIGIN_CUSTOM,
                 'owner' => ExtendScope::OWNER_CUSTOM,
                 'state' => ExtendScope::STATE_NEW
             ]

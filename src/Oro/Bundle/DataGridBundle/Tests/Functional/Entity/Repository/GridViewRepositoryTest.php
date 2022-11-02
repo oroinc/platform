@@ -13,7 +13,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
     /** @var GridViewRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,7 +64,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
     /**
      * {@inheritdoc}
      */
-    protected function getUsername()
+    protected function getUsername(): string
     {
         return LoadAdminUserData::DEFAULT_ADMIN_USERNAME;
     }

@@ -4,107 +4,95 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ThemeListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeListener */
-    protected $listener;
+    private ThemeListener $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new ThemeListener('defaultTheme');
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             [KernelEvents::REQUEST => ['onKernelRequest', -20]],
             ThemeListener::getSubscribedEvents()
         );
     }
 
-    public function testShouldSetDefaultTheme()
+    public function testShouldSetDefaultTheme(): void
     {
         $masterRequestEvent = $this->createMasterRequestEvent([], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
-        $this->assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
 
         $subRequestEvent = $this->createSubRequestEvent();
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
     }
 
-    public function testShouldNotSetSubRequestThemeFromMasterRequestQueryStringWithDebugFalse()
+    public function testShouldNotSetSubRequestThemeFromMasterRequestQueryStringWithDebugFalse(): void
     {
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
-        $this->assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('defaultTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
 
         $subRequestEvent = $this->createSubRequestEvent();
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('defaultTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
     }
 
-    public function testShouldSetSubRequestThemeFromMasterRequestQueryStringWithDebugTrue()
+    public function testShouldSetSubRequestThemeFromMasterRequestQueryStringWithDebugTrue(): void
     {
         $this->listener->setDebug(true);
 
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
-        $this->assertEquals('testTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('testTheme', $masterRequestEvent->getRequest()->attributes->get('_theme'));
 
         $subRequestEvent = $this->createSubRequestEvent();
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertEquals('testTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
+        self::assertEquals('testTheme', $subRequestEvent->getRequest()->attributes->get('_theme'));
     }
 
-    public function testShouldSetSubRequestRouteFromMasterRequest()
+    public function testShouldSetSubRequestRouteFromMasterRequest(): void
     {
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
 
         $subRequestEvent = $this->createSubRequestEvent();
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertEquals('testRoute', $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
+        self::assertEquals('testRoute', $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
     }
 
-    public function testSubRequestRouteShouldNotBeOverridden()
+    public function testSubRequestRouteShouldNotBeOverridden(): void
     {
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
 
         $subRequestEvent = $this->createSubRequestEvent(['_master_request_route' => 'oldRoute']);
         $this->listener->onKernelRequest($subRequestEvent);
-        $this->assertEquals('oldRoute', $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
+        self::assertEquals('oldRoute', $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
     }
 
-    /**
-     * @param array $query
-     * @param array $attributes
-     *
-     * @return GetResponseEvent
-     */
-    protected function createMasterRequestEvent(array $query = [], array $attributes = [])
+    private function createMasterRequestEvent(array $query = [], array $attributes = []): RequestEvent
     {
-        return new GetResponseEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+        return new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
             new Request($query, [], $attributes),
             HttpKernelInterface::MASTER_REQUEST
         );
     }
 
-    /**
-     * @param array $attributes
-     *
-     * @return GetResponseEvent
-     */
-    protected function createSubRequestEvent(array $attributes = [])
+    private function createSubRequestEvent(array $attributes = []): RequestEvent
     {
-        return new GetResponseEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+        return new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
             new Request([], [], $attributes),
             HttpKernelInterface::SUB_REQUEST
         );

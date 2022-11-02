@@ -10,12 +10,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var SegmentWidgetOptionsListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 

@@ -4,43 +4,32 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class GetWithTableInheritanceTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
-            LoadOrganization::class,
-            LoadBusinessUnit::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml'
         ]);
     }
 
     /**
-     * @param array        $params
-     * @param array|string $expects
-     *
-     * @dataProvider getParamsAndExpectation
+     * @dataProvider getParamsAndExpectationDataProvider
      */
-    public function testGetEntityWithTableInheritance($params, $expects)
+    public function testGetEntityWithTableInheritance(array $params, array|string $expects)
     {
         /** @var TestDepartment $department */
         $department = $this->getReference('test_department');
 
-        $expects = $this->loadResponseData($expects);
+        $expects = $this->getResponseData($expects);
         $expects['data'][0]['id'] = (string)$department->getId();
 
         $expects['data'][0]['relationships']['staff']['data'][0]['id'] =
             (string)$department->getStaff()->first()->getId();
         if (isset($expects['included'][0]['id'])) {
-            $expects['included'][0]['id'] = (string)(string)$department->getStaff()->first()->getId();
+            $expects['included'][0]['id'] = (string)$department->getStaff()->first()->getId();
         }
 
         $entityType = $this->getEntityType(TestDepartment::class);
@@ -48,13 +37,16 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         // test get list request
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
-        self::assertEquals($expects, self::jsonToArray($response->getContent()));
+        $this->assertResponseContains($expects, $response);
+        $responseContent = self::jsonToArray($response->getContent());
+        if (isset($responseContent['included'])) {
+            foreach ($responseContent['included'] as $key => $item) {
+                self::assertArrayNotHasKey('meta', $item, sprintf('included[%s]', $key));
+            }
+        }
     }
 
-    /**
-     * @return array
-     */
-    public function getParamsAndExpectation()
+    public function getParamsAndExpectationDataProvider(): array
     {
         return [
             'Related entity with table inheritance'            => [
@@ -76,7 +68,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
                     'sort'    => '-id'
                 ],
                 'expects' => 'table_inheritance_2.yml'
-            ],
+            ]
         ];
     }
 }

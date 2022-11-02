@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Button;
 
+/**
+ * Represents action button search context.
+ */
 class ButtonSearchContext
 {
     /** @var string */
@@ -10,8 +13,7 @@ class ButtonSearchContext
     /** @var int|string|array */
     protected $entityId;
 
-    /** @var string */
-    protected $routeName;
+    protected string $routeName = '';
 
     /** @var string */
     protected $datagrid;
@@ -52,20 +54,12 @@ class ButtonSearchContext
         return $this->entityId;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouteName()
+    public function getRouteName(): string
     {
         return $this->routeName;
     }
 
-    /**
-     * @param string $routeName
-     *
-     * @return $this
-     */
-    public function setRouteName($routeName)
+    public function setRouteName(string $routeName): self
     {
         $this->routeName = $routeName;
 

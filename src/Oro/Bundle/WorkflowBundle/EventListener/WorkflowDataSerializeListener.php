@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -10,68 +9,37 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * Performs serialization and deserialization of WorkflowItem data
+ * Performs serialization and deserialization of WorkflowItem data.
  */
-class WorkflowDataSerializeListener
+class WorkflowDataSerializeListener implements ServiceSubscriberInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
+    private ContainerInterface $container;
+    private DoctrineHelper $doctrineHelper;
+    private string $format = 'json';
+    /** @var WorkflowItem[] */
+    private array $scheduledEntities = [];
 
-    /**
-     * @var string
-     */
-    protected $format = 'json';
-
-    /**
-     * @var WorkflowItem[]
-     */
-    protected $scheduledEntities = [];
-
-    /** @var ServiceLink */
-    private $serializerLink;
-
-    /**
-     * @param ServiceLink $serializerLink
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(ServiceLink $serializerLink, DoctrineHelper $doctrineHelper)
+    public function __construct(ContainerInterface $container, DoctrineHelper $doctrineHelper)
     {
-        $this->serializerLink = $serializerLink;
+        $this->container = $container;
         $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
      * Before flush serializes all WorkflowItem's data
-     *
-     * @param OnFlushEventArgs $args
      */
-    public function onFlush(OnFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args): void
     {
-        /** @var WorkflowItem $entity */
-        $unitOfWork = $args->getEntityManager()->getUnitOfWork();
-
-        foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
-                $this->scheduledEntities[] = $entity;
-            }
-        }
-
-        foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
-            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
-                $this->scheduledEntities[] = $entity;
-            }
-        }
+        $uow = $args->getEntityManager()->getUnitOfWork();
+        $this->scheduleEntities($uow->getScheduledEntityInsertions());
+        $this->scheduleEntities($uow->getScheduledEntityUpdates());
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->scheduledEntities) {
             while ($workflowItem = array_shift($this->scheduledEntities)) {
@@ -83,25 +51,28 @@ class WorkflowDataSerializeListener
 
     /**
      * After WorkflowItem loaded, deserialize WorkflowItem
-     *
-     * @param WorkflowItem       $entity
-     * @param LifecycleEventArgs $args
      */
-    public function postLoad(WorkflowItem $entity, LifecycleEventArgs $args)
+    public function postLoad(WorkflowItem $entity): void
     {
         $this->deserialize($entity);
     }
 
+    private function scheduleEntities(array $entities): void
+    {
+        foreach ($entities as $entity) {
+            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
+                $this->scheduledEntities[] = $entity;
+            }
+        }
+    }
+
     /**
      * Serialize data of WorkflowItem
-     *
-     * @param WorkflowItem $workflowItem
      */
-    protected function serialize(WorkflowItem $workflowItem)
+    private function serialize(WorkflowItem $workflowItem): void
     {
         $serializer = $this->getSerializer();
         $serializer->setWorkflowName($workflowItem->getWorkflowName());
-
         $serializedData = $serializer->serialize(
             $this->getWorkflowData($workflowItem),
             $this->format
@@ -112,10 +83,8 @@ class WorkflowDataSerializeListener
 
     /**
      * Deserialize data of WorkflowItem
-     *
-     * @param WorkflowItem $workflowItem
      */
-    protected function deserialize(WorkflowItem $workflowItem)
+    private function deserialize(WorkflowItem $workflowItem): void
     {
         // Pass serializer into $workflowItem to make lazy loading of workflow item data.
         $workflowItem->setSerializer($this->getSerializer(), $this->format);
@@ -128,11 +97,7 @@ class WorkflowDataSerializeListener
         $workflowItem->setEntity($relatedEntity);
     }
 
-    /**
-     * @param WorkflowItem $workflowItem
-     * @return WorkflowData
-     */
-    protected function getWorkflowData(WorkflowItem $workflowItem)
+    private function getWorkflowData(WorkflowItem $workflowItem): WorkflowData
     {
         // Cloning workflow data instance to prevent changing of original data.
         $workflowData = clone $workflowItem->getData();
@@ -155,26 +120,17 @@ class WorkflowDataSerializeListener
         return $workflowData;
     }
 
-    /**
-     * @param $entity
-     * @return bool
-     */
-    protected function isSupported($entity)
+    private function isSupported(object $entity): bool
     {
         return $entity instanceof WorkflowItem;
     }
 
-    /**
-     * @param array $configuration
-     *
-     * @return array
-     */
-    protected function getVariablesNamesFromConfiguration($configuration)
+    private function getVariablesNamesFromConfiguration(?array $configuration): array
     {
         $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
         $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
 
-        if (!is_array($configuration) || !isset($configuration[$definitionsNode][$variablesNode])) {
+        if (!\is_array($configuration) || !isset($configuration[$definitionsNode][$variablesNode])) {
             return [];
         }
 
@@ -182,10 +138,17 @@ class WorkflowDataSerializeListener
     }
 
     /**
-     * @return WorkflowAwareSerializer
+     * {@inheritDoc}
      */
-    private function getSerializer()
+    public static function getSubscribedServices()
     {
-        return $this->serializerLink->getService();
+        return [
+            'oro_workflow.serializer.data.serializer' => WorkflowAwareSerializer::class
+        ];
+    }
+
+    private function getSerializer(): WorkflowAwareSerializer
+    {
+        return $this->container->get('oro_workflow.serializer.data.serializer');
     }
 }

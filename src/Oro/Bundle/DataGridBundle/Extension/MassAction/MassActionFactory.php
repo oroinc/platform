@@ -6,6 +6,9 @@ use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 
+/**
+ * The factory for datagrid mass actions.
+ */
 class MassActionFactory extends ActionFactory
 {
     /**
@@ -22,13 +25,11 @@ class MassActionFactory extends ActionFactory
     {
         $action = parent::createAction($actionName, $actionConfig);
         if (!$action instanceof MassActionInterface) {
-            throw new RuntimeException(
-                sprintf(
-                    'An action should be an instance of "%s", got "%s".',
-                    MassActionInterface::class,
-                    get_class($action)
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'An action should be an instance of "%s", got "%s".',
+                MassActionInterface::class,
+                get_class($action)
+            ));
         }
 
         return $action;

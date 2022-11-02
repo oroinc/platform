@@ -1,0 +1,10 @@
+Oro\Bundle\ActivityListBundle\Entity\ActivityList:
+  activityList1:
+    editor: '@admin'
+    organization: '@organization'
+    verb: 'create'
+    subject: 'System Calendar Event 1'
+    relatedActivityClass: 'Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent'
+    relatedActivityId: '1'
+    createdAt: '<(new DateTime("2019-05-30 21:00:00 UTC"))>'
+    updatedAt: '<(new DateTime("2019-05-30 21:00:00 UTC"))>'

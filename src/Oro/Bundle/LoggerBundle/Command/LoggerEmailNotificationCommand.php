@@ -1,99 +1,118 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class LoggerEmailNotificationCommand extends ContainerAwareCommand
+/**
+ * Updates logger email notification configuration.
+ */
+class LoggerEmailNotificationCommand extends Command
 {
-    const RECIPIENTS = 'recipients';
-    const DISABLE = 'disable';
+    protected static $defaultName = 'oro:logger:email-notification';
 
-    /**
-     * {@inheritdoc}
-     */
+    private ValidatorInterface $validator;
+    private ?ConfigManager $configManager;
+
+    public function __construct(ValidatorInterface $validator, ?ConfigManager $configManager)
+    {
+        $this->validator = $validator;
+        $this->configManager = $configManager;
+
+        parent::__construct();
+    }
+
+    public function isEnabled(): bool
+    {
+        return (bool) $this->configManager;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:logger:email-notification')
-            ->addOption(
-                self::DISABLE,
-                null,
-                InputOption::VALUE_NONE,
-                'Add this option to disable email notifications about errors in log.'
+            ->addOption('disable', null, InputOption::VALUE_NONE, 'Disable email notifications about logged errors')
+            ->addOption('recipients', 'r', InputOption::VALUE_REQUIRED, 'Recipient email addresses separated by ;')
+            ->setDescription('Updates logger email notification configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates logger email notification configuration.
+
+The <info>--disable</info> option can be used to disable email notifications about the logged errors:
+
+  <info>php %command.full_name% --disable</info>
+
+The <info>--recipients</info> option can be used to update the list of the recipients
+that will receive email notifications about the logged errors:
+
+  <info>php %command.full_name% --recipients=<recipients></info>
+  <info>php %command.full_name% --recipients='email1@example.com;email2@example.com;emailN@example.com'</info>
+
+HELP
             )
-            ->addOption(
-                self::RECIPIENTS,
-                'r',
-                InputOption::VALUE_REQUIRED,
-                'To send notifications about errors in log write email addresses separated by semicolon (;).'
-            )
-            ->setDescription('Update logger email notification configuration');
+            ->addUsage('--disable')
+            ->addUsage('--recipients=<recipients>')
+            ->addUsage("--recipients='email1@example.com;email2@example.com;emailN@example.com'")
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
-        $user = null;
-        $recipients = $input->getOption(self::RECIPIENTS);
+        $recipients = $input->getOption('recipients');
 
-        $disable = $input->getOption(self::DISABLE);
+        $disable = $input->getOption('disable');
 
-        /* @var ConfigManager $configManager */
-        $configManager = $this->getContainer()->get('oro_config.global');
         $recipientsConfigKey = Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS);
         if ($disable) {
-            if (!$configManager->get($recipientsConfigKey)) {
+            if (!$this->configManager->get($recipientsConfigKey)) {
                 $io->text("Error logs notification already disabled.");
 
-                return;
+                return 0;
             }
-            $configManager->reset($recipientsConfigKey);
+            $this->configManager->reset($recipientsConfigKey);
             $io->text("Error logs notification successfully disabled.");
-            $configManager->flush();
+            $this->configManager->flush();
 
-            return;
+            return 0;
         }
         if ($recipients) {
             $errors = $this->validateRecipients($recipients);
             if (!empty($errors)) {
                 $io->error($errors);
 
-                return;
+                return 1;
             }
-            $configManager->set($recipientsConfigKey, $recipients);
+            $this->configManager->set($recipientsConfigKey, $recipients);
             $io->text(["Error logs notification will be sent to listed email addresses:", $recipients]);
 
-            $configManager->flush();
+            $this->configManager->flush();
 
-            return;
+            return 0;
         }
 
         $io->error('Please provide --recipients or add --disable flag to the command.');
+
+        return 1;
     }
 
-    /**
-     * @param string $recipients
-     * @return array
-     */
-    protected function validateRecipients($recipients)
+    protected function validateRecipients(string $recipients): array
     {
-        $validator = $this->getContainer()->get('validator');
         $emails = explode(';', $recipients);
         $errors = [];
         foreach ($emails as $email) {
-            $violations = $validator->validate($email, new Email);
+            $violations = $this->validator->validate($email, new Email);
             if (0 !== count($violations)) {
                 foreach ($violations as $violation) {
                     $errors[] = sprintf('%s - %s', $email, $violation->getMessage());

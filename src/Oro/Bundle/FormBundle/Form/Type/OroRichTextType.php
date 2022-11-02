@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
@@ -15,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Provides WYSIWYG editor functionality. WYSIWYG editor can be disabled from System Configuration.
+ * @see https://www.tiny.cloud/docs/configure/editor-appearance/
  */
 class OroRichTextType extends AbstractType
 {
@@ -35,22 +37,22 @@ class OroRichTextType extends AbstractType
     /** @var ContextInterface */
     protected $context;
 
-    /** @var string */
-    protected $cacheDir;
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
 
     /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
      * @var array
      */
     public static $toolbars = [
-        self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
+        self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist | link image | fullscreen'],
         self::TOOLBAR_DEFAULT => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-             | fullscreen'
+            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ],
         self::TOOLBAR_LARGE => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-            | fullscreen'
+            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' .
+            '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ],
     ];
 
@@ -58,30 +60,21 @@ class OroRichTextType extends AbstractType
      * @var array
      */
     public static $defaultPlugins = [
-        'textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'
+        'code', 'link', 'fullscreen', 'paste', 'lists', 'image', 'advlist'
     ];
 
-    /**
-     * @param ConfigManager $configManager
-     * @param HtmlTagProvider $htmlTagProvider
-     * @param ContextInterface $context
-     * @param string $cacheDir
-     */
     public function __construct(
         ConfigManager $configManager,
         HtmlTagProvider $htmlTagProvider,
         ContextInterface $context,
-        $cacheDir = null
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->configManager   = $configManager;
         $this->htmlTagProvider = $htmlTagProvider;
         $this->context         = $context;
-        $this->cacheDir        = $cacheDir;
+        $this->htmlTagHelper   = $htmlTagHelper;
     }
 
-    /**
-     * @param AssetHelper $assetHelper
-     */
     public function setAssetHelper(AssetHelper $assetHelper)
     {
         $this->assetHelper = $assetHelper;
@@ -93,10 +86,7 @@ class OroRichTextType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $options['wysiwyg_options']['valid_elements']) {
-            $builder->addModelTransformer(new SanitizeHTMLTransformer(
-                $options['wysiwyg_options']['valid_elements'],
-                $this->cacheDir
-            ));
+            $builder->addModelTransformer(new SanitizeHTMLTransformer($this->htmlTagHelper));
         }
     }
 
@@ -121,16 +111,17 @@ class OroRichTextType extends AbstractType
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => $assetsBaseUrl . 'bundles/oroform/css/tinymce',
-            'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
+            'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements('default')),
             'menubar'            => false,
-            'statusbar'          => false,
+            'elementpath'        => false,
+            'branding'           => false,
             'relative_urls'      => false,
             'remove_script_host' => false,
             'convert_urls'       => true,
             'cache_suffix'       => $assetsVersionFormatted,
             'document_base_url'  => $assetsVersionBaseUrl,
-            'paste_data_images'  => false
+            'paste_data_images'  => false,
+            'assets_base_url'    => $assetsBaseUrl
         ];
 
         $defaults = [
@@ -139,8 +130,8 @@ class OroRichTextType extends AbstractType
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
-                    'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
+                    'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
+                    'content_css' => $assetsBaseUrl . 'build/admin/tinymce/wysiwyg-editor.css'
                 ]
             ],
         ];

@@ -4,25 +4,25 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Provides the metadata for a specific Data API resource.
+ * Provides the metadata for a specific API resource.
  */
-class MetadataProvider
+class MetadataProvider implements ResetInterface
 {
+    private const KEY_DELIMITER = '|';
+
     /** @var ActionProcessorInterface */
     private $processor;
 
     /** @var array */
     private $cache = [];
 
-    /**
-     * @param ActionProcessorInterface $processor
-     */
     public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
@@ -49,7 +49,7 @@ class MetadataProvider
         array $extras = [],
         bool $withExcludedProperties = false
     ): ?EntityMetadata {
-        if (empty($className)) {
+        if (!$className) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
@@ -64,7 +64,7 @@ class MetadataProvider
                 $withExcludedProperties
             );
         }
-        
+
         $cacheKey = $this->buildCacheKey(
             $className,
             $version,
@@ -73,7 +73,7 @@ class MetadataProvider
             $withExcludedProperties,
             $configKey
         );
-        if (array_key_exists($cacheKey, $this->cache)) {
+        if (\array_key_exists($cacheKey, $this->cache)) {
             $metadata = $this->cache[$cacheKey];
         } else {
             $metadata = $this->loadMetadata(
@@ -95,9 +95,9 @@ class MetadataProvider
     }
 
     /**
-     * Removes all already built metadatas from the internal cache.
+     * {@inheritdoc}
      */
-    public function clearCache(): void
+    public function reset()
     {
         $this->cache = [];
     }
@@ -160,16 +160,16 @@ class MetadataProvider
         string $configKey
     ): string {
         $cacheKey = (string)$requestType
-            . '|' . $version
-            . '|' . $className
-            . '|' . ($withExcludedProperties ? '1' : '0');
+            . self::KEY_DELIMITER . $version
+            . self::KEY_DELIMITER . $className
+            . self::KEY_DELIMITER . ($withExcludedProperties ? '1' : '0');
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $cacheKey .= '|' . $part;
+            if ($part) {
+                $cacheKey .= self::KEY_DELIMITER . $part;
             }
         }
-        $cacheKey .= '|' . $configKey;
+        $cacheKey .= self::KEY_DELIMITER . $configKey;
 
         return $cacheKey;
     }

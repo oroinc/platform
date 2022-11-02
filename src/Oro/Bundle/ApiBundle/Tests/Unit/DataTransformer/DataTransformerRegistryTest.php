@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,7 +22,7 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var DataTransformerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer1 = $this->createMock(DataTransformerInterface::class);
         $this->transformer2 = $this->createMock(DataTransformerInterface::class);
@@ -30,13 +31,18 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new DataTransformerRegistry(
             [
                 'dataType1' => [
-                    [$this->transformer2, 'rest'],
-                    [$this->transformer1, null]
+                    ['transformer2', 'rest'],
+                    ['transformer1', null]
                 ],
                 'dataType2' => [
-                    [$this->transformer3, 'rest']
+                    ['transformer3', 'rest']
                 ]
             ],
+            TestContainerBuilder::create()
+                ->add('transformer1', $this->transformer1)
+                ->add('transformer2', $this->transformer2)
+                ->add('transformer3', $this->transformer3)
+                ->getContainer($this),
             new RequestExpressionMatcher()
         );
     }

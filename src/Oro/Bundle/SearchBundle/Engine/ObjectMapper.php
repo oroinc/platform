@@ -2,29 +2,37 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Preparing storable index data from entities.
- *
- * @package Oro\Bundle\SearchBundle\Engine
  */
 class ObjectMapper extends AbstractMapper
 {
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param                          $mappingConfig
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, $mappingConfig)
-    {
-        $this->dispatcher    = $dispatcher;
-        $this->mappingConfig = $mappingConfig;
+    public function __construct(
+        protected SearchMappingProvider $mappingProvider,
+        protected PropertyAccessorInterface $propertyAccessor,
+        protected TypeCastingHandlerRegistry $handlerRegistry,
+        protected EntityNameResolver $nameResolver,
+        protected DoctrineHelper $doctrineHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected HtmlTagHelper $htmlTagHelper,
+        protected DateTimeFormatter $dateTimeFormatter
+    ) {
+        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry, $nameResolver, $doctrineHelper);
     }
 
     /**
@@ -113,6 +121,11 @@ class ObjectMapper extends AbstractMapper
         $objectData  = [];
         $objectClass = ClassUtils::getRealClass($object);
         if (is_object($object) && $this->mappingProvider->hasFieldsMapping($objectClass)) {
+            // generate system entity values
+            $objectData[Query::TYPE_INTEGER][Indexer::ID_FIELD] = $this->getEntityId($object);
+            $objectData[Query::TYPE_TEXT][Indexer::NAME_FIELD] = $this->getEntityName($object);
+
+            // add field data
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', []) as $field) {
                 $objectData = $this->processField($alias, $objectData, $field, $object);
@@ -127,8 +140,10 @@ class ObjectMapper extends AbstractMapper
                 $objectData,
                 $this->getEntityConfig($objectClass)
             );
-            $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
-            $objectData = $event->getData();
+            $this->dispatcher->dispatch($event, PrepareEntityMapEvent::EVENT_NAME);
+
+            // Generate "all_text" field from all text fields.
+            $objectData = $this->generateAllTextField($event->getData());
         }
 
         return $objectData;
@@ -159,12 +174,8 @@ class ObjectMapper extends AbstractMapper
     /**
      * Gathers additionally selected fields from the search index
      * into an output array.
-     *
-     * @param Query $query
-     * @param array $resultItem
-     * @return array
      */
-    public function mapSelectedData(Query $query, $resultItem)
+    public function mapSelectedData(Query $query, array $resultItem) : array
     {
         $dataFields = $query->getSelectDataFields();
 
@@ -175,45 +186,54 @@ class ObjectMapper extends AbstractMapper
         $result = [];
 
         foreach ($dataFields as $column => $dataField) {
-            list($type, $columnName) = Criteria::explodeFieldTypeName($column);
-
-            $value = '';
-
-            if (isset($resultItem[$columnName])) {
-                $value = $resultItem[$columnName];
-            }
-
-            if (isset($resultItem[$dataField])) {
-                $value = $resultItem[$dataField];
-            }
-
-            if (is_array($value)) {
-                $value = array_shift($value);
-            }
-
-            if (is_numeric($value)) {
-                if ($type === Query::TYPE_INTEGER) {
-                    $value = (int)$value;
-                } elseif ($type === Query::TYPE_DECIMAL) {
-                    $value = (float)$value;
-                }
-            }
-
-            $result[$dataField] = $value;
+            $result[$dataField] = $this->mapColumn($resultItem, $column, $dataField);
         }
 
         return $result;
     }
 
+    private function mapColumn(array $resultItem, string $column, string $dataField): mixed
+    {
+        [$type, $columnName] = Criteria::explodeFieldTypeName($column);
+
+        $value = '';
+
+        if (isset($resultItem[$columnName])) {
+            $value = $resultItem[$columnName];
+        }
+
+        if (isset($resultItem[$dataField])) {
+            $value = $resultItem[$dataField];
+        }
+
+        if (is_array($value)) {
+            $value = array_shift($value);
+        }
+
+        if (is_numeric($value)) {
+            if ($type === Query::TYPE_INTEGER) {
+                $value = (int)$value;
+            } elseif ($type === Query::TYPE_DECIMAL) {
+                $value = (float)$value;
+            }
+        }
+
+        if ($value instanceof \DateTime) {
+            $value = $this->dateTimeFormatter->format($value);
+        }
+
+        return $value;
+    }
+
     /**
      * Processes field mapping
      *
-     * @param string $alias
-     * @param array  $objectData
-     * @param array  $fieldConfig
-     * @param object $object
-     * @param string $parentFieldName
-     * @param bool   $isArray
+     * @param string      $alias
+     * @param array       $objectData
+     * @param array       $fieldConfig
+     * @param object      $object
+     * @param string|null $parentFieldName
+     * @param bool        $isArray
      *
      * @return array
      */
@@ -244,8 +264,8 @@ class ObjectMapper extends AbstractMapper
                 );
             }
         } else {
-            if (empty($fieldConfig['target_fields']) && $parentFieldName) {
-                $fieldConfig['target_fields'] = [$parentFieldName];
+            if (empty($fieldConfig['target_fields'])) {
+                $fieldConfig['target_fields'] = [$parentFieldName ?? $fieldConfig['name']];
             }
             $objectData = $this->setDataValue($alias, $objectData, $fieldConfig, $fieldValue, $isArray);
         }
@@ -315,7 +335,7 @@ class ObjectMapper extends AbstractMapper
      */
     protected function clearTextValue($fieldName, $value)
     {
-        if (strpos($fieldName, Indexer::TEXT_ALL_DATA_FIELD) === 0) {
+        if (str_starts_with($fieldName, Indexer::TEXT_ALL_DATA_FIELD)) {
             $value = $this->htmlTagHelper->stripTags((string)$value);
             $value = $this->htmlTagHelper->stripLongWords($value);
         }

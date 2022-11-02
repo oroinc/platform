@@ -1,7 +1,3 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery.validate';
 
-    var $ = require('jquery.validate');
-
-    $.validator.loadMethod('orouser/js/validator/password-complexity');
-});
+$.validator.loadMethod('orouser/js/validator/password-complexity');

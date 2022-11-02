@@ -2,17 +2,23 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
+use Oro\Bundle\ActionBundle\Handler\OperationFormHandler;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class WidgetController extends Controller
+/**
+ * Serves action widget actions.
+ */
+class WidgetController extends AbstractController
 {
-    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
+    const DEFAULT_FORM_TEMPLATE = '@OroAction/Operation/form.html.twig';
+    const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
 
     /**
      * @Route("/buttons", name="oro_action_widget_buttons")
@@ -22,10 +28,10 @@ class WidgetController extends Controller
      */
     public function buttonsAction()
     {
-        $buttonSearchContext = $this->get('oro_action.provider.button_search_context')->getButtonSearchContext();
+        $buttonSearchContext = $this->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
 
         return [
-            'buttons' => $this->get('oro_action.provider.button')->findAvailable($buttonSearchContext),
+            'buttons' => $this->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
         ];
     }
 
@@ -39,9 +45,9 @@ class WidgetController extends Controller
      */
     public function formAction(Request $request, $operationName)
     {
-        $handler = $this->get('oro_action.form.handler.operation_button');
+        $handler = $this->get(OperationFormHandler::class);
 
-        $result = $handler->process($operationName, $request, $this->get('session')->getFlashBag());
+        $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
 
         return $result instanceof Response ? $result : $this->render($this->getFormTemplate($result), $result);
     }
@@ -66,5 +72,20 @@ class WidgetController extends Controller
         }
 
         return $template;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ButtonSearchContextProvider::class,
+                ButtonProvider::class,
+                OperationFormHandler::class,
+            ]
+        );
     }
 }

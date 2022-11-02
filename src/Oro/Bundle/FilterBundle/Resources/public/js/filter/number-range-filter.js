@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var NumberRangeFilter;
-    var template = require('tpl!orofilter/templates/filter/number-range-filter.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var NumberFilter = require('oro/filter/number-filter');
+    const template = require('tpl-loader!orofilter/templates/filter/number-range-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const NumberFilter = require('oro/filter/number-filter');
 
-    NumberRangeFilter = NumberFilter.extend({
+    const NumberRangeFilter = NumberFilter.extend({
 
         /**
          * Template selector for filter criteria
@@ -56,10 +55,10 @@ define(function(require) {
         autoUpdateRangeFilterType: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NumberRangeFilter() {
-            NumberRangeFilter.__super__.constructor.apply(this, arguments);
+        constructor: function NumberRangeFilter(options) {
+            NumberRangeFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -74,15 +73,15 @@ define(function(require) {
 
             _.defaults(this.criteriaValueSelectors, NumberRangeFilter.__super__.criteriaValueSelectors);
 
-            NumberRangeFilter.__super__.initialize.apply(this, arguments);
+            NumberRangeFilter.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isEmptyValue: function() {
             if (!this.isApplicable(this.value.type)) {
-                return NumberRangeFilter.__super__.isEmptyValue.apply(this, arguments);
+                return NumberRangeFilter.__super__.isEmptyValue.call(this);
             } else if (!_.has(this.value, 'value') && !_.has(this.value, 'value_end')) {
                 return true;
             } else if (this.emptyValue.value === this.value.value &&
@@ -94,25 +93,29 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _applyValueAndHideCriteria: function() {
             this._beforeApply();
-            NumberRangeFilter.__super__._applyValueAndHideCriteria.apply(this);
+            NumberRangeFilter.__super__._applyValueAndHideCriteria.call(this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _updateValueField: function() {
-            NumberRangeFilter.__super__._updateValueField.apply(this, arguments);
+            NumberRangeFilter.__super__._updateValueField.call(this);
 
-            var type = this.$(this.criteriaValueSelectors.type).val();
+            const type = this.$(this.criteriaValueSelectors.type).val();
+            const filterEnd = this.$('.filter-separator, .filter-end');
+            const {inputFieldAriaLabel, rangeStartFieldAriaLabel} = this.getTemplateDataProps();
 
             if (this.isApplicable(type)) {
-                this.$('.filter-separator, .filter-end').show();
+                this.$(this.criteriaValueSelectors.value).attr('aria-label', rangeStartFieldAriaLabel);
+                filterEnd.show();
             } else {
-                this.$('.filter-separator, .filter-end').hide();
+                this.$(this.criteriaValueSelectors.value).attr('aria-label', inputFieldAriaLabel);
+                filterEnd.hide();
 
                 this.value.value_end = this.emptyValue.value_end;
                 this._setInputValue(this.criteriaValueSelectors.value_end, this.value.value_end);
@@ -135,34 +138,34 @@ define(function(require) {
          * @returns {String}
          */
         getRangeHint: function(type, start, end, between) {
-            var hint = '';
+            let hint = '';
 
-            var option = this._getChoiceOption(type);
+            let option = this._getChoiceOption(type);
 
             if (start && end) {
                 option = this._getChoiceOption(type);
                 hint += [option.label, start, __('and'), end].join(' ');
             } else if (between && start || !between && end) {
-                hint += [__('after'), start || end].join(' ');
+                hint += [__('oro.filter.number_range.greater_than'), start || end].join(' ');
             } else if (between && end || !between && start) {
-                hint += [__('before'), end || start].join(' ');
+                hint += [__('oro.filter.number_range.less_than'), end || start].join(' ');
             }
 
             return hint;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        _getCriteriaHint: function() {
+        _getCriteriaHint: function(...args) {
             if (this.isEmptyValue()) {
                 return this.placeholder;
             }
 
-            var hint = '';
-            var data = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            let hint = '';
+            const data = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
             if (data.value || data.value_end) {
-                var type = data.type ? data.type.toString() : '';
+                const type = data.type ? data.type.toString() : '';
                 switch (type) {
                     case this.typeValues.between.toString():
                         hint = this.getRangeHint(this.typeValues.between, data.value, data.value_end, true);
@@ -173,7 +176,7 @@ define(function(require) {
                 }
             }
             if (!hint) {
-                hint = NumberRangeFilter.__super__._getCriteriaHint.apply(this, arguments);
+                hint = NumberRangeFilter.__super__._getCriteriaHint.apply(this, args);
             }
 
             return hint ? hint : this.placeholder;
@@ -200,46 +203,22 @@ define(function(require) {
          */
         _updateRangeFilter: function(value) {
             value = this._formatRawValue(value);
-            var oldValue = tools.deepClone(value);
-            if (this.isApplicable(value.type)) {
-                if (value.value && value.value_end) {
-                    // if both values are filled
-                    // start/end values if end value is lower than start
-                    if (value.value_end < value.value) {
-                        var endValue = value.value_end;
-                        value.value_end = value.value;
-                        value.value = endValue;
-                    }
-                } else {
-                    if (value.value || value.value_end) {
-                        var type = parseInt(value.type);
-                        // if only one value is filled, replace filter type to less than or more than
-                        if (value.value_end) {
-                            value.type = type === this.typeValues.between
-                                ? this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
-                            value.value = value.value_end;
-                            value.value_end = '';
-                        } else {
-                            value.type = type === this.typeValues.between
-                                ? this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
-                        }
-                    }
-                }
-                if (!tools.isEqualsLoosely(value, oldValue)) {
-                    // apply new values and filter type
-                    this.setValue(value);
-                }
+            const oldValue = tools.deepClone(value);
+            value = this.swapValues(value);
+            if (!tools.isEqualsLoosely(value, oldValue)) {
+                // apply new values and filter type
+                this.setValue(value);
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(data) {
-            NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+            NumberRangeFilter.__super__._writeDOMValue.call(this, data);
 
             this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
-            var $typeInput = this.$(this.criteriaValueSelectors.type);
+            const $typeInput = this.$(this.criteriaValueSelectors.type);
             if ($typeInput.length && data.type !== $typeInput.val()) {
                 this._setInputValue(this.criteriaValueSelectors.type, data.type);
                 this._updateTypeDropdown(data.type);
@@ -255,7 +234,7 @@ define(function(require) {
          * @protected
          */
         _updateTypeDropdown: function(value) {
-            var a = this.$('.dropdown-menu:eq(0) a').filter(function() {
+            const a = this.$('.dropdown-menu:eq(0) a').filter(function() {
                 return $(this).data('value') === value;
             });
             a.parent().parent().find('li').each(function() {
@@ -263,28 +242,59 @@ define(function(require) {
             });
             a.parent().addClass('active');
 
-            var parentDiv = a.parent().parent().parent();
-            var choiceName = a.html();
+            const parentDiv = a.parent().parent().parent();
+            let choiceName = a.html();
             choiceName += this.caret;
             parentDiv.find('[data-toggle="dropdown"]').html(choiceName);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
-            var data = NumberRangeFilter.__super__._readDOMValue.apply(this, arguments);
+            const data = NumberRangeFilter.__super__._readDOMValue.call(this);
 
             data.value_end = this._getInputValue(this.criteriaValueSelectors.value_end);
 
             return data;
         },
 
+        swapValues(data) {
+            if (!this.isApplicable(data.type)) {
+                return data;
+            }
+            if (data.value && data.value_end) {
+                // if both values are filled
+                // start/end values if end value is lower than start
+                if (data.value_end < data.value) {
+                    const endValue = data.value_end;
+                    data.value_end = data.value;
+                    data.value = endValue;
+                }
+            } else {
+                if (data.value || data.value_end) {
+                    const type = parseInt(data.type);
+                    // if only one value is filled, replace filter type to less than or more than
+                    if (data.value_end) {
+                        data.type = type === this.typeValues.between
+                            ? this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
+                        data.value = data.value_end;
+                        data.value_end = '';
+                    } else {
+                        data.type = type === this.typeValues.between
+                            ? this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
+                    }
+                }
+            }
+
+            return data;
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue: function(data) {
-            var formatted = NumberRangeFilter.__super__._formatRawValue.apply(this, arguments);
+            const formatted = NumberRangeFilter.__super__._formatRawValue.call(this, data);
 
             formatted.value_end = this._toRawValue(data.value_end);
 
@@ -292,10 +302,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatDisplayValue: function(data) {
-            var formatted = NumberRangeFilter.__super__._formatDisplayValue.apply(this, arguments);
+            const formatted = NumberRangeFilter.__super__._formatDisplayValue.call(this, data);
 
             formatted.value_end = this._toDisplayValue(data.value_end);
 
@@ -303,19 +313,33 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {boolean}
          * @private
          */
         _isValid: function() {
-            var rawValue = this.formatter.toRaw(this._readDOMValue().value_end);
-            var validValueEnd = rawValue === void 0 || this._checkNumberRules(rawValue);
+            const rawValue = this.formatter.toRaw(this._readDOMValue().value_end);
+            const validValueEnd = rawValue === void 0 || this._checkNumberRules(rawValue);
 
             if (!validValueEnd) {
                 return false;
             } else {
-                return NumberRangeFilter.__super__._isValid.apply(this, arguments);
+                return NumberRangeFilter.__super__._isValid.call(this);
             }
+        },
+
+        getTemplateDataProps() {
+            const data = NumberRangeFilter.__super__.getTemplateDataProps.call(this);
+
+            return {
+                ...data,
+                rangeStartFieldAriaLabel: __('oro.filter.range_fields.start_field.aria_label', {
+                    label: this.label
+                }),
+                rangeEndFieldAriaLabel: __('oro.filter.range_fields.end_field.aria_label', {
+                    label: this.label
+                })
+            };
         }
     });
 

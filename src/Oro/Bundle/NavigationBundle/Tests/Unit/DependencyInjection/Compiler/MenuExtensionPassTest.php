@@ -9,94 +9,49 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerBuilder */
+    private $container;
+
+    /** @var Definition */
+    private $menuFactory;
 
     /** @var MenuExtensionPass */
-    protected $menuExtensionPass;
+    private $compiler;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerBuilder::class);
+        $this->container = new ContainerBuilder();
+        $this->menuFactory = $this->container->register('oro_menu.factory');
 
-        $this->menuExtensionPass = new MenuExtensionPass();
-    }
-
-    public function testProcessWithoutFactoryService()
-    {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(MenuExtensionPass::MENU_FACTORY_TAG))
-            ->will($this->returnValue(false));
-
-        $this->container
-            ->expects($this->never())
-            ->method('findTaggedServiceIds');
-
-        $this->container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $this->menuExtensionPass->process($this->container);
+        $this->compiler = new MenuExtensionPass();
     }
 
     public function testProcessWithoutTaggedServices()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(MenuExtensionPass::MENU_FACTORY_TAG))
-            ->will($this->returnValue(true));
-
-        $this->container
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($this->equalTo(MenuExtensionPass::MENU_EXTENSION_TAG))
-            ->will($this->returnValue([]));
-
-        $this->container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $this->menuExtensionPass->process($this->container);
+        $this->compiler->process($this->container);
+        $this->assertEquals([], $this->menuFactory->getMethodCalls());
     }
 
     public function testProcess()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(MenuExtensionPass::MENU_FACTORY_TAG))
-            ->will($this->returnValue(true));
+        $this->container->setDefinition('extension_1', new Definition())
+            ->addTag('oro_navigation.menu_extension');
+        $this->container->setDefinition('extension_2', new Definition())
+            ->addTag('oro_navigation.menu_extension', ['priority' => 100]);
+        $this->container->setDefinition('extension_3', new Definition())
+            ->addTag('oro_navigation.menu_extension', ['priority' => -100]);
 
-        $this->container
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($this->equalTo(MenuExtensionPass::MENU_EXTENSION_TAG))
-            ->will($this->returnValue([
-                'extension_1' => [['priority' => '10']],
-                'extension_2' => [['priority' => '20']]
-            ]));
-
-        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
-        $definition = $this->createMock(Definition::class);
-        $definition->expects($this->exactly(2))
-            ->method('addMethodCall')
-            ->withConsecutive(
-                ['addExtension', [new Reference('extension_1'), '10']],
-                ['addExtension', [new Reference('extension_2'), '20']]
-            );
-
-        $this->container
-            ->expects($this->once())
-            ->method('getDefinition')
-            ->with($this->equalTo(MenuExtensionPass::MENU_FACTORY_TAG))
-            ->will($this->returnValue($definition));
-
-        $this->menuExtensionPass->process($this->container);
+        $this->compiler->process($this->container);
+        $this->assertEquals(
+            [
+                ['addExtension', [new Reference('extension_1'), 0]],
+                ['addExtension', [new Reference('extension_2'), 100]],
+                ['addExtension', [new Reference('extension_3'), -100]]
+            ],
+            $this->menuFactory->getMethodCalls()
+        );
     }
 }

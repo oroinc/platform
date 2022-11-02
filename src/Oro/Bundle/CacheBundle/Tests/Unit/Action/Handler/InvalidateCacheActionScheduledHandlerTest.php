@@ -11,27 +11,19 @@ use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
 class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
     private $deferredScheduler;
 
-    /**
-     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $scheduleArgumentsBuilder;
 
-    /**
-     * @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cronFormatTransformer;
 
-    /**
-     * @var InvalidateCacheActionScheduledHandler
-     */
+    /** @var InvalidateCacheActionScheduledHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deferredScheduler = $this->createMock(DeferredScheduler::class);
         $this->scheduleArgumentsBuilder = $this->createMock(InvalidateCacheScheduleArgumentsBuilderInterface::class);
@@ -54,19 +46,19 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
             'parameters=' . serialize([]),
         ];
 
-        $this->scheduleArgumentsBuilder->expects(static::once())
+        $this->scheduleArgumentsBuilder->expects(self::once())
             ->method('build')
             ->with($dataStorage)
             ->willReturn($arguments);
 
-        $this->deferredScheduler->expects(static::once())
+        $this->deferredScheduler->expects(self::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
 
-        $this->deferredScheduler->expects(static::never())
+        $this->deferredScheduler->expects(self::never())
             ->method('addSchedule');
 
-        $this->deferredScheduler->expects(static::once())
+        $this->deferredScheduler->expects(self::once())
             ->method('flush');
 
         $this->handler->handle($dataStorage);
@@ -86,25 +78,25 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
         ];
         $cronDefinition = '1 3 5 2 *';
 
-        $this->scheduleArgumentsBuilder->expects(static::once())
+        $this->scheduleArgumentsBuilder->expects(self::once())
             ->method('build')
             ->with($dataStorage)
             ->willReturn($arguments);
 
-        $this->cronFormatTransformer->expects(static::once())
+        $this->cronFormatTransformer->expects(self::once())
             ->method('transform')
             ->with($time)
             ->willReturn($cronDefinition);
 
-        $this->deferredScheduler->expects(static::once())
+        $this->deferredScheduler->expects(self::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
 
-        $this->deferredScheduler->expects(static::once())
+        $this->deferredScheduler->expects(self::once())
             ->method('addSchedule')
-            ->with(InvalidateCacheScheduleCommand::NAME, $arguments, $cronDefinition);
+            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments, $cronDefinition);
 
-        $this->deferredScheduler->expects(static::once())
+        $this->deferredScheduler->expects(self::once())
             ->method('flush');
 
         $this->handler->handle($dataStorage);

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -13,16 +14,26 @@ use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
+use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Helper methods for import strategies.
+ */
 class ImportStrategyHelper
 {
+    use AuthorizationCheckerTrait;
+
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -47,15 +58,12 @@ class ImportStrategyHelper
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param ManagerRegistry                $managerRegistry
-     * @param ValidatorInterface             $validator
-     * @param TranslatorInterface            $translator
-     * @param FieldHelper                    $fieldHelper
-     * @param ConfigurableTableDataConverter $configurableDataConverter
-     * @param AuthorizationCheckerInterface  $authorizationChecker
-     * @param TokenAccessorInterface         $tokenAccessor
-     */
+    /** @var OwnerChecker */
+    protected $ownerChecker;
+
+    /** @var array */
+    protected $isGrantedCache = [];
+
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
@@ -63,7 +71,8 @@ class ImportStrategyHelper
         FieldHelper $fieldHelper,
         ConfigurableTableDataConverter $configurableDataConverter,
         AuthorizationCheckerInterface $authorizationChecker,
-        TokenAccessorInterface $tokenAccessor
+        TokenAccessorInterface $tokenAccessor,
+        OwnerChecker $ownerChecker
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
@@ -72,14 +81,104 @@ class ImportStrategyHelper
         $this->configurableDataConverter = $configurableDataConverter;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
+        $this->ownerChecker = $ownerChecker;
     }
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function setConfigProvider(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param string $permission
+     * @param object|string $entity
+     * @param string $entityName
+     * @return null
+     */
+    public function checkPermissionGrantedForEntity(ContextInterface $context, $permission, $entity, $entityName)
+    {
+        if (!$this->isGranted($permission, $entity)) {
+            $error = $this->translator->trans(
+                'oro.importexport.import.errors.access_denied_entity',
+                ['%entity_name%' => $entityName,]
+            );
+            $context->addError($error);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param object $entity
+     * @param bool $suppressErrorOutput
+     * @return bool
+     */
+    public function checkEntityOwnerPermissions(ContextInterface $context, $entity, bool $suppressErrorOutput = false)
+    {
+        if (!$this->ownerChecker->isOwnerCanBeSet($entity)) {
+            if (!$suppressErrorOutput) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.wrong_owner'
+                );
+                $this->addValidationErrors([$error], $context);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param object $entity
+     * @param object|null $existingEntity
+     * @param array|null $itemData
+     *
+     * @return bool
+     */
+    public function checkImportedEntityFieldsAcl(
+        ContextInterface $context,
+        $entity,
+        $existingEntity = null,
+        $itemData = null
+    ): bool {
+        $entityName = ClassUtils::getClass($entity);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
+        $action = $existingEntity ? 'EDIT' : 'CREATE';
+        $checkEntity = $existingEntity ?: new ObjectIdentity('entity', $entityName);
+        $isValid = true;
+
+        foreach ($fields as $field) {
+            if ($itemData && !array_key_exists($field['name'], (array) $itemData)) {
+                // Skips ACL check because field is not present in import.
+                continue;
+            }
+
+            if (!$this->isGranted($action, $checkEntity, $field['name'])) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $field['name'],
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $isValid = false;
+                $context->addError($error);
+                if ($existingEntity) {
+                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $field['name']);
+                    $this->fieldHelper->setObjectValue($entity, $field['name'], $existingValue);
+                } else {
+                    $this->fieldHelper->setObjectValue($entity, $field['name'], null);
+                }
+            }
+        }
+
+        return $isValid;
     }
 
     /**
@@ -99,16 +198,46 @@ class ImportStrategyHelper
         if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
+
+        $cacheKey = $this->getIsGrantedCacheKey($attributes, $obj, $property);
+        if (array_key_exists($cacheKey, $this->isGrantedCache)) {
+            return $this->isGrantedCache[$cacheKey];
+        }
+
         if ($property && !($obj instanceof FieldVote)) {
             $obj = new FieldVote($obj, $property);
         }
 
         try {
-            return $this->authorizationChecker->isGranted($attributes, $obj);
+            $this->isGrantedCache[$cacheKey] = $this->isAttributesGranted(
+                $this->authorizationChecker,
+                $attributes,
+                $obj
+            );
         } catch (InvalidDomainObjectException $exception) {
-            // if object do not have identity we skipp check
-            return true;
+            // if object do not have identity we skip check
+            $this->isGrantedCache[$cacheKey] = true;
         }
+
+        return $this->isGrantedCache[$cacheKey];
+    }
+
+    /**
+     * @param string|string[] $attributes
+     * @param object|string $obj
+     * @param string|null $property
+     *
+     * @return string
+     */
+    private function getIsGrantedCacheKey($attributes, $obj, $property = null): string
+    {
+        if ($obj instanceof ObjectIdentityInterface) {
+            $oid = sprintf('%s:%s', $obj->getIdentifier(), $obj->getType());
+        } else {
+            $oid = is_object($obj) ? \spl_object_hash($obj) : $obj;
+        }
+
+        return sprintf('%s:%s:%s', $oid, implode('_', (array) $attributes), (string) $property);
     }
 
     /**
@@ -136,10 +265,7 @@ class ImportStrategyHelper
      */
     public function importEntity($basicEntity, $importedEntity, array $excludedProperties = [])
     {
-        $basicEntityClass = ClassUtils::getClass($basicEntity);
-        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
-            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
-        }
+        $basicEntityClass = $this->verifyClass($basicEntity, $importedEntity);
 
         $entityProperties = $this->getEntityPropertiesByClassName($basicEntityClass);
         $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
@@ -195,22 +321,11 @@ class ImportStrategyHelper
      */
     public function addValidationErrors(array $validationErrors, ContextInterface $context, $errorPrefix = null)
     {
-        $batchSize = null;
-        $batchNumber = null;
-        if ($context instanceof BatchContextInterface) {
-            $batchSize = $context->getBatchSize();
-            $batchNumber = $context->getBatchNumber();
-        }
-
         if (null === $errorPrefix) {
-            $rowNumber = $context->getReadOffset();
-            if ($batchNumber && $batchSize) {
-                $rowNumber += --$batchNumber * $batchSize;
-            }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
                 [
-                    '%number%' => $rowNumber
+                    '%number%' => $this->getCurrentRowNumber($context),
                 ]
             );
         }
@@ -220,7 +335,7 @@ class ImportStrategyHelper
     }
 
     /**
-     * @return mixed|null
+     * @return AbstractUser|null
      */
     public function getLoggedUser()
     {
@@ -249,7 +364,7 @@ class ImportStrategyHelper
      *
      * @return array
      */
-    private function getEntityPropertiesByClassName($entityClassName)
+    protected function getEntityPropertiesByClassName($entityClassName)
     {
         /**
          * In case if we work with configured entities then we should use fieldHelper
@@ -257,9 +372,9 @@ class ImportStrategyHelper
          * that mustn't be changed by import/export
          */
         if ($this->extendConfigProvider->hasConfig($entityClassName)) {
-            $properties = $this->fieldHelper->getFields(
+            $properties = $this->fieldHelper->getEntityFields(
                 $entityClassName,
-                true
+                EntityFieldProvider::OPTION_WITH_RELATIONS
             );
 
             return array_column($properties, 'name');
@@ -273,5 +388,32 @@ class ImportStrategyHelper
             $entityMetadata->getFieldNames(),
             $entityMetadata->getAssociationNames()
         );
+    }
+
+    public function getCurrentRowNumber(ContextInterface $context): int
+    {
+        $batchSize = null;
+        $batchNumber = null;
+        if ($context instanceof BatchContextInterface) {
+            $batchSize = (int) $context->getBatchSize();
+            $batchNumber = (int) $context->getBatchNumber();
+        }
+
+        $rowNumber = (int) $context->getReadOffset();
+        if ($batchNumber && $batchSize) {
+            $rowNumber += --$batchNumber * $batchSize;
+        }
+
+        return $rowNumber;
+    }
+
+    protected function verifyClass($basicEntity, $importedEntity): string
+    {
+        $basicEntityClass = ClassUtils::getClass($basicEntity);
+        if ($basicEntityClass !== ClassUtils::getClass($importedEntity)) {
+            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
+        }
+
+        return $basicEntityClass;
     }
 }

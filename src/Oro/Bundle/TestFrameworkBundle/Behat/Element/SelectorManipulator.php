@@ -5,6 +5,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Selector\Xpath\Manipulator;
 
+/**
+ * Utility for element selectors manipulations
+ */
 class SelectorManipulator extends Manipulator
 {
     /**
@@ -14,7 +17,7 @@ class SelectorManipulator extends Manipulator
      */
     public function addContainsSuffix($cssSelector, $text)
     {
-        list($selectorType, $locator) = $this->parseSelector($cssSelector);
+        [$selectorType, $locator] = $this->parseSelector($cssSelector);
 
         if ($selectorType !== 'css') {
             throw new \InvalidArgumentException('Method "addContainsSuffix" support only css selectors');
@@ -49,7 +52,7 @@ class SelectorManipulator extends Manipulator
      */
     public function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
     {
-        list($selectorType, $locator) = $this->parseSelector($selector);
+        [$selectorType, $locator] = $this->parseSelector($selector);
 
         return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
@@ -68,6 +71,20 @@ class SelectorManipulator extends Manipulator
             sprintf("contains(%s, '%s')", $this->getToLowerXPathExpr('.'), strtolower($text)),
             $useChildren
         );
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $text
+     *
+     * @return array
+     */
+    public function getExactMatchXPathSelector($xpath, $text)
+    {
+        return [
+            'type' => 'xpath',
+            'locator' => $xpath . sprintf("[%s='%s']", $this->getToLowerXPathExpr('text()'), strtolower($text))
+        ];
     }
 
     /**
@@ -106,8 +123,19 @@ class SelectorManipulator extends Manipulator
     {
         return sprintf(
             "translate(%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')",
-            $expr
+            $this->getNormalizedSpacesXPathExpr($expr)
         );
+    }
+
+    /**
+     * Replace &nbsp; with normal space and remove not needed spaces
+     *
+     * @param string $expr
+     * @return string
+     */
+    protected function getNormalizedSpacesXPathExpr($expr)
+    {
+        return sprintf("normalize-space(translate(%s, '\xc2\xa0', ' '))", $expr);
     }
 
     /**
@@ -121,7 +149,7 @@ class SelectorManipulator extends Manipulator
     {
         $embedCondition = sprintf('text()[%s]', $xpathCondition);
         if ($useChildren) {
-            $embedCondition = sprintf('node()[%s]', $embedCondition);
+            $embedCondition = sprintf('descendant-or-self::node()[%s]', $embedCondition);
         }
 
         $length = strlen($xpath);

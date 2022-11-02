@@ -11,12 +11,8 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
  */
 class FeatureAwareMenuFactoryExtension implements ExtensionInterface
 {
-    /** @var FeatureChecker */
-    private $featureChecker;
+    private FeatureChecker $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
@@ -25,7 +21,7 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildOptions(array $options = [])
+    public function buildOptions(array $options): array
     {
         if (!empty($options['route'])
             && !$this->alreadyDenied($options)
@@ -40,7 +36,7 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildItem(ItemInterface $item, array $options)
+    public function buildItem(ItemInterface $item, array $options): void
     {
     }
 

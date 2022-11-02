@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
@@ -38,11 +39,11 @@ class ActivityListRepository extends EntityRepository
         if ($dateFrom) {
             if ($dateTo) {
                 $qb->andWhere($qb->expr()->between('activity.updatedAt', ':dateFrom', ':dateTo'))
-                    ->setParameter('dateTo', $dateTo);
+                    ->setParameter('dateTo', $dateTo, Types::DATETIME_MUTABLE);
             } else {
                 $qb->andWhere('activity.updatedAt > :dateFrom');
             }
-            $qb->setParameter('dateFrom', $dateFrom);
+            $qb->setParameter('dateFrom', $dateFrom, Types::DATETIME_MUTABLE);
         }
 
         return $qb;
@@ -77,9 +78,6 @@ class ActivityListRepository extends EntityRepository
 
     /**
      * Delete activity lists by related activity data
-     *
-     * @param $class
-     * @param $id
      */
     public function deleteActivityListsByRelatedActivityData($class, $id)
     {

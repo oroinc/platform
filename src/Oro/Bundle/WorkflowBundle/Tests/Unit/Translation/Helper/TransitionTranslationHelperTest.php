@@ -4,20 +4,17 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\Helper;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var TransitionTranslationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
 
@@ -25,21 +22,17 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider processTransitionTranslationsProvider
      */
     public function testProcessTransitionTranslations(array $inputData, array $expectedData)
     {
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValueMap($inputData['translates']));
+            ->willReturnMap($inputData['translates']);
 
-        /* @var $transition Transition */
         $transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
-            ->setMethods(['__construct'])
+            ->onlyMethods(['__construct'])
             ->getMock();
 
         $transition->setLabel($inputData['label']);
@@ -56,10 +49,8 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function processTransitionTranslationsProvider()
+    public function processTransitionTranslationsProvider(): array
     {
         return [
             'full labels' => [
@@ -124,7 +115,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedButtonLabel',
-                    'buttonTitle' => 'TranslatedButtonLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedButtonLabel',
@@ -146,7 +137,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedLabel',
-                    'buttonTitle' => 'TranslatedLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedLabel',
@@ -168,7 +159,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedButtonLabel',
-                    'buttonTitle' => 'TranslatedButtonLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedButtonLabel',
@@ -190,7 +181,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedLabel',
-                    'buttonTitle' => 'TranslatedLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedLabel',

@@ -15,18 +15,15 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
 {
     use EntityTrait;
 
-    const CURRENT_RELATION_TYPE = 'CurrentType';
+    private const CURRENT_RELATION_TYPE = 'CurrentType';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var EntityExtendedStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->listener = new EntityExtendedStructureOptionsListener($this->doctrineHelper);
@@ -62,14 +59,12 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
             ->with($expectedFieldName)
             ->willReturn(['type' => $type]);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
             ->with($expectedClass)
             ->willReturn(true);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->with($expectedClass)
             ->willReturn($entityMetadata);
@@ -82,10 +77,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
         $this->assertEquals([$this->getEntityStructure($fieldName, $expectedRelationType)], $event->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         $processedRelationType = lcfirst(self::CURRENT_RELATION_TYPE);
 
@@ -152,14 +144,12 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
         $entityMetadata->expects($this->never())
             ->method('getAssociationMapping');
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
             ->with(\stdClass::class)
             ->willReturn(false);
 
-        $this->doctrineHelper
-            ->expects($this->never())
+        $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadata');
 
         $event = new EntityStructureOptionsEvent();
@@ -175,7 +165,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
      * @param string $relationType
      * @return EntityStructure
      */
-    protected function getEntityStructure($fieldName, $relationType)
+    private function getEntityStructure($fieldName, $relationType)
     {
         return $this->getEntity(
             EntityStructure::class,

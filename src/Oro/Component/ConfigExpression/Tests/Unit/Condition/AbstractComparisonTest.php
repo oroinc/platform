@@ -3,40 +3,48 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
+use Oro\Component\ConfigExpression\ContextAccessorInterface;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractComparison|\PHPUnit\Framework\MockObject\MockObject */
-    protected $condition;
+    /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $contextAccessor;
+    /** @var AbstractComparison */
+    private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
-        $this->condition       = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\AbstractComparison')
-            ->getMockForAbstractClass();
+        $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
+
+        $this->condition = new class() extends AbstractComparison {
+            protected function doCompare($left, $right)
+            {
+            }
+
+            public function getName()
+            {
+            }
+        };
         $this->condition->setContextAccessor($this->contextAccessor);
     }
 
     /**
      * @dataProvider evaluateDataProvider
-     * @param array $options
-     * @param array $context
-     * @param mixed $expectedValue
      */
-    public function testEvaluate(array $options, array $context, $expectedValue)
+    public function testEvaluate(array $options, array $context, bool $expectedValue)
     {
-        $this->assertSame($this->condition, $this->condition->initialize($options));
+        $condition = $this->getMockForAbstractClass(AbstractComparison::class);
+        $condition->setContextAccessor($this->contextAccessor);
 
-        $keys     = array_keys($context);
-        $leftKey  = reset($keys);
+        $condition->initialize($options);
+
+        $keys = array_keys($context);
+        $leftKey = reset($keys);
         $rightKey = null;
         if (count($context) > 1) {
             $rightKey = end($keys);
@@ -53,30 +61,25 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
             $right = $options[1];
         }
 
-        $this->contextAccessor->expects($this->any())
+        $this->contextAccessor->expects(self::any())
             ->method('hasValue')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->contextAccessor->expects($this->any())
+        $this->contextAccessor->expects(self::any())
             ->method('getValue')
-            ->willReturnCallback(
-                function ($context, $value) {
-                    return $value instanceof PropertyPath ? $context[(string)$value] : $value;
-                }
-            );
+            ->willReturnCallback(function ($context, $value) {
+                return $value instanceof PropertyPath ? $context[(string)$value] : $value;
+            });
 
-        $this->condition->expects($this->once())
+        $condition->expects(self::once())
             ->method('doCompare')
             ->with($left, $right)
-            ->will($this->returnValue($expectedValue));
+            ->willReturn($expectedValue);
 
-        $this->assertEquals($expectedValue, $this->condition->evaluate($context));
+        self::assertEquals($expectedValue, $condition->evaluate($context));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             [
@@ -114,45 +117,34 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeSuccess()
     {
-        $this->assertSame($this->condition, $this->condition->initialize(['left' => 'foo', 'right' => 'bar']));
-        $this->assertAttributeEquals('foo', 'left', $this->condition);
-        $this->assertAttributeEquals('bar', 'right', $this->condition);
+        $result = $this->condition->initialize(['left' => 'foo', 'right' => 'bar']);
+
+        self::assertSame($this->condition, $result);
+        self::assertEquals('foo', ReflectionUtil::getPropertyValue($this->condition, 'left'));
+        self::assertEquals('bar', ReflectionUtil::getPropertyValue($this->condition, 'right'));
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "right" is required.
-     */
     public function testInitializeFailsWithEmptyRightOption()
     {
-        $this->condition->initialize(
-            [
-                'foo'  => 'bar',
-                'left' => 'foo'
-            ]
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "right" is required.');
+
+        $this->condition->initialize(['foo'  => 'bar', 'left' => 'foo']);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "left" is required.
-     */
     public function testInitializeFailsWithEmptyLeftOption()
     {
-        $this->condition->initialize(
-            [
-                'right' => 'foo',
-                'foo'   => 'bar',
-            ]
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "left" is required.');
+
+        $this->condition->initialize(['right' => 'foo', 'foo'   => 'bar',]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 elements, but 0 given.
-     */
     public function testInitializeFailsWithInvalidOptionsCount()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
+
         $this->condition->initialize([]);
     }
 
@@ -161,43 +153,42 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $context = ['foo' => 'fooValue', 'bar' => 'barValue'];
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];
 
-        $left  = $options['left'];
+        $left = $options['left'];
         $right = $options['right'];
 
-        $keys     = array_keys($context);
-        $rightKey = end($keys);
-        $leftKey  = reset($keys);
+        $leftKey = 'foo';
+        $rightKey = 'bar';
 
-        $this->condition->initialize($options);
+        $condition = $this->getMockForAbstractClass(AbstractComparison::class);
+        $condition->setContextAccessor($this->contextAccessor);
+
+        $condition->initialize($options);
+
         $message = 'Compare {{ left }} with {{ right }}.';
-        $this->condition->setMessage($message);
+        $condition->setMessage($message);
 
-        $this->contextAccessor->expects($this->any())
+        $this->contextAccessor->expects(self::any())
             ->method('hasValue')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->contextAccessor->expects($this->any())
+        $this->contextAccessor->expects(self::any())
             ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$context, $left, $context[$leftKey]],
-                        [$context, $right, $context[$rightKey]],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$context, $left, $context[$leftKey]],
+                [$context, $right, $context[$rightKey]],
+            ]);
 
-        $this->condition->expects($this->once())
+        $condition->expects(self::once())
             ->method('doCompare')
             ->with($context[$leftKey], $context[$rightKey])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $errors = new ArrayCollection();
 
-        $this->assertFalse($this->condition->evaluate($context, $errors));
+        self::assertFalse($condition->evaluate($context, $errors));
 
-        $this->assertCount(1, $errors);
-        $this->assertEquals(
+        self::assertCount(1, $errors);
+        self::assertEquals(
             [
                 'message'    => $message,
                 'parameters' => ['{{ left }}' => $context[$leftKey], '{{ right }}' => $context[$rightKey]]

@@ -1,13 +1,4 @@
 {% if check_ws() %}
-    <script type="text/javascript">
-        require({config: {
-            'oroentityconfig/js/sync/attribute-import-sync-notifier': {
-                'topic': '{{ data.topic }}'
-            }
-        }});
-
-        require(['oroentityconfig/js/sync/attribute-import-sync-notifier'], function(subscribeCallback) {
-            subscribeCallback();
-        });
-    </script>
+    <div data-page-component-module="oroentityconfig/js/components/attribute-import-sync-notifier"
+         data-page-component-options="{{ {topic: data.topic}|json_encode }}"></div>
 {% endif %}

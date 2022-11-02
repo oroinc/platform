@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set gridName = 'custom-entity-grid' %}
 {# grid params #}
@@ -10,6 +10,8 @@
 {% oro_title_set({params : {"%entityName%": label|default('N/A')|trans }}) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('CREATE', 'entity:' ~ entity_class) %}
         {{ UI.addButton({
             'path': path('oro_entity_update', {'entityName': entity_name}),

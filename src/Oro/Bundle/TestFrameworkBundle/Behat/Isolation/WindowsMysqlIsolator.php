@@ -14,6 +14,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Restore and backup MySQL database between features
+ */
 class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
     const TIMEOUT = 120;
@@ -44,9 +47,6 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
     /** @var  Process */
     protected $restoreDbFromDumpProcess;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $kernel->boot();
@@ -149,7 +149,7 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
      */
     protected function runProcess($commandline, $timeout = 120)
     {
-        $process = new Process($commandline);
+        $process = Process::fromShellCommandline($commandline);
 
         $process->setTimeout($timeout);
         $process->run();

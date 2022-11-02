@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\ItemValue;
 
@@ -33,7 +33,7 @@ class LoadItemsValues extends AbstractFixture implements DependentFixtureInterfa
     public function load(ObjectManager $manager)
     {
         foreach ($this->values as $reference) {
-            /* @var $item Item */
+            /* @var Item $item */
             $item = $this->getReference($reference);
 
             $value = new ItemValue();

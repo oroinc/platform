@@ -1,8 +1,3 @@
-fos_rest:
-    exception:
-        messages:
-            'Oro\Bundle\EntityBundle\Exception\RecordNotFoundException' : true
-
 doctrine:
     dbal:
         types:
@@ -34,7 +29,16 @@ doctrine:
                 year:           Oro\ORM\Query\AST\Functions\SimpleFunction
                 sign:           Oro\ORM\Query\AST\Functions\Numeric\Sign
                 pow:            Oro\ORM\Query\AST\Functions\Numeric\Pow
+                round:          Oro\ORM\Query\AST\Functions\Numeric\Round
             string_functions:
                 group_concat:   Oro\ORM\Query\AST\Functions\String\GroupConcat
                 concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
+                replace:        Oro\ORM\Query\AST\Functions\String\Replace
                 cast:           Oro\ORM\Query\AST\Functions\Cast
+                array_contains: Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\ArrayContains
+                json_agg:       Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\JsonAgg
+
+fos_rest:
+    exception:
+        messages:
+            'Oro\Bundle\EntityBundle\Exception\RecordNotFoundException' : true

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 
-use DateTime;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -19,6 +18,21 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $audit->setUser($user);
 
         $this->assertNotEmpty($audit->getUser());
+    }
+
+    public function testObjectId()
+    {
+        $audit = new Audit();
+
+        $this->assertNull($audit->getObjectId());
+
+        $audit->setObjectId(42);
+
+        $this->assertEquals(42, $audit->getObjectId());
+
+        $audit->setObjectId('string_id');
+
+        $this->assertEquals('string_id', $audit->getObjectId());
     }
 
     public function testObjectName()
@@ -51,60 +65,6 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $field->getOldValue());
     }
 
-    public function testGetDataShouldRetrieveOldFormadUsingFields()
-    {
-        $oldDate = new DateTime();
-        $newDate = new DateTime();
-
-        $audit = new Audit();
-        $audit->addField(new AuditField('field', 'integer', 1, 0));
-        $audit->addField(new AuditField('field2', 'string', 'new_', '_old'));
-        $audit->addField(new AuditField('field3', 'date', $newDate, $oldDate));
-        $audit->addField(new AuditField('field4', 'datetime', $newDate, $oldDate));
-        $auditFieldWithTranslationDomain = new AuditField('field5', 'string', 'new_translatable', 'old_translatable');
-        $auditFieldWithTranslationDomain->setTranslationDomain('message');
-        $audit->addField($auditFieldWithTranslationDomain);
-
-        $this->assertEquals(
-            [
-                'field' => [
-                    'new' => 1,
-                    'old' => 0,
-                ],
-                'field2' => [
-                    'new' => 'new_',
-                    'old' => '_old',
-                ],
-                'field3' => [
-                    'new' => [
-                        'value' => $newDate,
-                        'type'  => 'date',
-                    ],
-                    'old' => [
-                        'value' => $oldDate,
-                        'type'  => 'date',
-                    ],
-                ],
-                'field4' => [
-                    'new' => [
-                        'value' => $newDate,
-                        'type'  => 'datetime',
-                    ],
-                    'old' => [
-                        'value' => $oldDate,
-                        'type'  => 'datetime',
-                    ],
-                ],
-                'field5' => [
-                    'new' => 'new_translatable',
-                    'old' => 'old_translatable',
-                    'translationDomain' => 'message',
-                ],
-            ],
-            $audit->getData()
-        );
-    }
-
     public function testShouldSetNowAsLoggedAtIfNotPassed()
     {
         $audit = new Audit();
@@ -122,5 +82,14 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $audit->setLoggedAt($loggedAt);
 
         $this->assertSame($loggedAt, $audit->getLoggedAt());
+    }
+
+    public function testLimitOwnerDescription()
+    {
+        $descr = str_pad('a', 300);
+        $audit = new Audit();
+        $audit->setOwnerDescription($descr);
+
+        $this->assertSame(255, mb_strlen($audit->getOwnerDescription()));
     }
 }

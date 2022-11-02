@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set exportConfigurableWidgetViewOptions = {
     view: {
@@ -9,6 +9,8 @@
 } %}
 
 <div class="widget-content import-widget-content">
+    {% placeholder configurable_export_messages with { entityClass: entityName, options: options, exportJob: exportJob } %}
+
     <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableWidgetViewOptions) }}>
         {{ form_start(form, {
             'action': path('oro_importexport_export_config', {entity: entityName, options: options, exportJob: exportJob}),
@@ -29,7 +31,7 @@
             <div class="widget-actions">
                 <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                 <button class="btn btn-primary" type="submit">
-                    {{ 'Export'|trans }}
+                    {{ 'oro.importexport.export.popup.button.label'|trans }}
                 </button>
             </div>
         {{ form_end(form) }}

@@ -1,11 +1,11 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set exportButtonsHtml = '' %}
 {% set showExportButtons = false %}
 
 {% for configuration in get_import_export_configuration(alias) %}
     {% set hasExportProcessor = configuration.exportProcessorAlias is defined and configuration.exportProcessorAlias is not empty %}
-    {% set exportAllowed = hasExportProcessor and is_granted('oro_importexport_export') %}
+    {% set exportAllowed = hasExportProcessor and is_granted('oro_importexport_export') and is_granted('VIEW;entity:OroImportExportBundle:ImportExportResult') %}
     {% set exportProcessor = configuration.exportProcessorAlias is iterable ? configuration.exportProcessorAlias|first : configuration.exportProcessorAlias %}
     {% set isExportPopupRequired = configuration.exportProcessorAlias is iterable %}
     {% set exportLabel = configuration.exportButtonLabel|default('oro.importexport.export.label'|trans) %}
@@ -29,7 +29,7 @@
                     'filePrefix': configuration.filePrefix|default(null)
                 }|json_encode }}"
             >
-                <i class="fa-upload hide-text">{{ exportLabel }}</i>{{ exportLabel }}
+                <span class="fa-upload hide-text">{{ exportLabel }}</span>{{ exportLabel }}
             </a>
         {% endset %}
 

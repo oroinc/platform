@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,26 +18,20 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class DumpApiDocConsoleCommandListener
 {
-    const VIEW_OPTION = 'view';
+    private const VIEW_OPTION = 'view';
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
-    /**
-     * @param RestDocViewDetector $docViewDetector
-     */
     public function __construct(RestDocViewDetector $docViewDetector)
     {
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
-    public function onConsoleCommand(ConsoleCommandEvent $event)
+    public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
-        if ('help' === $command->getName()) {
+        if ($command instanceof HelpCommand) {
             $innerCommand = $this->getHelpInnerCommand($command, $event->getInput());
             if ($innerCommand && $this->isApiDocDumpCommand($innerCommand)) {
                 $this->ensureViewOptionDefined($innerCommand);
@@ -49,20 +45,13 @@ class DumpApiDocConsoleCommandListener
         }
     }
 
-    /**
-     * @param Command        $helpCommand
-     * @param InputInterface $input
-     *
-     * @return Command|null
-     */
-    protected function getHelpInnerCommand(Command $helpCommand, InputInterface $input)
+    private function getHelpInnerCommand(Command $helpCommand, InputInterface $input): ?Command
     {
         $innerCommand = null;
-        $reflClass = new \ReflectionClass($helpCommand);
-        if ($reflClass->hasProperty('command')) {
-            $property = $reflClass->getProperty('command');
-            $property->setAccessible(true);
-            $innerCommand = $property->getValue($helpCommand);
+        $commandProperty = ReflectionUtil::getProperty(new \ReflectionClass($helpCommand), 'command');
+        if (null !== $commandProperty) {
+            $commandProperty->setAccessible(true);
+            $innerCommand = $commandProperty->getValue($helpCommand);
         }
         if (!$innerCommand) {
             $innerCommandName = $this->getApiDocDumpCommandFromParameterOptions($input);
@@ -74,22 +63,12 @@ class DumpApiDocConsoleCommandListener
         return $innerCommand;
     }
 
-    /**
-     * @param Command $command
-     *
-     * @return bool
-     */
-    protected function isApiDocDumpCommand(Command $command)
+    private function isApiDocDumpCommand(Command $command): bool
     {
         return in_array($command->getName(), $this->getApiDocDumpCommands(), true);
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return string|null
-     */
-    protected function getApiDocDumpCommandFromParameterOptions(InputInterface $input)
+    private function getApiDocDumpCommandFromParameterOptions(InputInterface $input): ?string
     {
         $commands = $this->getApiDocDumpCommands();
         foreach ($commands as $command) {
@@ -104,27 +83,27 @@ class DumpApiDocConsoleCommandListener
     /**
      * @return string[]
      */
-    protected function getApiDocDumpCommands()
+    private function getApiDocDumpCommands(): array
     {
         return ['api:doc:dump', 'api:swagger:dump'];
     }
 
-    /**
-     * @param Command $command
-     */
-    protected function ensureViewOptionDefined(Command $command)
+    private function ensureViewOptionDefined(Command $command): void
     {
+        $viewOption = new InputOption(
+            self::VIEW_OPTION,
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'A view for which API definitions should be dumped.',
+            ApiDoc::DEFAULT_VIEW
+        );
         $inputDefinition = $command->getApplication()->getDefinition();
         if (!$inputDefinition->hasOption(self::VIEW_OPTION)) {
-            $inputDefinition->addOption(
-                new InputOption(
-                    self::VIEW_OPTION,
-                    null,
-                    InputOption::VALUE_OPTIONAL,
-                    'A view for which API definitions should be dumped.',
-                    ApiDoc::DEFAULT_VIEW
-                )
-            );
+            $inputDefinition->addOption($viewOption);
+        }
+        $commandDefinition = $command->getDefinition();
+        if (!$commandDefinition->hasOption(self::VIEW_OPTION)) {
+            $commandDefinition->addOption($viewOption);
         }
     }
 }

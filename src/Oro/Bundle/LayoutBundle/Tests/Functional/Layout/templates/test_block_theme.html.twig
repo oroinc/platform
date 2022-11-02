@@ -1,0 +1,25 @@
+{% block _root_widget -%}
+    {%- for child in block -%}
+        {%- if child.vars.visible -%}
+            {{ block_widget(child) }}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock %}
+
+{% block container_widget -%}
+    <{{ block.id }}>
+    {%- for child in block -%}
+        {%- if child.vars.visible -%}
+            {{ block_widget(child) }}
+        {%- endif -%}
+    {%- endfor %}
+    </{{ block.id }}>
+{%- endblock %}
+
+{% block _ordered_list_widget -%}
+    <ol>
+        <li>{{ first }}</li>
+        <li>{{ second }}</li>
+        <li>{{ third }}</li>
+    </ol>
+{%- endblock %}

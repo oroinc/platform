@@ -2,44 +2,39 @@
 
 namespace Oro\Bundle\NotificationBundle\Event;
 
-use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Must be dispatched after the email notification is passed to mailer for sending.
+ */
 class NotificationSentEvent extends Event
 {
-    const NAME = 'oro.notification.event.notification_send_after';
+    private RawMessage $message;
 
-    /**
-     * @var SpoolItem
-     */
-    protected $spoolItem;
+    private int $sentCount;
 
-    /**
-     * @var int
-     */
-    protected $sentCount;
+    private string $type;
 
-    public function __construct($spoolItem, $sentCount)
+    public function __construct(RawMessage $message, int $sentCount, string $type)
     {
-        $this->spoolItem = $spoolItem;
+        $this->message = $message;
         $this->sentCount = $sentCount;
+        $this->type = $type;
     }
 
-    /**
-     * Get spool item
-     *
-     * @return SpoolItem
-     */
-    public function getSpoolItem()
+    public function getMessage(): RawMessage
     {
-        return $this->spoolItem;
+        return $this->message;
     }
 
-    /**
-     * @return int
-     */
-    public function getSentCount()
+    public function getSentCount(): int
     {
         return $this->sentCount;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }

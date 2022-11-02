@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailBodyView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var errorHandler = require('oroui/js/error');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const errorHandler = require('oroui/js/error');
 
-    EmailBodyView = BaseView.extend({
+    const EmailBodyView = BaseView.extend({
         autoRender: true,
 
         /**
@@ -29,26 +28,26 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailBodyView() {
-            EmailBodyView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailBodyView(options) {
+            EmailBodyView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['bodyContent', 'styles']));
             this.$frame = this.$el;
-            this.$frame.on('emailShown', _.bind(this._updateHeight, this));
+            this.$frame.on('emailShown', this._updateHeight.bind(this));
             this.$frame.on('load', this.reattachBody.bind(this));
             this.setElement(this.$el.contents().find('html'));
-            EmailBodyView.__super__.initialize.apply(this, arguments);
+            EmailBodyView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -62,11 +61,11 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var $content;
-            var content = this.bodyContent;
+            let $content;
+            let content = this.bodyContent;
             try {
                 /**
                  * Valid email could not contain a root node after HTML tags strip,
@@ -88,7 +87,7 @@ define(function(require) {
                  *
                  * This content will not be correctly parsed by JQuery, but should be displayed as an HTML
                  */
-                var contentWithRootNode = '<div>' + content + '</div>';
+                const contentWithRootNode = '<div>' + content + '</div>';
                 $content = $(contentWithRootNode);
             } catch (e) {
                 errorHandler.showErrorInConsole(e);
@@ -120,11 +119,10 @@ define(function(require) {
          * @protected
          */
         _injectStyles: function() {
-            var $head;
             if (!this.styles) {
                 return;
             }
-            $head = this.$('head');
+            const $head = this.$('head');
             _.each(this.styles, function(src) {
                 $('<link/>', {rel: 'stylesheet', href: src}).appendTo($head);
             });
@@ -136,8 +134,8 @@ define(function(require) {
          * @protected
          */
         _updateHeight: function() {
-            var $frame = this.$frame;
-            var $el = this.$el;
+            const $frame = this.$frame;
+            const $el = this.$el;
             _.delay(function() {
                 $frame.height(0);
                 $frame.height($el[0].scrollHeight);
@@ -150,7 +148,7 @@ define(function(require) {
          * @protected
          */
         _markEmailExtraBody: function() {
-            var $extraBodies = this.$('body>.quote, body>.gmail_extra')
+            const $extraBodies = this.$('body>.quote, body>.gmail_extra')
                 .not('.email-extra-body')
                 .addClass('email-extra-body');
             $('<div class="email-extra-body-toggle"></div>').insertBefore($extraBodies);

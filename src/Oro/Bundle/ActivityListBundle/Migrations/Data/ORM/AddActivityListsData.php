@@ -3,9 +3,11 @@
 namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -47,8 +49,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $ownerField = '',
         $organizationField = ''
     ) {
-        $isApplicationInstalled = $this->container->hasParameter('installed')
-            && $this->container->getParameter('installed');
+        $isApplicationInstalled = $this->container->get(ApplicationState::class)->isInstalled();
 
         if ($isApplicationInstalled && !$this->hasRecordsInActivityList($activityClass)) {
             $provider     = $this->container->get('oro_activity_list.provider.chain');
@@ -83,7 +84,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
     {
         $qb  = $this->container
             ->get('doctrine')
-            ->getRepository('OroActivityListBundle:ActivityList')
+            ->getRepository(ActivityList::class)
             ->createQueryBuilder('activityList');
 
         $activityList = $qb->select('activityList.id')
@@ -131,17 +132,19 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $manager->clear();
     }
 
-    /**
-     * @param User         $user
-     * @param Organization $organization|null
-     */
     protected function setSecurityContext(User $user, Organization $organization = null)
     {
         $tokenStorage = $this->container->get('security.token_storage');
         if ($organization) {
-            $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+            $token = new UsernamePasswordOrganizationToken(
+                $user,
+                $user->getUsername(),
+                'main',
+                $organization,
+                $user->getUserRoles()
+            );
         } else {
-            $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
+            $token = new UsernamePasswordToken($user, $user->getUsername(), 'main', $user->getUserRoles());
         }
         $tokenStorage->setToken($token);
     }

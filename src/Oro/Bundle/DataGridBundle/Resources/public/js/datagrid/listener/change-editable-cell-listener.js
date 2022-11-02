@@ -6,27 +6,25 @@ define([
 ], function($, _, mediator, AbstractGridChangeListener) {
     'use strict';
 
-    var ChangeEditableCellListener;
-
     /**
      * @export  orodatagrid/js/datagrid/listener/change-editable-cell-listener
      * @class   orodatagrid.datagrid.listener.ChangeEditableCellListener
      * @extends orodatagrid.datagrid.listener.AbstractGridChangeListener
      */
-    ChangeEditableCellListener = AbstractGridChangeListener.extend({
+    const ChangeEditableCellListener = AbstractGridChangeListener.extend({
 
         /** @type {string|null} */
         selector: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ChangeEditableCellListener() {
-            ChangeEditableCellListener.__super__.constructor.apply(this, arguments);
+        constructor: function ChangeEditableCellListener(...args) {
+            ChangeEditableCellListener.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!_.has(options, 'selector')) {
@@ -38,14 +36,14 @@ define([
                 throw new Error('DOM element for selector not found');
             }
 
-            ChangeEditableCellListener.__super__.initialize.apply(this, arguments);
+            ChangeEditableCellListener.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         setDatagridAndSubscribe: function() {
-            ChangeEditableCellListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
+            ChangeEditableCellListener.__super__.setDatagridAndSubscribe.call(this);
 
             /** Restore cells state */
             mediator.bind('grid_load:complete', function() {
@@ -54,11 +52,11 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onModelEdited: function(e, model) {
-            var changes = model.changed;
-            var columns = this.columnName;
+            const changes = model.changed;
+            const columns = this.columnName;
 
             _.each(changes, function(value, column) {
                 if (_.indexOf(columns, column) === -1) {
@@ -70,7 +68,7 @@ define([
                 return;
             }
 
-            var id = model.get(this.dataField);
+            const id = model.get(this.dataField);
 
             if (!_.isUndefined(id)) {
                 this._processValue(id, changes);
@@ -84,7 +82,7 @@ define([
          * @param {Object} changes
          */
         _processValue: function(id, changes) {
-            var changeset = this.get('changeset');
+            const changeset = this.get('changeset');
             if (!_.has(changeset, id)) {
                 changeset[id] = {};
             }
@@ -97,14 +95,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _clearState: function() {
             this.set('changeset', {});
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _synchronizeState: function() {
             $(this.selector).val(JSON.stringify(this.get('changeset')));
@@ -125,11 +123,11 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _restoreState: function() {
-            var changeset = {};
-            var $selector = $(this.selector);
+            let changeset = {};
+            const $selector = $(this.selector);
             if ($selector.length) {
                 changeset = this._toObject($selector.val());
                 this.set('changeset', changeset);
@@ -140,7 +138,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _hasChanges: function() {
             return !_.isEmpty(this.get('changeset'));
@@ -159,17 +157,17 @@ define([
      * @param {Object} [options.metadata] configuration for the grid
      */
     ChangeEditableCellListener.init = function(deferred, options) {
-        var gridOptions = options.metadata.options || {};
-        var gridInitialization = options.gridPromise;
+        const gridOptions = options.metadata.options || {};
+        const gridInitialization = options.gridPromise;
 
         if (gridOptions.cellSelection) {
             gridInitialization.done(function(grid) {
-                var listenerOptions = _.defaults({
+                const listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name
                 }, gridOptions.cellSelection);
 
-                var listener = new ChangeEditableCellListener(listenerOptions);
+                const listener = new ChangeEditableCellListener(listenerOptions);
                 deferred.resolve(listener);
             }).fail(function() {
                 deferred.reject();

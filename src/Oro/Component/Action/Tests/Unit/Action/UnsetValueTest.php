@@ -5,38 +5,28 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Action\UnsetValue;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class UnsetValueTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AssignValue
-     */
-    protected $assignValue;
+    /** @var AssignValue|\PHPUnit\Framework\MockObject\MockObject */
+    private $assignValue;
 
-    /**
-     * @var ActionInterface
-     */
-    protected $action;
+    /** @var ActionInterface */
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->assignValue = $this->getMockBuilder('Oro\Component\Action\Action\AssignValue')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assignValue = $this->createMock(AssignValue::class);
 
         $this->action = new UnsetValue($this->assignValue);
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testExecute()
     {
-        $context = array();
+        $context = [];
         $this->assignValue->expects($this->once())
             ->method('execute')
             ->with($context);
@@ -45,8 +35,6 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testInitialize(array $options, array $expected)
     {
@@ -57,26 +45,24 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            array(
-                array(), array('value' => null)
-            ),
-            array(
-                array('attribute' => 'test'), array('attribute' => 'test', 'value' => null)
-            ),
-            array(
-                array('test'), array('test', null)
-            )
-        );
+        return [
+            [
+                [], ['value' => null]
+            ],
+            [
+                ['attribute' => 'test'], ['attribute' => 'test', 'value' => null]
+            ],
+            [
+                ['test'], ['test', null]
+            ]
+        ];
     }
 
     public function testSetCondition()
     {
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $condition = $this->createMock(ExpressionInterface::class);
 
         $this->assignValue->expects($this->once())
             ->method('setCondition')

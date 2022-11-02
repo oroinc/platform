@@ -3,28 +3,37 @@
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Entity Attribute Controller
  * @Route("/attribute")
  */
-class AttributeController extends Controller
+class AttributeController extends AbstractController
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_create")
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/create.html.twig")
+     *
      * @param Request $request
      * @param string $alias
+     *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function createAction(Request $request, $alias)
@@ -38,8 +47,7 @@ class AttributeController extends Controller
 
         $formAction = $this->generateUrl('oro_attribute_create', ['alias' => $alias]);
 
-        $response = $this
-            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
+        $response = $this->getCreateUpdateConfigFieldHandler()
             ->handleCreate($request, $fieldConfigModel, $formAction);
 
         return $this->addInfoToResponse($response, $alias);
@@ -47,7 +55,7 @@ class AttributeController extends Controller
 
     /**
      * @Route("/save/{alias}", name="oro_attribute_save")
-     * @Template("OroEntityConfigBundle:Attribute:update.html.twig")
+     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param Request $request
      * @param string $alias
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -58,13 +66,12 @@ class AttributeController extends Controller
         $this->ensureEntityConfigSupported($entityConfigModel);
 
         $redirectUrl = $this->generateUrl('oro_attribute_create', ['alias' => $alias]);
-        $successMessage = $this->get('translator')->trans('oro.entity_config.attribute.successfully_saved');
+        $successMessage = $this->getTranslator()->trans('oro.entity_config.attribute.successfully_saved');
         $formAction = $this->generateUrl('oro_attribute_save', ['alias' => $alias]);
 
         $options['attribute'] = ['is_attribute' => true];
 
-        $response = $this
-            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
+        $response = $this->getCreateUpdateConfigFieldHandler()
             ->handleFieldSave($request, $entityConfigModel, $redirectUrl, $formAction, $successMessage, $options);
 
         return $this->addInfoToResponse($response, $alias);
@@ -87,7 +94,7 @@ class AttributeController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_attribute_update", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param FieldConfigModel $fieldConfigModel
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -99,19 +106,19 @@ class AttributeController extends Controller
         $this->ensureFieldConfigSupported($fieldConfigModel);
 
         $formAction = $this->generateUrl('oro_attribute_update', ['id' => $fieldConfigModel->getId()]);
-        $successMessage = $this->get('translator')->trans('oro.entity_config.attribute.successfully_saved');
+        $successMessage = $this->getTranslator()
+            ->trans('oro.entity_config.attribute.successfully_saved');
 
         $response = $this
-            ->get('oro_entity_config.form.handler.config_field_handler')
+            ->get(ConfigFieldHandler::class)
             ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
 
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
+        $aliasResolver = $this->getEntityAliasResolver();
 
         return $this->addInfoToResponse($response, $aliasResolver->getAlias($entityConfigModel->getClassName()));
     }
 
     /**
-     * @param EntityConfigModel $entityConfigModel
      * @throws BadRequestHttpException
      */
     private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel)
@@ -123,43 +130,18 @@ class AttributeController extends Controller
 
         if (!$extendConfig->is('is_extend') || !$attributeConfig->is('has_attributes')) {
             throw new BadRequestHttpException(
-                $this->get('translator')->trans('oro.entity_config.attribute.entity_not_supported')
+                $this->getTranslator()->trans('oro.entity_config.attribute.entity_not_supported')
             );
         }
     }
 
     /**
-     * @return ConfigModelManager
-     */
-    private function getConfigModelManager()
-    {
-        return $this->get('oro_entity_config.attribute.config_model_manager');
-    }
-
-    /**
-     * @return ConfigProvider
-     */
-    private function getExtendConfigProvider()
-    {
-        return $this->get('oro_entity_config.provider.extend');
-    }
-
-    /**
-     * @return ConfigProvider
-     */
-    private function getAttributeConfigProvider()
-    {
-        return $this->get('oro_entity_config.provider.attribute');
-    }
-
-    /**
-     * @param FieldConfigModel $fieldConfigModel
      * @throws BadRequestHttpException
      */
     private function ensureFieldConfigSupported(FieldConfigModel $fieldConfigModel)
     {
         /** @var ConfigProvider $attributeConfigProvider */
-        $attributeConfigProvider = $this->get('oro_entity_config.provider.attribute');
+        $attributeConfigProvider = $this->getAttributeConfigProvider();
         $attributeConfig = $attributeConfigProvider->getConfig(
             $fieldConfigModel->getEntity()->getClassName(),
             $fieldConfigModel->getFieldName()
@@ -167,7 +149,7 @@ class AttributeController extends Controller
 
         if (!$attributeConfig->is('is_attribute')) {
             throw new BadRequestHttpException(
-                $this->get('translator')->trans('oro.entity_config.attribute.not_attribute')
+                $this->getTranslator()->trans('oro.entity_config.attribute.not_attribute')
             );
         }
     }
@@ -176,18 +158,16 @@ class AttributeController extends Controller
      * @param string $alias
      * @return EntityConfigModel
      */
-    private function getEntityByAlias($alias)
+    protected function getEntityByAlias($alias): EntityConfigModel
     {
-        /** @var EntityAliasResolver $aliasResolver */
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
-        $entityClass = $aliasResolver->getClassByAlias($alias);
+        $entityClass = $this->getEntityAliasResolver()->getClassByAlias($alias);
 
         return $this->getConfigModelManager()->findEntityModel($entityClass);
     }
 
     /**
      * @Route("/index/{alias}", name="oro_attribute_index")
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/index.html.twig")
      * @param string $alias
      * @return array
      */
@@ -195,11 +175,11 @@ class AttributeController extends Controller
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $this->ensureEntityConfigSupported($entityConfigModel);
-        list($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
+        [$layoutActions] = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
 
         $response = [
             'entity' => $entityConfigModel,
-            'fieldClassName' => $this->container->getParameter('oro_entity_config.entity.entity_field.class'),
+            'fieldClassName' => FieldConfigModel::class,
             'params' => ['entityId' => $entityConfigModel->getId()],
             'layoutActions' => $layoutActions
         ];
@@ -212,8 +192,10 @@ class AttributeController extends Controller
      *      "/remove/{id}",
      *      name="oro_attribute_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -221,13 +203,9 @@ class AttributeController extends Controller
     {
         $this->ensureFieldConfigSupported($field);
 
-        $successMessage = $this->get('translator')->trans('oro.entity_config.attribute.successfully_deleted');
+        $successMessage = $this->getTranslator()->trans('oro.entity_config.attribute.successfully_deleted');
 
-        $response = $this
-            ->get('oro_entity_config.form.handler.remove_restore_field_handler')
-            ->handleRemove($field, $successMessage);
-
-        return $response;
+        return $this->getRemoveRestoreConfigFieldHandler()->handleRemove($field, $successMessage);
     }
 
     /**
@@ -235,8 +213,10 @@ class AttributeController extends Controller
      *      "/unremove/{id}",
      *      name="oro_attribute_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -244,19 +224,73 @@ class AttributeController extends Controller
     {
         $this->ensureFieldConfigSupported($field);
 
-        return $this->get('oro_entity_config.form.handler.remove_restore_field_handler')
-            ->handleRestore(
-                $field,
-                $this->get('translator')->trans('oro.entity_config.attribute.cannot_be_restored'),
-                $this->get('translator')->trans('oro.entity_config.attribute.was_restored')
-            );
+        return $this->getRemoveRestoreConfigFieldHandler()->handleRestore(
+            $field,
+            $this->getTranslator()->trans('oro.entity_config.attribute.cannot_be_restored'),
+            $this->getTranslator()->trans('oro.entity_config.attribute.was_restored')
+        );
     }
 
     /**
-     * @return EntityConfigProviderHelper
+     * @return ConfigModelManager
      */
-    private function getConfigProviderHelper()
+    private function getConfigModelManager()
     {
-        return $this->get('oro_entity_config.helper.entity_config_provider_helper');
+        return $this->get(ConfigModelManager::class);
+    }
+
+    private function getExtendConfigProvider(): ConfigProvider
+    {
+        return $this->get(ConfigManager::class)->getProvider('extend');
+    }
+
+    private function getAttributeConfigProvider(): ConfigProvider
+    {
+        return $this->get(ConfigManager::class)->getProvider('attribute');
+    }
+
+    protected function getEntityAliasResolver(): EntityAliasResolver
+    {
+        return $this->get(EntityAliasResolver::class);
+    }
+
+    protected function getCreateUpdateConfigFieldHandler(): CreateUpdateConfigFieldHandler
+    {
+        return $this->get(CreateUpdateConfigFieldHandler::class);
+    }
+
+    protected function getRemoveRestoreConfigFieldHandler(): RemoveRestoreConfigFieldHandler
+    {
+        return $this->get(RemoveRestoreConfigFieldHandler::class);
+    }
+
+    protected function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
+    }
+
+    protected function getConfigProviderHelper(): EntityConfigProviderHelper
+    {
+        return $this->get(EntityConfigProviderHelper::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                RemoveRestoreConfigFieldHandler::class,
+                CreateUpdateConfigFieldHandler::class,
+                ConfigFieldHandler::class,
+                EntityConfigProviderHelper::class,
+                EntityAliasResolver::class,
+                ConfigManager::class,
+                ConfigModelManager::class,
+            ]
+        );
     }
 }

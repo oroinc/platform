@@ -1,6 +1,6 @@
 datagrids:
     attachment-grid:
-        extended_entity_name: '%oro_attachment.entity.class%'
+        extended_entity_name: 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
         source:
             type: orm
             query:
@@ -12,7 +12,7 @@ datagrids:
                     - file.fileSize as fileSize
                     - file.createdAt as createdAt
                 from:
-                    - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
+                    - { table: Oro\Bundle\AttachmentBundle\Entity\Attachment, alias: attachment }
                 join:
                     left:
                         - { join: attachment.file, alias: file }
@@ -24,12 +24,12 @@ datagrids:
                 type: twig
                 label: oro.attachment.file.filename.label
                 frontend_type: html
-                template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
+                template: '@OroAttachment/Attachment/Datagrid/Property/attachmentLink.html.twig'
             fileSize:
                 label: oro.attachment.file.file_size.label
                 type: twig
                 frontend_type: html
-                template: OroAttachmentBundle:Attachment:Datagrid/Property/fileSize.html.twig
+                template: '@OroAttachment/Attachment/Datagrid/Property/fileSize.html.twig'
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime
@@ -70,3 +70,87 @@ datagrids:
                 label:         oro.grid.action.delete
                 icon:          trash-o
                 link:          delete_link
+
+    base-attachment-files-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - file_item as root
+                    - file_item.sortOrder
+                    - file.originalFilename as originalFilename
+                    - CONCAT_WS(' ', fileOwner.firstName, fileOwner.lastName) as uploadedBy
+                    - file.createdAt
+                from:
+                    - { table: Oro\Bundle\AttachmentBundle\Entity\FileItem, alias: file_item }
+                join:
+                    left:
+                        - { join: file_item.file, alias: file }
+                        - { join: file.owner, alias: fileOwner }
+                        - { join: file.digitalAsset, alias: digitalAsset }
+                        - { join: digitalAsset.owner, alias: sourceOwner }
+                where:
+                    and:
+                      - entity.id = :entityId # entity with alias 'entity' sets in event listener
+        columns:
+            sortOrder:
+                label: oro.attachment.fileitem.sort_order.label
+        properties:
+            id: ~
+        sorters:
+            columns:
+                sortOrder:
+                    data_name: file_item.sortOrder
+                createdAt:
+                    data_name: file.createdAt
+            default:
+                sortOrder: ASC
+        filters:
+            columns:
+                originalFilename:
+                    type: string
+                    data_name: originalFilename
+                uploadedBy:
+                    type: string
+                    data_name: uploadedBy
+                createdAt:
+                    type:      datetime
+                    data_name: language.createdAt
+
+    attachment-files-grid:
+        extends: base-attachment-files-grid
+        options:
+            entityHint: oro.attachment.fileitem.file.plural_label
+        columns:
+            originalFilename:
+                label: oro.attachment.file.filename.label
+                type: twig
+                frontend_type: html
+                template: '@OroAttachment/Attachment/Datagrid/Property/fileLink.html.twig'
+            uploadedBy:
+                label: oro.attachment.file.uploaded_by.label
+                frontend_type: relation
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+
+    attachment-images-grid:
+        extends: base-attachment-files-grid
+        options:
+            entityHint: oro.attachment.fileitem.image.plural_label
+        columns:
+            image:
+                label: oro.attachment.file.image.label
+                type: twig
+                frontend_type: html
+                template: '@OroAttachment/Attachment/Datagrid/Property/image.html.twig'
+            originalFilename:
+                label: oro.attachment.file.name.label
+                type: twig
+                frontend_type: html
+                template: '@OroAttachment/Attachment/Datagrid/Property/fileLink.html.twig'
+            uploadedBy:
+                label: oro.attachment.file.uploaded_by.label
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime

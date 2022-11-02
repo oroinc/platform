@@ -16,7 +16,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /** @var WampClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $wampClientFactory;
 
-    /** @var ClientAttributes|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClientAttributes|\PHPUnit\Framework\MockObject\MockObject */
     private $clientAttributes;
 
     /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -28,7 +28,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /** @var WebsocketClient */
     private $websocketClient;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->wampClientFactory = $this->createMock(WampClientFactoryInterface::class);
         $this->clientAttributes = $this->createMock(ClientAttributes::class);
@@ -45,37 +45,28 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider connectDataProvider
-     *
-     * @param string $target
-     * @param string $expectedTarget
      */
     public function testConnect(string $target, string $expectedTarget)
     {
         $connectionSession = 'sampleSession';
 
-        $this->clientAttributes
-            ->expects(self::once())
+        $this->clientAttributes->expects(self::once())
             ->method('getPath')
             ->willReturn($target);
 
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('connect')
             ->with($expectedTarget)
             ->willReturn($connectionSession);
 
-        $this->ticketProvider
-            ->expects(self::once())
+        $this->ticketProvider->expects(self::once())
             ->method('generateTicket')
             ->willReturn(self::TICKET);
 
         self::assertSame($connectionSession, $this->websocketClient->connect());
     }
 
-    /**
-     * @return array
-     */
     public function connectDataProvider(): array
     {
         return [
@@ -109,8 +100,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     public function testDisconnect()
     {
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('disconnect')
             ->willReturn(true);
 
@@ -120,8 +110,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     public function testIsConnected()
     {
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(true);
 
@@ -136,26 +125,21 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $eligible = ['sampleEligible'];
 
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('connect');
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('publish')
-            ->with($topicUri, $payload, $exclude, $eligible)
-            ->willReturn(true);
+            ->with($topicUri, json_encode($payload), $exclude, $eligible);
 
         self::assertTrue($this->websocketClient->publish($topicUri, $payload, $exclude, $eligible));
     }
 
     public function testPublishValidationFailure()
     {
-        $this->wampClientFactory
-            ->expects(self::never())
+        $this->wampClientFactory->expects(self::never())
             ->method('createClient');
 
         $this->expectException(ValidationFailedException::class);
@@ -170,18 +154,14 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $uri = 'sampleUri';
 
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('connect');
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('prefix')
-            ->with($prefix, $uri)
-            ->willReturn(true);
+            ->with($prefix, $uri);
 
         self::assertTrue($this->websocketClient->prefix($prefix, $uri));
     }
@@ -192,18 +172,14 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $arguments = ['sampleArgument'];
 
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('connect');
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('call')
-            ->with($procUri, $arguments)
-            ->willReturn(true);
+            ->with($procUri, $arguments);
 
         self::assertTrue($this->websocketClient->call($procUri, $arguments));
     }
@@ -214,26 +190,21 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $payload = 'samplePayload';
 
         $this->mockClientFactory();
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('connect');
-        $this->wampClient
-            ->expects(self::once())
+        $this->wampClient->expects(self::once())
             ->method('event')
-            ->with($topicUri, $payload)
-            ->willReturn(true);
+            ->with($topicUri, json_encode($payload));
 
         self::assertTrue($this->websocketClient->event($topicUri, $payload));
     }
 
     public function testEventValidationFailure()
     {
-        $this->wampClientFactory
-            ->expects(self::never())
+        $this->wampClientFactory->expects(self::never())
             ->method('createClient');
 
         $this->expectException(ValidationFailedException::class);
@@ -244,8 +215,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 
     private function mockClientFactory(): void
     {
-        $this->wampClientFactory
-            ->expects(self::once())
+        $this->wampClientFactory->expects(self::once())
             ->method('createClient')
             ->with($this->clientAttributes)
             ->willReturn($this->wampClient);

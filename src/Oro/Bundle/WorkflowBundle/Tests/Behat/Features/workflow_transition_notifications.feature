@@ -4,11 +4,8 @@ Feature: Workflow transition notifications
   As an Administrator
   I want to be able to set transition for notification rules
 
-  Scenario: Update translations cache
+  Scenario: Feature background
     Given I login as administrator
-    When I go to System/Localization/Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Create an Email notification rule for workflow transition
     Given I go to System/Emails/Notification Rules
@@ -38,7 +35,8 @@ Feature: Workflow transition notifications
       | Email    | test@example.com    |
     And I save and close form
     Then I should see "Email notification rule saved" flash message
-    And I should see User in grid with following data:
+    And I should see First Workflow in grid with following data:
+      | Entity Name     | User                                         |
       | Event Name      | Workflow transition                          |
       | Workflow        | First Workflow                               |
       | Transition name | First Workflow Transition (start_transition) |
@@ -46,15 +44,15 @@ Feature: Workflow transition notifications
       | Recipient email | test@example.com                             |
 
   Scenario: Edit an Email notification rule for workflow transition
-    Given I click on User in grid
+    Given I click on First Workflow in grid
     When I fill form with:
-      | Workflow | Second Workflow |
-    And I fill form with:
+      | Workflow   | Second Workflow |
       | Transition | Second Workflow Transition (start_transition) |
       | Template   | user_reset_password                           |
     And I save and close form
     Then I should see "Email notification rule saved" flash message
-    And I should see User in grid with following data:
+    And I should see Second Workflow in grid with following data:
+      | Entity Name     | User                                          |
       | Event Name      | Workflow transition                           |
       | Workflow        | Second Workflow                               |
       | Transition name | Second Workflow Transition (start_transition) |
@@ -62,7 +60,7 @@ Feature: Workflow transition notifications
       | Recipient email | test@example.com                              |
 
   Scenario: Deleting workflow
-    Given I click Delete User in grid
+    Given I click Delete Second Workflow in grid
     When I confirm deletion
     Then I should see "Item deleted" flash message
-    And there is no "User" in grid
+    And there is no "Second Workflow" in grid

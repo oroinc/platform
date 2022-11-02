@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Cache\ClearableCache;
-use Doctrine\Common\Cache\FlushableCache;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -25,40 +23,33 @@ use Symfony\Component\Finder\Finder;
  */
 class ExtendConfigDumper
 {
-    const ACTION_PRE_UPDATE = 'preUpdate';
-    const ACTION_POST_UPDATE = 'postUpdate';
-
-    /** @deprecated Use ExtendHelper::getExtendEntityProxyClassName and ExtendHelper::ENTITY_NAMESPACE instead */
-    const ENTITY = 'Extend\\Entity\\';
-
-    const DEFAULT_PREFIX = 'default_';
+    public const ACTION_PRE_UPDATE  = 'preUpdate';
+    public const ACTION_POST_UPDATE = 'postUpdate';
+    public const DEFAULT_PREFIX     = 'default_';
 
     /** @var string */
-    protected $cacheDir;
+    private $cacheDir;
 
     /** @var EntityManagerBag */
-    protected $entityManagerBag;
+    private $entityManagerBag;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
+    private $fieldTypeHelper;
 
     /** @var EntityGenerator */
-    protected $entityGenerator;
-
-    /** @var array */
-    protected $extensions = [];
-
-    /** @var AbstractEntityConfigDumperExtension[]|null */
-    protected $sortedExtensions;
+    private $entityGenerator;
 
     /** @var ExtendEntityConfigProviderInterface */
-    protected $extendEntityConfigProvider;
+    private $extendEntityConfigProvider;
+
+    /** @var iterable|AbstractEntityConfigDumperExtension[] */
+    private $extensions;
 
     /**
      * @param EntityManagerBag $entityManagerBag
@@ -68,6 +59,7 @@ class ExtendConfigDumper
      * @param EntityGenerator $entityGenerator
      * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
      * @param string $cacheDir
+     * @param iterable|AbstractEntityConfigDumperExtension[] $extensions
      */
     public function __construct(
         EntityManagerBag $entityManagerBag,
@@ -76,15 +68,17 @@ class ExtendConfigDumper
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         ExtendEntityConfigProviderInterface $extendEntityConfigProvider,
-        $cacheDir
+        string $cacheDir,
+        iterable $extensions
     ) {
         $this->entityManagerBag = $entityManagerBag;
-        $this->configManager    = $configManager;
-        $this->nameGenerator    = $nameGenerator;
-        $this->fieldTypeHelper  = $fieldTypeHelper;
-        $this->entityGenerator  = $entityGenerator;
+        $this->configManager = $configManager;
+        $this->nameGenerator = $nameGenerator;
+        $this->fieldTypeHelper = $fieldTypeHelper;
+        $this->entityGenerator = $entityGenerator;
         $this->extendEntityConfigProvider = $extendEntityConfigProvider;
-        $this->cacheDir         = $cacheDir;
+        $this->cacheDir = $cacheDir;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -108,21 +102,13 @@ class ExtendConfigDumper
     }
 
     /**
-     * @param AbstractEntityConfigDumperExtension $extension
-     * @param int                                 $priority
-     */
-    public function addExtension(AbstractEntityConfigDumperExtension $extension, $priority = 0)
-    {
-        $this->extensions[$priority][] = $extension;
-    }
-
-    /**
      * Update config.
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
      * @param bool $updateCustom
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @throws \ReflectionException
      */
     public function updateConfig($filter = null, $updateCustom = false)
     {
@@ -133,9 +119,7 @@ class ExtendConfigDumper
             $this->updatePendingConfigs();
         }
 
-        $extensions = $this->getExtensions();
-
-        foreach ($extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             if ($extension->supports(self::ACTION_PRE_UPDATE)) {
                 $extension->preUpdate();
             }
@@ -151,7 +135,7 @@ class ExtendConfigDumper
             }
         }
 
-        foreach ($extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             if ($extension->supports(self::ACTION_POST_UPDATE)) {
                 $extension->postUpdate();
             }
@@ -199,7 +183,7 @@ class ExtendConfigDumper
      *
      * @return mixed|null
      */
-    protected function getRelationDataForEntity($extendConfigs, ConfigInterface $entityExtendConfig)
+    private function getRelationDataForEntity($extendConfigs, ConfigInterface $entityExtendConfig)
     {
         $relationData = $entityExtendConfig->get('relation', false, []);
 
@@ -225,6 +209,7 @@ class ExtendConfigDumper
 
     /**
      * Makes sure that extended entity configs are ready to be processing by other config related commands
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function checkConfig()
     {
@@ -297,28 +282,10 @@ class ExtendConfigDumper
         foreach ($this->entityManagerBag->getEntityManagers() as $em) {
             /** @var ClassMetadataFactory $metadataFactory */
             $metadataFactory = $em->getMetadataFactory();
-            $metadataCache   = $metadataFactory->getCacheDriver();
-            if ($metadataCache instanceof FlushableCache) {
-                $metadataCache->flushAll();
-            } elseif ($metadataCache instanceof ClearableCache) {
-                $metadataCache->deleteAll();
+            if (is_callable([$metadataFactory, 'clearCache'])) {
+                $metadataFactory->clearCache();
             }
         }
-    }
-
-    /**
-     * Return sorted extensions
-     *
-     * @return AbstractEntityConfigDumperExtension[]
-     */
-    protected function getExtensions()
-    {
-        if (null === $this->sortedExtensions) {
-            krsort($this->extensions);
-            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
-        }
-
-        return $this->sortedExtensions;
     }
 
     /**
@@ -330,18 +297,27 @@ class ExtendConfigDumper
      * @param array           $defaultProperties
      * @param array           $properties
      * @param array           $doctrine
+     * @param \ReflectionClass|null $reflectionEntityClass
+     * @throws \ReflectionException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function checkFieldSchema(
+    private function checkFieldSchema(
         $entityName,
         ConfigInterface $fieldConfig,
         array &$relationProperties,
         array &$defaultProperties,
         array &$properties,
-        array &$doctrine
+        array &$doctrine,
+        ?\ReflectionClass $reflectionEntityClass
     ) {
         if ($fieldConfig->is('is_extend')) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
+            if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE &&
+                $reflectionEntityClass &&
+                !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
+                return;
+            }
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
             $isDeleted     = $fieldConfig->is('is_deleted');
@@ -370,7 +346,7 @@ class ExtendConfigDumper
                 $doctrine[$entityName]['fields'][$fieldName] = [
                     'column'    => $columnName,
                     'type'      => $fieldType,
-                    'nullable'  => true,
+                    'nullable'  => $fieldConfig->get('nullable', false, true),
                     'length'    => $fieldConfig->get('length'),
                     'precision' => $fieldConfig->get('precision'),
                     'scale'     => $fieldConfig->get('scale'),
@@ -389,8 +365,9 @@ class ExtendConfigDumper
      * @param ConfigProvider  $configProvider
      * @param array|null      $aliases
      * @param callable|null   $filter function (ConfigInterface $config) : bool
+     * @throws \ReflectionException
      */
-    protected function checkSchema(
+    private function checkSchema(
         ConfigInterface $extendConfig,
         ConfigProvider $configProvider,
         $aliases,
@@ -434,6 +411,9 @@ class ExtendConfigDumper
         $fieldConfigs = null === $filter
             ? $configProvider->getConfigs($className, true)
             : $configProvider->filter($filter, $className, true);
+        $reflectionEntityClass = class_exists($entityName)
+            ? new \ReflectionClass($entityName)
+            : null;
         foreach ($fieldConfigs as $fieldConfig) {
             $this->updateFieldState($fieldConfig);
             $this->checkFieldSchema(
@@ -442,7 +422,8 @@ class ExtendConfigDumper
                 $relationProperties,
                 $defaultProperties,
                 $properties,
-                $doctrine
+                $doctrine,
+                $reflectionEntityClass
             );
         }
 
@@ -455,11 +436,17 @@ class ExtendConfigDumper
             }
 
             $fieldName = $fieldId->getFieldName();
-            $isDeleted = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
-                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
-                : false;
+            $fieldConfig = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
+                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)
+                : null;
+            $isDeleted = $fieldConfig ? $fieldConfig->is('is_deleted') : false;
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
+                if ($fieldConfig && $fieldConfig->get('state') === ExtendScope::STATE_DELETE
+                    && $reflectionEntityClass
+                    && !$reflectionEntityClass->hasProperty($fieldId->getFieldName())) {
+                    continue;
+                }
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }
@@ -490,12 +477,12 @@ class ExtendConfigDumper
         ];
 
         if ($type === 'Extend') {
-            $parentClassName = get_parent_class($className);
+            $parentClassName = class_exists($className) ? get_parent_class($className) : false;
             if ($parentClassName === $entityName) {
                 $parentClassName = $aliases[$entityName];
             }
             $schema['parent']  = $parentClassName;
-            $schema['inherit'] = get_parent_class($parentClassName);
+            $schema['inherit'] = class_exists($className) ? get_parent_class($parentClassName): false;
         } elseif ($extendConfig->has('inherit')) {
             $schema['inherit'] = $extendConfig->get('inherit');
         }
@@ -505,10 +492,7 @@ class ExtendConfigDumper
         $this->configManager->persist($extendConfig);
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
-    protected function updateFieldState(ConfigInterface $fieldConfig)
+    private function updateFieldState(ConfigInterface $fieldConfig)
     {
         if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('is_deleted', true);
@@ -522,11 +506,7 @@ class ExtendConfigDumper
         }
     }
 
-    /**
-     * @param ConfigInterface $entityConfig
-     * @param ConfigProvider  $configProvider
-     */
-    protected function updateStateValues(ConfigInterface $entityConfig, ConfigProvider $configProvider)
+    private function updateStateValues(ConfigInterface $entityConfig, ConfigProvider $configProvider)
     {
         if ($entityConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
@@ -565,7 +545,7 @@ class ExtendConfigDumper
     /**
      * Updates pending configs
      */
-    protected function updatePendingConfigs()
+    private function updatePendingConfigs()
     {
         $pendingChanges = [];
 

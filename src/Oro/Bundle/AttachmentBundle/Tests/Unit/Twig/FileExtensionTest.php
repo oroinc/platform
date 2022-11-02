@@ -2,302 +2,638 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
+use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var FileExtension */
-    protected $extension;
+    private const FILE_ID = 42;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $attachmentConfigProvider;
+    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $pictureSourcesProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var TestAttachment */
-    protected $attachment;
+    private FileTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileTitleProvider;
 
-    public function setUp()
+    private FileExtension $extension;
+
+    private TestFile $file;
+
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(AttachmentManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attachmentConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->any())
-            ->method('getProvider')
-            ->with('attachment')
-            ->will($this->returnValue($this->attachmentConfigProvider));
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->attachmentManager = $this->createMock(AttachmentManager::class);
+        $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->fileTitleProvider = $this->createMock(FileTitleProviderInterface::class);
 
-        $container = self::getContainerBuilder()
-            ->add('oro_attachment.manager', $this->manager)
-            ->add('oro_entity_config.config_manager', $configManager)
-            ->add('doctrine', $this->doctrine)
+        $serviceLocator = self::getContainerBuilder()
+            ->add(AttachmentManager::class, $this->attachmentManager)
+            ->add(PictureSourcesProvider::class, $this->pictureSourcesProvider)
+            ->add(ConfigManager::class, $this->configManager)
+            ->add(ManagerRegistry::class, $managerRegistry)
+            ->add(FileTitleProviderInterface::class, $this->fileTitleProvider)
             ->getContainer($this);
 
-        $this->extension = new FileExtension($container);
+        $this->extension = new FileExtension($serviceLocator);
 
-        $this->attachment = new TestAttachment();
+        $this->file = new TestFile();
+        $this->file->setId(self::FILE_ID);
+        $this->file->setFilename('name.pdf');
+        $this->file->setOriginalFilename('original-name.pdf');
+
+        $fileRepo = $this->createMock(EntityRepository::class);
+        $managerRegistry
+            ->expects(self::any())
+            ->method('getRepository')
+            ->willReturn($fileRepo);
+        $fileRepo
+            ->expects(self::any())
+            ->method('find')
+            ->with($this->file->getId())
+            ->willReturn($this->file);
+
+        $this->attachmentManager
+            ->expects(self::any())
+            ->method('getFilteredImageUrl')
+            ->willReturnCallback(static function (File $file, string $filter, string $format) {
+                return '/' . $filter . '/' . $file->getFilename() . ($format ? '.' . $format : '');
+            });
+
+        $this->attachmentManager
+            ->expects(self::any())
+            ->method('getResizedImageUrl')
+            ->willReturnCallback(static function (File $file, int $width, int $height, string $format) {
+                return '/' . $width . '/' . $height . '/' . $file->getFilename() . ($format ? '.' . $format : '');
+            });
     }
 
-    public function testGetName()
+    public function testGetFileUrl(): void
     {
-        $this->assertEquals('oro_attachment_file', $this->extension->getName());
-    }
+        $action = FileUrlProviderInterface::FILE_ACTION_DOWNLOAD;
 
-    public function testGetFileUrl()
-    {
-        $parentEntity = new TestClass();
-        $parentField = 'test_field';
-        $this->manager->expects($this->once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFileUrl')
-            ->with($parentEntity, $parentField, $this->attachment, 'download', true);
+            ->with($this->file, $action, UrlGeneratorInterface::ABSOLUTE_PATH);
 
         self::callTwigFunction(
             $this->extension,
             'file_url',
-            [$parentEntity, $parentField, $this->attachment, 'download', true]
+            [$this->file, $action, true]
         );
     }
 
-    public function testGetResizedImageUrl()
+    public function testGetResizedImageUrl(): void
     {
-        $this->manager->expects($this->once())
+        $width = 110;
+        $height = 120;
+
+        $this->attachmentManager->expects(self::once())
             ->method('getResizedImageUrl')
-            ->with($this->attachment, 110, 120);
+            ->with($this->file, $width, $height);
 
-        self::callTwigFunction($this->extension, 'resized_image_url', [$this->attachment, 110, 120]);
+        self::callTwigFunction($this->extension, 'resized_image_url', [$this->file, $width, $height]);
     }
 
-    public function testGetAttachmentIcon()
+    public function testGetFilteredImageUrl(): void
     {
-        $this->manager->expects($this->once())
+        $result = self::callTwigFunction($this->extension, 'filtered_image_url', [$this->file, 'sample_filter']);
+
+        self::assertEquals('/sample_filter/' . $this->file->getFilename(), $result);
+    }
+
+    public function testGetAttachmentIcon(): void
+    {
+        $this->attachmentManager->expects(self::once())
             ->method('getAttachmentIconClass')
-            ->with($this->attachment);
+            ->with($this->file);
 
-        self::callTwigFunction($this->extension, 'oro_attachment_icon', [$this->attachment]);
+        self::callTwigFunction($this->extension, 'oro_attachment_icon', [$this->file]);
     }
 
-    public function testGetEmptyFileView()
+    public function testGetFileView(): void
     {
-        $parentEntity = new TestClass();
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->file->setMimeType('plain/text');
+        $url = '/url/name.pdf';
 
-        $this->assertEquals(
-            '',
-            self::callTwigFunction(
-                $this->extension,
-                'oro_file_view',
-                [$environment, $parentEntity, $this->attachment]
-            )
-        );
-    }
+        $environment = $this->createMock(Environment::class);
+        $environment->expects(self::once())
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/file.html.twig',
+                [
+                    'iconClass' => '',
+                    'url' => $url,
+                    'pictureSources' => [],
+                    'fileName' => 'original-name.pdf',
+                    'additional' => null,
+                    'title' => '',
+                ]
+            );
 
-    public function testGetFileView()
-    {
-        $parentEntity = new TestClass();
-        $parentField = 'test_field';
-        $this->attachment->setFilename('test.doc');
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $template = new TestTemplate(new \Twig_Environment());
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
-        $this->manager->expects($this->once())
+        $this->attachmentManager->expects(self::once())
+            ->method('isImageType')
+            ->with($this->file->getMimeType())
+            ->willReturn(false);
+
+        $this->attachmentManager->expects(self::once())
             ->method('getAttachmentIconClass')
-            ->with($this->attachment);
-        $this->manager->expects($this->once())
-            ->method('getFileUrl');
+            ->with($this->file);
+
+
+        $this->attachmentManager->expects(self::once())
+            ->method('getFileUrl')
+            ->with($this->file)
+            ->willReturn($url);
 
         self::callTwigFunction(
             $this->extension,
             'oro_file_view',
-            [$environment, $parentEntity, $parentField, $this->attachment]
+            [$environment, $this->file]
         );
     }
 
-    public function testGetEmptyImageView()
+    public function testGetFileViewWhenImageType(): void
     {
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->file->setFilename('image.png');
+        $this->file->setMimeType('image/png');
+        $url = '/url/image.png';
 
-        $this->assertEquals(
+        $environment = $this->createMock(Environment::class);
+        $environment->expects(self::once())
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/file.html.twig',
+                [
+                    'iconClass' => '',
+                    'url' => $url,
+                    'pictureSources' => [
+                        'src' => '/original/image.png',
+                        'sources' => [],
+                    ],
+                    'fileName' => 'original-name.pdf',
+                    'additional' => null,
+                    'title' => '',
+                ]
+            );
+
+        $this->attachmentManager->expects(self::once())
+            ->method('isImageType')
+            ->with($this->file->getMimeType())
+            ->willReturn(true);
+
+        $this->attachmentManager->expects(self::once())
+            ->method('getAttachmentIconClass')
+            ->with($this->file);
+
+        $this->attachmentManager->expects(self::once())
+            ->method('getFileUrl')
+            ->with($this->file)
+            ->willReturn($url);
+
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/original/image.png',
+                'sources' => [],
+            ]);
+
+        self::callTwigFunction(
+            $this->extension,
+            'oro_file_view',
+            [$environment, $this->file]
+        );
+    }
+
+    public function testGetFileViewWhenImageTypeAndWebpIsSupported(): void
+    {
+        $this->file->setFilename('image.png');
+        $this->file->setMimeType('image/png');
+        $url = '/url/image.png';
+
+        $environment = $this->createMock(Environment::class);
+        $environment->expects(self::once())
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/file.html.twig',
+                [
+                    'iconClass' => '',
+                    'url' => $url,
+                    'pictureSources' => [
+                        'src' => '/original/image.png',
+                        'sources' => [
+                            [
+                                'srcset' => '/original/image.png.webp',
+                                'type' => 'image/webp',
+                            ],
+                        ],
+                    ],
+                    'fileName' => 'original-name.pdf',
+                    'additional' => null,
+                    'title' => '',
+                ]
+            );
+
+        $this->attachmentManager->expects(self::once())
+            ->method('isImageType')
+            ->with($this->file->getMimeType())
+            ->willReturn(true);
+
+        $this->attachmentManager->expects(self::once())
+            ->method('getAttachmentIconClass')
+            ->with($this->file);
+
+        $this->attachmentManager->expects(self::once())
+            ->method('getFileUrl')
+            ->with($this->file)
+            ->willReturn($url);
+
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/original/image.png',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.png.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
+        self::callTwigFunction(
+            $this->extension,
+            'oro_file_view',
+            [$environment, $this->file]
+        );
+    }
+
+    public function testGetEmptyImageView(): void
+    {
+        self::assertEquals(
             '',
-            self::callTwigFunction($this->extension, 'oro_image_view', [$environment, $this->attachment])
+            self::callTwigFunction(
+                $this->extension,
+                'oro_image_view',
+                [$this->createMock(Environment::class), null]
+            )
         );
     }
 
-    public function testGetImageView()
+    public function testGetImageView(): void
     {
-        $parentEntity = new TestClass();
-        $this->attachment->setFilename('test.doc');
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $template = new TestTemplate(new \Twig_Environment());
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
-        $this->manager->expects($this->once())
-            ->method('getResizedImageUrl')
-            ->with($this->attachment, 16, 16);
-        $this->manager->expects($this->once())
-            ->method('getFileUrl');
+        $environment = $this->createTwigEnvironmentForImagesTemplate($this->file);
 
-        self::callTwigFunction($this->extension, 'oro_image_view', [$environment, $parentEntity, $this->attachment]);
+        self::callTwigFunction($this->extension, 'oro_image_view', [$environment, $this->file]);
     }
 
-    public function testGetImageViewConfigured()
+    public function testGetImageViewWithIntegerAttachmentParameter(): void
     {
-        $parentEntity = new TestClass();
-        $this->attachment->setFilename('test.doc');
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $template = new TestTemplate(new \Twig_Environment());
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attachmentConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($config));
-        $config->expects($this->exactly(2))
+        $environment = $this->createTwigEnvironmentForImagesTemplate($this->file);
+
+        self::callTwigFunction($this->extension, 'oro_image_view', [$environment, self::FILE_ID]);
+    }
+
+    public function testGetImageViewConfigured(): void
+    {
+        $this->file->setFilename('test.doc');
+        $this->file->setParentEntityClass($parentEntityClass = \stdClass::class);
+        $this->file->setParentEntityFieldName($fieldName = 'sampleField');
+
+        $config = $this->createMock(Config::class);
+        $size = 120;
+
+        $environment = $this->createTwigEnvironmentForImagesTemplate($this->file, $size, $size);
+
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('attachment', $parentEntityClass, $fieldName)
+            ->willReturn($config);
+
+        $config->expects(self::exactly(2))
             ->method('get')
-            ->will($this->returnValue(120));
-        $this->manager->expects($this->once())
-            ->method('getResizedImageUrl')
-            ->with($this->attachment, 120, 120);
-        $this->manager->expects($this->once())
-            ->method('getFileUrl');
+            ->willReturn($size);
 
         self::callTwigFunction(
             $this->extension,
             'oro_image_view',
-            [$environment, $parentEntity, $this->attachment, new TestClass(), 'testField']
+            [$environment, $this->file]
         );
     }
 
-    public function testGetFilteredImageUrl()
+    public function testGetImageViewConfiguredWithDefaultWidthAndHeight(): void
     {
-        $this->manager->expects($this->once())
-            ->method('getFilteredImageUrl')
-            ->with($this->attachment, 'testFilter');
+        $this->file->setFilename('test.doc');
+        $this->file->setParentEntityClass($parentEntityClass = \stdClass::class);
+        $this->file->setParentEntityFieldName($fieldName = 'sampleField');
 
-        self::callTwigFunction($this->extension, 'filtered_image_url', [$this->attachment, 'testFilter']);
+        $config = $this->createMock(Config::class);
+
+        $environment = $this->createTwigEnvironmentForImagesTemplate($this->file);
+
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('attachment', $parentEntityClass, $fieldName)
+            ->willReturn($config);
+
+        self::callTwigFunction(
+            $this->extension,
+            'oro_image_view',
+            [$environment, $this->file]
+        );
     }
 
-    public function testGetTypeIsImage()
+    private function createTwigEnvironmentForImagesTemplate(
+        File $file,
+        int $width = 16,
+        int $height = 16
+    ): Environment|\PHPUnit\Framework\MockObject\MockObject {
+        $environment = $this->createMock(Environment::class);
+        $environment->expects(self::once())
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/image.html.twig',
+                [
+                    'file' => $file,
+                    'width' => $width,
+                    'height' => $height,
+                    'fileName' => 'original-name.pdf',
+                ]
+            );
+
+        return $environment;
+    }
+
+    public function testGetTypeIsImage(): void
     {
-        $this->manager->expects($this->once())
+        $mimeType = 'image/jpeg';
+
+        $this->attachmentManager->expects(self::once())
             ->method('isImageType')
-            ->with('image/jpeg');
+            ->with($mimeType);
 
-        self::callTwigFunction($this->extension, 'oro_type_is_image', ['image/jpeg']);
+        self::callTwigFunction($this->extension, 'oro_type_is_image', [$mimeType]);
     }
 
-    public function testIsPreviewAvailable()
+    public function testIsPreviewAvailable(): void
     {
-        $this->manager->expects($this->once())
+        $mimeType = 'image/jpeg';
+
+        $this->attachmentManager->expects(self::once())
             ->method('isImageType')
-            ->with('image/jpeg');
+            ->with($mimeType);
 
-        self::callTwigFunction($this->extension, 'oro_is_preview_available', ['image/jpeg']);
+        self::callTwigFunction($this->extension, 'oro_is_preview_available', [$mimeType]);
     }
 
-    public function testGetFileIconsConfig()
+    public function testGetFileIconsConfig(): void
     {
-        $this->manager->expects($this->once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFileIcons');
 
         self::callTwigFunction($this->extension, 'oro_file_icons_config', []);
     }
 
-    public function testGetConfiguredImageUrl()
+    public function testGetTitle(): void
     {
-        $parent = new TestAttachment();
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attachmentConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment', 'testField')
-            ->will($this->returnValue($config));
-        $config->expects($this->exactly(2))
-            ->method('get')
-            ->will($this->returnValue(45));
-        $this->attachment->setFilename('test.doc');
-        $this->manager->expects($this->once())
-            ->method('getResizedImageUrl')
-            ->with($this->attachment, 45, 45);
+        $localization = $this->createMock(Localization::class);
 
-        self::callTwigFunction(
+        $this->fileTitleProvider->expects(self::once())
+            ->method('getTitle')
+            ->with($this->file, $localization);
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [$this->file, $localization]);
+    }
+
+    public function testGetTitleWhenNullFile(): void
+    {
+        $this->fileTitleProvider->expects(self::never())
+            ->method('getTitle');
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [null]);
+    }
+
+    public function testGetTitleWhenNoLocalization(): void
+    {
+        $this->fileTitleProvider->expects(self::once())
+            ->method('getTitle')
+            ->with($this->file);
+
+        self::callTwigFunction($this->extension, 'oro_file_title', [$this->file]);
+    }
+
+    public function testGetFilteredPictureSourcesReturnsEmptyArrayWhenFileIsNull(): void
+    {
+        $result = self::callTwigFunction(
             $this->extension,
-            'oro_configured_image_url',
-            [$parent, 'testField', $this->attachment]
+            'oro_filtered_picture_sources',
+            [null]
+        );
+
+        self::assertEquals([], $result);
+    }
+
+    public function testGetFilteredPictureSources(): void
+    {
+        $this->file->setFilename('image.mime');
+        $this->file->setExtension('mime');
+        $this->file->setMimeType('image/mime');
+        $filterName = 'sample_filter';
+
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
+        $result = self::callTwigFunction(
+            $this->extension,
+            'oro_filtered_picture_sources',
+            [$this->file, $filterName, ['sample_key' => 'sample_value']]
+        );
+
+        self::assertEquals(
+            [
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                        'sample_key' => 'sample_value',
+                    ],
+                ],
+            ],
+            $result
         );
     }
 
-    public function testGetImageViewWIthIntegerAttachmentParameter()
+    public function testGetFilteredPictureSourcesWhenFileIsInt(): void
     {
-        $parentEntity = new TestClass();
-        $this->attachment->setFilename('test.doc');
-        $attachmentId = 1;
-        $repo = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($attachmentId)
-            ->will($this->returnValue($this->attachment));
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $template = new TestTemplate(new \Twig_Environment());
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
-        $this->manager->expects($this->once())
-            ->method('getResizedImageUrl')
-            ->with($this->attachment, 16, 16);
-        $this->manager->expects($this->once())
-            ->method('getFileUrl');
+        $this->file->setFilename('image.mime');
+        $this->file->setExtension('mime');
+        $this->file->setMimeType('image/mime');
+        $filterName = 'sample_filter';
 
-        self::callTwigFunction(
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
+        $result = self::callTwigFunction(
             $this->extension,
-            'oro_image_view',
-            [$environment, $parentEntity, $attachmentId]
+            'oro_filtered_picture_sources',
+            [self::FILE_ID, $filterName, ['sample_key' => 'sample_value']]
+        );
+
+        self::assertEquals(
+            [
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                        'sample_key' => 'sample_value',
+                    ],
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function testGetResizedPictureSourcesReturnsEmptyArrayWhenFileIsNull(): void
+    {
+        $result = self::callTwigFunction(
+            $this->extension,
+            'oro_resized_picture_sources',
+            [null]
+        );
+
+        self::assertEquals([], $result);
+    }
+
+    public function testGetResizedPictureSources(): void
+    {
+        $this->file->setFilename('image.mime');
+        $this->file->setExtension('mime');
+        $this->file->setMimeType('image/mime');
+        $width = 42;
+        $height = 24;
+
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/42/24/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/42/24/image.mime.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
+        $result = self::callTwigFunction(
+            $this->extension,
+            'oro_resized_picture_sources',
+            [$this->file, $width, $height, ['sample_key' => 'sample_value']]
+        );
+
+        self::assertEquals(
+            [
+                [
+                    'srcset' => '/42/24/image.mime.webp',
+                    'type' => 'image/webp',
+                    'sample_key' => 'sample_value',
+                ],
+                [
+                    'srcset' => '/42/24/image.mime',
+                    'type' => 'image/mime',
+                    'sample_key' => 'sample_value',
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function testGetResizedPictureSourcesWhenFileIsInt(): void
+    {
+        $this->file->setFilename('image.mime');
+        $this->file->setExtension('mime');
+        $this->file->setMimeType('image/mime');
+        $width = 42;
+        $height = 24;
+
+        $this->pictureSourcesProvider->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($this->file)
+            ->willReturn([
+                'src' => '/42/24/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/42/24/image.mime.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
+        $result = self::callTwigFunction(
+            $this->extension,
+            'oro_resized_picture_sources',
+            [self::FILE_ID, $width, $height, ['sample_key' => 'sample_value']]
+        );
+
+        self::assertEquals(
+            [
+                [
+                    'srcset' => '/42/24/image.mime.webp',
+                    'type' => 'image/webp',
+                    'sample_key' => 'sample_value',
+                ],
+                [
+                    'srcset' => '/42/24/image.mime',
+                    'type' => 'image/mime',
+                    'sample_key' => 'sample_value',
+                ],
+            ],
+            $result
         );
     }
 }

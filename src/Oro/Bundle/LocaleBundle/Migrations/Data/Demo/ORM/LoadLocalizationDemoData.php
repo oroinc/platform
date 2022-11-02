@@ -4,21 +4,20 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadLanguageDemoData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
+/**
+ * Creates demo data for localisations.
+ */
 class LoadLocalizationDemoData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /**
-     * @var array
-     */
-    protected $localizations = [
+    private array $localizations = [
         ['language' => LoadLanguageDemoData::LANG_EN_US, 'formatting' => 'en_US', 'parent' => null],
         ['language' => LoadLanguageDemoData::LANG_EN_CA, 'formatting' => 'en_CA', 'parent' => 'en_US'],
         ['language' => LoadLanguageDemoData::LANG_EN_GB, 'formatting' => 'en_GB', 'parent' => 'en_US'],
@@ -29,15 +28,12 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         ['language' => LoadLanguageDemoData::LANG_DE_DE, 'formatting' => 'de_DE', 'parent' => 'en_US'],
     ];
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    private ContainerInterface $container;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -45,19 +41,18 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
     /**
      * {@inheritdoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $registry = [];
         $localeSettings = $this->container->get('oro_locale.settings');
         $localeCode = $localeSettings->getLocale();
 
-        /* @var $repository EntityRepository */
-        $repository = $manager->getRepository('OroLocaleBundle:Localization');
+        $repository = $manager->getRepository(Localization::class);
 
         foreach ($this->localizations as $item) {
             /** @var Language $language */
             $language = $this->getReference($item['language']);
-            $name = Intl::getLocaleBundle()->getLocaleName($item['formatting'], $localeCode);
+            $name = Locales::getName($item['formatting'], $localeCode);
 
             $localization = $repository->findOneBy(['name' => $name]);
 
@@ -91,7 +86,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
     /**
      * {@inheritdoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [LoadLanguageDemoData::class];
     }

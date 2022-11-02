@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -17,10 +17,13 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The base class for ACL extensions that check permissions based on access levels.
+ */
 abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 {
     /** All access levels from the most to the least permissive level */
-    const ACCESS_LEVELS = [
+    protected const ACCESS_LEVELS = [
         'SYSTEM' => AccessLevel::SYSTEM_LEVEL,
         'GLOBAL' => AccessLevel::GLOBAL_LEVEL,
         'DEEP'   => AccessLevel::DEEP_LEVEL,
@@ -28,24 +31,11 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         'BASIC'  => AccessLevel::BASIC_LEVEL
     ];
 
-    /** @var ObjectIdAccessor */
-    protected $objectIdAccessor;
+    protected ObjectIdAccessor $objectIdAccessor;
+    protected OwnershipMetadataProviderInterface $metadataProvider;
+    protected EntityOwnerAccessor $entityOwnerAccessor;
+    protected AccessLevelOwnershipDecisionMakerInterface $decisionMaker;
 
-    /** @var OwnershipMetadataProviderInterface */
-    protected $metadataProvider;
-
-    /** @var EntityOwnerAccessor */
-    protected $entityOwnerAccessor;
-
-    /** @var AccessLevelOwnershipDecisionMakerInterface */
-    protected $decisionMaker;
-
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,
@@ -59,29 +49,27 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAccessLevelNames($object, $permissionName = null)
     {
         return $this->getMetadata($object)->getAccessLevelNames();
     }
 
-    /**
-     * @param int            $triggeredMask
-     * @param mixed          $object
-     * @param TokenInterface $securityToken
-     *
-     * @return bool
-     */
-    protected function isAccessGranted($triggeredMask, $object, TokenInterface $securityToken)
+    protected function isAccessGranted(int $triggeredMask, mixed $object, TokenInterface $securityToken): bool
     {
         $organization = null;
         $accessLevel = $this->getAccessLevel($triggeredMask);
-        if ($securityToken instanceof OrganizationContextTokenInterface) {
-            if ($this->isAccessDeniedByOrganizationContext($object, $securityToken, $accessLevel)) {
+        if ($securityToken instanceof OrganizationAwareTokenInterface) {
+            if ($this->isAccessDeniedByOrganizationContext(
+                $object,
+                $securityToken,
+                $accessLevel,
+                $this->getPermissions($triggeredMask, true)
+            )) {
                 return false;
             }
-            $organization = $securityToken->getOrganizationContext();
+            $organization = $securityToken->getOrganization();
         }
 
         return $this->isAccessGrantedByAccessLevel(
@@ -92,16 +80,12 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         );
     }
 
-    /**
-     * @param int    $accessLevel
-     * @param mixed  $object
-     * @param object $user
-     * @param object $organization
-     *
-     * @return bool
-     */
-    protected function isAccessGrantedByAccessLevel($accessLevel, $object, $user, $organization)
-    {
+    protected function isAccessGrantedByAccessLevel(
+        int $accessLevel,
+        mixed $object,
+        object|string|null $user,
+        ?object $organization
+    ): bool {
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         }
@@ -155,43 +139,31 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     }
 
     /**
-     * Checks whether an object is supported for check permissions
-     *
-     * @param mixed $object
-     *
-     * @return bool
+     * Checks whether an object is supported for check permissions.
      */
-    protected function isSupportedObject($object)
+    protected function isSupportedObject(mixed $object): bool
     {
         return
-            is_object($object)
+            \is_object($object)
             && !$object instanceof ObjectIdentity;
     }
 
     /**
-     * Gets metadata for the given object
-     *
-     * @param mixed $object
-     *
-     * @return OwnershipMetadataInterface
+     * Gets metadata for the given object.
      */
-    protected function getMetadata($object)
+    protected function getMetadata(mixed $object): OwnershipMetadataInterface
     {
         return $this->metadataProvider->getMetadata($this->getObjectClassName($object));
     }
 
     /**
-     * Gets class name for the given object
-     *
-     * @param mixed $object
-     *
-     * @return string|null
+     * Gets class name for the given object.
      */
     protected function getObjectClassName($object)
     {
         if ($object instanceof ObjectIdentityInterface) {
             $className = $object->getType();
-        } elseif (is_string($object)) {
+        } elseif (\is_string($object)) {
             $className = $id = $group = null;
             $this->parseDescriptor($object, $className, $id, $group);
         } else {
@@ -202,16 +174,25 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     }
 
     /**
-     * Constructs an ObjectIdentity for the given domain object
+     * Gets id for the given domain object.
      *
-     * @param object $domainObject
-     *
-     * @return ObjectIdentity
      * @throws InvalidDomainObjectException
      */
-    protected function fromDomainObject($domainObject)
+    protected function getObjectId(object $domainObject): int|string|null
     {
-        if (!is_object($domainObject)) {
+        return $domainObject instanceof DomainObjectReference
+            ? $domainObject->getIdentifier()
+            : $this->objectIdAccessor->getId($domainObject);
+    }
+
+    /**
+     * Constructs an ObjectIdentity for the given domain object.
+     *
+     * @throws InvalidDomainObjectException
+     */
+    protected function fromDomainObject(object $domainObject): ObjectIdentity
+    {
+        if (!\is_object($domainObject)) {
             throw new InvalidDomainObjectException('$domainObject must be an object.');
         }
 
@@ -228,33 +209,23 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     /**
      * Checks whether user does not have access to an entity from another organization.
      * We should check organization for all the entities what have ownership
-     *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types)
-     *
-     * @param object                            $object
-     * @param OrganizationContextTokenInterface $securityToken
-     * @param string                            $accessLevel
-     *
-     * @return bool
+     *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types).
      */
     protected function isAccessDeniedByOrganizationContext(
-        $object,
-        OrganizationContextTokenInterface $securityToken,
-        $accessLevel
-    ) {
+        object $object,
+        OrganizationAwareTokenInterface $securityToken,
+        int $accessLevel,
+        array $permissions
+    ): bool {
         $objectOrganizationId = $this->getOrganizationId($object);
 
         // check entity organization with current organization
         return
             null !== $objectOrganizationId
-            && $objectOrganizationId !== $securityToken->getOrganizationContext()->getId();
+            && $objectOrganizationId !== $securityToken->getOrganization()->getId();
     }
 
-    /**
-     * @param object $object
-     *
-     * @return int|null
-     */
-    protected function getOrganizationId($object)
+    protected function getOrganizationId(object $object): int|string|null
     {
         if ($object instanceof DomainObjectReference) {
             return $object->getOrganizationId();
@@ -267,30 +238,27 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
             // in case if entity has no organization field (none ownership type)
         }
 
-        return null !== $organization
-            ? $organization->getId()
-            : null;
+        return $organization?->getId();
     }
 
     /**
      * Creates an instance of InvalidAclMaskException indicates that a bitmask
-     * has invalid access level related permission
-     *
-     * @param int      $mask
-     * @param mixed    $object
-     * @param string   $permission
-     * @param string[] $maskAccessLevels
-     *
-     * @return InvalidAclMaskException
+     * has invalid access level related permission.
      */
-    protected function createInvalidAccessLevelAclMaskException($mask, $object, $permission, array $maskAccessLevels)
-    {
-        $msg = sprintf(
-            'The %s permission must be in one access level only, but it is in %s access levels.',
-            $permission,
-            implode(', ', $maskAccessLevels)
+    protected function createInvalidAccessLevelAclMaskException(
+        int $mask,
+        mixed $object,
+        string $permission,
+        array $maskAccessLevels
+    ): InvalidAclMaskException {
+        return $this->createInvalidAclMaskException(
+            $mask,
+            $object,
+            sprintf(
+                'The %s permission must be in one access level only, but it is in %s access levels.',
+                $permission,
+                implode(', ', $maskAccessLevels)
+            )
         );
-
-        return $this->createInvalidAclMaskException($mask, $object, $msg);
     }
 }

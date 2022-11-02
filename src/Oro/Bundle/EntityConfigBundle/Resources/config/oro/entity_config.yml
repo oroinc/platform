@@ -30,14 +30,27 @@ entity_config:
                         sortable:           true
                         filterable:         true
                         show_filter:        true
+
+                # this attribute is used to store an alias that was generated for an entity
+                # and helps to resolve duplicated aliases
+                entity_alias: # string
+                    options:
+                        auditable: false
+
+                # this attribute is used to store a plural alias that was generated for an entity
+                # and helps to resolve duplicated aliases
+                entity_plural_alias: # string
+                    options:
+                        auditable: false
     attribute:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#attribute
         entity:
             items:
                 has_attributes:
                     options:
                         require_schema_update: false
                         value_type: boolean
-                        default_value: false
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#attribute
         field:
             form:
                 block_config:
@@ -48,7 +61,6 @@ entity_config:
                 is_attribute:
                     options:
                         value_type: boolean
-                        default_value: false
                         indexed: true
                     grid:
                         type: boolean
@@ -59,89 +71,69 @@ entity_config:
                 is_system:
                     options:
                         value_type: boolean
-                        default_value: false
                         indexed: true
                 searchable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.searchable
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
                 filterable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filterable
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
                 filter_by:
                     options:
                         value_type: string
-                        default_value: 'exact_value'
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 oro.entity_config.field_config.filter_by.exact_value.label: exact_value
-                                oro.entity_config.field_config.filter_by.fuzzy_search.label: fuzzy_search
+                                oro.entity_config.field_config.filter_by.fulltext_search.label: fulltext_search
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filter_by.label
                             tooltip: oro.entity_config.entity_config.attribute.field.items.filter_by.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 'exact_value'
                 sortable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
-                enabled:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
-                        options:
-                            choices:
-                                No: 0
-                                Yes: 1
-                            placeholder: false
-                            block: attribute
-                            label: oro.entity_config.entity_config.attribute.field.items.enabled
-                visible:
-                    options:
-                        value_type: boolean
-                        default_value: true
-                        indexed: true
-                    grid:
-                        type: boolean
-                        label: oro.entity_config.entity_config.attribute.field.items.visible
-                        renderable: true
-                    form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
-                        options:
-                            choices:
-                                No: 0
-                                Yes: 1
-                            placeholder: false
-                            block: attribute
-                            label: oro.entity_config.entity_config.attribute.field.items.visible
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes

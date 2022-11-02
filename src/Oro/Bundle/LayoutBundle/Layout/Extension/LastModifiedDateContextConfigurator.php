@@ -2,24 +2,23 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider;
 
+/**
+ * Adds the last modification date of theme resources to the context.
+ */
 class LastModifiedDateContextConfigurator implements ContextConfiguratorInterface
 {
-    const MAX_MODIFICATION_DATE_PARAM = 'last_modification_date';
+    private const LAST_MODIFICATION_DATE = 'last_modification_date';
 
-    /** @var Cache */
-    private $cache;
+    /** @var LastModificationDateProvider */
+    private $lastModificationDateProvider;
 
-    /**
-     * @param Cache $cache
-     */
-    public function __construct(Cache $cache)
+    public function __construct(LastModificationDateProvider $lastModificationDateProvider)
     {
-        $this->cache = $cache;
+        $this->lastModificationDateProvider = $lastModificationDateProvider;
     }
 
     /**
@@ -29,13 +28,12 @@ class LastModifiedDateContextConfigurator implements ContextConfiguratorInterfac
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $context->getResolver()
-            ->setDefaults([self::MAX_MODIFICATION_DATE_PARAM => $date->format(\DateTime::COOKIE)])
-            ->setAllowedTypes(self::MAX_MODIFICATION_DATE_PARAM, 'string');
+            ->setDefaults([self::LAST_MODIFICATION_DATE => $date->format(\DateTime::COOKIE)])
+            ->setAllowedTypes(self::LAST_MODIFICATION_DATE, 'string');
 
-        $date = $this->cache->fetch(ThemeResourceProvider::CACHE_LAST_MODIFICATION_DATE);
-
-        if ($date) {
-            $context->set(self::MAX_MODIFICATION_DATE_PARAM, $date->format(\DateTime::COOKIE));
+        $date = $this->lastModificationDateProvider->getLastModificationDate();
+        if (null !== $date) {
+            $context->set(self::LAST_MODIFICATION_DATE, $date->format(\DateTime::COOKIE));
         }
     }
 }

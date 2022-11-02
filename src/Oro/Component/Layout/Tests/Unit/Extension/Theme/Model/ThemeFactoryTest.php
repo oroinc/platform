@@ -5,20 +5,19 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var PropertyAccessor */
+    private $propertyAccessor;
+
     /** @var ThemeFactory */
-    protected $factory;
+    private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->factory = new ThemeFactory();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->factory);
+        $this->factory = new ThemeFactory(new PropertyAccessor());
     }
 
     /**
@@ -45,6 +44,8 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
         $fullDefinition = new Theme('oro-black', 'base');
         $fullDefinition->setIcon('oro-black-icon.ico');
         $fullDefinition->setLogo('oro-black-logo.png');
+        $fullDefinition->setImagePlaceholders(['no_image' => 'some/test/route.png']);
+        $fullDefinition->setRtlSupport(true);
         $fullDefinition->setScreenshot('oro-black-screenshot.png');
         $fullDefinition->setLabel('Oro Black Theme');
         $fullDefinition->setDirectory('OroBlack');
@@ -103,6 +104,8 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
                     'screenshot' => 'oro-black-screenshot.png',
                     'icon'       => 'oro-black-icon.ico',
                     'logo'       => 'oro-black-logo.png',
+                    'image_placeholders' => ['no_image'   => 'some/test/route.png'],
+                    'rtl_support' => true,
                     'directory'  => 'OroBlack',
                     'description' => 'description',
                     'config' => $config

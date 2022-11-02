@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2;
 
 class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
 {
@@ -15,23 +17,16 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
      */
     public function testNewExtendEntity()
     {
-        $configModel = new EntityConfigModel(
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass'
-        );
-        $entityConfig = new Config(
-            new EntityConfigId(
-                'extend',
-                'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass'
-            )
-        );
+        $configModel = new EntityConfigModel(TestClass::class);
+        $entityConfig = new Config(new EntityConfigId('extend', TestClass::class));
 
         $this->configProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new EntityConfigListener();
+        $listener = new EntityConfigListener($this->eventDispatcher);
         $listener->updateEntity($event);
 
         $this->assertEquals(
@@ -53,15 +48,8 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
      */
     public function testNewNotExtendEntity()
     {
-        $configModel = new EntityConfigModel(
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2'
-        );
-        $entityConfig = new Config(
-            new EntityConfigId(
-                'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2',
-                'extend'
-            )
-        );
+        $configModel = new EntityConfigModel(TestClass2::class);
+        $entityConfig = new Config(new EntityConfigId(TestClass2::class, 'extend'));
 
         /**
          * value of NEW Config should be empty
@@ -73,11 +61,11 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
 
         $this->configProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new EntityConfigListener();
+        $listener = new EntityConfigListener($this->eventDispatcher);
         $listener->updateEntity($event);
 
         $this->assertEquals(

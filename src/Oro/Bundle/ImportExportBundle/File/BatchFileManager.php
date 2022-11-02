@@ -7,6 +7,10 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
+/**
+ * Splits import file in batches.
+ * Merges files into summary file.
+ */
 class BatchFileManager
 {
     /**
@@ -44,25 +48,16 @@ class BatchFileManager
         $this->sizeOfBatch = $sizeOfBatch;
     }
 
-    /**
-     * @param AbstractFileReader $reader
-     */
     public function setReader(AbstractFileReader $reader)
     {
         $this->reader = $reader;
     }
 
-    /**
-     * @param FileStreamWriter $writer
-     */
     public function setWriter(FileStreamWriter $writer)
     {
         $this->writer = $writer;
     }
 
-    /**
-     * @param array $options
-     */
     public function setConfigurationOptions(array $options)
     {
         $this->configurationOptions = $options;
@@ -86,6 +81,8 @@ class BatchFileManager
         ));
         $this->reader->initializeByContext($context);
 
+        $batchSize = $context->getOption(Context::OPTION_BATCH_SIZE) ?: $this->sizeOfBatch;
+
         $data = [];
         $i = 0;
         $header = null;
@@ -94,7 +91,7 @@ class BatchFileManager
         while ($row = $this->reader->read($context)) {
             $header = $header ?: $this->reader->getHeader();
             $data[] = $row;
-            if (++$i == $this->sizeOfBatch) {
+            if (++$i == $batchSize) {
                 $files[] = $this->writeBatch($data, $header, $extension);
                 $data = [];
                 $i = 0;

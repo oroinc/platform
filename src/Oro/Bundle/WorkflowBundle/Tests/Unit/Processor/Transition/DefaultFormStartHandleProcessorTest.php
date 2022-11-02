@@ -15,15 +15,15 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var DefaultFormStartHandleProcessor */
-    protected $processor;
+    private $processor;
 
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
@@ -32,9 +32,11 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->request = $this->createMock(Request::class);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessSavedTrue()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
             ->method('getFormOptions')
@@ -50,7 +52,10 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->request->expects($this->once())->method('isMethod')->with('POST')->willReturn(true);
+        $this->request->expects($this->once())
+            ->method('isMethod')
+            ->with('POST')
+            ->willReturn(true);
 
         $toPersist = (object)['id' => 'toPersist'];
         $notManageable = (object)['id' => 'notManageable'];
@@ -65,30 +70,40 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
             'not scheduled for insert' => $notScheduledForInsert
         ]);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('handleRequest')->with($this->request);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->once())->method('getData')->willReturn($workflowData);
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($this->request);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($workflowData);
 
         $context = new TransitionContext();
         $context->setRequest($this->request);
         $context->setTransition($transition);
         $context->setForm($form);
 
-        /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject $unitOfWork */
         $unitOfWork = $this->createMock(UnitOfWork::class);
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())->method('getUnitOfWork')->willReturn($unitOfWork);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork);
 
-        $this->doctrineHelper->expects($this->any())->method('getEntityManager')->willReturn($entityManager);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
 
         //not object will be filtered
         $this->doctrineHelper->expects($this->exactly(4))
-            ->method('isManageableEntity')->withConsecutive(
+            ->method('isManageableEntity')
+            ->withConsecutive(
                 [$toPersist],
                 [$notManageable],
                 [$notInIdentity],
@@ -126,7 +141,10 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $context = new TransitionContext();
         $context->setRequest($this->request);
 
-        $this->request->expects($this->once())->method('isMethod')->with('POST')->willReturn(false);
+        $this->request->expects($this->once())
+            ->method('isMethod')
+            ->with('POST')
+            ->willReturn(false);
 
         $this->processor->process($context);
 

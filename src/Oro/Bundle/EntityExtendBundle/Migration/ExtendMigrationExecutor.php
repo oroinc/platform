@@ -12,9 +12,6 @@ class ExtendMigrationExecutor extends MigrationExecutorWithNameGenerator
      */
     protected $extendOptionsManager;
 
-    /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     */
     public function setExtendOptionsManager(ExtendOptionsManager $extendOptionsManager)
     {
         $this->extendOptionsManager = $extendOptionsManager;

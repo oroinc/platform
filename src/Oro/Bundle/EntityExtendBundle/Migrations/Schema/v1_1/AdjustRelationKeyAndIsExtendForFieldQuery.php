@@ -19,9 +19,6 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param FieldTypeHelper $fieldTypeHelper
-     */
     public function __construct(FieldTypeHelper $fieldTypeHelper)
     {
         $this->fieldTypeHelper = $fieldTypeHelper;
@@ -49,6 +46,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
@@ -84,7 +82,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
                 $types  = ['data' => 'array', 'id' => 'integer'];
                 $this->logQuery($logger, $query, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $params, $types);
+                    $this->connection->executeStatement($query, $params, $types);
                 }
             }
         }

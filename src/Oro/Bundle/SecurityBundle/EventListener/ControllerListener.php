@@ -4,23 +4,20 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Checks if an access to a controller action is granted or not.
+ */
 class ControllerListener
 {
-    /** @var ClassAuthorizationChecker */
-    private $classAuthorizationChecker;
+    private ClassAuthorizationChecker $classAuthorizationChecker;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param ClassAuthorizationChecker $classAuthorizationChecker
-     * @param LoggerInterface           $logger
-     */
     public function __construct(
         ClassAuthorizationChecker $classAuthorizationChecker,
         LoggerInterface $logger
@@ -34,11 +31,9 @@ class ControllerListener
      *
      * This method is executed just before any controller action.
      *
-     * @param FilterControllerEvent $event
-     *
      * @throws AccessDeniedException
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         if (!$event->getRequest()->attributes->get('_oro_access_checked')) {
             $controller = $event->getController();
@@ -47,7 +42,7 @@ class ControllerListener
              * If it is a class, it comes in array format
              */
             if (is_array($controller)) {
-                list($object, $method) = $controller;
+                [$object, $method] = $controller;
                 $className = ClassUtils::getRealClass($object);
 
                 $this->logger->debug(

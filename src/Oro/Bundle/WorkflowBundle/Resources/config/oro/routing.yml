@@ -2,10 +2,154 @@ oro_workflow_bundle:
     resource:     "@OroWorkflowBundle/Controller"
     type:         annotation
 
-oro_workflow_bundle_api:
-    resource:     "@OroWorkflowBundle/Resources/config/oro/routing_api.yml"
-    requirements:
-        version:  latest|v1
-        _format:  json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_workflow_start:
+    path: '/api/rest/{version}/workflow/start/{workflowName}/{transitionName}.{_format}'
+    methods: [POST]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json
+
+oro_api_workflow_transit:
+    path: '/api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction'
+        version: latest
+        _format: json
+    requirements:
+        workflowItemId: \d+
+        version: latest|v1
+        _format: json
+
+oro_api_workflow_get:
+    path: '/api/rest/{version}/workflow/{workflowItemId}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::getAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        workflowItemId: \d+
+        _format: json
+
+oro_api_workflow_delete:
+    path: '/api/rest/{version}/workflow/{workflowItemId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deleteAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        workflowItemId: \d+
+        _format: json
+
+oro_api_workflow_activate:
+    path: '/api/rest/{version}/workflow/activate/{workflowDefinition}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::activateAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json
+
+oro_api_workflow_deactivate:
+    path: '/api/rest/{version}/workflow/deactivate/{workflowDefinition}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deactivateAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json
+
+oro_api_workflow_definition_get:
+    path: '/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowDefinitionController::getAction'
+        version: latest
+        _format: json
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_workflow_definition_put:
+    path: '/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowDefinitionController::putAction'
+        version: latest
+        _format: json
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_workflow_definition_post:
+    path: '/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowDefinitionController::postAction'
+        version: latest
+        _format: json
+        workflowDefinition: null
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_workflow_definition_delete:
+    path: '/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowDefinitionController::deleteAction'
+        version: latest
+        _format: json
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_workflow_entity_get:
+    path: '/api/rest/{version}/workflowentity.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\EntityController::getAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json
+
+oro_api_process_activate:
+    path: '/api/rest/{version}/process/activate/{processDefinition}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json
+
+oro_api_process_deactivate:
+    path: '/api/rest/{version}/process/deactivate/{processDefinition}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction'
+        version: latest
+        _format: json
+    requirements:
+        version: latest|v1
+        _format: json

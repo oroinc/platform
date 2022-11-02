@@ -3,41 +3,40 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
+use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatterManager;
+    /** @var FormatterManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $formatterManager;
+
+    /** @var UrlWithoutFrontControllerProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlProvider;
 
     /** @var FormatExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->formatterManager = $this->getMockBuilder(FormatterManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatterManager = $this->createMock(FormatterManager::class);
+        $this->urlProvider = $this->createMock(UrlWithoutFrontControllerProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('translator', $this->translator)
+            ->add(TranslatorInterface::class, $this->translator)
             ->add('oro_ui.formatter', $this->formatterManager)
+            ->add('oro_ui.provider.url_without_front_controller', $this->urlProvider)
             ->getContainer($this);
 
         $this->extension = new FormatExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_formatter_extension', $this->extension->getName());
     }
 
     public function testFormat()
@@ -62,10 +61,24 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGenerateUrlWithoutFrontController()
+    {
+        $name = 'some_route_name';
+        $parameters = ['any_route_parameter'];
+        $path = 'some/test/path.png';
+
+        $this->urlProvider->expects($this->once())
+            ->method('generate')
+            ->with($name, $parameters)
+            ->willReturn($path);
+
+        self::assertEquals($path, self::callTwigFunction($this->extension, 'asset_path', [$name, $parameters]));
+    }
+
     /**
      * @dataProvider formatFilenameProvider
      */
-    public function testFormatFilename($filename, $result)
+    public function testFormatFilename(string $filename, string $result)
     {
         $this->assertEquals(
             $result,
@@ -73,7 +86,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatFilenameProvider()
+    public function formatFilenameProvider(): array
     {
         return [
             [
@@ -110,7 +123,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ageDataProvider
      */
-    public function testGetAge($date, $options, $age)
+    public function testGetAge(\DateTime|string|null $date, array $options, ?int $age)
     {
         $this->assertEquals(
             $age,
@@ -137,9 +150,9 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('-1 year -1 month', new \DateTimeZone('UTC'));
 
         $this->translator->expects($this->once())
-            ->method('transChoice')
-            ->with('oro.age', 1, ['%count%' => 1])
-            ->will($this->returnValue('age 1'));
+            ->method('trans')
+            ->with('oro.age', ['%count%' => 1])
+            ->willReturn('age 1');
 
         $this->assertEquals(
             'age 1',
@@ -147,12 +160,13 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function ageDataProvider()
+    public function ageDataProvider(): array
     {
-        $oneYearAgo = new \DateTime('-1 year', new \DateTimeZone('UTC'));
+        $isFeb29 = date('md') === '0229';
+        $oneYearAgo = new \DateTime('-1 year' . ($isFeb29 ? ' -1 day' : ''), new \DateTimeZone('UTC'));
         $oneMonthAgo = new \DateTime('-1 month', new \DateTimeZone('UTC'));
         $oneYearTwoMonthAgo = new \DateTime('-1 year -2 months', new \DateTimeZone('UTC'));
-        $tenYearsAgo = new \DateTime('-10 years', new \DateTimeZone('UTC'));
+        $tenYearsAgo = new \DateTime('-10 years' . ($isFeb29 ? ' -1 day' : ''), new \DateTimeZone('UTC'));
         $inFuture = new \DateTime('+1 year', new \DateTimeZone('UTC'));
 
         return [

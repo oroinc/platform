@@ -1,8 +1,24 @@
 /* @theme: admin.oro; */
 
-@import "bowerassets/bootstrap/scss/breadcrumb";
+@import '~@oroinc/bootstrap/scss/breadcrumb';
 
 .breadcrumb {
     font-size: $breadcrumb-font-size;
     color: $breadcrumb-color;
+
+    + .breadcrumb-item {
+        /* rtl:raw:
+        padding-left: 0;
+    */
+
+        padding-left: $breadcrumb-item-padding;
+
+        &::before {
+            /* rtl:raw:
+            padding-right: 0;
+        */
+
+            padding-right: $breadcrumb-item-padding;
+        }
+    }
 }

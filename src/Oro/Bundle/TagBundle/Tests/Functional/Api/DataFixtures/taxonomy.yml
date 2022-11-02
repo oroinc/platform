@@ -1,0 +1,14 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+
+Oro\Bundle\TagBundle\Entity\Taxonomy:
+    taxonomy1:
+        name: 'taxonomy1'
+        backgroundColor: '#FF0000'
+        owner: '@user'
+        organization: '@organization'
+    taxonomy2:
+        name: 'taxonomy2'
+        owner: '@user'
+        organization: '@organization'

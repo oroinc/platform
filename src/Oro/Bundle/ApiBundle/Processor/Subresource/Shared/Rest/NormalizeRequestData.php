@@ -5,11 +5,13 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -19,14 +21,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class NormalizeRequestData implements ProcessorInterface
 {
     /** @var EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
+    private $entityIdTransformerRegistry;
 
     /** @var ChangeRelationshipContext */
-    protected $context;
+    private $context;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -47,14 +46,10 @@ class NormalizeRequestData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    protected function normalizeData(array $data)
+    private function normalizeData(array $data): array
     {
         $associationValue = reset($data);
+        $rootKey = (string)key($data);
 
         $associationName = $this->context->getAssociationName();
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
@@ -65,7 +60,7 @@ class NormalizeRequestData implements ProcessorInterface
                 $associationData = [];
                 foreach ($associationValue as $key => $value) {
                     $associationData[] = $this->normalizeRelationId(
-                        $associationName . '.' . $key,
+                        $rootKey . ConfigUtil::PATH_DELIMITER . (string)$key,
                         $targetEntityClass,
                         $value,
                         $targetMetadata
@@ -73,7 +68,7 @@ class NormalizeRequestData implements ProcessorInterface
                 }
             } elseif (null !== $associationValue) {
                 $associationData = $this->normalizeRelationId(
-                    $associationName,
+                    $rootKey,
                     $targetEntityClass,
                     $associationValue,
                     $targetMetadata
@@ -92,46 +87,54 @@ class NormalizeRequestData implements ProcessorInterface
      * @param string         $propertyPath
      * @param string         $entityClass
      * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param EntityMetadata $metadata
      *
      * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeRelationId($propertyPath, $entityClass, $entityId, EntityMetadata $entityMetadata)
-    {
+    private function normalizeRelationId(
+        string $propertyPath,
+        string $entityClass,
+        $entityId,
+        EntityMetadata $metadata
+    ): array {
         return [
             'class' => $entityClass,
-            'id'    => $this->normalizeEntityId($propertyPath, $entityId, $entityMetadata)
+            'id'    => $this->normalizeEntityId($propertyPath, $entityId, $metadata)
         ];
     }
 
     /**
      * @param string         $propertyPath
      * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param EntityMetadata $metadata
      *
      * @return mixed
      */
-    protected function normalizeEntityId($propertyPath, $entityId, EntityMetadata $entityMetadata)
+    private function normalizeEntityId(string $propertyPath, $entityId, EntityMetadata $metadata)
     {
         try {
-            return $this->getEntityIdTransformer($this->context->getRequestType())
-                ->reverseTransform($entityId, $entityMetadata);
+            $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $metadata);
+            if (null === $normalizedId) {
+                $this->context->addNotResolvedIdentifier(
+                    'requestData' . ConfigUtil::PATH_DELIMITER . $propertyPath,
+                    new NotResolvedIdentifier($entityId, $metadata->getClassName())
+                );
+            }
+
+            return $normalizedId;
         } catch (\Exception $e) {
-            $error = Error::createValidationError(Constraint::ENTITY_ID)
-                ->setInnerException($e)
-                ->setSource(ErrorSource::createByPropertyPath($propertyPath));
-            $this->context->addError($error);
+            $this->context->addError(
+                Error::createValidationError(Constraint::ENTITY_ID)
+                    ->setInnerException($e)
+                    ->setSource(ErrorSource::createByPropertyPath($propertyPath))
+            );
         }
 
         return $entityId;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
-    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }

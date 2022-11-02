@@ -14,7 +14,12 @@ oro:
 
         controller:
             config.saved.message: "Configuration saved"
-            page.reload.message:  "Please wait for the page to reload"
+            page.reload.message:  "Please wait until page will be reloaded"
+
+        feature:
+            system_configuration:
+                label: System Configuration Menu
+                description: Enables the Configuration menu item under System and gives access to all system settings on the global level.
 
         system_configuration:
             groups:
@@ -22,6 +27,7 @@ oro:
                 general_setup.title: "General Setup"
             use_default: "Use default"
             desktop_only: "System configuration is not available in mobile version. Please open the page on the desktop."
+
         acl:
             action:
                 general.label: Access system configuration

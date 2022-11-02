@@ -1,43 +1,24 @@
-{% import 'OroUIBundle::macros.html.twig' as ui %}
-{% import 'OroTagBundle::macros.html.twig' as tag %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import '@OroUI/macros.html.twig' as ui %}
+{% import '@OroTag/macros.html.twig' as tag %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
+{% import _self as userInfo %}
 
 {% macro renderEmail(emailAddress, isPrimary, entity) %}
-    {% import 'OroEmailBundle::macros.html.twig' as email %}
+    {% import '@OroEmail/macros.html.twig' as email %}
     {% if isPrimary %}<strong>{% endif %}
         {{ email.renderEmailWithActions(emailAddress, entity) }}
     {% if isPrimary %}</strong>{% endif %}
-{% endmacro %}
-
-{% macro renderApiBlock(user, userApi, viewProfile) %}
-    {% set ownUserView = app.user and user and app.user.id == user.id %}
-    {% if viewProfile or is_granted('MANAGE_API_KEY', user) or ownUserView %}
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'url': path('oro_user_apigen', { id: user.id }),
-            'alias': 'user-apikey-gen-widget',
-            'elementFirst': true,
-            'separateLayout': false
-        }) }}
-    {% endif %}
 {% endmacro %}
 
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
             {{ ui.renderProperty('oro.user.username.label'|trans, entity.username) }}
+            {{ ui.renderProperty('oro.user.birthday.label'|trans, ui.render_birthday(entity.birthday)) }}
 
-            {% set birthday_string %}
-                {{ entity.birthday is empty ? 'N/A'|trans : entity.birthday|oro_format_date }}
-                {% if entity.birthday is not empty %}
-                    ({{ entity.birthday|age_string({'default': 'N/A'}) }})
-                {% endif %}
-            {% endset %}
-            {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
-
-            {% set emails = [_self.renderEmail(entity.email, true, entity)] %}
+            {% set emails = [userInfo.renderEmail(entity.email, true, entity)] %}
             {% for emailEntity in entity.emails %}
-                {% set emails = emails|merge([_self.renderEmail(emailEntity.email, false, entity)]) %}
+                {% set emails = emails|merge([userInfo.renderEmail(emailEntity.email, false, entity)]) %}
             {% endfor %}
             {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
@@ -45,7 +26,7 @@
 
             {% if is_granted('oro_user_role_view') %}
                 {% set roles = [] %}
-                {% for entityRole in entity.roles %}
+                {% for entityRole in entity.userRoles %}
                     {% set roles = roles|merge([entityRole.label]) %}
                 {% endfor %}
                 {{ ui.renderHtmlProperty('oro.user.roles.label'|trans, roles|join('\n')|escape|nl2br) }}
@@ -60,12 +41,6 @@
             {% endif %}
 
             {{ entityConfig.renderDynamicFields(entity) }}
-        </div>
-
-        <div class="responsive-block">
-            {{ _self.renderApiBlock(entity, userApi, viewProfile) }}
-
-            {% placeholder view_user_api_block_after with {entity: entity, viewProfile: viewProfile} %}
         </div>
     </div>
 </div>

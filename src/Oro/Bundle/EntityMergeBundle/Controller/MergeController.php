@@ -4,32 +4,35 @@ namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
-use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
+use Oro\Bundle\EntityMergeBundle\Model\EntityMergerInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Provides action for simple and multiple merge.
+ *
  * @Route("/merge")
  */
-class MergeController extends Controller
+class MergeController extends AbstractController
 {
-
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_entity_merge_massaction")
      * @AclAncestor("oro_entity_merge")
-     * @Template("OroEntityMergeBundle:Merge:merge.html.twig")
+     * @Template("@OroEntityMerge/Merge/merge.html.twig")
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
@@ -38,7 +41,7 @@ class MergeController extends Controller
     public function mergeMassActionAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get('oro_entity_merge.mass_action.dispatcher');
+        $massActionDispatcher = $this->get(MassActionDispatcher::class);
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
@@ -74,14 +77,13 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
+        $flashBag = $request->getSession()->getFlashBag();
+
         $constraintViolations = $this->getValidator()->validate($entityData, null, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {
                 /* @var ConstraintViolation $violation */
-                $this->get('session')->getFlashBag()->add(
-                    'error',
-                    $violation->getMessage()
-                );
+                $flashBag->add('error', $violation->getMessage());
             }
 
             return $this->redirect($this->generateUrl($this->getEntityIndexRoute($entityData->getClassName())));
@@ -110,17 +112,13 @@ class MergeController extends Controller
                 } catch (ValidationException $exception) {
                     foreach ($exception->getConstraintViolations() as $violation) {
                         /* @var ConstraintViolation $violation */
-                        $this->get('session')->getFlashBag()->add(
-                            'error',
-                            $violation->getMessage()
-                        );
+                        $flashBag->add('error', $violation->getMessage());
                     }
                 }
 
-
-                $this->get('session')->getFlashBag()->add(
+                $flashBag->add(
                     'success',
-                    $this->get('translator')->trans('oro.entity_merge.controller.merged_successful')
+                    $this->get(TranslatorInterface::class)->trans('oro.entity_merge.controller.merged_successful')
                 );
 
                 return $this->redirect(
@@ -169,11 +167,11 @@ class MergeController extends Controller
     }
 
     /**
-     * @return \Oro\Bundle\EntityConfigBundle\Config\ConfigManager
+     * @return ConfigManager
      */
     protected function getConfigManager()
     {
-        return $this->get('oro_entity_config.config_manager');
+        return $this->get(ConfigManager::class);
     }
 
     /**
@@ -181,7 +179,7 @@ class MergeController extends Controller
      */
     protected function getEntityDataFactory()
     {
-        return $this->get('oro_entity_merge.data.entity_data_factory');
+        return $this->get(EntityDataFactory::class);
     }
 
     /**
@@ -189,15 +187,15 @@ class MergeController extends Controller
      */
     protected function getDoctineHelper()
     {
-        return $this->get('oro_entity_merge.doctrine_helper');
+        return $this->get(DoctrineHelper::class);
     }
 
     /**
-     * @return EntityMerger
+     * @return EntityMergerInterface
      */
     protected function getEntityMerger()
     {
-        return $this->get('oro_entity_merge.merger');
+        return $this->get(EntityMergerInterface::class);
     }
 
     /**
@@ -205,7 +203,7 @@ class MergeController extends Controller
      */
     protected function getEntityManager()
     {
-        return $this->get('doctrine.orm.entity_manager');
+        return $this->get('doctrine')->getManager();
     }
 
     /**
@@ -213,6 +211,25 @@ class MergeController extends Controller
      */
     protected function getValidator()
     {
-        return $this->get('validator');
+        return $this->get(ValidatorInterface::class);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ConfigManager::class,
+                EntityDataFactory::class,
+                DoctrineHelper::class,
+                EntityMergerInterface::class,
+                ValidatorInterface::class,
+                MassActionDispatcher::class,
+                TranslatorInterface::class,
+            ]
+        );
     }
 }

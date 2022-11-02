@@ -3,21 +3,16 @@
 namespace Oro\Bundle\CurrencyBundle\ImportExport\Serializer\Normalizer;
 
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
-use Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
-class MultiCurrencyNormalizer implements NormalizerInterface
+/**
+ * Provides normalization means for currency.
+ */
+class MultiCurrencyNormalizer implements ContextAwareNormalizerInterface
 {
-    /**
-     * @var NumberFormatter
-     */
-    private $formatter;
+    private NumberFormatter $formatter;
 
-    /**
-     * MultiCurrencyNormalizer constructor.
-     *
-     * @param NumberFormatter $formatter
-     */
     public function __construct(NumberFormatter $formatter)
     {
         $this->formatter = $formatter;
@@ -26,7 +21,7 @@ class MultiCurrencyNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof MultiCurrency;
     }
@@ -34,7 +29,7 @@ class MultiCurrencyNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         return $this->formatter->formatCurrency($object->getValue(), $object->getCurrency());
     }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
@@ -12,20 +12,17 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $messageProducer;
 
     /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
     private $currentJob;
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var JobRunner */
     private $jobRunner;
 
     /** @var JobProcessor|\PHPUnit\Framework\MockObject\MockObject */
@@ -34,26 +31,19 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    public function setUp()
+    /** @var PostponedRowsHandler */
+    private $handler;
+
+    protected function setUp(): void
     {
-        $fileManagerMock = $this->getMockBuilder(FileManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $writerChain = $this->getMockBuilder(WriterChain::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->messageProducer = $this->getMockBuilder(MessageProducerInterface::class)
-            ->getMock();
-        $this->currentJob = $this->getMockBuilder(Job::class)
-            ->getMock();
-        $rootJob = $this->getMockBuilder(Job::class)
-            ->getMock();
-        $this->jobProcessor = $this->getMockBuilder(JobProcessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $writerChain = $this->createMock(WriterChain::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
+        $this->currentJob = $this->createMock(Job::class);
+        $rootJob = $this->createMock(Job::class);
+        $this->jobProcessor = $this->createMock(JobProcessor::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->handler = new PostponedRowsHandler(
             $fileManagerMock,
             $this->messageProducer,
@@ -61,11 +51,14 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             $this->translator
         );
 
-        $rootJob->method('getName')
+        $rootJob->expects(self::any())
+            ->method('getName')
             ->willReturn('name');
-        $this->currentJob->method('getRootJob')
+        $this->currentJob->expects(self::any())
+            ->method('getRootJob')
             ->willReturn($rootJob);
-        $this->currentJob->method('getId')
+        $this->currentJob->expects(self::any())
+            ->method('getId')
             ->willReturn(1);
         $jobExtension = $this->createMock(ExtensionInterface::class);
         $this->jobRunner = new JobRunner($this->jobProcessor, $jobExtension, $this->currentJob);
@@ -73,17 +66,28 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testItCreatesIncrementedJob()
     {
-        $this->jobProcessor
+        $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
         $expectedMessage = new Message();
-        $expectedMessage->setBody(['jobId' => 1, 'attempts' => 1, 'fileName' => '']);
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
         $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::HTTP_IMPORT,
+                ImportTopic::getName(),
                 $expectedMessage
             );
 
@@ -95,19 +99,20 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testItStopsAfterFifthAttempt()
     {
-        $this->jobProcessor
+        $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
         $result = [];
         $body = ['attempts' => PostponedRowsHandler::MAX_ATTEMPTS];
-        $this->messageProducer->expects($this->never())->method('send');
+        $this->messageProducer->expects($this->never())
+            ->method('send');
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 
     public function testItAddsErrorMessageWhenPostponeRowsPresent()
     {
-        $this->jobProcessor
+        $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
@@ -116,14 +121,47 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $result['postponedRows'] = ['elem1', 'elem2'];
 
         $result['counts']['errors'] = 0;
-        $this->messageProducer->expects($this->never())->method('send');
-        $this->translator
-            ->expects($this->once())
+        $this->messageProducer->expects($this->never())
+            ->method('send');
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with(
                 'oro.importexport.import.postponed_rows',
                 ['%postponedRows%' => 2]
             );
+        $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
+    }
+
+    public function testPostponeWithIncrementedReadOption()
+    {
+        $this->jobProcessor->expects(self::any())
+            ->method('findOrCreateChildJob')
+            ->willReturn($this->currentJob);
+
+        $expectedMessage = new Message();
+        $expectedMessage->setBody(
+            [
+                'jobId' => 1,
+                'attempts' => 1,
+                'fileName' => '',
+                'options' => [
+                    'incremented_read' => false,
+                    'attempts' => 1,
+                    'max_attempts' => PostponedRowsHandler::MAX_ATTEMPTS,
+                ],
+            ]
+        );
+        $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(
+                ImportTopic::getName(),
+                $expectedMessage
+            );
+
+        $result = [];
+        $body = ['attempts' => 0, 'options' => []];
+
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 }

@@ -1,85 +1,142 @@
 /* @theme: admin.oro; */
 
 .oro_attachment_file {
-    border: none;
-    padding: 5px 5px 0 5px;
-    width: 295px;
-    line-height: 20px;
-    margin-top: 5px;
-    margin-bottom: 0;
+    margin-top: $attachment-file-offset-top;
+    padding: $attachment-file-inner-offset;
+    line-height: 1.3;
+    text-align: left;
 
-    .removeFile {
-        margin: 0;
-    }
+    @include text-line-truncate($attachment-section-width);
 
     .filename {
-        display: inline-block;
-        width: 260px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        @include text-line-truncate($attachment-section-width);
     }
 
     .delete {
         float: right;
-        line-height: 20px;
         margin-top: -4px;
+        line-height: 20px;
 
-        &:after {
-            display: inline-block;
-            font: 14px/1em 'FontAwesome';
-            color: #ddd;
-            content: "\f014";
-            text-indent: 0;
-        }
+        @include fa-icon($fa-var-trash-o);
 
-        &:hover:after {
-            color: #888;
+        &:hover {
+            &::after {
+                color: $primary-550;
+            }
         }
+    }
+
+    [class^='fa-'],
+    [class*='fa-'] {
+        margin-right: $attachment-offset-global;
     }
 }
 
-.attachment-file {
-    div.uploader {
-        border: none;
-        float: none;
+.attachment-item {
+    display: flex;
+    align-items: baseline;
+    margin: $attachment-item-offset-top 0;
+    max-width: $attachment-item-max-width;
 
-        input {
-            cursor: pointer;
-            width: 345px;
-        }
+    &--note {
+        margin: 0;
+        flex-direction: $attachment-item-note-flex-direction;
 
-        input:hover ~ span.action {
-            color: $link-color-hover;
-        }
-
-        span.action {
-            border: none;
-            background: none;
-            color: $link-color;
-            cursor: pointer;
-        }
-
-        .active span.action {
-            background: none;
-        }
-
-        span.filename {
-            width: 85px;
-        }
-
-        .focus {
-            border: none;
-            box-shadow: none;
+        .link-to-record {
+            max-width: 100%;
         }
     }
 
-    div.uploader.focus {
-        border: none;
-        box-shadow: none;
+    &__icon {
+        font-size: $attachment-item-icon-size;
+        margin-right: $attachment-item-fa-right;
+    }
 
-        span.action {
-            color: $link-color;
+    &__filename {
+        @include text-line-truncate(100%, true);
+
+        picture img {
+            width: $attachment-item-img-width;
+            height: $attachment-item-img-height;
         }
+    }
+
+    &__not-valid {
+        color: $danger-dark;
+    }
+
+    &__file-size {
+        margin-left: $attachment-offset-global;
+        white-space: nowrap;
+    }
+
+    .thumbnail .fa {
+        line-height: 1;
+        font-size: $attachment-thumbnail-fa-font-size;
+        color: $attachment-thumbnail-fa-color;
+    }
+
+    &__remove {
+        top: $attachment-item-remove-top;
+        width: $attachment-item-icon-size;
+        height: $attachment-item-icon-size;
+        margin-left: $attachment-offset-global;
+
+        align-self: normal;
+    }
+
+    &__form-rest input {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* stylelint-disable declaration-no-important */
+        width: 0 !important;
+        height: 0 !important;
+        /* stylelint-enable declaration-no-important */
+        border: none;
+        z-index: -1;
+    }
+
+    &__errors {
+        li {
+            list-style: none;
+
+            span {
+                @include validation-failed($danger-dark);
+            }
+        }
+    }
+
+    .ui-dialog & {
+        max-width: $attachment-item-dialog-max-width;
+    }
+}
+
+.attachment-container {
+    margin-top: -($content-padding-medium - $attachment-offset-global);
+
+    .controls {
+        padding-top: $attachment-item-in-control-offset - $attachment-offset-global;
+    }
+}
+
+.attachment-fileitems {
+    th.sort-order {
+        width: $attachment-fileitems-sort-order-width;
+    }
+
+    th.remove {
+        width: $attachment-fileitems-remove-width;
+    }
+
+    td.sort-order input {
+        width: $attachment-fileitems-sort-order-input-width;
+    }
+
+    td.file .control-group .controls {
+        margin-left: 0;
     }
 }

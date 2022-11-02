@@ -4,70 +4,44 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
-use Oro\Component\DependencyInjection\ServiceLinkRegistry;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider1;
+
     /** @var FormTemplateDataProviderRegistry */
     private $registry;
 
-    /** @var ServiceLinkRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $serviceLinkRegistry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serviceLinkRegistry = $this->createMock(ServiceLinkRegistry::class);
-        $this->registry = new FormTemplateDataProviderRegistry();
-        $this->registry->setServiceLinkRegistry($this->serviceLinkRegistry);
+        $this->provider1 = $this->createMock(FormTemplateDataProviderInterface::class);
+        $providers = new ServiceLocator([
+            'provider1' => function () {
+                return $this->provider1;
+            }
+        ]);
+
+        $this->registry = new FormTemplateDataProviderRegistry($providers);
     }
 
-    public function testGet()
+    public function testHasAndGetForKnownProvider()
     {
-        /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider */
-        $provider = $this->createMock(FormTemplateDataProviderInterface::class);
-
-        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($provider);
-
-        $this->assertSame($this->registry->get('test'), $provider);
+        self::assertTrue($this->registry->has('provider1'));
+        self::assertSame($this->provider1, $this->registry->get('provider1'));
     }
 
-    public function testExceptionOnInvalidServiceInterface()
+    public function testHasForUnknownProvider()
     {
-        $handler = (object)[];
-        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($handler);
-
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Form data provider `%s` with `%s` alias must implement %s.',
-                get_class($handler),
-                'test',
-                FormTemplateDataProviderInterface::class
-            )
-        );
-
-        $this->registry->get('test');
+        self::assertFalse($this->registry->has('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FormBundle\Exception\UnknownProviderException
-     * @expectedExceptionMessage Unknown provider with alias `test`.
-     */
-    public function testGetUnregisteredException()
+    public function testGetForUnknownProvider()
     {
-        $this->serviceLinkRegistry->expects($this->once())
-            ->method('get')->with('test')
-            ->willThrowException(new UnknownAliasException('test'));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown provider with alias "unknown".');
 
-        $this->registry->get('test');
-    }
-
-    public function testHas()
-    {
-        $this->serviceLinkRegistry->expects($this->at(0))->method('has')->with('alias')->willReturn(true);
-        $this->serviceLinkRegistry->expects($this->at(1))->method('has')->with('nonexistent')->willReturn(false);
-        $this->assertTrue($this->registry->has('alias'));
-        $this->assertFalse($this->registry->has('nonexistent'));
+        $this->registry->get('unknown');
     }
 }

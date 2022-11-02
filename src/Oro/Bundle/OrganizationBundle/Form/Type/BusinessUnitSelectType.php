@@ -2,25 +2,22 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to select a business unit.
+ */
 class BusinessUnitSelectType extends AbstractType
 {
-    /** @var Registry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
+    private TokenAccessorInterface $tokenAccessor;
 
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /**
-     * @param Registry               $doctrine
-     * @param TokenAccessorInterface $tokenAccessor
-     */
-    public function __construct(Registry $doctrine, TokenAccessorInterface $tokenAccessor)
+    public function __construct(ManagerRegistry $doctrine, TokenAccessorInterface $tokenAccessor)
     {
         $this->doctrine = $doctrine;
         $this->tokenAccessor = $tokenAccessor;
@@ -31,27 +28,19 @@ class BusinessUnitSelectType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'placeholder' => 'oro.business_unit.form.choose_business_user',
-                'empty_data'  => null,
-                'class'       => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-            ]
-        );
+        $resolver->setDefaults([
+            'placeholder' => 'oro.business_unit.form.choose_business_user',
+            'empty_data'  => null,
+            'class'       => BusinessUnit::class,
+        ]);
 
-        $queryBuilderNormalizer = function () {
-            $qb = $this->doctrine->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->createQueryBuilder('bu');
-
-            $qb->select('bu')
-                ->where('bu.organization = :organization');
-
-            $qb->setParameter('organization', $this->tokenAccessor->getOrganization());
-
-            return $qb;
-        };
-
-        $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
+        $resolver->setNormalizer('query_builder', function () {
+            return $this->doctrine->getRepository(BusinessUnit::class)
+                ->createQueryBuilder('bu')
+                ->select('bu')
+                ->where('bu.organization = :organization')
+                ->setParameter('organization', $this->tokenAccessor->getOrganization());
+        });
     }
 
     /**

@@ -13,15 +13,12 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
     use EntityTrait;
 
     /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
     /** @var EntityAliasStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $this->listener = new EntityAliasStructureOptionsListener($this->entityAliasResolver);
@@ -38,20 +35,17 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
         $pluralAlias = 'PLURAL_ALIAS';
         $entityStructure = $this->getEntity(EntityStructure::class, ['className' => \stdClass::class,]);
 
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('hasAlias')
             ->with(\stdClass::class)
             ->willReturn($hasAlias);
 
-        $this->entityAliasResolver
-            ->expects($this->exactly((int)$hasAlias))
+        $this->entityAliasResolver->expects($this->exactly((int)$hasAlias))
             ->method('getAlias')
             ->with(\stdClass::class)
             ->willReturn($alias);
 
-        $this->entityAliasResolver
-            ->expects($this->exactly((int)$hasAlias))
+        $this->entityAliasResolver->expects($this->exactly((int)$hasAlias))
             ->method('getPluralAlias')
             ->with(\stdClass::class)
             ->willReturn($pluralAlias);
@@ -69,10 +63,7 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function onOptionsRequestDataProvider()
+    public function onOptionsRequestDataProvider(): array
     {
         return [
             'positive' => [true],

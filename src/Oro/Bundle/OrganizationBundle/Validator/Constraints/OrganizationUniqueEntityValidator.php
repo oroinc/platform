@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
@@ -16,11 +16,6 @@ class OrganizationUniqueEntityValidator extends UniqueEntityValidator
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ManagerRegistry                    $registry
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param DoctrineHelper                     $doctrineHelper
-     */
     public function __construct(
         ManagerRegistry $registry,
         OwnershipMetadataProviderInterface $metadataProvider,

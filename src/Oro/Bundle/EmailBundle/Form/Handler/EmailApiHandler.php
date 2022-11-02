@@ -46,16 +46,6 @@ class EmailApiHandler extends ApiFormHandler
     /** @var EmailOrigin|null */
     protected $emailOrigin;
 
-    /**
-     * @param FormInterface            $form
-     * @param RequestStack             $requestStack
-     * @param EntityManager            $entityManager
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param TokenAccessorInterface   $tokenAccessor
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param DataTransformerInterface $emailImportanceTransformer
-     * @param DataTransformerInterface $emailBodyTypeTransformer
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -97,8 +87,8 @@ class EmailApiHandler extends ApiFormHandler
 
         if ($entity->getBody()) {
             $this->eventDispatcher->dispatch(
-                EmailBodyAdded::NAME,
-                new EmailBodyAdded($entity->getEntity())
+                new EmailBodyAdded($entity->getEntity()),
+                EmailBodyAdded::NAME
             );
         }
 
@@ -106,8 +96,6 @@ class EmailApiHandler extends ApiFormHandler
     }
 
     /**
-     * @param EmailModel $model
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -219,8 +207,6 @@ class EmailApiHandler extends ApiFormHandler
     }
 
     /**
-     * @param EmailModel $model
-     *
      * @throws \InvalidArgumentException
      */
     protected function assertModel(EmailModel $model)
@@ -243,9 +229,6 @@ class EmailApiHandler extends ApiFormHandler
         }
     }
 
-    /**
-     * @param EmailModel $model
-     */
     protected function ensureEmailEntitySet(EmailModel $model)
     {
         if ($model->getEntity() && $model->getEntity()->getId()) {
@@ -510,10 +493,6 @@ class EmailApiHandler extends ApiFormHandler
         }
     }
 
-    /**
-     * @param Email       $email
-     * @param EmailThread $thread
-     */
     protected function processThread(Email $email, EmailThread $thread)
     {
         if ($email->getId()) {

@@ -22,10 +22,7 @@ class ButtonTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadWorkflowDefinitions::class]);
@@ -41,9 +38,6 @@ class ButtonTest extends WebTestCase
 
     /**
      * @dataProvider displayButtonsDataProvider
-     *
-     * @param array $context
-     * @param array $expected
      */
     public function testDisplayButtons(array $context, array $expected = [])
     {
@@ -74,17 +68,14 @@ class ButtonTest extends WebTestCase
             $notExpected = array_diff($allItems, $expected);
         }
         foreach ($expected as $item) {
-            $this->assertContains($item, $crawler->html());
+            self::assertStringContainsString($item, $crawler->html());
         }
         foreach ($notExpected as $item) {
-            $this->assertNotContains($item, $crawler->html());
+            self::assertStringNotContainsString($item, $crawler->html());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function displayButtonsDataProvider()
+    public function displayButtonsDataProvider(): array
     {
         return [
             'empty context' => [
@@ -94,33 +85,33 @@ class ButtonTest extends WebTestCase
             'entity context' => [
                 'context' => ['entityClass' => 'entity1'],
                 'expected' => [
-                    'transition-test_start_init_option-start_transition_from_entities"',
+                    'transition-test_start_init_option-start_transition_from_entities',
                 ],
             ],
             'route context' => [
                 'context' => ['route' => 'route1'],
                 'expected' => [
-                    'transition-test_start_init_option-start_transition_from_routes"',
+                    'transition-test_start_init_option-start_transition_from_routes',
                 ],
             ],
             'datagrid context' => [
                 'context' => ['datagrid' => 'datagrid1'],
                 'expected' => [
-                    'transition-test_start_init_option-start_transition_from_datagrids"',
+                    'transition-test_start_init_option-start_transition_from_datagrids',
                 ],
             ],
             'entity and datagrid context' => [
                 'context' => ['datagrid' => 'datagrid1', 'entityClass' => 'entity1'],
                 'expected' => [
-                    'transition-test_start_init_option-start_transition_from_datagrids"',
-                    'transition-test_start_init_option-start_transition_from_entities"',
+                    'transition-test_start_init_option-start_transition_from_datagrids',
+                    'transition-test_start_init_option-start_transition_from_entities',
                 ],
             ],
             'workflow datagrid context' => [
                 'context' => ['entityClass' => WorkflowAwareEntity::class, 'datagrid' => 'datagrid1'],
                 'expected' => [
-                    'transition-test_flow_datagrids-transition1"',
-                    'transition-test_start_init_option-start_transition_from_datagrids"',
+                    'transition-test_flow_datagrids-transition1',
+                    'transition-test_start_init_option-start_transition_from_datagrids',
                 ],
             ],
             'not matched context' => [
@@ -130,10 +121,7 @@ class ButtonTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return WorkflowAwareEntity
-     */
-    protected function createNewEntity()
+    private function createNewEntity(): WorkflowAwareEntity
     {
         $testEntity = new WorkflowAwareEntity();
         $testEntity->setName('test_' . uniqid('test', true));

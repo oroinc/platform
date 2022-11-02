@@ -6,23 +6,25 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * Collects hydration statistic - number of hydrations, time and entities
+ */
 class OrmDataCollector extends DataCollector
 {
     /** @var OrmLogger */
     protected $logger;
 
-    /**
-     * @param OrmLogger $logger
-     */
     public function __construct(OrmLogger $logger)
     {
         $this->logger = $logger;
+
+        $this->reset();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['hydrations'] = $this->logger->getHydrations();
         $this->data['stats']      = $this->logger->getStats();
@@ -109,5 +111,17 @@ class OrmDataCollector extends DataCollector
     public function getName()
     {
         return 'orm';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = [
+            'hydrations' => [],
+            'stats' => [],
+            'statsTime' => 0.0,
+        ];
     }
 }

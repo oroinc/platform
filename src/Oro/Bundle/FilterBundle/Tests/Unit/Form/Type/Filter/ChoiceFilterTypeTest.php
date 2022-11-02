@@ -16,11 +16,11 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->type = new ChoiceFilterType($translator);
-        $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new CustomFormExtension([new FilterType($translator)]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
@@ -39,22 +39,22 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => ChoiceType::class,
-                    'field_options' => array(),
-                    'operator_choices' => array(
+                    'field_options' => [],
+                    'operator_choices' => [
                         'oro.filter.form.label_type_contains' => ChoiceFilterType::TYPE_CONTAINS,
                         'oro.filter.form.label_type_not_contains' => ChoiceFilterType::TYPE_NOT_CONTAINS,
-                    ),
+                    ],
                     'populate_default' => false,
                     'default_value' => null,
                     'null_value' => null,
-                    'class' => null
-                )
-            )
-        );
+                    'class' => null,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -62,64 +62,64 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array('type' => null, 'value' => null),
-                'viewData' => array(
-                    'value' => array('type' => null, 'value' => null),
-                )
-            ),
-            'predefined value choice' => array(
-                'bindData' => array('value' => 1),
-                'formData' => array('type' => null, 'value' => 1),
-                'viewData' => array(
-                    'value' => array('type' => null, 'value' => 1),
-                ),
-                'customOptions' => array(
-                    'field_options' => array(
-                        'choices' => array('One' => 1, 'Two' => 2)
-                    ),
-                )
-            ),
-            'invalid value choice' => array(
-                'bindData' => array('value' => 3),
-                'formData' => array('type' => null),
-                'viewData' => array(
-                    'value' => array('type' => null, 'value' => 3),
-                ),
-                'customOptions' => array(
-                    'field_options' => array(
-                        'choices' => array('One' => 1)
-                    ),
-                )
-            ),
-            'multiple choices' => array(
-                'bindData' => array('value' => array(1, 2)),
-                'formData' => array('type' => null, 'value' => array(1, 2)),
-                'viewData' => array(
-                    'value' => array('type' => null, 'value' => array(1, 2)),
-                ),
-                'customOptions' => array(
-                    'field_options' => array(
+        return [
+            'empty' => [
+                'bindData' => [],
+                'formData' => ['type' => null, 'value' => null],
+                'viewData' => [
+                    'value' => ['type' => null, 'value' => null],
+                ],
+            ],
+            'predefined value choice' => [
+                'bindData' => ['value' => 1],
+                'formData' => ['type' => null, 'value' => 1],
+                'viewData' => [
+                    'value' => ['type' => null, 'value' => 1],
+                ],
+                'customOptions' => [
+                    'field_options' => [
+                        'choices' => ['One' => 1, 'Two' => 2],
+                    ],
+                ],
+            ],
+            'invalid value choice' => [
+                'bindData' => ['value' => 3],
+                'formData' => ['type' => null],
+                'viewData' => [
+                    'value' => ['type' => null, 'value' => 3],
+                ],
+                'customOptions' => [
+                    'field_options' => [
+                        'choices' => ['One' => 1],
+                    ],
+                ],
+            ],
+            'multiple choices' => [
+                'bindData' => ['value' => [1, 2]],
+                'formData' => ['type' => null, 'value' => [1, 2]],
+                'viewData' => [
+                    'value' => ['type' => null, 'value' => [1, 2]],
+                ],
+                'customOptions' => [
+                    'field_options' => [
                         'multiple' => true,
-                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
-                    ),
-                )
-            ),
-            'invalid multiple choices' => array(
-                'bindData' => array('value' => array(3, 4)),
-                'formData' => array('type' => null),
-                'viewData' => array(
-                    'value' => array('type' => null, 'value' => array(3, 4)),
-                ),
-                'customOptions' => array(
-                    'field_options' => array(
+                        'choices' => ['One' => 1, 'Two' => 2, 'Three' => 3],
+                    ],
+                ],
+            ],
+            'invalid multiple choices' => [
+                'bindData' => ['value' => [4, 5]],
+                'formData' => ['type' => null, 'value' => []],
+                'viewData' => [
+                    'value' => ['type' => null, 'value' => []],
+                ],
+                'customOptions' => [
+                    'field_options' => [
                         'multiple' => true,
-                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
-                    ),
-                )
-            ),
-        );
+                        'choices' => ['One' => 1, 'Two' => 2, 'Three' => 3],
+                    ],
+                ],
+            ],
+        ];
     }
 }

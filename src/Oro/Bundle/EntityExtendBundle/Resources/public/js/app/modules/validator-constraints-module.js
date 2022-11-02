@@ -1,9 +1,3 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery.validate';
 
-    var $ = require('jquery.validate');
-
-    $.validator.loadMethod([
-        'oroentityextend/js/validator/field-name-length'
-    ]);
-});
+$.validator.loadMethod('oroentityextend/js/validator/field-name-length');

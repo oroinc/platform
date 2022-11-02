@@ -2,41 +2,36 @@
 
 namespace Oro\Component\MessageQueue\StatusCalculator;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 
+/**
+ * Calculate root job status and root job progress with DB queries.
+ */
 class QueryCalculator extends AbstractStatusCalculator
 {
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var array
-     */
-    private $childJobStatusCounts = [];
+    /** @var string */
+    private $entityClass;
 
-    /**
-     * @var Job
-     */
+    /** @var Job */
     private $rootJob;
 
-    /**
-     * @param JobStorage $jobStorage
-     */
-    public function __construct(JobStorage $jobStorage)
+    public function __construct(ManagerRegistry $doctrine, string $entityClass)
     {
-        $this->jobStorage = $jobStorage;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
     }
 
     /**
-     * @param Job $rootJob
+     * {@inheritdoc}
      */
     public function init(Job $rootJob)
     {
         $this->rootJob = $rootJob;
-        $this->childJobStatusCounts = $this->jobStorage->getChildStatusesWithJobCountByRootJob($rootJob);
     }
 
     /**
@@ -44,13 +39,11 @@ class QueryCalculator extends AbstractStatusCalculator
      */
     public function calculateRootJobProgress()
     {
-        if (empty($this->childJobStatusCounts)) {
-            return 0;
-        }
+        $childJobStatusCounts = $this->getJobRepository()->getChildStatusesWithJobCountByRootJob($this->rootJob);
 
         $processed = 0;
         $childrenCount = 0;
-        foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
+        foreach ($childJobStatusCounts as $jobStatus => $childJobCount) {
             if ($this->jobStatusChecker->isFinishedJobStatus($jobStatus)) {
                 $processed += $childJobCount;
             }
@@ -67,7 +60,6 @@ class QueryCalculator extends AbstractStatusCalculator
     public function clean()
     {
         $this->rootJob = null;
-        $this->childJobStatusCounts = [];
     }
 
     /**
@@ -75,21 +67,29 @@ class QueryCalculator extends AbstractStatusCalculator
      */
     protected function getChildrenInternalJobStatusCountList()
     {
+        $childJobStatusCounts = $this->getJobRepository()->getChildStatusesWithJobCountByRootJob($this->rootJob);
         $internalJobStatusCountList = $this->getFullInternalStatusCountList([]);
-        foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
+        foreach ($childJobStatusCounts as $jobStatus => $childJobCount) {
             $internalStatus = $this->convertJobStatusToInternalStatus($jobStatus);
             if (false === $internalStatus) {
-                $childJobIds = $this->jobStorage->getChildJobIdsByRootJobAndStatus($this->rootJob, $jobStatus);
-                throw new \LogicException(sprintf(
-                    'Got unsupported job status: ids: "%s" status: "%s"',
-                    implode(', ', $childJobIds),
-                    $jobStatus
-                ));
+                $childJobIds = $this->getJobRepository()->getChildJobIdsByRootJobAndStatus($this->rootJob, $jobStatus);
+                throw new \LogicException(
+                    sprintf(
+                        'Got unsupported job status: ids: "%s" status: "%s"',
+                        implode(', ', $childJobIds),
+                        $jobStatus
+                    )
+                );
             }
 
             $internalJobStatusCountList[$internalStatus] += $childJobCount;
         }
 
         return $internalJobStatusCountList;
+    }
+
+    private function getJobRepository(): JobRepositoryInterface
+    {
+        return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 }

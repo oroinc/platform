@@ -5,33 +5,32 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
-class CollectionTypeTest extends TypeTestCase
+class CollectionTypeTest extends ApiFormTypeTestCase
 {
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension(
-                [CollectionEntryType::class => new CollectionEntryType()],
-                []
+                [new CollectionEntryType()],
+                $this->getApiTypeExtensions()
             )
         ];
     }
 
     public function testShouldUseAdder()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -69,9 +68,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseRemover()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -111,9 +109,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUpdateExistingEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -150,9 +147,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseRemoverWhenRemoveAllItems()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -188,9 +184,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldValidateEntryEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();

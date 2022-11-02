@@ -1,19 +1,27 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import _self as organizationSelector %}
 
 {% set curr_organization = get_current_organization() %}
 {% set organizations = get_enabled_organizations() %}
 
 {% set organization_name %}
-{% spaceless %}
+{% apply spaceless %}
     {% placeholder organization_name %}
-{% endspaceless %}
+{% endapply %}
 {% endset %}
 
 {% if isDesktopVersion() %}
     {% if organizations|length > 1 %}
-        <div class="nav logo-wrapper dropdown">
+        <div class="nav logo-wrapper dropdown"
+            {{ UI.renderPageComponentAttributes({
+                module: 'orosecurity/js/app/components/switch-organization-component',
+                options: {
+                    currentOrganizationId: curr_organization.getId()
+                }
+            }) }}
+        >
             {{ UI.app_logo(organization_name) }}
-            {{ _self.organization_name_and_logo(organization_name) }}
+            {{ organizationSelector.organization_name_and_logo(organization_name) }}
             {% set togglerId = 'dropdown-'|uniqid %}
             <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                   role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
@@ -37,19 +45,23 @@
                 {% endfor %}
             </ul>
         </div>
-        <script type="text/javascript">
-            require(['orosecurity/js/init-organization-selector'])
-        </script>
     {% else %}{# if organizations|length == 1 #}
         <div class="nav logo-wrapper">
             {{ UI.app_logo(organization_name) }}
-            {{ _self.organization_name_and_logo(organization_name) }}
+            {{ organizationSelector.organization_name_and_logo(organization_name) }}
         </div>
     {% endif %}
 {% else %}
     {# Mobile view #}
     {% if organizations|length > 1 %}
-        <div class="nav organization-switcher dropdown">
+        <div class="organization-switcher dropdown"
+            {{ UI.renderPageComponentAttributes({
+                module: 'orosecurity/js/app/components/switch-organization-component',
+                options: {
+                    currentOrganizationId: curr_organization.getId()
+                }
+            }) }}
+        >
             {% set togglerId = 'dropdown-'|uniqid %}
             <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                 aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false">
@@ -67,9 +79,6 @@
                 {% endfor %}
             </ul>
         </div>
-        <script type="text/javascript">
-            require(['orosecurity/js/init-organization-selector'])
-        </script>
     {% else %}{# if organizations|length == 1 #}
         <h1 class="logo">
             <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}" class="organization-name">

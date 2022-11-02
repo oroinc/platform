@@ -1,0 +1,12 @@
+aliases:
+    oro/datagrid/action/map-action$: oroaddress/js/datagrid/action/map-action
+app-modules:
+    - oroaddress/js/app/modules/validator-constraints-module
+configs:
+    oroaddress/js/region/view: {}
+dynamic-imports:
+    commons:
+        - oroaddress/js/mapservice/googlemaps
+        - oroaddress/js/validator/name-or-organization
+    orouser:
+        - oroaddress/js/region/view

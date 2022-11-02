@@ -58,8 +58,6 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $response = new FakeRestResponse(200, [], 'foo');
 
         $this->assertEquals('foo', $response->getBodyAsString());
-        $this->assertEquals('foo', $response->getMessage());
-        $this->assertEquals('foo', (string)$response);
     }
 
     public function testResponseGetHeaders()

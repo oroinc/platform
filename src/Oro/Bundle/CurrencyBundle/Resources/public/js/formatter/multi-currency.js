@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     return {
         unformatMultiCurrency: function(value) {
@@ -11,8 +11,8 @@ define(function(require) {
                     currency: ''
                 };
             }
-            var amount = Number(value.substring(3));
-            var currency = value.substring(0, 3);
+            const amount = Number(value.substring(3));
+            const currency = value.substring(0, 3);
             return {
                 amount: amount,
                 currency: currency

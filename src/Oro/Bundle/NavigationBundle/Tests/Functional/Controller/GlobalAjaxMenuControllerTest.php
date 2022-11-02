@@ -8,12 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GlobalAjaxMenuControllerTest extends WebTestCase
 {
-    const MENU_NAME = 'application_menu';
+    private const MENU_NAME = 'application_menu';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -27,7 +24,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'parentKey' => MenuUpdateData::MENU_UPDATE_1,
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'POST',
             $this->getUrl('oro_navigation_global_menu_ajax_create', $parameters),
             [
@@ -47,7 +44,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'key' => MenuUpdateData::MENU_UPDATE_1_1
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_global_menu_ajax_delete', $parameters),
             ['ownerId' => 0]
@@ -65,7 +62,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'key' => MenuUpdateData::MENU_UPDATE_2_1
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_global_menu_ajax_show', $parameters),
             ['ownerId' => 0]
@@ -83,7 +80,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'key' => MenuUpdateData::MENU_UPDATE_2
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_global_menu_ajax_hide', $parameters),
             ['ownerId' => 0]
@@ -100,7 +97,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'menuName' => self::MENU_NAME
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_global_menu_ajax_move', $parameters),
             [
@@ -122,7 +119,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
             'menuName' => self::MENU_NAME
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_global_menu_ajax_reset', $parameters),
             ['ownerId' => 0]

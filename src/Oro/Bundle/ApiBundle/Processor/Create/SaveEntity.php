@@ -4,7 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Create;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -14,15 +15,15 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SaveEntity implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    public const OPERATION_NAME = 'save_new_entity';
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    private DoctrineHelper $doctrineHelper;
+    private FlushDataHandlerInterface $flushDataHandler;
+
+    public function __construct(DoctrineHelper $doctrineHelper, FlushDataHandlerInterface $flushDataHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->flushDataHandler = $flushDataHandler;
     }
 
     /**
@@ -30,16 +31,21 @@ class SaveEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SingleItemContext $context */
+        /** @var CreateContext $context */
+
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the entity was already saved
+            return;
+        }
 
         $entity = $context->getResult();
-        if (!is_object($entity)) {
+        if (!\is_object($entity)) {
             // entity does not exist
             return;
         }
 
         $em = $this->doctrineHelper->getEntityManager($entity, false);
-        if (!$em) {
+        if (null === $em) {
             // only manageable entities are supported
             return;
         }
@@ -50,9 +56,11 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
-        $em->persist($entity);
         try {
-            $em->flush();
+            $this->flushDataHandler->flushData(
+                $em,
+                new FlushDataHandlerContext([$context], $context->getSharedData())
+            );
         } catch (UniqueConstraintViolationException $e) {
             $context->addError(
                 Error::createConflictValidationError('The entity already exists')
@@ -67,5 +75,7 @@ class SaveEntity implements ProcessorInterface
                 $context->setId($id);
             }
         }
+
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

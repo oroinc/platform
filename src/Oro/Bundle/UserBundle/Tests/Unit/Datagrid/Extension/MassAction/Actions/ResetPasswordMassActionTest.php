@@ -8,12 +8,12 @@ use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\Actions\ResetPasswordMas
 class ResetPasswordMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResetPasswordMassAction */
-    protected $resetAction;
+    private $resetAction;
 
     /** @var ActionConfiguration */
-    protected $configuration;
+    private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = ActionConfiguration::createNamed(
             'test',

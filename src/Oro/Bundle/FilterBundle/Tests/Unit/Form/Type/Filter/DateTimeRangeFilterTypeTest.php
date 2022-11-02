@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
@@ -9,33 +10,30 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
+use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
+class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var DateTimeRangeFilterType
-     */
+    /** @var DateTimeRangeFilterType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
 
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimezone'])
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue(date_default_timezone_get()));
+            ->willReturn(date_default_timezone_get());
 
-        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
+        $subscriber = $this->getMockSubscriber(DateFilterSubscriber::class);
         $types = [
             new FilterType($translator),
             new DateRangeType($localeSettings),
-            new DateTimeRangeType($localeSettings),
+            new DateTimeRangeType(),
             new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber)
         ];
 
@@ -52,6 +50,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
     protected function getTestFormType()
     {
         return $this->type;
+    }
+
+    /**
+     * @dataProvider configureOptionsDataProvider
+     */
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
+    {
+        $resolver = new OptionsResolver();
+        $this->getTestFormType()->configureOptions($resolver);
+        $resolvedOptions = $resolver->resolve([]);
+        $resolvedOptions = array_intersect_key($resolvedOptions, $defaultOptions);
+        self::assertEquals($defaultOptions, $resolvedOptions);
     }
 
     /**

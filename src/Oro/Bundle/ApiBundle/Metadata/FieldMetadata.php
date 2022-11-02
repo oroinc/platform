@@ -2,25 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-use Oro\Component\ChainProcessor\ToArrayInterface;
-
 /**
  * The metadata for an entity field.
  */
-class FieldMetadata extends PropertyMetadata implements ToArrayInterface
+class FieldMetadata extends PropertyMetadata
 {
-    /** @var bool */
-    private $nullable = false;
-
-    /** @var int|null */
-    private $maxLength;
+    private bool $nullable = false;
+    private ?int $maxLength = null;
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = parent::toArray();
         if ($this->nullable) {
@@ -34,41 +27,33 @@ class FieldMetadata extends PropertyMetadata implements ToArrayInterface
     }
 
     /**
-     * Whether a value of the field can be NULL.
-     *
-     * @return bool
+     * Indicates whether a value of the field can be NULL.
      */
-    public function isNullable()
+    public function isNullable(): bool
     {
         return $this->nullable;
     }
 
     /**
      * Sets a flag indicates whether a value of the field can be NULL.
-     *
-     * @param bool $value
      */
-    public function setIsNullable($value)
+    public function setIsNullable(bool $value): void
     {
         $this->nullable = $value;
     }
 
     /**
      * Gets the maximum length of the field data.
-     *
-     * @return int|null
      */
-    public function getMaxLength()
+    public function getMaxLength(): ?int
     {
         return $this->maxLength;
     }
 
     /**
      * Sets the maximum length of the field data.
-     *
-     * @param int|null $maxLength
      */
-    public function setMaxLength($maxLength)
+    public function setMaxLength(?int $maxLength): void
     {
         $this->maxLength = $maxLength;
     }

@@ -20,10 +20,6 @@ class TemplateFixtureReader extends IteratorBasedReader
      */
     protected $fixture;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     * @param TemplateManager $templateManager
-     */
     public function __construct(ContextRegistry $contextRegistry, TemplateManager $templateManager)
     {
         parent::__construct($contextRegistry);

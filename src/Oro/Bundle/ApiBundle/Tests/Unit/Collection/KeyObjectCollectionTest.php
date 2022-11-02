@@ -4,12 +4,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */
     private $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->collection = new KeyObjectCollection();
     }
@@ -17,70 +21,67 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldAddObjectWithoutData()
     {
         $this->collection->add(new \stdClass(), 'key');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldAddObjectWithData()
     {
         $this->collection->add(new \stdClass(), 'key', 'data');
+        $this->expectNotToPerformAssertions();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $object argument of type "object", "NULL" given.
-     */
     public function testShouldAddThrowExceptionIfObjectIsNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $object argument of type "object", "NULL" given.');
+
         $this->collection->add(null, 'key');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $object argument of type "object", "string" given.
-     */
     public function testShouldAddThrowExceptionForNotObject()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $object argument of type "object", "string" given.');
+
         $this->collection->add('test', 'key');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "NULL" given.
-     */
     public function testShouldAddThrowExceptionForNullKey()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "NULL" given.');
+
         $this->collection->add(new \stdClass(), null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "stdClass" given.
-     */
     public function testShouldAddThrowExceptionIfKeyIsObject()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "stdClass" given.');
+
         $this->collection->add(new \stdClass(), new \stdClass());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "array" given.
-     */
     public function testShouldAddThrowExceptionIfKeyIsArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "array" given.');
+
         $this->collection->add(new \stdClass(), []);
     }
 
     /**
-     * @dataProvider             blankKeyProvider
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $key argument should not be a blank string.
+     * @dataProvider blankKeyProvider
      */
-    public function testShouldAddThrowExceptionForBlankKey($key)
+    public function testShouldAddThrowExceptionForBlankKey(string $key)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $key argument should not be a blank string.');
+
         $this->collection->add(new \stdClass(), $key);
     }
 
-    public function blankKeyProvider()
+    public function blankKeyProvider(): array
     {
         return [
             [''],
@@ -91,12 +92,13 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validKeysProvider
      */
-    public function testShouldAddWithNotStringKey($key)
+    public function testShouldAddWithNotStringKey(mixed $key)
     {
         $this->collection->add(new \stdClass(), $key);
+        $this->expectNotToPerformAssertions();
     }
 
-    public function validKeysProvider()
+    public function validKeysProvider(): array
     {
         return [
             ['test'],
@@ -200,11 +202,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldClearAllData()
     {
-        $this->collection->add(new \stdClass(), 'key', 'data');
+        $object = new \stdClass();
+        $this->collection->add($object, 'key', 'data');
         $this->collection->clear();
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 
     public function testShouldIsEmptyReturnTrueForEmptyCollection()
@@ -237,6 +240,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldRemoveNotThrowExceptionForUnknownObject()
     {
         $this->collection->remove(new \stdClass());
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldRemoveObject()
@@ -244,22 +248,24 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $object = new \stdClass();
         $this->collection->add($object, 'key', 'data');
         $this->collection->remove($object);
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 
     public function testShouldRemoveKeyNotThrowExceptionForUnknownKey()
     {
         $this->collection->removeKey('key');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldRemoveObjectByKey()
     {
-        $this->collection->add(new \stdClass(), 'key', 'data');
+        $object = new \stdClass();
+        $this->collection->add($object, 'key', 'data');
         $this->collection->removeKey('key');
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 }

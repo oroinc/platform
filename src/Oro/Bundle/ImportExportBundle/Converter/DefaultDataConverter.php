@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * The default implementation of data converter.
+ */
 class DefaultDataConverter implements DataConverterInterface
 {
     /**
@@ -41,7 +44,7 @@ class DefaultDataConverter implements DataConverterInterface
 
         foreach ($complexData as $key => $value) {
             $key = (string)$key;
-            if (strpos($key, $this->convertDelimiter) !== false) {
+            if (str_contains($key, $this->convertDelimiter)) {
                 throw new LogicException(sprintf('Delimiter "%s" is not allowed in keys', $this->convertDelimiter));
             }
 

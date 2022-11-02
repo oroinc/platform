@@ -12,9 +12,6 @@ abstract class AbstractTopic implements TopicInterface
     /** @var string */
     protected $topicName;
 
-    /**
-     * @param string $topicName
-     */
     public function __construct(string $topicName)
     {
         $this->topicName = $topicName;

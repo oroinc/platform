@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SetPasswordHandler
@@ -45,15 +45,6 @@ class SetPasswordHandler
     /** @var ValidatorInterface */
     protected $validator;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param RequestStack $requestStack
-     * @param TranslatorInterface $translator
-     * @param FormInterface $form
-     * @param Processor $mailerProcessor
-     * @param UserManager $userManager
-     * @param ValidatorInterface $validator
-     */
     public function __construct(
         LoggerInterface $logger,
         RequestStack    $requestStack,

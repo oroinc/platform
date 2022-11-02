@@ -5,18 +5,20 @@
 .select2-results .select2-result-label .aware-icon-block {
     height: 16px;
     width: 16px;
+    // stylelint-disable-next-line declaration-no-important
     background-size: contain !important;
     margin-right: 4px;
-    margin-top: -2px;
     vertical-align: middle;
     float: left;
 }
 
 .integration-icon {
-    margin-top: 1px;
+    margin-top: 3px;
 }
 
 .select2-results .select2-result-label .aware-icon-block {
     position: relative;
     top: 3px;
+    // stylelint-disable-next-line declaration-no-important
+    background-position: center !important;
 }

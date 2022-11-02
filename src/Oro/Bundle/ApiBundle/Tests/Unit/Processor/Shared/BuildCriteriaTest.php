@@ -2,53 +2,37 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var BuildCriteria */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->processor = new BuildCriteria();
     }
 
-    /**
-     * @return Criteria
-     */
-    private function getCriteria()
-    {
-        $resolver = $this->createMock(EntityClassResolver::class);
-
-        return new Criteria($resolver);
-    }
-
-    /**
-     * @param string $dataType
-     * @param string $propertyPath
-     *
-     * @return ComparisonFilter
-     */
-    private function getComparisonFilter($dataType, $propertyPath)
+    private function getComparisonFilter(string $dataType, string $propertyPath): ComparisonFilter
     {
         $filter = new ComparisonFilter($dataType);
-        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $filter->setField($propertyPath);
 
         return $filter;
@@ -73,16 +57,22 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcess()
     {
-        $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[label]', new FilterValue('label', 'val1', ComparisonFilter::EQ));
-        $filterValues->set('filter[name]', new FilterValue('name', 'val2', ComparisonFilter::EQ));
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set(
+            'filter[label]',
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', FilterOperator::EQ)
+        );
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', FilterOperator::EQ)
+        );
 
         $filers = $this->context->getFilters();
         $filers->add('filter[label]', $this->getComparisonFilter('string', 'label'));
         $filers->add('filter[name]', $this->getComparisonFilter('string', 'association.name'));
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -99,16 +89,22 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessShouldApplyFiltersInCorrectOrder()
     {
-        $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[label]', new FilterValue('label', 'val1', ComparisonFilter::EQ));
-        $filterValues->set('filter[name]', new FilterValue('name', 'val2', ComparisonFilter::EQ));
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set(
+            'filter[label]',
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', FilterOperator::EQ)
+        );
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', FilterOperator::EQ)
+        );
 
         $filers = $this->context->getFilters();
         $filers->add('filter[name]', $this->getComparisonFilter('string', 'association.name'));
         $filers->add('filter[label]', $this->getComparisonFilter('string', 'label'));
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -125,11 +121,14 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessForUnknownFilter()
     {
-        $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[name]', new FilterValue('name', 'val', ComparisonFilter::EQ));
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val', FilterOperator::EQ)
+        );
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull(
@@ -139,8 +138,11 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenApplyFilterFailed()
     {
-        $filterValues = new TestFilterValueAccessor();
-        $filterValues->set('filter[name]', new FilterValue('name', 'val', ComparisonFilter::EQ));
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set(
+            'filter[name]',
+            FilterValue::createFromSource('filter[name]', 'name', 'val', FilterOperator::EQ)
+        );
 
         $filter = $this->createMock(ComparisonFilter::class);
         $exception = new \Exception('some error');
@@ -153,7 +155,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getCriteria()->getWhereExpression());
@@ -169,10 +171,11 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenApplyPredefinedFilterFailed()
     {
-        $filterValues = new TestFilterValueAccessor();
-        $filterValue = new FilterValue('someFilter', 'val', ComparisonFilter::EQ);
-        $filterValues->set('someFilter', $filterValue);
-        $filterValue->setSourceKey(null);
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set(
+            'someFilter',
+            new FilterValue('someFilter', 'val', FilterOperator::EQ)
+        );
 
         $filter = $this->createMock(ComparisonFilter::class);
         $exception = new \Exception('some error');
@@ -185,7 +188,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getCriteria()->getWhereExpression());
@@ -199,14 +202,13 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessFilterWithDefaultValue()
     {
-        $filter = new PageSizeFilter('integer');
+        $filter = new PageSizeFilter(DataType::INTEGER);
         $filter->setDefaultValue(5);
 
         $filers = $this->context->getFilters();
         $filers->add('pageSize', $filter);
 
-        $this->context->setFilterValues(new TestFilterValueAccessor());
-        $this->context->setCriteria($this->getCriteria());
+        $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 
         self::assertEquals(

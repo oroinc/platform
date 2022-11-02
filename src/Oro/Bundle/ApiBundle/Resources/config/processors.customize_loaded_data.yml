@@ -1,8 +1,31 @@
 services:
+    oro_api.customize_loaded_data.multi_target_association_data_loader:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Loader\MultiTargetAssociationDataLoader
+        arguments:
+            - '@oro_api.config_provider'
+            - '@oro_api.entity_serializer'
+            - '@oro_api.entity_serializer.serialization_helper'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.resources_provider'
+
+    oro_api.customize_loaded_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
+        arguments:
+            - '@oro_api.processor_bag'
+            - customize_loaded_data
+
     oro_api.customize_loaded_data.build_custom_types:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes
         arguments:
-            - '@oro_entity_extend.association_manager'
+            - '@oro_api.expanded_association_provider'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.value_transformer'
         tags:
-            - { name: oro.api.processor, action: customize_loaded_data }
+            - { name: oro.api.processor, action: customize_loaded_data, priority: 10 }
+
+    oro_api.customize_loaded_data.expand_multi_target_associations:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandMultiTargetAssociations
+        arguments:
+            - '@oro_api.customize_loaded_data.multi_target_association_data_loader'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, priority: -100 }

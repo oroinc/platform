@@ -2,27 +2,25 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Transport;
 
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport;
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $clientFactory;
+    /** @var RestClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $clientFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $transport;
+    /** @var AbstractRestTransport|\PHPUnit\Framework\MockObject\MockObject */
+    private $transport;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->clientFactory = $this->createMock(
-            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\RestClientFactoryInterface'
-        );
-
-        $this->transport = $this->getMockBuilder(
-            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Transport\\AbstractRestTransport'
-        )->getMockForAbstractClass();
+        $this->clientFactory = $this->createMock(RestClientFactoryInterface::class);
+        $this->transport = $this->getMockForAbstractClass(AbstractRestTransport::class);
         $this->transport->setRestClientFactory($this->clientFactory);
     }
 
@@ -31,47 +29,42 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
         $expectedBaseUrl = 'https://example.com/api/v2';
         $expectedClientOptions = ['auth' => ['username', 'password']];
 
-        $expectedClient = $this->createMock(
-            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\RestClientInterface'
-        );
+        $expectedClient = $this->createMock(RestClientInterface::class);
 
-        $entity = $this->getMockBuilder('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entity = $this->createMock(Transport::class);
 
-        $settings = $this->createMock('Symfony\\Component\\HttpFoundation\\ParameterBag');
+        $settings = $this->createMock(ParameterBag::class);
 
-        $entity->expects($this->atLeastOnce())
+        $entity->expects(self::atLeastOnce())
             ->method('getSettingsBag')
-            ->will($this->returnValue($settings));
+            ->willReturn($settings);
 
-        $this->transport->expects($this->once())
+        $this->transport->expects(self::once())
             ->method('getClientBaseUrl')
             ->with($settings)
-            ->will($this->returnValue($expectedBaseUrl));
+            ->willReturn($expectedBaseUrl);
 
-        $this->transport->expects($this->once())
+        $this->transport->expects(self::once())
             ->method('getClientOptions')
             ->with($settings)
-            ->will($this->returnValue($expectedClientOptions));
+            ->willReturn($expectedClientOptions);
 
-        $this->clientFactory->expects($this->once())
+        $this->clientFactory->expects(self::once())
             ->method('createRestClient')
             ->with($expectedBaseUrl, $expectedClientOptions)
-            ->will($this->returnValue($expectedClient));
+            ->willReturn($expectedClient);
 
         $this->transport->init($entity);
 
-        $this->assertAttributeSame($expectedClient, 'client', $this->transport);
-        $this->assertSame($expectedClient, $this->transport->getClient());
+        self::assertSame($expectedClient, $this->transport->getClient());
+        self::assertSame($expectedClient, $this->transport->getClient());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage REST Transport isn't configured properly.
-     */
     public function testGetClientFails()
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("REST Transport isn't configured properly.");
+
         $this->transport->getClient();
     }
 }

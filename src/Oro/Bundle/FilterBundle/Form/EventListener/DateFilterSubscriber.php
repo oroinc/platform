@@ -6,18 +6,18 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * Responsible for formatting the datetime according to the time zone
+ * and copying submitted "start" and "end" values to model data under "start_original" and "end_original" keys.
  */
 class DateFilterSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DateFilterModifier
-     */
+    /** @var DateFilterModifier */
     protected $dateFilterModifier;
 
     /** @var array */
@@ -33,9 +33,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
         DateModifierInterface::PART_DOY     => [1, 366],
     ];
 
-    /**
-     * @param DateFilterModifier $modifier
-     */
     public function __construct(DateFilterModifier $modifier)
     {
         $this->dateFilterModifier = $modifier;
@@ -47,20 +44,20 @@ class DateFilterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SUBMIT => 'preSubmit'
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::SUBMIT     => 'submit'
         ];
     }
 
     /**
      * Parses date expressions
      * If date part given, then replace value fields by choice fields with specific to that value choices
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
         $form = $event->getForm();
+        $config = $form->getConfig();
 
         $oid = spl_object_hash($form);
         if (!empty($this->processed[$oid])) {
@@ -68,8 +65,19 @@ class DateFilterSubscriber implements EventSubscriberInterface
             // in case when DateTimeFilter already process and parent subscription is not necessary
             return;
         }
+
+        // Remembers submitted values.
+        // It is required to correct work of date interval filters, e.g. the "day without year" variable.
+        $context = $this->getSubmitContext($config);
+        if (isset($data['value']['start'])) {
+            $context->addValue('start_original', $data['value']['start']);
+        }
+        if (isset($data['value']['end'])) {
+            $context->addValue('end_original', $data['value']['end']);
+        }
+
         $children = array_keys($form->get('value')->all());
-        $data     = $this->dateFilterModifier->modify($data, $children);
+        $data = $this->dateFilterModifier->modify($data, $children);
         // replace value form children to needed sub forms in case when part is selected
         if (array_key_exists($data['part'], static::$partChoicesMap)) {
             $min = static::$partChoicesMap[$data['part']][0];
@@ -82,11 +90,21 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $this->processed[$oid] = true;
     }
 
+    public function submit(FormEvent $event)
+    {
+        // Adds submitted values to model data.
+        // It is required to correct work of date interval filters, e.g. the "day without year" variable.
+        $data = $event->getData();
+        if (\is_array($data)) {
+            $event->setData($this->getSubmitContext($event->getForm()->getConfig())->applyValues($data));
+        }
+    }
+
     /**
      * Returns array combined by range of $min and $max for keys and for values
      *
-     * @param integer $min
-     * @param integer $max
+     * @param int $min
+     * @param int $max
      *
      * @return array
      */
@@ -99,22 +117,17 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
     /**
      * Replace values form children to "choice" type with predefined choice list
-     *
-     * @param FormInterface $form
-     * @param array         $choices
      */
     private function replaceValueFields(FormInterface $form, array $choices)
     {
         $children = array_keys($form->all());
-
         foreach ($children as $child) {
-            $form->add(
-                $child,
-                ChoiceType::class,
-                [
-                    'choices' => array_flip($choices),
-                ]
-            );
+            $form->add($child, ChoiceType::class, ['choices' => array_flip($choices)]);
         }
+    }
+
+    private function getSubmitContext(FormConfigInterface $config): DateFilterSubmitContext
+    {
+        return $config->getOption('submit_context');
     }
 }

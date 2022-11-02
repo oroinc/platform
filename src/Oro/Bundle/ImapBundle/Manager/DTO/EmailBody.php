@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager\DTO;
 
-use Zend\Mail\Header\ContentType;
+use Laminas\Mail\Header\ContentType;
 
 /**
  * Represents IMAP email body.
@@ -65,7 +65,7 @@ class EmailBody
             $originalContentType = $originalContentType->getType();
         }
 
-        $this->originalContentType = strtolower($originalContentType);
+        $this->originalContentType = $originalContentType ? strtolower($originalContentType) : '';
 
         return $this;
     }

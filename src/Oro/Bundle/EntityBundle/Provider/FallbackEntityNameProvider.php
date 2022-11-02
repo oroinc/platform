@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
-use Symfony\Component\Translation\TranslatorInterface;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Generates a fallback entity name from entity id
@@ -22,15 +22,13 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
 
     /** @var TranslatorInterface */
     protected $translator;
+    private Inflector $inflector;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator)
+    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator, Inflector $inflector)
     {
         $this->doctrine = $doctrine;
         $this->translator = $translator;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -120,7 +118,7 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        $getterName = 'get' . Inflector::classify($fieldName);
+        $getterName = 'get' . $this->inflector->classify($fieldName);
 
         if (method_exists($entity, $getterName)) {
             return $entity->{$getterName}();

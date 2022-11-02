@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_24;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -14,9 +14,6 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
     /** @var $extendExtension */
     protected $extendExtension;
 
-    /**
-     * @param ExtendExtension $extendExtension
-     */
     public function __construct(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
@@ -69,28 +66,28 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
         ];
 
         $types = [
-            'id' => Type::STRING,
-            'name' => Type::STRING,
-            'priority' => Type::INTEGER,
-            'is_default' => Type::BOOLEAN,
+            'id' => Types::STRING,
+            'name' => Types::STRING,
+            'priority' => Types::INTEGER,
+            'is_default' => Types::BOOLEAN,
         ];
 
         foreach ($statuses as $status) {
             $this->logQuery($logger, $sql, $status, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($sql, $status, $types);
+                $this->connection->executeStatement($sql, $status, $types);
             }
         }
 
         $defaultStatus = ['default_status' => UserManager::STATUS_ACTIVE];
-        $defaultStatusType = ['default_status' => Type::STRING];
+        $defaultStatusType = ['default_status' => Types::STRING];
 
         $sql = 'UPDATE oro_user SET auth_status_id = :default_status';
 
         $this->logQuery($logger, $sql, $defaultStatus, $types);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $defaultStatus, $defaultStatusType);
+            $this->connection->executeStatement($sql, $defaultStatus, $defaultStatusType);
         }
     }
 }

@@ -1,4 +1,7 @@
 oro.imap:
     validator:
-      configuration:
-          folders_are_not_selected: At least one folder of mailbox is required to be selected.
+        configuration:
+            folders_are_not_selected: At least one folder of mailbox is required to be selected.
+            connection:
+                imap: Could not establish the IMAP connection
+                smtp: Could not establish the SMTP connection

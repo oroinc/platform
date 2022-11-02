@@ -12,7 +12,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Trim */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new Func\Trim();
         $this->function->setContextAccessor(new ContextAccessor());
@@ -92,21 +92,19 @@ class TrimTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
+
         $this->function->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 3 given.
-     */
     public function testInitializeFailsWhenMoreThanTwoOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
+
         $this->function->initialize([1, 2, 3]);
     }
 

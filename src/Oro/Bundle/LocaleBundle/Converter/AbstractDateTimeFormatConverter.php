@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provided functionality to convert date time to different formats
+ */
 abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverterInterface
 {
     /**
-     * @var DateTimeFormatter
+     * @var DateTimeFormatterInterface
      */
     protected $formatter;
 
@@ -19,7 +22,7 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      *
      * @var array
      */
-    protected $defaultFormatMatch = array(
+    protected $defaultFormatMatch = [
         'GGGGG'  => '',
         'GGGG'   => '',
         'GGG'    => '',
@@ -120,23 +123,19 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
         'xxx'    => '',
         'xx'     => '',
         'x'      => '',
-    );
+    ];
 
     /**
      * Property should be overridden in descendant classes
      *
      * @var array
      */
-    protected $formatMatch = array();
+    protected $formatMatch = [];
 
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param DateTimeFormatter   $formatter
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(DateTimeFormatter $formatter, TranslatorInterface $translator)
+    public function __construct(DateTimeFormatterInterface $formatter, TranslatorInterface $translator)
     {
         $this->formatter  = $formatter;
         $this->translator = $translator;
@@ -215,7 +214,20 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
     protected function convertFormat($format)
     {
         $formatMatch = array_merge($this->defaultFormatMatch, $this->formatMatch);
+        $quotedNeedles = array_map(static fn (string $key) => preg_quote($key, '/'), array_keys($formatMatch));
+        $pattern = '/(?:\b)+(?<token>' . implode('|', $quotedNeedles) . ')(?:\b)+/';
+        preg_match_all($pattern, $format, $matches, PREG_OFFSET_CAPTURE);
 
-        return strtr($format, $formatMatch);
+        $newFormat = $format;
+        foreach (array_reverse($matches['token']) as [$token, $position]) {
+            // Converts byte offset into char offset.
+            $position = mb_strlen(substr($format, 0, $position));
+            // Replaces a token.
+            $newFormat = mb_substr($newFormat, 0, $position)
+                . ($formatMatch[$token] ?? $token)
+                . mb_substr($newFormat, $position + mb_strlen($token));
+        }
+
+        return $newFormat;
     }
 }

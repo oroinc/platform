@@ -8,20 +8,14 @@ class GroupByHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider groupByDataProvider
-     * @param array  $selects
-     * @param string $groupBy
-     * @param array  $expected
      */
-    public function testGetGroupByFields($selects, $groupBy, $expected)
+    public function testGetGroupByFields(array $selects, ?string $groupBy, array $expected)
     {
         $helper = new GroupByHelper();
         $this->assertEquals($expected, $helper->getGroupByFields($groupBy, $selects));
     }
 
-    /**
-     * @return array
-     */
-    public function groupByDataProvider()
+    public function groupByDataProvider(): array
     {
         return [
             'no fields' => [

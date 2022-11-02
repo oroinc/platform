@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.tox-tinymce {
+    max-width: 100%;
+    /* stylelint-disable declaration-no-important */
+    border-radius: $input-field-border-radius !important;
+    border: $input-border-width solid $input-border-color !important;
+    /* stylelint-enable declaration-no-important */
+}
+
+.narrow-text-field {
+    .tox-tinymce:not(.tox-fullscreen) {
+        // stylelint-disable-next-line declaration-no-important
+        width: $field-width !important;
+        min-height: 300px;
+    }
+}

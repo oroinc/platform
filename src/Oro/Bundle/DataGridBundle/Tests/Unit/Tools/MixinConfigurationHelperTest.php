@@ -8,44 +8,32 @@ use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
 
 class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MixinConfigurationHelper
-     */
-    protected $helper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface */
+    private $configProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface
-     */
-    protected $configProvider;
+    /** @var MixinConfigurationHelper */
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this->createMock('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface');
+        $this->configProvider = $this->createMock(ConfigurationProviderInterface::class);
 
         $this->helper = new MixinConfigurationHelper($this->configProvider);
     }
 
     /**
-     * @param string $gridName
-     * @param array  $existingParameters
-     * @param array  $additionalParameters
-     * @param array  $expectedParameters
-     *
      * @dataProvider extendConfigurationDataProvider
      */
     public function testExtendConfiguration(
-        $gridName,
+        string $gridName,
         array $existingParameters,
         array $additionalParameters,
         array $expectedParameters
     ) {
-        $this->configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('getConfiguration')
-            ->will(
-                $this->returnValue(
-                    DatagridConfiguration::create($additionalParameters)
-                )
+            ->willReturn(
+                DatagridConfiguration::create($additionalParameters)
             );
 
         $this->assertEquals(
@@ -54,10 +42,7 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function extendConfigurationDataProvider()
+    public function extendConfigurationDataProvider(): array
     {
         return [
             'empty' => [
@@ -149,23 +134,15 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
      * @dataProvider mergeDataProvider
-     *
-     * @param array $expected
-     * @param array $first
-     * @param array $second
      */
     public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
     {
         $this->assertEquals($expected, MixinConfigurationHelper::arrayMergeRecursiveAppendDistinct($first, $second));
     }
 
-    /**
-     * @return array
-     */
-    public function mergeDataProvider()
+    public function mergeDataProvider(): array
     {
         return [
             [

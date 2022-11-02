@@ -8,45 +8,27 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
 {
-
-    /**
-     * @var NavigationTitleProvider
-     */
-    protected $provider;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TitleService
-     */
+    /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
     private $titleService;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userConfigManager;
 
-    public function setUp()
-    {
-        $this->titleService = $this->getMockBuilder(TitleService::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    /** @var NavigationTitleProvider */
+    private $provider;
 
-        $this->userConfigManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    protected function setUp(): void
+    {
+        $this->titleService = $this->createMock(TitleService::class);
+        $this->userConfigManager = $this->createMock(ConfigManager::class);
 
         $this->provider = new NavigationTitleProvider($this->titleService, $this->userConfigManager);
     }
 
-
     /**
      * @dataProvider getDataDataProvider
-     *
-     * @param string $routeName
-     * @param array  $params
-     * @param string $title
-     * @param string $expected
      */
-    public function testGetTitle($routeName, $params, $title, $expected)
+    public function testGetTitle(string $routeName, array $params, string $title, string $expected)
     {
         $this->titleService->expects($this->once())
             ->method('loadByRoute')
@@ -72,10 +54,7 @@ class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getDataDataProvider()
+    public function getDataDataProvider(): array
     {
         return [
             'existRoute' => [

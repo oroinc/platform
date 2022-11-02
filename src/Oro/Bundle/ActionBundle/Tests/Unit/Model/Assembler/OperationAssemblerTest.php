@@ -2,39 +2,34 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OperationAssembler */
-    protected $assembler;
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new OperationAssembler(
-            $this->getActionFactory(),
-            $this->getConditionFactory(),
-            $this->getAttributeAssembler(),
-            $this->getFormOptionsAssembler()
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class)
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->assembler, $this->conditionFactory, $this->attributeAssembler);
-    }
-
     /**
-     * @param array $configuration
-     * @param array $expected
-     *
      * @dataProvider assembleProvider
      */
     public function testCreateOperation(array $configuration, array $expected)
@@ -46,21 +41,18 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException
-     * @expectedExceptionMessage Option "label" is required
-     */
     public function testCreateOperationWithMissedRequiredOptions()
     {
+        $this->expectException(MissedRequiredOptionException::class);
+        $this->expectExceptionMessage('Option "label" is required');
+
         $this->assembler->createOperation('test', []);
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function assembleProvider()
+    public function assembleProvider(): array
     {
         $definition1 = new OperationDefinition();
         $definition1
@@ -144,17 +136,17 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                     'minimum_name' => [
                         'label' => 'My Label',
                         'entities' => [
-                            '\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'
+                            TestEntity1::class
                         ],
                     ]
                 ]
                 ,
                 'expected' => [
                     'minimum_name' => new Operation(
-                        $this->getActionFactory(),
-                        $this->getConditionFactory(),
-                        $this->getAttributeAssembler(),
-                        $this->getFormOptionsAssembler(),
+                        $this->createMock(ActionFactoryInterface::class),
+                        $this->createMock(ConditionFactory::class),
+                        $this->createMock(AttributeAssembler::class),
+                        $this->createMock(FormOptionsAssembler::class),
                         $definition1
                     )
                 ],
@@ -164,7 +156,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                     'maximum_name' => [
                         'label' => 'My Label',
                         'substitute_operation' => 'test_operation_to_substitute',
-                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                        'entities' => [TestEntity1::class],
                         'routes' => ['my_route'],
                         'groups' => ['my_group'],
                         'enabled' => false,
@@ -182,10 +174,10 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'maximum_name' => new Operation(
-                        $this->getActionFactory(),
-                        $this->getConditionFactory(),
-                        $this->getAttributeAssembler(),
-                        $this->getFormOptionsAssembler(),
+                        $this->createMock(ActionFactoryInterface::class),
+                        $this->createMock(ConditionFactory::class),
+                        $this->createMock(AttributeAssembler::class),
+                        $this->createMock(FormOptionsAssembler::class),
                         $definition2
                     )
                 ],
@@ -195,12 +187,12 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                     'maximum_name_and_acl' => [
                         'label' => 'My Label',
                         'substitute_operation' => 'test_operation_to_substitute',
-                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                        'entities' => [TestEntity1::class],
                         'routes' => ['my_route'],
                         'groups' => ['my_group'],
                         'enabled' => false,
                         'for_all_entities' => true,
-                        'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
+                        'exclude_entities' => [TestEntity2::class],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
                         OperationDefinition::PREACTIONS => ['config_pre_func'],
@@ -217,52 +209,14 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'maximum_name_and_acl' => new Operation(
-                        $this->getActionFactory(),
-                        $this->getConditionFactory(),
-                        $this->getAttributeAssembler(),
-                        $this->getFormOptionsAssembler(),
+                        $this->createMock(ActionFactoryInterface::class),
+                        $this->createMock(ConditionFactory::class),
+                        $this->createMock(AttributeAssembler::class),
+                        $this->createMock(FormOptionsAssembler::class),
                         $definition3
                     )
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ActionFactory
-     */
-    protected function getActionFactory()
-    {
-        return $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConditionFactory
-     */
-    protected function getConditionFactory()
-    {
-        return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler
-     */
-    protected function getAttributeAssembler()
-    {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler
-     */
-    protected function getFormOptionsAssembler()
-    {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

@@ -3,16 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Behat\Context;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
+class FeatureContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
 
     /**
      * @When /^I choose (?P<tableContent>([\w\s]+)) "(?P<value>([\w\s]+))" in (?P<rowNum>([\d]+)) row$/
@@ -78,7 +76,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         /** @var Table $table */
         $table = $this->findElementContains('Table', $tableContent);
         self::assertTrue(
-            $table->has('css', 'tbody tr i.handle'),
+            $table->has('css', 'tbody tr span.handle'),
             "There is no drag-n-drop icon among rows in '$tableContent' table"
         );
     }

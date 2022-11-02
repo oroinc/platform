@@ -9,21 +9,18 @@ use Symfony\Component\Routing\RouterInterface;
 class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routerProvider;
+    private $routerProvider;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mockRouter;
+    private $mockRouter;
 
     /** @var ApplicationsUrlHelper */
-    protected $instance;
+    private $instance;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->routerProvider = $this->getMockBuilder(RouteProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->mockRouter = $this->createMock('Symfony\Component\Routing\RouterInterface');
+        $this->routerProvider = $this->createMock(RouteProviderInterface::class);
+        $this->mockRouter = $this->createMock(RouterInterface::class);
 
         $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->mockRouter);
     }

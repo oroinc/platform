@@ -18,6 +18,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     /** @var FiltersConfiguration */
     private $filtersConfiguration;
 
+    /** @var SortersConfiguration */
+    private $sortersConfiguration;
+
     /**
      * @param string[]               $permissibleActions
      * @param FilterOperatorRegistry $filterOperatorRegistry
@@ -29,6 +32,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
             'subresources.subresource.action'
         );
         $this->filtersConfiguration = new FiltersConfiguration($filterOperatorRegistry);
+        $this->sortersConfiguration = new SortersConfiguration();
     }
 
     /**
@@ -39,6 +43,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         parent::setSettings($settings);
         $this->actionsConfiguration->setSettings($settings);
         $this->filtersConfiguration->setSettings($settings);
+        $this->sortersConfiguration->setSettings($settings);
     }
 
     /**
@@ -48,7 +53,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     {
         /** @var NodeBuilder $subresourceNode */
         $subresourceNode = $node->end()
-            ->useAttributeAsKey('name')
+            ->useAttributeAsKey('')
             ->normalizeKeys(false)
             ->prototype('array')
                 ->treatFalseLike([ConfigUtil::EXCLUDE => true])
@@ -68,9 +73,6 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureSubresourceNode(NodeBuilder $node): void
     {
         $sectionName = 'subresources.subresource';
@@ -90,7 +92,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $node
             ->scalarNode(ConfigUtil::TARGET_CLASS)->end()
             ->enumNode(ConfigUtil::TARGET_TYPE)
-                ->values(['to-many', 'to-one', 'collection'])
+                ->values([ConfigUtil::TO_MANY, ConfigUtil::TO_ONE, ConfigUtil::COLLECTION])
             ->end();
 
         $this->actionsConfiguration->configure(
@@ -99,27 +101,24 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->filtersConfiguration->configure(
             $node->arrayNode(ConfigUtil::FILTERS)->children()
         );
+        $this->sortersConfiguration->configure(
+            $node->arrayNode(ConfigUtil::SORTERS)->children()
+        );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessSubresourceConfig(array $config): array
     {
-        if (!empty($config[ConfigUtil::TARGET_TYPE])) {
-            if ('collection' === $config[ConfigUtil::TARGET_TYPE]) {
-                $config[ConfigUtil::TARGET_TYPE] = 'to-many';
-            }
-        } elseif (!empty($config[ConfigUtil::TARGET_CLASS])) {
-            $config[ConfigUtil::TARGET_TYPE] = 'to-one';
+        if (!empty($config[ConfigUtil::TARGET_TYPE]) && ConfigUtil::COLLECTION === $config[ConfigUtil::TARGET_TYPE]) {
+            $config[ConfigUtil::TARGET_TYPE] = ConfigUtil::TO_MANY;
         }
         if (empty($config[ConfigUtil::ACTIONS])) {
             unset($config[ConfigUtil::ACTIONS]);
         }
         if (empty($config[ConfigUtil::FILTERS])) {
             unset($config[ConfigUtil::FILTERS]);
+        }
+        if (empty($config[ConfigUtil::SORTERS])) {
+            unset($config[ConfigUtil::SORTERS]);
         }
 
         return $config;

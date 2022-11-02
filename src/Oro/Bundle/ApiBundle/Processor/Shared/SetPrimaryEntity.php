@@ -32,7 +32,7 @@ class SetPrimaryEntity implements ProcessorInterface
 
         $primaryEntity = $context->getResult();
         if (null !== $primaryEntity) {
-            $includedEntities->setPrimaryEntity($primaryEntity);
+            $includedEntities->setPrimaryEntity($primaryEntity, $context->getMetadata());
         }
     }
 }

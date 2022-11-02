@@ -1,0 +1,35 @@
+/* @theme: default; */
+
+$color-palette: (
+    'primary': (
+        'main': #2d333b,
+        'base': #cc5c28,
+        'light': #f2994b,
+        'dark': #b84926
+    ),
+    'secondary': (
+        'main': #fcb91d,
+        'base': #6e98dc,
+        'light': #7ea6a4,
+        'lighten': #197b30,
+        'dark': #f7941d
+    ),
+    'additional': (
+        'ultra': #fff,
+        'base': #f5f5f5,
+        'light': #ebebeb,
+        'middle': #d1d1d1,
+        'dark': #464646,
+        'darker': #000
+    ),
+    'ui': (
+        'error': #fff1f1,
+        'error-dark': #7a0026,
+        'success': #e9f9e0,
+        'success-dark': #5c7a58,
+        'warning': #fefbe7,
+        'warning-dark': #634c17,
+        'normal': #4597ca,
+        'focus': #348fc6
+    )
+) !default;

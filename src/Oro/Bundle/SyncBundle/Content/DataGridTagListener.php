@@ -14,9 +14,6 @@ class DataGridTagListener
     /** @var TagGeneratorInterface */
     protected $generator;
 
-    /**
-     * @param TagGeneratorInterface $generator
-     */
     public function __construct(TagGeneratorInterface $generator)
     {
         $this->generator = $generator;
@@ -25,8 +22,6 @@ class DataGridTagListener
     /**
      * Check whenever datasource is ORM and try to generate tags
      * It will be available in metadata and after build will be passed to content-manager
-     *
-     * @param BuildAfter $event
      */
     public function buildAfter(BuildAfter $event)
     {

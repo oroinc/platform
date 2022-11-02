@@ -17,19 +17,13 @@ use Symfony\Component\Form\FormView;
 /**
  * This widget must not has any model transformers that converts entities identifiers to object because it
  * stores model data in database widget options.
- * {@see Oro\Bundle\DashboardBundle\Controller\DashboardController::configureAction}
+ * @see \Oro\Bundle\DashboardBundle\Controller\DashboardController::configureAction
  */
 class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EntityManager  $entityManager
-     * @param SearchRegistry $registry
-     * @param ConfigProvider $configProvider
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         SearchRegistry $registry,

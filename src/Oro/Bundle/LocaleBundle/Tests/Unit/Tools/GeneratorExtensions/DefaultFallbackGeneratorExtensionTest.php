@@ -1,155 +1,179 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use CG\Generator\PhpClass;
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
+use Doctrine\Inflector\InflectorFactory;
+use Nette\PhpGenerator\Parameter;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
+use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DefaultFallbackGeneratorExtension */
-    protected $extension;
+    private EntityFallbackFieldsStorage|MockObject $storage;
 
-    public function setUp()
+    private DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider;
+
+    protected function setUp(): void
     {
-        $this->extension = new DefaultFallbackGeneratorExtension();
-    }
-
-    public function testSupports()
-    {
-        $this->extension->addDefaultMethodFields('testClass', []);
-
-        $this->assertTrue($this->extension->supports(['class' => 'testClass']));
-    }
-
-    public function testSupportsWithoutClass()
-    {
-        $this->assertFalse($this->extension->supports([]));
-    }
-
-    public function testSupportsWithoutExtension()
-    {
-        $this->assertFalse($this->extension->supports(['class' => 'testClass']));
-    }
-
-    public function testAddDefaultMethodFields()
-    {
-        $this->assertAttributeEquals([], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', []);
-        $this->assertAttributeEquals(['testClass' => []], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', ['test1' => 'data1']);
-        $this->assertAttributeEquals(['testClass' => ['test1' => 'data1']], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', ['test2' => 'data2']);
-        $this->assertAttributeEquals(
-            ['testClass' => ['test1' => 'data1', 'test2' => 'data2']],
-            'methodExtensions',
-            $this->extension
+        $this->storage = $this->createMock(EntityFallbackFieldsStorage::class);
+        $this->defaultFallbackMethodsNamesProvider = new DefaultFallbackMethodsNamesProvider(
+            InflectorFactory::create()->build()
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMethodNotGenerated()
+    public function testSupports(): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $this->storage->expects($this->once())
+            ->method('getFieldMap')
+            ->willReturn([
+                'testClass' => []
+            ]);
+
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        self::assertTrue($extension->supports(['class' => 'testClass']));
+    }
+
+    public function testSupportsWithoutClass(): void
+    {
+        $this->storage->expects($this->never())
+            ->method('getFieldMap');
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        self::assertFalse($extension->supports([]));
+    }
+
+    public function testSupportsWithoutExtension(): void
+    {
+        $this->expectEmptyFieldMap();
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        self::assertFalse($extension->supports(['class' => 'testClass']));
+    }
+
+    public function testMethodNotGenerated(): void
+    {
+        $this->expectException(\Nette\InvalidArgumentException::class);
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->generate($schema, $class);
+        $this->expectEmptyFieldMap();
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        $extension->generate($schema, $class);
 
         $class->getMethod('defaultTestGetter');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMethodNotGeneratedIncompleteFields()
+    public function testMethodNotGeneratedIncompleteFields(): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $this->expectException(\TypeError::class);
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addDefaultMethodFields('Test\Entity', [
-            'testField'
-        ]);
-
-        $this->extension->generate($schema, $class);
+        $this->storage->expects($this->atLeastOnce())
+            ->method('getFieldMap')
+            ->willReturn([
+                'Test\Entity' => ['testField']
+            ]);
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        $extension->generate($schema, $class);
 
         $class->getMethod('getDefaultTestField');
     }
 
-    public function testGenerateWithoutFields()
+    public function testGenerateWithoutFields(): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
         $clonedClass = clone $class;
 
-        $this->extension->addDefaultMethodFields('Test\Entity', []);
-        $this->extension->generate(['class' => 'Test\Entity'], $class);
+        $this->storage->expects($this->atLeastOnce())
+            ->method('getFieldMap')
+            ->willReturn([
+                'Test\Entity' => []
+            ]);
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        $extension->generate(['class' => 'Test\Entity'], $class);
 
-        $this->assertEquals($class, $clonedClass);
-        $this->assertEmpty($class->getMethods());
+        self::assertEquals($class, $clonedClass);
+        self::assertEmpty($class->getMethods());
     }
 
-    public function testMethodGenerated()
+    public function testMethodGenerated(): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addDefaultMethodFields('Test\Entity', [
-            'name'=> 'names',
-        ]);
-
-        $this->extension->generate($schema, $class);
+        $this->storage->expects($this->atLeastOnce())
+            ->method('getFieldMap')
+            ->willReturn([
+                'Test\Entity' => ['name'=> 'names']
+            ]);
+        $extension = new DefaultFallbackGeneratorExtension($this->storage, $this->defaultFallbackMethodsNamesProvider);
+        $extension->generate($schema, $class);
 
         $this->assertMethod(
             $class,
             'getName',
-            'return $this->getFallbackValue($this->names, $localization);',
-            "/**\n * @param Localization|null \$localization\n * @return LocalizedFallbackValue|null\n */",
+            'return $this->getFallbackValue($this->names, $localization);' . "\n",
+            "@param \Oro\Bundle\LocaleBundle\Entity\Localization|null \$localization\n"
+            . "@return \Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue|null",
             [
-                $this->getParameter('localization', Localization::class, true),
+                'localization' => $this->getParameter('localization', Localization::class, true),
             ]
         );
 
         $this->assertMethod(
             $class,
             'getDefaultName',
-            'return $this->getDefaultFallbackValue($this->names);',
-            "/**\n * @return LocalizedFallbackValue|null\n */"
+            'return $this->getDefaultFallbackValue($this->names);' . "\n",
+            "@return \Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue|null"
         );
 
         $this->assertMethod(
             $class,
             'setDefaultName',
-            'return $this->setDefaultFallbackValue($this->names, $value);',
-            "/**\n * @param string \$value\n * @return \$this\n */",
+            'return $this->setDefaultFallbackValue($this->names, $value);' . "\n",
+            "@param string \$value\n@return \$this",
             [
-                $this->getParameter('value'),
+                'value' => $this->getParameter('value'),
             ]
+        );
+
+        $cloneLocalizedFallbackValueAssociationsMethodBody = <<<METHOD_BODY
+foreach (["names"] as \$propertyName) {
+    \$newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+
+    foreach (\$this->\$propertyName as \$element) {
+        \$newCollection->add(clone \$element);
+    }
+
+    \$this->\$propertyName = \$newCollection;
+}
+
+return \$this;
+
+METHOD_BODY;
+
+        $this->assertMethod(
+            $class,
+            'cloneLocalizedFallbackValueAssociations',
+            $cloneLocalizedFallbackValueAssociationsMethodBody,
+            "Clones a collections of LocalizedFallbackValue associations."
         );
     }
 
-    /**
-     * @param string $name
-     * @param string|null $type
-     * @param bool|false $nullable
-     * @return PhpParameter
-     */
-    protected function getParameter($name, $type = null, $nullable = false)
+    private function getParameter(string $name, ?string $type = null, bool $nullable = false): Parameter
     {
-        $parameter = PhpParameter::create($name)
-            ->setType($type);
+        $parameter = new Parameter($name);
+        $parameter->setType($type);
 
         if ($nullable) {
             $parameter->setDefaultValue(null);
@@ -158,22 +182,26 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         return $parameter;
     }
 
-    /**
-     * @param PhpClass $class
-     * @param string $methodName
-     * @param string $methodBody
-     * @param string $docblock
-     * @param array $parameters
-     */
-    protected function assertMethod(PhpClass $class, $methodName, $methodBody, $docblock, array $parameters = [])
-    {
-        $this->assertTrue($class->hasMethod($methodName));
+    private function assertMethod(
+        ClassGenerator $class,
+        string $methodName,
+        string $methodBody,
+        string $docblock,
+        array $parameters = []
+    ): void {
+        self::assertTrue($class->hasMethod($methodName));
 
-        /* @var $method PhpMethod */
         $method = $class->getMethod($methodName);
 
-        $this->assertEquals($methodBody, $method->getBody());
-        $this->assertEquals($docblock, $method->getDocblock());
-        $this->assertEquals($parameters, $method->getParameters());
+        self::assertEquals($methodBody, $method->getBody());
+        self::assertEquals($docblock, $method->getComment());
+        self::assertEquals($parameters, $method->getParameters());
+    }
+
+    private function expectEmptyFieldMap(): void
+    {
+        $this->storage->expects($this->once())
+            ->method('getFieldMap')
+            ->willReturn([]);
     }
 }

@@ -32,12 +32,6 @@ class ExecuteOperationHandler
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param RequestStack    $requestStack
-     * @param FormProvider    $formProvider
-     * @param ContextHelper   $helper
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         RequestStack $requestStack,
         FormProvider $formProvider,
@@ -52,10 +46,6 @@ class ExecuteOperationHandler
 
     /**
      * Process operation execution request
-     *
-     * @param Operation $operation
-     *
-     * @return ExecuteOperationResult
      */
     public function process(Operation $operation): ExecuteOperationResult
     {
@@ -79,10 +69,6 @@ class ExecuteOperationHandler
     }
 
     /**
-     * @param Operation              $operation
-     * @param ActionData             $data
-     * @param ExecuteOperationResult $result
-     *
      * @throws \Symfony\Component\Form\Exception\AlreadySubmittedException
      * @throws \Oro\Component\Action\Exception\InvalidConfigurationException
      * @throws \Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException
@@ -103,12 +89,6 @@ class ExecuteOperationHandler
         }
     }
 
-    /**
-     * @param ExecuteOperationResult $result
-     * @param Operation              $operation
-     * @param \Exception             $reason
-     * @param int                    $code
-     */
     protected function setFailResult(
         ExecuteOperationResult $result,
         Operation $operation,

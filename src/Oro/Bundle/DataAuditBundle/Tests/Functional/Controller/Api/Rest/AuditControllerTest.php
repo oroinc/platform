@@ -13,12 +13,13 @@ use Oro\Component\Testing\ResponseExtension;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AuditControllerTest extends WebTestCase
 {
     use ResponseExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +30,7 @@ class AuditControllerTest extends WebTestCase
     {
         $this->client->setServerParameters([]);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audits'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audits'));
 
         $this->assertLastResponseStatus(401);
         $this->assertLastResponseContentTypeJson();
@@ -40,9 +41,6 @@ class AuditControllerTest extends WebTestCase
         $em = $this->getEntityManager();
 
         $user = $this->findAdmin();
-
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
 
         $audit = new Audit();
         $audit->setAction('anAction');
@@ -64,14 +62,14 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audits'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audits'));
 
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(2, $result);
 
         $actualAudit = $result[0];
@@ -80,7 +78,7 @@ class AuditControllerTest extends WebTestCase
         $this->assertEquals(123, $actualAudit['objectId']);
         $this->assertEquals('aClass', $actualAudit['objectClass']);
         $this->assertEquals('aName', $actualAudit['objectName']);
-        $this->assertEquals('admin', $actualAudit['username']);
+        $this->assertEquals($user->getId(), $actualAudit['user']);
         $this->assertEquals('anAction', $actualAudit['action']);
     }
 
@@ -89,9 +87,6 @@ class AuditControllerTest extends WebTestCase
         $em = $this->getEntityManager();
 
         $user = $this->findAdmin();
-
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
 
         $audit = new Audit();
         $audit->setAction('anAction');
@@ -116,13 +111,13 @@ class AuditControllerTest extends WebTestCase
         //guard
         $this->assertNotEmpty($audit->getId());
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $actualAudit = $result;
         $this->assertEquals($audit->getId(), $actualAudit['id']);
@@ -130,7 +125,7 @@ class AuditControllerTest extends WebTestCase
         $this->assertEquals(123, $actualAudit['objectId']);
         $this->assertEquals('aClass', $actualAudit['objectClass']);
         $this->assertEquals('aName', $actualAudit['objectName']);
-        $this->assertEquals('admin', $actualAudit['username']);
+        $this->assertEquals($user->getId(), $actualAudit['user']);
         $this->assertEquals('anAction', $actualAudit['action']);
     }
 
@@ -139,9 +134,6 @@ class AuditControllerTest extends WebTestCase
         $em = $this->getEntityManager();
 
         $user = $this->findAdmin();
-
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
 
         $audit = new Audit();
         $audit->setObjectName('aName');
@@ -157,13 +149,13 @@ class AuditControllerTest extends WebTestCase
         //guard
         $this->assertNotEmpty($audit->getId());
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertEquals([
             'fooField' => ['old' => null, 'new' => 'foo'],
@@ -179,7 +171,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -187,7 +179,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -195,13 +187,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt>='.urlencode('2012-10-12T00:01+0000')
         );
@@ -210,7 +202,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(2, $result);
     }
@@ -223,7 +215,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -231,7 +223,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -239,13 +231,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt>'.urlencode('2012-10-12T00:01+0000')
         );
@@ -254,7 +246,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(1, $result);
     }
@@ -267,7 +259,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -275,7 +267,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -283,13 +275,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt<='.urlencode('2012-10-12T00:01+0000')
         );
@@ -298,7 +290,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(2, $result);
     }
@@ -311,7 +303,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -319,7 +311,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -327,13 +319,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt<'.urlencode('2012-10-12T00:01+0000')
         );
@@ -342,7 +334,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(1, $result);
     }
@@ -355,7 +347,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setAction('create');
         $em->persist($audit);
 
@@ -363,7 +355,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setAction('update');
         $em->persist($audit);
 
@@ -371,13 +363,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setAction('remove');
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?action=create'
         );
@@ -386,7 +378,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(1, $result);
     }
@@ -399,7 +391,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setAction('create');
         $em->persist($audit);
 
@@ -407,7 +399,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setAction('update');
         $em->persist($audit);
 
@@ -415,13 +407,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setAction('remove');
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?action<>create'
         );
@@ -430,7 +422,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(2, $result);
     }
@@ -443,7 +435,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -451,7 +443,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -459,13 +451,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setObjectClass(TestAuditDataOwner::class);
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?objectClass='.TestAuditDataOwner::class
         );
@@ -474,7 +466,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(1, $result);
     }
@@ -487,7 +479,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -495,7 +487,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -503,13 +495,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setObjectClass(TestAuditDataOwner::class);
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?objectClass<>'.TestAuditDataOwner::class
         );
@@ -518,7 +510,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(2, $result);
     }
@@ -533,7 +525,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setUser($user);
         $em->persist($audit);
 
@@ -541,7 +533,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setUser(null);
         $em->persist($audit);
 
@@ -549,13 +541,13 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setUser(null);
         $em->persist($audit);
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?user='.$user->getId()
         );
@@ -564,7 +556,7 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(1, $result);
     }
@@ -585,7 +577,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?user=0'
         );
@@ -594,23 +586,17 @@ class AuditControllerTest extends WebTestCase
 
         $result = $this->getLastResponseJsonContent();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
 
         $this->assertCount(0, $result);
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->client->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    /**
-     * @return User
-     */
-    private function findAdmin()
+    private function findAdmin(): User
     {
         return $this->getEntityManager()->getRepository(User::class)->findOneBy([
             'username' => 'admin'

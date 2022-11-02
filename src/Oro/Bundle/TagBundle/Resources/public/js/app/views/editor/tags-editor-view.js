@@ -1,6 +1,12 @@
 define(function(require) {
     'use strict';
 
+    const AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const select2autosizer = require('oroui/js/tools/select2-autosizer');
+
     /**
      * Tags-select content editor. Please note that it requires column data format
      * corresponding to [tags-view](../viewer/tags-view.md).
@@ -64,14 +70,7 @@ define(function(require) {
      * @augments [AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)
      * @exports TagsEditorView
      */
-    var TagsEditorView;
-    var AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var select2autosizer = require('oroui/js/tools/select2-autosizer');
-
-    TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
+    const TagsEditorView = AbstractRelationEditorView.extend(/** @exports TagsEditorView.prototype */{
         className: 'tags-select-editor',
         DEFAULT_PER_PAGE: 20,
 
@@ -84,19 +83,20 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TagsEditorView() {
-            TagsEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function TagsEditorView(options) {
+            TagsEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            TagsEditorView.__super__.initialize.apply(this, arguments);
+            TagsEditorView.__super__.initialize.call(this, options);
             this.listenTo(this.autocompleteApiAccessor, 'cache:clear', this.onCacheClear);
             this.permissions = options.permissions || {};
+            this.cell = options.cell;
         },
 
         getInitialResultItem: function() {
@@ -111,13 +111,15 @@ define(function(require) {
 
         autoSize: function() {
             select2autosizer.applyTo(this.$el, this);
+            if (this.cell) {
+                this.cell.$el.css('height', this.$el.height());
+            }
         },
 
         getSelect2Options: function() {
-            var _this = this;
-            var options = _.omit(TagsEditorView.__super__.getSelect2Options.apply(this, arguments), 'data');
-            _this.currentData = null;
-            _this.firstPageData = {
+            const options = _.omit(TagsEditorView.__super__.getSelect2Options.call(this), 'data');
+            this.currentData = null;
+            this.firstPageData = {
                 results: [],
                 more: false,
                 isDummy: true
@@ -138,39 +140,39 @@ define(function(require) {
                         __('oro.tag.inline_editing.new_tag') + ')</span>')
                         : '');
                 },
-                formatNoMatches: function() {
+                formatNoMatches: () => {
                     // no matches appears in following two cases only
                     // we use this message not for its original mission
-                    return _this.isLoading
+                    return this.isLoading
                         ? __('oro.tag.inline_editing.loading')
-                        : (_this.isCurrentTagSelected()
+                        : (this.isCurrentTagSelected()
                             ? __('oro.tag.inline_editing.existing_tag')
                             : __('oro.tag.inline_editing.no_matches')
                         );
                 },
-                initSelection: function(element, callback) {
-                    callback(_this.getInitialResultItem());
+                initSelection: (element, callback) => {
+                    callback(this.getInitialResultItem());
                 },
-                query: function(options) {
-                    _this.currentTerm = options.term;
-                    _this.currentPage = options.page;
-                    _this.currentCallback = options.callback;
-                    _this.isLoading = true;
+                query: options => {
+                    this.currentTerm = options.term;
+                    this.currentPage = options.page;
+                    this.currentCallback = options.callback;
+                    this.isLoading = true;
                     if (options.page === 1) {
                         // immediately show first item
-                        _this.showResults();
+                        this.showResults();
                     }
-                    options.callback = _.bind(_this.commonDataCallback, _this);
-                    if (_this.currentRequest && _this.currentRequest.term !== '' &&
-                        _this.currentRequest.state() !== 'resolved') {
-                        _this.currentRequest.abort();
+                    options.callback = this.commonDataCallback.bind(this);
+                    if (this.currentRequest && this.currentRequest.term !== '' &&
+                        this.currentRequest.state() !== 'resolved') {
+                        this.currentRequest.abort();
                     }
-                    var autoCompleteUrlParameters = _this.buildAutoCompleteUrlParameters();
+                    const autoCompleteUrlParameters = this.buildAutoCompleteUrlParameters();
                     if (options.term !== '' &&
-                        !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
-                        _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
+                        !this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
+                        this.debouncedMakeRequest(options, autoCompleteUrlParameters);
                     } else {
-                        _this.makeRequest(options, autoCompleteUrlParameters);
+                        this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
             });
@@ -195,7 +197,7 @@ define(function(require) {
 
         onCacheClear: function() {
             this.makeRequest({
-                callback: _.bind(this.commonDataCallback, this),
+                callback: this.commonDataCallback.bind(this),
                 term: this.currentTerm,
                 page: this.currentPage,
                 per_page: this.perPage
@@ -203,12 +205,12 @@ define(function(require) {
         },
 
         isCurrentTagSelected: function() {
-            var select2Data = this.$('.select2-container').inputWidget('data');
+            const select2Data = this.$('.select2-container').inputWidget('data');
             if (!select2Data) {
                 return false;
             }
-            for (var i = 0; i < select2Data.length; i++) {
-                var tag = select2Data[i];
+            for (let i = 0; i < select2Data.length; i++) {
+                const tag = select2Data[i];
                 if (tag.label === this.currentTerm) {
                     return true;
                 }
@@ -217,26 +219,26 @@ define(function(require) {
         },
 
         showResults: function() {
-            var data;
+            let data;
             if (this.currentPage === 1) {
                 data = $.extend({}, this.firstPageData);
-                if (this.permissions.oro_tag_create && this.isValidTerm(this.currentTerm)) {
-                    if (this.firstPageData.term === this.currentTerm &&
-                        -1 === this.indexOfTermInResults(this.currentTerm, data.results)) {
-                        data.results.unshift({
-                            id: this.currentTerm,
-                            label: this.currentTerm,
-                            isNew: true,
-                            owner: true
-                        });
-                    }
-                } else {
-                    if (this.firstPageData.isDummy) {
-                        // do not update list until choices will be loaded
-                        return;
-                    }
+                if (
+                    this.permissions.oro_tag_create &&
+                    this.isValidTerm(this.currentTerm) &&
+                    this.firstPageData.term === this.currentTerm &&
+                    -1 === this.indexOfTermInResults(this.currentTerm, data.results)
+                ) {
+                    data.results.unshift({
+                        id: this.currentTerm,
+                        label: this.currentTerm,
+                        isNew: true,
+                        owner: true
+                    });
+                } else if (this.firstPageData.isDummy) {
+                    // do not update list until choices will be loaded
+                    return;
                 }
-                data.results.sort(_.bind(this.tagSortCallback, this));
+                data.results.sort(this.tagSortCallback.bind(this));
             } else {
                 data = $.extend({}, this.currentData);
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);
@@ -245,8 +247,8 @@ define(function(require) {
         },
 
         indexOfTermInResults: function(term, results) {
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 if (result.label === term) {
                     return i;
                 }
@@ -256,8 +258,8 @@ define(function(require) {
 
         filterTermFromResults: function(term, results) {
             results = _.clone(results);
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 if (result.label === term) {
                     results.splice(i, 1);
                     break;
@@ -267,13 +269,13 @@ define(function(require) {
         },
 
         tagSortCallback: function(a, b) {
-            var firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
+            const firstCondition = this.getTermSimilarity(a.label) - this.getTermSimilarity(b.label);
             return firstCondition !== 0 ? firstCondition : a.label.length - b.label.length;
         },
 
         getTermSimilarity: function(term) {
-            var lowerCaseTerm = term.toLowerCase();
-            var index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
+            const lowerCaseTerm = term.toLowerCase();
+            const index = lowerCaseTerm.indexOf(this.currentTerm.toLowerCase());
             if (index === -1) {
                 return 1000;
             }
@@ -298,10 +300,10 @@ define(function(require) {
             if (!this.isSelect2Initialized) {
                 return false;
             }
-            var stringValue = _.toArray(this.getValue().sort().map(function(item) {
+            const stringValue = _.toArray(this.getValue().sort().map(function(item) {
                 return item.label;
             })).join('☕');
-            var stringModelValue = _.toArray(this.getModelValue().sort().map(function(item) {
+            const stringModelValue = _.toArray(this.getModelValue().sort().map(function(item) {
                 return item.name;
             })).join('☕');
             return stringValue !== stringModelValue;
@@ -312,7 +314,7 @@ define(function(require) {
         },
 
         getServerUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     name: item.label
@@ -322,7 +324,7 @@ define(function(require) {
         },
 
         getModelUpdateData: function() {
-            var data = {};
+            const data = {};
             data[this.fieldName] = this.getValue().map(function(item) {
                 return {
                     id: item.id,
@@ -331,6 +333,18 @@ define(function(require) {
                 };
             });
             return data;
+        },
+
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.cell) {
+                this.cell.$el.css('height', '');
+            }
+
+            TagsEditorView.__super__.dispose.call(this);
         }
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',

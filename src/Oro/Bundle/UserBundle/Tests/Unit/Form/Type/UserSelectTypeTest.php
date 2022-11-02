@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
@@ -7,23 +7,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UserSelectType
-     */
-    protected $type;
+    /** @var UserSelectType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new UserSelectType();
     }
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver $resolver */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));

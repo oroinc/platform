@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore'
-], function($, _) {
+define(function(require) {
     'use strict';
 
-    var dataFilterWrapper;
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    dataFilterWrapper = {
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
+
+    const dataFilterWrapper = {
         /**
          * @property {boolean}
          */
@@ -14,7 +14,7 @@ define([
 
         _getWrapperTemplate: function() {
             if (!this.wrapperTemplate) {
-                var wrapperTemplateSrc = '';
+                let wrapperTemplateSrc = '';
                 if (this.wrapperTemplateSelector) {
                     wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
                 }
@@ -27,30 +27,33 @@ define([
             this.setElement(this._getWrapperTemplate()({
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
-                criteriaHint: this._getCriteriaHint(),
-                canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue(),
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                criteriaHint: this._getCriteriaHint(),
+                criteriaClass: this.getCriteriaExtraClass(),
+                ...this.getTemplateDataProps()
             }));
 
             this._appendFilter($filter);
 
-            var events = ['click', 'show.bs.dropdown'].map(function(eventName) {
-                return eventName + this._eventNamespace();
-            }.bind(this)).join(' ');
+            const events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown', 'clearMenus']
+                .map(eventName => eventName + this._eventNamespace())
+                .join(' ');
 
-            $(document).on(events, _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
+            $(document).off(this._eventNamespace());
+            $(document).on(events, e => {
+                if (this.popupCriteriaShowed && this.autoClose !== false) {
                     this._onClickOutsideCriteria(e);
                 }
-            }, this));
+            });
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', _.bind(function(e) {
-                if (e.keyCode === 27) {
+            this.$el.on(`keydown${this._eventNamespace()}`, '.dropdown-menu.filter-criteria', e => {
+                if (e.keyCode === KEYBOARD_CODES.ESCAPE) {
                     this._hideCriteria();
+                    this.focusCriteriaToggler();
                 }
-            }, this));
+            });
         },
 
         /**

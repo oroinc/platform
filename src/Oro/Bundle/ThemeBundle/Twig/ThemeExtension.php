@@ -3,29 +3,23 @@
 namespace Oro\Bundle\ThemeBundle\Twig;
 
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class ThemeExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render back-office theme logo and icon:
+ *   - oro_theme_logo
+ *   - oro_theme_icon
+ */
+class ThemeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_theme';
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return ThemeRegistry
-     */
-    protected function getThemeRegistry()
-    {
-        return $this->container->get('oro_theme.registry');
     }
 
     /**
@@ -34,14 +28,12 @@ class ThemeExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_theme_logo', [$this, 'getThemeLogo']),
-            new \Twig_SimpleFunction('oro_theme_icon', [$this, 'getThemeIcon']),
+            new TwigFunction('oro_theme_logo', [$this, 'getThemeLogo']),
+            new TwigFunction('oro_theme_icon', [$this, 'getThemeIcon']),
         ];
     }
 
     /**
-     * Get theme logo
-     *
      * @return string
      */
     public function getThemeLogo()
@@ -51,12 +43,11 @@ class ThemeExtension extends \Twig_Extension
         if ($activeTheme) {
             $result = $activeTheme->getLogo();
         }
+
         return $result;
     }
 
     /**
-     * Get theme icon
-     *
      * @return string
      */
     public function getThemeIcon()
@@ -66,14 +57,22 @@ class ThemeExtension extends \Twig_Extension
         if ($activeTheme) {
             $result = $activeTheme->getIcon();
         }
+
         return $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            ThemeRegistry::class
+        ];
+    }
+
+    private function getThemeRegistry(): ThemeRegistry
+    {
+        return $this->container->get(ThemeRegistry::class);
     }
 }

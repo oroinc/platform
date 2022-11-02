@@ -2,29 +2,26 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\DefaultLabelListener;
+use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Namespace\\Entity';
+    private const ENTITY_CLASS = 'Namespace\Entity';
 
-    /**
-     * @var DefaultLabelListener
-     */
-    protected $listener;
+    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityConfigHelper;
+    /** @var DefaultLabelListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityConfigHelper = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\EventListener\\Metadata\\EntityConfigHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigHelper = $this->createMock(EntityConfigHelper::class);
 
         $this->listener = new DefaultLabelListener($this->entityConfigHelper);
     }
@@ -34,84 +31,73 @@ class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnCreateMetadata()
     {
-        $entityMetadata = $this->createEntityMetadata();
+        $entityMetadata = $this->createMock(EntityMetadata::class);
         $entityMetadata->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue(self::ENTITY_CLASS));
+            ->willReturn(self::ENTITY_CLASS);
 
         $entityMetadata->expects($this->once())
             ->method('has')
             ->with('label')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $entityConfig = $this->createEntityConfig();
-
-        $this->entityConfigHelper->expects($this->at(0))
-            ->method('getConfig')
-            ->with('entity', self::ENTITY_CLASS, null)
-            ->will($this->returnValue($entityConfig));
+        $entityConfig = $this->createMock(ConfigInterface::class);
 
         $expectedEntityPluralLabel = 'entity_plural_label';
         $entityConfig->expects($this->once())
             ->method('get')
             ->with('plural_label')
-            ->will($this->returnValue($expectedEntityPluralLabel));
+            ->willReturn($expectedEntityPluralLabel);
 
         $entityMetadata->expects($this->once())
             ->method('set')
             ->with('label', $expectedEntityPluralLabel);
 
-        $fooField = $this->createFieldMetadata();
-        $barField = $this->createFieldMetadata();
-        $bazField = $this->createFieldMetadata();
+        $fooField = $this->createMock(FieldMetadata::class);
+        $barField = $this->createMock(FieldMetadata::class);
+        $bazField = $this->createMock(FieldMetadata::class);
 
         $entityMetadata->expects($this->once())
             ->method('getFieldsMetadata')
-            ->will($this->returnValue(array($fooField, $barField, $bazField)));
+            ->willReturn([$fooField, $barField, $bazField]);
 
         // Field with label
         $fooField->expects($this->once())
             ->method('has')
             ->with('label')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         // Field not defined by source entity and collection
         $barField->expects($this->once())
             ->method('has')
             ->with('label')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $barExpectedSourceClassName = 'Bar\\Entity';
+        $barExpectedSourceClassName = 'Bar\Entity';
         $barField->expects($this->once())
             ->method('getSourceClassName')
-            ->will($this->returnValue($barExpectedSourceClassName));
+            ->willReturn($barExpectedSourceClassName);
 
         $barExpectedSourceFieldName = 'bar_source_field_name';
         $barField->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($barExpectedSourceFieldName));
+            ->willReturn($barExpectedSourceFieldName);
 
         $barField->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
         $barField->expects($this->once())
             ->method('isCollection')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $barFieldEntityConfig = $this->createEntityConfig();
-
-        $this->entityConfigHelper->expects($this->at(1))
-            ->method('getConfig')
-            ->with('entity', $barExpectedSourceClassName, null)
-            ->will($this->returnValue($barFieldEntityConfig));
+        $barFieldEntityConfig = $this->createMock(ConfigInterface::class);
 
         $barExpectedFieldLabel = 'bar_expected_field_label';
 
         $barFieldEntityConfig->expects($this->once())
             ->method('get')
             ->with('plural_label')
-            ->will($this->returnValue($barExpectedFieldLabel));
+            ->willReturn($barExpectedFieldLabel);
 
         $barField->expects($this->once())
             ->method('set')
@@ -121,74 +107,42 @@ class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
         $bazField->expects($this->once())
             ->method('has')
             ->with('label')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $bazExpectedSourceClassName = 'Baz\\Entity';
+        $bazExpectedSourceClassName = 'Baz\Entity';
         $bazField->expects($this->once())
             ->method('getSourceClassName')
-            ->will($this->returnValue($bazExpectedSourceClassName));
+            ->willReturn($bazExpectedSourceClassName);
 
         $bazExpectedSourceFieldName = 'baz_source_field_name';
         $bazField->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($bazExpectedSourceFieldName));
-
+            ->willReturn($bazExpectedSourceFieldName);
         $bazField->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $bazFieldEntityConfig = $this->createEntityConfig();
-
-        $this->entityConfigHelper->expects($this->at(2))
-            ->method('getConfig')
-            ->with('entity', $bazExpectedSourceClassName, $bazExpectedSourceFieldName)
-            ->will($this->returnValue($bazFieldEntityConfig));
+        $bazFieldEntityConfig = $this->createMock(ConfigInterface::class);
 
         $bazExpectedFieldLabel = 'bar_expected_field_label';
 
         $bazFieldEntityConfig->expects($this->once())
             ->method('get')
             ->with('label')
-            ->will($this->returnValue($bazExpectedFieldLabel));
+            ->willReturn($bazExpectedFieldLabel);
 
         $bazField->expects($this->once())
             ->method('set')
             ->with('label', $bazExpectedFieldLabel);
 
-        $this->listener->onCreateMetadata($this->createEntityMetadataEvent($entityMetadata));
-    }
+        $this->entityConfigHelper->expects($this->exactly(3))
+            ->method('getConfig')
+            ->willReturnMap([
+                ['entity', self::ENTITY_CLASS, null, $entityConfig],
+                ['entity', $barExpectedSourceClassName, null, $barFieldEntityConfig],
+                ['entity', $bazExpectedSourceClassName, $bazExpectedSourceFieldName, $bazFieldEntityConfig]
+            ]);
 
-    protected function createEntityConfig()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createEntityMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createEntityMetadataEvent(EntityMetadata $entityMetadata)
-    {
-        $result = $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Event\\EntityMetadataEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $result->expects($this->atLeastOnce())
-            ->method('getEntityMetadata')
-            ->will($this->returnValue($entityMetadata));
-
-        return $result;
+        $this->listener->onCreateMetadata(new EntityMetadataEvent($entityMetadata));
     }
 }

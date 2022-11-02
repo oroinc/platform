@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -46,15 +45,12 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
-
     /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -62,7 +58,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
-     * @JMS\Type("dateTime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -77,7 +72,7 @@ class EmailUser
      * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $organization;
 
@@ -86,7 +81,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $owner;
 
@@ -95,7 +89,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", inversedBy="emailUsers")
      * @ORM\JoinColumn(name="mailbox_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $mailboxOwner;
 
@@ -103,7 +96,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
-     * @JMS\Type("dateTime")
      */
     protected $receivedAt;
 
@@ -111,7 +103,6 @@ class EmailUser
      * @var bool
      *
      * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @JMS\Type("boolean")
      */
     protected $seen = false;
 
@@ -120,7 +111,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
-     * @JMS\Exclude
      */
     protected $origin;
 
@@ -136,7 +126,6 @@ class EmailUser
      *     joinColumns={@ORM\JoinColumn(name="email_user_id", referencedColumnName="id", onDelete="CASCADE")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")},
      * )
-     * @JMS\Exclude
      */
     protected $folders;
 
@@ -145,7 +134,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $email;
 
@@ -155,6 +143,13 @@ class EmailUser
      * @ORM\Column(type="integer", options={"default"=0})
      */
     protected $unsyncedFlagCount = 0;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_private", type="boolean", nullable=true)
+     */
+    private $isEmailPrivate = false;
 
     public function __construct()
     {
@@ -179,18 +174,6 @@ class EmailUser
         $this->folders->add($folder);
 
         return $this;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return $this
-     *
-     * @deprecated since 1.9. Use EmailUser::addFolder instead
-     */
-    public function setFolder(EmailFolder $folder)
-    {
-        return $this->addFolder($folder);
     }
 
     /**
@@ -511,5 +494,21 @@ class EmailUser
         }
 
         return $fromEmailAddress->getOwner();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailPrivate(): bool
+    {
+        return $this->isEmailPrivate ?: false;
+    }
+
+    /**
+     * @param bool $isEmailPrivate
+     */
+    public function setIsEmailPrivate(bool $isEmailPrivate): void
+    {
+        $this->isEmailPrivate = $isEmailPrivate;
     }
 }

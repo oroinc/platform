@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -13,18 +14,15 @@ use Symfony\Component\Form\FormView;
 class FormProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
+    private $formFactory;
 
-    /** @var OperationExecutionType */
-    protected $formType;
+    /** @var string */
+    private $formType;
 
     /** @var FormProvider */
-    protected $formProvider;
+    private $formProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = OperationExecutionType::class;
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
@@ -40,17 +38,17 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $formView = new FormView();
         $tokenView = new FormView();
 
-        $reflection = new \ReflectionProperty(FormView::class, 'children');
-        $reflection->setAccessible(true);
-        $reflection->setValue($formView, [FormProvider::CSRF_TOKEN_FIELD => $tokenView]);
+        ReflectionUtil::setPropertyValue($formView, 'children', [FormProvider::CSRF_TOKEN_FIELD => $tokenView]);
 
+        $operation->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_operation');
         $form->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
 
-        $options = ['csrf_token_id' => '_test_key'];
-        $this->formFactory
-            ->expects($this->once())
+        $options = ['csrf_token_id' => 'test_operation'];
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with($this->formType, $operation, $options)
             ->willReturn($form);
@@ -64,22 +62,17 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $actionData = new ActionData([ActionData::OPERATION_TOKEN => 'test_key']);
         $operation = $this->createMock(Operation::class);
         $form = $this->createMock(FormInterface::class);
-        $options = ['csrf_token_id' => '_test_key'];
-        $this->formFactory
-            ->expects($this->once())
+
+        $operation->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_operation');
+
+        $options = ['csrf_token_id' => 'test_operation'];
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with($this->formType, $operation, $options)
             ->willReturn($form);
 
         $this->formProvider->getOperationExecutionForm($operation, $actionData);
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->formProvider,
-            $this->formFactory,
-            $this->formType
-        );
     }
 }

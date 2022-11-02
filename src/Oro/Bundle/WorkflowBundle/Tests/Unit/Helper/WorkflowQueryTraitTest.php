@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
@@ -14,32 +14,31 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
 {
     use WorkflowQueryTrait;
 
-    const ENTITY_CLASS = 'SomeEntityClass';
+    private const ENTITY_CLASS = 'SomeEntityClass';
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryBuilder;
+    private $queryBuilder;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
+    private $entityManager;
 
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    protected $classMetadata;
+    private $classMetadata;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $this->classMetadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
     }
 
     // joinWorkflowItem call tested implicitly
     public function testJoinWorkflowStepOnDry()
     {
         //when no workflowItem alias comes
-        $this->queryBuilder->expects($this->at(0))->method('getAllAliases')->willReturn(['entityClass1']);
+        $this->queryBuilder->expects($this->once())
+            ->method('getAllAliases')
+            ->willReturn(['entityClass1']);
 
         $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
@@ -69,8 +68,8 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
                     WorkflowItem::class,
                     'itemAlias',
                     Join::WITH,
-                    sprintf('CAST(rootAlias.ident1 as string) = CAST(itemAlias.entityId as string)' .
-                        ' AND itemAlias.entityClass = \'entityClass1\'')
+                    'CAST(rootAlias.ident1 as string) = CAST(itemAlias.entityId as string)'
+                        . ' AND itemAlias.entityClass = \'entityClass1\''
                 ],
                 [
                     'itemAlias.currentStep',
@@ -88,9 +87,11 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
     public function testJoinWorkflowStepOnWet()
     {
         //when workflowItem was already joined to an alias provided
-        $this->queryBuilder->expects($this->at(0))->method('getAllAliases')->willReturn(['entityClass1', 'itemAlias']);
+        $this->queryBuilder->expects($this->once())
+            ->method('getAllAliases')
+            ->willReturn(['entityClass1', 'itemAlias']);
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('itemAlias.currentStep', 'stepAlias')->willReturn($this->queryBuilder);
 
@@ -140,56 +141,39 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider identifierFieldTypeDataProvider
-     * @param string $identifierFieldType
-     * @param string $identifierFieldName
-     * @param string $entityAlias
-     * @param string $itemAlias
-     * @param string $expectedCondition
      */
     public function testJoinWorkflowItem(
-        $identifierFieldType,
-        $identifierFieldName,
-        $entityAlias,
-        $itemAlias,
-        $expectedCondition
+        string $identifierFieldType,
+        string $identifierFieldName,
+        string $entityAlias,
+        string $itemAlias,
+        string $expectedCondition
     ) {
-        /** @var WorkflowQueryTrait $trait */
-        $trait = static::getMockForTrait(WorkflowQueryTrait::class);
+        $trait = $this->getMockForTrait(WorkflowQueryTrait::class);
 
-        $this->classMetadata
-            ->expects($this->any())
+        $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->willReturn([$identifierFieldName]);
-
-        $this->classMetadata
-            ->expects($this->any())
+        $this->classMetadata->expects($this->any())
             ->method('getTypeOfField')
             ->with($identifierFieldName)
             ->willReturn($identifierFieldType);
 
-        $this->entityManager
-            ->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->classMetadata);
 
-        $this->queryBuilder
-            ->expects($this->any())
+        $this->queryBuilder->expects($this->any())
             ->method('getRootEntities')
             ->willReturn([self::ENTITY_CLASS]);
-
-        $this->queryBuilder
-            ->expects($this->any())
+        $this->queryBuilder->expects($this->any())
             ->method('getRootAliases')
             ->willReturn([$entityAlias]);
-
-        $this->queryBuilder
-            ->expects($this->any())
+        $this->queryBuilder->expects($this->any())
             ->method('getEntityManager')
             ->willReturn($this->entityManager);
-
-        $this->queryBuilder
-            ->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with(
                 WorkflowItem::class,
@@ -201,14 +185,11 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
         $trait->joinWorkflowItem($this->queryBuilder, $itemAlias);
     }
 
-    /**
-     * @return array
-     */
-    public function identifierFieldTypeDataProvider()
+    public function identifierFieldTypeDataProvider(): array
     {
         return [
             [
-                'identifierFieldType' => Type::INTEGER,
+                'identifierFieldType' => Types::INTEGER,
                 'identifierFieldName' => 'idField',
                 'entityAlias' => 't',
                 'itemAlias' => 'workflowAlias',
@@ -218,7 +199,7 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
                 )
             ],
             [
-                'identifierFieldType' => Type::STRING,
+                'identifierFieldType' => Types::STRING,
                 'identifierFieldName' => 'idField',
                 'entityAlias' => 'rootAlias',
                 'itemAlias' => 'workflowAlias',

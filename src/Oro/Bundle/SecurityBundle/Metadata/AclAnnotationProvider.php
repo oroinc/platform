@@ -2,188 +2,148 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface;
+use Oro\Component\Config\Cache\PhpConfigProvider;
+use Oro\Component\Config\ResourcesContainerInterface;
 
-class AclAnnotationProvider
+/**
+ * The provider for ACL annotations configuration
+ * that are loaded from "Resources/config/oro/acls.yml" files and PHP classes of controllers.
+ */
+class AclAnnotationProvider extends PhpConfigProvider
 {
-    const CACHE_KEY = 'data';
-
-    /** @var AclAnnotationLoaderInterface[] */
-    protected $loaders = [];
+    /** @var iterable|AclAnnotationLoaderInterface[] */
+    private $loaders;
 
     /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
-    /** @var CacheProvider|null */
-    protected $cache;
-
-    /** @var AclAnnotationStorage */
-    protected $storage;
+    private $entityClassResolver;
 
     /**
-     * @param EntityClassResolver $entityClassResolver
-     * @param CacheProvider|null  $cache
+     * @param string                                  $cacheFile
+     * @param bool                                    $debug
+     * @param EntityClassResolver                     $entityClassResolver
+     * @param iterable|AclAnnotationLoaderInterface[] $loaders
      */
-    public function __construct(EntityClassResolver $entityClassResolver, CacheProvider $cache = null)
-    {
+    public function __construct(
+        string $cacheFile,
+        bool $debug,
+        EntityClassResolver $entityClassResolver,
+        iterable $loaders
+    ) {
+        parent::__construct($cacheFile, $debug);
         $this->entityClassResolver = $entityClassResolver;
-        $this->cache = $cache;
+        $this->loaders = $loaders;
     }
 
     /**
-     * Add new loader
+     * Gets an annotation by its ID.
      *
-     * @param AclAnnotationLoaderInterface $loader
+     * @param string $id
+     *
+     * @return AclAnnotation|null AclAnnotation object or NULL if ACL annotation was not found
      */
-    public function addLoader(AclAnnotationLoaderInterface $loader)
+    public function findAnnotationById(string $id): ?AclAnnotation
     {
-        $this->loaders[] = $loader;
+        return $this->getStorage()->findById($id);
     }
 
     /**
-     * Gets an annotation by its id
+     * Gets ACL annotation is bound to the given class/method.
      *
-     * @param  string             $id
-     * @return AclAnnotation|null AclAnnotation object or null if ACL annotation was not found
+     * @param string      $class
+     * @param string|null $method
+     *
+     * @return AclAnnotation|null AclAnnotation object or NULL if ACL annotation was not found
      */
-    public function findAnnotationById($id)
+    public function findAnnotation(string $class, string $method = null): ?AclAnnotation
     {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->findById($id);
+        return $this->getStorage()->find($class, $method);
     }
 
     /**
-     * Gets ACL annotation is bound to the given class/method
-     *
-     * @param  string             $class
-     * @param  string|null        $method
-     * @return AclAnnotation|null AclAnnotation object or null if ACL annotation was not found
+     * Determines whether the given class/method has ACL annotation.
      */
-    public function findAnnotation($class, $method = null)
+    public function hasAnnotation(string $class, string $method = null): bool
     {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->find($class, $method);
+        return $this->getStorage()->has($class, $method);
     }
 
     /**
-     * Determines whether the given class/method has an annotation
+     * Gets ACL annotations.
      *
-     * @param  string      $class
-     * @param  string|null $method
-     * @return bool
-     */
-    public function hasAnnotation($class, $method = null)
-    {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->has($class, $method);
-    }
-
-    /**
-     * Gets annotations
+     * @param string|null $type The annotation type
      *
-     * @param  string|null     $type The annotation type
      * @return AclAnnotation[]
      */
-    public function getAnnotations($type = null)
+    public function getAnnotations(string $type = null): array
     {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->getAnnotations($type);
+        return $this->getStorage()->getAnnotations($type);
     }
 
     /**
-     * Checks whether the given class or at least one of its method is protected by ACL security policy
+     * Checks whether the given class or at least one of its method is protected by ACL security policy.
      *
-     * @param  string $class
-     * @return bool   true if the class is protected; otherwise, false
-     */
-    public function isProtectedClass($class)
-    {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->isKnownClass($class);
-    }
-
-    /**
-     * Checks whether the given method of the given class is protected by ACL security policy
+     * @param string $class
      *
-     * @param  string $class
-     * @param  string $method
-     * @return bool   true if the method is protected; otherwise, false
+     * @return bool TRUE if the class is protected by ACL; otherwise, FALSE
      */
-    public function isProtectedMethod($class, $method)
+    public function isProtectedClass(string $class): bool
     {
-        $this->ensureAnnotationsLoaded();
-
-        return $this->storage->isKnownMethod($class, $method);
+        return $this->getStorage()->isKnownClass($class);
     }
 
     /**
-     * Warms up the cache
+     * Checks whether the given method of the given class is protected by ACL security policy.
+     *
+     * @param string $class
+     * @param string $method
+     *
+     * @return bool TRUE if the method is protected by ACL; otherwise, FALSE
      */
-    public function warmUpCache()
+    public function isProtectedMethod(string $class, string $method): bool
     {
-        $this->loadAnnotations();
+        return $this->getStorage()->isKnownMethod($class, $method);
     }
 
     /**
-     * Clears the cache
+     * {@inheritdoc}
      */
-    public function clearCache()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        if ($this->cache) {
-            $this->cache->delete(self::CACHE_KEY);
-        }
-        $this->storage = null;
-    }
-
-    /**
-     * Makes sure that annotations loaded and cached
-     */
-    protected function ensureAnnotationsLoaded()
-    {
-        if ($this->storage === null) {
-            $data = null;
-            if ($this->cache) {
-                $data = $this->cache->fetch(self::CACHE_KEY);
-            }
-            if ($data) {
-                $this->storage = $data;
-            } else {
-                $this->loadAnnotations();
-            }
-        }
-    }
-
-    /**
-     * Loads annotations and save them in cache
-     */
-    protected function loadAnnotations()
-    {
-        $data = new AclAnnotationStorage();
+        $storage = new AclAnnotationStorage();
         foreach ($this->loaders as $loader) {
-            $loader->load($data);
+            $loader->load($storage, $resourcesContainer);
         }
 
-        // this small hack increases performance of Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
-        $annotations = $data->getAnnotations();
+        /**
+         * resolve entity names here to increase performance of AclExtensionSelector
+         * @see \Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
+         */
+        $annotations = $storage->getAnnotations();
         foreach ($annotations as $annotation) {
             if (EntityAclExtension::NAME === $annotation->getType()) {
                 $annotation->setClass($this->entityClassResolver->getEntityClass($annotation->getClass()));
             }
         }
 
-        if ($this->cache) {
-            $this->cache->save(self::CACHE_KEY, $data);
-        }
+        return $storage;
+    }
 
-        $this->storage = $data;
+    /**
+     * {@inheritdoc}
+     */
+    protected function assertLoaderConfig($config): void
+    {
+        if (!$config instanceof AclAnnotationStorage) {
+            throw new \LogicException(\sprintf('Expected instance of %s.', AclAnnotationStorage::class));
+        }
+    }
+
+    private function getStorage(): AclAnnotationStorage
+    {
+        return $this->doGetConfig();
     }
 }

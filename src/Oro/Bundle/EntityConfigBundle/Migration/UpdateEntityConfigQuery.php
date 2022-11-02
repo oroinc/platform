@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Update option value for a given meta relation field from one entity to another with a given relation type.
+ */
 class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
@@ -84,7 +87,7 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
     {
         $row = $this->fetchEntityConfigRow($logger);
 
-        $data = isset($row['data']) ? $this->connection->convertToPHPValue($row['data'], Type::TARRAY) : [];
+        $data = isset($row['data']) ? $this->connection->convertToPHPValue($row['data'], Types::ARRAY) : [];
 
         $fullRelationName = $this->getFullRelationName();
 
@@ -105,7 +108,7 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
 
         $data['extend']['relation'][$fullRelationName][$this->key] = $this->value;
 
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+        $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
         $this->updateEntityConfig($row['id'], $data, $logger, $dryRun);
     }

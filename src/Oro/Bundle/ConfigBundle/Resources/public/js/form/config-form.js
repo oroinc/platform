@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ConfigForm;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var Modal = require('oroui/js/modal');
-    var DefaultFieldValueView = require('oroform/js/app/views/default-field-value-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const Modal = require('oroui/js/modal');
+    const DefaultFieldValueView = require('oroform/js/app/views/default-field-value-view');
 
-    ConfigForm = DefaultFieldValueView.extend({
+    const ConfigForm = DefaultFieldValueView.extend({
 
         /**
          * @param {Object} Where key is input name and value is changed value
@@ -24,14 +23,15 @@ define(function(require) {
 
         events: {
             'click :input[type=reset]': 'resetHandler',
-            'submit': 'submitHandler'
+            'submit': 'submitHandler',
+            'change .parent-scope-checkbox :input[type=checkbox]': 'onDefaultCheckboxStateChange'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ConfigForm() {
-            ConfigForm.__super__.constructor.apply(this, arguments);
+        constructor: function ConfigForm(options) {
+            ConfigForm.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,7 +44,7 @@ define(function(require) {
                 this.$el.on(
                     'change',
                     'input[data-needs-page-reload]',
-                    _.bind(this._onNeedsReloadChange, this)
+                    this._onNeedsReloadChange.bind(this)
                 );
             }
             window.view = this;
@@ -57,12 +57,12 @@ define(function(require) {
 
             this.$el.off('change', 'input[data-needs-page-reload]');
 
-            ConfigForm.__super__.dispose.apply(this, arguments);
+            ConfigForm.__super__.dispose.call(this);
         },
 
         _onNeedsReloadChange: function(e) {
-            var $input = $(e.target);
-            var name = $input.attr('name');
+            const $input = $(e.target);
+            const name = $input.attr('name');
 
             if (this.changedValues.hasOwnProperty(name)) {
                 delete this.changedValues[name];
@@ -73,14 +73,30 @@ define(function(require) {
             this.options.pageReload = !_.isEmpty(this.changedValues);
         },
 
+        removeValidationErrors: function($field) {
+            const $container = $field.closest('.controls');
+            $container
+                .removeClass('validation-error')
+                .find('.error')
+                .removeClass('error');
+            $container.find('.validation-failed').remove();
+        },
+
+        onDefaultCheckboxStateChange: function(e) {
+            const $checkbox = $(e.target);
+            if ($checkbox.is(':checked')) {
+                this.removeValidationErrors($checkbox);
+            }
+        },
+
         /**
          * Resets form and default value checkboxes.
          *
          * @param event
          */
         resetHandler: function(event) {
-            var $checkboxes = this.$el.find('.parent-scope-checkbox input');
-            var confirm = new Modal({
+            const $checkboxes = this.$el.find('.parent-scope-checkbox input');
+            const confirm = new Modal({
                 title: __('Confirmation'),
                 okText: __('OK'),
                 cancelText: __('Cancel'),
@@ -88,13 +104,14 @@ define(function(require) {
                 className: 'modal modal-primary'
             });
 
-            confirm.on('ok', _.bind(function() {
+            const self = this;
+            confirm.on('ok', () => {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
                     $(elem).inputWidget('val', null, true);
                 });
                 this.$el.find('.removeRow').each(function() {
-                    var $row = $(this).closest('*[data-content]');
+                    const $row = $(this).closest('*[data-content]');
                     // non-persisted options have a simple number for data-content
                     if (_.isNumber($row.data('content'))) {
                         $row.trigger('content:remove').remove();
@@ -105,7 +122,12 @@ define(function(require) {
                     .attr('checked', true);
 
                 this.$el.find(':input').change();
-            }, this));
+
+                this.$el.find(':input').each(function() {
+                    const $field = $(this);
+                    self.removeValidationErrors($field);
+                });
+            });
 
             confirm.open();
 
@@ -119,7 +141,7 @@ define(function(require) {
          * receive within response. Only new form contains validation result information.
          */
         submitHandler: function() {
-            if (this.options.pageReload) {
+            if (this.options.pageReload && mediator.execute('isPageStateChanged')) {
                 mediator.off('config-form:init', this.onInitAfterSubmit)
                     .once('config-form:init', this.onInitAfterSubmit);
             }

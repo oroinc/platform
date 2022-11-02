@@ -2,297 +2,281 @@
 
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class FileExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to work with files, images and attachments.
+ */
+class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_THUMB_SIZE = 16;
+    private const DEFAULT_THUMB_SIZE = 16;
+    private const FILES_TEMPLATE = '@OroAttachment/Twig/file.html.twig';
+    private const IMAGES_TEMPLATE = '@OroAttachment/Twig/image.html.twig';
 
-    const FILES_TEMPLATE  = 'OroAttachmentBundle:Twig:file.html.twig';
-    const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
+    private ContainerInterface $container;
+    private ?AttachmentManager $attachmentManager = null;
+    private ?PictureSourcesProviderInterface $pictureSourcesProvider = null;
+    private ?ConfigManager $configManager = null;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
-     * @return AttachmentManager
-     */
-    protected function getAttachmentManager()
-    {
-        return $this->container->get('oro_attachment.manager');
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->container->get('oro_entity_config.config_manager');
-    }
-
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getDoctrine()
-    {
-        return $this->container->get('doctrine');
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new \Twig_SimpleFunction('file_url', [$this, 'getFileUrl']),
-            new \Twig_SimpleFunction('file_size', [$this, 'getFileSize']),
-            new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
-            new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
-            new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
-            new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
-            new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
-            new \Twig_SimpleFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
-            new \Twig_SimpleFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('file_url', [$this, 'getFileUrl']),
+            new TwigFunction('file_size', [$this, 'getFileSize']),
+            new TwigFunction('resized_image_url', [$this, 'getResizedImageUrl']),
+            new TwigFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
+            new TwigFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
+            new TwigFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
+            new TwigFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
+            new TwigFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
+            new TwigFunction(
                 'oro_file_view',
                 [$this, 'getFileView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_image_view',
                 [$this, 'getImageView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
-            )
+            ),
+            new TwigFunction(
+                'oro_resized_picture_sources',
+                [$this, 'getResizedPictureSources']
+            ),
+            new TwigFunction(
+                'oro_filtered_picture_sources',
+                [$this, 'getFilteredPictureSources']
+            ),
+            new TwigFunction('oro_file_title', [$this, 'getFileTitle']),
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_attachment_file';
-    }
-
-    /**
-     * Get file url
-     *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $attachment
-     * @param string $type
-     * @param bool   $absolute
-     *
-     * @return string
-     */
     public function getFileUrl(
-        $parentEntity,
-        $fieldName,
-        File $attachment,
-        $type = 'get',
-        $absolute = false
-    ) {
-        return $this->getAttachmentManager()->getFileUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
+        File $file,
+        string $action = FileUrlProviderInterface::FILE_ACTION_GET,
+        bool $absolute = false
+    ): string {
+        $referenceType = $absolute === false
+            ? UrlGeneratorInterface::ABSOLUTE_URL
+            : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+        return $this->getAttachmentManager()->getFileUrl($file, $action, $referenceType);
     }
 
-    /**
-     * Get human readable file size
-     *
-     * @param integer $bytes
-     *
-     * @return string
-     */
-    public function getFileSize($bytes)
-    {
-        return $this->getAttachmentManager()->getFileSize($bytes);
-    }
-
-    /**
-     * Get resized attachment image url
-     *
-     * @param File $attachment
-     * @param int  $width
-     * @param int  $height
-     *
-     * @return string
-     */
     public function getResizedImageUrl(
-        File $attachment,
-        $width = self::DEFAULT_THUMB_SIZE,
-        $height = self::DEFAULT_THUMB_SIZE
-    ) {
-        return $this->getAttachmentManager()->getResizedImageUrl($attachment, $width, $height);
+        File $file,
+        int $width = self::DEFAULT_THUMB_SIZE,
+        int $height = self::DEFAULT_THUMB_SIZE,
+        string $format = ''
+    ): string {
+        return $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height, $format);
+    }
+
+    public function getFilteredImageUrl(File $file, string $filterName, string $format = ''): string
+    {
+        return $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName, $format);
+    }
+
+    /**
+     * Get human-readable file size
+     */
+    public function getFileSize(int|string|null $bytes): string
+    {
+        return BytesFormatter::format((int)$bytes);
     }
 
     /**
      * Get attachment icon class
-     *
-     * @param FileExtensionInterface $attachment
-     *
-     * @return string
      */
-    public function getAttachmentIcon(FileExtensionInterface $attachment)
+    public function getAttachmentIcon(FileExtensionInterface $attachment): string
     {
         return $this->getAttachmentManager()->getAttachmentIconClass($attachment);
     }
 
     /**
      * Get file view html block
-     *
-     * @param \Twig_Environment $environment
-     * @param mixed             $parentEntity
-     * @param string            $fieldName
-     * @param File              $attachment
-     * @param array             $additional
-     *
-     * @return string
      */
-    public function getFileView(
-        \Twig_Environment $environment,
-        $parentEntity,
-        $fieldName,
-        $attachment = null,
-        $additional = null
-    ) {
-        /**
-         * @todo: should be refactored in BAP-5637
-         */
-        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
-            $attachment = $this->getFileById($attachment);
-        }
-        if ($attachment && $attachment->getFilename()) {
-            $attachmentManager = $this->getAttachmentManager();
-            $url = null;
-            if (is_object($parentEntity)) {
-                $url = $attachmentManager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true);
-            }
-
-            return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
-                [
-                    'iconClass'  => $attachmentManager->getAttachmentIconClass($attachment),
-                    'url'        => $url,
-                    'fileName'   => $attachment->getOriginalFilename(),
-                    'additional' => $additional
-                ]
-            );
+    public function getFileView(Environment $environment, File|int|null $file, ?array $additional = null): string
+    {
+        $file = $this->getFile($file);
+        if (!$file || !$file->getFilename()) {
+            return '';
         }
 
-        return '';
+        $url = $this->getAttachmentManager()->getFileUrl(
+            $file,
+            FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $pictureSources = [];
+        if ($this->getAttachmentManager()->isImageType($file->getMimeType())) {
+            $pictureSources = $this->getFilteredPictureSources($file);
+        }
+
+        return $environment->render(
+            self::FILES_TEMPLATE,
+            [
+                'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
+                'url' => $url,
+                'pictureSources' => $pictureSources,
+                'fileName' => $file->getOriginalFilename(),
+                'additional' => $additional,
+                'title' => $this->getFileTitle($file),
+            ]
+        );
     }
 
     /**
      * Get Image html block
-     *
-     * @param \Twig_Environment $environment
-     * @param object            $parentEntity
-     * @param mixed             $attachment
-     * @param string|object     $entityClass
-     * @param string            $fieldName
-     *
-     * @return string
      */
-    public function getImageView(
-        \Twig_Environment $environment,
-        $parentEntity,
-        $attachment = null,
-        $entityClass = null,
-        $fieldName = ''
-    ) {
-        /**
-         * @todo: should be refactored in BAP-5637
-         */
-        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
-            $attachment = $this->getFileById($attachment);
+    public function getImageView(Environment $environment, File|int|null $file): string
+    {
+        $file = $this->getFile($file);
+        if (!$file || !$file->getFilename()) {
+            return '';
         }
 
-        if ($attachment && $attachment->getFilename()) {
-            $width  = self::DEFAULT_THUMB_SIZE;
-            $height = self::DEFAULT_THUMB_SIZE;
+        $width = self::DEFAULT_THUMB_SIZE;
+        $height = self::DEFAULT_THUMB_SIZE;
+        $entityClass = $file->getParentEntityClass();
+        $fieldName = $file->getParentEntityFieldName();
 
-            if ($entityClass && $fieldName) {
-                if (is_object($entityClass)) {
-                    $entityClass = ClassUtils::getRealClass($entityClass);
-                }
-                $config = $this->getConfigManager()
-                    ->getProvider('attachment')
-                    ->getConfig($entityClass, $fieldName);
-                $width  = $config->get('width');
-                $height = $config->get('height');
-            }
+        if ($entityClass && $fieldName) {
+            $config = $this->getConfigManager()->getFieldConfig('attachment', $entityClass, $fieldName);
+            $width = (int) $config->get('width') ?: self::DEFAULT_THUMB_SIZE;
+            $height = (int) $config->get('height') ?: self::DEFAULT_THUMB_SIZE;
+        }
 
-            $attachmentManager = $this->getAttachmentManager();
+        return $environment->render(
+            self::IMAGES_TEMPLATE,
+            [
+                'file' => $file,
+                'width' => $width,
+                'height' => $height,
+                'fileName' => $file->getOriginalFilename(),
+            ]
+        );
+    }
 
-            return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
-                [
-                    'imagePath' => $attachmentManager->getResizedImageUrl($attachment, $width, $height),
-                    'url'       => $attachmentManager
-                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName'  => $attachment->getOriginalFilename()
-                ]
+    /**
+     * Returns sources array that can be used in <picture> tag.
+     * Adds WebP image variants is current oro_attachment.webp_strategy is "if_supported".
+     *
+     * @param File|int|null $file
+     * @param int $width
+     * @param int $height
+     * @param array $attrs Extra attributes to add to <source> tags
+     *
+     * @return array
+     *  [
+     *      [
+     *          'srcset' => '/url/for/image.png',
+     *          'type' => 'image/png',
+     *      ],
+     *      // ...
+     *  ]
+     */
+    public function getResizedPictureSources(
+        File|int|null $file,
+        int $width = self::DEFAULT_THUMB_SIZE,
+        int $height = self::DEFAULT_THUMB_SIZE,
+        array $attrs = []
+    ): array {
+        $file = $this->getFile($file);
+        $sources = [];
+        if ($file instanceof File) {
+            $pictureSources = $this->getPictureSourcesProvider()->getResizedPictureSources($file, $width, $height);
+            $sources = $this->mergeSources($pictureSources, $file, $attrs);
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Returns sources array that can be used in <picture> tag.
+     * Adds WebP image variants is current oro_attachment.webp_strategy is "if_supported".
+     *
+     * @param File|int|null $file
+     * @param string $filterName
+     * @param array $attrs Extra attributes to add to <source> tags
+     *
+     * @return array
+     *  [
+     *      [
+     *          'srcset' => '/url/for/image.png',
+     *          'type' => 'image/png',
+     *      ],
+     *      // ...
+     *  ]
+     */
+    public function getFilteredPictureSources(
+        File|int|null $file,
+        string $filterName = 'original',
+        array $attrs = []
+    ): array {
+        $file = $this->getFile($file);
+        $pictureSources = [];
+
+        if ($file) {
+            $pictureSources = $this->getPictureSourcesProvider()->getFilteredPictureSources($file, $filterName);
+
+            $pictureSources['sources'] = array_map(
+                static fn (array $source) => array_merge($source, $attrs),
+                $pictureSources['sources'] ?? []
             );
         }
 
-        return '';
+        return $pictureSources;
     }
 
-    /**
-     * Get attachment image resized with config values
-     *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $attachment
-     *
-     * @return string
-     */
-    public function getConfiguredImageUrl($parentEntity, $fieldName, File $attachment = null)
+    private function mergeSources(array $pictureSources, File $file, array $attrs): array
     {
-        if (!$attachment) {
-            $attachment = PropertyAccess::createPropertyAccessor()->getValue($parentEntity, $fieldName);
+        $sources = $pictureSources['sources'] ?? [];
+        if (!empty($pictureSources['src'])) {
+            $sources = array_merge(
+                $pictureSources['sources'],
+                [['srcset' => $pictureSources['src'], 'type' => $file->getMimeType()]]
+            );
         }
 
-        if ($attachment && $attachment->getFilename()) {
-            $entityClass = ClassUtils::getRealClass($parentEntity);
-            $config = $this->getConfigManager()->getProvider('attachment')->getConfig($entityClass, $fieldName);
-
-            return $this->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'));
+        if ($attrs) {
+            $sources = array_map(static fn (array $source) => array_merge($source, $attrs), $sources);
         }
 
-        return '';
-    }
-
-    /**
-     * @param File   $attachment
-     * @param string $filterName
-     *
-     * @return string
-     */
-    public function getFilteredImageUrl(File $attachment, $filterName)
-    {
-        return $this->getAttachmentManager()->getFilteredImageUrl($attachment, $filterName);
+        return $sources;
     }
 
     /**
      * Checks if file type is an image
-     *
-     * @param  string $type
-     * @return bool
      */
-    public function getTypeIsImage($type)
+    public function getTypeIsImage(string $type): bool
     {
         return $this->getAttachmentManager()->isImageType($type);
     }
@@ -300,32 +284,86 @@ class FileExtension extends \Twig_Extension
     /**
      * Check if we can show preview for file type
      * Currently only images preview is supported
-     *
-     * @param  string $type
-     * @return bool
      */
-    public function isPreviewAvailable($type)
+    public function isPreviewAvailable(string $type): bool
     {
         return $this->getTypeIsImage($type);
     }
 
     /**
      * Get config array of file icons
-     *
-     * @return array
      */
-    public function getFileIconsConfig()
+    public function getFileIconsConfig(): array
     {
         return $this->getAttachmentManager()->getFileIcons();
     }
 
     /**
-     * @param int $id
-     *
-     * @return File
+     * Provides file title which can be used, e.g. in title or alt HTML attributes.
      */
-    protected function getFileById($id)
+    public function getFileTitle(?File $file, Localization $localization = null): string
     {
-        return $this->getDoctrine()->getRepository('OroAttachmentBundle:File')->find($id);
+        if (!$file) {
+            return '';
+        }
+
+        return $this->container->get(FileTitleProviderInterface::class)->getTitle($file, $localization);
+    }
+
+    private function getFile(File|int|null $file): ?File
+    {
+        if (filter_var($file, FILTER_VALIDATE_INT)) {
+            return $this->getDoctrine()->getRepository(File::class)->find($file);
+        }
+
+        return $file;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            AttachmentManager::class,
+            PictureSourcesProvider::class,
+            ConfigManager::class,
+            ManagerRegistry::class,
+            PropertyAccessorInterface::class,
+            FileTitleProviderInterface::class,
+            CacheManager::class,
+        ];
+    }
+
+    private function getAttachmentManager(): AttachmentManager
+    {
+        if (null === $this->attachmentManager) {
+            $this->attachmentManager = $this->container->get(AttachmentManager::class);
+        }
+
+        return $this->attachmentManager;
+    }
+
+    private function getPictureSourcesProvider(): PictureSourcesProviderInterface
+    {
+        if (null === $this->pictureSourcesProvider) {
+            $this->pictureSourcesProvider = $this->container->get(PictureSourcesProvider::class);
+        }
+
+        return $this->pictureSourcesProvider;
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        if (null === $this->configManager) {
+            $this->configManager = $this->container->get(ConfigManager::class);
+        }
+
+        return $this->configManager;
+    }
+
+    private function getDoctrine(): ManagerRegistry
+    {
+        return $this->container->get(ManagerRegistry::class);
     }
 }

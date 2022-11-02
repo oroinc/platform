@@ -1,11 +1,10 @@
 define([
     'underscore',
     'oroui/js/tools',
-    './filters-manager'
-], function(_, tools, FiltersManager) {
+    'orofilter/js/filters-manager',
+    'oroui/js/mediator'
+], function(_, tools, FiltersManager, mediator) {
     'use strict';
-
-    var CollectionFiltersManager;
 
     /**
      * View that represents all grid filters
@@ -14,12 +13,12 @@ define([
      * @class   orofilter.CollectionFiltersManager
      * @extends orofilter.FiltersManager
      */
-    CollectionFiltersManager = FiltersManager.extend({
+    const CollectionFiltersManager = FiltersManager.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CollectionFiltersManager() {
-            CollectionFiltersManager.__super__.constructor.apply(this, arguments);
+        constructor: function CollectionFiltersManager(options) {
+            CollectionFiltersManager.__super__.constructor.call(this, options);
         },
 
         /**
@@ -41,11 +40,11 @@ define([
 
             this.isVisible = true;
 
-            CollectionFiltersManager.__super__.initialize.apply(this, arguments);
+            CollectionFiltersManager.__super__.initialize.call(this, options);
         },
 
         render: function() {
-            CollectionFiltersManager.__super__.render.apply(this, arguments);
+            CollectionFiltersManager.__super__.render.call(this);
             this._onUpdateCollectionState(this.collection);
             this._onCollectionReset(this.collection);
             return this;
@@ -63,7 +62,7 @@ define([
             }
             this._updateView();
 
-            CollectionFiltersManager.__super__._onFilterUpdated.apply(this, arguments);
+            CollectionFiltersManager.__super__._onFilterUpdated.call(this, filter);
         },
 
         /**
@@ -92,8 +91,8 @@ define([
          *
          * @protected
          */
-        _onChangeFilterSelect: function() {
-            CollectionFiltersManager.__super__._onChangeFilterSelect.apply(this, arguments);
+        _onChangeFilterSelect: function(filters) {
+            CollectionFiltersManager.__super__._onChangeFilterSelect.call(this, filters);
             this._updateView();
         },
 
@@ -103,6 +102,7 @@ define([
          * @protected
          */
         _updateView: function() {
+            this.trigger('update-view:before-fetch');
             this.collection.state.currentPage = 1;
             this.collection.fetch({reset: true});
         },
@@ -113,16 +113,16 @@ define([
          * @protected
          */
         _onCollectionReset: function(collection) {
-            var hasRecords = collection.length > 0;
-            var hasFiltersState = !_.isEmpty(collection.state.filters);
+            const hasRecords = collection.length > 0;
+            const hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 if (!this.isVisible) {
-                    this.$el.show();
+                    this.show();
                     this.isVisible = true;
                 }
             } else {
                 if (this.isVisible) {
-                    this.$el.hide();
+                    this.hide();
                     this.isVisible = false;
                 }
             }
@@ -135,18 +135,18 @@ define([
          * @protected
          */
         _createState: function() {
-            var state = {};
+            const state = {};
             _.each(this.filters, function(filter, name) {
-                var shortName = '__' + name;
+                const shortName = '__' + name;
                 if (_.has(this.collection.initialState.filters, name) && !filter.isEmptyValue()) {
                     state[name] = filter.getValue();
-                } else if (filter.enabled) {
+                } else if (filter.renderable) {
                     if (!filter.isEmptyValue()) {
                         state[name] = filter.getValue();
-                    } else if (!filter.defaultEnabled) {
+                    } else if (!filter.renderableByDefault) {
                         state[shortName] = '1';
                     }
-                } else if (filter.defaultEnabled) {
+                } else if (filter.renderableByDefault) {
                     state[shortName] = '0';
                 }
             }, this);
@@ -162,21 +162,20 @@ define([
          * @return {*}
          */
         _applyState: function(state) {
-            var toEnable = [];
-            var toDisable = [];
-            var valuesToApply = {};
+            const toEnable = [];
+            const toDisable = [];
+            const valuesToApply = {};
 
             _.each(this.filters, function(filter, name) {
-                var shortName = '__' + name;
-                var filterState;
+                const shortName = '__' + name;
+                let filterState;
 
                 // Reset to initial state,
-                // todo: should be removed after complete story about filter states
-                if (filter.defaultEnabled === false && filter.enabled === true) {
+                if (filter.renderableByDefault === false && filter.renderable === true) {
                     this.disableFilter(filter);
                 }
 
-                if (filter.defaultEnabled === true && filter.enabled === false) {
+                if (filter.renderableByDefault === true && filter.renderable === false) {
                     this.enableFilter(filter);
                 }
 
@@ -207,6 +206,9 @@ define([
             _.each(valuesToApply, function(filterState, name) {
                 this.filters[name].setValue(filterState);
             }, this);
+
+            mediator.trigger('filters-manager:after-applying-state', this);
+            this.checkFiltersVisibility();
 
             return this;
         }

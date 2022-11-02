@@ -15,10 +15,6 @@ class UpdateExtendIndicesPostUpMigrationListener
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper
@@ -29,8 +25,6 @@ class UpdateExtendIndicesPostUpMigrationListener
 
     /**
      * POST UP event handler
-     *
-     * @param PostMigrationEvent $event
      */
     public function onPostUp(PostMigrationEvent $event)
     {

@@ -12,30 +12,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Handles update action of controller used to create or update entity on separate page or widget dialog.
+ */
 class UpdateHandlerFacade
 {
-    /** @var UpdateFactory */
-    private $updateFactory;
+    private UpdateFactory $updateFactory;
+    private RequestStack $requestStack;
+    protected Session $session;
+    private Router $router;
+    protected DoctrineHelper $doctrineHelper;
 
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var Session */
-    private $session;
-
-    /** @var Router */
-    private $router;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     * @param UpdateFactory $updateFactory
-     */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
@@ -56,7 +43,7 @@ class UpdateHandlerFacade
      *
      * @param string|object $data Data of form or FQCN
      * @param string|FormInterface $form Form instance or form_type name
-     * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
+     * @param string|null $saveMessage Message added to session flash bag in case if form will be saved successfully
      *      and if form is not submitted from widget.
      * @param Request|null $request optional Request instance otherwise will be used current request from RequestStack
      * @param FormHandlerInterface|string|callable|null $formHandler to handle form (string is an alias for registered)
@@ -79,13 +66,13 @@ class UpdateHandlerFacade
      *          if form was successfully submitted from create/update page
      */
     public function update(
-        $data,
-        $form,
-        $saveMessage,
+        string|object $data,
+        string|FormInterface $form,
+        ?string $saveMessage,
         Request $request = null,
-        $formHandler = null,
-        $resultProvider = null
-    ) {
+        FormHandlerInterface|string|callable|null $formHandler = null,
+        FormTemplateDataProviderInterface|string|callable|null $resultProvider = null
+    ): array|RedirectResponse {
         $update = $this->updateFactory->createUpdate($data, $form, $formHandler, $resultProvider);
 
         $request = $request ?: $this->getCurrentRequest();
@@ -97,19 +84,17 @@ class UpdateHandlerFacade
         return $this->getResult($update, $request);
     }
 
-    /**
-     * @param UpdateInterface $update
-     * @param Request $request
-     * @param string $saveMessage
-     *
-     * @return array|RedirectResponse
-     */
-    protected function constructResponse(UpdateInterface $update, Request $request, $saveMessage)
-    {
+    protected function constructResponse(
+        UpdateInterface $update,
+        Request $request,
+        ?string $saveMessage
+    ): array|RedirectResponse {
         $entity = $update->getFormData();
         if ($request->get('_wid')) {
             $result = $this->getResult($update, $request);
-            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            if ($this->doctrineHelper->isManageableEntity($entity)) {
+                $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
 
             return $result;
         } else {
@@ -119,13 +104,7 @@ class UpdateHandlerFacade
         }
     }
 
-    /**
-     * @param UpdateInterface $update
-     * @param Request $request
-     *
-     * @return array
-     */
-    protected function getResult(UpdateInterface $update, Request $request)
+    protected function getResult(UpdateInterface $update, Request $request): array
     {
         $result = $update->getTemplateData($request);
 
@@ -137,10 +116,7 @@ class UpdateHandlerFacade
         return $result;
     }
 
-    /**
-     * @return Request
-     */
-    protected function getCurrentRequest()
+    protected function getCurrentRequest(): Request
     {
         return $this->requestStack->getCurrentRequest();
     }

@@ -4,20 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType;
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LocalizationSelectType
-     */
-    protected $type;
+    /** @var LocalizationSelectType */
+    private $type;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new LocalizationSelectType();
     }

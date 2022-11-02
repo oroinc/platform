@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SyncBundle\Authentication\Provider;
 
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
-use Guzzle\Http\Message\RequestInterface;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
@@ -25,10 +26,6 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
      */
     private $providerKey;
 
-    /**
-     * @param AuthenticationProviderInterface $ticketAuthenticationProvider
-     * @param string $providerKey
-     */
     public function __construct(
         AuthenticationProviderInterface $ticketAuthenticationProvider,
         string $providerKey
@@ -42,7 +39,7 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
      *
      * @throws BadCredentialsException
      */
-    public function authenticate(ConnectionInterface $connection)
+    public function authenticate(ConnectionInterface $connection): TokenInterface
     {
         $ticket = $this->getTicketFromConnection($connection);
         $token = $this->createTokenFromTicket($ticket);
@@ -56,37 +53,32 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
     }
 
     /**
-     * @param ConnectionInterface $connection
-     *
-     * @return string
-     *
      * @throws BadCredentialsException
      */
     private function getTicketFromConnection(ConnectionInterface $connection): string
     {
-        if (!isset($connection->WebSocket->request)) {
+        if (!isset($connection->httpRequest)) {
             throw new \InvalidArgumentException('WebSocket request was not found in the connection object');
         }
 
         /** @var RequestInterface $request */
-        $request = $connection->WebSocket->request;
+        $request = $connection->httpRequest;
 
         // Try to find the ticket in requested URL.
-        $requestUrl = $request->getUrl(true);
-        $ticket = base64_decode((string)$requestUrl->getQuery()->get('ticket'));
+        $requestUri = $request->getUri();
+        parse_str($requestUri->getQuery(), $query);
 
-        if ($ticket === false || \substr_count($ticket, ';') < 3) {
+        if (isset($query['ticket'])) {
+            $ticket = base64_decode((string)$query['ticket']);
+        }
+
+        if (empty($ticket) || \substr_count($ticket, ';') < 3) {
             throw new BadCredentialsException('Authentication ticket has invalid format');
         }
 
         return $ticket;
     }
 
-    /**
-     * @param string $ticket
-     *
-     * @return Token
-     */
     private function createTokenFromTicket(string $ticket): Token
     {
         [$ticketId, $username, $nonce, $created] = explode(';', $ticket);

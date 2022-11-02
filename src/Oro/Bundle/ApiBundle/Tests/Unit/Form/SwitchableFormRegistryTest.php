@@ -6,20 +6,43 @@ use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
 use Oro\Bundle\ApiBundle\Form\FormExtensionState;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormExtensionInterface;
-use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected only one form extension.
-     */
+    private function expectSwitchFormExtension(
+        array &$switchCalls,
+        SwitchableDependencyInjectionExtension|\PHPUnit\Framework\MockObject\MockObject $extension,
+        FormExtensionState|\PHPUnit\Framework\MockObject\MockObject $formExtensionState
+    ): void {
+        $switchCalls = [];
+        $extension->expects(self::exactly(2))
+            ->method('switchFormExtension')
+            ->willReturnCallback(function ($extensionName) use (&$switchCalls) {
+                $switchCalls[] = 'extension::switchFormExtension - ' . $extensionName;
+            });
+        $formExtensionState->expects(self::once())
+            ->method('switchToApiFormExtension')
+            ->willReturnCallback(function () use (&$switchCalls) {
+                $switchCalls[] = 'formExtensionState::switchToApiFormExtension';
+            });
+        $formExtensionState->expects(self::once())
+            ->method('switchToDefaultFormExtension')
+            ->willReturnCallback(function () use (&$switchCalls) {
+                $switchCalls[] = 'formExtensionState::switchToDefaultFormExtension';
+            });
+    }
+
     public function testConstructorWithSeveralFormExtensions()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected only one form extension.');
+
         $extensions = [
             $this->createMock(FormExtensionInterface::class),
             $this->createMock(FormExtensionInterface::class)
@@ -32,14 +55,14 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected type of form extension is "Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension"
-     */
-    // @codingStandardsIgnoreEnd
     public function testConstructorWithUnexpectedFormExtensions()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Expected type of form extension is "%s"',
+            SwitchableDependencyInjectionExtension::class
+        ));
+
         $extensions = [
             $this->createMock(FormExtensionInterface::class)
         ];
@@ -61,10 +84,10 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             $this->createMock(FormExtensionState::class)
         );
 
-        $this->setPrivatePropertyValue($formRegistry, 'types', null);
-        $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
-        self::assertAttributeEquals(null, 'types', $formRegistry);
-        self::assertAttributeEquals(null, 'guesser', $formRegistry);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
     }
 
     public function testSwitchToDefaultFormExtensionWhenThisExtensionIsAlreadyActive()
@@ -101,30 +124,32 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             $formExtensionState
         );
 
-        $extension->expects(self::at(0))
-            ->method('switchFormExtension')
-            ->with(SwitchableFormRegistry::API_EXTENSION);
-        $formExtensionState->expects(self::at(0))
-            ->method('switchToApiFormExtension');
-        $extension->expects(self::at(1))
-            ->method('switchFormExtension')
-            ->with(SwitchableFormRegistry::DEFAULT_EXTENSION);
-        $formExtensionState->expects(self::at(1))
-            ->method('switchToDefaultFormExtension');
+        $switchCalls = [];
+        $this->expectSwitchFormExtension($switchCalls, $extension, $formExtensionState);
 
         // should switch to api form extension
-        $this->setPrivatePropertyValue($formRegistry, 'types', null);
-        $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
-        self::assertAttributeEquals([], 'types', $formRegistry);
-        self::assertAttributeEquals(false, 'guesser', $formRegistry);
+        self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // should switch to default form extension
-        $this->setPrivatePropertyValue($formRegistry, 'types', null);
-        $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToDefaultFormExtension();
-        self::assertAttributeEquals([], 'types', $formRegistry);
-        self::assertAttributeEquals(false, 'guesser', $formRegistry);
+        self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
+
+        self::assertEquals(
+            [
+                'extension::switchFormExtension - ' . SwitchableFormRegistry::API_EXTENSION,
+                'formExtensionState::switchToApiFormExtension',
+                'extension::switchFormExtension - ' . SwitchableFormRegistry::DEFAULT_EXTENSION,
+                'formExtensionState::switchToDefaultFormExtension'
+            ],
+            $switchCalls
+        );
     }
 
     public function testSeveralSwitchToApiAndThenToDefaultFormExtension()
@@ -138,40 +163,42 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             $formExtensionState
         );
 
-        $extension->expects(self::at(0))
-            ->method('switchFormExtension')
-            ->with(SwitchableFormRegistry::API_EXTENSION);
-        $formExtensionState->expects(self::at(0))
-            ->method('switchToApiFormExtension');
-        $extension->expects(self::at(1))
-            ->method('switchFormExtension')
-            ->with(SwitchableFormRegistry::DEFAULT_EXTENSION);
-        $formExtensionState->expects(self::at(1))
-            ->method('switchToDefaultFormExtension');
+        $switchCalls = [];
+        $this->expectSwitchFormExtension($switchCalls, $extension, $formExtensionState);
 
         // the first "ToApi" switch should switch to api form extension
-        $this->setPrivatePropertyValue($formRegistry, 'types', null);
-        $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
-        self::assertAttributeEquals([], 'types', $formRegistry);
-        self::assertAttributeEquals(false, 'guesser', $formRegistry);
+        self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the second "ToApi" switch should do nothing
-        $this->setPrivatePropertyValue($formRegistry, 'types', null);
-        $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
-        self::assertAttributeEquals(null, 'types', $formRegistry);
-        self::assertAttributeEquals(null, 'guesser', $formRegistry);
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the first "ToDefault" switch should do nothing
         $formRegistry->switchToDefaultFormExtension();
-        self::assertAttributeEquals(null, 'types', $formRegistry);
-        self::assertAttributeEquals(null, 'guesser', $formRegistry);
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the second "ToDefault" switch should switch to default form extension
         $formRegistry->switchToDefaultFormExtension();
-        self::assertAttributeEquals([], 'types', $formRegistry);
-        self::assertAttributeEquals(false, 'guesser', $formRegistry);
+        self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
+
+        self::assertEquals(
+            [
+                'extension::switchFormExtension - ' . SwitchableFormRegistry::API_EXTENSION,
+                'formExtensionState::switchToApiFormExtension',
+                'extension::switchFormExtension - ' . SwitchableFormRegistry::DEFAULT_EXTENSION,
+                'formExtensionState::switchToDefaultFormExtension'
+            ],
+            $switchCalls
+        );
     }
 
     public function testGetTypeShouldReturnKnownApiFormType()
@@ -207,14 +234,13 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in Data API.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeShouldThrowExceptionForNotKnownApiFormType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in API.'
+        );
+
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $resolvedTypeFactory = $this->createMock(ResolvedFormTypeFactoryInterface::class);
         $formRegistry = new SwitchableFormRegistry([$extension], $resolvedTypeFactory, new FormExtensionState());
@@ -263,21 +289,5 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             $resolvedType,
             $formRegistry->getType(BooleanType::class)
         );
-    }
-
-    /**
-     * @param SwitchableFormRegistry $formRegistry
-     * @param string                 $propertyName
-     * @param mixed                  $value
-     */
-    protected function setPrivatePropertyValue(SwitchableFormRegistry $formRegistry, $propertyName, $value)
-    {
-        $r = new \ReflectionClass(FormRegistry::class);
-        if (!$r->hasProperty($propertyName)) {
-            throw new \RuntimeException(sprintf('The "%s" property does not exist.', $propertyName));
-        }
-        $p = $r->getProperty($propertyName);
-        $p->setAccessible(true);
-        $p->setValue($formRegistry, $value);
     }
 }

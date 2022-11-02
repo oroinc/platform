@@ -14,9 +14,6 @@ class LoginListener
     /** @var SyncCredentialsIssueManager */
     private $syncCredentialsManager;
 
-    /**
-     * @param SyncCredentialsIssueManager $syncCredentialsManager
-     */
     public function __construct(SyncCredentialsIssueManager $syncCredentialsManager)
     {
         $this->syncCredentialsManager = $syncCredentialsManager;
@@ -24,8 +21,6 @@ class LoginListener
 
     /**
      * Run processing the invalid email origins that was failed during sync for the logged user.
-     *
-     * @param InteractiveLoginEvent $event
      */
     public function onLogin(InteractiveLoginEvent $event)
     {

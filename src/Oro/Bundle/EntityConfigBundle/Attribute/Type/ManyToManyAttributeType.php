@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
+use InvalidArgumentException;
+use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
+use RuntimeException;
 
+/**
+ * Provides metadata about many-to-many association attribute type.
+ */
 class ManyToManyAttributeType implements AttributeTypeInterface
 {
     use AttributeLocalizableTrait;
@@ -18,10 +23,6 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EntityNameResolver $entityNameResolver, DoctrineHelper $doctrineHelper)
     {
         $this->entityNameResolver = $entityNameResolver;
@@ -31,15 +32,7 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'manyToMany';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -47,7 +40,7 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -55,7 +48,7 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return $this->isAttributeLocalizable($attribute);
     }
@@ -96,15 +89,15 @@ class ManyToManyAttributeType implements AttributeTypeInterface
             return (string)$this->getLocalizedFallbackValue($originalValue, $localization);
         }
 
-        throw new \RuntimeException('Not supported');
+        throw new RuntimeException('Not supported');
     }
 
     /**
      * @param string $originalValue
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function ensureTraversable($originalValue)
     {
-        $this->guardForArrayOrTraversable($originalValue, 'Value', \InvalidArgumentException::class);
+        $this->guardForArrayOrTraversable($originalValue, 'Value', InvalidArgumentException::class);
     }
 }

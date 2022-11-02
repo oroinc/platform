@@ -1,0 +1,26 @@
+services:
+    oro_activity.api.activity_association_provider:
+        class: Oro\Bundle\ActivityBundle\Api\ActivityAssociationProvider
+        arguments:
+            - !abstract '$activityAssociationNames defined in Oro\Bundle\ActivityBundle\DependencyInjection\OroActivityExtension'
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+            - '@oro_activity.manager'
+            - '@oro_api.resources_provider'
+
+    oro_activity.api.get_config.add_activity_associations:
+        class: Oro\Bundle\ActivityBundle\Api\Processor\AddActivityAssociations
+        arguments:
+            - '@oro_activity.api.activity_association_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', priority: -10 }
+
+    oro_activity.api.get_config.add_activity_association_descriptions:
+        class: Oro\Bundle\ActivityBundle\Api\Processor\AddActivityAssociationDescriptions
+        arguments:
+            - '@oro_activity.api.activity_association_provider'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+            - '@oro_api.entity_name_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }

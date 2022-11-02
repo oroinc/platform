@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +22,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->firstProvider = $this->createMock(EntityOverrideProviderInterface::class);
@@ -30,12 +30,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $entityOverrideProviders
-     *
-     * @return EntityOverrideProviderRegistry
-     */
-    private function getRegistry(array $entityOverrideProviders)
+    private function getRegistry(array $entityOverrideProviders): EntityOverrideProviderRegistry
     {
         return new EntityOverrideProviderRegistry(
             $entityOverrideProviders,
@@ -44,12 +39,11 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an entity override provider for the request "rest,another".
-     */
     public function testGetEntityOverrideProviderForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an entity override provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getEntityOverrideProvider($requestType);

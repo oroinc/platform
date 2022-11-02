@@ -1,4 +1,4 @@
-title: "Sticky Note"
+title: oro.sidebar.sticky_note_widget.title
 iconClass: "fa-sticky-note-o"
 dialogIcon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon-sticky.png"
 module: "orosidebar/widget/sticky-note"

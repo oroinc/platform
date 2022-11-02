@@ -1,34 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var NumberFilter;
-
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var ChoiceFilter = require('./choice-filter');
-    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const NumberFormatter = require('orofilter/js/formatter/number-formatter');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Number filter: formats value as a number
      */
-    NumberFilter = ChoiceFilter.extend({
+    const NumberFilter = ChoiceFilter.extend({
         /**
          * @property {Boolean}
          */
         wrapHintValue: false,
 
         /**
-         * @property {Number}
+         * @inheritdoc
          */
-        precision: null,
-
-        /**
-         * @inheritDoc
-         */
-        constructor: function NumberFilter() {
-            NumberFilter.__super__.constructor.apply(this, arguments);
+        constructor: function NumberFilter(options) {
+            NumberFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -43,16 +36,17 @@ define(function(require) {
                 formatterOptions: {},
                 arraySeparator: ',',
                 arrayOperators: [],
-                dataType: 'data_integer'
+                dataType: 'data_integer',
+                limitDecimals: false
             });
 
             this._filterArrayChoices();
             this.formatter = new NumberFormatter(this.formatterOptions);
-            NumberFilter.__super__.initialize.apply(this, arguments);
+            NumberFilter.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -65,17 +59,17 @@ define(function(require) {
         _filterArrayChoices: function() {
             this.choices = _.filter(
                 this.choices,
-                _.bind(function(item) {
+                item => {
                     return this.dataType === 'data_integer' || !this._isArrayType(item.data);
-                }, this)
+                }
             );
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue: function(value) {
-            var formatted = _.clone(value);
+            const formatted = _.clone(value);
 
             formatted.value = this._toRawValue(value.value);
 
@@ -83,10 +77,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatDisplayValue: function(value) {
-            var formatted = _.clone(value);
+            const formatted = _.clone(value);
 
             formatted.value = this._toDisplayValue(value.value);
 
@@ -121,15 +115,10 @@ define(function(require) {
             if (value) {
                 if (this._isArrayTypeSelected()) {
                     return this._formatArray(value);
-                } else if (_.isString(value)) {
-                    value = parseFloat(value);
                 }
             }
 
-            if (_.isNumber(value)) {
-                value = this.formatter.fromRaw(value);
-            }
-            return value;
+            return this.formatter.fromRaw(value);
         },
 
         /**
@@ -141,7 +130,7 @@ define(function(require) {
                 _.map(
                     value.toString().split(this.arraySeparator),
                     function(number) {
-                        return parseInt(number);
+                        return parseFloat(number);
                     }
                 ),
                 function(number) {
@@ -165,27 +154,27 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(data) {
             this._initInputWidget();
 
-            return NumberFilter.__super__._writeDOMValue.apply(this, arguments);
+            return NumberFilter.__super__._writeDOMValue.call(this, data);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {boolean}
          * @private
          */
         _isValid: function() {
-            var rawValue = this.formatter.toRaw(this._readDOMValue().value);
-            var validValue = rawValue === void 0 || this._checkNumberRules(rawValue);
+            const rawValue = this.formatter.toRaw(this._readDOMValue().value);
+            const validValue = rawValue === void 0 || this._checkNumberRules(rawValue);
 
             if (!validValue) {
                 return false;
             } else {
-                return NumberFilter.__super__._isValid.apply(this, arguments);
+                return NumberFilter.__super__._isValid.call(this);
             }
         },
 
@@ -200,15 +189,10 @@ define(function(require) {
                 return true;
             }
 
-            var result = true;
+            let result = true;
 
-            if (!_.isNumber(value) || _.isNaN(value)) {
+            if (_.isNaN(value)) {
                 this._showNumberWarning();
-                result = false;
-            }
-
-            if (this.formatter.percent && value > 100) {
-                this._showMaxPercentWarning();
                 result = false;
             }
 
@@ -226,23 +210,13 @@ define(function(require) {
             );
         },
 
-        /**
-         * @private
-         */
-        _showMaxPercentWarning: function() {
-            mediator.execute(
-                'showFlashMessage',
-                'warning',
-                __('This value should be {{ limit }} or less.', {limit: 100})
-            );
-        },
-
         _initInputWidget: function() {
-            if (this.precision) {
-                _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
-                    $(field).attr('data-precision', this.precision);
-                }, this);
-            }
+            _.each(this.$el.find('input[type="number"]'), function(field) {
+                if (this.formatter.decimals) {
+                    $(field).attr('data-precision', this.formatter.decimals);
+                }
+                $(field).attr('data-limit-decimals', this.limitDecimals);
+            }, this);
 
             this.$el.inputWidget('seekAndCreate');
         }

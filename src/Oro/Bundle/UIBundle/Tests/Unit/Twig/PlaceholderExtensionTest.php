@@ -8,37 +8,34 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Twig\Environment;
 
 class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const PLACEHOLDER_NAME = 'placeholder_name';
-    const INVALID_PLACEHOLDER_NAME = 'invalid_placeholder_name';
-    const TEMPLATE_NAME = 'FooBarBundle:Test:test.html.twig';
-    const ACTION_NAME = 'FooBarBundle:Test:test';
-    const DELIMITER = '<br/>';
+    private const PLACEHOLDER_NAME = 'placeholder_name';
+    private const INVALID_PLACEHOLDER_NAME = 'invalid_placeholder_name';
+    private const TEMPLATE_NAME = '@FooBar/Test/test.html.twig';
+    private const ACTION_NAME = 'Foo\Bundle\BarBundle\Controller\TestController::testAction';
+    private const DELIMITER = '<br/>';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $placeholderProvider;
+    /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $placeholderProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $kernelExtension;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fragmentHandler;
+    private $fragmentHandler;
 
     /** @var PlaceholderExtension */
-    protected $extension;
+    private $extension;
 
-    /** @var array */
-    protected $placeholders = [
+    private array $placeholders = [
         self::PLACEHOLDER_NAME => [
             'items' => [
                 ['template' => self::TEMPLATE_NAME],
@@ -52,21 +49,16 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
-        $this->placeholderProvider = $this->getMockBuilder(PlaceholderProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->environment = $this->createMock(Environment::class);
+        $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->fragmentHandler = $this->createMock(FragmentHandler::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.placeholder.provider', $this->placeholderProvider)
-            ->add('request_stack', $this->requestStack)
+            ->add(RequestStack::class, $this->requestStack)
             ->add('fragment.handler', $this->fragmentHandler)
             ->getContainer($this);
 
@@ -90,16 +82,16 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->placeholderProvider->expects($this->once())
             ->method('getPlaceholderItems')
             ->with(self::PLACEHOLDER_NAME, $variables)
-            ->will($this->returnValue($this->placeholders[self::PLACEHOLDER_NAME]['items']));
+            ->willReturn($this->placeholders[self::PLACEHOLDER_NAME]['items']);
 
         $this->environment->expects($this->once())
             ->method('render')
             ->with(self::TEMPLATE_NAME, $variables)
-            ->will($this->returnValue($expectedTemplateRender));
+            ->willReturn($expectedTemplateRender);
 
         $this->fragmentHandler->expects($this->once())
             ->method('render')
-            ->will($this->returnValue($expectedActionRender));
+            ->willReturn($expectedActionRender);
 
         $result = self::callTwigFunction(
             $this->extension,
@@ -115,18 +107,17 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot render placeholder item with keys "bar", "bar". Expects "template" or "action" key.
-     */
-    //@codingStandardsIgnoreEnd
     public function testRenderPlaceholderFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot render placeholder item with keys "bar", "bar". Expects "template" or "action" key.'
+        );
+
         $this->placeholderProvider->expects($this->once())
             ->method('getPlaceholderItems')
             ->with(self::INVALID_PLACEHOLDER_NAME, [])
-            ->will($this->returnValue($this->placeholders[self::INVALID_PLACEHOLDER_NAME]['items']));
+            ->willReturn($this->placeholders[self::INVALID_PLACEHOLDER_NAME]['items']);
 
         self::callTwigFunction(
             $this->extension,
@@ -138,10 +129,5 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
                 ['delimiter' => self::DELIMITER]
             ]
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(PlaceholderExtension::EXTENSION_NAME, $this->extension->getName());
     }
 }

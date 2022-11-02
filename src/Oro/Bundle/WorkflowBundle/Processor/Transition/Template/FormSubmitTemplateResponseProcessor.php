@@ -6,35 +6,40 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\View\ViewHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializerInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
+/**
+ * Creates a response that contains transition completion data (success or failure).
+ */
 class FormSubmitTemplateResponseProcessor implements ProcessorInterface
 {
-    const WIDGET_TEMPLATE_TRANSITION_COMPLETE = 'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig';
+    private const WIDGET_TEMPLATE_TRANSITION_COMPLETE = '@OroWorkflow/Widget/widget/transitionComplete.html.twig';
 
-    /** @var ViewHandlerInterface */
-    private $viewHandler;
+    private WorkflowItemSerializerInterface $workflowItemSerializer;
+    private ViewHandlerInterface $viewHandler;
+    private Environment $twig;
 
-    /** @var \Twig_Environment */
-    private $twig;
-
-    /**
-     * @param ViewHandlerInterface $viewHandler
-     * @param \Twig_Environment $twig
-     */
-    public function __construct(ViewHandlerInterface $viewHandler, \Twig_Environment $twig)
-    {
+    public function __construct(
+        WorkflowItemSerializerInterface $workflowItemSerializer,
+        ViewHandlerInterface $viewHandler,
+        Environment $twig
+    ) {
+        $this->workflowItemSerializer = $workflowItemSerializer;
         $this->viewHandler = $viewHandler;
         $this->twig = $twig;
     }
 
     /**
-     * @param ContextInterface|TransitionContext $context
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context)
     {
+        /** @var TransitionContext $context */
+
         if (!$context->getResultType() instanceof TemplateResultType) {
             return;
         }
@@ -43,12 +48,7 @@ class FormSubmitTemplateResponseProcessor implements ProcessorInterface
         $context->setProcessed(true);
     }
 
-    /**
-     * @param TransitionContext $context
-     *
-     * @return Response
-     */
-    private function createCompleteResponse(TransitionContext $context)
+    private function createCompleteResponse(TransitionContext $context): Response
     {
         $responseCode = $context->get('responseCode');
         $responseMessage = $context->get('responseMessage');
@@ -56,12 +56,13 @@ class FormSubmitTemplateResponseProcessor implements ProcessorInterface
         $transitResponseContent = null;
         if (!$responseCode) {
             $view = View::create([
-                'workflowItem' => $context->getWorkflowItem(),
+                'workflowItem' => $this->workflowItemSerializer->serialize($context->getWorkflowItem())
             ]);
             $view->setFormat('json');
+            $view->getContext()->setSerializeNull(true);
             $transitResponse = $this->viewHandler->handle($view);
             $responseCode = $transitResponse->getStatusCode();
-            $transitResponseContent = json_decode($transitResponse->getContent());
+            $transitResponseContent = json_decode($transitResponse->getContent(), false, 512, JSON_THROW_ON_ERROR);
         }
 
         $content = $this->twig->render(

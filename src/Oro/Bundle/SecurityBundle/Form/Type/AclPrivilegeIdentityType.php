@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
-use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;

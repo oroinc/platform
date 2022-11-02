@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class BeforeGroupingChainWidgetEvent extends Event
 {
@@ -35,9 +35,6 @@ class BeforeGroupingChainWidgetEvent extends Event
         return $this->widgets;
     }
 
-    /**
-     * @param array $widgets
-     */
     public function setWidgets(array $widgets)
     {
         $this->widgets = $widgets;

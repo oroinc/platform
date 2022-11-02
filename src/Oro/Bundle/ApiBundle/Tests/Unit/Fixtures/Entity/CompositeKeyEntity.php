@@ -30,7 +30,7 @@ class CompositeKeyEntity
     /**
      * @ORM\ManyToMany(targetEntity="CompositeKeyEntity")
      * @ORM\JoinTable(name="composite_key_entity_children")
-     **/
+     */
     protected $children;
 
     public function __construct()
@@ -78,9 +78,6 @@ class CompositeKeyEntity
         return $this->children;
     }
 
-    /**
-     * @param CompositeKeyEntity $child
-     */
     public function addChild(CompositeKeyEntity $child)
     {
         if (!$this->children->contains($child)) {
@@ -88,9 +85,6 @@ class CompositeKeyEntity
         }
     }
 
-    /**
-     * @param CompositeKeyEntity $child
-     */
     public function removeChild(CompositeKeyEntity $child)
     {
         if ($this->children->contains($child)) {

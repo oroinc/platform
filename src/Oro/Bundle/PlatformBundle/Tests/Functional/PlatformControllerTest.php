@@ -6,10 +6,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class PlatformControllerTest extends WebTestCase
 {
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
         $this->initClient(
-            array(),
+            [],
             $this->generateBasicAuthHeader()
         );
         $this->client->useHashNavigation(true);
@@ -22,8 +25,9 @@ class PlatformControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $content = $result->getContent();
-        $this->assertContains('Oro Packages', $content);
-        $this->assertContains('3rd Party Packages', $content);
-        $this->assertContains('symfony/symfony', $content);
+        self::assertStringContainsString('Deployment Type', $content);
+        self::assertStringContainsString('Oro Packages', $content);
+        self::assertStringContainsString('3rd Party Packages', $content);
+        self::assertStringContainsString('doctrine/dbal', $content);
     }
 }

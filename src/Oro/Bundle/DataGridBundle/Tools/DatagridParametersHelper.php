@@ -3,12 +3,15 @@
 namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 
 /**
  * Contains useful methods common for services that work with datagrid parameters.
  */
 class DatagridParametersHelper
 {
+    public const DATAGRID_SKIP_EXTENSION_PARAM = 'dataGridSkipExtensionParam';
+
     /**
      * @param ParameterBag $datagridParameters
      * @param string $parameterName
@@ -41,5 +44,48 @@ class DatagridParametersHelper
         }
 
         return $parameter ?? null;
+    }
+
+    public function resetFilter(ParameterBag $dataGridParameters, string $filterName): void
+    {
+        $filters = $dataGridParameters->get(AbstractFilterExtension::FILTER_ROOT_PARAM);
+        if ($filters) {
+            unset($filters[$filterName]);
+            $dataGridParameters->set(AbstractFilterExtension::FILTER_ROOT_PARAM, $filters);
+        }
+
+        $minifiedFilters = $dataGridParameters->get(ParameterBag::MINIFIED_PARAMETERS);
+        if ($minifiedFilters) {
+            unset($minifiedFilters[AbstractFilterExtension::MINIFIED_FILTER_PARAM][$filterName]);
+            $dataGridParameters->set(ParameterBag::MINIFIED_PARAMETERS, $minifiedFilters);
+        }
+    }
+
+    public function resetFilters(ParameterBag $dataGridParameters): void
+    {
+        $filters = $dataGridParameters->get(AbstractFilterExtension::FILTER_ROOT_PARAM);
+        if ($filters) {
+            $dataGridParameters->set(AbstractFilterExtension::FILTER_ROOT_PARAM, []);
+        }
+
+        $minifiedFilters = $dataGridParameters->get(ParameterBag::MINIFIED_PARAMETERS);
+        if ($minifiedFilters) {
+            $minifiedFilters[AbstractFilterExtension::MINIFIED_FILTER_PARAM] = [];
+            $dataGridParameters->set(ParameterBag::MINIFIED_PARAMETERS, $minifiedFilters);
+        }
+    }
+
+    /**
+     * @param ParameterBag $parameterBag
+     * @param boolean $value
+     */
+    public function setDatagridExtensionSkipped(ParameterBag $parameterBag, bool $value = true): void
+    {
+        $parameterBag->set(self::DATAGRID_SKIP_EXTENSION_PARAM, $value);
+    }
+
+    public function isDatagridExtensionSkipped(ParameterBag $parameterBag): bool
+    {
+        return $parameterBag->get(self::DATAGRID_SKIP_EXTENSION_PARAM, false);
     }
 }

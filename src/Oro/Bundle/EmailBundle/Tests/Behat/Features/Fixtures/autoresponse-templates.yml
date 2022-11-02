@@ -1,0 +1,20 @@
+Oro\Bundle\EmailBundle\Entity\EmailTemplate:
+  email_entity_template:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 0
+    name: 'email_entity_template'
+    entity_name: 'Oro\\Bundle\\EmailBundle\\Entity\\Email'
+    type: 'html'
+    subject: 'RE: {{ entity.subject }}'
+    content: '\<h1\>Email related Content\</h1\>\<br/\>You wrote: {{ entity.emailBody }}'
+
+  auto_response_non_entity_related_template:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 0
+    name: 'auto_response_non_entity_related_template'
+    entity_name: ~
+    type: 'txt'
+    subject: 'Autoresponse non-entity Subject'
+    content: 'Autoresponse non-entity Content'

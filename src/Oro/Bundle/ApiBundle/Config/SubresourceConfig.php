@@ -5,25 +5,19 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents the configuration of Data API sub-resource.
+ * Represents the configuration of API sub-resource.
  */
-class SubresourceConfig implements ConfigBagInterface
+class SubresourceConfig
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
-
+    private ?bool $exclude = null;
+    private array $items = [];
     /** @var ActionConfig[] [action name => ActionConfig, ...] */
-    protected $actions = [];
+    private array $actions = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (null !== $this->exclude) {
@@ -39,10 +33,8 @@ class SubresourceConfig implements ConfigBagInterface
 
     /**
      * Indicates whether the sub-resource does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclude
@@ -64,36 +56,23 @@ class SubresourceConfig implements ConfigBagInterface
      *
      * @return ActionConfig[] [action name => ActionConfig, ...]
      */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
 
     /**
      * Gets the configuration of the action.
-     *
-     * @param string $actionName
-     *
-     * @return ActionConfig|null
      */
-    public function getAction($actionName)
+    public function getAction(string $actionName): ?ActionConfig
     {
-        if (!isset($this->actions[$actionName])) {
-            return null;
-        }
-
-        return $this->actions[$actionName];
+        return $this->actions[$actionName] ?? null;
     }
 
     /**
      * Adds the configuration of the action.
-     *
-     * @param string            $actionName
-     * @param ActionConfig|null $action
-     *
-     * @return ActionConfig
      */
-    public function addAction($actionName, ActionConfig $action = null)
+    public function addAction(string $actionName, ActionConfig $action = null): ActionConfig
     {
         if (null === $action) {
             $action = new ActionConfig();
@@ -106,26 +85,24 @@ class SubresourceConfig implements ConfigBagInterface
 
     /**
      * Removes the configuration of the action.
-     *
-     * @param string $actionName
      */
-    public function removeAction($actionName)
+    public function removeAction(string $actionName): void
     {
         unset($this->actions[$actionName]);
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -135,9 +112,9 @@ class SubresourceConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -147,43 +124,37 @@ class SubresourceConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded()
+    public function hasExcluded(): bool
     {
         return null !== $this->exclude;
     }
 
     /**
      * Indicates whether the exclusion flag.
-     *
-     * @return bool
      */
-    public function isExcluded()
+    public function isExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
-
-        return $this->exclude;
+        return $this->exclude ?? false;
     }
 
     /**
@@ -191,27 +162,23 @@ class SubresourceConfig implements ConfigBagInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
 
     /**
      * Gets the class name of a target entity.
-     *
-     * @return string|null
      */
-    public function getTargetClass()
+    public function getTargetClass(): ?string
     {
         return $this->get(ConfigUtil::TARGET_CLASS);
     }
 
     /**
      * Sets the class name of a target entity.
-     *
-     * @param string|null $className
      */
-    public function setTargetClass($className)
+    public function setTargetClass(?string $className): void
     {
         if ($className) {
             $this->items[ConfigUtil::TARGET_CLASS] = $className;
@@ -223,23 +190,19 @@ class SubresourceConfig implements ConfigBagInterface
     /**
      * Indicates whether a target association represents "to-many" or "to-one" relationship.
      *
-     * @return bool|null TRUE if a target association represents "to-many" relationship
+     * @return bool TRUE if a target association represents "to-many" relationship; otherwise, FALSE
      */
-    public function isCollectionValuedAssociation()
+    public function isCollectionValuedAssociation(): bool
     {
-        if (!\array_key_exists(ConfigUtil::TARGET_TYPE, $this->items)) {
-            return null;
-        }
-
-        return 'to-many' === $this->items[ConfigUtil::TARGET_TYPE];
+        return
+            \array_key_exists(ConfigUtil::TARGET_TYPE, $this->items)
+            && ConfigUtil::TO_MANY === $this->items[ConfigUtil::TARGET_TYPE];
     }
 
     /**
      * Indicates whether the type of a target association is set explicitly.
-     *
-     * @return bool
      */
-    public function hasTargetType()
+    public function hasTargetType(): bool
     {
         return $this->has(ConfigUtil::TARGET_TYPE);
     }
@@ -249,7 +212,7 @@ class SubresourceConfig implements ConfigBagInterface
      *
      * @return string|null Can be "to-one" or "to-many"
      */
-    public function getTargetType()
+    public function getTargetType(): ?string
     {
         return $this->get(ConfigUtil::TARGET_TYPE);
     }
@@ -259,7 +222,7 @@ class SubresourceConfig implements ConfigBagInterface
      *
      * @param string|null $targetType Can be "to-one" or "to-many"
      */
-    public function setTargetType($targetType)
+    public function setTargetType(?string $targetType): void
     {
         if ($targetType) {
             $this->items[ConfigUtil::TARGET_TYPE] = $targetType;

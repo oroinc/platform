@@ -16,6 +16,6 @@ class LoadRolesData extends AbstractLoadAclData
      */
     protected function getDataPath()
     {
-        return '@OroSecurityBundle/Tests/Functional/DataFixtures/role_permissions.yml';
+        return '@OroSecurityBundle/Tests/Functional/DataFixtures/data/role_permissions.yml';
     }
 }

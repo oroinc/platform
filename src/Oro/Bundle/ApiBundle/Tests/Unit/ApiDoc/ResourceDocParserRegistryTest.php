@@ -6,24 +6,19 @@ use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $resourceDocParsers
-     *
-     * @return ResourceDocParserRegistry
-     */
-    private function getResourceDocParserRegistry(array $resourceDocParsers)
+    private function getResourceDocParserRegistry(array $resourceDocParsers): ResourceDocParserRegistry
     {
         return new ResourceDocParserRegistry(
             $resourceDocParsers,
@@ -72,12 +67,11 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a resource documentation parser for the request "another".
-     */
     public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a resource documentation parser for the request "another".');
+
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api']
         ]);

@@ -12,6 +12,7 @@ oro:
         auditfield:
             entity_label:         Audit Field
             entity_plural_label:  Audit Fields
+            entity_grid_all_view_label: All %entity_plural_label%
             data_type.label:      Data Type
             field.label:          Field
             id.label:             Id
@@ -41,6 +42,12 @@ oro:
             audit_list.label:       "Data Audit"
             audit_list.description: "Data Audit"
 
+        collection:
+            added: '%record% "%entity_name%" added'
+            removed: '%record% "%entity_name%" removed'
+            changed: '%record% "%entity_name%" changed'
+        record: '%record% "%entity_name%"'
+
         datagrid:
             author: Author
             logged_at: Logged at
@@ -50,10 +57,12 @@ oro:
             version: Version
             entity_type: Entity type
             entity_name: Entity name
-            entity_id: Entity id
+            entity_id: Entity identifier
             data: Data
             organization: Organization
-            author_impersonation: " (impersonated from %ipAddress%)"
+            author_impersonation: " (impersonated from %ipAddress% using %token%)"
+            author_impersonation_filter: "Impersonated from %ipAddress% using %token%"
+            impersonation: Impersonation
 
         entity_config:
             entity:
@@ -62,6 +71,9 @@ oro:
             field:
                 items:
                     auditable: Auditable
+                    propagate:
+                        label: Append audit log to the related entity
+                        tooltip: Use the option to enable reverse side audit for the relations.
 
         condition_builder:
             criteria:
@@ -70,6 +82,7 @@ oro:
         abstractaudit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at
@@ -84,10 +97,12 @@ oro:
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields
+            type.label: Audit type
 
         audit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at
@@ -102,3 +117,9 @@ oro:
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields
+            type.label: Audit type
+
+        feature:
+            manage:
+                label: Data Audit
+                description: Enables the system to set entities as auditable to monitor the history of their changes.

@@ -1,0 +1,14 @@
+include:
+    - '@OroTranslationBundle:FrenchLanguage.yml'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_french:
+        string: 'French'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_french:
+        name: 'French'
+        language: '@french_lang'
+        formattingCode: 'fr_FR'
+        titles: ['@title_localization_french']
+        parentLocalization: '@default_localization'

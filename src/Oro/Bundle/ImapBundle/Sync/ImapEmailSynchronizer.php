@@ -2,22 +2,26 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
-use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailsTopic;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
+use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -25,7 +29,8 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    protected static $messageQueueTopic = Topics::SYNC_EMAILS;
+    /** @var string */
+    protected static $messageQueueTopic = SyncEmailsTopic::NAME;
 
     /** @var ImapEmailSynchronizationProcessorFactory */
     protected $syncProcessorFactory;
@@ -36,40 +41,29 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var OAuthManagerRegistry */
+    protected $oauthManagerRegistry;
 
     /** @var SyncCredentialsIssueManager */
     private $credentialsIssueManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
-     * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+        OAuthManagerRegistry $oauthManagerRegistry,
+        NotificationAlertManager $notificationAlertManager
     ) {
-        parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
+        parent::__construct($doctrine, $knownEmailAddressCheckerFactory, $notificationAlertManager);
 
         $this->syncProcessorFactory = $syncProcessorFactory;
         $this->connectorFactory     = $connectorFactory;
         $this->encryptor            = $encryptor;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-
-    /**
-     * @param SyncCredentialsIssueManager $credentialsIssueManager
-     */
     public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
     {
         $this->credentialsIssueManager = $credentialsIssueManager;
@@ -80,7 +74,13 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     public function supports(EmailOrigin $origin)
     {
-        return $origin instanceof UserEmailOrigin;
+        return ($origin instanceof UserEmailOrigin) && $this->isTypeSupported($origin->getAccountType());
+    }
+
+    protected function isTypeSupported(string $accountType): bool
+    {
+        return (AccountTypeModel::ACCOUNT_TYPE_OTHER === $accountType)
+            || $this->oauthManagerRegistry->isOauthImapEnabled($accountType);
     }
 
     /**
@@ -88,7 +88,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     protected function getEmailOriginClass()
     {
-        return 'OroImapBundle:UserEmailOrigin';
+        return UserEmailOrigin::class;
     }
 
     /**
@@ -107,13 +107,26 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     protected function createSynchronizationProcessor($origin)
     {
+        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
+            : null;
+
+        try {
+            $accessToken = $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null;
+        } catch (RefreshOAuthAccessTokenFailureException $e) {
+            $notification = EmailSyncNotificationAlert::createForRefreshTokenFail($e->getMessage());
+            $this->notificationsBag->addNotification($notification);
+
+            throw $e;
+        }
+
         $config = new ImapConfig(
             $origin->getImapHost(),
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
+            $accessToken
         );
 
         return $this->syncProcessorFactory->create(

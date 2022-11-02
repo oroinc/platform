@@ -12,29 +12,20 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FieldConfigModelRepositoryTest extends WebTestCase
 {
-    /**
-     * @var FieldConfigModelRepository
-     */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->useHashNavigation(true);
+        $this->loadFixtures([LoadAttributeFamilyData::class]);
+    }
 
-        $this->loadFixtures([
-            LoadAttributeFamilyData::class,
-        ]);
-
-        $this->repository = $this
-            ->getContainer()
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepositoryForClass(FieldConfigModel::class);
+    private function getRepository(): FieldConfigModelRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(FieldConfigModel::class);
     }
 
     public function testGetAttributesByIdsEmpty()
     {
-        $attributes = $this->repository->getAttributesByIds([]);
+        $attributes = $this->getRepository()->getAttributesByIds([]);
 
         $this->assertCount(0, $attributes);
     }
@@ -44,7 +35,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         $attribute1Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
         $attribute2Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_2);
         $attribute3Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
-        $attributes = $this->repository->getAttributesByIds([$attribute1Id, $attribute2Id, $attribute3Id]);
+        $attributes = $this->getRepository()->getAttributesByIds([$attribute1Id, $attribute2Id, $attribute3Id]);
 
         $this->assertCount(3, $attributes);
         $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
@@ -55,7 +46,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
     public function testGetAttributesByIdsWithIndexEmpty()
     {
-        $attributes = $this->repository->getAttributesByIdsWithIndex([]);
+        $attributes = $this->getRepository()->getAttributesByIdsWithIndex([]);
 
         $this->assertCount(0, $attributes);
     }
@@ -65,7 +56,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         $attributeId1 = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
         $attributeId2 = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_2);
         $attributeId3 = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
-        $attributes = $this->repository->getAttributesByIdsWithIndex([
+        $attributes = $this->getRepository()->getAttributesByIdsWithIndex([
             $attributeId1,
             $attributeId2,
             $attributeId3,
@@ -81,10 +72,10 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
     public function testGetAttributesByClassEmpty()
     {
-        /** @var \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily $family */
+        /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->repository->getAttributesByClass($family->getEntityClass().'FalseClass');
+        $attributes = $this->getRepository()->getAttributesByClass($family->getEntityClass().'FalseClass');
 
         $this->assertCount(0, $attributes);
     }
@@ -94,15 +85,14 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->repository->getAttributesByClass($family->getEntityClass());
+        $attributes = $this->getRepository()->getAttributesByClass($family->getEntityClass());
 
         // check only attributes added by this bundle because other bundles may add own attributes
         $expectedAttributes = [
             LoadAttributeData::SYSTEM_ATTRIBUTE_1,
             LoadAttributeData::SYSTEM_ATTRIBUTE_2,
             LoadAttributeData::REGULAR_ATTRIBUTE_1,
-            LoadAttributeData::REGULAR_ATTRIBUTE_2,
-            LoadAttributeData::NOT_USED_ATTRIBUTE
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
         ];
         foreach ($attributes as $attribute) {
             self::assertInstanceOf(FieldConfigModel::class, $attribute);
@@ -119,7 +109,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->repository->getActiveAttributesByClass($family->getEntityClass());
+        $attributes = $this->getRepository()->getActiveAttributesByClass($family->getEntityClass());
 
         // check only attributes added by this bundle because other bundles may add own attributes
         $expectedAttributes = [
@@ -145,7 +135,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->repository->getAttributesByClassAndIsSystem($family->getEntityClass(), true);
+        $attributes = $this->getRepository()->getAttributesByClassAndIsSystem($family->getEntityClass(), true);
 
         // check only attributes added by this bundle because other bundles may add own attributes
         $expectedAttributes = [
@@ -166,16 +156,15 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
     public function testGetAttributesByClassAndIsSystemFalse()
     {
-        /** @var \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily $family */
+        /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->repository->getAttributesByClassAndIsSystem($family->getEntityClass(), false);
+        $attributes = $this->getRepository()->getAttributesByClassAndIsSystem($family->getEntityClass(), false);
 
         // check only attributes added by this bundle because other bundles may add own attributes
         $expectedAttributes = [
             LoadAttributeData::REGULAR_ATTRIBUTE_1,
-            LoadAttributeData::REGULAR_ATTRIBUTE_2,
-            LoadAttributeData::NOT_USED_ATTRIBUTE,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
         ];
         foreach ($attributes as $attribute) {
             self::assertInstanceOf(FieldConfigModel::class, $attribute);
@@ -185,6 +174,27 @@ class FieldConfigModelRepositoryTest extends WebTestCase
             }
             $extendOptions = $attribute->toArray('extend');
             self::assertEquals(ExtendScope::OWNER_CUSTOM, $extendOptions['owner'], $attributeName);
+        }
+        self::assertEquals([], $expectedAttributes);
+    }
+
+    public function testGetAllAttributes(): void
+    {
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
+        ];
+        $attributes = $this->getRepository()->getAllAttributes();
+
+        // Check only attributes added by this bundle because other bundles may add own attributes
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
         }
         self::assertEquals([], $expectedAttributes);
     }

@@ -7,22 +7,19 @@ use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * Adds the relation type for fields that represent associations.
+ */
 class EntityExtendedStructureOptionsListener
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();
@@ -45,7 +42,7 @@ class EntityExtendedStructureOptionsListener
      *
      * @return null|string
      */
-    protected function getRelationType($className, $fieldName)
+    private function getRelationType($className, $fieldName)
     {
         //Process field that represents unidirectional relation from other entity to the current.
         //For example "Oro\Bundle\AccountBundle\Entity\Account::referredBy"

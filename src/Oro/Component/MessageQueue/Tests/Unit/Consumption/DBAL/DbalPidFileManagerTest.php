@@ -2,23 +2,23 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @var string
      */
     private $pidDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'test-mq-dbal';
-
-        $fs = new Filesystem();
-        $fs->remove($this->pidDir);
+        $this->pidDir = $this->getTempDir('test-mq-dbal', false);
     }
 
     public function testCouldCreatePidFile()
@@ -92,7 +92,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
 
         // test
         $processManager->removePidFile('consumer-id');
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
     }
 
     public function testShouldNotThrowAnyErrorIfFileDoesNotExistWhenRemovindPids()
@@ -101,7 +101,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $processManager->createPidFile('consumer-id');
 
         // guard
-        $this->assertFileNotExists($this->pidDir.'/not-existent-pid-file.pid');
+        $this->assertFileDoesNotExist($this->pidDir.'/not-existent-pid-file.pid');
 
         // test
         $processManager->removePidFile('not-existent-pid-file');

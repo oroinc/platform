@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
 class UserControllerACLTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserACLData::class]);
@@ -24,7 +24,7 @@ class UserControllerACLTest extends WebTestCase
     public function testACLInfoAction($resource, $user, $status)
     {
         $this->loginUser($user);
-        /* @var $resource User */
+        /* @var User $resource */
         $resource = $this->getReference($resource);
 
         $this->client->request(
@@ -36,7 +36,7 @@ class UserControllerACLTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        static::assertHtmlResponseStatusCodeEquals($response, $status);
+        self::assertHtmlResponseStatusCodeEquals($response, $status);
     }
 
     /**

@@ -9,22 +9,16 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /**
-     * @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $actionHandler;
 
-    /**
-     * @var ChannelActionHandlerTransactionDecorator
-     */
+    /** @var ChannelActionHandlerTransactionDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->actionHandler = $this->createMock(ChannelActionHandlerInterface::class);
@@ -37,27 +31,33 @@ class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\Te
 
     public function testHandleActionWithError()
     {
-        $this->entityManager->expects(static::once())->method('beginTransaction');
-        $this->entityManager->expects(static::once())->method('rollback');
-        $this->entityManager->expects(static::never())->method('commit');
+        $this->entityManager->expects(self::once())
+            ->method('beginTransaction');
+        $this->entityManager->expects(self::once())
+            ->method('rollback');
+        $this->entityManager->expects(self::never())
+            ->method('commit');
 
-        $this->actionHandler->expects(static::once())
+        $this->actionHandler->expects(self::once())
             ->method('handleAction')
             ->willReturn(false);
 
-        static::assertFalse($this->decorator->handleAction(new Channel()));
+        self::assertFalse($this->decorator->handleAction(new Channel()));
     }
 
     public function testHandleActionWithNoError()
     {
-        $this->entityManager->expects(static::once())->method('beginTransaction');
-        $this->entityManager->expects(static::never())->method('rollback');
-        $this->entityManager->expects(static::once())->method('commit');
+        $this->entityManager->expects(self::once())
+            ->method('beginTransaction');
+        $this->entityManager->expects(self::never())
+            ->method('rollback');
+        $this->entityManager->expects(self::once())
+            ->method('commit');
 
-        $this->actionHandler->expects(static::once())
+        $this->actionHandler->expects(self::once())
             ->method('handleAction')
             ->willReturn(true);
 
-        static::assertTrue($this->decorator->handleAction(new Channel()));
+        self::assertTrue($this->decorator->handleAction(new Channel()));
     }
 }

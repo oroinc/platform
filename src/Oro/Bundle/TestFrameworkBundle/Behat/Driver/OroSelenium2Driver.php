@@ -41,6 +41,7 @@ class OroSelenium2Driver extends Selenium2Driver
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function setValue($xpath, $value)
     {
@@ -78,7 +79,9 @@ class OroSelenium2Driver extends Selenium2Driver
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
-            $this->fillTinyMce($element, $value);
+            if (!$this->fillTinyMce($element, $value)) {
+                $this->setTextInputElement($element, $value);
+            }
             $this->triggerEvent($xpath, 'keyup');
             $this->triggerEvent($xpath, 'change');
 
@@ -86,6 +89,28 @@ class OroSelenium2Driver extends Selenium2Driver
         }
 
         parent::setValue($xpath, $value);
+    }
+
+    /**
+     * @param string $xpath
+     * @return array|bool|mixed|string|void|null
+     * @throws \Behat\Mink\Exception\DriverException
+     * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+     */
+    public function getValue($xpath)
+    {
+        $element = $this->findElement($xpath);
+        $elementName = strtolower($element->name());
+        $type = $element->attribute('type');
+        $elementType = $type ? strtolower($type) : null;
+
+        if ($elementName === 'input' && $elementType !== 'checkbox' && $elementType !== 'radio') {
+            $script = 'return ({{ELEMENT}}).value;';
+
+            return $this->executeJsOnElement($element, $script);
+        }
+
+        return parent::getValue($xpath);
     }
 
     /**
@@ -98,7 +123,7 @@ class OroSelenium2Driver extends Selenium2Driver
         $elementName = strtolower($element->name());
 
         if (in_array($elementName, array('input', 'textarea'))) {
-            $existingValueLength = strlen($element->attribute('value'));
+            $existingValueLength = strlen($this->getValue($xpath));
             $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
         }
 
@@ -109,7 +134,9 @@ class OroSelenium2Driver extends Selenium2Driver
      * Set content tinymce editor with value
      *
      * @param Element $element Form element that was replaced by TinyMCE
-     * @param string  $value   Text for set into tiny
+     * @param string $value Text for set into tiny
+     *
+     * @return bool TRUE if the given element is TinyMCE; otherwise, FALSE
      */
     protected function fillTinyMce(Element $element, $value)
     {
@@ -119,16 +146,16 @@ class OroSelenium2Driver extends Selenium2Driver
             sprintf('null != tinyMCE.get("%s");', $fieldId)
         );
 
-        self::assertNotNull(
-            $isTinyMce,
-            sprintf('Field was guessed as tinymce, but can\'t find tiny with id "%s" on page', $fieldId)
-        );
+        if (!$isTinyMce) {
+            return false;
+        }
 
         $this->executeScript(
             sprintf('tinyMCE.get("%s").setContent("%s");', $fieldId, $value)
         );
-    }
 
+        return true;
+    }
 
     /**
      * @param Element $element
@@ -153,27 +180,36 @@ JS;
     {
         $jsCheck = <<<JS
         (function () {
-            if (document["readyState"] !== "complete") {
+            if (document['readyState'] !== 'complete') {
                 return false;
             }
             
-            if (document.title === "Loading...") {
+            if (document.title === 'Loading...') {
                 return false;
             }
             
-            if (jQuery == null || jQuery.active) {
-                return false;
-            }
-            
-            if (document.body.classList.contains('loading')) {
+            if (document.body.classList.contains('loading') && !document.body.classList.contains('modal-open')) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown') !== null) {
+            const ladings = ':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading';
+            if (document.querySelector(ladings) !== null) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
             
-            if (document.querySelector('div.lazy-loading') !== null) {
+            // loadModules should be available at this point.
+            // loadModules is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where loadModules is loaded.
+            if (typeof loadModules === 'undefined') {
+                return true;
+            }
+
+            if ((document.querySelector('script[src*="/app.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null))
+                || (typeof(jQuery) !== 'undefined' && jQuery.active)
+            ) {
                 return false;
             }
             
@@ -207,26 +243,46 @@ JS;
                 return false;
             }
             
-            if (document.body.classList.contains('loading')) {
-                return false;
-            }
-
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.body.classList.contains('loading') && !document.body.classList.contains('modal-open')) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
             
+            if (document.body.classList.contains('img-loading')) {
+                return false;
+            }
+
+            const ladings = ':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading';
+            if (document.querySelector(ladings) !== null) {
+                // confirmation dialog can be shown over loading mask
+                return false;
+            }
+            
+            // loadModules should be available at this point.
+            // loadModules is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where loadModules is loaded.
+            if (typeof loadModules === 'undefined') {
+                return true;
+            }
+            
             try {
-                if (jQuery == null || jQuery.active) {
+                if ((document.querySelector('script[src*="/app.js"]') !== null
+                    && (typeof(jQuery) === 'undefined' || jQuery == null))
+                    || (typeof(jQuery) !== 'undefined' && jQuery.active)
+                ) {
                     return false;
                 }
                 
                 if (!window.mediatorCachedForSelenium) {
-                    window.mediatorCachedForSelenium = require('oroui/js/mediator');
+                    loadModules(['oroui/js/mediator'], function(mediator) {
+                        window.mediatorCachedForSelenium = mediator;
+                    });
+                    return false;
                 }
                 
-                var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
+                var isInAction = window.mediatorCachedForSelenium.execute('isInAction');
                 
-                if (isInAction !== false || jQuery.active) {
+                if (isInAction !== false) {
                     return false;
                 }
             } catch (e) {
@@ -249,12 +305,64 @@ JS;
     /**
      * {@inheritdoc}
      */
+    public function wait($timeout, $condition)
+    {
+        $script = "return $condition;";
+        $start = microtime(true);
+        $end = $start + $timeout / 1000.0;
+
+        do {
+            $result = $this->getWebDriverSession()
+                ->execute(array('script' => $script, 'args' => array()));
+            usleep(100000);
+        } while (microtime(true) < $end && !$result);
+
+        return (bool) $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function doubleClick($xpath)
     {
         // Original method doesn't work properly with chromedriver,
         // as it doesn't generate a pair of mouseDown/mouseUp events
         // mouseDown event is used to postpone single click handler
         $script = 'Syn.trigger("dblclick", {}, {{ELEMENT}})';
+        $this->withSyn()->executeJsOnXpath($xpath, $script);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keyDown($xpath, $char, $modifier = null)
+    {
+        $charToKeyMap = [
+            8 => 'Backspace',
+            9 => 'Tab',
+            13 => 'Enter',
+            27 => 'Escape', // Esc
+            32 => ' ', // Space
+            33 => 'PageUp',
+            34 => 'PageDown',
+            35 => 'End',
+            36 => 'Home',
+            37 => 'ArrowLeft',
+            38 => 'ArrowUp',
+            39 => 'ArrowRight',
+            40 => 'ArrowDown',
+            45 => 'Insert',
+            46 => 'Delete',
+        ];
+        $options = json_decode(self::charToOptions($char, $modifier), true);
+
+        if (array_key_exists($char, $charToKeyMap)) {
+            $options['key'] = $charToKeyMap[$char];
+        }
+
+        $event = 'keydown';
+        $options = json_encode($options);
+        $script = 'Syn.trigger("' . $event . '", ' . $options . ', {{ELEMENT}})';
         $this->withSyn()->executeJsOnXpath($xpath, $script);
     }
 
@@ -281,11 +389,11 @@ JS;
      */
     protected function executeJsOnElement(Element $element, $script, $sync = true)
     {
-        $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
+        $script = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 
         $options = array(
             'script' => $script,
-            'args'   => array(array('ELEMENT' => $element->getID())),
+            'args' => array(array('ELEMENT' => $element->getID())),
         );
 
         if ($sync) {
@@ -297,8 +405,8 @@ JS;
 
     /**
      * @param Element $element
-     * @param string  $value
-     * @param bool    $multiple
+     * @param string $value
+     * @param bool $multiple
      */
     protected function selectOptionOnElement(Element $element, $value, $multiple = false)
     {
@@ -324,8 +432,6 @@ JS;
      * Deselects all options of a multiple select
      *
      * Note: this implementation does not trigger a change event after deselecting the elements.
-     *
-     * @param Element $element
      */
     private function deselectAllOptions(Element $element)
     {
@@ -350,7 +456,7 @@ JS;
             usleep(100000);
         } while (microtime(true) < $end && !$result);
 
-        return (bool) $result;
+        return (bool)$result;
     }
 
     /**
@@ -388,9 +494,6 @@ JS;
         $this->executeJsOnXpath($xpath, $script);
     }
 
-    /**
-     * @param NodeElement $element
-     */
     public function switchToIFrameByElement(NodeElement $element)
     {
         $id = $element->getAttribute('id');

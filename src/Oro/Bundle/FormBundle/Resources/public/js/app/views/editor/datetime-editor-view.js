@@ -68,33 +68,20 @@ define(function(require) {
      * @augments [DateEditorView](./date-editor-view.md)
      * @exports DatetimeEditorView
      */
-    var DatetimeEditorView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var DateEditorView = require('./date-editor-view');
-    var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const DateEditorView = require('./date-editor-view');
+    const DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
+    const DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
         className: 'datetime-editor',
         inputType: 'hidden',
         view: DatetimepickerView,
 
         DEFAULT_OPTIONS: {
-            dateInputAttrs: {
-                'placeholder': __('oro.form.choose_date'),
-                'name': 'date',
-                'autocomplete': 'off',
-                'data-validation': JSON.stringify({Date: {}})
-            },
-            datePickerOptions: {
-                altFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: '-80:+1',
-                showButtonPanel: true
-            },
+            ...DateEditorView.prototype.DEFAULT_OPTIONS,
             timeInputAttrs: {
                 'placeholder': __('oro.form.choose_time'),
                 'name': 'time',
@@ -102,8 +89,7 @@ define(function(require) {
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },
-            timePickerOptions: {
-            }
+            timePickerOptions: {}
         },
 
         events: {
@@ -118,24 +104,23 @@ define(function(require) {
         format: datetimeFormatter.getBackendDateTimeFormat(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DatetimeEditorView() {
-            DatetimeEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function DatetimeEditorView(options) {
+            DatetimeEditorView.__super__.constructor.call(this, options);
         },
 
         render: function() {
-            var _this = this;
             DatetimeEditorView.__super__.render.call(this);
             // fix ESCAPE time-picker behaviour
             // must stopPropagation on ESCAPE, if time-picker was visible
-            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                if (e.keyCode === _this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
+            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), e => {
+                if (e.keyCode === this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
                     e.stopPropagation();
                 }
             });
             // fix arrows behaviour
-            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), this.onGenericArrowKeydown.bind(this));
 
             return this;
         },
@@ -174,7 +159,7 @@ define(function(require) {
         },
 
         parseRawValue: function(value) {
-            var parsed;
+            let parsed;
             try {
                 parsed = datetimeFormatter.getMomentForBackendDateTime(value);
             } catch (e) {
@@ -206,14 +191,14 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var $list = this.view.getTimePickerWidget();
-            var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
+            const $list = this.view.getTimePickerWidget();
+            const isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
             $list.off(this.eventNamespace())
-                .on('mousedown' + this.eventNamespace(), _.bind(function(e) {
+                .on('mousedown' + this.eventNamespace(), e => {
                     // adds flag that blur event was as sequence of time selection in dropdown
                     this._isTimeSelection = true;
-                }, this));
+                });
         },
 
         onGenericTabKeydown: function(e) {

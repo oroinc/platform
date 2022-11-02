@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -24,8 +24,8 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const ENTITY_CLASS = 'stdClass';
-    const ENTITY_ID_FIELD = 'id';
+    private const ENTITY_CLASS = 'stdClass';
+    private const ENTITY_ID_FIELD = 'id';
 
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowAssembler;
@@ -42,15 +42,10 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionTriggerCronVerifier */
     private $verifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflowItemRepository = $this->getMockBuilder(WorkflowItemRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);
+        $this->workflowItemRepository = $this->createMock(WorkflowItemRepository::class);
 
         $metadata = new ClassMetadataInfo(self::ENTITY_CLASS);
         $metadata->setIdentifier([self::ENTITY_ID_FIELD]);
@@ -79,37 +74,46 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
 
     public function testAddOptionVerifier()
     {
-        $this->assertAttributeEmpty('optionVerifiers', $this->verifier);
+        $trigger = $this->createMock(TransitionCronTrigger::class);
+        $trigger->expects(self::any())
+            ->method('getCron')
+            ->willReturn('something');
 
-        $this->verifier->addOptionVerifier('test', $this->cronVerifier);
+        $verifier1 = $this->createMock(ExpressionVerifierInterface::class);
+        $verifier1->expects(self::exactly(2))
+            ->method('verify');
 
-        $this->assertAttributeCount(1, 'optionVerifiers', $this->verifier);
-        $this->assertAttributeEquals(['test' => [$this->cronVerifier]], 'optionVerifiers', $this->verifier);
+        $this->verifier->addOptionVerifier('cron', $verifier1);
 
-        $this->verifier->addOptionVerifier('test', $this->filterVerifier);
+        $this->verifier->verify($trigger);
 
-        $this->assertAttributeCount(1, 'optionVerifiers', $this->verifier);
-        $this->assertAttributeEquals(
-            ['test' => [$this->cronVerifier, $this->filterVerifier]],
-            'optionVerifiers',
-            $this->verifier
-        );
+        $verifier2 = $this->createMock(ExpressionVerifierInterface::class);
+        $verifier2->expects(self::once())
+            ->method('verify');
+
+        $this->verifier->addOptionVerifier('cron', $verifier2);
+        $this->verifier->verify($trigger);
     }
 
     public function testVerify()
     {
         $cron = '* * * * *';
         $filter = 'e.test = data';
-        $query = $this->getMockBuilder(AbstractQuery::class)->disableOriginalConstructor()->getMock();
+        $query = $this->createMock(AbstractQuery::class);
         $transitionName = 'test_transition';
         $expectedStep = $this->getStep('step2', [$transitionName]);
         $workflow = $this->getWorkflow([$this->getStep('step1', ['invalid_transition']), $expectedStep]);
 
-        $this->cronVerifier->expects($this->once())->method('verify')->with($cron);
-        $this->filterVerifier->expects($this->once())->method('verify')->with($query);
+        $this->cronVerifier->expects($this->once())
+            ->method('verify')
+            ->with($cron);
+        $this->filterVerifier->expects($this->once())
+            ->method('verify')
+            ->with($query);
 
         $testVerifier = $this->createMock(ExpressionVerifierInterface::class);
-        $testVerifier->expects($this->never())->method($this->anything());
+        $testVerifier->expects($this->never())
+            ->method($this->anything());
 
         $this->verifier->addOptionVerifier('cron', $this->cronVerifier);
         $this->verifier->addOptionVerifier('filter', $this->filterVerifier);
@@ -120,6 +124,11 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
             ->with($workflow->getDefinition(), false)
             ->willReturn($workflow);
 
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
         $this->workflowItemRepository->expects($this->once())
             ->method('findByStepNamesAndEntityClassQueryBuilder')
             ->with(
@@ -128,69 +137,58 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
                 self::ENTITY_ID_FIELD,
                 $filter
             )
-            ->willReturn($this->setUpQueryBuilder($query));
+            ->willReturn($qb);
 
         $this->verifier->verify($this->getTrigger($workflow, $transitionName, $cron, $filter));
     }
 
-    /**
-     * @param Workflow $workflow
-     * @param string $transitionName
-     * @param string $cron
-     * @param string $filter
-     * @return TransitionCronTrigger|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getTrigger(Workflow $workflow, $transitionName, $cron, $filter)
-    {
-        $trigger = $this->getMockBuilder(TransitionCronTrigger::class)->disableOriginalConstructor()->getMock();
-        $trigger->expects($this->any())->method('getCron')->willReturn($cron);
-        $trigger->expects($this->any())->method('getFilter')->willReturn($filter);
-        $trigger->expects($this->any())->method('getWorkflowDefinition')->willReturn($workflow->getDefinition());
-        $trigger->expects($this->any())->method('getTransitionName')->willReturn($transitionName);
-        $trigger->expects($this->any())->method('getEntityClass')->willReturn(self::ENTITY_CLASS);
+    private function getTrigger(
+        Workflow $workflow,
+        string $transitionName,
+        string $cron,
+        string $filter
+    ): TransitionCronTrigger {
+        $trigger = $this->createMock(TransitionCronTrigger::class);
+        $trigger->expects($this->any())
+            ->method('getCron')
+            ->willReturn($cron);
+        $trigger->expects($this->any())
+            ->method('getFilter')
+            ->willReturn($filter);
+        $trigger->expects($this->any())
+            ->method('getWorkflowDefinition')
+            ->willReturn($workflow->getDefinition());
+        $trigger->expects($this->any())
+            ->method('getTransitionName')
+            ->willReturn($transitionName);
+        $trigger->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(self::ENTITY_CLASS);
 
         return $trigger;
     }
 
-    /**
-     * @param array $steps
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getWorkflow(array $steps)
+    private function getWorkflow(array $steps): Workflow
     {
         $workflowDefinition = $this->getEntity(WorkflowDefinition::class, ['relatedEntity' => self::ENTITY_CLASS]);
         $stepManager = new StepManager($steps);
 
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($workflowDefinition);
-        $workflow->expects($this->any())->method('getStepManager')->willReturn($stepManager);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($workflowDefinition);
+        $workflow->expects($this->any())
+            ->method('getStepManager')
+            ->willReturn($stepManager);
 
         return $workflow;
     }
 
-    /**
-     * @param string $name
-     * @param array $allowedTransitions
-     * @return Step
-     */
-    protected function getStep($name, array $allowedTransitions)
+    private function getStep(string $name, array $allowedTransitions): Step
     {
         $step = new Step();
         $step->setName($name)->setAllowedTransitions($allowedTransitions);
 
         return $step;
-    }
-
-    /**
-     * @param AbstractQuery $query
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function setUpQueryBuilder(AbstractQuery $query)
-    {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
-        $qb->expects($this->once())->method('getQuery')->willReturn($query);
-
-        return $qb;
     }
 }

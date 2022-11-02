@@ -2,64 +2,60 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * The factory to create the segment query converter.
+ */
 class SegmentQueryConverterFactory
 {
     /** @var FunctionProviderInterface */
-    protected $functionProvider;
+    private $functionProvider;
 
     /** @var VirtualFieldProviderInterface */
-    protected $virtualFieldProvider;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var RestrictionBuilderInterface */
-    protected $restrictionBuilder;
+    private $virtualFieldProvider;
 
     /** @var VirtualRelationProviderInterface */
-    protected $virtualRelationProvide;
+    private $virtualRelationProvider;
 
-    /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param ManagerRegistry                  $doctrine
-     * @param RestrictionBuilderInterface      $restrictionBuilder
-     * @param VirtualRelationProviderInterface $virtualRelationProvide
-     */
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var RestrictionBuilderInterface */
+    private $restrictionBuilder;
+
+    /** @var SegmentQueryConverterState */
+    private $segmentQueryConverterState;
+
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine,
+        VirtualRelationProviderInterface $virtualRelationProvider,
+        DoctrineHelper $doctrineHelper,
         RestrictionBuilderInterface $restrictionBuilder,
-        VirtualRelationProviderInterface $virtualRelationProvide
+        SegmentQueryConverterState $segmentQueryConverterState
     ) {
         $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
-        $this->doctrine = $doctrine;
+        $this->virtualRelationProvider = $virtualRelationProvider;
+        $this->doctrineHelper = $doctrineHelper;
         $this->restrictionBuilder = $restrictionBuilder;
-        $this->virtualRelationProvide = $virtualRelationProvide;
+        $this->segmentQueryConverterState = $segmentQueryConverterState;
     }
 
-    /**
-     * @return SegmentQueryConverter
-     */
-    public function createInstance()
+    public function createInstance(): SegmentQueryConverter
     {
-        $converter = new SegmentQueryConverter(
+        return new SegmentQueryConverter(
             $this->functionProvider,
             $this->virtualFieldProvider,
-            $this->doctrine,
-            $this->restrictionBuilder
+            $this->virtualRelationProvider,
+            $this->doctrineHelper,
+            $this->restrictionBuilder,
+            $this->segmentQueryConverterState
         );
-
-        $converter->setVirtualRelationProvider($this->virtualRelationProvide);
-
-        return $converter;
     }
 }

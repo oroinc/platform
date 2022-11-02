@@ -26,18 +26,18 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"notes",
-      "attributes":{  
-         "message":"<p>test note message</p>"
+{
+   "data": {
+      "type": "notes",
+      "attributes": {
+         "message": "<p>test note message</p>"
       },
-      "relationships":{  
-         "activityTargets":{  
-            "data":[  
-               {  
-                  "type":"accounts",
-                  "id":"7"
+      "relationships": {
+         "activityTargets": {
+            "data": [
+               {
+                  "type": "accounts",
+                  "id": "7"
                }
             ]
          }
@@ -51,37 +51,39 @@ Example:
 
 Edit a specific note record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"notes",
-      "id":"2",
-      "attributes":{  
-         "message":"New message"
+{
+   "data": {
+      "type": "notes",
+      "id": "2",
+      "attributes": {
+         "message": "New message"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "activityTargets":{  
-            "data":[  
-               {  
-                  "type":"accounts",
-                  "id":"7"
+         "activityTargets": {
+            "data": [
+               {
+                  "type": "accounts",
+                  "id": "7"
                }
             ]
          }
@@ -105,39 +107,27 @@ Delete a collection of note records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### message
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### activityTargets
-
-A records to which the note record associated with.
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 ## SUBRESOURCES
 
@@ -203,7 +193,7 @@ Retrieve the record of the user who is the owner of a specific note record.
 
 #### get_relationship
 
-Retrieve the ID of a user who is the owner of a specific note record
+Retrieve the ID of a user who is the owner of a specific note record.
 
 #### update_relationship
 
@@ -248,25 +238,3 @@ Example:
 }
 ```
 {@/request}
-
-### activityTargets
-
-#### get_subresource
-
-Retrieve records to which the note associated.
-
-#### get_relationship
-
-Retrieve the IDs of records to which the note associated.
-
-#### add_relationship
-
-Associate records with the note.
-
-#### update_relationship
-
-Completely replace association between records and the note.
-
-#### delete_relationship
-
-Delete association between records and the note.

@@ -2,35 +2,31 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dateTimeFormatter;
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateTimeFormatter;
 
     /** @var SystemVariablesProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->dateTimeFormatter = $this->createMock(DateTimeFormatterInterface::class);
 
         $this->provider = new SystemVariablesProvider(
             $translator,
@@ -44,6 +40,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
             [
+                'currentDateTime' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_datetime'],
                 'currentDate'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_date'],
                 'currentTime'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_time'],
                 'appURL'       => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_url'],
@@ -56,30 +53,29 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->configManager->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['oro_ui.application_name', false, false, null, ''],
-                        ['oro_ui.application_title', false, false, null, ''],
-                        ['oro_ui.application_url', false, false, null, 'http://localhost'],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['oro_ui.application_name', false, false, null, ''],
+                ['oro_ui.application_title', false, false, null, ''],
+                ['oro_ui.application_url', false, false, null, 'http://localhost'],
+            ]);
+        $this->dateTimeFormatter->expects($this->once())
+            ->method('format')
+            ->with($this->isInstanceOf(\DateTime::class))
+            ->willReturn('datetime');
         $this->dateTimeFormatter->expects($this->once())
             ->method('formatDate')
-            ->with($this->isInstanceOf('\DateTime'))
-            ->will($this->returnValue('date'));
+            ->with($this->isInstanceOf(\DateTime::class))
+            ->willReturn('date');
         $this->dateTimeFormatter->expects($this->once())
             ->method('formatTime')
-            ->with($this->isInstanceOf('\DateTime'))
-            ->will($this->returnValue('time'));
+            ->with($this->isInstanceOf(\DateTime::class))
+            ->willReturn('time');
 
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
             [
-                'appShortName' => '',
-                'appFullName'  => '',
                 'appURL'       => 'http://localhost',
+                'currentDateTime'  => 'datetime',
                 'currentDate'  => 'date',
                 'currentTime'  => 'time',
             ],

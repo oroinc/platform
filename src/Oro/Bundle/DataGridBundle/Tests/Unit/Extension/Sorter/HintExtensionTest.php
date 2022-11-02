@@ -10,11 +10,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 class HintExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HintExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        /** @var QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject $queryHintResolver */
         $queryHintResolver = $this->createMock(QueryHintResolver::class);
         $queryHintResolver->expects(self::any())
             ->method('resolveHintName')

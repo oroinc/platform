@@ -8,113 +8,145 @@ Feature: Display settings manage
   As Administrator
   I need to be able to change display settings parameters
 
-  Scenario: Hide recent emails in user bar
-    Given I login as administrator
-    And I should see an "Recent Emails" element
+  Scenario: Prepare sessions
+    Given sessions active:
+      | Config | first_session  |
+      | Check  | second_session |
+
+  Scenario: Create Check session
+    Given I proceed as the Check
+    And I login as administrator
+
+  Scenario: Create Config session
+    Given I proceed as the Config
+    And I login as administrator
+
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
-    And I fill "System Config Form" with:
+
+  Scenario: Hide recent emails in user bar
+    Given I proceed as the Config
+    And I should see an "Recent Emails" element
+    When I fill "System Config Form" with:
       | Show recent emails | false |
     And I save form
     Then I should not see an "Recent Emails" element
 
   Scenario: Disable WYSIWYG editor
-    Given I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
-    And I fill "System Config Form" with:
+    When I fill "System Config Form" with:
       | Enable WYSIWYG editor | true |
     And save form
-    When I go to Activities/Calendar Events
+
+    When I proceed as the Check
+    And I go to Activities/Calendar Events
     And click "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
-    But I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
     And save form
-    When I go to Activities/Calendar Events
-    And click "Create Calendar event"
+
+    When I proceed as the Check
+    And I reload the page
     Then I should not see an "WYSIWYG editor" element
 
   Scenario: Change records in grid per page amount
-    Given I go to Activities/ Calendar Events
+    Given I proceed as the Check
+    And I go to Activities/ Calendar Events
     Then per page amount should be 25
-    And records in current page grid should be 25
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    And records in grid should be 25
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Items per Page by Default | 10 |
     And I save form
-    And I go to Activities/ Calendar Events
+
+    Given I proceed as the Check
+    # I'm at Activities/ Calendar Events
+    And I reload the page
     Then per page amount should be 10
-    And records in current page grid should be 10
+    And records in grid should be 10
 
   Scenario: Make grid header sticky
-    Given I go to Activities/ Calendar Events
-    Then I see that grid has scrollable header
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    # I'm at Activities/ Calendar Events
+    Given I see that grid has scrollable header
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Lock headers in grids | false |
     And I save form
-    And I go to Activities/ Calendar Events
+
+    Given I proceed as the Check
+    # I'm at Activities/ Calendar Events
+    And I reload the page
     Then I see that grid header is sticky
 
   Scenario: Disable navigation through grid entity from a view page
-    Given I go to Activities/ Calendar Events
-    And I click view 1 in grid
+    # I'm at Activities/ Calendar Events
+    Given I click view 1 in grid
     Then I should see an "Entity pagination" element
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Record Pagination | false |
     And I save form
-    And I go to Activities/ Calendar Events
-    And click view 1 in grid
+
+    When I proceed as the Check
+    # I'm at Activities/ Calendar Events view 1
+    And I reload the page
     Then I should not see an "Entity pagination" element
 
   Scenario: Change record pagination limit
-    Given I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    Given I proceed as the Config
     And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
-    And I go to Activities/ Calendar Events
-    And I click view 1 in grid
+
+    When I proceed as the Check
+    # I'm at Activities/ Calendar Events view 1
+    And I reload the page
     Then I should see an "Entity pagination" element
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Record Pagination limit | 20 |
     And I save form
+
+    When I proceed as the Check
     And I go to Activities/ Calendar Events
     And I click view 1 in grid
     Then I should not see an "Entity pagination" element
 
   Scenario: Change activity list configuration
     Given I go to System/ User Management/ Users
-    And I click View Charlie in grid
+    And I filter Username as is equal to "charlie"
+    And I click view charlie in grid
     Then there is 10 records in activity list
     And Activity List must be sorted descending by updated date
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Sort direction            | Ascending |
       | Items Per Page By Default | 25        |
     And I save form
-    And I go to System/ User Management/ Users
-    And click View Charlie in grid
+
+    When I proceed as the Check
+    # I'm at View Charlie User page
+    And I reload the page
     Then there is 25 records in activity list
     And Activity List must be sorted ascending by updated date
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+
+    When I proceed as the Config
     And I fill "System Config Form" with:
       | Sort by field             | Created date |
       | Sort direction            | Descending   |
       | Items Per Page By Default | 10           |
     And I save form
-    And I go to System/ User Management/ Users
-    And click View Charlie in grid
+
+    When I proceed as the Check
+    # I'm at View Charlie User page
+    And I reload the page
     Then I see following records in activity list with provided order:
       | -1 days |
       | -2 days |
@@ -127,17 +159,14 @@ Feature: Display settings manage
       | -9 days |
 
   Scenario: Change sidebar settings
-    Given right sidebar is visible
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
-    And I fill "System Config Form" with:
+    When I proceed as the Config
+    Then right sidebar is visible
+    When I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | No  |
     And save form
     Then right sidebar is out of sight
     And left sidebar is visible
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | Yes |
@@ -150,6 +179,8 @@ Feature: Display settings manage
       | Event colors    | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
       | Calendar colors | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
     And save form
+
+    When I proceed as the Check
     And go to Activities/ Calendar Events
     And click "Create Calendar event"
     Then I should see following available "Event Form" colors:
@@ -160,23 +191,30 @@ Feature: Display settings manage
       | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
 
   Scenario: Change taxonomy color settings
-    Given I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    When I proceed as the Config
     And fill "System Config Form" with:
       | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
     And save form
+
+    When I proceed as the Check
     And go to System/Tags Management/Taxonomies
     And click "Create Taxonomy"
     Then I should see following available "TaxonomyForm" colors:
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
 
-  Scenario: Change reports settings
+  Scenario: Change reports/segments settings
     Given I go to Reports & Segments/Calendar Events/Test Report
     Then I should not see "Show SQL Query"
-    When I go to System/Configuration
-    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    When I go to Reports & Segments/ Manage Segments
+    And I click view "Featured Products" in grid
+    Then I should not see "Show SQL Query"
+    When I proceed as the Config
     And fill "System Config Form" with:
       | Display SQL in Reports and Segments | true |
     And save form
+    When I proceed as the Check
     And I go to Reports & Segments/Calendar Events/Test Report
+    Then I should see "Show SQL Query"
+    When I go to Reports & Segments/ Manage Segments
+    And I click view "Featured Products" in grid
     Then I should see "Show SQL Query"

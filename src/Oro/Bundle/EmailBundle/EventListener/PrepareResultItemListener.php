@@ -2,51 +2,45 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Replace found EmailUser entity with related Email entity.
+ */
 class PrepareResultItemListener
 {
-    /** @var Router */
-    protected $router;
+    private UrlGeneratorInterface $urlGenerator;
+    private ManagerRegistry $doctrine;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(Router $router, DoctrineHelper $doctrineHelper)
+    public function __construct(UrlGeneratorInterface $urlGenerator, ManagerRegistry $doctrine)
     {
-        $this->router = $router;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->urlGenerator = $urlGenerator;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * Change search results view for Email entity
-     *
-     * @param PrepareResultItemEvent $event
-     */
-    public function prepareEmailItemDataEvent(PrepareResultItemEvent $event)
+    public function prepareResultItem(PrepareResultItemEvent $event): void
     {
-        if ($event->getResultItem()->getEntityName() === EmailUser::ENTITY_CLASS) {
-            $searchItem = $event->getResultItem();
-
-            $id = $this
-                ->doctrineHelper
-                ->getEntityRepository(EmailUser::ENTITY_CLASS)
-                ->find($searchItem->getId())
-                ->getEmail()
-                ->getId();
-
-            $searchItem->setRecordId($id);
-            $searchItem->setEntityName(Email::ENTITY_CLASS);
-            $route = $this->router->generate('oro_email_thread_view', ['id' => $id], true);
-            $searchItem->setRecordUrl($route);
+        if ($event->getResultItem()->getEntityName() !== EmailUser::class) {
+            return;
         }
+
+        $resultItem = $event->getResultItem();
+
+        $emailId = $this->doctrine->getManagerForClass(EmailUser::class)
+            ->find(EmailUser::class, $resultItem->getId())
+            ->getEmail()
+            ->getId();
+
+        $resultItem->setRecordId($emailId);
+        $resultItem->setEntityName(Email::class);
+        $resultItem->setRecordUrl($this->urlGenerator->generate(
+            'oro_email_thread_view',
+            ['id' => $emailId],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ));
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ValueRenderEvent extends Event
 {

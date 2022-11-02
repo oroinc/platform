@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Field;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
+/**
+ * Provides detailed information about fields for a specific entity taking into account workflow context.
+ */
 class FieldProvider extends EntityFieldProvider
 {
     /**
      * {@inheritdoc}
      */
-    protected function addFields(array &$result, $className, $applyExclusions, $translate)
+    protected function addEntityFields(array &$result, string $className, int $options): void
     {
-        // exclusions are not used in workflow
-        parent::addFields($result, $className, false, $translate);
+        // Exclusions are not used in workflow.
+        parent::addEntityFields($result, $className, $options &~ EntityFieldProvider::OPTION_APPLY_EXCLUSIONS);
 
         $metadata = $this->getMetadataFor($className);
 
@@ -38,7 +41,7 @@ class FieldProvider extends EntityFieldProvider
             $field = [
                 'name' => $associationName,
                 'type' => $this->getRelationFieldType($className, $associationName),
-                'label' => $translate ? $this->translator->trans($label) : $label,
+                'label' => $options & EntityFieldProvider::OPTION_TRANSLATE ? $this->translator->trans($label) : $label,
             ];
 
             $result[$associationName . '-field'] = $field;

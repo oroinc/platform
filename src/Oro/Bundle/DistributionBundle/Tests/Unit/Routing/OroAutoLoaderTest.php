@@ -7,10 +7,7 @@ use Symfony\Component\Routing\Route;
 
 class OroAutoLoaderTest extends AbstractLoaderTest
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getLoader()
+    public function getLoader(): OroAutoLoader
     {
         $loader = new OroAutoLoader($this->kernel, $this->routeOptionsResolver);
         $loader->setResolver($this->loaderResolver);
@@ -19,10 +16,7 @@ class OroAutoLoaderTest extends AbstractLoaderTest
         return $loader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLoaderWithoutEventDispatcher()
+    public function getLoaderWithoutEventDispatcher(): OroAutoLoader
     {
         $loader = new OroAutoLoader($this->kernel, $this->routeOptionsResolver);
         $loader->setResolver($this->loaderResolver);
@@ -30,22 +24,19 @@ class OroAutoLoaderTest extends AbstractLoaderTest
         return $loader;
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
-        $this->assertTrue($this->getLoader()->supports(null, 'oro_auto'));
+        self::assertTrue($this->getLoader()->supports(null, 'oro_auto'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadDataProvider()
+    public function loadDataProvider(): array
     {
         return [
             [
                 [
+                    'route2' => (new Route('/root2'))->setOptions(['expose' => true, 'priority' => 10]),
                     'route' => new Route('/root'),
-                    'route2' => (new Route('/root2'))->setOption('expose', true),
-                    'route3' => (new Route('/root3'))->setOption('expose', false)
+                    'route3' => (new Route('/root3'))->setOptions(['expose' => false, 'priority' => -10])
                 ]
             ]
         ];

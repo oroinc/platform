@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
@@ -60,16 +61,6 @@ class ActivityListManager
     protected $htmlTagHelper;
 
     /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityNameResolver            $entityNameResolver
-     * @param ConfigManager                 $config
-     * @param ActivityListChainProvider     $provider
-     * @param ActivityListIdProvider        $activityListIdProvider
-     * @param CommentApiManager             $commentManager
-     * @param DoctrineHelper                $doctrineHelper
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param WorkflowDataHelper            $workflowHelper
-     * @param HtmlTagHelper                 $htmlTagHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -101,7 +92,7 @@ class ActivityListManager
      */
     public function getRepository()
     {
-        return $this->doctrineHelper->getEntityRepository(ActivityList::ENTITY_NAME);
+        return $this->doctrineHelper->getEntityRepository(ActivityList::class);
     }
 
     /**
@@ -117,7 +108,7 @@ class ActivityListManager
         $result = [];
 
         $event = new ActivityListPreQueryBuildEvent($entityClass, $entityId);
-        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ActivityListPreQueryBuildEvent::EVENT_NAME);
         $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
             $event->getTargetIds()
@@ -197,10 +188,14 @@ class ActivityListManager
             return null;
         }
 
-        $activity       = $this->doctrineHelper->getEntity(
+        $activity = $this->doctrineHelper->getEntity(
             $entity->getRelatedActivityClass(),
             $entity->getRelatedActivityId()
         );
+
+        if (!$activity) {
+            return null;
+        }
 
         $ownerName = '';
         $ownerId   = '';
@@ -214,7 +209,7 @@ class ActivityListManager
 
         $editorName = '';
         $editorId   = '';
-        $editor     = $entity->getEditor();
+        $editor     = $entity->getUpdatedBy();
         if ($editor) {
             $editorName = $this->entityNameResolver->getName($editor);
             if ($this->authorizationChecker->isGranted('VIEW', $editor)) {
@@ -222,7 +217,7 @@ class ActivityListManager
             }
         }
 
-        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
+        $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider, $activity);
         $numberOfComments = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
             $relatedActivityEntities
@@ -380,7 +375,7 @@ class ActivityListManager
             $entityClass,
             $this->doctrineHelper->getSingleEntityIdentifier($entity)
         );
-        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ActivityListPreQueryBuildEvent::EVENT_NAME);
         $entityIds = $event->getTargetIds();
         $qb = $this->getRepository()->createQueryBuilder('activity')
             ->leftJoin('activity.activityOwners', 'ao')
@@ -401,25 +396,23 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param object       $entityProvider
+     * @param ActivityListProviderInterface $entityProvider
+     * @param object $activity
      *
      * @return array
      */
-    protected function getRelatedActivityEntities(ActivityList $entity, $entityProvider)
-    {
-        $relatedActivityEntities = [$entity];
-        if ($entityProvider instanceof ActivityListGroupProviderInterface) {
-            $relationEntity = $this->doctrineHelper->getEntity(
-                $entity->getRelatedActivityClass(),
-                $entity->getRelatedActivityId()
-            );
-            $relatedActivityEntities = $entityProvider->getGroupedEntities($relationEntity);
-            if (count($relatedActivityEntities) === 0) {
-                $relatedActivityEntities = [$entity];
-            }
+    protected function getRelatedActivityEntities(
+        ActivityList $entity,
+        ActivityListProviderInterface $entityProvider,
+        $activity
+    ) {
+        if (!$entityProvider instanceof ActivityListGroupProviderInterface) {
+            return [$entity];
         }
 
-        return $relatedActivityEntities;
+        $relatedActivityEntities = $entityProvider->getGroupedEntities($activity);
+
+        return count($relatedActivityEntities) > 0 ? $relatedActivityEntities : [$entity];
     }
 
     /**
@@ -457,7 +450,7 @@ class ActivityListManager
 
         if (is_null($activityClass)) {
             $associationName = $this->getActivityListAssociationName($targetClass);
-            $entityClass = ActivityList::ENTITY_NAME;
+            $entityClass = ActivityList::class;
         } else {
             $associationName = $this->getActivityAssociationName($targetClass);
             $entityClass = $activityClass;
@@ -471,7 +464,7 @@ class ActivityListManager
             $targetField = current(array_keys($association['relationToTargetKeyColumns']));
 
             $dbConnection = $this->doctrineHelper
-                ->getEntityManager(ActivityList::ENTITY_NAME)
+                ->getEntityManager(ActivityList::class)
                 ->getConnection();
 
             // to avoid of duplication activity lists and activities items we need to clear these relations

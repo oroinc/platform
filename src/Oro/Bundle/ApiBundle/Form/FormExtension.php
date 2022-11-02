@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
 /**
- * Provides all form types, type extensions and guessers that can be used in Data API forms.
+ * Provides all form types, type extensions and guessers that can be used in API forms.
  */
 class FormExtension implements FormExtensionInterface
 {
@@ -100,13 +100,13 @@ class FormExtension implements FormExtensionInterface
                 $extensions[] = $extension = $this->container->get($serviceId);
 
                 // validate result of getExtendedType() to ensure it is consistent with the service definition
-                if ($extension->getExtendedType() !== $name) {
+                if (!in_array($name, $extension->getExtendedTypes(), true)) {
                     throw new InvalidArgumentException(\sprintf(
                         'The extended type specified for the service "%s" does not match the actual extended type.'
                         . ' Expected "%s", given "%s".',
                         $serviceId,
                         $name,
-                        $extension->getExtendedType()
+                        implode(', ', $extension->getExtendedTypes())
                     ));
                 }
             }

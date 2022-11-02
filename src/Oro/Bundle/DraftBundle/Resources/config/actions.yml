@@ -1,0 +1,34 @@
+services:
+    oro_draft.action.draft_redirect:
+        class: Oro\Bundle\DraftBundle\Action\DraftRedirectAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_entity_config.config_manager'
+            - '@router'
+        tags:
+            - { name: oro_action.action, alias: draft_redirect }
+
+    oro_draft.action.draft_create:
+        class: Oro\Bundle\DraftBundle\Action\DraftCreateAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.manager.draft_manager'
+        tags:
+            - { name: oro_action.action, alias: draft_create }
+
+    oro_draft.action.draft_publish:
+        class: Oro\Bundle\DraftBundle\Action\DraftPublishAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.manager.draft_manager'
+        tags:
+            - { name: oro_action.action, alias: draft_publish }
+
+    oro_draft.action.assign_draftable_fields:
+        class: Oro\Bundle\DraftBundle\Action\AssignDraftableFields
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.helper.draft_helper'
+            - '@oro_draft.provider.chain_draftable_fields_exclusion'
+        tags:
+            - { name: oro_action.action, alias: assign_draftable_fields }

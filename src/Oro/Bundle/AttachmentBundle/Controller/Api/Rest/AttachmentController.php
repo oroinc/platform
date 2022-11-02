@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -13,10 +10,9 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("attachment")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Attachment entity.
  */
-class AttachmentController extends RestController implements ClassResourceInterface
+class AttachmentController extends RestController
 {
     /**
      * Get attachment.
@@ -32,7 +28,7 @@ class AttachmentController extends RestController implements ClassResourceInterf
      *
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -56,7 +52,7 @@ class AttachmentController extends RestController implements ClassResourceInterf
      *
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

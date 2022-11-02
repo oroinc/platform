@@ -2,6 +2,8 @@ oro_entity:
     exclusions:
         - { entity: Oro\Bundle\UserBundle\Entity\User, field: password }
         - { entity: Oro\Bundle\UserBundle\Entity\User, field: salt }
+        - { entity: Oro\Bundle\UserBundle\Entity\User, field: confirmationToken }
+        - { entity: Oro\Bundle\UserBundle\Entity\UserLoginAttempt, field: context }
 
     entity_aliases:
         Oro\Bundle\UserBundle\Entity\Email:
@@ -13,6 +15,3 @@ oro_entity:
         Oro\Bundle\UserBundle\Entity\Role:
             alias:        userrole
             plural_alias: userroles
-        Oro\Bundle\UserBundle\Entity\Status:
-            alias:        userstatus
-            plural_alias: userstatuses

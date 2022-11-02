@@ -1,0 +1,27 @@
+<% var selectorId = _.uniqueId('selector-'); %>
+<% var criteriaId = _.uniqueId('criteria-'); %>
+<div class="filter-item" data-filter-wrapper-template>
+    <%
+        var criteriaClasses = 'filter-criteria-selector';
+        if (obj.isEmpty) {
+            criteriaClasses += ' filter-default-value';
+        }
+        if (obj.criteriaClass) {
+            criteriaClasses += obj.criteriaClass;
+        }
+    %>
+    <button id="<%- selectorId %>"
+        class="<%- criteriaClasses %>"
+        data-zoom-disable
+        type="button"
+    <% if (renderMode === 'toggle-mode') { %>
+        aria-controls="<%- criteriaId %>"
+    <% } %>
+    >
+        <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %><span class="filter-item-hint"></span>
+        <span class="filter-criteria-selector-icon-wrap" aria-hidden="true">
+            <span class="filter-criteria-selector-icon"></span>
+        </span>
+    </button>
+    <div id="<%- criteriaId %>" class="filter-criteria <% if (renderMode !== 'toggle-mode') { %>dropdown-menu<% } %>" aria-labelledby="<%- selectorId %>"></div>
+</div>

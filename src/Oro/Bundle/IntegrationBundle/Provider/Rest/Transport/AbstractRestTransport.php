@@ -25,9 +25,6 @@ abstract class AbstractRestTransport implements TransportInterface
      */
     protected $clientFactory;
 
-    /**
-     * @param RestClientFactoryInterface $clientFactory
-     */
     public function setRestClientFactory(RestClientFactoryInterface $clientFactory)
     {
         $this->clientFactory = $clientFactory;

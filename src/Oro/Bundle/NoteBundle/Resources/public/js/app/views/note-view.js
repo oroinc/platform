@@ -1,16 +1,14 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'routing',
-    'orolocale/js/formatter/datetime',
-    'autolinker'
-], function($, _, BaseView, routing, dateTimeFormatter, autolinker) {
+define(function(require) {
     'use strict';
 
-    var NoteView;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const routing = require('routing');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    const autolinker = require('autolinker');
 
-    NoteView = BaseView.extend({
+    const NoteView = BaseView.extend({
         options: {
             template: null
         },
@@ -30,14 +28,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NoteView() {
-            NoteView.__super__.constructor.apply(this, arguments);
+        constructor: function NoteView(options) {
+            NoteView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -49,14 +47,14 @@ define([
         },
 
         render: function() {
-            NoteView.__super__.render.apply(this, arguments);
+            NoteView.__super__.render.call(this);
             this._onRender();
 
             return this;
         },
 
         getTemplateData: function() {
-            var data = NoteView.__super__.getTemplateData.call(this);
+            const data = NoteView.__super__.getTemplateData.call(this);
 
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);

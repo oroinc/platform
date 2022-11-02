@@ -12,7 +12,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var RelationshipRequestDataValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,14 +22,14 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceIdentifierObjectProvider
      */
-    public function testValidResourceIdentifierObject($requestData)
+    public function testValidResourceIdentifierObject(array $requestData)
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
         self::assertEmpty($errors);
     }
 
-    public function validResourceIdentifierObjectProvider()
+    public function validResourceIdentifierObjectProvider(): array
     {
         return [
             [
@@ -37,6 +37,24 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => null]
+            ],
+            [
+                ['data' => null, 'jsonapi' => []]
+            ],
+            [
+                ['data' => null, 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => null, 'meta' => []]
+            ],
+            [
+                ['data' => null, 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => null, 'links' => []]
+            ],
+            [
+                ['data' => null, 'links' => ['test' => null]]
             ]
         ];
     }
@@ -44,14 +62,14 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceIdentifierObjectCollectionProvider
      */
-    public function testValidResourceIdentifierObjectCollection($requestData)
+    public function testValidResourceIdentifierObjectCollection(array $requestData)
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 
         self::assertEmpty($errors);
     }
 
-    public function validResourceIdentifierObjectCollectionProvider()
+    public function validResourceIdentifierObjectCollectionProvider(): array
     {
         return [
             [
@@ -59,6 +77,24 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => []]
+            ],
+            [
+                ['data' => [], 'jsonapi' => []]
+            ],
+            [
+                ['data' => [], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => [], 'meta' => []]
+            ],
+            [
+                ['data' => [], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => [], 'links' => []]
+            ],
+            [
+                ['data' => [], 'links' => ['test' => null]]
             ]
         ];
     }
@@ -66,7 +102,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectProvider
      */
-    public function testInvalidResourceIdentifierObject($requestData, $expectedErrors)
+    public function testInvalidResourceIdentifierObject(array $requestData, array $expectedErrors)
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
@@ -78,7 +114,10 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedErrorObjects, $errors);
     }
 
-    public function invalidResourceIdentifierObjectProvider()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function invalidResourceIdentifierObjectProvider(): array
     {
         return [
             [
@@ -145,6 +184,42 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                     ['The \'type\' property should be a string', '/data/type'],
                     ['The \'id\' property should be a string', '/data/id']
                 ]
+            ],
+            [
+                ['data' => null, 'jsonapi' => null],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'jsonapi' => 'test'],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'jsonapi' => ['test']],
+                [['The \'jsonapi\' property should be an associative array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'meta' => null],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => null, 'meta' => 'test'],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => null, 'meta' => ['test']],
+                [['The \'meta\' property should be an associative array', '/meta']]
+            ],
+            [
+                ['data' => null, 'links' => null],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => null, 'links' => 'test'],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => null, 'links' => ['test']],
+                [['The \'links\' property should be an associative array', '/links']]
             ]
         ];
     }
@@ -152,7 +227,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectCollectionProvider
      */
-    public function testInvalidResourceIdentifierObjectCollection($requestData, $expectedErrors)
+    public function testInvalidResourceIdentifierObjectCollection(array $requestData, array $expectedErrors)
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 
@@ -164,7 +239,10 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedErrorObjects, $errors);
     }
 
-    public function invalidResourceIdentifierObjectCollectionProvider()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function invalidResourceIdentifierObjectCollectionProvider(): array
     {
         return [
             [
@@ -237,6 +315,42 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                     ['The \'type\' property should be a string', '/data/0/type'],
                     ['The \'id\' property should be a string', '/data/0/id']
                 ]
+            ],
+            [
+                ['data' => [], 'jsonapi' => null],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'jsonapi' => 'test'],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'jsonapi' => ['test']],
+                [['The \'jsonapi\' property should be an associative array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'meta' => null],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => [], 'meta' => 'test'],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => [], 'meta' => ['test']],
+                [['The \'meta\' property should be an associative array', '/meta']]
+            ],
+            [
+                ['data' => [], 'links' => null],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => [], 'links' => 'test'],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => [], 'links' => ['test']],
+                [['The \'links\' property should be an associative array', '/links']]
             ]
         ];
     }

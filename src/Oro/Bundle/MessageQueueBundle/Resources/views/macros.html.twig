@@ -1,21 +1,21 @@
 {% macro getJobStatusClass(job) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set status = job.status %}
 
     {% if status is constant('STATUS_RUNNING', job) %}
-        {% set class = 'label-info' %}
+        {% set class = 'info' %}
     {% elseif status is constant('STATUS_SUCCESS', job) %}
-        {% set class = 'label-success' %}
+        {% set class = 'success' %}
     {% elseif status is constant('STATUS_FAILED', job) %}
-        {% set class = 'label-warning' %}
+        {% set class = 'warning' %}
     {% elseif status is constant('STATUS_FAILED_REDELIVERED', job) %}
-        {% set class = 'label-warning' %}
+        {% set class = 'warning' %}
     {% elseif status in [constant('STATUS_CANCELLED', job), constant('STATUS_STALE', job)] %}
-        {% set class = 'label-inverse' %}
+        {% set class = 'inverse' %}
     {% else %}
         {% set class = '' %}
     {% endif %}
 
     {{ class }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

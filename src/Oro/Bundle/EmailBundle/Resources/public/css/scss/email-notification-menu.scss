@@ -9,7 +9,7 @@
             padding-top: 3px;
             display: inline-block;
             font-style: normal;
-            font-weight: normal;
+            font-weight: font-weight('light');
             font-size: 16px;
             line-height: 16px;
 
@@ -33,10 +33,9 @@
 
     .dropdown-menu {
         background-color: $email-dropdown-bg;
-        width: $email-recent-emails-popup-width !important;
+        width: $email-recent-emails-popup-width;
         padding: 0;
         outline: none;
-        #{$end}: -7px;
 
         .empty {
             padding: 5px 10px;
@@ -54,9 +53,9 @@
         color: $primary-400;
         border-radius: 4px;
         z-index: $zindex-popover;
-        box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .5);
+        box-shadow: $email-dropdown-box-shadow;
 
-        &:after {
+        &::after {
             content: '';
             display: inline-block;
             border-left: 6px solid transparent;

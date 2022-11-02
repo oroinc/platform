@@ -4,149 +4,153 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
+use Oro\Component\Config\ResourcesContainerInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConfigProvider
+/**
+ * The provider for dashboards configuration
+ * that is loaded from "Resources/config/oro/dashboards.yml" files.
+ */
+class ConfigProvider extends PhpArrayConfigProvider
 {
-    const NODE_DASHBOARD = 'dashboards';
-    const NODE_WIDGET = 'widgets';
+    private const CONFIG_FILE = 'Resources/config/oro/dashboards.yml';
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    private const DASHBOARDS     = 'dashboards';
+    private const WIDGETS        = 'widgets';
+    private const WIDGETS_CONFIG = 'widgets_configuration';
+    private const CONFIG         = 'configuration';
+    private const WIDGET         = 'widget';
+    private const ROUTE_PARAMS   = 'route_parameters';
+    private const ITEMS          = 'items';
+    private const POSITION       = 'position';
 
-    /**
-     * Array of dashboards config section
-     *
-     * @var array
-     */
-    protected $configs;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
-    /**
-     * @param array $configs
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function __construct(array $configs, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->configs = $configs;
+    public function __construct(
+        string $cacheFile,
+        bool $debug,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        parent::__construct($cacheFile, $debug);
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function getDashboardConfigs(): array
+    {
+        $configs = $this->doGetConfig();
+
+        return $configs[self::DASHBOARDS];
+    }
+
+    public function hasDashboardConfig(string $dashboardName): bool
+    {
+        $configs = $this->doGetConfig();
+
+        return isset($configs[self::DASHBOARDS][$dashboardName]);
+    }
+
     /**
-     * @param string $key
      * @throws InvalidConfigurationException
-     * @return array
      */
-    public function getConfig($key)
+    public function getDashboardConfig(string $dashboardName): array
     {
-        if (!$this->hasConfig($key)) {
-            throw new InvalidConfigurationException($key);
-        }
-
-        return $this->copyConfigurationArray($this->configs[$key]);
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfigs()
-    {
-        return $this->copyConfigurationArray($this->configs);
-    }
-
-    /**
-     * @return array
-     */
-    public function getDashboardConfigs()
-    {
-        return $this->copyConfigurationArray($this->configs[self::NODE_DASHBOARD]);
-    }
-
-    /**
-     * @return array
-     */
-    public function getWidgetConfigs()
-    {
-        return $this->copyConfigurationArray($this->configs[self::NODE_WIDGET]);
-    }
-
-    /**
-     * @param string $dashboardName
-     * @throws InvalidConfigurationException
-     * @return array
-     */
-    public function getDashboardConfig($dashboardName)
-    {
-        if (!$this->hasDashboardConfig($dashboardName)) {
+        $configs = $this->doGetConfig();
+        if (!isset($configs[self::DASHBOARDS][$dashboardName])) {
             throw new InvalidConfigurationException($dashboardName);
         }
 
-        return $this->copyConfigurationArray($this->configs[self::NODE_DASHBOARD][$dashboardName]);
+        return $configs[self::DASHBOARDS][$dashboardName];
+    }
+
+    public function getWidgetConfigs(): array
+    {
+        $configs = $this->doGetConfig();
+
+        return $configs[self::WIDGETS];
+    }
+
+    public function hasWidgetConfig(string $widgetName): bool
+    {
+        $configs = $this->doGetConfig();
+
+        return isset($configs[self::WIDGETS][$widgetName]);
     }
 
     /**
-     * @param string $key
-     * @return bool
+     * @throws InvalidConfigurationException if the widget config was not found and $throwExceptionIfMissing = true
      */
-    public function hasConfig($key)
+    public function getWidgetConfig(string $widgetName, bool $throwExceptionIfMissing = true): ?array
     {
-        return isset($this->configs[$key]);
-    }
-
-    /**
-     * @param string $dashboardName
-     * @return bool
-     */
-    public function hasDashboardConfig($dashboardName)
-    {
-        return isset($this->configs[self::NODE_DASHBOARD][$dashboardName]);
-    }
-
-    /**
-     * @param string $widgetName
-     * @throws InvalidConfigurationException
-     * @return array
-     */
-    public function getWidgetConfig($widgetName)
-    {
-        if (!$this->hasWidgetConfig($widgetName)) {
-            throw new InvalidConfigurationException($widgetName);
-        }
-
-        $config = $this->copyConfigurationArray($this->configs[self::NODE_WIDGET][$widgetName]);
-        if ($this->eventDispatcher->hasListeners(WidgetConfigurationLoadEvent::EVENT_NAME)) {
-            $event = new WidgetConfigurationLoadEvent($config);
-            $this->eventDispatcher->dispatch(WidgetConfigurationLoadEvent::EVENT_NAME, $event);
-            $config = $event->getConfiguration();
-        }
-
-        return $config;
-    }
-
-    /**
-     * @param string $widgetName
-     * @return bool
-     */
-    public function hasWidgetConfig($widgetName)
-    {
-        return isset($this->configs[self::NODE_WIDGET][$widgetName]);
-    }
-
-    /**
-     * Copy array to avoid rewrite original array items by reference
-     *
-     * @param array $configurations
-     * @return array
-     */
-    protected function copyConfigurationArray(array $configurations)
-    {
-        return array_map(function ($config) {
-            if (!is_array($config)) {
-                return $config;
+        $configs = $this->doGetConfig();
+        if (!isset($configs[self::WIDGETS][$widgetName])) {
+            if ($throwExceptionIfMissing) {
+                throw new InvalidConfigurationException($widgetName);
             }
+            return null;
+        }
 
-            return $this->copyConfigurationArray($config);
-        }, $configurations);
+        $widgetConfig = $configs[self::WIDGETS][$widgetName];
+        if ($this->eventDispatcher->hasListeners(WidgetConfigurationLoadEvent::EVENT_NAME)) {
+            $event = new WidgetConfigurationLoadEvent($widgetConfig);
+            $this->eventDispatcher->dispatch($event, WidgetConfigurationLoadEvent::EVENT_NAME);
+            $widgetConfig = $event->getConfiguration();
+        }
+
+        return $widgetConfig;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
+    {
+        $configs = [];
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_dashboard', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (!empty($resource->data[Configuration::ROOT_NODE_NAME])) {
+                $configs[] = $resource->data[Configuration::ROOT_NODE_NAME];
+            }
+        }
+
+        $processedConfig = CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new Configuration(),
+            $configs
+        );
+
+        $this->prepareWidgets(
+            $processedConfig[self::WIDGETS],
+            $processedConfig[self::WIDGETS_CONFIG]
+        );
+        unset($processedConfig[self::WIDGETS_CONFIG]);
+
+        return $processedConfig;
+    }
+
+    private function prepareWidgets(array &$widgets, array $defaultConfig): void
+    {
+        foreach ($widgets as $widgetName => &$widget) {
+            $widget[self::CONFIG] = \array_merge_recursive($defaultConfig, $widget[self::CONFIG]);
+            $widget[self::ROUTE_PARAMS][self::WIDGET] = $widgetName;
+            if (empty($widget[self::ITEMS])) {
+                unset($widget[self::ITEMS]);
+            } else {
+                $this->sortItemsByPosition($widget[self::ITEMS]);
+            }
+        }
+    }
+
+    private function sortItemsByPosition(array &$items): void
+    {
+        ArrayUtil::sortBy($items, false, self::POSITION);
+        foreach ($items as &$item) {
+            unset($item[self::POSITION]);
+        }
     }
 }

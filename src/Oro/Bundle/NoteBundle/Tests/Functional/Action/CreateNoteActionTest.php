@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CreateNoteActionTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadNoteTargets::class]);
@@ -18,7 +18,6 @@ class CreateNoteActionTest extends WebTestCase
 
     /**
      * @dataProvider argumentTypes
-     * @param array $arguments
      */
     public function testCreateAction(array $arguments)
     {

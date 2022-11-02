@@ -1,95 +1,95 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\OrganizationBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class UpdateOrganizationCommand extends ContainerAwareCommand
+/**
+ * Updates an organization.
+ */
+class UpdateOrganizationCommand extends Command
 {
-    /** @var OrganizationManager */
-    protected $organizationManager;
+    protected static $defaultName = 'oro:organization:update';
 
-    /** @var EntityManagerInterface */
-    protected $entityManager;
+    private OrganizationManager $organizationManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(OrganizationManager $organizationManager)
+    {
+        $this->organizationManager = $organizationManager;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:organization:update')
-            ->setDescription('Update organization by name.')
-            ->addArgument('organization-name', InputArgument::REQUIRED, 'Organization name to update')
-            ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
-            ->addOption('organization-description', null, InputOption::VALUE_OPTIONAL, 'Organization description')
-            ->addOption('organization-enabled', null, InputOption::VALUE_OPTIONAL, 'Organization enabled');
+            ->addArgument('organization-name', InputArgument::REQUIRED, 'Organization name')
+            ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'New name')
+            ->addOption('organization-description', null, InputOption::VALUE_OPTIONAL, 'Description')
+            ->addOption('organization-enabled', null, InputOption::VALUE_OPTIONAL, '"Enabled" flag')
+            ->setDescription('Updates an organization.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates an organization.
+
+The <info>--organization-description</info> option can be used to update the organization description:
+
+  <info>php %command.full_name% --organization-description=<description> <organization-name></info>
+
+The <info>--organization-name</info> option can be used to rename an organization.
+The provided value becomes the new name:
+
+  <info>php %command.full_name% --organization-name=<new-name> <old-name></info>
+
+The <info>--organization-enabled</info> option can be used to enable or disable an organization:
+
+  <info>php %command.full_name% --organization-enabled=1 <organization-name></info>
+  <info>php %command.full_name% --organization-enabled=0 <organization-name></info>
+
+HELP
+            )
+            ->addUsage('--organization-description=<description> <organization-name>')
+            ->addUsage('--organization-name=<new-name> <old-name>')
+            ->addUsage('--organization-enabled=1 <organization-name>')
+            ->addUsage('--organization-enabled=0 <organization-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $organizationName = $input->getArgument('organization-name');
-        $organization     = $this->getOrganizationManager()->getOrganizationByName($organizationName);
-        $options          = $input->getOptions();
-
-        if (!$organization) {
-            throw new \InvalidArgumentException(sprintf('Organization "%s" not found.', $organizationName));
-        }
-
+        $io = new SymfonyStyle($input, $output);
         try {
-            $this->updateOrganization($organization, $options);
-        } catch (\InvalidArgumentException $exception) {
-            $output->writeln($exception->getMessage());
-        }
-    }
+            $organizationName = $input->getArgument('organization-name');
+            $organization = $this->organizationManager->getOrganizationByName($organizationName);
 
-    /**
-     * @param Organization $organization
-     * @param array        $options
-     */
-    protected function updateOrganization(Organization $organization, $options)
-    {
-        $properties = ['name', 'description', 'enabled'];
-        foreach ($properties as $property) {
-            if (!empty($options['organization-' . $property])) {
-                $organization->{'set' . ucfirst($property)}($options['organization-' . $property]);
+            if (!$organization) {
+                throw new \InvalidArgumentException(sprintf('Organization "%s" not found.', $organizationName));
             }
+
+            if (null !== $input->getOption('organization-name')) {
+                $organization->setName((string)$input->getOption('organization-name'));
+            }
+            if (null !== $input->getOption('organization-description')) {
+                $organization->setDescription((string)$input->getOption('organization-description'));
+            }
+            if (null !== $input->getOption('organization-enabled')) {
+                $organization->setEnabled((bool)$input->getOption('organization-enabled'));
+            }
+            $this->organizationManager->updateOrganization($organization);
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+
+            return $e->getCode() ?: 1;
         }
 
-        $this->getOrganizationManager()->updateOrganization($organization);
-    }
-
-    /**
-     * @return OrganizationManager
-     */
-    protected function getOrganizationManager()
-    {
-        if (!$this->organizationManager) {
-            $this->organizationManager = $this->getContainer()->get('oro_organization.organization_manager');
-        }
-
-        return $this->organizationManager;
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        }
-
-        return $this->entityManager;
+        return 0;
     }
 }

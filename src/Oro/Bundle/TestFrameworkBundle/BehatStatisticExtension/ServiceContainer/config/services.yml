@@ -8,6 +8,14 @@ services:
             - '@oro_behat_statistic.feature_avg_time_provider.registry'
             - '@oro_behat_statistic.specification.feature_path_locator'
 
+    oro_behat_statistic.manager:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisticManager
+        public: false
+        arguments:
+            - '@oro_behat_statistic.feature_repository'
+            - '@oro_behat_statistic.specification.feature_path_locator'
+            - '@oro_behat_statistic.criteria_array_collection'
+
     oro_behat_statistic.suite.suite_configuration_registry:
         class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry
         arguments:
@@ -25,6 +33,7 @@ services:
 
     oro_behat_statistic.database.connection:
         class: Doctrine\DBAL\Connection
+        public: true
         factory:   ['Doctrine\DBAL\DriverManager', getConnection]
         arguments: ['%oro_behat_statistic.connection%']
 

@@ -3,30 +3,30 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData\Handler;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $customizationProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public function handlerCallback(array $data)
+    public function handlerCallback(array $data, array $context): array
     {
-        $data['callbackKey'] = 'callbackValue';
+        $data['callbackKey'] = sprintf('callbackValue for "%s" action', $context['action']);
 
         return $data;
     }
@@ -40,7 +40,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField($propertyPath)->createAndSetTargetEntity();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -49,7 +53,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $config
+            $config,
+            $configExtras,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -65,6 +71,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
                     $propertyPath,
                     $entityClass,
                     $fieldConfig,
+                    $configExtras,
                     $data
                 ) {
                     self::assertEquals($version, $context->getVersion());
@@ -73,6 +80,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
                     self::assertEquals($propertyPath, $context->getPropertyPath());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($fieldConfig, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
+                    self::assertEquals('item', $context->getFirstGroup());
+                    self::assertEquals('item', $context->getLastGroup());
                     self::assertEquals($data, $context->getResult());
 
                     $contextData = $context->getResult();
@@ -81,7 +91,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -96,7 +106,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\UserProfile::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -105,7 +119,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             Entity\User::class,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -115,6 +131,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -123,15 +141,13 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -146,7 +162,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\UserProfile::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler1 = [$this, 'handlerCallback'];
         $previousHandler2 = new AssociationHandler(
@@ -157,6 +177,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             Entity\User::class,
             $config,
+            $configExtras,
+            false,
             $previousHandler1
         );
         $handler = new AssociationHandler(
@@ -167,6 +189,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler2
         );
 
@@ -175,17 +199,19 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
-            ['key' => 'value', 'callbackKey' => 'callbackValue', 'anotherKey' => 'anotherValue'],
+            [
+                'key'         => 'value',
+                'callbackKey' => 'callbackValue for "get" action',
+                'anotherKey'  => 'anotherValue'
+            ],
             $handledData
         );
     }
@@ -198,7 +224,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -207,7 +237,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -217,6 +249,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -225,19 +259,17 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if ('1.2' === $context->getVersion()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif ('1.0' === $context->getVersion()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if ('1.2' === $context->getVersion()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif ('1.0' === $context->getVersion()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -252,7 +284,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -261,7 +297,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -271,6 +309,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -279,19 +319,17 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if ('test' === (string)$context->getRequestType()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif ('test1' === (string)$context->getRequestType()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if ('test' === (string)$context->getRequestType()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif ('test1' === (string)$context->getRequestType()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -306,7 +344,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -315,7 +357,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             Entity\Account::class,
             $propertyPath,
             $entityClass,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -325,6 +369,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -333,19 +379,17 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if (Entity\Product::class === $context->getRootClassName()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif (Entity\Account::class === $context->getRootClassName()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if (Entity\Product::class === $context->getRootClassName()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif (Entity\Account::class === $context->getRootClassName()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -360,7 +404,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -369,7 +417,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             'organization',
             $entityClass,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -379,6 +429,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -387,19 +439,17 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if ('owner' === $context->getPropertyPath()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif ('organization' === $context->getPropertyPath()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if ('owner' === $context->getPropertyPath()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif ('organization' === $context->getPropertyPath()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -414,7 +464,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = new AssociationHandler(
             $this->customizationProcessor,
@@ -423,7 +477,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             Entity\Account::class,
-            $config
+            $config,
+            $configExtras,
+            false
         );
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -433,6 +489,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -441,19 +499,17 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if (Entity\User::class === $context->getClassName()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif (Entity\Account::class === $context->getClassName()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if (Entity\User::class === $context->getClassName()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif (Entity\Account::class === $context->getClassName()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -468,7 +524,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $previousHandler = function (array $data) {
             $data['previousKey'] = 'previousValue';
@@ -483,6 +543,8 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $propertyPath,
             $entityClass,
             $config,
+            $configExtras,
+            false,
             $previousHandler
         );
 
@@ -491,15 +553,13 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -515,7 +575,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $entityClass = Entity\User::class;
         $rootConfig = new EntityDefinitionConfig();
         $config = $rootConfig->addField($propertyPath)->createAndSetTargetEntity();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -524,7 +588,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $rootConfig
+            $rootConfig,
+            $configExtras,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -533,13 +599,14 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->customizationProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config, $configExtras) {
                     self::assertSame($rootConfig, $context->getRootConfig());
                     self::assertSame($config, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                 }
             );
 
-        \call_user_func($handler, $data);
+        $handler($data, $context);
     }
 
     public function testConfigForUnknownField()
@@ -550,7 +617,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'owner';
         $entityClass = Entity\User::class;
         $rootConfig = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -559,7 +630,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $rootConfig
+            $rootConfig,
+            $configExtras,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -568,13 +641,14 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->customizationProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use ($rootConfig) {
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $configExtras) {
                     self::assertSame($rootConfig, $context->getRootConfig());
                     self::assertNull($context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                 }
             );
 
-        \call_user_func($handler, $data);
+        $handler($data, $context);
     }
 
     public function testConfigForExcludedField()
@@ -587,7 +661,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $rootConfig = new EntityDefinitionConfig();
         $config = $rootConfig->addField($propertyPath)->createAndSetTargetEntity();
         $rootConfig->getField($propertyPath)->setExcluded();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -596,7 +674,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $rootConfig
+            $rootConfig,
+            $configExtras,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -605,13 +685,14 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->customizationProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config, $configExtras) {
                     self::assertSame($rootConfig, $context->getRootConfig());
                     self::assertSame($config, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                 }
             );
 
-        \call_user_func($handler, $data);
+        $handler($data, $context);
     }
 
     public function testConfigForNestedAssociationField()
@@ -624,7 +705,11 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $rootConfig = new EntityDefinitionConfig();
         $associationConfig = $rootConfig->addField('owner')->createAndSetTargetEntity();
         $config = $associationConfig->addField('organization')->createAndSetTargetEntity();
+        $configExtras = [new EntityDefinitionConfigExtra()];
         $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
 
         $handler = new AssociationHandler(
             $this->customizationProcessor,
@@ -633,7 +718,9 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $rootEntityClass,
             $propertyPath,
             $entityClass,
-            $rootConfig
+            $rootConfig,
+            $configExtras,
+            false
         );
 
         $this->customizationProcessor->expects(self::once())
@@ -642,12 +729,80 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->customizationProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config, $configExtras) {
                     self::assertSame($rootConfig, $context->getRootConfig());
                     self::assertSame($config, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
                 }
             );
 
-        \call_user_func($handler, $data);
+        $handler($data, $context);
+    }
+
+    public function testForCollectionHandler()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner';
+        $entityClass = Entity\User::class;
+        $config = new EntityDefinitionConfig();
+        $fieldConfig = $config->addField($propertyPath)->createAndSetTargetEntity();
+        $configExtras = [new EntityDefinitionConfigExtra()];
+        $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $config,
+            $configExtras,
+            true
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use (
+                    $version,
+                    $requestType,
+                    $rootEntityClass,
+                    $propertyPath,
+                    $entityClass,
+                    $fieldConfig,
+                    $configExtras,
+                    $data
+                ) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($rootEntityClass, $context->getRootClassName());
+                    self::assertEquals($propertyPath, $context->getPropertyPath());
+                    self::assertEquals($entityClass, $context->getClassName());
+                    self::assertSame($fieldConfig, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
+                    self::assertEquals('collection', $context->getFirstGroup());
+                    self::assertEquals('collection', $context->getLastGroup());
+                    self::assertEquals($data, $context->getResult());
+
+                    $contextData = $context->getResult();
+                    $contextData['anotherKey'] = 'anotherValue';
+                    $context->setResult($contextData);
+                }
+            );
+
+        $handledData = $handler($data, $context);
+        self::assertEquals(
+            ['key' => 'value', 'anotherKey' => 'anotherValue'],
+            $handledData
+        );
     }
 }

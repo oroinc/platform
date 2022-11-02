@@ -1,0 +1,6 @@
+services:
+    oro_locale.duplicator.extension.localized_fall_back_value_extension:
+        class: Oro\Bundle\LocaleBundle\Duplicator\Extension\LocalizedFallBackValueExtension
+        arguments: ['@doctrine']
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }

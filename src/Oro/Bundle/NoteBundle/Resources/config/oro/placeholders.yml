@@ -3,13 +3,13 @@ placeholders:
 
     items:
         oro_add_note_button:
-            template: OroNoteBundle:Note:addButton.html.twig
+            template: '@@OroNote/Note/addButton.html.twig'
             acl: [oro_note_create, oro_note_view]
 
         oro_add_note_link:
-            template: OroNoteBundle:Note:addLink.html.twig
+            template: '@@OroNote/Note/addLink.html.twig'
             acl: [oro_note_create, oro_note_view]
 
         oro_notes:
-            template: OroNoteBundle:Note:notes.html.twig
+            template: '@@OroNote/Note/notes.html.twig'
             acl: oro_note_view

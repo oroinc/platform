@@ -7,19 +7,19 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorAwareInterface
+/**
+ * Process all messages in queue before make db dump
+ */
+class InitalMessageQueueIsolator implements MessageQueueProcessorAwareInterface
 {
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
+    use MessageQueueProcessorAwareTrait;
 
-    /**
-     * @var KernelInterface
-     */
+    /** @var KernelInterface */
     private $kernel;
 
     public function __construct(KernelInterface $kernel)
@@ -30,12 +30,19 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
-        $this->kernel->boot();
-        $this->messageQueueIsolator->startMessageQueue();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->stopMessageQueue();
-        $this->kernel->shutdown();
         $event->writeln('<info>Process messages before make db dump</info>');
+
+        $this->kernel->boot();
+
+        if ($this->kernel->getContainer()->has('oro_message_queue.mock_lifecycle_message.cache')) {
+            $cache = $this->kernel->getContainer()->get('oro_message_queue.mock_lifecycle_message.cache');
+            $cache->clear();
+        }
+
+        $this->messageQueueProcessor->startMessageQueue();
+        $this->messageQueueProcessor->waitWhileProcessingMessages();
+        $this->messageQueueProcessor->stopMessageQueue();
+        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */
@@ -73,7 +80,7 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     /** {@inheritdoc} */
     public function getName()
     {
-        return 'Inital Message Queue Isolator';
+        return sprintf('Initial Message Queue Isolator');
     }
 
     /**
@@ -82,13 +89,5 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     public function getTag()
     {
         return 'inital_message_queue';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 }

@@ -6,16 +6,19 @@ use Oro\Bundle\DataGridBundle\Tests\Unit\Provider\State\AbstractStateProviderTes
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Bundle\FilterBundle\Provider\State\FiltersStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class FiltersStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var FiltersStateProvider */
     private $provider;
 
     private const DEFAULT_FILTERS_STATE = ['sampleFilter' => ['value' => 'sampleValue']];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,10 +31,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -44,10 +43,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param array $minifiedState
-     */
     private function mockParametersState(array $state, array $minifiedState): void
     {
         $this->datagridParametersHelper
@@ -63,10 +58,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $filtersColumns
-     * @param array $defaultFilters
-     */
     private function mockFiltersColumns(array $filtersColumns, array $defaultFilters): void
     {
         $this->datagridConfiguration
@@ -80,10 +71,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(
         array $state,
@@ -99,9 +86,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function stateDataProvider(): array
     {
         return [
@@ -136,10 +120,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -163,10 +143,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -178,10 +154,12 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
+        $user = $this->getEntity(User::class, ['id' => 42]);
+
         $this->tokenAccessor
             ->expects(self::once())
             ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+            ->willReturn($user);
 
         $this->gridViewManager
             ->expects(self::once())
@@ -196,10 +174,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenGridViewsDisabled(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -216,10 +190,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultFiltersState(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -236,10 +206,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(
         array $state,
@@ -257,10 +223,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $defaultFilters
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetDefaultState(
         array $defaultFilters,

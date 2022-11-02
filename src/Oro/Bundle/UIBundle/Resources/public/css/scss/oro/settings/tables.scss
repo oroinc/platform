@@ -1,0 +1,126 @@
+/* @theme: admin.oro; */
+
+$table-offset-bottom: 0 !default;
+$table-unit-table-min-width: 300px !default;
+$table-unit-table-td-first-child-font-weight: font-weight('bold') !default;
+
+$table-td-first-child-inner-offset: $content-padding-medium !default;
+$table-td-first-child-text-align: left !default;
+$table-td-expander-font-size: 30px !default;
+$table-td-expander-content: '- - - - - - - - - - - - - - - - - - - - - - -' +
+    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - ' !default;
+$table-td-last-child-inner-offset: $content-padding-medium !default;
+
+$table-td-ul-only-child-offset-bottom: 0 !default;
+$table-border-radius: 2px !default;
+$table-td-nowrap-ellipsis-position: relative !default;
+$table-td-nowrap-ellipsis-min-width: 100px !default;
+
+$table-td-nowrap-ellipsis-div-position: absolute !default;
+$table-td-nowrap-ellipsis-div-white-space: nowrap !default;
+$table-td-nowrap-ellipsis-div-overflow: hidden !default;
+$table-td-nowrap-ellipsis-div-text-overflow: ellipsis !default;
+$table-td-nowrap-ellipsis-div-width: 100% !default;
+
+$table-thead-th-background: $primary-200 !default;
+$table-thead-th-font-size: $base-font-size--xs !default;
+$table-thead-th-color: $primary-inverse !default;
+$table-thead-th-padding: 11px 8px !default;
+$table-thead-th-white-space: nowrap !default;
+$table-thead-th-vertical-align: top !default;
+$table-thead-th-text-transform: uppercase !default;
+$table-bordered-thead-th-border-color: $primary-200 !default;
+
+$table-thead-th-a-color: inherit !default;
+$table-thead-th-a-display: block !default;
+$table-thead-th-a-line-height: 11px !default;
+$table-thead-th-a-inner-offset: 7px 0 5px !default;
+$table-thead-th-a-text-transform: uppercase !default;
+
+$table-thead-th-a-focus-outline: none !default;
+
+$table-thead-th-sortable-caret-display: none !default;
+$table-thead-th-sortable-border: none !default;
+$table-thead-th-sortable-border-right: 4px solid transparent !default;
+$table-thead-th-sortable-border-left: 4px solid transparent !default;
+
+$table-thead-th-ascending-color: $extra-100 !default;
+
+$table-thead-th-ascending-caret-offset-top: 0 !default;
+$table-thead-th-ascending-caret-display: inline-block !default;
+$table-thead-th-ascending-caret-border-top: none !default;
+$table-thead-th-ascending-caret-border-bottom: 4px solid !default;
+
+$table-thead-th-descending-color: $extra-100 !default;
+
+$table-thead-th-descending-caret-offset-top: 4px !default;
+$table-thead-th-descending-caret-display: inline-block !default;
+$table-thead-th-descending-caret-border-bottom: none !default;
+$table-thead-th-descending-caret-border-top: 4px solid !default;
+
+$table-tbody-row-click-action-cursor: pointer !default;
+
+$table-tbody-row-selected-background: $row-highlight-background !default;
+
+$table-tbody-row-selected-hover-background: $row-selected-background !default;
+
+$table-tbody-row-selected-hover-td-background: inherit !default;
+
+$table-tbody-td-border-top: 1px solid $primary-860 !default;
+$table-tbody-td-border-bottom: 1px solid $primary-860 !default;
+$table-tbody-td-offset: $content-padding-small !default;
+
+$table-tfoot-th-background: $primary-200 !default;
+$table-tfoot-th-inner-offset: ($content-padding-small * .5) $content-padding-small !default;
+
+$table-dl-offset: 0 0 15px !default;
+$table-checkbox-vertical-align: -3px !default;
+
+$table-action-cell-vertical-align: top !default;
+$table-action-cell-width: 50px !default;
+
+$table-action-cell-dropdown-menu-min-width: 0 !default;
+
+$table-action-column-width: 50px !default;
+
+$table-account-info-inner-offset: 0 20px 0 105px !default;
+
+$table-account-info-user-img-position: relative !default;
+$table-account-info-user-img-float: left !default;
+$table-account-info-user-img-width: 75px !default;
+$table-account-info-user-img-margin: 0 0 0 -85px !default;
+$table-account-info-user-img-overflow: hidden !default;
+
+$table-account-info-user-img-img-width: 75px !default;
+
+$table-account-info-col-float: left !default;
+$table-account-info-col-width: 50% !default;
+
+$table-account-info-dt-float: left !default;
+$table-account-info-dt-width: 120px !default;
+$table-account-info-dt-text-align: right !default;
+
+$table-account-info-dd-clear: right !default;
+$table-account-info-dd-inner-offset: 0 0 10px 120px !default;
+
+$table-user-name-font-size: 20px !default;
+$table-user-name-font-weight: font-weight('bold') !default;
+
+$table-user-state-font-size: 14px !default;
+$table-user-state-inner-offset: 0 15px !default;
+$table-user-state-color: $primary-300 !default;
+
+$table-open-row-background: url('#{$global-url}/oroui/img/bg-opener-grid.png') no-repeat !default;
+$table-open-row-width: 13px !default;
+$table-open-row-height: 13px !default;
+$table-open-row-text-indent: -9999px !default;
+$table-open-row-font-size: 0 !default;
+$table-open-row-line-height: 0 !default;
+$table-open-row-display: block !default;
+$table-open-row-offset: 5px 0 0 3px !default;
+$table-open-row-cursor: pointer !default;
+
+$table-open-tr-td-border-bottom: 0 !default;
+$table-open-tr-td-background: #f4f4f4 !default;
+
+$table-open-tr-open-row-background-position: 0 -13px !default;

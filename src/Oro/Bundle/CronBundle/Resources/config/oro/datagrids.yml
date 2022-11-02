@@ -3,20 +3,22 @@ datagrids:
     oro-cron-schedules-grid:
         acl_resource: oro_cron_schedule_view
         options:
-            entityHint: schedules
+            entityHint: oro.cron.schedule.entity_plural_label
         source:
             type: orm
-            query_builder: "@oro_cron.repository.schedule->getEnabledSchedulesQb"
+            query_builder: "@oro_cron.schedule.datagrid_helper->getEnabledSchedulesQueryBuilder"
         columns:
             command:
                 label: oro.cron.schedule.command.label
+                cellClassName: 'direction-ltr'
                 type: twig
-                template: OroCronBundle:Schedule:Datagrid/command.html.twig
+                template: '@OroCron/Schedule/Datagrid/command.html.twig'
                 frontend_type: html
             definition:
                 label: oro.cron.schedule.definition.label
+                cellClassName: 'direction-ltr'
                 type: twig
-                template: OroCronBundle:Schedule:Datagrid/definition.html.twig
+                template: '@OroCron/Schedule/Datagrid/definition.html.twig'
                 frontend_type: html
         sorters:
             columns:

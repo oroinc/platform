@@ -1,3 +1,0 @@
-services:
-    test_orm_service:
-        class: 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle'

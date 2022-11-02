@@ -326,11 +326,9 @@ Feature: Backend workflow configuration
 
     And save and close form
     And click "Activate"
-    And click "Activate"
+    And I click "Activate" in modal window
     # for now, in UI no way to change datagrids
     And append grid "users-grid" for active workflow "Workflow Button Titles"
-    And go to System/ Localization/ Translations
-    And click "Update Cache"
 
   Scenario: Check Button Title on the datagrid with Name in the transition
     Given I go to System/ User Management/ Users
@@ -502,13 +500,13 @@ Feature: Backend workflow configuration
     Given I go to System/ User Management/ Users
     And click View user2@example.com in grid
     Then I should see "Popup transition with only name" button with attributes:
-      | title | Popup transition with only name |
+      | title | ~ |
     When I click "Popup transition with only name"
     Then I should see "Step with only Name"
 
   Scenario: Check Button Title on the entity view with Message and Label in the transition
     Then I should see "Label TML" button with attributes:
-      | title | Label TML |
+      | title | ~ |
     When I click "Label TML"
     Then I should see "UiWindow" with elements:
       | Title        | Label TML                |
@@ -544,7 +542,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with Attribute in the transition
     Then I should see "Popup transition with Attribute" button with attributes:
-      | title | Popup transition with Attribute |
+      | title | ~ |
     When I click "Popup transition with Attribute"
     Then I should see "UiDialog" with elements:
       | Title        | Popup transition with Attribute |
@@ -555,7 +553,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with Attribute and Label in the transition
     Then I should see "Label TAL" button with attributes:
-      | title | Label TAL |
+      | title | ~ |
     When I click "Label TAL"
     Then I should see "UiDialog" with elements:
       | Title               | Label TAL        |
@@ -600,7 +598,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with Original Page and only Name in the transition
     Then I should see "Page Original transition with only name" button with attributes:
-      | title | Page Original transition with only name |
+      | title | ~ |
     When I click "Page Original transition with only name"
     Then I should see that "Workflow Page Title" contains "Page Original transition with only name"
     And click "Submit"
@@ -608,7 +606,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with View Page and Message and Label in the transition
     Then I should see "Label TPML" button with attributes:
-      | title | Label TPML |
+      | title | ~ |
     When I click "Label TPML"
     Then I should see that "Workflow Page Title" contains "Label TPML"
     And I should see "warning message text View Page and Message and Label"
@@ -636,7 +634,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with View Page and Attribute in the transition
     Then I should see "Page View transition with Attribute" button with attributes:
-      | title | Page View transition with Attribute |
+      | title | ~ |
     When I click "Page View transition with Attribute"
     Then I should see that "Workflow Page Title" contains "Page View transition with Attribute"
     And click "Submit"
@@ -644,7 +642,7 @@ Feature: Backend workflow configuration
 
   Scenario: Check Button Title on the entity view with Index Page and Attribute and Label in the transition
     Then I should see "Label TPAL" button with attributes:
-      | title | Label TPAL |
+      | title | ~ |
     When I click "Label TPAL"
     Then I should see that "Workflow Page Title" contains "Label TPAL"
     And click "Submit"

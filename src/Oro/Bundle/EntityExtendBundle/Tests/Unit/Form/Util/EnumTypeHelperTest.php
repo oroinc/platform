@@ -3,25 +3,29 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var EnumTypeHelper */
-    protected $typeHelper;
+    private $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->typeHelper = new EnumTypeHelper($this->configManager);
     }
@@ -30,15 +34,15 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertNull(
             $this->typeHelper->getEnumCode($className)
@@ -50,15 +54,15 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertNull(
             $this->typeHelper->getEnumCode($className, $fieldName)
@@ -70,27 +74,25 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $enumCode  = 'test_enum';
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('code')
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(
             $enumCode,
@@ -104,27 +106,25 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('enum_code')
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(
             $enumCode,
@@ -136,15 +136,15 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse(
             $this->typeHelper->hasEnumCode($className)
@@ -156,15 +156,15 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse(
             $this->typeHelper->hasEnumCode($className, $fieldName)
@@ -173,30 +173,28 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasEnumCodeForEntity()
     {
-        $enumCode  = 'test_enum';
+        $enumCode = 'test_enum';
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('code')
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertTrue(
             $this->typeHelper->hasEnumCode($className)
@@ -205,31 +203,29 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasEnumCodeForField()
     {
-        $enumCode  = 'test_enum';
+        $enumCode = 'test_enum';
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('enum_code')
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertTrue(
             $this->typeHelper->hasEnumCode($className, $fieldName)
@@ -238,31 +234,29 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasEnumCodeForEmptyEnumCode()
     {
-        $enumCode  = '';
+        $enumCode = '';
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('enum_code')
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertFalse(
             $this->typeHelper->hasEnumCode($className, $fieldName)
@@ -272,7 +266,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasOtherReferencesProvider
      */
-    public function testHasOtherReferences($enumType)
+    public function testHasOtherReferences(string $enumType)
     {
         $enumCode = 'test_enum';
 
@@ -289,25 +283,21 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $configs      = [$config1, $config2];
         $fieldConfigs = [$config1Field1, $config1Field2, $config1Field3];
 
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['enum', $enumConfigProvider],
-                        ['extend', $extendConfigProvider]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['enum', $enumConfigProvider],
+                ['extend', $extendConfigProvider]
+            ]);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
         $enumConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with('Test\Entity1')
-            ->will($this->returnValue($fieldConfigs));
+            ->willReturn($fieldConfigs);
 
         $this->assertTrue(
             $this->typeHelper->hasOtherReferences($enumCode, 'Test\Entity1', 'field1')
@@ -317,7 +307,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasOtherReferencesProvider
      */
-    public function testHasOtherReferencesWithNoRefs($enumType)
+    public function testHasOtherReferencesWithNoRefs(string $enumType)
     {
         $enumCode = 'test_enum';
 
@@ -333,32 +323,28 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $configs      = [$config1, $config2];
         $fieldConfigs = [$config1Field1, $config1Field2];
 
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['enum', $enumConfigProvider],
-                        ['extend', $extendConfigProvider]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['enum', $enumConfigProvider],
+                ['extend', $extendConfigProvider]
+            ]);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
         $enumConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with('Test\Entity1')
-            ->will($this->returnValue($fieldConfigs));
+            ->willReturn($fieldConfigs);
 
         $this->assertFalse(
             $this->typeHelper->hasOtherReferences($enumCode, 'Test\Entity1', 'field1')
         );
     }
 
-    public function hasOtherReferencesProvider()
+    public function hasOtherReferencesProvider(): array
     {
         return [
             ['enum'],
@@ -370,15 +356,15 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $configProvider->expects($this->never())
             ->method('getConfig');
 
@@ -394,22 +380,22 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
 
-        $config = new Config($this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'));
+        $config = new Config($this->createMock(ConfigIdInterface::class));
         $config->set('owner', $owner);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(
             $expected,
@@ -417,7 +403,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isSystemProvider()
+    public function isSystemProvider(): array
     {
         return [
             [ExtendScope::OWNER_SYSTEM, true, null],
@@ -474,34 +460,26 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $enumConfig8 = new Config(new EntityConfigId('enum', 'Test\EnumValue8'));
         $enumConfig8->set('code', 'test_enum8');
 
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['enum', $enumConfigProvider],
-                        ['extend', $extendConfigProvider]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['enum', $enumConfigProvider],
+                ['extend', $extendConfigProvider]
+            ]);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(null, true)
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
         $enumConfigProvider->expects($this->exactly(4))
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test\EnumValue1', null, $enumConfig1],
-                        ['Test\EnumValue2', null, $enumConfig2],
-                        ['Test\EnumValue5', null, $enumConfig5],
-                        ['Test\EnumValue8', null, $enumConfig8],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Test\EnumValue1', null, $enumConfig1],
+                ['Test\EnumValue2', null, $enumConfig2],
+                ['Test\EnumValue5', null, $enumConfig5],
+                ['Test\EnumValue8', null, $enumConfig8],
+            ]);
 
         $this->assertEquals(
             [
@@ -510,15 +488,5 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
             ],
             $this->typeHelper->getPublicEnumTypes()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

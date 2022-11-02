@@ -1,58 +1,78 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\Job as JobComponent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * Clears old records from message_queue_job table.
+ */
+class CleanupCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    const COMMAND_NAME = 'oro:cron:message-queue:cleanup';
-    const INTERVAL_FOR_SUCCESSES = '-2 weeks';
-    const INTERVAL_FOR_FAILED = '-1 month';
+    public const INTERVAL_FOR_SUCCESSES = '-2 weeks';
+    public const INTERVAL_FOR_FAILED = '-1 month';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isActive()
+    /** @var string */
+    protected static $defaultName = 'oro:cron:message-queue:cleanup';
+
+    private DoctrineHelper $doctrineHelper;
+
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        return true;
+        $this->doctrineHelper = $doctrineHelper;
+        parent::__construct();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '0 1 * * *';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName(static::COMMAND_NAME)
             ->addOption(
                 'dry-run',
                 'd',
                 InputOption::VALUE_NONE,
-                'If option exists jobs won\'t be deleted, job count that match cleanup criteria will be shown'
+                'Show the number of jobs that match the cleanup criteria instead of deletion'
             )
-            ->setDescription('Clear successes and failed jobs from message_queue_job table');
+            ->setDescription('Clears old records from message_queue_job table.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears successful job records
+that are older than 2 weeks and failed job records older than 1 month
+from <comment>message_queue_job</comment> table.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to show the number of jobs that match
+the cleanup criteria instead of deleting them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
+            )
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('dry-run')) {
@@ -63,7 +83,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 )
             );
 
-            return;
+            return 0;
         }
 
         $output->writeln(sprintf(
@@ -72,6 +92,8 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         ));
 
         $output->writeln('<info>Message queue job history cleanup complete</info>');
+
+        return 0;
     }
 
     /**
@@ -107,14 +129,10 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     private function getEntityManager()
     {
-        return $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityManagerForClass(Job::class);
+        return $this->doctrineHelper->getEntityManagerForClass(Job::class);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @return mixed
-     */
-    private function addOutdatedJobsCriteria(QueryBuilder $qb)
+    private function addOutdatedJobsCriteria(QueryBuilder $qb): void
     {
         $qb
             ->where($qb->expr()->andX(
@@ -126,8 +144,16 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 $qb->expr()->lt('job.stoppedAt', ':failed_end_time')
             ))
             ->setParameter('status_success', JobComponent::STATUS_SUCCESS)
-            ->setParameter('success_end_time', new \DateTime(self::INTERVAL_FOR_SUCCESSES, new \DateTimeZone('UTC')))
+            ->setParameter(
+                'success_end_time',
+                new \DateTime(self::INTERVAL_FOR_SUCCESSES, new \DateTimeZone('UTC')),
+                Types::DATETIME_MUTABLE
+            )
             ->setParameter('status_failed', JobComponent::STATUS_FAILED)
-            ->setParameter('failed_end_time', new \DateTime(self::INTERVAL_FOR_FAILED, new \DateTimeZone('UTC')));
+            ->setParameter(
+                'failed_end_time',
+                new \DateTime(self::INTERVAL_FOR_FAILED, new \DateTimeZone('UTC')),
+                Types::DATETIME_MUTABLE
+            );
     }
 }

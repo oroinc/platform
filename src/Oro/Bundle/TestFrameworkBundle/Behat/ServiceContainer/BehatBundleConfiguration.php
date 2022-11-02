@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
-use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
+use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Configuration defenition of `/Tests/Behat/behat.yml` for bundles.
+ * Configuration definition of `/Tests/Behat/behat.yml` for bundles.
  */
 class BehatBundleConfiguration implements ConfigurationInterface
 {
@@ -26,7 +26,7 @@ class BehatBundleConfiguration implements ConfigurationInterface
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
-        $this->kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $this->kernel = $container->get(SymfonyExtension::KERNEL_ID);
     }
 
     /**
@@ -35,8 +35,8 @@ class BehatBundleConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_behat_extension');
+        $treeBuilder = new TreeBuilder('oro_behat_extension');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
@@ -48,19 +48,21 @@ class BehatBundleConfiguration implements ConfigurationInterface
                                 return is_array($suite) && count($suite);
                             })
                             ->then(function ($suite) {
-                                $suite['settings'] = isset($suite['settings'])
-                                    ? $suite['settings']
-                                    : [];
+                                $suite['settings'] = $suite['settings'] ?? [];
 
                                 foreach ($suite as $key => $val) {
                                     $suiteKeys = ['enabled', 'type', 'settings'];
                                     if ('paths' === $key) {
                                         $val = array_map(function ($v) {
-                                            if ('@' === substr($v, 0, 1)) {
+                                            if (str_starts_with($v, '@')) {
                                                 $bundleName = explode('/', substr($v, 1))[0];
-                                                $bundlePath = $this->kernel->getBundle('!' . $bundleName)->getPath();
+                                                $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
 
                                                 return str_replace('@'.$bundleName, $bundlePath, $v);
+                                            }
+
+                                            if (!str_starts_with($v, '/')) {
+                                                return $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . $v;
                                             }
 
                                             return $v;

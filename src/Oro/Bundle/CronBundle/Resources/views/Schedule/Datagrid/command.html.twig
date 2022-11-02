@@ -1,3 +1,4 @@
 <code>
-    {{ record.getValue('command') }} {{ record.getValue('arguments')|join(' ')|truncate }}
+    {% set argumentsStr = record.getValue('arguments')|join(' ') %}
+    {{ record.getValue('command') }} {{ argumentsStr|length <= 30 ? argumentsStr : argumentsStr|slice(0, 30)|trim(side='right') ~ '...' }}
 </code>

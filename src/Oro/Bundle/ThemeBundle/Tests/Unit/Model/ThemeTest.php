@@ -1,52 +1,49 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
 
 class ThemeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Theme
-     */
-    protected $theme;
+    /** @var Theme */
+    private $theme;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->theme = new Theme('test');
     }
 
-    public function testGetNameAndConstructor()
+    public function testGetNameAndConstructor(): void
     {
-        $this->assertEquals('test', $this->theme->getName());
+        self::assertEquals('test', $this->theme->getName());
     }
 
-    public function testIconMethods()
+    public function testIconMethods(): void
     {
-        $this->assertNull($this->theme->getIcon());
+        self::assertNull($this->theme->getIcon());
         $this->theme->setIcon('favicon.ico');
-        $this->assertEquals('favicon.ico', $this->theme->getIcon());
+        self::assertEquals('favicon.ico', $this->theme->getIcon());
     }
 
-    public function testLogoMethods()
+    public function testLogoMethods(): void
     {
-        $this->assertNull($this->theme->getIcon());
+        self::assertNull($this->theme->getIcon());
         $this->theme->setIcon('logo.png');
-        $this->assertEquals('logo.png', $this->theme->getIcon());
+        self::assertEquals('logo.png', $this->theme->getIcon());
     }
 
-    public function testScreenshotMethods()
+    public function testScreenshotMethods(): void
     {
-        $this->assertNull($this->theme->getScreenshot());
+        self::assertNull($this->theme->getScreenshot());
         $this->theme->setScreenshot('screenshot.png');
-        $this->assertEquals('screenshot.png', $this->theme->getScreenshot());
+        self::assertEquals('screenshot.png', $this->theme->getScreenshot());
     }
 
-    public function testStylesMethods()
+    public function testRtlSupportMethods(): void
     {
-        $this->assertEquals(array(), $this->theme->getStyles());
-        $this->theme->setStyles(array('styles.png'));
-        $this->assertEquals(array('styles.png'), $this->theme->getStyles());
+        self::assertFalse($this->theme->isRtlSupport());
+        $this->theme->setRtlSupport(true);
+        self::assertTrue($this->theme->isRtlSupport());
     }
 }

@@ -10,7 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(
  *      name="oro_segment_snapshot",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"})
+ *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"}),
+ *          @ORM\UniqueConstraint(columns={"segment_id", "integer_entity_id"})
  *      },
  *      indexes={
  *          @ORM\Index(name="sgmnt_snpsht_int_entity_idx", columns={"integer_entity_id"}),
@@ -29,7 +30,7 @@ class SegmentSnapshot
      * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
+     * @ORM\Column(type="bigint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
@@ -51,7 +52,7 @@ class SegmentSnapshot
     /**
      * @var Segment
      *
-     * @ORM\ManyToOne(targetEntity="Segment")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\SegmentBundle\Entity\Segment")
      * @ORM\JoinColumn(name="segment_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $segment;
@@ -65,8 +66,6 @@ class SegmentSnapshot
 
     /**
      * Constructor
-     *
-     * @param Segment $segment
      */
     public function __construct(Segment $segment)
     {
@@ -105,9 +104,6 @@ class SegmentSnapshot
         return $this->segment;
     }
 
-    /**
-     * @param \Datetime $createdAt
-     */
     public function setCreatedAt(\Datetime $createdAt)
     {
         $this->createdAt = $createdAt;

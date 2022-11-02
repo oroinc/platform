@@ -5,9 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,79 +16,139 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EmptyDataExtension */
     private $emptyDataExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityInstantiator = $this->createMock(EntityInstantiator::class);
 
         $this->emptyDataExtension = new EmptyDataExtension($this->entityInstantiator);
     }
 
-    public function testGetExtendedType()
+    private function expectBuildForm(array $options): \Closure
     {
-        self::assertEquals(FormType::class, $this->emptyDataExtension->getExtendedType());
+        $emptyDataNormalizer = null;
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('setEmptyData')
+            ->willReturnCallback(function ($value) use (&$emptyDataNormalizer) {
+                $emptyDataNormalizer = $value;
+            });
+        $this->emptyDataExtension->buildForm($builder, $options);
+
+        return $emptyDataNormalizer;
+    }
+
+    public function testGetExtendedTypes()
+    {
+        self::assertEquals([FormType::class], EmptyDataExtension::getExtendedTypes());
     }
 
     /**
      * @dataProvider scalarValueProvider
      */
-    public function testEmptyDataNormalizerForScalarField($value, $expected)
-    {
-        $optionsResolver = new OptionsResolver();
-        $optionsResolver->setDefault('data_class', null);
-        $this->emptyDataExtension->configureOptions($optionsResolver);
-        $options = $optionsResolver->resolve([]);
+    public function testEmptyDataNormalizerForScalarField(
+        string|int|null $expected,
+        ?string $viewData,
+        mixed $emptyData
+    ) {
+        $options = [
+            'data_class' => null,
+            'empty_data' => $emptyData
+        ];
 
-        $emptyDataNormalizer = $options['empty_data'];
+        $emptyDataNormalizer = $this->expectBuildForm($options);
 
         $form = $this->createMock(FormInterface::class);
-        $formConfig = $this->createMock(FormConfigInterface::class);
-        $form->expects(self::once())
-            ->method('getConfig')
-            ->willReturn($formConfig);
-        $formConfig->expects(self::once())
-            ->method('getCompound')
-            ->willReturn(false);
 
-        self::assertSame($expected, $emptyDataNormalizer($form, $value));
+        self::assertSame($expected, $emptyDataNormalizer($form, $viewData));
     }
 
-    public function scalarValueProvider()
+    public function scalarValueProvider(): array
     {
         return [
-            [null, null],
-            ['', '']
+            'null, null'                           => [
+                'expected'  => null,
+                'viewData'  => null,
+                'emptyData' => null
+            ],
+            'null, null (closure)'                 => [
+                'expected'  => null,
+                'viewData'  => null,
+                'emptyData' => function () {
+                    return null;
+                }
+            ],
+            'null, empty string'                   => [
+                'expected'  => null,
+                'viewData'  => null,
+                'emptyData' => ''
+            ],
+            'null, empty string (closure)'         => [
+                'expected'  => null,
+                'viewData'  => null,
+                'emptyData' => function () {
+                    return '';
+                }
+            ],
+            'empty string, null'                   => [
+                'expected'  => '',
+                'viewData'  => '',
+                'emptyData' => null
+            ],
+            'empty string, null (closure)'         => [
+                'expected'  => '',
+                'viewData'  => '',
+                'emptyData' => function () {
+                    return null;
+                }
+            ],
+            'empty string, empty string'           => [
+                'expected'  => '',
+                'viewData'  => '',
+                'emptyData' => ''
+            ],
+            'empty string, empty string (closure)' => [
+                'expected'  => '',
+                'viewData'  => '',
+                'emptyData' => function () {
+                    return '';
+                }
+            ],
+            'not empty value'                      => [
+                'expected'  => 0,
+                'viewData'  => '',
+                'emptyData' => 0
+            ],
+            'not empty value (closure)'            => [
+                'expected'  => 0,
+                'viewData'  => '',
+                'emptyData' => function () {
+                    return 0;
+                }
+            ]
         ];
     }
 
     public function testEmptyDataNormalizerForCompoundField()
     {
-        $optionsResolver = new OptionsResolver();
-        $optionsResolver->setDefault('data_class', null);
-        $this->emptyDataExtension->configureOptions($optionsResolver);
-        $options = $optionsResolver->resolve([]);
+        $options = [
+            'data_class' => null,
+            'empty_data' => function () {
+                return [];
+            }
+        ];
 
-        $emptyDataNormalizer = $options['empty_data'];
+        $emptyDataNormalizer = $this->expectBuildForm($options);
 
         $form = $this->createMock(FormInterface::class);
-        $formConfig = $this->createMock(FormConfigInterface::class);
-        $form->expects(self::once())
-            ->method('getConfig')
-            ->willReturn($formConfig);
-        $formConfig->expects(self::once())
-            ->method('getCompound')
-            ->willReturn(true);
 
         self::assertSame([], $emptyDataNormalizer($form, ''));
     }
 
     public function testEmptyDataNormalizerForEmptyOptionalCompoundFieldWithDataClass()
     {
-        $optionsResolver = new OptionsResolver();
-        $optionsResolver->setDefault('data_class', null);
-        $this->emptyDataExtension->configureOptions($optionsResolver);
-        $options = $optionsResolver->resolve(['data_class' => 'Test\Class']);
+        $options = ['data_class' => 'Test\Class'];
 
-        $emptyDataNormalizer = $options['empty_data'];
+        $emptyDataNormalizer = $this->expectBuildForm($options);
 
         $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
@@ -107,12 +166,9 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyDataNormalizerForEmptyRequiredCompoundFieldWithDataClass()
     {
-        $optionsResolver = new OptionsResolver();
-        $optionsResolver->setDefault('data_class', null);
-        $this->emptyDataExtension->configureOptions($optionsResolver);
-        $options = $optionsResolver->resolve(['data_class' => 'Test\Class']);
+        $options = ['data_class' => 'Test\Class'];
 
-        $emptyDataNormalizer = $options['empty_data'];
+        $emptyDataNormalizer = $this->expectBuildForm($options);
 
         $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
@@ -133,12 +189,9 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClass()
     {
-        $optionsResolver = new OptionsResolver();
-        $optionsResolver->setDefault('data_class', null);
-        $this->emptyDataExtension->configureOptions($optionsResolver);
-        $options = $optionsResolver->resolve(['data_class' => 'Test\Class']);
+        $options = ['data_class' => 'Test\Class'];
 
-        $emptyDataNormalizer = $options['empty_data'];
+        $emptyDataNormalizer = $this->expectBuildForm($options);
 
         $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
@@ -150,6 +203,29 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('instantiate')
             ->with('Test\Class')
             ->willReturn($object);
+
+        self::assertSame($object, $emptyDataNormalizer($form, ''));
+    }
+
+    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClassAndExistingEmptyDataNormalizer()
+    {
+        $object = new \stdClass();
+        $options = [
+            'data_class' => 'Test\Class',
+            'empty_data' => function () use ($object) {
+                return $object;
+            }
+        ];
+
+        $emptyDataNormalizer = $this->expectBuildForm($options);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        $this->entityInstantiator->expects(self::never())
+            ->method('instantiate');
 
         self::assertSame($object, $emptyDataNormalizer($form, ''));
     }

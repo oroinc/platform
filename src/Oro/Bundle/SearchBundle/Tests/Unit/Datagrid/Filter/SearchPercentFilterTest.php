@@ -12,44 +12,36 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchPercentFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchPercentFilter */
-    protected $filter;
-
     /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datasource;
+    private $datasource;
 
-    protected function setUp()
+    /** @var SearchPercentFilter */
+    private $filter;
+
+    protected function setUp(): void
     {
-        /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->createMock(FormFactoryInterface::class);
 
-        /** @var FilterUtility $filterUtility */
-        $filterUtility = $this->createMock(FilterUtility::class);
-
-        $this->filter = new SearchPercentFilter($formFactory, $filterUtility);
+        $this->filter = new SearchPercentFilter($formFactory, new FilterUtility());
 
         $this->datasource = $this->createMock(SearchFilterDatasourceAdapter::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
-        /** @var FilterDatasourceAdapterInterface $ds */
-        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
+        $this->expectException(UnexpectedTypeException::class);
 
         $this->filter->apply(
-            $ds,
+            $this->createMock(FilterDatasourceAdapterInterface::class),
             [
                 'type' => NumberRangeFilterType::TYPE_BETWEEN,
                 'value' => 1.42,
-                'value_end' => 1.55,
+                'value_end' => 1.55
             ]
         );
     }
@@ -83,7 +75,7 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $this->datasource->expects($this->exactly(1))
+        $this->datasource->expects($this->once())
             ->method('addRestriction')
             ->with(
                 new CompositeExpression(
@@ -107,5 +99,11 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
                 ]
             )
         );
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

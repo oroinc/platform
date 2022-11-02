@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var AutocompleteComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var routing = require('routing');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    AutocompleteComponent = BaseComponent.extend({
+    const AutocompleteComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -44,28 +43,28 @@ define(function(require) {
         debounceWait: 500,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AutocompleteComponent() {
-            AutocompleteComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AutocompleteComponent(options) {
+            AutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            AutocompleteComponent.__super__.initialize.apply(this, arguments);
+            AutocompleteComponent.__super__.initialize.call(this, options);
 
             // add debounce to search method
             this._searchForResults = _.debounce(this._searchForResults.bind(this), this.debounceWait);
 
-            var thisOptions = {
-                selection_template: _.bind(this.renderSelection, this),
+            const thisOptions = {
+                selection_template: this.renderSelection.bind(this),
                 config: {
-                    source: _.bind(this.source, this),
-                    matcher: _.bind(this.matcher, this),
-                    updater: _.bind(this.updater, this),
-                    sorter: _.bind(this.sorter, this),
+                    source: this.source.bind(this),
+                    matcher: this.matcher.bind(this),
+                    updater: this.updater.bind(this),
+                    sorter: this.sorter.bind(this),
                     show: this.show,
                     hide: this.hide
                 }
@@ -76,7 +75,7 @@ define(function(require) {
 
             this.$el.attr('autocomplete', 'off');
 
-            var dropClasses = this.$el.data('dropdown-classes');
+            const dropClasses = this.$el.data('dropdown-classes');
             if (dropClasses) {
                 this.options.config = _.assign(this.options.config, {
                     holder: '<div class="' + dropClasses.holder + '"></div>',
@@ -104,7 +103,7 @@ define(function(require) {
          * @param {Function} callback
          */
         source: function(query, callback) {
-            var $el = this.$el;
+            const $el = this.$el;
 
             if (this.lastSearch === query) {
                 $el.typeahead('show');
@@ -116,7 +115,11 @@ define(function(require) {
         },
 
         _searchForResults: function(query, callback) {
-            var self = this;
+            const self = this;
+
+            if (this.disposed) {
+                return;
+            }
 
             if (this.jqXHR) {
                 this.jqXHR.abort(); // abort ajax call with out-dated results
@@ -138,7 +141,7 @@ define(function(require) {
         },
 
         sourceCallback: function(query, callback, response) {
-            var results = this.prepareResults(response);
+            const results = this.prepareResults(response);
             callback(this.$el.is(':focus') ? results : []);
 
             this.lastSearch = query;
@@ -169,18 +172,25 @@ define(function(require) {
         },
 
         show: function() {
-            var pos = $.extend({}, this.$element.position(), {
+            const pos = $.extend({}, this.$element.position(), {
                 height: this.$element[0].offsetHeight
             });
 
-            var $autocomplete = this.$holder.length ? this.$holder : this.$menu;
+            const $autocomplete = this.$holder.length ? this.$holder : this.$menu;
+            const direction = {};
+
+            if (_.isRTL()) {
+                direction.right = this._calculateRightPosition();
+            } else {
+                direction.left = pos.left;
+            }
 
             if (this.$holder.length) {
                 this.$holder
                     .insertAfter(this.$element)
                     .css({
                         top: pos.top + pos.height,
-                        left: pos.left
+                        ...direction
                     })
                     .append(this.$menu)
                     .show();
@@ -189,19 +199,19 @@ define(function(require) {
                     .insertAfter(this.$element)
                     .css({
                         top: pos.top + pos.height,
-                        left: pos.left
+                        ...direction
                     })
                     .show();
             }
 
             this.shown = true;
 
-            var $window = $(window);
-            var viewportBottom = $window.scrollTop() + $window.height();
-            var autocompleteHeight = $autocomplete.outerHeight(false);
-            var autocompleteTop = $autocomplete.offset().top;
-            var enoughBelow = autocompleteTop + autocompleteHeight <= viewportBottom;
-            var enoughAbove = this.$element.offset().top > autocompleteHeight;
+            const $window = $(window);
+            const viewportBottom = $window.scrollTop() + $window.height();
+            const autocompleteHeight = $autocomplete.outerHeight(false);
+            const autocompleteTop = $autocomplete.offset().top;
+            const enoughBelow = autocompleteTop + autocompleteHeight <= viewportBottom;
+            const enoughAbove = this.$element.offset().top > autocompleteHeight;
 
             if (!enoughBelow && enoughAbove) {
                 $autocomplete.css('top', -autocompleteHeight);
@@ -227,10 +237,10 @@ define(function(require) {
          * @returns {Array}
          */
         prepareResults: function(response) {
-            var self = this;
+            const self = this;
             this.resultsMapping = {};
             return _.map(response.results || [], function(item) {
-                var result = $.trim(self.options.selection_template(item));
+                const result = self.options.selection_template(item).trim();
                 self.resultsMapping[result] = item;
                 return result;
             });
@@ -241,14 +251,14 @@ define(function(require) {
          * @returns {String}
          */
         renderSelection: function(result) {
-            var title = '';
+            let title = '';
             if (result) {
                 if (this.options.properties.length === 0) {
                     if (result.text !== undefined) {
                         title = result.text;
                     }
                 } else {
-                    var values = [];
+                    const values = [];
                     _.each(this.options.properties, function(property) {
                         values.push(result[property]);
                     });
@@ -256,6 +266,18 @@ define(function(require) {
                 }
             }
             return title;
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.jqXHR) {
+                this.jqXHR.abort();
+            }
+
+            AutocompleteComponent.__super__.dispose.call(this);
         }
     });
 

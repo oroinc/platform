@@ -20,9 +20,6 @@ class NormalizeIdFilterKey implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -42,18 +39,16 @@ class NormalizeIdFilterKey implements ProcessorInterface
             foreach ($filters as $filterKey => $filter) {
                 if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                     $filter->setDescription(self::ID_FILTER_DESCRIPTION);
-                    $filterCollection->remove($filterKey);
-                    $filterCollection->add(JsonApiDoc::ID, $filter);
+                    if (JsonApiDoc::ID !== $filterKey) {
+                        $filterCollection->remove($filterKey);
+                        $filterCollection->add(JsonApiDoc::ID, $filter);
+                    }
+                    break;
                 }
             }
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return string|null
-     */
     private function getIdentifierFieldName(Context $context): ?string
     {
         $idFieldName = null;

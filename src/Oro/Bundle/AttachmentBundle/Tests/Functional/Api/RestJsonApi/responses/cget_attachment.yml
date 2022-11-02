@@ -1,0 +1,73 @@
+data:
+    -
+        type: attachments
+        id: '<toString(@attachment1->id)>'
+        attributes:
+            comment: 'Attachment 1'
+            createdAt: '@attachment1->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@attachment1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            file:
+                data:
+                    type: files
+                    id: '<toString(@file1->id)>'
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            target:
+                data:
+                    type: testapidepartments
+                    id: '<toString(@department1->id)>'
+    -
+        type: attachments
+        id: '<toString(@attachment2->id)>'
+        attributes:
+            comment: 'Attachment 2'
+            createdAt: '@attachment2->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@attachment2->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            file:
+                data:
+                    type: files
+                    id: '<toString(@file2->id)>'
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user1->id)>'
+            target:
+                data:
+                    type: testapidepartments
+                    id: '<toString(@department1->id)>'
+    -
+        type: attachments
+        id: '<toString(@attachment3->id)>'
+        attributes:
+            comment: 'Attachment 3'
+            createdAt: '@attachment3->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@attachment3->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            file:
+                data:
+                    type: files
+                    id: '<toString(@file3->id)>'
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            target:
+                data:
+                    type: testapidepartments
+                    id: '<toString(@department2->id)>'

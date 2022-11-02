@@ -16,7 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ReportRepositoryTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -71,7 +71,7 @@ class ReportRepositoryTest extends WebTestCase
     /**
      * @return ReportRepository
      */
-    protected function getRepository()
+    private function getRepository()
     {
         return $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepositoryForClass(Report::class);
     }

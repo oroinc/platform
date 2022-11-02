@@ -8,12 +8,10 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var string
-     */
-    protected $locale;
+    /** @var string */
+    private $locale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -21,7 +19,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -50,7 +48,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     public function testBuildForm(
         $data,
         array $viewData,
-        array $options = array()
+        array $options = []
     ) {
         $form = $this->factory->create(OroPercentType::class, $data, $options);
         $view = $form->createView();
@@ -61,28 +59,25 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
+                'data'     => 0.1123,
+                'viewData' => [
+                    'value' => '11.23'
+                ],
+            ],
+            'custom precision' => [
                 'data'     => 0.1122,
-                'viewData' => array(
-                    'value' => '11.22'
-                ),
-            ),
-            'custom precision' => array(
-                'data'     => 0.1122,
-                'viewData' => array(
+                'viewData' => [
                     'value' => '11'
-                ),
-                'options' => array(
+                ],
+                'options' => [
                     'scale' => 0
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -94,7 +89,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     public function testSubmitForm(
         $data,
         $expectedData,
-        array $options = array()
+        array $options = []
     ) {
         $form = $this->factory->create(OroPercentType::class, null, $options);
         $form->submit($data);
@@ -102,10 +97,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         self::assertSame($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitFormDataProvider()
+    public function submitFormDataProvider(): array
     {
         return [
             'unspecified precision, with numbers after decimal point'                                       => [

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -28,11 +28,6 @@ class GroupHandler
      */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
     {
         $this->form    = $form;

@@ -6,6 +6,9 @@ use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
+/**
+ * The filter by a string value.
+ */
 class StringFilter extends AbstractFilter
 {
     /**
@@ -31,11 +34,8 @@ class StringFilter extends AbstractFilter
             $parameterName
         );
         $this->resetCaseSensitivity($ds);
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-            $ds->setParameter(
-                $parameterName,
-                $this->convertValue($data['value'])
-            );
+        if ($this->isValueRequired($comparisonType)) {
+            $ds->setParameter($parameterName, $this->convertValue($data['value']));
         }
 
         return $expr;
@@ -43,17 +43,20 @@ class StringFilter extends AbstractFilter
 
     /**
      * @param array $data
+     *
      * @return array|mixed|string
      */
     protected function convertValue($data)
     {
         if (is_array($data) && !$this->isCaseInsensitive()) {
             // used when e.g. we have type TextFilterType::TYPE_IN and search is case-sensitive
-            return array_map(array($this, 'convertData'), $data);
-        } elseif (is_array($data)) {
+            return array_map([$this, 'convertData'], $data);
+        }
+        if (is_array($data)) {
             // used when e.g. we have type TextFilterType::TYPE_IN and search is case-insensitive
             return array_map('mb_strtolower', $data);
-        } elseif (!$this->isCaseInsensitive()) {
+        }
+        if (!$this->isCaseInsensitive()) {
             // used when e.g. we have type other then TextFilterType::TYPE_IN and search is case sensitive
             return $this->convertData($data);
         }
@@ -70,21 +73,62 @@ class StringFilter extends AbstractFilter
     }
 
     /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function parseData($data)
     {
-        $type = isset($data['type']) ? $data['type'] : null;
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])
-            && (!is_array($data) || !array_key_exists('value', $data) || $data['value'] === '')
-        ) {
+        $data = parent::parseData($data);
+
+        if (!\is_array($data)) {
             return false;
         }
 
-        $data['type'] = $type;
-        $data['value'] = $this->parseValue($data['type'], $data['value']);
+        if (!$this->isValueRequired($data['type'])) {
+            return $data;
+        }
+
+        if (!isset($data['value']) || '' === $data['value']) {
+            return false;
+        }
+
+        if (!$data['type']) {
+            $data['type'] = TextFilterType::TYPE_EQUAL;
+        }
+
+        return $this->parseValue($data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return mixed
+     */
+    protected function parseValue(array $data)
+    {
+        switch ($data['type']) {
+            case TextFilterType::TYPE_CONTAINS:
+            case TextFilterType::TYPE_NOT_CONTAINS:
+                $data['value'] = sprintf('%%%s%%', $data['value']);
+                break;
+            case TextFilterType::TYPE_STARTS_WITH:
+                $data['value'] = sprintf('%s%%', $data['value']);
+                break;
+            case TextFilterType::TYPE_ENDS_WITH:
+                $data['value'] = sprintf('%%%s', $data['value']);
+                break;
+            case TextFilterType::TYPE_IN:
+            case TextFilterType::TYPE_NOT_IN:
+                $data['value'] = array_map('trim', explode(',', $data['value']));
+                break;
+        }
 
         return $data;
     }
@@ -149,38 +193,13 @@ class StringFilter extends AbstractFilter
      */
     protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
     {
-        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
-    }
-
-    /**
-     * Return a value depending on comparison type
-     *
-     * @param int    $comparisonType
-     * @param string $value
-     *
-     * @return mixed
-     */
-    protected function parseValue($comparisonType, $value)
-    {
-        switch ($comparisonType) {
-            case TextFilterType::TYPE_CONTAINS:
-            case TextFilterType::TYPE_NOT_CONTAINS:
-                return sprintf('%%%s%%', $value);
-            case TextFilterType::TYPE_STARTS_WITH:
-                return sprintf('%s%%', $value);
-            case TextFilterType::TYPE_ENDS_WITH:
-                return sprintf('%%%s', $value);
-            case TextFilterType::TYPE_IN:
-            case TextFilterType::TYPE_NOT_IN:
-                return array_map('trim', explode(',', $value));
-            default:
-                return $value;
+        $filter = $ds->getFieldByAlias($fieldName);
+        if ($filter === null) {
+            return false;
         }
+        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $filter);
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     */
     protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $platform = $ds->getDatabasePlatform();
@@ -189,9 +208,6 @@ class StringFilter extends AbstractFilter
         }
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     */
     protected function resetCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $ds->expr()->setCaseInsensitive(false);

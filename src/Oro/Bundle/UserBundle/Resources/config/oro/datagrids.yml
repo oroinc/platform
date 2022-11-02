@@ -1,13 +1,13 @@
 datagrids:
     users-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         views_list: "@oro_user.user.datagrid_view_list"
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         acl_resource: oro_user_user_view
         source:
             type: orm
@@ -23,10 +23,12 @@ datagrids:
                     - u.enabled
                     - au.id as auth_status
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 join:
                     left:
                         - { join: u.auth_status, alias: au }
+            hints:
+                - HINT_TRANSLATABLE
         inline_editing:
             enable: true
         columns:
@@ -45,8 +47,8 @@ datagrids:
                 inline_editing:
                     enable: false
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
             auth_status:
                 label:         oro.user.auth_status.label
                 editable:      false
@@ -100,7 +102,7 @@ datagrids:
                 auth_status:
                     data_name: au.priority
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
 
         filters:
             columns:
@@ -122,8 +124,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
                 auth_status:
                     type:      enum
                     data_name: au.id
@@ -164,9 +166,9 @@ datagrids:
         action_configuration: ['@oro_user.datagrid.action_checker', checkActions]
 
     groups-grid:
-        extended_entity_name: '%oro_user.group.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\Group'
         options:
-            entityHint: groups
+            entityHint: oro.user.group.entity_plural_label
             entity_pagination: true
         acl_resource: oro_user_group_view
         source:
@@ -176,7 +178,7 @@ datagrids:
                     - g.id
                     - g.name
                 from:
-                    - { table: '%oro_user.group.entity.class%', alias: g }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\Group', alias: g }
         columns:
             name:
                 label: oro.user.group.name.label
@@ -215,7 +217,7 @@ datagrids:
                 name:
                     data_name: g.name
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                name: ASC
 
         filters:
             columns:
@@ -224,14 +226,13 @@ datagrids:
                     data_name: g.name
 
     roles-grid:
-        extended_entity_name: '%oro_user.role.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\Role'
         options:
-            entityHint: roles
+            entityHint: oro.user.role.entity_plural_label
             entity_pagination: true
         acl_resource: oro_user_role_view
         source:
             type: orm
-            skip_acl_apply: true
             query:
                 select:
                     - r
@@ -239,10 +240,7 @@ datagrids:
                     - r.role
                     - r.label
                 from:
-                    - { table: '%oro_user.role.entity.class%', alias: r }
-                where:
-                    and:
-                        - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'
+                    - { table: 'Oro\Bundle\UserBundle\Entity\Role', alias: r }
         columns:
             label:
                 label: oro.user.role.label.label
@@ -291,7 +289,7 @@ datagrids:
                 label:
                     data_name: r.label
             default:
-                label: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                label: ASC
 
         filters:
             columns:
@@ -311,7 +309,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: OroUserBundle:User, alias: u }
+                    - { table: Oro\Bundle\UserBundle\Entity\User, alias: u }
 
         columns: []
 
@@ -339,7 +337,7 @@ datagrids:
             query:
                 join:
                     left:
-                        - { join: u.roles, alias: r }
+                        - { join: u.userRoles, alias: r }
                 where:
                     and:
                       - r.id = :role_id
@@ -360,8 +358,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 firstName:
@@ -382,12 +380,12 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             default:
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                lastName: ASC
 
     role-users-grid:
         extends: user-relation-grid
@@ -397,7 +395,7 @@ datagrids:
                 select:
                     - >
                       (CASE WHEN (:role_id IS NOT NULL) THEN
-                        CASE WHEN (:role_id MEMBER OF u.roles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
+                        CASE WHEN (:role_id MEMBER OF u.userRoles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       ELSE
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
@@ -424,8 +422,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 has_role:
@@ -449,8 +447,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             columns:
@@ -458,8 +456,8 @@ datagrids:
                     data_name: has_role
 
             default:
-                has_role: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                has_role: DESC
+                lastName: ASC
         options:
             rowSelection:
                 dataField: id
@@ -474,12 +472,12 @@ datagrids:
             type: role-permission-provider
         columns:
             label:
-                label: "Entity"
+                label: oro.user.datagrid.role_permission.columns.label
                 data_name: label
                 frontend_type: string
                 translatable: true
             permissions:
-                label: "Permissions"
+                label: oro.user.datagrid.role_permission.columns.permissions.label
                 data_name: permissions
                 frontend_type: action-permissions
             identity:
@@ -497,7 +495,7 @@ datagrids:
         filters: ~
         sorters: ~
         options:
-            requireJSModules:
+            jsmodules:
                 - orouser/js/datagrid/roles-datagrid-builder
             toolbarOptions:
                 placement:
@@ -539,8 +537,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 has_group:
@@ -564,16 +562,16 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             multiple_sorting: true
             columns:
                 has_group:
                     data_name: has_group
             default:
-                has_group: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                has_group: DESC
+                lastName: ASC
 
         options:
             rowSelection:
@@ -584,9 +582,9 @@ datagrids:
                     excluded: '#groupRemoveUsers'
 
     users-select-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
         acl_resource: oro_user_user_view
         source:
             type: orm
@@ -599,7 +597,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
         columns:
             firstName:
                 label: oro.user.first_name.label
@@ -613,8 +611,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
 
         properties:
             id: ~
@@ -631,7 +629,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
         filters:
             columns:
                 firstName:
@@ -652,13 +650,13 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
 
     owner-users-select-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
         source:
             type: orm
             skip_acl_apply: true
@@ -671,7 +669,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 where:
                     and:
                         - u.enabled=true
@@ -698,7 +696,7 @@ datagrids:
                 username:
                     data_name: u.username
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
         filters:
             columns:
                 firstName:
@@ -723,9 +721,9 @@ datagrids:
                         - u.id != @oro_security.token_accessor->getUserId
 
     users-for-context-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
             entity_pagination: true
             toolbarOptions:
                 pageSize:
@@ -743,7 +741,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 where:
                     and:
                         - u.id != @oro_security.token_accessor->getUserId
@@ -762,8 +760,8 @@ datagrids:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         sorters:
             columns:
                 firstName:
@@ -777,7 +775,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                username: ASC
 
         filters:
             columns:
@@ -799,5 +797,107 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
+
+    user-login-attempts-grid:
+        acl_resource: oro_view_user_login_attempt
+        source:
+            type: orm
+            query:
+                select:
+                    - partial ul.{ id }
+                    - ul.id
+                    - ul.attemptAt
+                    - ul.success
+                    - ul.source
+                    - ul.username
+                    - ul.ip
+                    - ul.userAgent
+                    - CONCAT_WS(' ', user.firstName, user.lastName) as userInfo
+                    - user
+                from:
+                    - { table: 'Oro\Bundle\UserBundle\Entity\UserLoginAttempt', alias: ul }
+                join:
+                    left:
+                        - { join: ul.user, alias: user }
+        columns:
+            id:
+                label: oro.user.userloginattempt.id.label
+                renderable: false
+            attemptAt:
+                label: oro.user.userloginattempt.attempt_at.label
+                frontend_type: datetime
+            success:
+                label: oro.user.userloginattempt.success.label
+                frontend_type: boolean
+            source:
+                label: oro.user.userloginattempt.source.label
+                frontend_type: select
+                choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+            username:
+                label: oro.user.userloginattempt.username.label
+            user:
+                label: oro.user.userloginattempt.user.label
+                type: twig
+                frontend_type: html
+                template: '@OroUser/Datagrid/Column/user.html.twig'
+            ip:
+                label: oro.user.userloginattempt.ip.label
+            userAgent:
+                label: oro.user.userloginattempt.user_agent.label
+                type: twig
+                frontend_type: html
+                template: '@OroUser/Datagrid/Column/userAgentColumn.html.twig'
+        sorters:
+            columns:
+                attemptAt:
+                    data_name: ul.attemptAt
+                success:
+                    data_name: ul.success
+                username:
+                    data_name: ul.username
+                user:
+                    data_name: userInfo
+                source:
+                    data_name: ul.source
+                ip:
+                    data_name: ul.ip
+                userAgent:
+                    data_name: ul.userAgent
+            default:
+                attemptAt: DESC
+        filters:
+            columns:
+                id:
+                    type: string
+                    data_name: ul.id
+                success:
+                    data_name: ul.success
+                    type: boolean
+                attemptAt:
+                    type: datetime
+                    data_name: ul.attemptAt
+                username:
+                    type: string
+                    data_name: ul.username
+                source:
+                    type: choice
+                    data_name: ul.source
+                    options:
+                        field_options:
+                            choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+                            multiple: true
+                user:
+                    type: choice-tree
+                    label: oro.user.userloginattempt.user.label
+                    data_name: ul.user
+                    autocomplete_alias: users
+                    renderedPropertyName: 'fullName'
+                    className: 'Oro\Bundle\UserBundle\Entity\User'
+                ip:
+                    type: string
+                    data_name: ul.ip
+                userAgent:
+                    type: string
+                    data_name: ul.userAgent

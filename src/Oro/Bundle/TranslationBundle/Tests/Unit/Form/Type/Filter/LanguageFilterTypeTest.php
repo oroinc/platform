@@ -13,29 +13,16 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 class LanguageFilterTypeTest extends FormIntegrationTestCase
 {
     /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
+    private $formatter;
 
     /** @var LanguageFilterType */
-    protected $type;
+    private $type;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder(LanguageCodeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(LanguageCodeFormatter::class);
 
         $this->type = new LanguageFilterType($this->formatter);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->formatter, $this->type);
     }
 
     public function testGetBlockPrefix()
@@ -66,10 +53,10 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
 
         $this->formatter->expects($this->any())
             ->method('formatLocale')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['Locale Label', 'Formatted Locale Label'],
                 ['Locale Label2', 'Formatted Locale Label2'],
-            ]));
+            ]);
 
         $this->type->finishView($view, $this->createMock(FormInterface::class), []);
 

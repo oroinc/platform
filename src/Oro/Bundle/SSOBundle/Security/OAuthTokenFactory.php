@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\SSOBundle\Security;
 
+/**
+ * The factory to create OAuthToken.
+ */
 class OAuthTokenFactory implements OAuthTokenFactoryInterface
 {
     /**
-     * @param string|array $accessToken
-     * @param array $roles
-     * @return OAuthToken
+     * {@inheritdoc}
      */
     public function create($accessToken, array $roles = [])
     {

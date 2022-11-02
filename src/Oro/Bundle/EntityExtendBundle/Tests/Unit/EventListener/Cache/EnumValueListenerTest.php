@@ -3,14 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener\Cache;
 
 use Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueListener;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class EnumValueListenerTest extends EnumValueListenerTestCase
 {
     /** @var EnumValueListener */
     private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -21,7 +21,7 @@ class EnumValueListenerTest extends EnumValueListenerTestCase
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postPersist(new StubEnumValue(1, 'test'));
+        $this->listener->postPersist(new TestEnumValue(1, 'test'));
     }
 
     public function testPostPersistNotSupportedClass()
@@ -35,7 +35,7 @@ class EnumValueListenerTest extends EnumValueListenerTestCase
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postUpdate(new StubEnumValue(1, 'test'));
+        $this->listener->postUpdate(new TestEnumValue(1, 'test'));
     }
 
     public function testPostUpdateNotSupportedClass()
@@ -49,7 +49,7 @@ class EnumValueListenerTest extends EnumValueListenerTestCase
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postRemove(new StubEnumValue(1, 'test'));
+        $this->listener->postRemove(new TestEnumValue(1, 'test'));
     }
 
     public function testPostRemoveNotSupportedClass()

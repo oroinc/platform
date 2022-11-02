@@ -5,29 +5,22 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for Auto Response email templates selector.
+ */
 class AutoResponseTemplateChoiceType extends AbstractType
 {
-    const NAME = 'oro_email_autoresponse_template_choice';
+    private TokenAccessorInterface $tokenAccessor;
+    private TranslatorInterface $translator;
 
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TranslatorInterface    $translator
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor, TranslatorInterface $translator)
     {
         $this->tokenAccessor = $tokenAccessor;
@@ -40,12 +33,13 @@ class AutoResponseTemplateChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'selectedEntity' => Email::ENTITY_CLASS,
+            'selectedEntity' => Email::class,
             'query_builder' => function (EmailTemplateRepository $repository) {
                 return $repository->getEntityTemplatesQueryBuilder(
-                    Email::ENTITY_CLASS,
+                    Email::class,
                     $this->tokenAccessor->getOrganization(),
-                    true
+                    true,
+                    false
                 );
             },
             'configs' => [
@@ -56,16 +50,13 @@ class AutoResponseTemplateChoiceType extends AbstractType
     }
 
     /**
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $options
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /* @var $choice ChoiceView */
+        /* @var ChoiceView $choice */
         foreach ($view->vars['choices'] as $choice) {
-            /* @var $template EmailTemplate */
+            /* @var EmailTemplate $template */
             $template = $choice->data;
             if (!$template->isVisible()) {
                 $choice->label = $this->translator->trans('oro.form.custom_value');
@@ -94,6 +85,6 @@ class AutoResponseTemplateChoiceType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return static::NAME;
+        return 'oro_email_autoresponse_template_choice';
     }
 }

@@ -2,4 +2,7 @@ label: Demo Theme
 logo: bundles/oroui/themes/oro/images/oro-platform-logo.svg
 icon: bundles/oroui/themes/oro/images/favicon.ico
 styles:
-    - bundles/oroui/themes/demo/css/scss/main.scss
+    css:
+        inputs:
+            - bundles/oroui/themes/demo/css/scss/settings/primary-settings
+        output: css/oro.css

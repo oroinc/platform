@@ -21,7 +21,7 @@ define(function(require) {
      *
      * Then following code on the client:
      * ``` javascript
-     * var apiAP = new ApiAccessror(serverConfiguration);
+     * const apiAP = new ApiAccessror(serverConfiguration);
      * apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
      *     console.log(result)
      * })
@@ -51,16 +51,15 @@ define(function(require) {
      * @augments [BaseClass](./base-class.md)
      * @exports ApiAccessor
      */
-    var ApiAccessor;
 
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var BaseClass = require('../base-class');
-    var RouteModel = require('../app/models/route-model');
-    var apiAccessorUnloadMessagesGroup = require('./api-accessor-unload-messages-group');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const BaseClass = require('../base-class');
+    const RouteModel = require('../app/models/route-model');
+    const apiAccessorUnloadMessagesGroup = require('./api-accessor-unload-messages-group');
 
-    ApiAccessor = BaseClass.extend(/** @lends ApiAccessor.prototype */{
+    const ApiAccessor = BaseClass.extend(/** @lends ApiAccessor.prototype */{
         DEFAULT_HEADERS: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -73,10 +72,10 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ApiAccessor() {
-            ApiAccessor.__super__.constructor.apply(this, arguments);
+        constructor: function ApiAccessor(options) {
+            ApiAccessor.__super__.constructor.call(this, options);
         },
 
         /**
@@ -159,14 +158,14 @@ define(function(require) {
          * @returns {$.Promise} - $.Promise instance with abort() support
          */
         send: function(urlParameters, body, headers, options) {
-            var promise = this._makeAjaxRequest({
+            const promise = this._makeAjaxRequest({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
-                data: JSON.stringify(this.formatBody(body)),
+                data: body ? JSON.stringify(this.formatBody(body)) : {},
                 errorHandlerMessage: this.getErrorHandlerMessage(options)
             });
-            var resultPromise = promise.then(_.bind(this.formatResult, this), _.bind(this.onAjaxError, this));
+            const resultPromise = promise.then(this.formatResult.bind(this), this.onAjaxError.bind(this));
             if (options && options.processingMessage) {
                 mediator.execute('showProcessingMessage', options.processingMessage, resultPromise);
             }
@@ -176,7 +175,7 @@ define(function(require) {
                     apiAccessorUnloadMessagesGroup.release(options.preventWindowUnload);
                 });
             }
-            resultPromise.abort = _.bind(promise.abort, promise);
+            resultPromise.abort = promise.abort.bind(promise);
             return resultPromise;
         },
 
@@ -188,7 +187,7 @@ define(function(require) {
          * @protected
          */
         getErrorHandlerMessage: function(options) {
-            var errorHandlerMessage = true;
+            let errorHandlerMessage = true;
             if (_.has(options, 'errorHandlerMessage') && options.errorHandlerMessage !== undefined) {
                 errorHandlerMessage = options.errorHandlerMessage;
             }
@@ -204,18 +203,18 @@ define(function(require) {
          */
         _makeAjaxRequest: function(options) {
             if (this.enableClientCache) {
-                var hash = this.hashCode(options.url);
-                var time = (new Date()).getTime();
-                var cacheRecord = this.cache[hash];
+                const hash = this.hashCode(options.url);
+                const time = (new Date()).getTime();
+                let cacheRecord = this.cache[hash];
                 if (!cacheRecord || cacheRecord.expires < time) {
                     cacheRecord = this.cache[hash] = {
                         expires: time + this.clientCacheExpires,
                         request: $.ajax(options)
                     };
                     // remove item from cache when request fails
-                    cacheRecord.request.fail(_.bind(function() {
+                    cacheRecord.request.fail(() => {
                         delete this.cache[hash];
-                    }, this));
+                    });
                 }
                 return cacheRecord.request;
             }
@@ -240,9 +239,9 @@ define(function(require) {
          */
         isCacheExistsFor: function(urlParameters) {
             if (this.enableClientCache) {
-                var hash = this.hashCode(this.getUrl(urlParameters));
-                var time = (new Date()).getTime();
-                var cacheRecord = this.cache[hash];
+                const hash = this.hashCode(this.getUrl(urlParameters));
+                const time = (new Date()).getTime();
+                const cacheRecord = this.cache[hash];
                 return cacheRecord && cacheRecord.expires > time;
             }
             return false;
@@ -265,9 +264,9 @@ define(function(require) {
          * @returns {Object}
          */
         prepareUrlParameters: function(urlParameters) {
-            for (var oldName in this.routeParametersRenameMap) {
+            for (const oldName in this.routeParametersRenameMap) {
                 if (this.routeParametersRenameMap.hasOwnProperty(oldName)) {
-                    var newName = this.routeParametersRenameMap[oldName];
+                    const newName = this.routeParametersRenameMap[oldName];
                     urlParameters[newName] = urlParameters[oldName];
                 }
             }
@@ -291,7 +290,7 @@ define(function(require) {
          * @returns {Object}
          */
         formatBody: function(body) {
-            var formattedBody;
+            let formattedBody;
             if (this.formName) {
                 formattedBody = {};
                 formattedBody[this.formName] = body;

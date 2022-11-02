@@ -3,10 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ConvertToExtendExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -16,82 +18,55 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadataHelper;
+    private $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
-    protected $extendOptionsManager;
-
-    /** @var ExtendOptionsParser */
-    protected $extendOptionsParser;
+    private $extendOptionsManager;
 
     /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configModelManager;
+    private $configModelManager;
 
     /** @var QueryBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queries;
+    private $queries;
 
-    /** @var  Schema|\PHPUnit\Framework\MockObject\MockObject */
-    protected $schema;
+    /** @var Schema|\PHPUnit\Framework\MockObject\MockObject */
+    private $schema;
 
-    protected function setUp()
+    /** @var ConvertToExtendExtension */
+    private $convertToExtendExtension;
+
+    protected function setUp(): void
     {
-        $this->entityMetadataHelper =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
+        $this->extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
+        $this->configModelManager = $this->createMock(ConfigModelManager::class);
+        $this->queries = $this->createMock(QueryBag::class);
+        $this->schema = $this->createMock(Schema::class);
 
-        $this->extendOptionsManager = new ExtendOptionsManager();
-
-        $this->configModelManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->queries =$this->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\QueryBag')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->schema = $this->getMockBuilder('Doctrine\DBAL\Schema\Schema')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return ConvertToExtendExtension
-     */
-    protected function getConvertToExtendExtension()
-    {
-        $result = new ConvertToExtendExtension(
+        $this->convertToExtendExtension = new ConvertToExtendExtension(
             $this->extendOptionsManager,
             $this->entityMetadataHelper,
             $this->configModelManager
         );
-
-        return $result;
     }
 
     public function testManyToOneRelationNewFiledNameSameCurrentFieldName()
     {
-        $convertToExtendExtension = $this->getConvertToExtendExtension();
-
-        $configFieldModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()->getMock();
+        $configFieldModel = $this->createMock(FieldConfigModel::class);
 
         $configFieldModel->expects($this->any())
             ->method('toArray')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entity', ['label' => 'label', 'description' => 'description']],
-                        ['extend', ['is_extend' => false]],
-                        ['form', ['is_enabled' => false]],
-                        ['view', ['is_displayable' => true]],
-                        ['merge', ['display' => true]],
-                        ['dataaudit', ['auditable' => true]]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['entity', ['label' => 'label', 'description' => 'description']],
+                ['extend', ['is_extend' => false]],
+                ['form', ['is_enabled' => false]],
+                ['view', ['is_displayable' => true]],
+                ['merge', ['display' => true]],
+                ['dataaudit', ['auditable' => true]]
+            ]);
 
-        $this->configModelManager->expects(self::once())->method('getFieldModel')
+        $this->configModelManager->expects(self::once())
+            ->method('getFieldModel')
             ->willReturn($configFieldModel);
 
         $currentEntityName = 'TestEntityClass';
@@ -108,13 +83,15 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
             'dataaudit' => ['auditable' => false]
         ];
 
-        $tableObject = $this->getMockBuilder('Doctrine\DBAL\Schema\Table')->disableOriginalConstructor()->getMock();
+        $tableObject = $this->createMock(Table::class);
 
+        $this->schema->expects(self::once())
+            ->method('getTable')
+            ->willReturn($tableObject);
+        $this->queries->expects(self::never())
+            ->method('addQuery');
 
-        $this->schema->expects(self::once())->method('getTable')->willReturn($tableObject);
-        $this->queries->expects(self::never())->method('addQuery');
-
-        $convertToExtendExtension->manyToOneRelation(
+        $this->convertToExtendExtension->manyToOneRelation(
             $this->queries,
             $this->schema,
             $currentEntityName,
@@ -153,27 +130,23 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testManyToOneRelationNewFiledNameNotSameCurrentFieldName()
     {
-        $convertToExtendExtension = $this->getConvertToExtendExtension();
+        $configFieldModel = $this->createMock(FieldConfigModel::class);
 
-        $configFieldModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->configModelManager->expects(self::once())->method('getFieldModel')
+        $this->configModelManager->expects(self::once())
+            ->method('getFieldModel')
             ->willReturn($configFieldModel);
 
         $configFieldModel->expects($this->any())
             ->method('toArray')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entity', ['label' => 'label', 'description' => 'description']],
-                        ['extend', ['is_extend' => false]],
-                        ['form', ['is_enabled' => false]],
-                        ['view', ['is_displayable' => true]],
-                        ['merge', ['display' => true]],
-                        ['dataaudit', ['auditable' => true]]
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    ['entity', ['label' => 'label', 'description' => 'description']],
+                    ['extend', ['is_extend' => false]],
+                    ['form', ['is_enabled' => false]],
+                    ['view', ['is_displayable' => true]],
+                    ['merge', ['display' => true]],
+                    ['dataaudit', ['auditable' => true]]
+                ]
             );
 
         $currentEntityName = 'TestEntityClass';
@@ -190,12 +163,15 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
             'dataaudit' => ['auditable' => false]
         ];
 
-        $tableObject = $this->getMockBuilder('Doctrine\DBAL\Schema\Table')->disableOriginalConstructor()->getMock();
+        $tableObject = $this->createMock(Table::class);
 
-        $this->schema->expects(self::once())->method('getTable')->willReturn($tableObject);
-        $this->queries->expects(self::once())->method('addQuery');
+        $this->schema->expects(self::once())
+            ->method('getTable')
+            ->willReturn($tableObject);
+        $this->queries->expects(self::once())
+            ->method('addQuery');
 
-        $convertToExtendExtension->manyToOneRelation(
+        $this->convertToExtendExtension->manyToOneRelation(
             $this->queries,
             $this->schema,
             $currentEntityName,

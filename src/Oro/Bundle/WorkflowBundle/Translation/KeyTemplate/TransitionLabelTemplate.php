@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
+/**
+ * Transition label key template.
+ */
 class TransitionLabelTemplate extends TransitionTemplate
 {
     const NAME = 'transition_label';
@@ -9,7 +12,7 @@ class TransitionLabelTemplate extends TransitionTemplate
     /**
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return parent::getTemplate() . '.label';
     }

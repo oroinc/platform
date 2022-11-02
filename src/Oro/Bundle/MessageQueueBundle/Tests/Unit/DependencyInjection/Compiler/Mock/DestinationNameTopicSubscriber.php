@@ -1,15 +1,16 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class DestinationNameTopicSubscriber implements TopicSubscriberInterface
 {
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [
-            'topic-subscriber-name' => [
-                'destinationName' => 'subscriber-destination-name'
+            'subscribed_topic_name' => [
+                'destinationName' => 'subscriber_destination_name'
             ],
         ];
     }

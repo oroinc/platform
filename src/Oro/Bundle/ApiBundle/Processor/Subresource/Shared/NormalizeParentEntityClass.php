@@ -21,15 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 class NormalizeParentEntityClass implements ProcessorInterface
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
-    /**
-     * @param ValueNormalizer   $valueNormalizer
-     * @param ResourcesProvider $resourcesProvider
-     */
     public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -45,17 +41,15 @@ class NormalizeParentEntityClass implements ProcessorInterface
 
         $parentEntityClass = $context->getParentClassName();
         if (!$parentEntityClass) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::ENTITY_TYPE,
-                    'The parent entity class must be set in the context.'
-                )
-            );
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                'The parent entity class must be set in the context.'
+            ));
 
             return;
         }
 
-        if (false !== strpos($parentEntityClass, '\\')) {
+        if (str_contains($parentEntityClass, '\\')) {
             // the parent entity class is already normalized
             return;
         }
@@ -65,38 +59,27 @@ class NormalizeParentEntityClass implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (null !== $normalizedEntityClass) {
-            $context->setParentClassName($normalizedEntityClass);
-        } else {
-            $context->setParentClassName(null);
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::ENTITY_TYPE,
-                    sprintf('Unknown parent entity type: %s.', $parentEntityClass),
-                    Response::HTTP_NOT_FOUND
-                )
-            );
+        $context->setParentClassName($normalizedEntityClass);
+        if (null === $normalizedEntityClass) {
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                sprintf('Unknown parent entity type: %s.', $parentEntityClass),
+                Response::HTTP_NOT_FOUND
+            ));
         }
     }
 
-    /**
-     * @param string      $entityType
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType, $version, RequestType $requestType)
+    private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $requestType,
-            false
+            $requestType
         );
-        if (null !== $entityClass
-            && !$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
-        ) {
+        if (!$entityClass) {
+            return null;
+        }
+        if (!$this->resourcesProvider->isResourceAccessibleAsAssociation($entityClass, $version, $requestType)) {
             throw new ResourceNotAccessibleException();
         }
 

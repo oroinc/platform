@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
@@ -10,39 +13,22 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var InverseAssociationAccessor
-     */
-    protected $accessor;
+    /** @var InverseAssociationAccessor */
+    private $accessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->setMethods([])
-            ->getMock();
-
-        $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository
-            ->expects($this->any())
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->any())
             ->method('findBy')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
-        $this->accessor = new InverseAssociationAccessor($this->doctrineHelper);
+        $this->accessor = new InverseAssociationAccessor($doctrineHelper);
     }
 
     public function testGetName()
@@ -52,59 +38,54 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportsFalseWhenDefinedBySourceEntity()
     {
-        $entity = $this->createEntity();
-        $fieldMetadata = $this->createFieldMetadata();
+        $entity = new EntityStub();
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
 
         $fieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertFalse($this->accessor->supports($entity, $fieldMetadata));
     }
 
     public function testSupportsFalseWhenNotHasDoctrineMetadata()
     {
-        $entity = $this->createEntity();
-        $fieldMetadata = $this->createFieldMetadata();
+        $entity = new EntityStub();
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
 
         $fieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $fieldMetadata->expects($this->once())
             ->method('hasDoctrineMetadata')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse($this->accessor->supports($entity, $fieldMetadata));
     }
 
     public function testSupportsTrue()
     {
-        $entity = $this->createEntity();
+        $entity = new EntityStub();
 
-        $doctrineMetadata = $this->createDoctrineMetadata();
-
+        $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
         $doctrineMetadata->expects($this->once())
             ->method('isManyToOne')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
         $doctrineMetadata->expects($this->once())
             ->method('isOneToOne')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $fieldMetadata = $this->createFieldMetadata();
-
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
         $fieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
         $fieldMetadata->expects($this->once())
             ->method('hasDoctrineMetadata')
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
         $fieldMetadata->expects($this->once())
             ->method('getDoctrineMetadata')
-            ->will($this->returnValue($doctrineMetadata));
+            ->willReturn($doctrineMetadata);
 
         $this->assertTrue($this->accessor->supports($entity, $fieldMetadata));
     }
@@ -112,16 +93,16 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($entity, FieldMetadata $metadata, $expectedValue)
+    public function testGetValue(object $entity, FieldMetadata $metadata, mixed $expectedValue)
     {
-        $this->assertEquals($expectedValue, $this->accessor->getValue($entity, $metadata));
+        $this->assertSame($expectedValue, $this->accessor->getValue($entity, $metadata));
     }
 
-    public function getValueDataProvider()
+    public function getValueDataProvider(): array
     {
         return [
             'default' => [
-                'entity' => $this->createEntity('foo'),
+                'entity' => new EntityStub('foo'),
                 'metadata' => $this->getFieldMetadata('id'),
                 'expected' => [],
             ]
@@ -131,93 +112,59 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue($entity, FieldMetadata $metadata, $values)
+    public function testSetValue(?object $entity, FieldMetadata $metadata, ArrayCollection $values)
     {
         $this->accessor->setValue($entity, $metadata, $values);
         foreach ($values as $value) {
-            $this->assertEquals($entity, $value->getEntityStub());
+            $this->assertSame($entity, $value->getEntityStub());
         }
     }
 
-    public function setValueDataProvider()
+    public function setValueDataProvider(): array
     {
         return [
             'default' => [
-                'entity' => $this->createEntity('foo'),
+                'entity' => new EntityStub('foo'),
                 'metadata' => $this->getFieldMetadata('entityStub'),
-                'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
+                'values' => new ArrayCollection([new CollectionItemStub('related-foo')]),
             ],
             'setter' => [
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
+                'entity' => new EntityStub('foo', new EntityStub('bar')),
                 'metadata' => $this->getFieldMetadata('entityStub', ['setter' => 'setEntityStub']),
-                'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
+                'values' => new ArrayCollection([new CollectionItemStub('related-foo')]),
             ],
             'reflection' => [
                 'entity' => null,
                 'metadata' => $this->getFieldMetadata('noGetter'),
-                'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
+                'values' => new ArrayCollection([new CollectionItemStub('related-foo')]),
             ],
         ];
     }
 
-    protected function getFieldMetadata($fieldName = null, array $options = [])
+    private function getFieldMetadata(string $fieldName = null, array $options = []): FieldMetadata
     {
-        $result = $this->createFieldMetadata();
-
-        $doctrineMetadata = $this->createDoctrineMetadata();
-
+        $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
         $doctrineMetadata->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
-        $result
-            ->expects($this->any())
+        $result = $this->createMock(FieldMetadata::class);
+        $result->expects($this->any())
             ->method('getDoctrineMetadata')
-            ->will($this->returnValue($doctrineMetadata));
-
+            ->willReturn($doctrineMetadata);
         $result->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        $this->assertArrayHasKey($code, $options);
-                        return $options[$code];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                $this->assertArrayHasKey($code, $options);
 
+                return $options[$code];
+            });
         $result->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        return isset($options[$code]);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                return isset($options[$code]);
+            });
 
         return $result;
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()->getMock();
-    }
-
-    protected function createDoctrineMetadata()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
-            ->disableOriginalConstructor()->getMock();
-    }
-
-    protected function createEntity($id = null, $parent = null)
-    {
-        return new EntityStub($id, $parent);
-    }
-
-    protected function createRelatedEntity($id = null)
-    {
-        return new CollectionItemStub($id);
     }
 }

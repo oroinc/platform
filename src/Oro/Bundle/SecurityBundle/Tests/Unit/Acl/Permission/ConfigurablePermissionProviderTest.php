@@ -2,66 +2,38 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurablePermissionProvider */
-    protected $provider;
-
     /** @var ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
+    private $configurationProvider;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cacheProvider;
+    /** @var ConfigurablePermissionProvider */
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurablePermissionConfigurationProvider::class);
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
 
-        $this->provider = new ConfigurablePermissionProvider($this->configurationProvider, $this->cacheProvider);
-    }
-
-    public function testBuildCache()
-    {
-        $data = ['some_data'];
-        $this->configurationProvider->expects($this->once())->method('getConfiguration')->willReturn($data);
-        $this->cacheProvider
-            ->expects($this->once())
-            ->method('save')
-            ->with(ConfigurablePermissionProvider::CACHE_ID, $data);
-
-        $this->provider->buildCache();
+        $this->provider = new ConfigurablePermissionProvider($this->configurationProvider);
     }
 
     /**
      * @dataProvider getDataProvider
-     *
-     * @param string $name
-     * @param array $data
-     * @param ConfigurablePermission $expected
      */
-    public function testGet($name, array $data, ConfigurablePermission $expected)
+    public function testGet(string $name, array $data, ConfigurablePermission $expected)
     {
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
-            ->with(ConfigurablePermissionProvider::CACHE_ID)
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
             ->willReturn($data);
 
         $this->assertEquals($expected, $this->provider->get($name));
     }
 
-    /**
-     * @return array
-     */
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         $name = 'test_name';
         $default = true;
@@ -92,23 +64,5 @@ class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
                 'expected' => new ConfigurablePermission('some_other_name'),
             ],
         ];
-    }
-
-    public function testGetWithCacheBuild()
-    {
-        $data = ['some_data'];
-
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
-            ->with(ConfigurablePermissionProvider::CACHE_ID)
-            ->willReturn(false);
-        $this->configurationProvider->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($data);
-        $this->cacheProvider->expects($this->once())
-            ->method('save')
-            ->with(ConfigurablePermissionProvider::CACHE_ID, $data);
-
-        $this->assertEquals(new ConfigurablePermission('test_name'), $this->provider->get('test_name'));
     }
 }

@@ -1,7 +1,10 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth, no-descending-specificity */
+
 .dot-menu {
     .dropdown-toggle {
+        // stylelint-disable-next-line declaration-no-important
         background-color: transparent !important;
 
         .fa-bars {
@@ -13,22 +16,17 @@
 
     .dropdown-menu {
         padding: 0;
-        width: 425px !important;
+        width: 480px;
 
         outline: none;
 
         .tabs-left {
             > .nav-tabs {
-                float: #{$start};
+                float: left;
                 margin: 0;
+                padding: 0;
                 width: 132px;
-
                 border: 0;
-
-                @include if-rtl {
-                    #{$start}: 0;
-                    #{$end}: auto;
-                }
 
                 li {
                     width: 100%;
@@ -39,14 +37,13 @@
                         display: block;
                         margin-right: 0;
                         margin-bottom: 0;
-                        padding: side-values(12px 6px 12px 16px) !important;
+                        padding: $dot-menu-nav-tabs-offset;
 
-                        line-height: 14px;
-                        font-weight: normal !important;
+                        line-height: $dot-menu-tab-content-item-line-height;
 
                         border: none;
                         border-radius: 0;
-                        color: $dot-menu-nav-tabs-color !important;
+                        color: $dot-menu-nav-tabs-color;
                         text-shadow: none;
 
                         &:hover {
@@ -54,7 +51,11 @@
                         }
 
                         .menu-icon {
-                            font-size: 16px;
+                            min-width: $dropdown-item-icon-fa-size;
+                            height: $dropdown-item-icon-fa-size;
+                            margin-right: $dropdown-item-icon-fa-offset;
+
+                            font-size: $dropdown-item-icon-fa-font-size;
 
                             color: $dot-menu-nav-tabs-icon-color;
                         }
@@ -76,15 +77,16 @@
             }
 
             &.tabbable {
-                padding: 16px;
+                padding: $dot-menu-tabs-tabbable-offset;
 
                 overflow: hidden;
             }
 
             > .tab-content {
+                position: relative;
                 z-index: 99;
 
-                padding-#{$start}: 16px;
+                padding: $dot-menu-tabs-offset;
                 min-height: $dot-menu-dropdown-min-height;
                 max-height: $dot-menu-dropdown-max-height;
 
@@ -92,19 +94,6 @@
 
                 overflow: auto;
                 clear: none;
-
-                .tab-pane {
-                    .extra-list {
-                        li {
-                            a {
-                                padding: 0 !important;
-                                display: inline-block;
-
-                                line-height: 16px;
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -113,11 +102,11 @@
         li {
             position: relative;
 
-            padding: side-values(4px 16px 4px 16px);
+            padding: $dot-menu-tab-content-item-offset;
 
-            border-bottom: 1px solid $dot-menu-tab-content-item-border-color;
+            border-bottom: $dot-menu-tab-content-item-border;
 
-            line-height: 1.4;
+            line-height: $dot-menu-tab-content-item-line-height;
 
             &:last-child {
                 border-bottom: none;
@@ -131,7 +120,8 @@
 
             .close {
                 position: absolute;
-                #{$end}: 0;
+                right: $dot-menu-close-pisotion;
+                top: $dot-menu-close-pisotion;
 
                 font-size: 0;
 
@@ -145,18 +135,19 @@
 
                 @include fa-icon($fa-var-times);
 
-                &:before {
+                &::before {
                     font-size: 15px;
                 }
             }
         }
     }
 
-    .dot-menu-empty-message {
-        padding: ($dot-menu-dropdown-min-height / 2 - 10px) 15px 15px;
-
-        text-align: center;
-
-        color: $dot-menu-empty-message-color;
+    .no-data {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: auto;
+        left: 0;
+        right: 0;
     }
 }

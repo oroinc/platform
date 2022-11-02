@@ -51,10 +51,7 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
         $this->assertEquals($expected, (string) $this->createEventTrigger($data));
     }
 
-    /**
-     * @return array
-     */
-    public function toStringDataProvider()
+    public function toStringDataProvider(): array
     {
         $wd1 = (new WorkflowDefinition())->setName('wd1');
 
@@ -102,10 +99,7 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function equalityDataProvider()
+    public function equalityDataProvider(): array
     {
         $workflowDefinitionOne = (new WorkflowDefinition())->setName('one');
         $workflowDefinitionTwo = (new WorkflowDefinition())->setName('two');
@@ -162,7 +156,7 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
 
         foreach ($fieldsSets as $field => $values) {
             $caseTrueName = sprintf('all null and %s is equals', $field);
-            list($first, $second) = $values;
+            [$first, $second] = $values;
             $nullsExceptOne[$caseTrueName] = [
                 true,
                 [$field => $first],
@@ -224,7 +218,7 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
      * @param array $attributes
      * @return TransitionEventTrigger
      */
-    protected function createEventTrigger(array $attributes)
+    private function createEventTrigger(array $attributes)
     {
         $trigger = new TransitionEventTrigger();
 

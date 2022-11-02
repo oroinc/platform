@@ -3,68 +3,69 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ConfigurableTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Configurable
-     */
-    protected $configurableAction;
+    private array $testConfiguration = ['key' => 'value'];
+    private array $testContext = [1, 2, 3];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler
-     */
-    protected $assembler;
+    /** @var ActionAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $assembler;
 
-    /**
-     * @var array
-     */
-    protected $testConfiguration = array('key' => 'value');
+    /** @var ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dummyAction;
 
-    /**
-     * @var array
-     */
-    protected $testContext = array(1, 2, 3);
+    /** @var Configurable */
+    private $configurableAction;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->assembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
+        $this->assembler = $this->getMockBuilder(ActionAssembler::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
+            ->onlyMethods(['assemble'])
             ->getMock();
+        $this->dummyAction = $this->createMock(ActionInterface::class);
+
         $this->configurableAction = new Configurable($this->assembler);
     }
 
-    protected function tearDown()
+    public function testWithoutInitializeUsedEmptyConfigurationForAssembling()
     {
-        unset($this->configurableAction, $this->assembler);
-    }
+        $this->assembler->expects(self::once())
+            ->method('assemble')
+            ->with([])
+            ->willReturn($this->dummyAction);
 
-    public function testInitialize()
+        $this->configurableAction->execute($this->testContext);
+    }
+    public function testInitializeSetsConfigurationUsedForAssembling()
     {
-        $this->assertAttributeEmpty('configuration', $this->configurableAction);
+        $this->assembler->expects(self::once())
+            ->method('assemble')
+            ->with($this->testConfiguration)
+            ->willReturn($this->dummyAction);
+
         $this->configurableAction->initialize($this->testConfiguration);
-        $this->assertAttributeEquals($this->testConfiguration, 'configuration', $this->configurableAction);
+        $this->configurableAction->execute($this->testContext);
     }
 
     public function testExecute()
     {
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $action->expects($this->exactly(2))
+        $this->dummyAction->expects(self::exactly(2))
             ->method('execute')
             ->with($this->testContext);
 
-        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $condition->expects($this->never())
+        $condition = $this->createMock(ExpressionInterface::class);
+        $condition->expects(self::never())
             ->method('evaluate');
 
-        $this->assembler->expects($this->once())
+        $this->assembler->expects(self::once())
             ->method('assemble')
             ->with($this->testConfiguration)
-            ->will($this->returnValue($action));
+            ->willReturn($this->dummyAction);
 
         $this->configurableAction->initialize($this->testConfiguration);
         $this->configurableAction->setCondition($condition);

@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Entity for testing workflows
+ *
  * @ORM\Table(name="test_workflow_aware_entity")
  * @ORM\Entity
  * @Config(
@@ -19,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 class WorkflowAwareEntity implements TestFrameworkEntityInterface
 {
     /**
-     * @var integer $id
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -28,7 +30,7 @@ class WorkflowAwareEntity implements TestFrameworkEntityInterface
     protected $id;
 
     /**
-     * @var string $name
+     * @var string
      *
      * @ORM\Column(name="name", type="string", nullable=true)
      */

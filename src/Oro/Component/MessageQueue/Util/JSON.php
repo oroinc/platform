@@ -1,58 +1,46 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Util;
 
+/**
+ * Contains handy methods for working with JSON.
+ */
 class JSON
 {
     /**
-     * @param string $string
+     * @param mixed $data
      *
-     * @throws \InvalidArgumentException
+     * @param bool $throwOnError
      *
-     * @return array
+     * @return mixed
+     *
+     * @throws \JsonException
      */
-    public static function decode($string)
+    public static function decode(mixed $data, bool $throwOnError = true): mixed
     {
-        if (!is_string($string)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Accept only string argument but got: "%s"',
-                is_object($string) ? get_class($string) : gettype($string)
-            ));
+        if (!is_string($data)) {
+            // Returns as is if data is already decoded.
+            // BC layer for message queue processors that still decode message body on their own.
+            return $data;
         }
 
-        // PHP7 fix - empty string and null cause syntax error
-        if (empty($string)) {
+        // Empty string and null cause syntax error when passed to json_decode().
+        if ($data === '') {
             return null;
         }
 
-        $decoded = json_decode($string, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException(sprintf(
-                'The malformed json given. Error %s and message %s',
-                json_last_error(),
-                json_last_error_msg()
-            ));
-        }
-
-        return $decoded;
+        return json_decode($data, true, 512, $throwOnError ? JSON_THROW_ON_ERROR : 0);
     }
 
     /**
      * @param mixed $value
      *
      * @return string
+     *
+     * @throws \JsonException
      */
-    public static function encode($value)
+    public static function encode(mixed $value, bool $throwOnError = true): string
     {
-        $encoded = json_encode($value, JSON_UNESCAPED_UNICODE);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException(sprintf(
-                'Could not encode value into json. Error %s and message %s',
-                json_last_error(),
-                json_last_error_msg()
-            ));
-        }
-
-        return $encoded;
+        return json_encode($value, JSON_UNESCAPED_UNICODE | ($throwOnError ? JSON_THROW_ON_ERROR : 0));
     }
 }

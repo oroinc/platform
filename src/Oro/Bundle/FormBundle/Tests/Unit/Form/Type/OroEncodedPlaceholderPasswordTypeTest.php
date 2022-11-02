@@ -11,17 +11,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $crypter;
 
-    /**
-     * @var OroEncodedPlaceholderPasswordType
-     */
+    /** @var OroEncodedPlaceholderPasswordType */
     private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
 
@@ -49,7 +45,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $pass = 'test';
         $passEncrypted = base64_encode($pass);
 
-        $this->crypter->expects(static::once())
+        $this->crypter->expects(self::once())
             ->method('encryptData')
             ->willReturn($passEncrypted);
 
@@ -73,7 +69,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     {
         $pass = 'test';
         $passEncrypted = base64_encode($pass);
-        $this->crypter->expects(static::once())
+        $this->crypter->expects(self::once())
             ->method('decryptData')
             ->willReturn($pass);
 
@@ -81,64 +77,50 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
         $view = $form->createView();
 
-        static::assertSame('****', $view->vars['value']);
+        self::assertSame('****', $view->vars['value']);
     }
 
-    /**
-     * @dataProvider browserAutocompleteDataProvider
-     *
-     * @param bool $state
-     * @param array $expected
-     */
-    public function testBuildViewWithAutocompleteAttribute($state, $expected)
+    public function testBuildViewWithAutocompleteAttribute()
     {
-        $form = $this->factory->create(
+        $formDisabledAutocomplete = $this->factory->create(
             OroEncodedPlaceholderPasswordType::class,
             null,
-            ['browser_autocomplete' => $state]
+            ['browser_autocomplete' => false]
         );
-        $view = $form->createView();
+        $viewDisabledAutocomplete = $formDisabledAutocomplete->createView();
+        $this->assertSame('new-password', $viewDisabledAutocomplete->vars['attr']['autocomplete']);
 
-        static::assertArraySubset($expected, $view->vars['attr']);
-    }
-
-    /**
-     * @return array
-     */
-    public function browserAutocompleteDataProvider()
-    {
-        return [
-            'autocomplete disabled' => [false, ['autocomplete' => 'new-password']],
-            'autocomplete enabled' => [true, []],
-        ];
+        $formEnabledAutocomplete = $this->factory->create(
+            OroEncodedPlaceholderPasswordType::class,
+            null,
+            ['browser_autocomplete' => true]
+        );
+        $viewEnabledAutocomplete = $formEnabledAutocomplete->createView();
+        $this->assertEmpty($viewEnabledAutocomplete->vars['attr']);
     }
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver
-            ->expects($this->once())
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['browser_autocomplete' => false])
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+            ->willReturnSelf();
+        $resolver->expects($this->once())
             ->method('setAllowedTypes')
             ->with('browser_autocomplete', 'bool')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->formType->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        static::assertSame(PasswordType::class, $this->formType->getParent());
+        self::assertSame(PasswordType::class, $this->formType->getParent());
     }
 
     public function testGetBlockPrefix()
     {
-        static::assertSame('oro_encoded_placeholder_password', $this->formType->getBlockPrefix());
+        self::assertSame('oro_encoded_placeholder_password', $this->formType->getBlockPrefix());
     }
 }

@@ -7,9 +7,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityIdentifierType extends EntityType
 {
-    /**
-     * @param array $choices
-     */
     public function __construct(array $choices)
     {
         parent::__construct($choices, 'oro_entity_identifier');

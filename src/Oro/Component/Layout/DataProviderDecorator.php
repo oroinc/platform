@@ -3,66 +3,38 @@
 namespace Oro\Component\Layout;
 
 /**
- * The data provider decorator that allows calls methods with pre-defined prefix
+ * The data provider decorator that allows to call methods that have name starts with "get", "has", "is".
  */
 class DataProviderDecorator
 {
-    /**
-     * @var object
-     */
-    protected $dataProvider;
+    private const PATTERN = '/^(get|has|is)(.+)$/i';
 
-    /**
-     * @var string[]
-     */
-    protected $methodPrefixes;
+    /** @var object */
+    private $dataProvider;
 
-    /**
-     * @param object $dataProvider
-     * @param string[] $methodPrefixes
-     */
-    public function __construct($dataProvider, $methodPrefixes)
+    public function __construct(object $dataProvider)
     {
-        if (!is_object($dataProvider)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Data provider must be "object" instance, "%s" given.',
-                    gettype($dataProvider)
-                )
-            );
-        }
-
         $this->dataProvider = $dataProvider;
-        $this->methodPrefixes = $methodPrefixes;
     }
 
     /**
      * @param string $name
-     * @param array $arguments
+     * @param array  $arguments
+     *
      * @return mixed
-     * @throws \BadMethodCallException
+     *
+     * @throws \BadMethodCallException when calling a method with the given name is not allowed
+     * @throws \Error when the decorated data provider does not have a method with the given name
      */
     public function __call($name, $arguments)
     {
-        if (preg_match(sprintf('/^(%s)(.+)$/i', implode('|', $this->methodPrefixes)), $name, $matches)) {
-            if (!method_exists($this->dataProvider, $name)) {
-                throw new \BadMethodCallException(
-                    sprintf(
-                        'Method "%s" not found in "%s".',
-                        $name,
-                        get_class($this->dataProvider)
-                    )
-                );
-            }
-            return call_user_func_array([$this->dataProvider, $name], $arguments);
-        } else {
-            throw new \BadMethodCallException(
-                sprintf(
-                    'Method "%s" cannot be called. The called method should begin with "%s".',
-                    $name,
-                    implode('", "', $this->methodPrefixes)
-                )
-            );
+        if (!preg_match(self::PATTERN, $name, $matches)) {
+            throw new \BadMethodCallException(sprintf(
+                'Method "%s" cannot be called. The method name should start with "get", "has" or "is".',
+                $name
+            ));
         }
+
+        return $this->dataProvider->{$name}(...$arguments);
     }
 }

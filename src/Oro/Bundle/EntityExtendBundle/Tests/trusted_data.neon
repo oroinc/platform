@@ -1,0 +1,8 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    safe_methods:
+        Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator:
+            generateManyToManyJoinTableName: true
+    safe_static_methods:
+        Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper:
+            buildAssociationName: true

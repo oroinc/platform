@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        public: true
+
+    oro_platform.provider.package.with_license_info:
+        public: false
+        parent: oro_platform.provider.package
+        arguments:
+            - '%oro_platform.composer.installed_json%'
+
+    Oro\Bundle\PlatformBundle\Controller\PlatformController:
+       arguments:
+           - '@oro_platform.provider.package.with_license_info'
+           - '@oro_platform.provider.deployment_variables'

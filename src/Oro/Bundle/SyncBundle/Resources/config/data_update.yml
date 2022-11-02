@@ -9,20 +9,28 @@ services:
     oro_sync.event_listener.doctrine_tag:
         class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
         arguments:
-            - '@oro_sync.content.data_update_topic_sender'
-            - '@oro_sync.content.tag_generator'
-            - '%installed%'
+            - '@Psr\Container\ContainerInterface'
+            - '@oro_distribution.handler.application_status'
         tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: container.service_subscriber, id: oro_sync.content.tag_generator }
+            - { name: container.service_subscriber, id: oro_sync.content.data_update_topic_sender }
 
     oro_sync.content.tag_generator:
-        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
+        class: Oro\Bundle\SyncBundle\Content\ChainTagGenerator
+        public: true
+        arguments:
+            - !tagged_iterator oro_sync.tag_generator
+
+    Oro\Bundle\SyncBundle\Content\TagGeneratorInterface:
+        alias: oro_sync.content.tag_generator
 
     oro_sync.content.tag_generator.doctrine:
         class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
         arguments:
             - '@doctrine'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro_sync.tag_generator }
 
@@ -32,11 +40,15 @@ services:
             - { name: oro_sync.tag_generator }
 
     oro_sync.content.data_update_topic_sender:
-        class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
+        class: Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender
+        public: true
         arguments:
             - '@oro_sync.websocket_client'
             - '@oro_sync.client.connection_checker'
             - '@security.token_storage'
+
+    Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender:
+        alias: oro_sync.content.data_update_topic_sender
 
     oro_sync.topic.data_update:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic

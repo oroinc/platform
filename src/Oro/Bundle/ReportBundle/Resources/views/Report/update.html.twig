@@ -1,10 +1,10 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroReportBundle:Form:fields.html.twig'
+    '@OroForm/Form/fields.html.twig',
+    '@OroReport/Form/fields.html.twig'
 ] %}
-{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
-{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+{% import '@OroQueryDesigner/macros.html.twig' as QD %}
+{% import '@OroSegment/macros.html.twig' as segmentQD %}
 
 {% oro_title_set({params : {"%report.name%": entity.name} }) %}
 {% set formAction = form.vars.value.id ? path('oro_report_update', {'id': form.vars.value.id}) : path('oro_report_create') %}
@@ -18,6 +18,16 @@
 {% endblock %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% if form.vars.value.id and is_granted('CREATE', form.vars.value) %}
+        {{ UI.button({
+            'path' : path('oro_report_clone', {'id': form.vars.value.id}),
+            'iCss': 'fa-files-o',
+            'title': 'oro.report.action.clone.button.title'|trans,
+            'label': 'oro.report.action.clone.button.label'|trans,
+        }) }}
+    {% endif %}
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_report', {'id': form.vars.value.id}),
@@ -60,11 +70,13 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.report.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{
@@ -76,31 +88,30 @@
 
     {% set ownerDataBlock = oro_form_process(ownerDataBlock, form) %}
     {% set dataBlocks = [{
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.name, {'label': 'oro.report.name.label'}),
-                        form_row(form.description, {
-                            'label': 'oro.report.description.label',
-                            'attr': {
-                                'class': 'report-descr'
-                            }
-                        })
-                    ]
-                },
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.entity, {'label': 'oro.report.entity.label'}),
-                        form_row(form.type, {'label': 'oro.report.type.label'})
-                    ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
-                }
-            ]
-        }]
-    %}
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.name, {'label': 'oro.report.name.label'}),
+                    form_row(form.description, {
+                        'label': 'oro.report.description.label',
+                        'attr': {
+                            'class': 'report-descr'
+                        }
+                    })
+                ]
+            },
+            {
+                'title': '',
+                'data': [
+                    form_row(form.entity, {'label': 'oro.report.entity.label'}),
+                    form_row(form.type, {'label': 'oro.report.type.label'})
+                ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
+            }
+        ]
+    }] %}
 
     {% set type = 'oro_report' %}
     {% set dataBlocks = dataBlocks|merge( [{
@@ -162,6 +173,7 @@
                         'id': type ~ '-condition-builder',
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
+                        'fieldConditionOptions': form.vars.field_condition_options
                     }),
                     segmentQD.expressionEditor(),
                     QD.query_type_converter()
@@ -184,20 +196,7 @@
         ]
     }] ) %}
 
-    {% set additionalData = [] %}
-    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-        {% set additionalData = additionalData|merge([form_row(child)]) %}
-    {% endfor %}
-    {% if additionalData is not empty %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional'|trans,
-            'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
-            }]
-        }] ) %}
-    {% endif %}
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,

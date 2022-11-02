@@ -10,16 +10,17 @@ use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * Provides a set of methods to manage activity entity associations.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActivityManager
@@ -51,16 +52,6 @@ class ActivityManager
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param ConfigProvider      $activityConfigProvider
-     * @param ConfigProvider      $groupingConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param AssociationManager  $associationManager
-     * @param FeatureChecker      $featureChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
@@ -81,9 +72,6 @@ class ActivityManager
         $this->featureChecker         = $featureChecker;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -146,7 +134,7 @@ class ActivityManager
 
             if ($this->eventDispatcher) {
                 $event = new ActivityEvent($activityEntity, $targetEntity);
-                $this->eventDispatcher->dispatch(Events::ADD_ACTIVITY, $event);
+                $this->eventDispatcher->dispatch($event, Events::ADD_ACTIVITY);
             }
 
             return true;
@@ -225,7 +213,7 @@ class ActivityManager
             $activityEntity->removeActivityTarget($targetEntity);
             if ($this->eventDispatcher) {
                 $event = new ActivityEvent($activityEntity, $targetEntity);
-                $this->eventDispatcher->dispatch(Events::REMOVE_ACTIVITY, $event);
+                $this->eventDispatcher->dispatch($event, Events::REMOVE_ACTIVITY);
             }
 
             return true;
@@ -433,7 +421,7 @@ class ActivityManager
                 'className'       => $activityClassName,
                 'associationName' => $associationName,
                 'label'           => $entityConfig->get('plural_label'),
-                'route'           => $activityConfig->get('route')
+                'route'           => (string) $activityConfig->get('route')
             ];
 
             $priority = $activityConfig->get('priority');

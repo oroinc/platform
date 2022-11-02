@@ -8,23 +8,19 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
 {
-    const MODEL_ID = 42;
-    const FIELD_NAME = 'someFieldName';
-    const FIELD_TYPE = 'enum';
+    private const MODEL_ID = 42;
+    private const FIELD_NAME = 'someFieldName';
+    private const FIELD_TYPE = 'enum';
 
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
-    /**
-     * @var FieldSessionStorage
-     */
+    /** @var FieldSessionStorage */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->session = $this->createMock(Session::class);
 
         $this->storage = new FieldSessionStorage($this->session);
     }
@@ -32,13 +28,11 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     public function testGetFieldInfo()
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $entityConfigModel
-            ->expects($this->exactly(2))
+        $entityConfigModel->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(self::MODEL_ID);
 
-        $this->session
-            ->expects($this->exactly(2))
+        $this->session->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [sprintf(FieldSessionStorage::SESSION_ID_FIELD_NAME, self::MODEL_ID)],
@@ -54,10 +48,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedInfo, $this->storage->getFieldInfo($entityConfigModel));
     }
 
-    /**
-     * @return array
-     */
-    public function absentFieldInfoDataProvider()
+    public function absentFieldInfoDataProvider(): array
     {
         return [
             [
@@ -77,20 +68,15 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider absentFieldInfoDataProvider
-     *
-     * @param string $fieldName
-     * @param string $fieldType
      */
-    public function testHasFieldInfoWhenInfoIsAbsent($fieldName, $fieldType)
+    public function testHasFieldInfoWhenInfoIsAbsent(?string $fieldName, ?string $fieldType)
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $entityConfigModel
-            ->expects($this->exactly(2))
+        $entityConfigModel->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(self::MODEL_ID);
 
-        $this->session
-            ->expects($this->exactly(2))
+        $this->session->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [sprintf(FieldSessionStorage::SESSION_ID_FIELD_NAME, self::MODEL_ID)],
@@ -104,13 +90,11 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     public function testHasFieldInfoWhenInfoExists()
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $entityConfigModel
-            ->expects($this->exactly(2))
+        $entityConfigModel->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(self::MODEL_ID);
 
-        $this->session
-            ->expects($this->exactly(2))
+        $this->session->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [sprintf(FieldSessionStorage::SESSION_ID_FIELD_NAME, self::MODEL_ID)],
@@ -124,13 +108,11 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     public function testSaveFieldInfo()
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $entityConfigModel
-            ->expects($this->exactly(2))
+        $entityConfigModel->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(self::MODEL_ID);
 
-        $this->session
-            ->expects($this->exactly(2))
+        $this->session->expects($this->exactly(2))
             ->method('set')
             ->withConsecutive(
                 [sprintf(FieldSessionStorage::SESSION_ID_FIELD_NAME, self::MODEL_ID), self::FIELD_NAME],

@@ -19,9 +19,6 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
     /** @var WebsocketClientInterface */
     private $decoratedClient;
 
-    /**
-     * @param WebsocketClientInterface $decoratedClient
-     */
     public function __construct(WebsocketClientInterface $decoratedClient)
     {
         $this->decoratedClient = $decoratedClient;
@@ -155,25 +152,16 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * @param BadResponseException $e
-     */
     private function logBadResponseException(BadResponseException $e): void
     {
         $this->logger->error('Error occurred while communicating with websocket server', [$e]);
     }
 
-    /**
-     * @param WebsocketException $e
-     */
     private function logWebsocketException(WebsocketException $e): void
     {
         $this->logger->error('Could not send data to websocket server', [$e]);
     }
 
-    /**
-     * @param ValidationFailedException $e
-     */
     private function logValidationFailedException(ValidationFailedException $e): void
     {
         $this->logger->error('Validation failed while trying to send payload to websocket server', [$e]);

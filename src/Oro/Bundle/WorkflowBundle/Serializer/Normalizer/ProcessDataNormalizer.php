@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
+/**
+ * Normalizes/denormalizes before processing it
+ */
 class ProcessDataNormalizer extends AbstractProcessNormalizer
 {
     /**
@@ -13,9 +16,6 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -24,7 +24,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
@@ -43,10 +43,10 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $denormalizedData = $this->serializer->denormalize($data, null, $format, $context);
-        $denormalizedData = $denormalizedData ?: array();
+        $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
+        $denormalizedData = $denormalizedData ?: [];
 
         return new ProcessData($denormalizedData);
     }
@@ -62,7 +62,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return $this->supportsClass($type);
     }
@@ -75,9 +75,6 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
      */
     protected function supportsClass($class)
     {
-        $processDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-
-        return $processDataClass == $class ||
-               is_string($class) && class_exists($class) && in_array($processDataClass, class_parents($class));
+        return is_a($class, ProcessData::class, true);
     }
 }

@@ -1,0 +1,18 @@
+/* @theme: default; */
+
+$floating-validation-message-top: -10px !default;
+$floating-validation-message-bottom: auto !default;
+
+$floating-validation-message-after-top: 100% !default;
+$floating-validation-message-after-left: 10px !default;
+$floating-validation-message-after-color: get-color('ui', 'error') transparent !default;
+
+$floating-validation-message-label-top: -24px !default;
+$floating-validation-message-label-left: 0 !default;
+$floating-validation-message-label-text-align: left !default;
+$floating-validation-message-label-background-color: get-color('ui', 'error') !default;
+$floating-validation-message-label-color: get-color('ui', 'error-dark') !default;
+$floating-validation-message-label-inner-offset: 5px 8px 6px !default;
+$floating-validation-message-label-border-radius: 3px !default;
+
+$floating-validation-message-icon-display: none !default;

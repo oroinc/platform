@@ -1,0 +1,4 @@
+oro_api:
+    api_doc_cache:
+        resettable_services:
+            - oro_comment.api.comment_association_provider

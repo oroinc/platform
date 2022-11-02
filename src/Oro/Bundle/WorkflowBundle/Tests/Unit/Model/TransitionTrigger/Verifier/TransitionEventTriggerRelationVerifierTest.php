@@ -10,12 +10,10 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TransitionEventTriggerRelationVerifier
-     */
+    /** @var TransitionEventTriggerRelationVerifier */
     private $verifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new TransitionEventTriggerRelationVerifier();
     }

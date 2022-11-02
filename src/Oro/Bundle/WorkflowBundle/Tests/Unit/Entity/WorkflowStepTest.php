@@ -2,24 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowStepTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowStep
-     */
-    protected $step;
+    /** @var WorkflowStep */
+    private $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->step = new WorkflowStep();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->step);
     }
 
     public function testGetId()
@@ -27,10 +22,8 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->step->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->step, $value);
-        $this->assertEquals($value, $this->step->getId());
+        ReflectionUtil::setId($this->step, $value);
+        $this->assertSame($value, $this->step->getId());
     }
 
     /**
@@ -45,15 +38,15 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($this->step, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('name', 'test'),
-            array('label', 'test'),
-            array('stepOrder', 1),
-            array('definition', $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')),
-            array('final', true)
-        );
+        return [
+            ['name', 'test'],
+            ['label', 'test'],
+            ['stepOrder', 1],
+            ['definition', $this->createMock(WorkflowDefinition::class)],
+            ['final', true]
+        ];
     }
 
     public function testImport()

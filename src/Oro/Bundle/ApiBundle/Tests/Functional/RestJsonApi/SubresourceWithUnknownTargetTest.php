@@ -4,17 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
-use Symfony\Component\HttpFoundation\Response;
 
 class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/test_product.yml'
         ]);
@@ -30,15 +25,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPostSubresource()
@@ -51,15 +38,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPatchSubresource()
@@ -72,15 +51,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDeleteSubresource()
@@ -93,15 +64,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testGetRelationship()
@@ -114,15 +77,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPostRelationship()
@@ -135,15 +90,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPatchRelationship()
@@ -156,15 +103,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDeleteRelationship()
@@ -177,14 +116,6 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 }

@@ -3,103 +3,81 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\CloneObject;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CloneObjectTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CloneObject */
-    protected $action;
+    private $action;
 
-    /** @var ContextAccessor */
-    protected $contextAccessor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-        $this->action = new CloneObject($this->contextAccessor);
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new CloneObject(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    protected function tearDown()
-    {
-        unset($this->contextAccessor, $this->action);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Target parameter is required
-     */
     public function testInitializeExceptionNoTargetObject()
     {
-        $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Target parameter is required');
+
+        $this->action->initialize(['some' => 1, 'attribute' => $this->createMock(PropertyPath::class)]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required.
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute name parameter is required.');
+
         $this->action->initialize(['target' => new \stdClass()]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     */
     public function testInitializeExceptionInvalidAttribute()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize(['target' => new \stdClass(), 'attribute' => 'string']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object data must be an array.
-     */
     public function testInitializeExceptionInvalidData()
     {
-        $this->action->initialize(
-            ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
-        );
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Object data must be an array.');
+
+        $this->action->initialize([
+            'target' => new \stdClass(),
+            'attribute' => $this->createMock(PropertyPath::class),
+            'data' => 'string_value'
+        ]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Ignored properties should be a sequence.
-     */
     public function testInitializeExceptionInvalidIgnoredProperties()
     {
-        $this->action->initialize(
-            ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath(), 'ignore' => 'string_value']
-        );
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Ignored properties should be a sequence.');
+
+        $this->action->initialize([
+            'target' => new \stdClass(),
+            'attribute' => $this->createMock(PropertyPath::class),
+            'ignore' => 'string_value'
+        ]);
     }
 
     public function testInitialize()
     {
-        $options = ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath()];
-        $this->assertEquals($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($options, 'options', $this->action);
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $options = ['target' => new \stdClass(), 'attribute' => $this->createMock(PropertyPath::class)];
+        self::assertEquals($this->action, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     /**
      * @dataProvider executeDataProvider
-     * @param array $options
-     * @param array $expectedData
-     * @param null|array $contextData
      */
     public function testExecute(array $options, array $contextData = [], array $expectedData = null)
     {
@@ -107,24 +85,21 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $attributeName = (string)$options['attribute'];
         $this->action->initialize($options);
         $this->action->execute($context);
-        $this->assertNotNull($context->$attributeName);
-        $this->assertInstanceOf(get_class($options['target']), $context->$attributeName);
+        self::assertNotNull($context->{$attributeName});
+        self::assertInstanceOf(get_class($options['target']), $context->{$attributeName});
 
-        if ($context->$attributeName instanceof ItemStub) {
+        if ($context->{$attributeName} instanceof ItemStub) {
             /** @var ItemStub $entity */
-            $entity = $context->$attributeName;
+            $entity = $context->{$attributeName};
             if (!$expectedData) {
                 $expectedData = !empty($options['data']) ? $options['data'] : [];
             }
-            $this->assertInstanceOf(get_class($options['target']), $entity);
-            $this->assertEquals($expectedData, $entity->getData());
+            self::assertInstanceOf(get_class($options['target']), $entity);
+            self::assertEquals($expectedData, $entity->getData());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             'without data' => [

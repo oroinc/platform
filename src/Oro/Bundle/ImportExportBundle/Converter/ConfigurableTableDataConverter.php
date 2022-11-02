@@ -3,10 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -34,6 +36,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /** @var RelationCalculator */
     protected $relationCalculator;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /** @var string */
     protected $relationDelimiter = ' ';
 
@@ -43,19 +48,16 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     * @param RelationCalculatorInterface $relationCalculator
-     */
-    public function __construct(FieldHelper $fieldHelper, RelationCalculatorInterface $relationCalculator)
-    {
+    public function __construct(
+        FieldHelper $fieldHelper,
+        RelationCalculatorInterface $relationCalculator,
+        LocaleSettings $localeSettings
+    ) {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
+        $this->localeSettings = $localeSettings;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -71,11 +73,24 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     public function getFieldHeaderWithRelation($entityClassName, $initialFieldName, $isSearchingIdentityField = false)
     {
-        $fields = $this->fieldHelper->getFields($entityClassName, true);
+        $expectedFields = [$initialFieldName];
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityClassName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
+
+        $dotPosition = strpos($initialFieldName, '.');
+        if ($dotPosition && $this->attributeConfigHelper) {
+            $fieldName = substr($initialFieldName, 0, $dotPosition);
+
+            if ($this->attributeConfigHelper->isFieldAttribute($entityClassName, $fieldName)) {
+                $expectedFields[] = $fieldName;
+            }
+        }
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            $notFoundFieldName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
+            $notFoundFieldName = !$isSearchingIdentityField && !in_array($fieldName, $expectedFields, true);
             $foundIdentifyField = $this->fieldHelper->getConfigValue($entityClassName, $fieldName, 'identity');
             $notFoundFieldIdentify = $isSearchingIdentityField && !$foundIdentifyField;
 
@@ -84,11 +99,17 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             }
 
             if ($this->fieldHelper->isRelation($field) &&
-                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)) {
+                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)
+            ) {
+                $relatedClassName = $field['related_entity_name'];
+                $relatedFieldName = $dotPosition
+                    ? substr($initialFieldName, $dotPosition + 1, strlen($initialFieldName))
+                    : '';
+
                 return
                     $this->getFieldHeader($entityClassName, $field) .
                     $this->relationDelimiter .
-                    $this->getFieldHeaderWithRelation($field['related_entity_name'], null, true);
+                    $this->getFieldHeaderWithRelation($relatedClassName, $relatedFieldName, $relatedFieldName === '');
             }
 
             return $this->getFieldHeader($entityClassName, $field);
@@ -120,28 +141,27 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /**
      * {@inheritdoc}
      */
-    public function setEntityName($entityName)
+    public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
     }
 
     protected function initializeRules()
     {
-        if ($this->headerConversionRules === null) {
-            $this->assertEntityName();
-            if ($this->translateUsingLocale && $this->configManager) {
-                $this->fieldHelper->setLocale($this->configManager->get('oro_locale.language'));
-            }
-
-            $headerConversionRules = $this->getEntityRules(
-                $this->entityName,
-                true,
-                self::DEFAULT_SINGLE_RELATION_LEVEL,
-                self::DEFAULT_MULTIPLE_RELATION_LEVEL
-            );
-
-            $this->headerConversionRules = $this->processCollectionRegexp($headerConversionRules);
+        // Do not cache header because it is dependent on the locale
+        $this->assertEntityName();
+        if ($this->translateUsingLocale) {
+            $this->fieldHelper->setLocale($this->localeSettings->getLanguage());
         }
+
+        $headerConversionRules = $this->getEntityRules(
+            $this->entityName,
+            true,
+            self::DEFAULT_SINGLE_RELATION_LEVEL,
+            self::DEFAULT_MULTIPLE_RELATION_LEVEL
+        );
+
+        $this->headerConversionRules = $this->processCollectionRegexp($headerConversionRules);
     }
 
     /**
@@ -152,14 +172,14 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         if ($this->headerConversionRules === null || $this->backendHeader === null) {
             $this->assertEntityName();
 
-            list($headerConversionRules, $backendHeader) = $this->getEntityRulesAndBackendHeaders(
+            [$headerConversionRules, $backendHeader] = $this->getEntityRulesAndBackendHeaders(
                 $this->entityName,
                 true,
                 self::DEFAULT_SINGLE_RELATION_LEVEL,
                 self::DEFAULT_MULTIPLE_RELATION_LEVEL
             );
 
-            list($this->headerConversionRules, $this->backendHeader) = [
+            [$this->headerConversionRules, $this->backendHeader] = [
                 $this->processCollectionRegexp($headerConversionRules),
                 $backendHeader
             ];
@@ -190,7 +210,10 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
         $rules = [];
         $defaultOrder = self::DEFAULT_ORDER;
@@ -198,7 +221,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         // generate conversion rules and backend header
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if (!$this->isFieldAvailableForExport($entityName, $fieldName)) {
                 continue;
             }
 
@@ -252,7 +275,10 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
         $rules = [];
         $backendHeaders = [];
@@ -261,7 +287,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         // generate conversion rules and backend header
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if (!$this->isFieldAvailableForExport($entityName, $fieldName)) {
                 continue;
             }
 
@@ -280,7 +306,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 if ($this->fieldHelper->isRelation($field)
                     && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
                 ) {
-                    list($relationRules, $relationBackendHeaders) = $this->getRelatedEntityRulesAndBackendHeaders(
+                    [$relationRules, $relationBackendHeaders] = $this->getRelatedEntityRulesAndBackendHeaders(
                         $entityName,
                         $singleRelationDeepLevel,
                         $multipleRelationDeepLevel,
@@ -301,6 +327,11 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
 
         return $this->prepareDataAfterSort($event, true, true);
+    }
+
+    protected function isFieldAvailableForExport(string $entityName, string $fieldName): bool
+    {
+        return !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded');
     }
 
     /**
@@ -429,7 +460,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected function processCollectionRegexp(array $rules)
     {
         foreach ($rules as $frontendHeader => $backendHeader) {
-            if (strpos($frontendHeader, $this->collectionDelimiter) !== false) {
+            if (str_contains($frontendHeader, $this->collectionDelimiter)) {
                 $rules[$frontendHeader] = [
                     self::FRONTEND_TO_BACKEND => [
                         $frontendHeader,
@@ -599,7 +630,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
             // process and merge relation rules and backend header for relation
-            list($relationRules, $relationBackendHeaders) = $this->getEntityRulesAndBackendHeaders(
+            [$relationRules, $relationBackendHeaders] = $this->getEntityRulesAndBackendHeaders(
                 $relatedEntityName,
                 $fieldFullData,
                 $singleRelationDeepLevel - 1,
@@ -657,7 +688,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             $fullData
         );
         if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
-            $this->dispatcher->dispatch(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);
+            $this->dispatcher->dispatch($event, Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS);
         }
 
         return $event;

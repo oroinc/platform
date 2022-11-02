@@ -1,7 +1,8 @@
-{% extends "OroEmailBundle:Email:activityLink.html.twig" %}
-
+{% extends "@OroEmail/Email/activityLink.html.twig" %}
 
 {% block action_controll %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set options = options|merge({
         'aCss': 'no-hash'
     }) %}

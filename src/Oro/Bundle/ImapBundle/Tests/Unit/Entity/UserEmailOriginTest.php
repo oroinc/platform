@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Component\Testing\ReflectionUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetId()
@@ -116,5 +119,93 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $origin->setSmtpEncryption('');
 
         $this->assertFalse($origin->isSmtpConfigured());
+    }
+
+    public function testTypeGetterAndSetter(): void
+    {
+        $origin = new UserEmailOrigin();
+        $this->assertEquals('other', $origin->getAccountType());
+        $origin->setAccountType('test_type');
+        $this->assertEquals('test_type', $origin->getAccountType());
+    }
+
+    /**
+     * @param string $host
+     * @param int $port
+     * @param string $user
+     * @param string $password
+     * @param string $accessToken
+     * @param bool $expectedResult
+     *
+     * @dataProvider setDataProviderImapConfigured
+     */
+    public function testIsImapConfigured($host, $port, $user, $password, $accessToken, $expectedResult)
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setImapHost($host);
+        $origin->setImapPort($port);
+        $origin->setUser($user);
+        $origin->setPassword($password);
+        $origin->setAccessToken($accessToken);
+        $origin->setSmtpEncryption('ssl');
+
+        $this->assertEquals($expectedResult, $origin->isImapConfigured());
+    }
+
+    /**
+     * @return array
+     */
+    public function setDataProviderImapConfigured()
+    {
+        return [
+            'empty host' => [
+                'host' => null,
+                'port' => 25,
+                'user' => 'test',
+                'password' => 'password',
+                'accessToken' => 'token',
+                'expectedResult' => false
+            ],
+            'empty port' => [
+                'host' => 'host',
+                'port' => null,
+                'user' => 'test',
+                'password' => 'password',
+                'accessToken' => 'token',
+                'expectedResult' => false
+            ],
+            'empty user' => [
+                'host' => 'host',
+                'port' => 25,
+                'user' => null,
+                'password' => 'password',
+                'accessToken' => 'token',
+                'expectedResult' => false
+            ],
+            'empty password and token' => [
+                'host' => 'host',
+                'port' => 25,
+                'user' => 'test',
+                'password' => '',
+                'accessToken' => '',
+                'expectedResult' => false
+            ],
+            'success with password' => [
+                'host' => 'host',
+                'port' => 25,
+                'user' => 'test',
+                'password' => 'password',
+                'accessToken' => '',
+                'expectedResult' => true
+            ],
+            'success with token' => [
+                'host' => 'host',
+                'port' => 25,
+                'user' => 'test',
+                'password' => '',
+                'accessToken' => 'token',
+                'expectedResult' => true
+            ]
+        ];
     }
 }

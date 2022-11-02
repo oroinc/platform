@@ -2,13 +2,19 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
+use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * It is expected that this trait will be used in classes that have "getContainer" static method.
  * E.g. classes derived from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase.
+ *
+ * @method static ContainerInterface getContainer()
  */
 trait MessageQueueExtension
 {
     use MessageQueueAssertTrait;
+    use MessageQueueConsumerTestTrait;
 
     /**
      * Removes all sent messages.
@@ -17,16 +23,60 @@ trait MessageQueueExtension
      */
     public function setUpMessageCollector()
     {
-        $this->clearMessageCollector();
+        self::clearMessageCollector();
+        self::purgeMessageQueue();
     }
 
     /**
      * Removes all sent messages.
      *
      * After triggered after client removed
+     *
+     * @beforeResetClient
      */
-    public function tearDown()
+    protected static function tearDownMessageCollector(): void
     {
-        $this->clearMessageCollector();
+        self::purgeMessageQueue();
+        self::clearMessageCollector();
+        self::clearProcessedMessages();
+        self::disableMessageBuffering();
+    }
+
+    protected static function getBufferedMessageProducer(): BufferedMessageProducer
+    {
+        return self::getContainer()->get('oro_message_queue.client.buffered_message_producer');
+    }
+
+    /**
+     * Enables the buffering of sent messages.
+     */
+    protected static function enableMessageBuffering(): void
+    {
+        $bufferedProducer = self::getBufferedMessageProducer();
+        if (!$bufferedProducer->isBufferingEnabled()) {
+            $bufferedProducer->enableBuffering();
+        }
+    }
+
+    /**
+     * Disables the buffering of sent messages.
+     */
+    protected static function disableMessageBuffering(): void
+    {
+        $bufferedProducer = self::getBufferedMessageProducer();
+        if ($bufferedProducer->isBufferingEnabled()) {
+            $bufferedProducer->disableBuffering();
+        }
+    }
+
+    /**
+     * Flushes buffered sent messages.
+     */
+    protected static function flushMessagesBuffer(): void
+    {
+        $bufferedProducer = self::getBufferedMessageProducer();
+        if ($bufferedProducer->isBufferingEnabled()) {
+            $bufferedProducer->flushBuffer();
+        }
     }
 }

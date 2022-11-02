@@ -2,28 +2,31 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SESSION_ID          = 'test_sid';
-    const TEST_CSRF_TOKEN_ID       = 'test_token_id';
-    const TEST_CSRF_TOKEN_LIFETIME = 123;
+    private const TEST_SESSION_ID = 'test_sid';
+    private const TEST_CSRF_TOKEN_ID = 'test_token_id';
+    private const TEST_CSRF_TOKEN_LIFETIME = 123;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenCache;
+    /** @var ArrayAdapter */
+    private $tokenCache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $sessionIdProvider;
+    /** @var SessionIdProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $sessionIdProvider;
 
     /** @var CsrfTokenStorage */
-    protected $csrfTokenStorage;
+    private $csrfTokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->tokenCache = $this->createMock(CacheProvider::class);
+        $this->tokenCache = new ArrayAdapter();
         $this->sessionIdProvider = $this->createMock(SessionIdProviderInterface::class);
 
         $this->sessionIdProvider->expects(self::any())
@@ -37,48 +40,23 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasTokenShouldReturnFalseIfTokenIsNotCached()
+    public function testHasToken(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('fetch')
-            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
-            ->willReturn(false);
-
         self::assertFalse(
             $this->csrfTokenStorage->hasToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testHasTokenShouldReturnTrueIfTokenIsNotCached()
+    public function testGetTokenShouldReturnNullIfTokenIsNotCached(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('fetch')
-            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
-            ->willReturn('test');
-
-        self::assertTrue(
-            $this->csrfTokenStorage->hasToken(self::TEST_CSRF_TOKEN_ID)
-        );
-    }
-
-    public function testGetTokenShouldReturnNullIfTokenIsNotCached()
-    {
-        $this->tokenCache->expects(self::once())
-            ->method('fetch')
-            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
-            ->willReturn(false);
-
         self::assertNull(
             $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testGetTokenShouldReturnCachedToken()
+    public function testGetTokenShouldReturnCachedToken(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('fetch')
-            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
-            ->willReturn('test');
+        $this->tokenCache->get(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID, fn (ItemInterface $item) => 'test');
 
         self::assertEquals(
             'test',
@@ -86,33 +64,57 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetToken()
+    public function testSetToken(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('save')
-            ->with(
-                self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID,
-                'test',
-                self::TEST_CSRF_TOKEN_LIFETIME
-            );
-
-        $this->csrfTokenStorage->setToken(self::TEST_CSRF_TOKEN_ID, 'test');
+        $this->assertSavedToken();
     }
 
-    public function testRemoveToken()
+    public function testSetTokenWhenPruneable(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('delete')
-            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID);
+        $tokenCache = $this->createMock(PhpFilesAdapter::class);
+
+        $csrfTokenStorage = new CsrfTokenStorage(
+            $tokenCache,
+            self::TEST_CSRF_TOKEN_LIFETIME,
+            $this->sessionIdProvider
+        );
+
+        $cacheItem = new CacheItem();
+        $tokenCache->expects(self::once())
+            ->method('getItem')
+            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
+            ->willReturn($cacheItem);
+        $tokenCache->expects(self::once())
+            ->method('save');
+        $tokenCache->expects(self::once())
+            ->method('prune');
+
+        $csrfTokenStorage->setToken(self::TEST_CSRF_TOKEN_ID, 'test');
+    }
+
+    public function testRemoveToken(): void
+    {
+        $this->assertSavedToken();
 
         $this->csrfTokenStorage->removeToken(self::TEST_CSRF_TOKEN_ID);
+
+        self::assertNull($this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID));
     }
 
-    public function testClear()
+    public function testClear(): void
     {
-        $this->tokenCache->expects(self::once())
-            ->method('deleteAll');
+        $this->assertSavedToken();
 
         $this->csrfTokenStorage->clear();
+
+        self::assertNull($this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID));
+    }
+
+    private function assertSavedToken(): void
+    {
+        $token = 'test';
+        $this->csrfTokenStorage->setToken(self::TEST_CSRF_TOKEN_ID, $token);
+
+        self::assertEquals($token, $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID));
     }
 }

@@ -1,44 +1,43 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Displays available conditions.
+ */
 class DebugConditionCommand extends AbstractDebugCommand
 {
-    const COMMAND_NAME = 'oro:debug:condition';
-    const ARGUMENT_NAME = 'condition-name';
-    const FACTORY_SERVICE_ID = 'oro_action.expression.factory';
+    public const ARGUMENT_NAME = 'condition-name';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:debug:condition';
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Displays current "conditions" for an application')
-            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
+        $this
+            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Condition name')
+            ->setDescription('Displays available conditions.')
             ->setHelp(
-                <<<EOF
-The <info>%command.name%</info> displays list of all conditions with full description:
+                <<<'HELP'
+The <info>%command.name%</info> command displays available conditions.
 
   <info>php %command.full_name%</info>
-EOF
-            );
+
+To get information about a specific condition, specify its name:
+
+  <info>php %command.full_name% <condition></info>
+  <info>php %command.full_name% instanceof</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFactoryServiceId()
-    {
-        return self::FACTORY_SERVICE_ID;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getArgumentName()
+    protected function getArgumentName(): string
     {
         return self::ARGUMENT_NAME;
     }

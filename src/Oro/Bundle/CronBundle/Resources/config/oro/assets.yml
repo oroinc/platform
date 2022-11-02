@@ -1,4 +1,7 @@
-assets:
-    css:
-        'orocron':
-            - 'bundles/orocron/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/orocron/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orocron/css/scss/main.scss'

@@ -17,9 +17,6 @@ class DoctrineInitializer implements ObjectInitializerInterface
     /** @var ObjectInitializerInterface */
     private $innerInitializer;
 
-    /**
-     * @param ObjectInitializerInterface $innerInitializer
-     */
     public function __construct(ObjectInitializerInterface $innerInitializer)
     {
         $this->innerInitializer = $innerInitializer;

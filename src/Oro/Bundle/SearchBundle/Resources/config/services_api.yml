@@ -1,0 +1,88 @@
+services:
+    oro_search.api.search_field_resolver_factory:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory
+        arguments:
+            - '@oro_search.provider.search_mapping'
+
+    oro_search.api.filter_factory.search_query:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@oro_search.api.search_field_resolver_factory'
+
+    oro_search.api.filter_factory.search_aggregation:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilterFactory
+        arguments:
+            - '@oro_search.api.search_field_resolver_factory'
+
+    oro_search.api.search_entity_list_filter_helper:
+        class: Oro\Bundle\SearchBundle\Api\SearchEntityListFilterHelper
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@oro_search.index'
+            - '@oro_api.resources_provider'
+            - '@oro_api.value_normalizer'
+
+    oro_search.api.search_entity_repository:
+        class: Oro\Bundle\SearchBundle\Api\Repository\SearchEntityRepository
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@oro_search.index'
+            - '@oro_api.resources_provider'
+            - '@oro_api.value_normalizer'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+
+    oro_search.api.add_search_entity_url_link:
+        class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchEntityUrlLink
+        tags:
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\SearchBundle\Api\Model\SearchItem, priority: -200 }
+
+    oro_search.api.validate_search_capability:
+        class: Oro\Bundle\SearchBundle\Api\Processor\ValidateSearchCapability
+        arguments:
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\SearchBundle\Api\Model\SearchEntity }
+            - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\SearchBundle\Api\Model\SearchItem }
+
+    oro_search.api.load_search_entities:
+        class: Oro\Bundle\SearchBundle\Api\Processor\LoadSearchEntities
+        arguments:
+            - '@oro_search.api.search_entity_repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\SearchBundle\Api\Model\SearchEntity }
+
+    oro_search.api.add_search_text_filter:
+        class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchTextFilter
+        arguments:
+            - '@oro_search.provider.search_mapping'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: filters&!identifier_fields_only, priority: -90 }
+
+    oro_search.api.set_default_search_text_sorting:
+        class: Oro\Bundle\SearchBundle\Api\Processor\SetDefaultSearchTextSorting
+        arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 95 }
+
+    oro_search.api.build_search_query:
+        class: Oro\Bundle\SearchBundle\Api\Processor\BuildSearchQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_search.index'
+            - '@oro_search.provider.search_mapping'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
+
+    oro_search.api.load_entities_by_search_text:
+        class: Oro\Bundle\SearchBundle\Api\Processor\LoadEntitiesBySearchText
+        arguments:
+            - '@oro_search.index'
+            - '@oro_search.api.search_entity_list_filter_helper'
+            - '@oro_api.value_normalizer'
+            - '@event_dispatcher'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\SearchBundle\Api\Model\SearchItem }

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var GoogleSyncCheckboxView;
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    GoogleSyncCheckboxView = BaseView.extend({
+    const GoogleSyncCheckboxView = BaseView.extend({
         $errorMessage: null,
 
         $successMessage: null,
@@ -29,14 +28,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function GoogleSyncCheckboxView() {
-            GoogleSyncCheckboxView.__super__.constructor.apply(this, arguments);
+        constructor: function GoogleSyncCheckboxView(options) {
+            GoogleSyncCheckboxView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);

@@ -4,4 +4,14 @@ security:
             pattern:   ^/embedded-form/(submit|success)
             provider:  chain_provider
             anonymous: true
-            logout_on_user_change: true
+
+# X-Frame-Options header should be removed from embedded forms
+# OroEmbeddedForm bundle has lower priority than OroSecurityBundle
+# Therefore, app.yml cannot be used for setting the correct sequence of `clickjacking` paths
+# For adding appropriate configuration used `OroEmbeddedFormExtension::prepend`
+#
+#nelmio_security:
+#    clickjacking:
+#        paths:
+#            '/embedded-form/submit': ALLOW
+#            '/embedded-form/success': ALLOW

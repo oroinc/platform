@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FeaturesChange extends Event
 {
@@ -13,9 +13,6 @@ class FeaturesChange extends Event
      */
     protected $changeSet = [];
 
-    /**
-     * @param array $changeSet
-     */
     public function __construct(array $changeSet)
     {
         $this->changeSet = $changeSet;

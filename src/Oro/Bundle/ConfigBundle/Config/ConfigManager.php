@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
@@ -10,6 +11,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
+ * Configuration manager.
+ * Contains chain of scope managers, get/set config values with a respect to fallback.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
@@ -28,32 +32,31 @@ class ConfigManager
     /** @var AbstractScopeManager[] */
     protected $managers;
 
+    /** @var AbstractScopeManager[] */
+    protected $defaultManagers;
+
     /** @var string */
     protected $scope;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param string                       $scope
-     * @param ConfigDefinitionImmutableBag $configDefinition
-     * @param EventDispatcherInterface     $eventDispatcher
-     */
+    /** @var MemoryCache */
+    private $memoryCache;
+
     public function __construct(
-        $scope,
+        string $scope,
         ConfigDefinitionImmutableBag $configDefinition,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MemoryCache $memoryCache
     ) {
-        $this->scope           = $scope;
-        $this->settings        = $configDefinition->all();
+        $this->scope = $scope;
+        $this->settings = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
+        $this->memoryCache = $memoryCache;
     }
 
-    /**
-     * @param string               $scope
-     * @param AbstractScopeManager $manager
-     */
-    public function addManager($scope, $manager)
+    public function addManager(string $scope, AbstractScopeManager $manager): void
     {
         $this->managers[$scope] = $manager;
     }
@@ -110,7 +113,15 @@ class ConfigManager
      */
     public function get($name, $default = false, $full = false, $scopeIdentifier = null)
     {
-        return $this->getValue($name, $default, $full, $scopeIdentifier);
+        $cacheKey = $this->getCacheKey($name, $default, $full, $scopeIdentifier);
+        if ($this->memoryCache->has($cacheKey)) {
+            return $this->memoryCache->get($cacheKey);
+        }
+
+        $value = $this->getValue($name, $default, $full, $scopeIdentifier);
+        $this->memoryCache->set($cacheKey, $value);
+
+        return $value;
     }
 
     /**
@@ -149,7 +160,7 @@ class ConfigManager
         $valueWasFind = false;
 
         foreach ($this->managers as $manager) {
-            list($created, $updated, $isNullValue) = $manager->getInfo($name, $scopeIdentifier);
+            [$created, $updated, $isNullValue] = $manager->getInfo($name, $scopeIdentifier);
             if (!$isNullValue) {
                 $createdValue = $created;
                 $updatedValue = $updated;
@@ -186,6 +197,8 @@ class ConfigManager
     public function set($name, $value, $scopeIdentifier = null)
     {
         $this->getScopeManager()->set($name, $value, $scopeIdentifier);
+
+        $this->resetMemoryCache();
     }
 
     /**
@@ -197,6 +210,20 @@ class ConfigManager
     public function reset($name, $scopeIdentifier = null)
     {
         $this->getScopeManager()->reset($name, $scopeIdentifier);
+
+        $this->resetMemoryCache();
+    }
+
+    /**
+     * Removes scope settings. To save changes in a database, a flush method should be called.
+     *
+     * @param int|object $scopeIdentifier
+     */
+    public function deleteScope($scopeIdentifier): void
+    {
+        $this->getScopeManager()->deleteScope($scopeIdentifier);
+
+        $this->resetMemoryCache();
     }
 
     /**
@@ -230,33 +257,32 @@ class ConfigManager
         }
 
         $oldValues = [];
-        foreach ($settings as $name => $setting) {
+        foreach ($settings as $name => $fieldSettings) {
             $oldValues[$name] = $this->getValue($name, false, false, $scopeIdentifier, true);
-
-            $eventName = sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name);
-            $settings[$name] = $this->dispatchConfigSettingsUpdateEvent($eventName, $setting);
+            $settings[$name] = $this->dispatchConfigSettingsUpdateEvent(
+                sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name),
+                $fieldSettings
+            );
         }
 
         $settings = $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::BEFORE_SAVE, $settings);
 
-        list($updated, $removed) = $this->getScopeManager()->save($settings, $scopeIdentifier);
+        [$updated, $removed] = $this->getScopeManager()->save($settings, $scopeIdentifier);
+
+        $this->resetMemoryCache();
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
-        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
-        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
+        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->resolveIdentifier($scopeIdentifier));
+        $this->eventDispatcher->dispatch($event, ConfigUpdateEvent::EVENT_NAME);
 
         return $changeSet;
     }
 
-    /**
-     * @param string $eventName
-     * @param array $settings
-     * @return array
-     */
-    protected function dispatchConfigSettingsUpdateEvent($eventName, array $settings)
+    protected function dispatchConfigSettingsUpdateEvent(string $eventName, array $settings): array
     {
         $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
+
         return $event->getSettings();
     }
 
@@ -284,32 +310,25 @@ class ConfigManager
     public function reload($scopeIdentifier = null)
     {
         $this->getScopeManager()->reload($scopeIdentifier);
+
+        $this->resetMemoryCache();
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return array
-     */
-    public function getSettingsByForm(FormInterface $form)
+    public function getSettingsByForm(FormInterface $form): array
     {
         $settings = [];
 
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            $name            = $child->getName();
-            $key             = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
+            $name = $child->getName();
+            $key = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
             $settings[$name] = $this->get($key, false, true);
-
-            if (!isset($settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY])) {
-                $settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY] = true;
+            if (!isset($settings[$name][self::USE_PARENT_SCOPE_VALUE_KEY])) {
+                $settings[$name][self::USE_PARENT_SCOPE_VALUE_KEY] = true;
             }
         }
 
-        $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::FORM_PRESET, $event);
-
-        return $event->getSettings();
+        return $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::FORM_PRESET, $settings);
     }
 
     /**
@@ -322,7 +341,7 @@ class ConfigManager
      */
     public function getSettingsDefaults($name, $full = false)
     {
-        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        [$section, $key] = explode(self::SECTION_MODEL_SEPARATOR, $name);
 
         if (empty($this->settings[$section][$key])) {
             return null;
@@ -330,14 +349,14 @@ class ConfigManager
 
         $setting = $this->settings[$section][$key];
 
-        if ($setting[static::VALUE_KEY] instanceof ValueProviderInterface) {
-            $setting[static::VALUE_KEY] = $setting[static::VALUE_KEY]->getValue();
+        if ($setting[self::VALUE_KEY] instanceof ValueProviderInterface) {
+            $setting[self::VALUE_KEY] = $setting[self::VALUE_KEY]->getValue();
             // replace provider with value that it returns
-            $this->settings[$section][$key][static::VALUE_KEY] = $setting[static::VALUE_KEY];
+            $this->settings[$section][$key][self::VALUE_KEY] = $setting[self::VALUE_KEY];
         }
 
         if (!$full) {
-            return $setting[static::VALUE_KEY];
+            return $setting[self::VALUE_KEY];
         }
 
         return $setting;
@@ -388,14 +407,13 @@ class ConfigManager
      * @param string $name
      * @param bool $default
      * @param bool $full
-     * @param null|int $scopeIdentifier
+     * @param null|int|object $scopeIdentifier
      * @param bool $skipChanges
      *
      * @return mixed
      */
     protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
-        $value = null;
         $scopeId = $this->resolveIdentifier($scopeIdentifier);
         $managers = $this->getScopeManagersToGetValue($default);
         $settingValue = null;
@@ -405,7 +423,7 @@ class ConfigManager
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
                 if ($this->scope !== $scopeName) {
-                    $settingValue[static::USE_PARENT_SCOPE_VALUE_KEY] = true;
+                    $settingValue[self::USE_PARENT_SCOPE_VALUE_KEY] = true;
                 }
                 break;
             }
@@ -417,8 +435,8 @@ class ConfigManager
         }
 
         $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
-        $this->eventDispatcher->dispatch(ConfigGetEvent::NAME, $event);
-        $this->eventDispatcher->dispatch(sprintf('%s.%s', ConfigGetEvent::NAME, $name), $event);
+        $this->eventDispatcher->dispatch($event, ConfigGetEvent::NAME);
+        $this->eventDispatcher->dispatch($event, sprintf('%s.%s', ConfigGetEvent::NAME, $name));
 
         $value = $event->getValue();
 
@@ -430,6 +448,54 @@ class ConfigManager
     }
 
     /**
+     * @param string $name
+     * @param bool $default
+     * @param bool $full
+     * @param null|int|object $scopeIdentifier
+     * @param bool $skipChanges
+     *
+     * @return string
+     */
+    private function getCacheKey(
+        string $name,
+        bool $default = false,
+        bool $full = false,
+        $scopeIdentifier = null,
+        bool $skipChanges = false
+    ): string {
+        if (is_object($scopeIdentifier)) {
+            $managers = $this->getScopeManagersToGetValue($default);
+            $scopedEntityName = '';
+            $resolvedScopeId = null;
+            foreach ($managers as $manager) {
+                if ($resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier)) {
+                    $scopedEntityName = $manager->getScopedEntityName();
+                    break;
+                }
+            }
+        } else {
+            $scopedEntityName = $this->getScopeEntityName();
+            $resolvedScopeId = $this->resolveIdentifier($scopeIdentifier);
+        }
+
+        return sprintf(
+            '%s|%s|%d|%s|%d|%d|%d',
+            $this->getScopeEntityName(),
+            $scopedEntityName,
+            (int)$resolvedScopeId,
+            $name,
+            (int)$default,
+            (int)$full,
+            (int)$skipChanges
+        );
+    }
+
+    private function resetMemoryCache(): void
+    {
+        $this->memoryCache->deleteAll();
+    }
+
+    /**
      * @param mixed $value
      * @param bool $full
      *
@@ -438,7 +504,7 @@ class ConfigManager
     protected function isArrayValue($value, $full)
     {
         if ($full) {
-            return is_array($value[static::VALUE_KEY]);
+            return is_array($value[self::VALUE_KEY]);
         }
 
         return is_array($value);
@@ -452,7 +518,7 @@ class ConfigManager
      */
     protected function getPlainValue($value, $full)
     {
-        return $full ? $value[static::VALUE_KEY] : $value;
+        return $full ? $value[self::VALUE_KEY] : $value;
     }
 
     /**
@@ -468,7 +534,7 @@ class ConfigManager
             return $newValue;
         }
 
-        $value[static::VALUE_KEY] = $newValue;
+        $value[self::VALUE_KEY] = $newValue;
 
         return $value;
     }
@@ -484,16 +550,18 @@ class ConfigManager
             return $this->managers;
         }
 
-        // in case if we need default value - skip the current and more priority scope managers than the current one
-        $managers = $this->managers;
-        foreach ($this->managers as $scope => $manager) {
-            unset($managers[$scope]);
-            if ($scope === $this->scope) {
-                break;
+        if (!$this->defaultManagers) {
+            // in case if we need default value - skip the current and more priority scope managers than the current one
+            $this->defaultManagers = $this->managers;
+            foreach ($this->managers as $scope => $manager) {
+                unset($this->defaultManagers[$scope]);
+                if ($scope === $this->scope) {
+                    break;
+                }
             }
         }
 
-        return $managers;
+        return $this->defaultManagers;
     }
 
     /**
@@ -507,8 +575,8 @@ class ConfigManager
         $normalizedSettings = [];
         if (is_array($settings)) {
             foreach ($settings as $name => $value) {
-                list($section, $key) = explode(
-                    ConfigManager::SECTION_MODEL_SEPARATOR,
+                [$section, $key] = explode(
+                    self::SECTION_MODEL_SEPARATOR,
                     str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name)
                 );
                 if (!empty($this->settings[$section][$key])) {
@@ -554,6 +622,13 @@ class ConfigManager
      */
     protected function resolveIdentifier($scopeIdentifier)
     {
-        return $this->getScopeManager()->resolveIdentifier($scopeIdentifier);
+        foreach ($this->getScopeManagersToGetValue(false) as $scopeManager) {
+            $identifier = $scopeManager->resolveIdentifier($scopeIdentifier);
+            if ($identifier !== null) {
+                return $identifier;
+            }
+        }
+
+        return null;
     }
 }

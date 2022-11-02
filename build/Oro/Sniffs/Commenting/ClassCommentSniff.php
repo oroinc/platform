@@ -115,13 +115,13 @@ class ClassCommentSniff extends BaseClassCommentSniff
 
         // check format "objectName"
         if (strtolower($docText) === strtolower($objectName)) {
-            $error = 'The descripion "%s" is not valid because contains only the %s name';
+            $error = 'The description "%s" is not valid because contains only the %s name';
             $phpcsFile->addError($error, $stackPtr, 'Class doc', [$docText, $objectType]);
         }
 
         // check format "objectType objectName"
         if (strtolower($objectType . $objectName) === str_replace(' ', '', strtolower($docText))) {
-            $error = 'The descripion "%s" is not valid because contains only the object type and name';
+            $error = 'The description "%s" is not valid because contains only the object type and name';
             $phpcsFile->addError($error, $stackPtr, 'Class doc', [$docText]);
         }
     }

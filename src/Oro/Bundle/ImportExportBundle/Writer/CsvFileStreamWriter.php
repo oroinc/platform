@@ -80,7 +80,6 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
     /**
      * Write CSV line.
      *
-     * @param array $fields
      * @throws RuntimeException
      */
     protected function writeLine(array $fields)

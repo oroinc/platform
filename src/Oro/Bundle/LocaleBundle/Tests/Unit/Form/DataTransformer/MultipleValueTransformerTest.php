@@ -4,36 +4,31 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    const FIELD_DEFAULT = 'default';
-    const FIELD_VALUES  = 'values';
+    private const FIELD_DEFAULT = 'default';
+    private const FIELD_VALUES = 'values';
 
-    /**
-     * @var MultipleValueTransformer
-     */
-    protected $transformer;
+    /** @var MultipleValueTransformer */
+    private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_VALUES);
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider transformDataProvider
      */
-    public function testTransform($input, $expected)
+    public function testTransform(mixed $input, mixed $expected)
     {
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             'null' => [
@@ -70,29 +65,23 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testTransformUnexpectedTypeException()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $this->transformer->transform(new \DateTime());
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($input, $expected)
+    public function testReverseTransform(mixed $input, mixed $expected)
     {
         $this->assertEquals($expected, $this->transformer->reverseTransform($input));
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'null' => [
@@ -130,30 +119,27 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testReverseTransformUnexpectedTypeException()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $this->transformer->reverseTransform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Value does not contain default value
-     */
     public function testReverseTransformNoDefaultDataException()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Value does not contain default value');
+
         $this->transformer->reverseTransform([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Value does not contain collection value
-     */
     public function testReverseTransformNoCollectionDataException()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Value does not contain collection value');
+
         $this->transformer->reverseTransform([self::FIELD_DEFAULT => 'default string']);
     }
 }

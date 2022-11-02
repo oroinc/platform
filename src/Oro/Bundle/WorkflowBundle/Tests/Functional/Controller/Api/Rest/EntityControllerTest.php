@@ -7,12 +7,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityControllerTest extends WebTestCase
 {
-    /**
-     * @var EntityWithFieldsProvider
-     */
-    protected $provider;
+    /** @var EntityWithFieldsProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->provider = $this->client->getContainer()->get('oro_workflow.entity_field_list_provider');
@@ -20,7 +18,7 @@ class EntityControllerTest extends WebTestCase
 
     public function testGetAction()
     {
-        $this->client->request('GET', $this->getUrl('oro_api_workflow_entity_get'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_workflow_entity_get'));
 
         $actual = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -32,7 +30,7 @@ class EntityControllerTest extends WebTestCase
             foreach ($entityData['fields'] as $fieldData) {
                 if (array_key_exists('relation_type', $fieldData)) {
                     $this->assertArrayHasKey('name', $fieldData);
-                    $this->assertNotRegExp(
+                    self::assertDoesNotMatchRegularExpression(
                         '/many$/',
                         $fieldData['relation_type'],
                         sprintf('Unsupported *toMany relation present %s:%s', $entityData['name'], $fieldData['name'])
@@ -45,10 +43,7 @@ class EntityControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getExpectedData()
+    private function getExpectedData(): array
     {
         return array_map(
             function (array $data) {

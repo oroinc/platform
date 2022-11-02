@@ -11,32 +11,21 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroAutocompleteTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroAutocompleteType
-     */
-    protected $formType;
+    /** @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchHandler;
 
-    /**
-     * @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $searchRegistry;
+    /** @var OroAutocompleteType */
+    private $formType;
 
-    /**
-     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $searchHandler;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formType = new OroAutocompleteType($this->getMockSearchRegistry());
+        $searchRegistry = $this->createMock(SearchRegistry::class);
+        $searchRegistry->expects(self::any())
+            ->method('getSearchHandler')
+            ->willReturn($this->getMockSearchHandler());
+
+        $this->formType = new OroAutocompleteType($searchRegistry);
         parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->formType, $this->searchRegistry, $this->searchHandler);
     }
 
     /**
@@ -54,27 +43,13 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    public function getMockSearchRegistry()
-    {
-        if (!$this->searchRegistry) {
-            $this->searchRegistry = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry');
-            $this->searchRegistry->method('getSearchHandler')->willReturn($this->getMockSearchHandler());
-        }
-
-        return $this->searchRegistry;
-    }
-
-    /**
-     * @return SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    public function getMockSearchHandler()
+    private function getMockSearchHandler(): SearchHandlerInterface
     {
         if (!$this->searchHandler) {
-            $this->searchHandler = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
-            $this->searchHandler->method('getProperties')->willReturn(['code', 'label']);
+            $this->searchHandler = $this->createMock(SearchHandlerInterface::class);
+            $this->searchHandler->expects(self::any())
+                ->method('getProperties')
+                ->willReturn(['code', 'label']);
         }
 
         return $this->searchHandler;
@@ -86,10 +61,6 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $options
-     * @param array $expectedFormOptions
-     * @param array $expectedComponentOptions
-     *
      * @dataProvider buildFormDataProvider
      */
     public function testBuildForm(array $options, array $expectedFormOptions, array $expectedComponentOptions)
@@ -109,10 +80,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         $this->assertEquals($view->vars['componentOptions'], $expectedComponentOptions);
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
         $defaultOptions = [
             'route_name' => '',
@@ -150,8 +118,8 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         );
         $aliasFormOptions['route_parameters']['name'] = $aliasOptions['alias'];
 
-        return array(
-            'without options' => array(
+        return [
+            'without options' => [
                 'options' => [],
                 'expectedFormOptions' => $defaultOptions,
                 'expectedComponentOptions' => [
@@ -159,8 +127,8 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
                     'route_parameters' => $defaultOptions['route_parameters'],
                     'properties' => $defaultOptions['properties'],
                 ],
-            ),
-            'with route' => array(
+            ],
+            'with route' => [
                 'options' => $routeOptions,
                 'expectedFormOptions' => $routeFormOptions,
                 'expectedComponentOptions' => [
@@ -168,8 +136,8 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
                     'route_parameters' => $routeFormOptions['route_parameters'],
                     'properties' => $routeFormOptions['properties'],
                 ],
-            ),
-            'with alias' => array(
+            ],
+            'with alias' => [
                 'options' => $aliasOptions,
                 'expectedFormOptions' => $aliasFormOptions,
                 'expectedComponentOptions' => [
@@ -177,7 +145,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
                     'route_parameters' => $aliasFormOptions['route_parameters'],
                     'properties' => $aliasFormOptions['properties'],
                 ],
-            ),
-        );
+            ],
+        ];
     }
 }

@@ -6,10 +6,12 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * This class is required to make User entity extendable.
+ *
  * @method setAuthStatus(AbstractEnumValue $enum)
  * @method AbstractEnumValue getAuthStatus()
  */
-class ExtendUser extends AbstractUser
+abstract class ExtendUser extends AbstractUser
 {
     /**
      * Constructor

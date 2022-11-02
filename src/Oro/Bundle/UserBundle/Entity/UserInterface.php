@@ -2,45 +2,47 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\Role\RoleInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Oro\Bundle\SecurityBundle\Model\Role;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
-interface UserInterface extends AdvancedUserInterface
+/**
+ * Represents the interface that all user classes must implement.
+ */
+interface UserInterface extends SymfonyUserInterface
 {
     /**
      * @param string $username New username
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setUsername($username);
+    public function setUsername($username): self;
 
     /**
-     * @param string $password New encoded password
+     * @param string|null $password New encoded password
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setPassword($password);
+    public function setPassword(?string $password): self;
 
     /**
      * Get plain user password.
-     *
-     * @return string
      */
-    public function getPlainPassword();
+    public function getPlainPassword(): ?string;
 
     /**
-     * @param string $password New password as plain string
+     * @param string|null $password New password as plain string
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setPlainPassword($password);
+    public function setPlainPassword(?string $password): self;
 
     /**
      * Adds a Role to the Collection.
-     *
-     * @param RoleInterface $role
-     *
-     * @return UserInterface
      */
-    public function addRole(RoleInterface $role);
+    public function addUserRole(Role $role): self;
+
+    /**
+     * @return Role[]
+     */
+    public function getUserRoles(): array;
 }

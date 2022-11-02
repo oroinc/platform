@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -8,9 +10,11 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that adds associations to multiple emails.
+ */
 class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -28,11 +32,6 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
      */
     private $logger;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(MessageProducerInterface $producer, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->producer = $producer;
@@ -45,13 +44,7 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['emailIds'], $data['targetClass'], $data['targetId']) || ! is_array($data['emailIds'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         asort($data['emailIds']);
 
@@ -77,12 +70,15 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
                             $id
                         ),
                         function (JobRunner $jobRunner, Job $child) use ($data, $id) {
-                            $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAIL, [
-                                'emailId' => $id,
-                                'targetClass' => $data['targetClass'],
-                                'targetId' => $data['targetId'],
-                                'jobId' => $child->getId(),
-                            ]);
+                            $this->producer->send(
+                                AddEmailAssociationTopic::getName(),
+                                [
+                                    'emailId' => $id,
+                                    'targetClass' => $data['targetClass'],
+                                    'targetId' => $data['targetId'],
+                                    'jobId' => $child->getId(),
+                                ]
+                            );
                         }
                     );
                 }
@@ -104,6 +100,6 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ADD_ASSOCIATION_TO_EMAILS];
+        return [AddEmailAssociationsTopic::getName()];
     }
 }

@@ -4,55 +4,35 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
+class UniqueKeysValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var UniqueKeysValidator
-     */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->validator = new UniqueKeysValidator();
-        $this->validator->initialize($this->context);
+        return new UniqueKeysValidator();
     }
 
     /**
-     * @param array $value
-     * @param bool  $violation
-     *
      * @dataProvider validateDataProvider
      */
-    public function testValidate(array $value, $violation)
+    public function testValidate(array $value, bool $valid)
     {
         $constraint = new UniqueKeys();
-
-        if ($violation) {
-            $this->context
-                ->expects($this->once())
-                ->method('addViolation')
-                ->with($this->equalTo($constraint->message));
-        }
-
         $this->validator->validate($value, $constraint);
+
+        if ($valid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->assertRaised();
+        }
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
-            'empty'           => [[], false],
+            'empty'           => [[], true],
             'name_not_unique' => [
                 [
                     [
@@ -70,7 +50,7 @@ class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                true
+                false
             ],
             'keys_not_unique' => [
                 [
@@ -89,7 +69,7 @@ class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                true
+                false
             ],
             'same_field'      => [
                 [
@@ -108,7 +88,7 @@ class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                false
+                true
             ],
             'unique_fields'   => [
                 [
@@ -127,7 +107,7 @@ class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                false
+                true
             ]
         ];
     }

@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\Criteria;
 
 /**
  * Allows to pass callbacks instead of the actual values to calculate them separately on demand
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LazyResult extends Result
 {
@@ -56,8 +58,6 @@ class LazyResult extends Result
 
     /**
      * Fill internal storage of ArrayCollection to maintain compatibility with Collection interface
-     *
-     * @param array $elements
      */
     protected function fillCollectionElements(array $elements)
     {
@@ -266,7 +266,7 @@ class LazyResult extends Result
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         $this->initializeElements();
 
@@ -308,7 +308,7 @@ class LazyResult extends Result
      *
      * {@inheritDoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->initializeElements();
 

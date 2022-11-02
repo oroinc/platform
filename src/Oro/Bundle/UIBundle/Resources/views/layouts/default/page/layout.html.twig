@@ -1,0 +1,152 @@
+{% block _layout_js_modules_config_widget %}
+    {{ block_widget(block) }}
+    {% placeholder js_modules_config %}
+    {% import '@OroAsset/Asset.html.twig' as Asset %}
+    {{ Asset.js_modules_config({
+        'oroui/js/app': {
+            publicPath: asset(publicPath)|split('?', 2)[0]
+        }
+    }) }}
+{% endblock %}
+
+{% block _layout_js_build_scripts_widget %}
+    {% import '@OroAsset/Asset.html.twig' as Asset %}
+    {{ Asset.js(src) }}
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block body_widget %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' body ' ~ (isMobileVersion() ? 'mobile' : 'desktop') ~ '-version'
+    }) %}
+
+    <body {{ block('block_attributes') }}>
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/app-loading-mask-component'
+        }) }}></div>
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/app-loading-bar-component'
+        }) }}></div>
+        <div id="container" data-layout="separate"
+             {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
+            {{ block_widget(block) }}
+        </div>
+    </body>
+{% endblock %}
+
+{% block _wrapper_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' wrapper'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-container'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_main_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-main',
+        'data-role': 'page-main-container',
+        'data-skip-focus-decoration': ''
+    }) %}
+
+    <main{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </main>
+{% endblock %}
+
+{% block _page_main_content_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-main__content'
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_main_header_widget %}
+    {% if block.count > 0 %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-main__header'
+        }) %}
+        <div{{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block _page_content_widget %}
+    {% set visibleSidebarChildren = [] %}
+    {% if blocks.page_sidebar is defined %}
+        {% for child in blocks.page_sidebar.children %}
+            {% if child.vars.visible %}
+                {% set visibleSidebarChildren  = visibleSidebarChildren|merge([child]) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-content',
+        'data-role': 'page-content'
+    }) %}
+
+    {% set sidebarIsVisible = visibleSidebarChildren|length > 0 %}
+    {% if sidebarExpanded is defined and sidebarExpanded == false %}
+        {% set sidebarIsVisible = false %}
+    {% endif %}
+
+    {% if sidebarIsVisible %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-content--has-sidebar'
+        }) %}
+    {% endif %}
+
+    <section {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </section>
+{% endblock %}
+
+{% block _page_sidebar_widget %}
+    {% if block.count > 0 %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-sidebar',
+            'data-role': 'page-sidebar'
+        }) %}
+
+        {% if sidebarExpanded is defined and sidebarExpanded == false %}
+            {% set attr = layout_attr_defaults(attr, {
+                '~class': ' hidden'
+            }) %}
+        {% endif %}
+
+        <aside {{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </aside>
+    {% endif %}
+{% endblock %}
+
+{% block _skip_to_content_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': 'btn btn--info skip-to-content__btn',
+        'data-page-component-proxy-focus': '[data-role="page-main-container"]',
+        'type': 'button'
+    }) %}
+
+    <div class="skip-to-content">
+        <button {{ block('block_attributes') }}>{{ 'oro.ui.button.skip_to_content'|trans }}</button>
+        <div class="skip-to-content__decorator" aria-hidden="true"></div>
+    </div>
+{% endblock %}

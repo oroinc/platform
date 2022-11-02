@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * Abstract implementation of page state entity.
+ *
  * @ORM\MappedSuperclass
  */
 class AbstractPageState
@@ -25,11 +27,12 @@ class AbstractPageState
     protected $user;
 
     /**
-     * Base64 encoded page URL
+     * Base64 encoded page URL.
+     * Max URL length set in application to 8190. Max Base64 encoded string length is 8190 * 4/3 = 10920
      *
      * @var string $pageId
      *
-     * @ORM\Column(name="page_id", type="string", length=4000)
+     * @ORM\Column(name="page_id", type="string", length=10920)
      */
     protected $pageId;
 

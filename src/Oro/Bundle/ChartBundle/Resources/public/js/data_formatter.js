@@ -1,7 +1,9 @@
-define([
-    'moment', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
-], function(moment, numberFormatter, dateTimeFormatter) {
+define(function(require) {
     'use strict';
+
+    const moment = require('moment');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     /**
      * @export orochart/js/data_formatter
@@ -14,7 +16,7 @@ define([
          * @return {*}
          */
         formatValue: function(data, format) {
-            var date;
+            let date;
             switch (format) {
                 case 'integer':
                 case 'smallint':
@@ -86,7 +88,7 @@ define([
                     return dateTimeFormatter.unformatBackendDateTime(data).valueOf(); // add convert to date
                 case 'datetime':
                 case 'time':
-                    var date = dateTimeFormatter.unformatBackendDateTime(data);
+                    const date = dateTimeFormatter.unformatBackendDateTime(data);
                     return date;
                 default:
                     return null;

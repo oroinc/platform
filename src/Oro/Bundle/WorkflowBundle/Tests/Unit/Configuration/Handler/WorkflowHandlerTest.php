@@ -2,92 +2,87 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
+use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class WorkflowHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowHandler
-     */
-    protected $handler;
+    /** @var WorkflowHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new WorkflowHandler();
     }
 
     /**
-     * @param array $expected
-     * @param array $input
      * @dataProvider handleDataProvider
      */
     public function testHandle(array $expected, array $input)
     {
-        $otherHandler = $this
-            ->createMock('Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface');
-        $otherHandler->expects($this->once())->method('handle')->with($expected)
-            ->will($this->returnValue($expected));
+        $otherHandler = $this->createMock(ConfigurationHandlerInterface::class);
+        $otherHandler->expects($this->once())
+            ->method('handle')
+            ->with($expected)
+            ->willReturn($expected);
 
         $this->handler->addHandler($otherHandler);
 
         $this->assertEquals($expected, $this->handler->handle($input));
     }
 
-    /**
-     * @return array
-     */
-    public function handleDataProvider()
+    public function handleDataProvider(): array
     {
-        return array(
-            'simple configuration' => array(
-                'expected' => array(
+        return [
+            'simple configuration' => [
+                'expected' => [
                     'name' => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'entity' => '\DateTime',
-                ),
-                'input' => array(
+                    'entity' => \DateTime::class,
+                ],
+                'input' => [
                     'name' => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'entity' => '\DateTime',
-                ),
-            ),
-            'filtered configuration' => array(
-                'expected' => array(
+                    'entity' => \DateTime::class,
+                ],
+            ],
+            'filtered configuration' => [
+                'expected' => [
                     'name' => 'test_workflow',
-                    'entity' => '\DateTime',
+                    'entity' => \DateTime::class,
                     'label' => 'Test Workflow',
                     'is_system' => false,
                     'start_step' => null,
                     'entity_attribute' => 'entity',
                     'steps_display_ordered' => true,
-                    WorkflowConfiguration::NODE_STEPS => array(),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(),
-                ),
-                'input' => array(
+                    WorkflowConfiguration::NODE_STEPS => [],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [],
+                ],
+                'input' => [
                     'name' => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'entity' => '\DateTime',
+                    'entity' => \DateTime::class,
                     'is_system' => false,
                     'start_step' => null,
                     'entity_attribute' => 'entity',
                     'steps_display_ordered' => true,
-                    WorkflowConfiguration::NODE_STEPS => array(),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(),
-                ),
-            )
-        );
+                    WorkflowConfiguration::NODE_STEPS => [],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [],
+                ],
+            ]
+        ];
     }
 
     public function testHandleEmptyConfiguration()
     {
-        $configuration = array(
+        $configuration = [
             'entity' => 'NotExistingEntity',
-        );
+        ];
 
         $result = $this->handler->handle($configuration);
 

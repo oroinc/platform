@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manage extend table/column options.
+ */
 class ExtendOptionsManager
 {
     const ENTITY_CLASS_OPTION = '_entity_class';
@@ -31,6 +35,10 @@ class ExtendOptionsManager
      * ]
      */
     protected $options = [];
+
+    public function __construct(private ConfigurationHandler $configurationHandler)
+    {
+    }
 
     /**
      * Sets table options
@@ -106,28 +114,18 @@ class ExtendOptionsManager
         $this->options[$objectKey] = ArrayUtil::arrayMergeRecursiveDistinct($this->options[$objectKey], $options);
     }
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @return bool
-     */
     public function hasColumnOptions(string $tableName, string $columnName): bool
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
 
-        return isset($this->options[$objectKey]);
+        return isset($this->getExtendOptions()[$objectKey]);
     }
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @return array
-     */
     public function getColumnOptions(string $tableName, string $columnName): array
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
 
-        return $this->options[$objectKey] ?? [];
+        return $this->getExtendOptions()[$objectKey] ?? [];
     }
 
     /**
@@ -165,6 +163,8 @@ class ExtendOptionsManager
      */
     public function getExtendOptions()
     {
+        $this->filterOptions();
+
         return $this->options;
     }
 
@@ -197,6 +197,28 @@ class ExtendOptionsManager
             } else {
                 $this->options[$objectKey][$scope] = $values;
             }
+
+            $this->validateOptions($objectKey, $scope, $this->options[$objectKey][$scope]);
+        }
+    }
+
+    /**
+     * @param string $objectKey
+     * @param string $scope
+     * @param $values
+     */
+    private function validateOptions(string $objectKey, string $scope, $values): void
+    {
+        if (is_array($values) && !str_starts_with($scope, '_')) {
+            $table = $objectKey;
+            $type = ConfigurationHandler::CONFIG_ENTITY_TYPE;
+
+            if (str_contains($objectKey, '!')) {
+                $table = explode('!', $objectKey)[0];
+                $type = ConfigurationHandler::CONFIG_FIELD_TYPE;
+            }
+
+            $this->configurationHandler->validate($type, $scope, $values, $table);
         }
     }
 
@@ -259,9 +281,6 @@ class ExtendOptionsManager
     }
 
     /**
-     * @param $objectKey
-     * @param $scope
-     * @param $values
      * @throws \InvalidArgumentException
      */
     private function validateOption($objectKey, $scope, $values)
@@ -273,10 +292,29 @@ class ExtendOptionsManager
         }
 
         // a scope which name starts with '_' is a temporary and it should be removed in ExtendOptionsBuilder
-        if (!is_array($values) && strpos($scope, '_') !== 0) {
+        if (!is_array($values) && !str_starts_with($scope, '_')) {
             throw new \InvalidArgumentException(
                 sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
             );
         }
+    }
+
+    protected function filterOptions(): void
+    {
+        $this->options = array_filter($this->options, static function ($options, $key) {
+            // Filter only columns with only extend options set
+            if (empty($options['extend'])
+                || !str_contains($key, '!')
+                || count(array_diff(array_keys($options), ['extend', '_type'])) > 0
+            ) {
+                return true;
+            }
+
+            // Check for options set not only by ExtendColumn
+            $extendColumnKeys = ['nullable', 'length', 'precision', 'scale', 'default'];
+            $diff = array_diff(array_keys($options['extend']), $extendColumnKeys);
+
+            return !empty($diff);
+        }, ARRAY_FILTER_USE_BOTH);
     }
 }

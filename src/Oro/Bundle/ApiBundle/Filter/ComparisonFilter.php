@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Model\Range;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * A filter that can be used to filter data by a field value.
@@ -41,62 +42,24 @@ use Oro\Bundle\ApiBundle\Model\Range;
  */
 class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInterface, CollectionAwareFilterInterface
 {
-    /** @var string "not equal to" operator */
-    public const NEQ = 'neq';
-    /** @var string "less than" operator */
-    public const LT = 'lt';
-    /** @var string "less than or equal to" operator */
-    public const LTE = 'lte';
-    /** @var string "greater than" operator */
-    public const GT = 'gt';
-    /** @var string "greater than or equal to" operator */
-    public const GTE = 'gte';
-    /**
-     * @var string "exists" operator,
-     * value is true = EXISTS (IS NOT NULL for fields and to-one associations
-     * and check whether a collection is not empty for to-many associations),
-     * value is false = NOT EXISTS (IS NULL for fields and to-one associations
-     * and check whether a collection is empty for to-many associations),
-     */
-    public const EXISTS = 'exists';
-    /**
-     * @var string "not equal to or IS NULL" operator for fields and to-one associations,
-     * for to-many associations checks whether a collection does not contain any of specific values
-     * or a collection is empty
-     */
-    public const NEQ_OR_NULL = 'neq_or_null';
-    /**
-     * @var string "contains" (LIKE %value%) operator for string fields
-     * and to-one associations with string identifier,
-     * for to-many associations checks whether a collection contains all of specific values
-     */
-    public const CONTAINS = 'contains';
-    /**
-     * @var string "not contains" (NOT LIKE %value%) operator for string fields
-     * and to-one associations with string identifier,
-     * for to-many associations checks whether a collection does not contain all of specific values
-     */
-    public const NOT_CONTAINS = 'not_contains';
-    /** @var string "starts with" (LIKE value%) operator */
-    public const STARTS_WITH = 'starts_with';
-    /** @var string "not starts with" (NOT LIKE value%) operator */
-    public const NOT_STARTS_WITH = 'not_starts_with';
-    /** @var string "ends with" (LIKE %value) operator */
-    public const ENDS_WITH = 'ends_with';
-    /** @var string "not ends with" (NOT LIKE %value) operator */
-    public const NOT_ENDS_WITH = 'not_ends_with';
-
     /** @var string[] The list of operators that support several values, e.g. an array or a range */
-    private const SUPPORT_SEVERAL_VALUES_OPERATORS = [self::EQ, self::NEQ, self::NEQ_OR_NULL];
+    private const SUPPORT_SEVERAL_VALUES_OPERATORS = [
+        FilterOperator::EQ,
+        FilterOperator::NEQ,
+        FilterOperator::NEQ_OR_NULL
+    ];
 
     /** @var string[] The list of operators that support several values specified as an array for collection */
-    private const SUPPORT_ARRAY_VALUES_OPERATORS_COLLECTION = [self::CONTAINS, self::NOT_CONTAINS];
+    private const SUPPORT_ARRAY_VALUES_OPERATORS_COLLECTION = [
+        FilterOperator::CONTAINS,
+        FilterOperator::NOT_CONTAINS
+    ];
 
     /** @var string */
-    protected $field;
+    private $field;
 
     /** @var bool */
-    protected $collection = false;
+    private $collection = false;
 
     /** @var bool */
     private $caseInsensitive = false;
@@ -105,29 +68,25 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     private $valueTransformer;
 
     /**
-     * Gets a field by which the data is filtered.
-     *
-     * @return string|null
-     */
-    public function getField()
-    {
-        return $this->field;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function setField($field)
+    public function setField(string $field): void
     {
         $this->field = $field;
     }
 
     /**
-     * Indicates whether the filter represents a collection valued association.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isCollection()
+    public function getField(): ?string
+    {
+        return $this->field;
+    }
+
+    /**
+     * Indicates whether the filter represents a collection valued association.
+     */
+    public function isCollection(): bool
     {
         return $this->collection;
     }
@@ -135,7 +94,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * {@inheritdoc}
      */
-    public function setCollection($collection)
+    public function setCollection(bool $collection): void
     {
         $this->collection = $collection;
     }
@@ -143,7 +102,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * {@inheritdoc}
      */
-    public function isArrayAllowed($operator = null)
+    public function isArrayAllowed(string $operator = null): bool
     {
         return
             parent::isArrayAllowed($operator)
@@ -160,7 +119,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * {@inheritdoc}
      */
-    public function isRangeAllowed($operator = null)
+    public function isRangeAllowed(string $operator = null): bool
     {
         return
             parent::isRangeAllowed($operator)
@@ -172,10 +131,8 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Sets a value that indicates whether case-insensitive comparison should be used.
-     *
-     * @param bool $caseInsensitive
      */
-    public function setCaseInsensitive(bool $caseInsensitive)
+    public function setCaseInsensitive(bool $caseInsensitive): void
     {
         $this->caseInsensitive = $caseInsensitive;
     }
@@ -185,7 +142,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @param callable $valueTransformer
      */
-    public function setValueTransformer($valueTransformer)
+    public function setValueTransformer($valueTransformer): void
     {
         $this->valueTransformer = $valueTransformer;
     }
@@ -193,7 +150,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * {@inheritdoc}
      */
-    public function apply(Criteria $criteria, FilterValue $value = null)
+    public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);
         if (null !== $expr) {
@@ -203,16 +160,21 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Creates an expression that can be used to in WHERE statement to filter data by this filter.
-     *
-     * @param FilterValue|null $value
-     *
-     * @return Expression|null
      */
-    protected function createExpression(FilterValue $value = null)
+    protected function createExpression(FilterValue $value = null): ?Expression
     {
-        return null !== $value
-            ? $this->buildExpression($this->field, $value->getPath(), $value->getOperator(), $value->getValue())
-            : null;
+        if (null === $value) {
+            return null;
+        }
+        $field = $this->getField();
+        if (!$field) {
+            throw new \InvalidArgumentException('The field must not be empty.');
+        }
+        if (ConfigUtil::IGNORE_PROPERTY_PATH === $field) {
+            return null;
+        }
+
+        return $this->buildExpression($field, $value->getPath(), $value->getOperator(), $value->getValue());
     }
 
     /**
@@ -228,20 +190,17 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      * @throws \InvalidArgumentException
      * @throws InvalidFilterOperatorException
      */
-    protected function buildExpression($field, $path, $operator, $value)
+    protected function buildExpression(string $field, string $path, ?string $operator, $value): Expression
     {
-        if (!$field) {
-            throw new \InvalidArgumentException('The field must not be empty.');
-        }
         if (null === $value) {
             throw new \InvalidArgumentException(\sprintf('The value must not be NULL. Field: "%s".', $field));
         }
 
         if (null === $operator) {
-            $operator = self::EQ;
+            $operator = FilterOperator::EQ;
         }
-        if (\in_array($operator, $this->operators, true)) {
-            $expr = $this->collection
+        if (\in_array($operator, $this->getSupportedOperators(), true)) {
+            $expr = $this->isCollection()
                 ? $this->doBuildCollectionExpression($field, $path, $operator, $value)
                 : $this->doBuildExpression($field, $path, $operator, $value);
             if (null !== $expr) {
@@ -262,36 +221,36 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doBuildExpression($field, $path, $operator, $value)
+    protected function doBuildExpression(string $field, string $path, string $operator, $value): ?Expression
     {
         switch ($operator) {
-            case self::EQ:
+            case FilterOperator::EQ:
                 return $this->buildEqualToExpression($field, $value);
-            case self::NEQ:
+            case FilterOperator::NEQ:
                 return $this->buildNotEqualToExpression($field, $value);
-            case self::GT:
+            case FilterOperator::GT:
                 return $this->buildComparisonExpression($field, Comparison::GT, $value);
-            case self::LT:
+            case FilterOperator::LT:
                 return $this->buildComparisonExpression($field, Comparison::LT, $value);
-            case self::GTE:
+            case FilterOperator::GTE:
                 return $this->buildComparisonExpression($field, Comparison::GTE, $value);
-            case self::LTE:
+            case FilterOperator::LTE:
                 return $this->buildComparisonExpression($field, Comparison::LTE, $value);
-            case self::EXISTS:
+            case FilterOperator::EXISTS:
                 return $this->buildComparisonExpression($field, 'EXISTS', $value);
-            case self::NEQ_OR_NULL:
+            case FilterOperator::NEQ_OR_NULL:
                 return $this->buildComparisonExpression($field, 'NEQ_OR_NULL', $value);
-            case self::CONTAINS:
+            case FilterOperator::CONTAINS:
                 return $this->buildComparisonExpression($field, Comparison::CONTAINS, $value);
-            case self::NOT_CONTAINS:
+            case FilterOperator::NOT_CONTAINS:
                 return $this->buildComparisonExpression($field, 'NOT_CONTAINS', $value);
-            case self::STARTS_WITH:
+            case FilterOperator::STARTS_WITH:
                 return $this->buildComparisonExpression($field, Comparison::STARTS_WITH, $value);
-            case self::NOT_STARTS_WITH:
+            case FilterOperator::NOT_STARTS_WITH:
                 return $this->buildComparisonExpression($field, 'NOT_STARTS_WITH', $value);
-            case self::ENDS_WITH:
+            case FilterOperator::ENDS_WITH:
                 return $this->buildComparisonExpression($field, Comparison::ENDS_WITH, $value);
-            case self::NOT_ENDS_WITH:
+            case FilterOperator::NOT_ENDS_WITH:
                 return $this->buildComparisonExpression($field, 'NOT_ENDS_WITH', $value);
         }
 
@@ -306,25 +265,23 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @return Expression|null
      */
-    protected function doBuildCollectionExpression($field, $path, $operator, $value)
+    protected function doBuildCollectionExpression(string $field, string $path, string $operator, $value): ?Expression
     {
         switch ($operator) {
-            case self::EQ:
+            case FilterOperator::EQ:
                 return $this->buildComparisonExpression($field, Comparison::MEMBER_OF, $value);
-            case self::NEQ:
+            case FilterOperator::NEQ:
                 return $this->buildNotExpression(
                     $this->buildComparisonExpression($field, Comparison::MEMBER_OF, $value)
                 );
-            case self::EXISTS:
+            case FilterOperator::EXISTS:
                 return $this->buildComparisonExpression($field, 'EMPTY', !$value);
-            case self::NEQ_OR_NULL:
+            case FilterOperator::NEQ_OR_NULL:
                 return $this->buildComparisonExpression($field, 'NEQ_OR_EMPTY', $value);
-            case self::CONTAINS:
+            case FilterOperator::CONTAINS:
                 return $this->buildComparisonExpression($field, 'ALL_MEMBER_OF', $value);
-            case self::NOT_CONTAINS:
-                return $this->buildNotExpression(
-                    $this->buildComparisonExpression($field, 'ALL_MEMBER_OF', $value)
-                );
+            case FilterOperator::NOT_CONTAINS:
+                return $this->buildComparisonExpression($field, 'ALL_NOT_MEMBER_OF', $value);
         }
 
         return null;
@@ -336,7 +293,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @return Expression
      */
-    protected function buildEqualToExpression($field, $value)
+    protected function buildEqualToExpression(string $field, $value): Expression
     {
         if (\is_array($value)) {
             return $this->buildComparisonExpression($field, Comparison::IN, $value);
@@ -360,7 +317,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @return Expression
      */
-    protected function buildNotEqualToExpression($field, $value)
+    protected function buildNotEqualToExpression(string $field, $value): Expression
     {
         if (\is_array($value)) {
             return $this->buildComparisonExpression($field, Comparison::NIN, $value);
@@ -385,7 +342,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @return Comparison
      */
-    protected function buildComparisonExpression($field, $operator, $value)
+    protected function buildComparisonExpression(string $field, string $operator, $value): Comparison
     {
         if ($this->caseInsensitive) {
             $operator .= '/i';
@@ -397,12 +354,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return new Comparison($field, $operator, new Value($value));
     }
 
-    /**
-     * @param Expression $expr
-     *
-     * @return Expression
-     */
-    protected function buildNotExpression(Expression $expr)
+    protected function buildNotExpression(Expression $expr): Expression
     {
         return new CompositeExpression('NOT', [$expr]);
     }
@@ -419,7 +371,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             if (\is_array($value)) {
                 $value = \array_map($transformer, $value);
             } else {
-                $value = \call_user_func($transformer, $value);
+                $value = $transformer($value);
             }
         }
 

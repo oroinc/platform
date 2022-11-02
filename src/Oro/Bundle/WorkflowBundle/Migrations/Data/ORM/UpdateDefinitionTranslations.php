@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
@@ -15,6 +15,10 @@ use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Update translation of translatable string in workflow definition
+ * Process translation of workflow label, step labels.
+ */
 class UpdateDefinitionTranslations extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     use ContainerAwareTrait;
@@ -28,7 +32,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
         /** @var $definitions WorkflowDefinition[] */
         $definitions = $qb->where($qb->expr()->notIn('wd.name', ':names'))
-            ->setParameter('names', $this->getWorkflowNamesFromCurrentConfiguration(), Type::TARRAY)
+            ->setParameter('names', $this->getWorkflowNamesFromCurrentConfiguration(), Types::ARRAY)
             ->getQuery()
             ->getResult();
 
@@ -58,10 +62,6 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         return array_keys($workflowConfiguration);
     }
 
-    /**
-     * @param TranslationProcessor $processor
-     * @param WorkflowDefinition $definition
-     */
     protected function processConfiguration(TranslationProcessor $processor, WorkflowDefinition $definition)
     {
         $sourceConfiguration = array_merge(
@@ -85,10 +85,6 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $definition->setConfiguration($preparedConfiguration);
     }
 
-    /**
-     * @param WorkflowDefinition $definition
-     * @param array $stepsConfiguration
-     */
     protected function setWorkflowdefinitionSteps(WorkflowDefinition $definition, array $stepsConfiguration)
     {
         foreach ($stepsConfiguration as $name => $stepConfiguration) {

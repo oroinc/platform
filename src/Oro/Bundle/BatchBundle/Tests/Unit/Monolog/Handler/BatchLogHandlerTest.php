@@ -3,46 +3,36 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use Oro\Component\Testing\TempDirExtension;
 
 class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BatchLogHandler */
-    protected $batchLogHandler;
+    use TempDirExtension;
 
-    protected function setUp()
+    public function testWrite(): void
     {
-        $this->batchLogHandler = new BatchLogHandler(sys_get_temp_dir());
-        $this->batchLogHandler->setSubDirectory('batch_test');
-    }
+        $batchLogHandler = new BatchLogHandler($this->getTempDir('batch_log_handler'), true);
+        $batchLogHandler->setSubDirectory('batch_test');
 
-    protected function tearDown()
-    {
-        if (is_file($this->batchLogHandler->getFilename())) {
-            unlink($this->batchLogHandler->getFilename());
-            rmdir(dirname($this->batchLogHandler->getFilename()));
-        }
-
-        unset($this->batchLogHandler);
-    }
-
-    public function testGetIsActive()
-    {
-        $this->assertFalse($this->batchLogHandler->isActive());
-        $this->batchLogHandler->setIsActive(true);
-        $this->assertTrue($this->batchLogHandler->isActive());
-    }
-
-    public function testWrite()
-    {
         $messageText = 'batch.DEBUG: Job execution started';
-        $record      = ['formatted' => $messageText];
+        $record = ['formatted' => $messageText];
 
-        $this->batchLogHandler->write($record);
-        $this->assertFalse(is_file($this->batchLogHandler->getFilename()));
+        $batchLogHandler->write($record);
+        $batchLogHandler->close();
+        self::assertFileExists($batchLogHandler->getFilename());
+        self::assertEquals($messageText, file_get_contents($batchLogHandler->getFilename()));
+    }
 
-        $this->batchLogHandler->setIsActive(true);
-        $this->batchLogHandler->write($record);
-        $this->batchLogHandler->close();
-        $this->assertEquals($messageText, file_get_contents($this->batchLogHandler->getFilename()));
+    public function testWriteWhenNotActive(): void
+    {
+        $batchLogHandler = new BatchLogHandler($this->getTempDir('batch_log_handler'), false);
+
+        $messageText = 'batch.DEBUG: Job execution started';
+        $record = ['formatted' => $messageText];
+
+        $batchLogHandler->write($record);
+        self::assertFileDoesNotExist($batchLogHandler->getFilename());
+
+        $batchLogHandler->close();
     }
 }

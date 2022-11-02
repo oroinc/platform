@@ -19,11 +19,6 @@ class EmailCacheManager
     /** @var EmailBodySynchronizer */
     protected $emailBodySynchronizer;
 
-    /**
-     * @param EntityManager            $em
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param EmailBodySynchronizer    $emailBodySynchronizer
-     */
     public function __construct(
         EntityManager $em,
         EventDispatcherInterface $eventDispatcher,
@@ -37,8 +32,6 @@ class EmailCacheManager
     /**
      * Check that email body is cached.
      * If do not, load it using appropriate email extension add it to a cache.
-     *
-     * @param Email $email
      */
     public function ensureEmailBodyCached(Email $email)
     {
@@ -48,6 +41,6 @@ class EmailCacheManager
             $this->emailBodySynchronizer->syncOneEmailBody($email, true);
         }
 
-        $this->eventDispatcher->dispatch(EmailBodyLoaded::NAME, new EmailBodyLoaded($email));
+        $this->eventDispatcher->dispatch(new EmailBodyLoaded($email), EmailBodyLoaded::NAME);
     }
 }

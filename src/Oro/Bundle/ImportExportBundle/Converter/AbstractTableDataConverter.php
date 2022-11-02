@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -34,8 +35,16 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var AttributeConfigHelper|null */
+    protected $attributeConfigHelper;
+
     /** @var bool */
     protected $translateUsingLocale = true;
+
+    public function setAttributeConfigHelper(?AttributeConfigHelper $attributeConfigHelper): void
+    {
+        $this->attributeConfigHelper = $attributeConfigHelper;
+    }
 
     /**
      * {@inheritDoc}
@@ -91,9 +100,6 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
             ->getResult();
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -136,15 +142,13 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     {
         $event = new FormatConversionEvent($record, $result);
         if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
         }
 
         return $event;
     }
 
     /**
-     * @param array $header
-     * @param array $data
      * @throws LogicException
      */
     protected function validateColumns(array $header, array $data)
@@ -189,7 +193,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     {
         $data = array_map(
             function ($value) {
-                if ($value === '') {
+                if (is_string($value) && trim($value) === '') {
                     return null;
                 }
 
@@ -249,9 +253,8 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     protected function receiveHeaderConversionRules()
     {
-        if (null === $this->headerConversionRules) {
-            $this->headerConversionRules = $this->getHeaderConversionRules();
-        }
+        // Do not cache header because it is dependent on the locale
+        $this->headerConversionRules = $this->getHeaderConversionRules();
 
         return $this->headerConversionRules;
     }
@@ -278,6 +281,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      * @param array $header
      * @param string $direction
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertHeader(array $header, $direction)
     {

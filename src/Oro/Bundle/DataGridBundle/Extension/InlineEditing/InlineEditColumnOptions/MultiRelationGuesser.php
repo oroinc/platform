@@ -23,7 +23,7 @@ class MultiRelationGuesser extends RelationGuesser
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
- 
+
         if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
             && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::MULTI_RELATION) {
             $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);

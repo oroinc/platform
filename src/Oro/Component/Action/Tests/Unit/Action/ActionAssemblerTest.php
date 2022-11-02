@@ -8,241 +8,216 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\TreeExecutor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider assembleDataProvider
      */
     public function testAssemble(array $source, array $expected)
     {
-        $test = $this;
-
-        $actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $actionFactory = $this->createMock(ActionFactoryInterface::class);
         $actionFactory->expects($this->any())
             ->method('create')
-            ->will(
-                $this->returnCallback(
-                    function ($type, $options, $condition) use ($test) {
-                        if ($type == TreeExecutor::ALIAS) {
-                            $action = $test->getTreeExecutorMock();
-                        } else {
-                            $action = new ArrayAction(array('_type' => $type));
-                            $action->initialize($options);
-                        }
-                        if ($condition) {
-                            $action->setCondition($condition);
-                        }
-                        return $action;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($type, $options, $condition) {
+                if (TreeExecutor::ALIAS === $type) {
+                    $action = $this->getTreeExecutor();
+                } else {
+                    $action = new ArrayAction(['_type' => $type]);
+                    $action->initialize($options);
+                }
+                if ($condition) {
+                    $action->setCondition($condition);
+                }
 
-        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+                return $action;
+            });
+
+        $conditionFactory = $this->getMockBuilder(ConditionFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('create'))
+            ->onlyMethods(['create'])
             ->getMock();
         $conditionFactory->expects($this->any())
             ->method('create')
-            ->will(
-                $this->returnCallback(
-                    function ($type, $options) {
-                        $condition = new ArrayCondition(array('_type' => $type));
-                        $condition->initialize($options);
-                        return $condition;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($type, $options) {
+                $condition = new ArrayCondition(['_type' => $type]);
+                $condition->initialize($options);
 
-        $configurationPass = $this->getMockBuilder(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
-        )->getMockForAbstractClass();
+                return $condition;
+            });
 
+        $configurationPass = $this->createMock(ConfigurationPassInterface::class);
         $configurationPass->expects($this->any())
             ->method('passConfiguration')
             ->with($this->isType('array'))
-            ->will(
-                $this->returnCallback(
-                    function (array $data) {
-                        $data['_pass'] = true;
-                        return $data;
-                    }
-                )
-            );
+            ->willReturnCallback(function (array $data) {
+                $data['_pass'] = true;
 
-        /** @var ActionFactoryInterface $actionFactory */
-        /** @var ConditionFactory $conditionFactory */
+                return $data;
+            });
+
         $assembler = new ActionAssembler($actionFactory, $conditionFactory);
         $assembler->addConfigurationPass($configurationPass);
         /** @var TreeExecutor $actualTree */
         $actualTree = $assembler->assemble($source);
-        $this->assertInstanceOf('Oro\Component\Action\Action\TreeExecutor', $actualTree);
+        $this->assertInstanceOf(TreeExecutor::class, $actualTree);
         $this->assertEquals($expected, $this->getActions($actualTree));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function assembleDataProvider()
+    public function assembleDataProvider(): array
     {
-        return array(
-            'empty configuration' => array(
-                'source'   => array(),
-                'expected' => array(),
-            ),
-            'not empty configuration' => array(
-                'source' => array(
-                    array(
-                        '@create_new_entity' => array(
-                            'parameters' => array('class_name' => 'TestClass'),
-                        ),
-                    ),
-                    array(
-                        '@assign_value' => array(
-                            'parameters' => array('from' => 'name', 'to' => 'contact.name'),
+        return [
+            'empty configuration' => [
+                'source'   => [],
+                'expected' => [],
+            ],
+            'not empty configuration' => [
+                'source' => [
+                    [
+                        '@create_new_entity' => [
+                            'parameters' => ['class_name' => 'TestClass'],
+                        ],
+                    ],
+                    [
+                        '@assign_value' => [
+                            'parameters' => ['from' => 'name', 'to' => 'contact.name'],
                             'break_on_failure' => true,
-                        )
-                    ),
-                    array('not_a_service' => array())
-                ),
-                'expected' => array(
-                    array(
-                        'instance' => array(
+                        ]
+                    ],
+                    ['not_a_service' => []]
+                ],
+                'expected' => [
+                    [
+                        'instance' => [
                             '_type' => 'create_new_entity',
-                            'parameters' => array('class_name' => 'TestClass', '_pass' => true)
-                        ),
+                            'parameters' => ['class_name' => 'TestClass', '_pass' => true]
+                        ],
                         'breakOnFailure' => true,
-                    ),
-                    array(
-                        'instance' => array(
+                    ],
+                    [
+                        'instance' => [
                             '_type' => 'assign_value',
-                            'parameters' => array('from' => 'name', 'to' => 'contact.name', '_pass' => true)
-                        ),
+                            'parameters' => ['from' => 'name', 'to' => 'contact.name', '_pass' => true]
+                        ],
                         'breakOnFailure' => true,
-                    ),
-                ),
-            ),
-            'nested configuration' => array(
-                'source' => array(
-                    array(
-                        '@tree' => array(
-                            array(
-                                '@assign_value' => array(
-                                    'parameters' => array('from' => 'name', 'to' => 'contact.name'),
+                    ],
+                ],
+            ],
+            'nested configuration' => [
+                'source' => [
+                    [
+                        '@tree' => [
+                            [
+                                '@assign_value' => [
+                                    'parameters' => ['from' => 'name', 'to' => 'contact.name'],
                                     'break_on_failure' => true,
-                                )
-                            ),
-                        )
-                    ),
-                    array(
-                        '@tree' => array(
-                            'actions' => array(
-                                array(
-                                    '@assign_value' => array(
-                                        'parameters' => array('from' => 'date', 'to' => 'contact.date'),
+                                ]
+                            ],
+                        ]
+                    ],
+                    [
+                        '@tree' => [
+                            'actions' => [
+                                [
+                                    '@assign_value' => [
+                                        'parameters' => ['from' => 'date', 'to' => 'contact.date'],
                                         'break_on_failure' => false,
-                                    )
-                                ),
-                            ),
-                        )
-                    ),
-                ),
-                'expected' => array(
-                    array(
-                        'instance' => array(
+                                    ]
+                                ],
+                            ],
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    [
+                        'instance' => [
                             '_type' => 'tree',
-                            'actions' => array(
-                                array(
-                                    'instance' => array(
+                            'actions' => [
+                                [
+                                    'instance' => [
                                         '_type' => 'assign_value',
-                                        'parameters' => array('from' => 'name', 'to' => 'contact.name', '_pass' => true)
-                                    ),
+                                        'parameters' => ['from' => 'name', 'to' => 'contact.name', '_pass' => true]
+                                    ],
                                     'breakOnFailure' => true,
-                                ),
-                            )
-                        ),
+                                ],
+                            ]
+                        ],
                         'breakOnFailure' => true,
-                    ),
-                    array(
-                        'instance' => array(
+                    ],
+                    [
+                        'instance' => [
                             '_type' => 'tree',
-                            'actions' => array(
-                                array(
-                                    'instance' => array(
+                            'actions' => [
+                                [
+                                    'instance' => [
                                         '_type' => 'assign_value',
-                                        'parameters' => array('from' => 'date', 'to' => 'contact.date', '_pass' => true)
-                                    ),
+                                        'parameters' => ['from' => 'date', 'to' => 'contact.date', '_pass' => true]
+                                    ],
                                     'breakOnFailure' => false,
-                                ),
-                            )
-                        ),
+                                ],
+                            ]
+                        ],
                         'breakOnFailure' => true,
-                    ),
-                ),
-            ),
-            'condition configuration' => array(
-                'source' => array(
-                    array(
-                        '@tree' => array(
-                            'conditions' => array('@not_empty' => '$contact'),
-                            'actions' => array(
-                                array(
-                                    '@assign_value' => array(
-                                        'conditions' => array('@not_empty' => '$contact.foo'),
-                                        'parameters' => array('from' => 'name', 'to' => 'contact.foo'),
-                                    )
-                                ),
-                            ),
+                    ],
+                ],
+            ],
+            'condition configuration' => [
+                'source' => [
+                    [
+                        '@tree' => [
+                            'conditions' => ['@not_empty' => '$contact'],
+                            'actions' => [
+                                [
+                                    '@assign_value' => [
+                                        'conditions' => ['@not_empty' => '$contact.foo'],
+                                        'parameters' => ['from' => 'name', 'to' => 'contact.foo'],
+                                    ]
+                                ],
+                            ],
                             'break_on_failure' => false,
-                        )
-                    ),
-                ),
-                'expected' => array(
-                    array(
-                        'instance' => array(
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    [
+                        'instance' => [
                             '_type' => 'tree',
-                            'actions' => array(
-                                array(
-                                    'instance' => array(
+                            'actions' => [
+                                [
+                                    'instance' => [
                                         '_type' => 'assign_value',
-                                        'parameters' => array('from' => 'name', 'to' => 'contact.foo', '_pass' => true),
-                                        'condition' => array('_type' => 'configurable', '@not_empty' => '$contact.foo'),
-                                    ),
+                                        'parameters' => ['from' => 'name', 'to' => 'contact.foo', '_pass' => true],
+                                        'condition' => ['_type' => 'configurable', '@not_empty' => '$contact.foo'],
+                                    ],
                                     'breakOnFailure' => true,
-                                ),
-                            ),
-                            'condition' => array(
+                                ],
+                            ],
+                            'condition' => [
                                 '_type' => 'configurable',
                                 '@not_empty' => '$contact'
-                            ),
-                        ),
+                            ],
+                        ],
                         'breakOnFailure' => false,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
     }
 
-    /**
-     * @param TreeExecutor $treeExecutor
-     * @param ActionInterface $action
-     * @param boolean $breakOnFailure
-     */
-    public function addPostAction(TreeExecutor $treeExecutor, ActionInterface $action, $breakOnFailure)
+    public function addPostAction(TreeExecutor $treeExecutor, ActionInterface $action, bool $breakOnFailure)
     {
-        $actionsReflection = $this->getTreeExecutorActionReflection();
-
-        $actionData = array();
+        $actionData = [];
         if ($action instanceof TreeExecutor) {
-            $actionData = array(
-                '_type'        => TreeExecutor::ALIAS,
-                'actions'      => $this->getActions($action),
-            );
+            $actionData = [
+                '_type'   => TreeExecutor::ALIAS,
+                'actions' => $this->getActions($action),
+            ];
         } elseif ($action instanceof ArrayAction) {
             $actionData = $action->toArray();
         }
@@ -252,76 +227,41 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
             $actionData['condition'] = $conditionData;
         }
 
-        $treeActions = $actionsReflection->getValue($treeExecutor);
-        $treeActions[] = array(
+        $treeActions = $this->getActions($treeExecutor);
+        $treeActions[] = [
             'instance'       => $actionData,
             'breakOnFailure' => $breakOnFailure
-        );
+        ];
 
-        $actionsReflection->setValue($treeExecutor, $treeActions);
+        ReflectionUtil::setPropertyValue($treeExecutor, 'actions', $treeActions);
     }
 
-    /**
-     * @param TreeExecutor $action
-     * @return array
-     */
-    protected function getActions(TreeExecutor $action)
+    private function getActions(TreeExecutor $action): array
     {
-        $actionsReflection = $this->getTreeExecutorActionReflection();
-
-        return $actionsReflection->getValue($action);
+        return ReflectionUtil::getPropertyValue($action, 'actions');
     }
 
-    /**
-     * @return \ReflectionProperty
-     */
-    protected function getTreeExecutorActionReflection()
+    public function getTreeExecutor(): TreeExecutor
     {
-        $reflection = new \ReflectionProperty('Oro\Component\Action\Action\TreeExecutor', 'actions');
-        $reflection->setAccessible(true);
-
-        return $reflection;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TreeExecutor
-     */
-    public function getTreeExecutorMock()
-    {
-        $test = $this;
-
-        $treeExecutor = $this->getMockBuilder('Oro\Component\Action\Action\TreeExecutor')
-            ->setMethods(array('addAction'))
+        $treeExecutor = $this->getMockBuilder(TreeExecutor::class)
+            ->onlyMethods(['addAction'])
             ->getMock();
         $treeExecutor->expects($this->any())
             ->method('addAction')
-            ->will(
-                $this->returnCallback(
-                    function ($action, $breakOnFailure) use ($treeExecutor, $test) {
-                        /** @var TreeExecutor $treeExecutor */
-                        $test->addPostAction($treeExecutor, $action, $breakOnFailure);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($action, $breakOnFailure) use ($treeExecutor) {
+                /** @var TreeExecutor $treeExecutor */
+                $this->addPostAction($treeExecutor, $action, $breakOnFailure);
+            });
 
         return $treeExecutor;
     }
 
-    /**
-     * @param ActionInterface $postAction
-     * @return array|null
-     */
-    protected function getCondition(ActionInterface $postAction)
+    private function getCondition(ActionInterface $postAction): ?array
     {
         /** @var ArrayCondition $condition */
         $condition = null;
         if ($postAction instanceof TreeExecutor) {
-            $reflection = new \ReflectionProperty(
-                'Oro\Component\Action\Action\TreeExecutor',
-                'condition'
-            );
-            $reflection->setAccessible(true);
-            $condition = $reflection->getValue($postAction);
+            $condition = ReflectionUtil::getPropertyValue($postAction, 'condition');
         } elseif ($postAction instanceof ArrayAction) {
             $condition = $postAction->getCondition();
         }

@@ -6,32 +6,24 @@ use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
+/**
+ * Adds a datagrid with workflow permissions to the role view and edit pages.
+ */
 class RolePageListener
 {
-    /** @var TranslatorInterface */
-    protected $translator;
+    private TranslatorInterface $translator;
+    private RequestStack $requestStack;
 
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param RequestStack $requestStack
-     */
     public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
     {
         $this->translator = $translator;
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * Adds rendered Workflows ACL datagrid block on edit role page.
-     *
-     * @param BeforeFormRenderEvent $event
-     */
-    public function onUpdatePageRender(BeforeFormRenderEvent $event)
+    public function onUpdatePageRender(BeforeFormRenderEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request) {
@@ -41,7 +33,7 @@ class RolePageListener
         $route = $request->attributes->get('_route');
         $routeParameters = $request->attributes->get('_route_params');
 
-        if (!in_array($route, ['oro_action_widget_form', 'oro_user_role_update', 'oro_user_role_create'], true)) {
+        if (!\in_array($route, ['oro_action_widget_form', 'oro_user_role_update', 'oro_user_role_create'], true)) {
             // not a manipulate role page
             return;
         }
@@ -60,12 +52,7 @@ class RolePageListener
         );
     }
 
-    /**
-     * Adds rendered readonly Workflows ACL datagrid block on edit role page.
-     *
-     * @param BeforeViewRenderEvent $event
-     */
-    public function onViewPageRender(BeforeViewRenderEvent $event)
+    public function onViewPageRender(BeforeViewRenderEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request) {
@@ -87,59 +74,35 @@ class RolePageListener
         );
     }
 
-    /**
-     * Adds the Workflow ACL datagrid block to the page data and return updated data array.
-     *
-     * @param array             $pageData
-     * @param \Twig_Environment $twigEnvironment
-     * @param Role              $entity
-     * @param boolean           $readOnly
-     *
-     * @return array
-     */
-    protected function addWorkflowAclDatagrid($pageData, \Twig_Environment $twigEnvironment, Role $entity, $readOnly)
-    {
+    private function addWorkflowAclDatagrid(
+        array $pageData,
+        Environment $twigEnvironment,
+        Role $entity,
+        bool $readOnly
+    ): array {
+        $entityBlockIndex = $readOnly ? 2 : 1;
         $dataBlocks = $pageData['dataBlocks'];
         $resultBlocks = [];
-        foreach ($dataBlocks as $id => $dataBlock) {
-            $resultBlocks[] = $dataBlock;
+        foreach ($dataBlocks as $key => $dataBlock) {
+            $resultBlocks[\is_int($key) && $key > $entityBlockIndex ? $key + 1 : $key] = $dataBlock;
             // insert Workflow ACL Grid block after the entity block
-            if ($id === 2) {
+            if ($key === $entityBlockIndex) {
                 $resultBlocks[] = [
                     'title'     => $this->translator->trans('oro.workflow.workflowdefinition.entity_plural_label'),
-                    'subblocks' => [
-                        [
-                            'data' => [
-                                $this->getRenderedGridHtml($twigEnvironment, $entity, $readOnly)
-                            ]
-                        ]
-                    ]
+                    'subblocks' => [['data' => [$this->getRenderedGridHtml($twigEnvironment, $entity, $readOnly)]]]
                 ];
             }
         }
-
         $pageData['dataBlocks'] = $resultBlocks;
 
         return $pageData;
     }
 
-    /**
-     * Renders Datagrid html for given role
-     *
-     * @param \Twig_Environment $twigEnvironment
-     * @param Role              $entity
-     * @param boolean           $readOnly
-     *
-     * @return string
-     */
-    protected function getRenderedGridHtml(\Twig_Environment $twigEnvironment, Role $entity, $readOnly)
+    private function getRenderedGridHtml(Environment $twigEnvironment, Role $entity, bool $readOnly): string
     {
         return $twigEnvironment->render(
-            'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
-            [
-                'entity'     => $entity,
-                'isReadonly' => $readOnly
-            ]
+            '@OroWorkflow/Datagrid/aclGrid.html.twig',
+            ['entity' => $entity, 'isReadonly' => $readOnly]
         );
     }
 }

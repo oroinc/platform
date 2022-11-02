@@ -1,6 +1,13 @@
 services:
-    Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand
+
+    Oro\Bundle\TestFrameworkBundle\Command\TestVerbosityCommand:
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand:
+        arguments:
+            - '@oro_test.provider.container_tags_documentation_information'
         tags:
             - { name: console.command }

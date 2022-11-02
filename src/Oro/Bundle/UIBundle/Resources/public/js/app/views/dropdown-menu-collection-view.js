@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var DropdownMenuCollectionView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const itemTemplate = require('tpl-loader!oroui/templates/dropdown-menu-collection--item.html');
 
     /**
      * DropdownMenuCollectionView renders dropdown element based on passed items collection
@@ -15,12 +15,12 @@ define(function(require) {
      * Basic usage:
      * ```javascript
      * // ...
-     * var itemsCollection = new Collection([
+     * const itemsCollection = new Collection([
      *     {value: '3', value_text: 'Three'},
      *     {value: '5', value_text: 'Five'}
      * ]);
      *
-     * var dropdownMenu = new DropdownMenuCollectionView({
+     * const dropdownMenu = new DropdownMenuCollectionView({
      *     collection: itemsCollection,
      *     loadingText: __('Searching...'),
      *     fallbackText: __('No items found'),
@@ -39,7 +39,7 @@ define(function(require) {
      * @augment BaseCollectionView
      * @exports DropdownMenuView
      */
-    DropdownMenuCollectionView = BaseCollectionView.extend({
+    const DropdownMenuCollectionView = BaseCollectionView.extend({
         tagName: 'div',
         className: 'dropdown-menu dropdown-menu-collection',
         animationDuration: 0,
@@ -67,13 +67,13 @@ define(function(require) {
         },
 
         template: _.template([
-            '<div class="dropdown-menu-collection__fallback" data-name="fallback"><%= fallbackText %></div>',
-            '<div class="dropdown-menu-collection__loading" data-name="loading"><%= loadingText %></div>',
-            '<ul class="dropdown-menu-collection__list" data-name="list" role="menu"></ul>'
+            '<div class="dropdown-item" data-name="fallback"><%- fallbackText %></div>',
+            '<div class="dropdown-item" data-name="loading"><%- loadingText %></div>',
+            '<ul class="list-unstyled" data-name="list" role="menu"></ul>'
         ].join('')),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DropdownMenuCollectionView(options) {
             DropdownMenuCollectionView.__super__.constructor.call(this, options);
@@ -82,10 +82,10 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap']));
             if (options.keysMap) {
-                var keysMap = options.keysMap;
-                var ItemView = this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
+                const keysMap = options.keysMap;
+                const ItemView = this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                     getTemplateData: function() {
-                        var data = ItemView.__super__.getTemplateData.call(this);
+                        const data = ItemView.__super__.getTemplateData.call(this);
                         data.id = keysMap.id && data[keysMap.id];
                         data.text = keysMap.text && data[keysMap.text];
                         return data;
@@ -96,20 +96,20 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = DropdownMenuCollectionView.__super__.getTemplateData.call(this);
+            const data = DropdownMenuCollectionView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this, ['loadingText', 'fallbackText']));
             return data;
         },
 
         itemView: BaseView.extend({// eslint-disable-line oro/named-constructor
             tagName: 'li',
-            template: _.template('<a href="#" data-value="<%= id %>"><%= text %></a>')
+            template: itemTemplate
         }),
 
         onItemClick: function(e) {
             e.preventDefault();
             e.stopPropagation();
-            var subview = _.find(this.subviews, function(subview) {
+            const subview = _.find(this.subviews, function(subview) {
                 return subview.el === e.currentTarget;
             });
             if (subview) {
@@ -122,9 +122,9 @@ define(function(require) {
         },
 
         onCollectionSyncStateChange: function() {
-            _.defer(_.bind(function() {
+            _.defer(() => {
                 this.$el.trigger('content:changed');
-            }, this));
+            });
         }
     });
 

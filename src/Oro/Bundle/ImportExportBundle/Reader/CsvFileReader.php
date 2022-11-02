@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ParseException;
+use Oro\Bundle\BatchBundle\Exception\ParseException;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -30,8 +29,10 @@ class CsvFileReader extends AbstractFileReader
     protected $escape;
 
     /**
-     * @param ContextRegistry $contextRegistry
+     * @var \SplFileObject
      */
+    private $file;
+
     public function __construct(ContextRegistry $contextRegistry)
     {
         parent::__construct($contextRegistry);
@@ -50,43 +51,21 @@ class CsvFileReader extends AbstractFileReader
         }
 
         $data = $this->getFile()->fgetcsv();
-        if (false !== $data) {
-            if (! $context instanceof ContextInterface) {
-                $context = $this->getContext();
-            }
-            $context->incrementReadOffset();
-            if (null === $data || [null] === $data) {
-                if ($this->isEof()) {
-                    return null;
-                }
-
-                return [];
-            }
-            $context->incrementReadCount();
-
-            if ($this->firstLineIsHeader) {
-                if (count($this->header) !== count($data)) {
-                    throw new InvalidItemException(
-                        sprintf(
-                            'Expecting to get %d columns, actually got %d.
-                            Header contains: %s 
-                            Row contains: %s',
-                            count($this->header),
-                            count($data),
-                            print_r($this->header, true),
-                            print_r($data, true)
-                        ),
-                        $data
-                    );
-                }
-
-                $data = array_combine($this->header, $data);
-            }
-        } else {
+        if (false === $data) {
             throw new ParseException('An error occurred while reading the csv.');
         }
 
-        return $data;
+        if (!$context instanceof ContextInterface) {
+            $context = $this->getContext();
+        }
+
+        $context->incrementReadOffset();
+        if (null === $data || [null] === $data) {
+            return $this->isEof() ? null : [];
+        }
+        $context->incrementReadCount();
+
+        return $this->normalizeRow($data);
     }
 
     /**
@@ -94,12 +73,21 @@ class CsvFileReader extends AbstractFileReader
      */
     protected function isEof()
     {
-        if ($this->getFile()->eof()) {
-            $this->getFile()->rewind();
+        $file = $this->getFile();
+        if ($file->eof()) {
+            $file->rewind();
             $this->header = null;
 
             return true;
         }
+
+        $before = $file->ftell();
+        $file->fgetcsv();
+        if ($before === $file->ftell()) {
+            return true;
+        }
+
+        $file->fseek($before);
 
         return false;
     }
@@ -118,7 +106,7 @@ class CsvFileReader extends AbstractFileReader
             $this->file->setFlags(
                 \SplFileObject::READ_CSV |
                 \SplFileObject::READ_AHEAD |
-                \SplFileObject::DROP_NEW_LINE
+                \SplFileObject::SKIP_EMPTY
             );
             $this->file->setCsvControl(
                 $this->delimiter,
@@ -134,7 +122,6 @@ class CsvFileReader extends AbstractFileReader
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     protected function initializeFromContext(ContextInterface $context)
@@ -152,13 +139,14 @@ class CsvFileReader extends AbstractFileReader
         if ($context->hasOption(Context::OPTION_ESCAPE)) {
             $this->escape = $context->getOption(Context::OPTION_ESCAPE);
         }
+    }
 
-        if ($context->hasOption(Context::OPTION_FIRST_LINE_IS_HEADER)) {
-            $this->firstLineIsHeader = (bool)$context->getOption(Context::OPTION_FIRST_LINE_IS_HEADER);
-        }
-
-        if ($context->hasOption(Context::OPTION_HEADER)) {
-            $this->header = $context->getOption(Context::OPTION_HEADER);
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->file = null;
+        parent::close();
     }
 }

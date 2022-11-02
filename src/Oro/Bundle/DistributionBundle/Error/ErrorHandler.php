@@ -2,99 +2,41 @@
 
 namespace Oro\Bundle\DistributionBundle\Error;
 
-use Symfony\Component\Debug\ErrorHandler as BaseErrorHandler;
+use Symfony\Component\ErrorHandler\ErrorHandler as BaseErrorHandler;
 
+/**
+ * Silencing error messages for known unresolvable issues
+ */
 class ErrorHandler extends BaseErrorHandler
 {
-    /**
-     * @var array
-     */
-    private $errorTypes = [
-        E_WARNING => 'Warning',
-        E_NOTICE => 'Notice',
-        E_USER_ERROR => 'User Error',
-        E_USER_WARNING => 'User Warning',
-        E_USER_NOTICE => 'User Notice',
-        E_STRICT => 'Runtime Notice',
-        E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
-        E_DEPRECATED => 'Deprecated',
-        E_USER_DEPRECATED => 'User Deprecated',
-        E_ERROR => 'Error',
-        E_CORE_ERROR => 'Core Error',
-        E_COMPILE_ERROR => 'Compile Error',
-        E_PARSE => 'Parse',
-    ];
-
-    /**
-     * Register all custom application error handlers
-     */
-    public function registerHandlers()
+    public static function register(BaseErrorHandler $handler = null, bool $replace = true): BaseErrorHandler
     {
-        $errorTypes = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
-        set_error_handler([$this, 'handleErrors'], $errorTypes);
+        $errorLevel = error_reporting();
+        // Silence all PHP deprecation notices as many of them are triggered all over the ORO and vendor code
+        error_reporting($errorLevel & ~\E_DEPRECATED);
 
-        self::register($this, true);
-    }
-
-    /**
-     * @param int    $code
-     * @param string $message
-     * @param string $file
-     * @param int    $line
-     *
-     * @return bool
-     * @throws \ErrorException
-     */
-    public function handleErrors($code, $message, $file, $line)
-    {
-        /**
-         * Check if suppress warnings used
-         */
-        if (error_reporting() === 0) {
-            return false;
-        }
-
-        switch ($code) {
-            case E_WARNING:
-            case E_USER_WARNING:
-                return $this->handleWarning($code, $message);
-                break;
-            case E_ERROR:
-            case E_USER_ERROR:
-            case E_RECOVERABLE_ERROR:
-                $errorType = isset($this->errorTypes[$code]) ? $this->errorTypes[$code] : "Unknown error ({$code})";
-                $message = "{$errorType}: {$message} in {$file} on line {$line}";
-                throw new \ErrorException($message, 0, $code, $file, $line);
-                break;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param int $number
-     * @param string $string
-     * @deprecated since 1.7 it will be protected after 1.9
-     *
-     * @return bool
-     */
-    public function handleWarning($number, $string)
-    {
-        // silence warning from php_network_getaddresses due to https://magecore.atlassian.net/browse/BAP-3979
-        if (strpos($string, 'php_network_getaddresses') !== false) {
-            return true;
-        }
-
-        return false;
+        return parent::register($handler, $replace);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated Use handleErrors() instead, to prevent confusion with Symfony\Component\Debug\ErrorHandler::handle
      */
-    public function handle($level, $message, $file = 'unknown', $line = 0, $context = [])
+    public function handleError(int $type, string $message, string $file, int $line): bool
     {
-        return $this->handleErrors($level, $message, $file, $line);
+        if (error_reporting() !== 0) {
+            // silence warning from php_network_getaddresses due to BAP-3979
+            if (str_contains($message, 'php_network_getaddresses')) {
+                return true;
+            }
+
+            // silence deprecation from ReflectionType::__toString()
+            if (str_contains($message, 'Function ReflectionType::__toString() is deprecated')
+                || str_contains($message, 'a ? b : c ? d : e')
+            ) {
+                return true;
+            }
+        }
+
+        return parent::handleError($type, $message, $file, $line);
     }
 }

@@ -205,4 +205,18 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
                 ->getQuery()
                 ->getArrayResult();
     }
+
+    /**
+     * @param array $organizations
+     * @return array
+     */
+    public function findIdsByOrganizations(array $organizations)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.id')
+            ->where($qb->expr()->in('u.organization', ':organizations'))
+            ->setParameter('organizations', $organizations);
+
+        return array_unique(array_column($qb->getQuery()->getArrayResult(), 'id'));
+    }
 }

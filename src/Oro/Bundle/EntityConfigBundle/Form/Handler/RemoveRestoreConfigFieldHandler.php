@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -16,28 +17,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class RemoveRestoreConfigFieldHandler
 {
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
+    private FieldNameValidationHelper $validationHelper;
+    private ConfigHelper $configHelper;
+    private Session $session;
+    private ManagerRegistry $registry;
 
-    /** @var FieldNameValidationHelper */
-    private $validationHelper;
-
-    /** @var ConfigHelper */
-    private $configHelper;
-
-    /** @var Session */
-    private $session;
-
-    /** @var ManagerRegistry */
-    private $registry;
-
-    /**
-     * @param ConfigManager $configManager
-     * @param FieldNameValidationHelper $validationHelper
-     * @param ConfigHelper $configHelper
-     * @param Session $session
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         ConfigManager $configManager,
         FieldNameValidationHelper $validationHelper,
@@ -52,15 +37,9 @@ class RemoveRestoreConfigFieldHandler
         $this->registry = $registry;
     }
 
-    /**
-     * @param FieldConfigModel $field
-     * @param string $successMessage
-     * @return JsonResponse
-     */
-    public function handleRemove(FieldConfigModel $field, $successMessage)
+    public function handleRemove(FieldConfigModel $field, string $successMessage): JsonResponse
     {
         $validationMessages = $this->validationHelper->getRemoveFieldValidationErrors($field);
-
         if ($validationMessages) {
             foreach ($validationMessages as $message) {
                 $this->session->getFlashBag()->add('error', $message);
@@ -76,12 +55,43 @@ class RemoveRestoreConfigFieldHandler
         }
 
         $entityConfig = $this->configHelper->getEntityConfigByField($field, 'extend');
-        $entityConfig->set('upgradeable', true);
 
         $fieldConfig = $this->configHelper->getFieldConfig($field, 'extend');
-        $fieldConfig->set('state', ExtendScope::STATE_DELETE);
+        if ($fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+            $configEntityManager = $this->configManager->getEntityManager();
+            $configEntityManager->remove($field);
+            $configEntityManager->flush();
+        } else {
+            $entityConfig->set('upgradeable', true);
+            $fieldConfig->set('state', ExtendScope::STATE_DELETE);
+            $this->configManager->persist($fieldConfig);
+        }
 
-        $this->configManager->persist($fieldConfig);
+        $otherFieldsRequireUpdate = $this->configHelper->filterEntityConfigByField(
+            $field,
+            'extend',
+            function (ConfigInterface $field) use ($fieldConfig) {
+                return
+                    $field->in('state', [
+                        ExtendScope::STATE_NEW,
+                        ExtendScope::STATE_UPDATE,
+                        ExtendScope::STATE_RESTORE
+                    ])
+                    && $field->getId()->getFieldName() !== $fieldConfig->getId()->getFieldName()
+                ;
+            },
+        );
+
+        if ($entityConfig->in('state', [ExtendScope::STATE_UPDATE, ExtendScope::STATE_NEW])
+            && !$entityConfig->get('pending_changes')
+            && !$otherFieldsRequireUpdate
+        ) {
+            $entityConfig->set('upgradeable', false);
+            if ($entityConfig->is('state', ExtendScope::STATE_UPDATE)) {
+                $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
+            }
+        }
+
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
 
@@ -90,13 +100,7 @@ class RemoveRestoreConfigFieldHandler
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
     }
 
-    /**
-     * @param FieldConfigModel $field
-     * @param string $errorMessage
-     * @param string $successMessage
-     * @return JsonResponse
-     */
-    public function handleRestore(FieldConfigModel $field, $errorMessage, $successMessage)
+    public function handleRestore(FieldConfigModel $field, string $errorMessage, string $successMessage): JsonResponse
     {
         if (!$this->validationHelper->canFieldBeRestored($field)) {
             $this->session->getFlashBag()->add('error', $errorMessage);
@@ -133,6 +137,8 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($fieldConfig);
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
+
+        $this->session->getFlashBag()->add('success', $successMessage);
 
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
     }

@@ -4,81 +4,44 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
-use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
-use Oro\Component\DependencyInjection\ServiceLinkRegistry;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class FormHandlerRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ServiceLinkRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $serviceLinkRegistry;
+    /** @var FormHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $handler1;
 
     /** @var FormHandlerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serviceLinkRegistry = $this->createMock(ServiceLinkRegistry::class);
-        $this->registry = new FormHandlerRegistry();
-        $this->registry->setServiceLinkRegistry($this->serviceLinkRegistry);
+        $this->handler1 = $this->createMock(FormHandlerInterface::class);
+        $handlers = new ServiceLocator([
+            'handler1' => function () {
+                return $this->handler1;
+            }
+        ]);
+
+        $this->registry = new FormHandlerRegistry($handlers);
     }
 
-    public function testRegisterAndGet()
+    public function testHasAndGetForKnownHandler()
     {
-        $handler = $this->getHandlerMock();
-        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($handler);
-        $this->assertSame($this->registry->get('test'), $handler);
+        self::assertTrue($this->registry->has('handler1'));
+        self::assertSame($this->handler1, $this->registry->get('handler1'));
     }
 
-    /**
-     */
-    public function testHas()
+    public function testHasForUnknownHandler()
     {
-        $this->serviceLinkRegistry->expects($this->at(0))->method('has')->with('exists')->willReturn(true);
-        $this->serviceLinkRegistry->expects($this->at(1))->method('has')->with('not_exists')->willReturn(false);
-
-        $this->assertTrue($this->registry->has('exists'));
-        $this->assertFalse($this->registry->has('not_exists'));
+        self::assertFalse($this->registry->has('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FormBundle\Exception\UnknownFormHandlerException
-     * @expectedExceptionMessage Unknown form handler with alias `test`
-     */
-    public function testGetUnregisteredException()
+    public function testGetForUnknownHandler()
     {
-        $this->serviceLinkRegistry->expects($this->once())
-            ->method('get')->with('test')
-            ->willThrowException(new UnknownAliasException('test'));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown form handler with alias "unknown".');
 
-        $this->registry->get('test');
-    }
-
-
-    public function testExceptionOnInvalidServiceInterface()
-    {
-        $handler = (object)[];
-        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($handler);
-
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Form data provider `%s` with `%s` alias must implement %s.',
-                get_class($handler),
-                'test',
-                FormHandlerInterface::class
-            )
-        );
-
-        $this->registry->get('test');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FormHandlerInterface
-     */
-    protected function getHandlerMock()
-    {
-        $handler = $this->getMockBuilder(FormHandlerInterface::class)->disableOriginalConstructor()->getMock();
-
-        return $handler;
+        $this->registry->get('unknown');
     }
 }

@@ -2,96 +2,79 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
+/**
+ * Provides a way to get email attachment models are related to a specific entity.
+ */
 class EmailAttachmentProvider
 {
-    /**
-     * @var EmailThreadProvider
-     */
-    protected $emailThreadProvider;
+    /** @var EmailThreadProvider */
+    private $emailThreadProvider;
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var AttachmentProvider
-     */
-    protected $attachmentProvider;
+    /** @var AttachmentProvider */
+    private $attachmentProvider;
 
-    /**
-     * @var EmailAttachmentTransformer
-     */
-    protected $emailAttachmentTransformer;
+    /** @var EmailAttachmentTransformer */
+    private $emailAttachmentTransformer;
 
-    /**
-     * @var Factory
-     */
-    protected $factory;
-
-    /**
-     * @param EmailThreadProvider        $emailThreadProvider
-     * @param EntityManager              $entityManager
-     * @param AttachmentProvider         $attachmentProvider
-     * @param EmailAttachmentTransformer $emailAttachmentTransformer
-     */
     public function __construct(
         EmailThreadProvider $emailThreadProvider,
-        EntityManager $entityManager,
+        ManagerRegistry $doctrine,
         AttachmentProvider $attachmentProvider,
         EmailAttachmentTransformer $emailAttachmentTransformer
     ) {
-        $this->emailThreadProvider        = $emailThreadProvider;
-        $this->em                         = $entityManager;
-        $this->attachmentProvider         = $attachmentProvider;
+        $this->emailThreadProvider = $emailThreadProvider;
+        $this->doctrine = $doctrine;
+        $this->attachmentProvider = $attachmentProvider;
         $this->emailAttachmentTransformer = $emailAttachmentTransformer;
     }
 
     /**
      * @param Email $emailEntity
      *
-     * @return array
+     * @return EmailAttachmentModel[]
      */
-    public function getThreadAttachments(Email $emailEntity)
+    public function getThreadAttachments(Email $emailEntity): array
     {
-        $attachments = [];
-        $threadEmails = $this->emailThreadProvider->getThreadEmails($this->em, $emailEntity);
-
-        /** @var Email $threadEmail */
+        $emailAttachmentModels = [];
+        $threadEmails = $this->emailThreadProvider->getThreadEmails(
+            $this->doctrine->getManager(),
+            $emailEntity
+        );
         foreach ($threadEmails as $threadEmail) {
             if ($threadEmail->getEmailBody() && $threadEmail->getEmailBody()->getHasAttachments()) {
                 $emailAttachments = $threadEmail->getEmailBody()->getAttachments();
-
                 foreach ($emailAttachments as $emailAttachment) {
-                    $attachments[] = $this->emailAttachmentTransformer->entityToModel($emailAttachment);
+                    $emailAttachmentModels[] = $this->emailAttachmentTransformer->entityToModel($emailAttachment);
                 }
             }
         }
 
-        return $attachments;
+        return $emailAttachmentModels;
     }
 
     /**
-     * @param $entity
+     * @param object $entity
      *
-     * @return array
+     * @return EmailAttachmentModel[]
      */
-    public function getScopeEntityAttachments($entity)
+    public function getScopeEntityAttachments(object $entity): array
     {
-        $attachments = [];
-        $oroAttachments = $this->attachmentProvider->getEntityAttachments($entity);
-
-        foreach ($oroAttachments as $oroAttachment) {
-            $attachments[] = $this->emailAttachmentTransformer->oroToModel($oroAttachment);
+        $emailAttachmentModels = [];
+        $attachments = $this->attachmentProvider->getEntityAttachments($entity);
+        foreach ($attachments as $attachment) {
+            $emailAttachmentModels[] = $this->emailAttachmentTransformer->attachmentEntityToModel($attachment);
         }
 
-        return $attachments;
+        return $emailAttachmentModels;
     }
 }

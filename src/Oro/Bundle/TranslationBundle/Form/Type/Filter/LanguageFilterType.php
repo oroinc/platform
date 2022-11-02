@@ -16,9 +16,6 @@ class LanguageFilterType extends AbstractType
     /** @var LanguageCodeFormatter */
     protected $formatter;
 
-    /**
-     * @param LanguageCodeFormatter $formatter
-     */
     public function __construct(LanguageCodeFormatter $formatter)
     {
         $this->formatter = $formatter;

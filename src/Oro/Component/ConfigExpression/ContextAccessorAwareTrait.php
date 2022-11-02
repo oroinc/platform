@@ -5,7 +5,9 @@ namespace Oro\Component\ConfigExpression;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * @property \ArrayAccess|null errors
+ * Provides methods to resolve the property path or expression in the context
+ *
+ * @property \ArrayAccess|null $errors
  */
 trait ContextAccessorAwareTrait
 {
@@ -14,8 +16,6 @@ trait ContextAccessorAwareTrait
 
     /**
      * Sets the context accessor.
-     *
-     * @param ContextAccessorInterface $contextAccessor
      */
     public function setContextAccessor(ContextAccessorInterface $contextAccessor)
     {

@@ -1,13 +1,13 @@
 {% set itemTitle = item.label|trans %}
 <span class="title" title="{{ itemTitle }}">{{ itemTitle }}</span>
-<h3 class="value">{{ item.value.value|raw }}</h3>
+<h3 class="value">{{ item.value.value }}</h3>
 {% if item.value.deviation is defined and item.value.previousRange is defined %}
 <div class="deviation">
     <span class="deviation {% if item.value.isPositive is defined %}{% if item.value.isPositive %}positive{% else %}negative{% endif %}{% endif %}">
         {% if item.value.deviation is empty %}
             {{ 'oro.dashboard.widget.big_number.no_changes'|trans }}
         {% else %}
-            {{ item.value.deviation|raw }}
+            {{ item.value.deviation|oro_html_sanitize|raw }}
         {% endif %}
     </span>
 </div>

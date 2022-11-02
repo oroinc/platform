@@ -1,64 +1,59 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookWidgetComponent;
-    var AddressBookComponent = require('oroaddress/js/app/components/address-book-component');
-    var widgetManager = require('oroui/js/widget-manager');
-    var routing = require('routing');
-    var _ = require('underscore');
+    const AddressBookComponent = require('oroaddress/js/app/components/address-book-component');
+    const widgetManager = require('oroui/js/widget-manager');
+    const routing = require('routing');
+    const _ = require('underscore');
 
-    AddressBookWidgetComponent = AddressBookComponent.extend({
+    const AddressBookWidgetComponent = AddressBookComponent.extend({
         optionNames: AddressBookComponent.prototype.optionNames.concat([
             'wid', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
         ]),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AddressBookWidgetComponent() {
-            AddressBookWidgetComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookWidgetComponent(options) {
+            AddressBookWidgetComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initialize: function() {
-            AddressBookWidgetComponent.__super__.initialize.call(this, arguments);
+        initialize: function(options) {
+            AddressBookWidgetComponent.__super__.initialize.call(this, options);
 
             widgetManager.getWidgetInstance(this.wid, this._onWidgetLoad.bind(this));
         },
 
         _getAddressBookViewOptions: function() {
-            var addressDeleteRoute = this.addressDeleteRoute;
-            var addressUpdateRoute = this.addressUpdateRoute;
+            const addressDeleteRoute = this.addressDeleteRoute;
+            const addressUpdateRoute = this.addressUpdateRoute;
 
-            return {
-                el: this.addressBookSelector,
-                addressListUrl: this.addressListUrl,
+            const options = AddressBookWidgetComponent.__super__._getAddressBookViewOptions.call(this);
+
+            return _.extend(options, {
                 addressCreateUrl: this.addressCreateUrl,
-                addressUpdateUrl: function() {
-                    var address = arguments[0];
-
+                addressUpdateUrl: function(address) {
                     return routing.generate(
                         addressUpdateRoute.route,
                         _.extend({id: address.get('id')}, addressUpdateRoute.params)
                     );
                 },
-                addressDeleteUrl: function() {
-                    var address = arguments[0];
-
+                addressDeleteUrl: function(address) {
                     return routing.generate(
                         addressDeleteRoute.route,
                         _.extend({addressId: address.get('id')}, addressDeleteRoute.params)
                     );
                 }
-            };
+            });
         },
 
         _onWidgetLoad: function(widget) {
             widget.getAction('add_address', 'adopted', function(action) {
-                var addressBookView = this.view;
-                action.on('click', _.bind(addressBookView.createAddress, addressBookView));
+                const addressBookView = this.view;
+                action.on('click', addressBookView.createAddress.bind(addressBookView));
             }.bind(this));
         }
     });

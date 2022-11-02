@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
+/**
+ * Represents a service that is used to render page titles.
+ */
 interface TitleServiceInterface
 {
     /**
@@ -37,7 +40,7 @@ interface TitleServiceInterface
     /**
      * Load title template for current route from title readers
      *
-     * @param string      $route
+     * @param string|null $route
      * @param string|null $menuName
      *
      * @return TitleServiceInterface

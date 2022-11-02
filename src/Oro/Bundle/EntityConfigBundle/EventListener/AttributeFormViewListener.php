@@ -8,6 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
+use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 /**
  * Add attributes to view for entity view and edit pages.
@@ -19,17 +21,11 @@ class AttributeFormViewListener
      */
     private $attributeManager;
 
-    /**
-     * @param AttributeManager $attributeManager
-     */
     public function __construct(AttributeManager $attributeManager)
     {
         $this->attributeManager = $attributeManager;
     }
 
-    /**
-     * @param BeforeListRenderEvent $event
-     */
     public function onEdit(BeforeListRenderEvent $event)
     {
         $entity = $event->getEntity();
@@ -39,39 +35,17 @@ class AttributeFormViewListener
         }
 
         $scrollData = $event->getScrollData();
-        $formView = $event->getFormView();
         $groupsData = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
         $this->filterGroupAttributes($groupsData, 'form', 'is_enabled');
         $this->addNotEmptyGroupBlocks($scrollData, $groupsData);
 
         foreach ($groupsData as $groupsDatum) {
-            /** @var AttributeGroup $group */
-            $group = $groupsDatum['group'];
-            /** @var FieldConfigModel $attribute */
-            foreach ($groupsDatum['attributes'] as $attribute) {
-                $fieldId = $attribute->getFieldName();
-                $attributeView = $formView->offsetGet($fieldId);
-
-                if (!$attributeView->isRendered()) {
-                    $html = $event->getEnvironment()->render('OroEntityConfigBundle:Attribute:row.html.twig', [
-                        'child' => $attributeView,
-                    ]);
-
-                    $subblockId = $scrollData->addSubBlock($group->getCode());
-                    $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldId);
-                } else {
-                    $this->moveFieldToBlock($scrollData, $attribute->getFieldName(), $group->getCode());
-                }
-            }
+            $this->addAttributeEditBlocks($event, $groupsDatum['group'], $groupsDatum['attributes']);
         }
 
         $this->removeEmptyGroupBlocks($scrollData, $groupsData);
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param array $groups
-     */
     private function removeEmptyGroupBlocks(ScrollData $scrollData, array $groups)
     {
         $data = $scrollData->getData();
@@ -98,11 +72,7 @@ class AttributeFormViewListener
         }
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param array $groups
-     */
-    private function addNotEmptyGroupBlocks(ScrollData $scrollData, array $groups)
+    protected function addNotEmptyGroupBlocks(ScrollData $scrollData, array $groups)
     {
         foreach ($groups as $group) {
             if (!empty($group['attributes'])) {
@@ -115,7 +85,63 @@ class AttributeFormViewListener
 
     /**
      * @param BeforeListRenderEvent $event
+     * @param AttributeGroup $group
+     * @param FieldConfigModel[] $attributes
      */
+    protected function addAttributeEditBlocks(BeforeListRenderEvent $event, AttributeGroup $group, array $attributes)
+    {
+        if (!$attributes) {
+            return;
+        }
+
+
+        $scrollData = $event->getScrollData();
+        $formView = $event->getFormView();
+
+        foreach ($attributes as $attribute) {
+            $fieldId = $attribute->getFieldName();
+            $attributeView = $formView->offsetGet($fieldId);
+
+            if (!$attributeView->isRendered()) {
+                $html = $this->renderAttributeEditData($event->getEnvironment(), $attributeView, $attribute);
+
+                $scrollData->addSubBlockData(
+                    $group->getCode(),
+                    $this->getSubBlockIdForGroup($group, $scrollData),
+                    $html,
+                    $fieldId
+                );
+            } else {
+                $this->moveFieldToBlock($scrollData, $attribute->getFieldName(), $group->getCode());
+            }
+        }
+    }
+
+    private function getSubBlockIdForGroup(AttributeGroup $attributeGroup, ScrollData $scrollData): string|int
+    {
+        $subBlockIds = $scrollData->getSubblockIds($attributeGroup->getCode());
+        if (count($subBlockIds) < 2) {
+            // Adds a new subblock if number of subblocks is less than 2 - one for each column.
+            $subBlockId = $scrollData->addSubBlock($attributeGroup->getCode());
+        } else {
+            // Uses the existing last subblock if number of subblocks is already more than 2 - one for each column.
+            $subBlockId = end($subBlockIds);
+        }
+
+        return $subBlockId;
+    }
+
+    /**
+     * @param Environment $twig
+     * @param FormView $attributeView
+     * @param FieldConfigModel $attribute
+     * @return string
+     */
+    protected function renderAttributeEditData(Environment $twig, FormView $attributeView, FieldConfigModel $attribute)
+    {
+        return $twig->render('@OroEntityConfig/Attribute/row.html.twig', ['child' => $attributeView]);
+    }
+
     public function onViewList(BeforeListRenderEvent $event)
     {
         $entity = $event->getEntity();
@@ -131,31 +157,54 @@ class AttributeFormViewListener
 
         /** @var AttributeGroup $group */
         foreach ($groups as $groupData) {
-            /** @var AttributeGroup $group */
-            $group = $groupData['group'];
-
-            /** @var FieldConfigModel $attribute */
-            foreach ($groupData['attributes'] as $attribute) {
-                $fieldName = $attribute->getFieldName();
-                if ($scrollData->hasNamedField($fieldName)) {
-                    $this->moveFieldToBlock($scrollData, $fieldName, $group->getCode());
-                    continue;
-                }
-
-                $html = $event->getEnvironment()->render(
-                    'OroEntityConfigBundle:Attribute:attributeView.html.twig',
-                    [
-                        'entity' => $entity,
-                        'field' => $attribute,
-                    ]
-                );
-
-                $subblockId = $scrollData->addSubBlock($group->getCode());
-                $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldName);
-            }
+            $this->addAttributeViewBlocks($event, $groupData['group'], $groupData['attributes']);
         }
 
         $this->removeEmptyGroupBlocks($scrollData, $groups);
+    }
+
+    /**
+     * @param BeforeListRenderEvent $event
+     * @param AttributeGroup $group
+     * @param FieldConfigModel[] $attributes
+     */
+    protected function addAttributeViewBlocks(BeforeListRenderEvent $event, AttributeGroup $group, array $attributes)
+    {
+        if (!$attributes) {
+            return;
+        }
+
+        $scrollData = $event->getScrollData();
+
+        foreach ($attributes as $attribute) {
+            $fieldName = $attribute->getFieldName();
+            if ($scrollData->hasNamedField($fieldName)) {
+                $this->moveFieldToBlock($scrollData, $fieldName, $group->getCode());
+                continue;
+            }
+
+            $html = $this->renderAttributeViewData($event->getEnvironment(), $event->getEntity(), $attribute);
+            $scrollData->addSubBlockData(
+                $group->getCode(),
+                $this->getSubBlockIdForGroup($group, $scrollData),
+                $html,
+                $fieldName
+            );
+        }
+    }
+
+    /**
+     * @param Environment $twig
+     * @param object $entity
+     * @param FieldConfigModel $attribute
+     * @return string
+     */
+    protected function renderAttributeViewData(Environment $twig, $entity, FieldConfigModel $attribute)
+    {
+        return $twig->render(
+            '@OroEntityConfig/Attribute/attributeView.html.twig',
+            ['entity' => $entity, 'field' => $attribute]
+        );
     }
 
     /**

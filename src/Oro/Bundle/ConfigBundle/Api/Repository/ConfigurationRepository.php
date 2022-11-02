@@ -6,35 +6,34 @@ use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
 
+/**
+ * The repository to get system configuration.
+ */
 class ConfigurationRepository
 {
-    /** @var ConfigApiManager */
-    protected $configManager;
+    private ConfigApiManager $configManager;
 
-    /**
-     * @param ConfigApiManager $configManager
-     */
     public function __construct(ConfigApiManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
     /**
-     * Returns all configuration scopes.
+     * Gets all configuration scopes.
      *
      * @return string[]
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->configManager->getScopes();
     }
 
     /**
-     * Returns ids of all configuration sections.
+     * Gets IDs of all configuration sections.
      *
      * @return string[]
      */
-    public function getSectionIds()
+    public function getSectionIds(): array
     {
         return array_map(
             function ($sectionId) {
@@ -45,14 +44,9 @@ class ConfigurationRepository
     }
 
     /**
-     * Finds a configuration section by its id.
-     *
-     * @param string $sectionId
-     * @param string $scope
-     *
-     * @return ConfigurationSection|null
+     * Finds a configuration section by its ID.
      */
-    public function getSection($sectionId, $scope)
+    public function getSection(string $sectionId, string $scope): ?ConfigurationSection
     {
         if (!$this->configManager->hasSection($this->decodeSectionId($sectionId))) {
             return null;
@@ -65,14 +59,14 @@ class ConfigurationRepository
     }
 
     /**
-     * Returns all configuration options from a given section.
+     * Gets all configuration options from a given section.
      *
      * @param string $sectionId
      * @param string $scope
      *
      * @return ConfigurationOption[]
      */
-    public function getSectionOptions($sectionId, $scope)
+    public function getSectionOptions(string $sectionId, string $scope): array
     {
         $result = [];
         $data = $this->configManager->getData($this->decodeSectionId($sectionId), $scope);
@@ -90,15 +84,9 @@ class ConfigurationRepository
     }
 
     /**
-     * Returns a configuration option from a given section.
-     *
-     * @param string $key
-     * @param string $sectionId
-     * @param string $scope
-     *
-     * @return ConfigurationOption
+     * Gets a configuration option from a given section.
      */
-    public function getSectionOption($key, $sectionId, $scope)
+    public function getSectionOption(string $key, string $sectionId, string $scope): ConfigurationOption
     {
         $item = $this->configManager->getDataItem($key, $this->decodeSectionId($sectionId), $scope);
         $option = new ConfigurationOption($scope, $item['key']);
@@ -112,24 +100,16 @@ class ConfigurationRepository
 
     /**
      * Converts a section identifier to a form that may be used in API.
-     *
-     * @param string $sectionId
-     *
-     * @return string mixed
      */
-    protected function encodeSectionId($sectionId)
+    private function encodeSectionId(string $sectionId): string
     {
         return str_replace('/', '.', $sectionId);
     }
 
     /**
      * Converts a section identifier from a form that is used in API to its original value.
-     *
-     * @param string $sectionId
-     *
-     * @return string mixed
      */
-    protected function decodeSectionId($sectionId)
+    private function decodeSectionId(string $sectionId): string
     {
         return str_replace('.', '/', $sectionId);
     }

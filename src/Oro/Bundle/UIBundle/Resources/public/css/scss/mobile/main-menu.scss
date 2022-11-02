@@ -11,12 +11,12 @@
     background: rgba($primary-inverse, .5);
     overflow: hidden;
 
-    @include fa-icon($fa-var-times, after);
-
-    &:after {
+    @include fa-icon($fa-var-times, after, true) {
         position: absolute;
         top: 5px;
-        #{$start}: $main-menu-mobile-width - 36px;
+
+        @include safe-area-property-left(left, $main-menu-mobile-width - 36px);
+        
         width: 32px;
         height: 32px;
         text-align: center;
@@ -35,11 +35,13 @@
     .main-menu {
         height: 100%;
         margin-bottom: 0;
-        margin-#{$start}: 0;
+        margin-left: 0;
+
         /* iOS 11 */
-        margin-#{$start}: constant(safe-area-inset-left);
+        margin-left: constant(safe-area-inset-left);
+
         /* iOS 11.2+ */
-        margin-#{$start}: env(safe-area-inset-left);
+        margin-left: env(safe-area-inset-left);
         width: $main-menu-mobile-width;
         background-color: $menu-background-color;
         box-shadow: $menu-mobile-box-shadow;
@@ -50,7 +52,8 @@
         .title {
             margin: 0;
 
-            font-weight: normal;
+            font-size: $menu-font-size + 2;
+            font-weight: font-weight('light');
 
             background-color: transparent;
 
@@ -75,13 +78,13 @@
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &:before {
+                &::before {
                     content: '';
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
-                    margin-#{$end}: 8px;
-                    font-weight: normal;
+                    margin-right: 8px;
+                    font-weight: font-weight('light');
                     line-height: 1;
                     text-align: center;
                     color: $menu-accordion-icon-color;
@@ -90,18 +93,18 @@
             }
 
             .accordion-toggle {
-                font-weight: bold;
+                font-weight: font-weight('bold');
 
                 @include fa-icon($fa-var-angle-right);
 
-                &:before {
+                &::before {
                     transform: rotate(90deg);
                 }
 
                 &.collapsed {
-                    font-weight: normal;
+                    font-weight: font-weight('light');
 
-                    &:before {
+                    &::before {
                         transform: rotate(0);
                     }
                 }
@@ -117,7 +120,7 @@
 
                 @for $i from 1 through 5 {
                     &-level-#{$i} {
-                        padding-#{$start}: $main-menu-title-mobile-offset * ($i - 1);
+                        padding-left: $main-menu-title-mobile-offset * ($i - 1);
                     }
                 }
             }
@@ -127,33 +130,38 @@
     .accordion-body {
         background-color: $menu-dropdown-background-color;
 
-        & > a {
+        > a {
             display: none;
-        }
-
-        .active {
-            background-color: $menu-background-color-active;
         }
 
         .accordion-group {
             background-color: transparent;
         }
+
+        .dropdown-menu-single-item.active {
+            background-color: $menu-background-color-active;
+        }
     }
 
     // First level
-    .accordion-toggle.title-level-1 {
+    .title-level-1 {
         position: relative;
-        padding: side-values(14px 22px 14px 24px);
-        margin: 0;
-        background-color: $menu-dropdown-background-color-active;
+        padding: 14px 22px 14px 24px;
         color: $menu-item-first-level-text-color;
+        display: block;
 
         .menu-icon {
             min-width: 16px;
-            margin-#{$end}: 8px;
-            margin-#{$start}: 0;
+            margin-right: 8px;
+            margin-left: 0;
             text-align: center;
         }
+    }
+
+    .accordion-toggle.title-level-1 {
+        position: relative;
+        margin: 0;
+        background-color: $menu-dropdown-background-color-active;
 
         &.collapsed {
             background-color: $menu-background-color;

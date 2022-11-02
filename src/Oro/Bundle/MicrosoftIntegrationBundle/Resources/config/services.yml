@@ -1,0 +1,7 @@
+services:
+    oro_microsoft_integration.form.type.enable_config_checkbox:
+        class: Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\EnableConfigCheckboxType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type }

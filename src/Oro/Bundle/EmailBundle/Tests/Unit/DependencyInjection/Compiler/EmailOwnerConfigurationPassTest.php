@@ -3,112 +3,48 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessNoServices()
+    public function testProcessWhenNoProviders()
     {
-        $containerBuilder = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = new ContainerBuilder();
+        $storageDef = $container->register('oro_email.email.owner.provider.storage');
 
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(EmailOwnerConfigurationPass::SERVICE_KEY))
-            ->will($this->returnValue(false));
-        $containerBuilder->expects($this->never())
-            ->method('getDefinition');
-        $containerBuilder->expects($this->never())
-            ->method('findTaggedServiceIds');
+        $compiler = new EmailOwnerConfigurationPass();
+        $compiler->process($container);
 
-        $pass = new EmailOwnerConfigurationPass();
-        $pass->process($containerBuilder);
+        self::assertSame(
+            [],
+            $storageDef->getMethodCalls()
+        );
     }
 
     public function testProcess()
     {
-        $service = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineTargetEntityResolver = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = new ContainerBuilder();
+        $storageDef = $container->register('oro_email.email.owner.provider.storage');
 
-        $containerBuilder = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container->register('provider1')->addTag('oro_email.owner.provider', ['order' => 3]);
+        $container->register('provider2')->addTag('oro_email.owner.provider', ['order' => 1]);
+        $container->register('provider3')->addTag('oro_email.owner.provider');
+        $container->register('provider4')->addTag('oro_email.owner.provider', ['order' => 2]);
+        $container->register('provider5')->addTag('oro_email.owner.provider', ['order' => 4]);
 
-        $containerBuilder->expects($this->exactly(2))
-            ->method('hasDefinition')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array(EmailOwnerConfigurationPass::SERVICE_KEY, true),
-                        array('doctrine.orm.listeners.resolve_target_entity', true),
-                    )
-                )
-            );
-        $containerBuilder->expects($this->exactly(2))
-            ->method('getDefinition')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array(EmailOwnerConfigurationPass::SERVICE_KEY, $service),
-                        array('doctrine.orm.listeners.resolve_target_entity', $doctrineTargetEntityResolver),
-                    )
-                )
-            );
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->will(
-                $this->returnValue(
-                    array(
-                        'provider1' => array(array('order' => 3)),
-                        'provider2' => array(array('order' => 1)),
-                        'provider4' => array(),
-                        'provider3' => array(array('order' => 2)),
-                        'provider5' => array(array('order' => 3)),
-                    )
-                )
-            );
+        $compiler = new EmailOwnerConfigurationPass();
+        $compiler->process($container);
 
-        $serviceMethodCalls = array();
-        $serviceProviders = array();
-        $service->expects($this->exactly(5))
-            ->method('addMethodCall')
-            ->will(
-                $this->returnCallback(
-                    function ($method, array $arguments) use (&$serviceMethodCalls, &$serviceProviders) {
-                        $serviceMethodCalls[] = $method;
-                        $serviceProviders[] = (string)$arguments[0];
-                    }
-                )
-            );
-
-        $containerBuilder->expects($this->once())
-            ->method('getParameter')
-            ->with($this->equalTo('oro_email.entity.cache_namespace'))
-            ->will($this->returnValue('SomeNamespace'));
-
-        $doctrineTargetEntityResolver->expects($this->once())
-            ->method('addMethodCall')
-            ->with(
-                $this->equalTo('addResolveTargetEntity'),
-                $this->equalTo(
-                    array(
-                        'Oro\Bundle\EmailBundle\Entity\EmailAddress',
-                        'SomeNamespace\EmailAddressProxy',
-                        array()
-                    )
-                )
-            );
-
-        $pass = new EmailOwnerConfigurationPass();
-        $pass->process($containerBuilder);
-
-        $this->assertEquals(
-            array('addProvider', 'addProvider', 'addProvider', 'addProvider', 'addProvider'),
-            $serviceMethodCalls
-        );
-        $this->assertEquals(
-            array('provider2', 'provider3', 'provider1', 'provider5', 'provider4'),
-            $serviceProviders
+        self::assertEquals(
+            [
+                ['addProvider', [new Reference('provider2')]],
+                ['addProvider', [new Reference('provider4')]],
+                ['addProvider', [new Reference('provider1')]],
+                ['addProvider', [new Reference('provider5')]],
+                ['addProvider', [new Reference('provider3')]]
+            ],
+            $storageDef->getMethodCalls()
         );
     }
 }

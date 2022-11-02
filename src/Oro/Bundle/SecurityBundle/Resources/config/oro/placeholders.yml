@@ -12,7 +12,7 @@ placeholders:
 
     items:
         organization_selector:
-            template: OroSecurityBundle:Organization:selector.html.twig
+            template: '@@OroSecurity/Organization/selector.html.twig'
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         organization_name:
-            template: OroSecurityBundle:Organization:current_name.html.twig
+            template: '@@OroSecurity/Organization/current_name.html.twig'

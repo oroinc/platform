@@ -7,13 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 interface GlobalOptionsProviderInterface
 {
-    /**
-     * @param Command $command
-     */
     public function addGlobalOptions(Command $command);
 
-    /**
-     * @param InputInterface $input
-     */
     public function resolveGlobalOptions(InputInterface $input);
 }

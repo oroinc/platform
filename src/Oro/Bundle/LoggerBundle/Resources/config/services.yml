@@ -2,9 +2,12 @@ parameters:
     oro_logger.detailed_logs_default_level: error
 services:
     oro_logger.cache:
-        parent: doctrine_cache.abstract.array
-        calls:
-            - [ setNamespace, [ 'oro_logger' ] ]
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
+        public: true
+        lazy: true
+        arguments:
+            - 0
+            - false
 
     oro_logger.event_subscriber.console_command:
         class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber
@@ -14,23 +17,33 @@ services:
             - { name: kernel.event_subscriber }
             - { name: monolog.logger, channel: console }
 
-    oro_logger.monolog.detailed_logs.handler.prototype:
-        abstract: true
-        class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
+    oro_logger.monolog.db_logs.handler:
+        class: Oro\Bundle\LoggerBundle\Monolog\DBLogsHandler
         calls:
             - ['setContainer', ['@service_container']]
+            - ['setFormatter', ['@monolog.formatter.normalizer']]
 
-    oro_logger.monolog.detailed_logs.handler:
-        parent: oro_logger.monolog.detailed_logs.handler.prototype
+    oro_logger.log_level_config_provider:
+        class: Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig
+        arguments:
+            - '@oro_logger.cache'
+            - '@?oro_config.user'
+            - '@oro_distribution.handler.application_status'
+            - '%oro_logger.detailed_logs_default_level%'
 
-    oro_logger.message_factory:
-        class: Oro\Bundle\LoggerBundle\Mailer\MessageFactory
-        calls:
-            - ['setContainer', ['@service_container']]
+    oro_logger.monolog.email_factory.error_log_notification:
+        class: Oro\Bundle\LoggerBundle\Monolog\EmailFactory\ErrorLogNotificationEmailFactory
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_logger.provider.error_log_notification_recipients'
 
-    swiftmailer.plugin.no_recipient.abstract:
-        class: Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin
-        abstract: true
+    oro_logger.provider.error_log_notification_recipients:
+        class: Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider
+        arguments:
+            # Global config manager is used on purpose because 1) configuration which is fetched by this provider is
+            # present only in global config scope; 2) other config scopes might be not working at the moment of logging
+            # error (when this provider is intended to be used).
+            - '@oro_config.global'
 
     oro_logger.processor.log_message:
         class: Monolog\Processor\PsrLogMessageProcessor
@@ -45,3 +58,24 @@ services:
             - '@oro_message_queue.log.message_processor_class_provider'
         tags:
             - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_logger.validator.email_recipients_list:
+        class: Oro\Bundle\LoggerBundle\Validator\Constraints\EmailRecipientsListValidator
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_logger.deduplication_handler.cache.warmer:
+        public: false
+        class: Oro\Bundle\LoggerBundle\Cache\DeduplicationHandlerCacheWarmer
+        arguments:
+            - '@?monolog.handler.deduplicated'
+        tags:
+            - { name: kernel.cache_warmer, priority: -1000 }
+
+    oro_logger.event_listener.console_error:
+        public: false
+        class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleErrorSubscriber
+        arguments:
+            - '@monolog.logger.console'
+        tags:
+            - { name: kernel.event_subscriber }

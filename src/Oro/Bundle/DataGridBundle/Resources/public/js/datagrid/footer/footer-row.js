@@ -1,12 +1,12 @@
-define([
-    './footer-cell',
-    'chaplin'
-], function(FooterCell, Chaplin) {
+define(function(require) {
     'use strict';
 
-    var FooterRow;
+    const FooterCell = require('./footer-cell');
+    const Chaplin = require('chaplin');
 
-    FooterRow = Chaplin.CollectionView.extend({
+    const FooterRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -14,10 +14,10 @@ define([
         animationDuration: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FooterRow() {
-            FooterRow.__super__.constructor.apply(this, arguments);
+        constructor: function FooterRow(options) {
+            FooterRow.__super__.constructor.call(this, options);
         },
 
         /** @property */
@@ -29,15 +29,15 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            var _this = this;
+            const footerRowView = this;
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(itemViewOptions) {
-                    var column = itemViewOptions.model;
-                    var FooterCell = column.get('footerCell') || options.footerCell || _this.footerCell;
-                    var cellOptions = {
+                    const column = itemViewOptions.model;
+                    const FooterCell = column.get('footerCell') || options.footerCell || footerRowView.footerCell;
+                    const cellOptions = {
                         column: column,
-                        collection: _this.dataCollection,
+                        collection: footerRowView.dataCollection,
                         rowName: options.rowName,
                         themeOptions: {
                             className: 'grid-cell grid-footer-cell'
@@ -46,16 +46,30 @@ define([
                     if (column.get('name')) {
                         cellOptions.themeOptions.className += ' grid-footer-cell-' + column.get('name');
                     }
-                    _this.columns.trigger('configureInitializeOptions', FooterCell, cellOptions);
+                    footerRowView.columns.trigger('configureInitializeOptions', FooterCell, cellOptions);
                     return new FooterCell(cellOptions);
                 };
             }
-            FooterRow.__super__.initialize.apply(this, arguments);
+            FooterRow.__super__.initialize.call(this, options);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
             this.cells = this.subviews;
         },
 
+        _updateAttributes() {
+            if (this.disposed) {
+                return;
+            }
+            this._setAttributes(this._collectAttributes());
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

@@ -1,0 +1,26 @@
+aliases:
+    oro/datagrid/cell/action-permissions-cell$: orouser/js/datagrid/cell/action-permissions-cell
+    oro/select2-acl-user-autocomplete-component$: orouser/js/components/select2-acl-user-autocomplete-component
+    oro/select2-acl-user-multiselect-component$: orouser/js/components/select2-acl-user-multiselect-component
+app-modules:
+    - orouser/js/app/modules/validator-constraints-module
+    - orouser/js/init-user
+configs:
+    orouser/js/components/role/entity-category-tabs-component: {}
+    orouser/js/views/role/capability-group-view: {}
+dynamic-imports:
+    commons:
+        - oro/select2-acl-user-autocomplete-component
+        - orouser/js/validator/password-complexity
+    orodatagrid:
+        - oro/datagrid/cell/action-permissions-cell
+        - orouser/js/datagrid/roles-datagrid-builder
+    orouser:
+        - oro/select2-acl-user-multiselect-component
+        - orouser/js/app/views/user-reset-password-view
+        - orouser/js/components/password-generate
+        - orouser/js/components/role/capability-set-component
+        - orouser/js/components/role/entity-category-tabs-component
+        - orouser/js/tools/acl-users-search-api-accessor
+        - orouser/js/views/role-view
+        - orouser/js/views/user-apikey-gen-view

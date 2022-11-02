@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\OrganizationBundle\Controller\OrganizationController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\OrganizationBundle\Controller\BusinessUnitController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_organization.form.handler.business_unit, key: Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler }
+            - { name: container.service_subscriber, id: oro_organization.form.business_unit }

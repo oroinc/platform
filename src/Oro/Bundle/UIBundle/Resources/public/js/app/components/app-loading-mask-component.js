@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var AppLoadingMaskComponent;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
-    AppLoadingMaskComponent = BaseComponent.extend({
+    const AppLoadingMaskComponent = BaseComponent.extend({
         listen: {
             'page:beforeChange mediator': 'showLoading',
             'page:afterChange mediator': 'hideLoading'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AppLoadingMaskComponent(options) {
             AppLoadingMaskComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.initView(options);
@@ -42,7 +41,7 @@ define(function(require) {
          * @param {Object} options
          */
         initView: function(options) {
-            var viewOptions = _.defaults({}, options.viewOptions, {
+            const viewOptions = _.defaults({}, options.viewOptions, {
                 container: 'body',
                 hideDelay: 25
             });

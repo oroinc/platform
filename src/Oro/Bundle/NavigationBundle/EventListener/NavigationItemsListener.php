@@ -16,17 +16,11 @@ class NavigationItemsListener
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param ConfigureMenuEvent $event
-     */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         $disabledItems = $this->featureChecker->getDisabledResourcesByType('navigation_items');
@@ -50,9 +44,6 @@ class NavigationItemsListener
         }
     }
 
-    /**
-     * @param ItemInterface $item
-     */
     protected function disableItem(ItemInterface $item)
     {
         $item->setDisplay(false);

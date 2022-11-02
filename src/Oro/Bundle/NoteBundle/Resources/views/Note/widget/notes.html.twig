@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
 
@@ -7,23 +7,23 @@
         {% block widget_actions %}
             <div class="widget-actions">
                 {{ UI.clientLink({
-                    'aCss': 'expand-all-button btn-mini',
+                    'aCss': 'expand-all-button btn-link',
                     'label' : 'Expand All'|trans,
                     'dataAttributes': {'action-name': 'expand_all'}
                 }) }}
                 {{ UI.clientLink({
-                    'aCss': 'collapse-all-button btn-mini',
+                    'aCss': 'collapse-all-button btn-link',
                     'label' : 'Collapse All'|trans,
                     'dataAttributes': {'action-name': 'collapse_all'}
                 }) }}
                 {{ UI.clientLink({
-                    'aCss': 'btn refresh-button icons-holder-text',
+                    'aCss': 'btn btn-icon refresh-button icons-holder-text',
                     'iCss': 'fa-refresh',
                     'title' : 'Refresh'|trans,
                     'dataAttributes': {'action-name': 'refresh'}
                 }) }}
                 {{ UI.clientLink({
-                    'aCss': 'btn sort-button icons-holder-text',
+                    'aCss': 'btn btn-icon sort-button icons-holder-text',
                     'iCss': 'fa-arrow-up',
                     'title' : 'Descending Order'|trans,
                     'dataAttributes': {
@@ -63,8 +63,8 @@
                 data-page-component-module="oronote/js/app/components/notes-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
-            {% include 'OroNoteBundle:Note:js/list.html.twig' with {'id': 'template-note-list'} %}
-            {% include 'OroNoteBundle:Note:js/view.html.twig' with {'id': 'template-note-item'} %}
+            {% include '@OroNote/Note/js/list.html.twig' with {'id': 'template-note-list'} %}
+            {% include '@OroNote/Note/js/view.html.twig' with {'id': 'template-note-item'} %}
         {% endblock %}
     {% endblock %}
 </div>

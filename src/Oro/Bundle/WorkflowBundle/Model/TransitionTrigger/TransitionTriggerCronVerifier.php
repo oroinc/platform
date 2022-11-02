@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -23,19 +23,12 @@ class TransitionTriggerCronVerifier
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param WorkflowAssembler $workflowAssembler
-     * @param ManagerRegistry $registry
-     */
     public function __construct(WorkflowAssembler $workflowAssembler, ManagerRegistry $registry)
     {
         $this->workflowAssembler = $workflowAssembler;
         $this->registry = $registry;
     }
 
-    /**
-     * @param TransitionCronTrigger $trigger
-     */
     public function verify(TransitionCronTrigger $trigger)
     {
         $expressions = $this->prepareExpressions($trigger);

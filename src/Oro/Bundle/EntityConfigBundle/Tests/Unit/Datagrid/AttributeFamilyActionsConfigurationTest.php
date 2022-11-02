@@ -13,8 +13,7 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
 {
     use EntityTrait;
 
-    /** @var int */
-    const ENTITY_ID = 777;
+    private const ENTITY_ID = 777;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
@@ -25,7 +24,7 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
     /** @var AttributeFamilyActionsConfiguration */
     private $attributeFamilyActionsConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entityManager = $this->createMock(EntityManager::class);
@@ -36,10 +35,7 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    /**
-     * @return array
-     */
-    public function isGrantedDataProvider()
+    public function isGrantedDataProvider(): array
     {
         return [
             'deletion is granted' => [
@@ -53,9 +49,8 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider isGrantedDataProvider
-     * @param bool $isGranted
      */
-    public function testConfigureActionsVisibility($isGranted)
+    public function testConfigureActionsVisibility(bool $isGranted)
     {
         $attributeFamily = $this->getEntity(AttributeFamily::class, ['id' => self::ENTITY_ID]);
 

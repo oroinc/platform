@@ -2,85 +2,52 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\Input;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'OroWorkflowBundle:WorkflowItem';
-
-    /** @var WorkflowTransitCommand */
-    private $command;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowManager */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Input */
+    /** @var Input|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repo;
 
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
-    {
-        $this->repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+    /** @var WorkflowTransitCommand */
+    private $command;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $em->expects($this->any())
+    protected function setUp(): void
+    {
+        $this->repo = $this->createMock(EntityRepository::class);
+
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->managerRegistry->expects($this->any())
             ->method('getRepository')
-            ->with(self::CLASS_NAME)
+            ->with(WorkflowItem::class)
             ->willReturn($this->repo);
 
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->managerRegistry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(self::CLASS_NAME)
-            ->willReturn($em);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->command = new WorkflowTransitCommand($this->managerRegistry, $this->workflowManager);
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->command = new WorkflowTransitCommand();
-        $this->command->setContainer($this->container);
-
-        $this->input = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
+        $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->container,
-            $this->repo,
-            $this->workflowManager,
-            $this->managerRegistry,
-            $this->input,
-            $this->output,
-            $this->command
-        );
     }
 
     public function testConfigure()
@@ -92,21 +59,16 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $id
-     * @param string $transition
-     * @param array $expectedOutput
-     * @param \Exception $exception
-     * @param \Exception $expectedException
      * @dataProvider executeProvider
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testExecute(
-        $id,
-        $transition,
-        $expectedOutput,
+        string|int $id,
+        ?string $transition,
+        array $expectedOutput,
         \Exception $exception = null,
         \Exception $expectedException = null
     ) {
-        $this->expectContainerGetManagerRegistryAndWorkflowManager();
         $this->input->expects($this->exactly(2))
             ->method('getOption')
             ->willReturnMap([
@@ -117,7 +79,8 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $workflowItem = $this->createWorkflowItem($id);
 
         if (!$transition || !is_numeric($id)) {
-            $this->repo->expects($this->never())->method('find');
+            $this->repo->expects($this->never())
+                ->method('find');
         } else {
             $this->repo->expects($this->once())
                 ->method('find')
@@ -126,12 +89,18 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         }
 
         if ((!$workflowItem) || (!$transition)) {
-            $this->workflowManager->expects($this->never())->method('transit');
+            $this->workflowManager->expects($this->never())
+                ->method('transit');
+        } elseif ($exception) {
+            $this->workflowManager->expects($this->once())
+                ->method('transit')
+                ->with($workflowItem, $transition)
+                ->willThrowException($exception);
         } else {
             $this->workflowManager->expects($this->once())
                 ->method('transit')
                 ->with($workflowItem, $transition)
-                ->will($exception ? $this->throwException($exception) : $this->returnSelf());
+                ->willReturnSelf();
         }
 
         if ($expectedException) {
@@ -141,12 +110,10 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $messages = $this->getObjectAttribute($this->output, 'messages');
-
         $found = 0;
-        foreach ($messages as $message) {
+        foreach ($this->output->messages as $message) {
             foreach ($expectedOutput as $expected) {
-                if (strpos($message, $expected) !== false) {
+                if (str_contains($message, $expected)) {
                     $found++;
                 }
             }
@@ -155,10 +122,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertCount($found, $expectedOutput);
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         return [
             'valid id' => [
@@ -219,34 +183,14 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function expectContainerGetManagerRegistryAndWorkflowManager()
-    {
-        $this->container->expects($this->any())
-            ->method('getParameter')
-            ->with('oro_workflow.entity.workflow_item.class')
-            ->willReturn(self::CLASS_NAME);
-
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnMap([
-                ['oro_workflow.manager', 1, $this->workflowManager],
-                ['doctrine', 1, $this->managerRegistry],
-            ]);
-    }
-
-    /**
-     * @param int $id
-     * @return WorkflowItem
-     */
-    protected function createWorkflowItem($id)
+    private function createWorkflowItem(string|int $id): ?WorkflowItem
     {
         if ($id > 2) {
             return null;
         }
 
         $workflowItem = new WorkflowItem();
-        $workflowItem
-            ->setId($id);
+        $workflowItem->setId($id);
 
         return $workflowItem;
     }

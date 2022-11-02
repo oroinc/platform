@@ -1,11 +1,6 @@
-define(function(require) {
-    'use strict';
+import localeSettings from 'orolocale/js/locale-settings';
 
-    var _ = require('underscore');
-    var localeSettings = require('orolocale/js/locale-settings');
-
-    // google api configuration, set language for Google+ widgets
-    window.___gcfg = _.extend(window.___gcfg || {}, {
-        lang: localeSettings.getLocale()
-    });
+// google api configuration, set language for Google+ widgets
+window.___gcfg = Object.assign(window.___gcfg || {}, {
+    lang: localeSettings.getLocale()
 });

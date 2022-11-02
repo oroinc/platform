@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var ColumnModel;
-    var EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
+    const EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
 
-    ColumnModel = EntityFieldModel.extend({
+    const ColumnModel = EntityFieldModel.extend({
         fieldAttribute: 'name',
 
         defaults: {
@@ -12,10 +11,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ColumnModel() {
-            ColumnModel.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnModel(...args) {
+            ColumnModel.__super__.constructor.apply(this, args);
         }
     });
 

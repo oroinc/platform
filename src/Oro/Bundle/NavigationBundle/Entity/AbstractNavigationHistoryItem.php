@@ -141,7 +141,6 @@ abstract class AbstractNavigationHistoryItem implements
     }
 
     /**
-     *
      * @param int $visitCount
      *
      * @return AbstractNavigationHistoryItem
@@ -242,8 +241,6 @@ abstract class AbstractNavigationHistoryItem implements
 
     /**
      * Set entity properties
-     *
-     * @param array $values
      */
     public function setValues(array $values)
     {

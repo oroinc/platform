@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% import '@OroUI/macros.html.twig' as ui %}
 {% set userId = user.id %}
 {% set formId = 'user-apikey-gen-form-' ~ userId %}
 {% set apiKeyElementId = 'user-apikey-gen-elem-' ~ userId %}
@@ -8,26 +8,22 @@
     'formSelector': '#' ~ formId,
     'responseMessage': 'oro.user.apikey_gen.new_key.success'
 } %}
-<div class="control-group api-block"
-     data-nohash="true"
+{% set apiKeyHTML = form_row(
+    form,
+    {
+        method: 'POST',
+        action: path('oro_user_apigen', {'id': userId}),
+        attr: {'id': formId},
+        apiKeyElementId: apiKeyElementId
+    }
+) %}
+{% set attributeOptions = {
+    rootClass: 'api-block',
+    tooltipHTML: ui.tooltip('oro.user.api.tooltip_text', {}, 'bottom'),
+} %}
+<div data-nohash="true"
      data-page-component-module="oroui/js/app/components/view-component"
      data-page-component-options="{{ options|json_encode }}"
      data-layout="separate">
-    <label class="control-label control-label-api-key">
-        {{ ui.tooltip('oro.user.api.tooltip_text', {}, 'bottom') }}
-        {{ 'oro.user.api.label'|trans }}
-    </label>
-    <div class="controls">
-        <div class="control-label html-content">
-            {{ form_row(
-                form,
-                {
-                    method: 'POST',
-                    action: path('oro_user_apigen', {'id': userId}),
-                    attr: {'id': formId},
-                    apiKeyElementId: apiKeyElementId
-                }
-            ) }}
-        </div>
-    </div>
+    {{ ui.renderAttribute('oro.user.api.label'|trans, apiKeyHTML, attributeOptions) }}
 </div>

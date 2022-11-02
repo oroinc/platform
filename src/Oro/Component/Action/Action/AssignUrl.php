@@ -7,6 +7,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Actions that generates url and assigns to the specified attribute.
+ */
 class AssignUrl extends AbstractAction
 {
     /**
@@ -24,10 +27,6 @@ class AssignUrl extends AbstractAction
      */
     protected $urlAttribute;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param RouterInterface $router
-     */
     public function __construct(ContextAccessor $contextAccessor, RouterInterface $router)
     {
         parent::__construct($contextAccessor);
@@ -69,7 +68,7 @@ class AssignUrl extends AbstractAction
             throw new InvalidParameterException('Route parameters must be an array');
         }
         if (empty($options['attribute'])) {
-            throw new InvalidParameterException('Attribiute parameters is required');
+            throw new InvalidParameterException('Attribute parameters is required');
         }
 
         $this->urlAttribute = $options['attribute'];
@@ -80,13 +79,13 @@ class AssignUrl extends AbstractAction
 
     /**
      * @param mixed $context
-     * @return string|null
+     * @return string
      */
-    protected function getRoute($context)
+    protected function getRoute($context): string
     {
         return !empty($this->options['route'])
-            ? $this->contextAccessor->getValue($context, $this->options['route'])
-            : null;
+            ? (string) $this->contextAccessor->getValue($context, $this->options['route'])
+            : '';
     }
 
     /**

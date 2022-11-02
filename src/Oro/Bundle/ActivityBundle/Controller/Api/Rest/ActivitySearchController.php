@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
@@ -15,8 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("activity_search_relation")
- * @NamePrefix("oro_api_")
+ * REST API controller to find activity associations.
  */
 class ActivitySearchController extends RestGetController
 {
@@ -25,8 +21,6 @@ class ActivitySearchController extends RestGetController
      *
      * @param Request $request
      * @param string $activity The type of the activity entity.
-     *
-     * @Get("/activities/{activity}/relations/search")
      *
      * @QueryParam(
      *      name="page",

@@ -24,9 +24,7 @@ define([
         stacked: false,
 
         draw: function(options) {
-            var shape;
-
-            shape = this.calculateShape(options);
+            const shape = this.calculateShape(options);
             this.shapes.push(shape);
 
             this.plot(shape, options);
@@ -36,15 +34,15 @@ define([
         },
 
         hit: function(options) {
-            var s1;
-            var s2;
-            var s3;
-            var args = options.args;
-            var mouse = args[0];
-            var x = mouse.relX;
-            var y = mouse.relY;
-            var fullRectangle = !_.every(this.shapes, function(seg, i) {
-                var belongSide = true;
+            let s1;
+            let s2;
+            let s3;
+            const args = options.args;
+            const mouse = args[0];
+            const x = mouse.relX;
+            const y = mouse.relY;
+            const fullRectangle = !_.every(this.shapes, function(seg, i) {
+                let belongSide = true;
                 /**
                  *  left/right rectangle side case
                  *  detect mouse is in figure
@@ -100,8 +98,8 @@ define([
         },
 
         drawHit: function(options, i) {
-            var context = options.context;
-            var shape = this.shapes[i];
+            const context = options.context;
+            const shape = this.shapes[i];
             context.save();
             context.lineJoin = 'round';
             context.lineWidth = options.lineWidth;
@@ -117,7 +115,7 @@ define([
         },
 
         clearHit: function(options) {
-            var context = options.context;
+            const context = options.context;
             context.save();
             _.each(this.shapes, function(shape) {
                 context.clearRect(
@@ -136,7 +134,7 @@ define([
          * @param options
          */
         plot: function(shape, options) {
-            var context = options.context;
+            const context = options.context;
             context.save();
             context.lineJoin = 'round';
             context.lineWidth = options.lineWidth;
@@ -160,18 +158,15 @@ define([
          * @returns {Object}
          */
         calculateShape: function(options) {
-            var shape;
-            var leftHeight;
-            var width;
-            var AD;
-            var BC;
-            var index = options.index;
-            var series = this.allSeries[index];
-            var shift = options.explode || 0;
-            var shiftX = options.marginX || 0;
-            var shiftY = options.marginY || 0;
-            var frameWidth = options.width - shiftX;
-            var frameHeight = options.height - shiftY * 2 - shift;
+            let leftHeight;
+            let width;
+            const index = options.index;
+            const series = this.allSeries[index];
+            const shift = options.explode || 0;
+            const shiftX = options.marginX || 0;
+            const shiftY = options.marginY || 0;
+            const frameWidth = options.width - shiftX;
+            const frameHeight = options.height - shiftY * 2 - shift;
 
             leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + (options.extraHeight || 0);
             width = index > 0 ? this.shapes[index - 1].bottomWidth : frameWidth;
@@ -182,7 +177,7 @@ define([
                 leftHeight -= shift;
             }
 
-            shape = {};
+            const shape = {};
             shape.color = series.color = options.colors[index];
             shape.height = Math.round(frameHeight / this.total() * options.data[0]);
             if (shift > 0 && shape.height > shift) {
@@ -214,8 +209,8 @@ define([
              *                      | P
              */
 
-            AD = Math.ceil(width / 2);
-            BC = Math.ceil(AD * (leftHeight - shape.height) / leftHeight);
+            const AD = Math.ceil(width / 2);
+            const BC = Math.ceil(AD * (leftHeight - shape.height) / leftHeight);
 
             shape.leftHeight = leftHeight - shape.height;
             shape.topWidth = AD * 2;
@@ -237,14 +232,14 @@ define([
          * @param options
          */
         renderLabel: function(shape, options) {
-            var context = options.context;
-            var index = options.index;
-            var series = this.allSeries[index];
-            var $prev = $(options.element).find('.flotr-grid-label').last();
-            var distX = options.width - options.marginX * 0.8;
-            var distY = !$prev[0] ? options.marginY
+            const context = options.context;
+            const index = options.index;
+            const series = this.allSeries[index];
+            const $prev = $(options.element).find('.flotr-grid-label').last();
+            const distX = options.width - options.marginX * 0.8;
+            const distY = !$prev[0] ? options.marginY
                 : $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
-            var style = {
+            const style = {
                 size: options.fontSize * 1.2,
                 color: options.fontColor,
                 weight: 1.5
@@ -254,14 +249,14 @@ define([
             style.textBaseline = 'top';
             style.wordWrap = 'break-word';
 
-            var html = [];
-            var divStyle =
+            const html = [];
+            const divStyle =
                     style.textBaseline + ':' + (distY - style.size) + 'px;' +
                     style.textAlign + ':' + (distX + 10) + 'px;';
 
             html.push('<div style="', divStyle, '" class="flotr-grid-label funnel-label">', series.label, '</div>');
 
-            var div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
+            const div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
             Flotr.DOM.insert(div, html.join(''));
             Flotr.DOM.insert(options.element, div);
 
@@ -308,8 +303,8 @@ define([
          * @returns {number}
          */
         total: function() {
-            var sum = this._sum;
-            var total = 0;
+            const sum = this._sum;
+            let total = 0;
 
             if (!this._total) {
                 _.each(this.allSeries, function(series) {

@@ -2,31 +2,41 @@
     Displays title and search form
 #}
 {% macro renderTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid page-title configuration-header">
-    {% if pageTitle is iterable %}
-        <div class="customer-info customer-simple pull-left">
-        {% for title in pageTitle%}
-            {% if not loop.last %}
-            <div class="sub-title">
-                {{ title }}
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    <div class="page-title__path">
+                        <div class="top-row">
+                            <div class="page-title__entity-title-wrapper">
+                                {% if pageTitle is iterable %}
+                                    {% for title in pageTitle%}
+                                        {% if not loop.last %}
+                                        <div class="sub-title">
+                                            {{ title }}
+                                        </div>
+                                        <span class="separator">/</span>
+                                        {% else %}
+                                        <h1 class="page-title__entity-title">{{ title|raw }}</h1>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <h1 class="page-title__entity-title">
+                                        {{ pageTitle }}
+                                    </h1>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {% if buttons is defined %}
+                        {% for button in buttons %}
+                            {{ button }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
-            <span class="separator">/</span>
-            {% else %}
-            <h1 class="user-name">{{ title|raw }}</h1>
-            {% endif %}
-        {% endfor %}
-        </div>
-    {% else %}
-        <h1>
-            {{ pageTitle }}
-        </h1>
-    {% endif %}
-        <div class="pull-right navbar-extra-right">
-            {% if buttons is defined %}
-                {% for button in buttons %}
-                    {{ button }}
-                {% endfor %}
-            {% endif %}
         </div>
     </div>
 {% endmacro %}
@@ -42,7 +52,9 @@
         routeParameters  - additional route parameters
 #}
 {% macro renderScrollData(configTree, form, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
-    {{ _self.renderConfigurationScrollData({
+    {% import _self as configMacros %}
+
+    {{ configMacros.renderConfigurationScrollData({
         configTree: configTree,
         form: form,
         content: {},
@@ -54,10 +66,11 @@
 {% endmacro %}
 
 {% macro renderConfigurationScrollData(data) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% import _self as configMacros %}
 
     {% set content %}
-        <div data-page-component-view="{{ {
+        <div class="layout-content" data-page-component-view="{{ {
             view: 'oroui/js/app/views/highlight-text-view',
             highlightSwitcherContainer: 'div.system-configuration-content-header',
             highlightStateStorageKey: 'show-all-configuration-items-on-search',
@@ -66,7 +79,8 @@
                 'h5.user-fieldset span',
                 'div.control-label label',
                 'i.tooltip-icon',
-                'div.controls > div.control-subgroup *[data-name="field__value"]'
+                'div.controls > div.control-subgroup *[data-name="field__value"]',
+                '.select2-offscreen[data-name]'
             ],
             toggleSelectors: {
                 'div.control-group': 'div.control-group-wrapper',
@@ -74,17 +88,18 @@
             },
             viewGroup: 'configuration'
         }|json_encode }}">
-            {{ _self.renderTabContent(data.form, data.content) }}
+            {{ configMacros.renderTabContent(data.form, data.content) }}
         </div>
     {% endset %}
     <div class="system-configuration-container">
-        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+        {% embed "@OroUI/content_sidebar.html.twig" with {options: {
             scrollbar: '[data-role="jstree-container"]'
         }} %}
             {% block header %}
                 <div id="system-configuration-jstree-inline-actions"></div>
             {% endblock header %}
             {% block sidebar %}
+                {% import '@OroUI/macros.html.twig' as UI %}
                 {{ UI.renderJsTree({
                     'label': null,
                     'treeOptions': {
@@ -117,6 +132,8 @@
         form        - form view for active tab tree configuration
 #}
 {% macro renderTabContent(form, content) %}
+    {% import _self as configMacros %}
+
     {% set content = content|default({}) %}
     {% set processForm = false %}
     {% if content.formErrors is not defined %}
@@ -143,7 +160,7 @@
         <div class="scrollable-container">
             <div class="system-configuration-content content form-container" id="configuration-options-block">
                 <div class="pull-right">
-                    <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
+                    <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}">
                 </div>
                 {% if content.formErrors is defined and content.formErrors | length %}
                     <div class="customer-info-actions container-fluid well-small alert-wrap" role="alert">
@@ -168,7 +185,7 @@
 
                         {% for subblock in scrollBlock.subblocks %}
                             {% if subblock is iterable %}
-                                {{ _self.renderFieldset(subblock) }}
+                                {{ configMacros.renderFieldset(subblock) }}
                             {% else %}
                                 {{ subblock|raw }}
                             {% endif %}
@@ -193,7 +210,8 @@
         block.tooltip     - fieldset tooltip (optional)
 #}
 {% macro renderFieldset(block) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
+    {% if block.data|filter(v => v != "")|length > 0 %}
     <fieldset class="form-horizontal form-horizontal-large">
         {% if block.title is defined %}
         <h5 class="user-fieldset">
@@ -206,7 +224,11 @@
 
         {% if block.description is defined and block.description != '' %}
             <div class="container-fluid">
-                <p>{{ block.description|trans }}</p>
+                {% if block.descriptionStyle is defined and block.descriptionStyle != '' %}
+                    <p class="{{ block.descriptionStyle }}">{{ block.description|trans|oro_html_sanitize }}</p>
+                {% else %}
+                    <p>{{ block.description|trans|oro_html_sanitize }}</p>
+                {% endif %}
             </div>
         {% endif %}
 
@@ -216,4 +238,5 @@
             {% endfor %}
         </div>
     </fieldset>
+    {% endif %}
 {% endmacro %}

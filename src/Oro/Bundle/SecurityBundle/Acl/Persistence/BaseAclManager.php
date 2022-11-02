@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Constructs SID based on role name, role object, user or security token.
+ */
 class BaseAclManager implements AclSidInterface
 {
     /**
@@ -17,8 +20,8 @@ class BaseAclManager implements AclSidInterface
     {
         if (is_string($identity)) {
             return new RoleSecurityIdentity($identity);
-        } elseif ($identity instanceof RoleInterface) {
-            return new RoleSecurityIdentity($identity->getRole());
+        } elseif ($identity instanceof Role) {
+            return new RoleSecurityIdentity((string)$identity->getRole());
         } elseif ($identity instanceof UserInterface) {
             return UserSecurityIdentity::fromAccount($identity);
         } elseif ($identity instanceof TokenInterface) {

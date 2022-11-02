@@ -3,11 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
 /**
- * Class AbstractPager
- * @package Oro\Bundle\DataGridBundle\Extension\Pager
+ * Provides abstract description for pager functionality for datagrids based on ORM data source.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractPager implements \Iterator, \Countable, \Serializable, PagerInterface
+abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
 {
     protected $page = 1;
     protected $maxPerPage = 0;
@@ -15,7 +14,6 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     protected $nbResults = 0;
     protected $cursor = 1;
     protected $currentMaxLink = 1;
-    protected $maxRecordLimit = false;
     protected $maxPageLinks = 10;
 
     // used by iterator interface
@@ -386,7 +384,7 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -396,7 +394,7 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -406,31 +404,31 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->initializeIteratorIfNotInitialized();
 
         --$this->resultsCounter;
 
-        return next($this->results);
+        next($this->results);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->initializeIteratorIfNotInitialized();
 
         $this->resultsCounter = count($this->results);
 
-        return reset($this->results);
+        reset($this->results);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -440,29 +438,19 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->getNbResults();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        $vars = get_object_vars($this);
-
-        return serialize($vars);
+        return get_object_vars($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $array = unserialize($serialized);
-
-        foreach ($array as $name => $values) {
+        foreach ($serialized as $name => $values) {
             $this->$name = $values;
         }
     }

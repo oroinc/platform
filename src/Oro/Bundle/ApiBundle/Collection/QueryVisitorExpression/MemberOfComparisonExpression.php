@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\QueryException;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -23,46 +23,36 @@ class MemberOfComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         $value
     ) {
-        if ($value instanceof Range) {
-            return $this->walkRangeExpression($visitor, $field, $parameterName, $value);
+        if (null === $value) {
+            // the filter like NULL MEMBER OF COLLECTION does not have a sense
+            throw new QueryException(\sprintf('The value for "%s" must not be NULL.', $field));
         }
 
-        $visitor->addParameter($parameterName, $value);
+        $subquery = $visitor->createSubquery($field, true);
 
-        return $visitor->getExpressionBuilder()
-            ->isMemberOf($visitor->buildPlaceholder($parameterName), $field);
-    }
+        if ($value instanceof Range) {
+            $fromParameterName = $parameterName . '_from';
+            $toParameterName = $parameterName . '_to';
+            $visitor->addParameter($fromParameterName, $value->getFromValue());
+            $visitor->addParameter($toParameterName, $value->getToValue());
 
-    /**
-     * @param QueryExpressionVisitor $visitor
-     * @param string                 $field
-     * @param string                 $parameterName
-     * @param Range                  $value
-     *
-     * @return Expr\Func
-     */
-    private function walkRangeExpression(
-        QueryExpressionVisitor $visitor,
-        string $field,
-        string $parameterName,
-        Range $value
-    ): Expr\Func {
-        $fromParameterName = $parameterName . '_from';
-        $toParameterName = $parameterName . '_to';
-
-        $visitor->addParameter($fromParameterName, $value->getFromValue());
-        $visitor->addParameter($toParameterName, $value->getToValue());
-
-        $subquery = $visitor->createSubquery($field);
-        $subquery->andWhere(
-            $subquery->expr()->between(
-                QueryBuilderUtil::getSingleRootAlias($subquery),
+            $subqueryWhereExpr = $subquery->expr()->between(
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($fromParameterName),
                 $visitor->buildPlaceholder($toParameterName)
-            )
-        );
+            );
+        } else {
+            $visitor->addParameter($parameterName, $value);
 
-        return $visitor->getExpressionBuilder()
-            ->exists($subquery->getDQL());
+            $subqueryWhereExpr = $subquery->expr()->in(
+                QueryBuilderUtil::getSelectExpr($subquery),
+                $visitor->buildPlaceholder($parameterName)
+            );
+        }
+
+        $subquery->andWhere($subqueryWhereExpr);
+        $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
+
+        return $visitor->getExpressionBuilder()->exists($subquery->getDQL());
     }
 }

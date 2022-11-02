@@ -11,17 +11,16 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var WorkflowAwareManager */
-    protected $manger;
+    private $manger;
 
-    /** @var string */
-    protected $testWorkflowName = 'test_workflow';
+    private string $testWorkflowName = 'test_workflow';
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->manger = new WorkflowAwareManager($this->workflowManager);
         $this->manger->setWorkflowName($this->testWorkflowName);
     }
@@ -50,7 +49,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWorkflow()
     {
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $workflow = $this->createMock(Workflow::class);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')

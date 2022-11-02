@@ -4,190 +4,156 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\Action\Action\FormatString;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormatStringTest extends \PHPUnit\Framework\TestCase
 {
-    const ATTRIBUTE_PATH = 'attribute';
-    const ARGUMENTS_PATH = 'arguments';
+    private const ATTRIBUTE_PATH = 'attribute';
+    private const ARGUMENTS_PATH = 'arguments';
 
-    /**
-     * @var FormatString
-     */
-    protected $action;
+    private string $testString = 'some "%param1%" test "%param2%" string';
+    private array $testArguments = ['param1' => 'first', 'param2' => 'second'];
+    private string $expectedString = 'some "first" test "second" string';
 
-    /**
-     * @var string
-     */
-    protected $testString = 'some "%param1%" test "%param2%" string';
+    /** @var FormatString */
+    private $action;
 
-    /**
-     * @var array
-     */
-    protected $testArguments = array('param1' => 'first', 'param2' => 'second');
-
-    /**
-     * @var string
-     */
-    protected $expectedString = 'some "first" test "second" string';
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new FormatString(new ContextAccessor());
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->action);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array $options
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            'only string' => array(
-                'options' => array(
+        return [
+            'only string' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => 'some test string'
-                ),
+                ],
                 'expected' => 'some test string',
-            ),
-            'array arguments' => array(
-                'options' => array(
+            ],
+            'array arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => $this->testArguments,
-                ),
+                ],
                 'expected' => $this->expectedString,
-            ),
-            'property path array arguments' => array(
-                'options' => array(
+            ],
+            'property path array arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-                ),
+                ],
                 'expected' => $this->expectedString,
                 'arguments' => $this->testArguments,
-            ),
-            'property path collection arguments' => array(
-                'options' => array(
+            ],
+            'property path collection arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-                ),
+                ],
                 'expected' => $this->expectedString,
                 'arguments' => new ArrayCollection($this->testArguments),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no attribute' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no attribute' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute name parameter is required',
-            ),
-            'incorrect attribute' => array(
-                'options' => array(
+            ],
+            'incorrect attribute' => [
+                'options' => [
                     'attribute' => 'string'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute must be valid property definition',
-            ),
-            'no string' => array(
-                'options' => array(
+            ],
+            'no string' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'String parameter must be specified',
-            ),
-            'incorrect arguments' => array(
-                'options' => array(
+            ],
+            'incorrect arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => 'not array',
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Argument parameter must be either array or PropertyPath',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $expected
-     * @param mixed $arguments
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expected, $arguments = null)
+    public function testExecute(array $options, string $expected, mixed $arguments = null)
     {
         $context = new ItemStub();
         if (null !== $arguments) {
             $argumentsPath = self::ARGUMENTS_PATH;
-            $context->$argumentsPath = $arguments;
+            $context->{$argumentsPath} = $arguments;
         }
 
         $this->action->initialize($options);
         $this->action->execute($context);
 
         $attributePath = self::ATTRIBUTE_PATH;
-        $this->assertEquals($expected, $context->$attributePath);
+        self::assertEquals($expected, $context->{$attributePath});
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Argument parameter must be traversable
-     */
     public function testNotTraversableArguments()
     {
-        $options = array(
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Argument parameter must be traversable');
+
+        $options = [
             'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
             'string' => $this->testString,
             'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-        );
+        ];
 
         $context = new ItemStub();
         $argumentsPath = self::ARGUMENTS_PATH;
-        $context->$argumentsPath = 'not_traversable_value';
+        $context->{$argumentsPath} = 'not_traversable_value';
 
         $this->action->initialize($options);
         $this->action->execute($context);

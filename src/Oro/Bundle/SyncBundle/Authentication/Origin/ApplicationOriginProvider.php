@@ -15,10 +15,6 @@ class ApplicationOriginProvider implements OriginProviderInterface
     /** @var OriginExtractor */
     private $originExtractor;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param OriginExtractor $originExtractor
-     */
     public function __construct(
         ConfigManager $configManager,
         OriginExtractor $originExtractor
@@ -32,7 +28,7 @@ class ApplicationOriginProvider implements OriginProviderInterface
      */
     public function getOrigins(): array
     {
-        $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url', null));
+        $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url'));
 
         return $origin === null ? [] : [$origin];
     }

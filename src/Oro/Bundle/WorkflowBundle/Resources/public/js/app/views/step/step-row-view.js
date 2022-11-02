@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var StepRowView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var TransitionsShortListView = require('../transition/transition-list-short-view');
-    var StepModel = require('../../models/step-model');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const TransitionsShortListView = require('../transition/transition-list-short-view');
+    const StepModel = require('../../models/step-model');
 
-    StepRowView = BaseView.extend({
+    const StepRowView = BaseView.extend({
         tagName: 'tr',
 
         events: {
@@ -27,18 +26,18 @@ define(function(require) {
             'destroy model': 'remove'
         },
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function StepRowView() {
-            StepRowView.__super__.constructor.apply(this, arguments);
+        constructor: function StepRowView(options) {
+            StepRowView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var template = this.options.template || $('#step-row-template').html();
+            const template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
             this.transitionsListView = null;
         },
@@ -79,8 +78,8 @@ define(function(require) {
                 workflow: this.options.workflow,
                 stepFrom: this.model
             });
-            var rowHtml = $(this.template(this.model.toJSON()));
-            var transitionsListEl = this.transitionsListView.render().$el;
+            const rowHtml = $(this.template(this.model.toJSON()));
+            const transitionsListEl = this.transitionsListView.render().$el;
             rowHtml.filter('.step-transitions').append(transitionsListEl);
             this.$el.append(rowHtml);
 

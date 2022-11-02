@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -53,9 +53,6 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
         ];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');
@@ -65,13 +62,11 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
                 $group->setDefaultLabel($groupName);
 
                 foreach ($attributes as $attributeName) {
-                    $attribute = $configManager->getConfigFieldModel(
-                        LoadAttributeData::ENTITY_CONFIG_MODEL,
-                        $attributeName
-                    );
                     $relation = new AttributeGroupRelation();
                     $relation->setAttributeGroup($group);
-                    $relation->setEntityConfigFieldId($attribute->getId());
+                    $relation->setEntityConfigFieldId(
+                        LoadAttributeData::getAttribute($configManager, $attributeName)->getId()
+                    );
                     $manager->persist($relation);
                     $group->addAttributeRelation($relation);
                 }

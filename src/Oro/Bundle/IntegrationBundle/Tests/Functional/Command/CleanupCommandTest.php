@@ -2,34 +2,30 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
+use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CleanupCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData']);
+        $this->loadFixtures([LoadStatusData::class]);
     }
 
     /**
      * @dataProvider paramProvider
-     *
-     * @param string $expectedContent
-     * @param array  $params
      */
-    public function testCommandOutput($expectedContent, $params, $rowsCount)
+    public function testCommandOutput(string $expectedContent, array $params, int $rowsCount)
     {
         $result = $this->runCommand('oro:cron:integration:cleanup', $params);
-        $this->assertContains($expectedContent, $result);
-        $totalRows = $this->getContainer()->get('doctrine')->getRepository('OroIntegrationBundle:Status')->findAll();
-        $this->assertCount($rowsCount, $totalRows);
+        self::assertStringContainsString($expectedContent, $result);
+        $totalRows = $this->getContainer()->get('doctrine')->getRepository(Status::class)->findAll();
+        self::assertCount($rowsCount, $totalRows);
     }
 
-    /**
-     * @return array
-     */
-    public function paramProvider()
+    public function paramProvider(): array
     {
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
         $maxDateFromFixtures = new \DateTime('2015-02-01 00:20:00', new \DateTimeZone('UTC'));

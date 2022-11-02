@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 
 class DiscriminatorMapListener
 {
@@ -21,9 +21,6 @@ class DiscriminatorMapListener
         $this->supportedClassNames[$key] = $supportedClassName;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $eventArgs
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
     {
         if (!$this->supportedClassNames) {

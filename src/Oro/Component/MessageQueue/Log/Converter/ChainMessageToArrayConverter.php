@@ -9,13 +9,13 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
  */
 class ChainMessageToArrayConverter implements MessageToArrayConverterInterface
 {
-    /** @var MessageToArrayConverterInterface[] */
+    /** @var iterable|MessageToArrayConverterInterface[] */
     private $converters;
 
     /**
-     * @param MessageToArrayConverterInterface[] $converters
+     * @param iterable|MessageToArrayConverterInterface[] $converters
      */
-    public function __construct(array $converters)
+    public function __construct(iterable $converters)
     {
         $this->converters = $converters;
     }
@@ -23,13 +23,13 @@ class ChainMessageToArrayConverter implements MessageToArrayConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convert(MessageInterface $message)
+    public function convert(MessageInterface $message): array
     {
-        $result = [];
+        $items = [];
         foreach ($this->converters as $converter) {
-            $result = array_merge($result, $converter->convert($message));
+            $items[] = $converter->convert($message);
         }
 
-        return $result;
+        return array_merge(...$items);
     }
 }

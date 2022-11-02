@@ -1,45 +1,78 @@
 services:
-    Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand
+
+    Oro\Bundle\EntityExtendBundle\Command\CacheCommand:
+        abstract: true
+        arguments:
+            - '@oro_entity_extend.extend.entity_proxy_generator'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity_extend.tools.dumper'
+            - '@doctrine'
+            - '@kernel'
+
+    Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
+        arguments:
+            - '@oro_entity_extend.tools.dumper'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand:
+        parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
         public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand
         tags:
             - { name: console.command }
 
 
     Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand:
+        parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
         public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand
         tags:
             - { name: console.command }
 
-
     Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand
+        arguments:
+            - '@oro_entity_extend.migration.options_parser'
+            - '@oro_entity_extend.migration.config_processor'
+            - '%oro_entity_extend.migration.config_processor.options.path%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
+        arguments:
+            - '@kernel'
+            - '@router'
+            - '@filesystem'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\ValidatorCacheClearCommand:
+        arguments:
+            - '@kernel'
+            - '@validator.mapping.cache_warmer'
+            - '@filesystem'
+            - '%validator.mapping.cache.file%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand
+        arguments:
+            - '@oro_entity_extend.tools.dumper'
         tags:
             - { name: console.command }
 
-
     Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand:
-        public: false
-        class: Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.provider.extend_entity_config_provider'
+            - '@oro_entity_extend.enum_synchronizer'
+            - '@oro_entity_extend.tools.save_schema_tool'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\UpdateCommand:
+        arguments:
+            - '@oro_entity_extend.extend.update_processor'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: console.command }

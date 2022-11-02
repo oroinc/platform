@@ -1,0 +1,11 @@
+placeholders:
+    placeholders:
+        js_modules_config:
+            items:
+                form_js_modules_config:
+                    order: 100
+
+    items:
+        form_js_modules_config:
+            template: '@@OroForm/js_modules_config.html.twig'
+            applicable: "@oro_layout.helper->isTemplateRequest()"

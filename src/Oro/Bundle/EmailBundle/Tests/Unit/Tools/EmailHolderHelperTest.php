@@ -10,20 +10,19 @@ use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
 
     /** @var EmailHolderHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->helper = new EmailHolderHelper($this->extendConfigProvider);
     }
@@ -31,7 +30,7 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEmailProvider
      */
-    public function testGetEmail($object, $expected)
+    public function testGetEmail(object|string|null $object, ?string $expected)
     {
         $this->assertEquals($expected, $this->helper->getEmail($object));
     }
@@ -45,7 +44,7 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
@@ -66,17 +65,17 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'emailHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder'
+                    'target_entity' => TestEmailHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -84,11 +83,11 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(null, $this->helper->getEmail($object));
     }
@@ -107,17 +106,17 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'emailHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder'
+                    'target_entity' => TestEmailHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -125,34 +124,37 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->helper->addTargetEntity('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser');
-        $this->helper->addTargetEntity('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder', -10);
+        $this->helper->addTargetEntity(TestUser::class);
+        $this->helper->addTargetEntity(TestEmailHolder::class, -10);
 
         $this->assertEquals('test@example.com', $this->helper->getEmail($object));
     }
 
-    public function getEmailProvider()
+    public function getEmailProvider(): array
     {
-        return array(
-            'null'                                => array(null, null),
-            'not obj'                             => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder',
+        return [
+            'null' => [
+                null,
                 null
-            ),
-            'obj implements EmailHolderInterface' => array(
+            ],
+            'not obj' => [
+                TestEmailHolder::class,
+                null
+            ],
+            'obj implements EmailHolderInterface' => [
                 new TestEmailHolder('test@example.com'),
                 'test@example.com'
-            ),
-            'obj has getEmail method'             => array(
+            ],
+            'obj has getEmail method' => [
                 new TestUser('test@example.com'),
                 'test@example.com'
-            ),
-        );
+            ],
+        ];
     }
 }

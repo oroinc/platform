@@ -17,9 +17,6 @@ class DefaultLocalizationValidator extends ConstraintValidator
      */
     protected $localizationManager;
 
-    /**
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(LocalizationManager $localizationManager)
     {
         $this->localizationManager = $localizationManager;

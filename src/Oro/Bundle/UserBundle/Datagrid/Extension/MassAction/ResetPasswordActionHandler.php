@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
@@ -25,11 +25,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param ResetPasswordHandler   $resetPasswordHandler
-     * @param TranslatorInterface    $translator
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         ResetPasswordHandler $resetPasswordHandler,
         TranslatorInterface $translator,

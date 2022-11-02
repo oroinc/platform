@@ -1,93 +1,131 @@
 <?php
+declare(strict_types=1);
+
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Runs synchronization for integration
+ * Schedules synchronization for integrations.
  */
-class SyncCommand extends Command implements CronCommandInterface, ContainerAwareInterface
+class SyncCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:cron:integration:sync';
+
+    private JobProcessor $jobProcessor;
+    private TranslatorInterface $translator;
+    private GenuineSyncScheduler $syncScheduler;
+    private ObjectManager $entityManager;
+
+    public function __construct(
+        JobProcessor $jobProcessor,
+        TranslatorInterface $translator,
+        GenuineSyncScheduler $syncScheduler,
+        ObjectManager $objectManager
+    ) {
+        $this->jobProcessor = $jobProcessor;
+        $this->translator = $translator;
+        $this->syncScheduler = $syncScheduler;
+        $this->entityManager = $objectManager;
+        parent::__construct();
+    }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '*/5 * * * *';
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
-    public function isActive()
+    public function isActive(): bool
     {
         /** @var ChannelRepository $integrationRepository */
-        $integrationRepository = $this->getEntityManager()->getRepository(Integration::class);
+        $integrationRepository = $this->entityManager->getRepository(Integration::class);
         $qb = $integrationRepository
             ->createQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->where('c.transport is NOT NULL')
             ->andWhere('c.enabled = :isEnabled')
-            ->setParameter('isEnabled', true);
+            ->andWhere('c.connectors <> :emptyConnectors')
+            ->setParameter('isEnabled', true, Types::BOOLEAN)
+            ->setParameter('emptyConnectors', [], Types::ARRAY);
 
         $count = $qb->getQuery()->getSingleScalarResult();
 
         return ($count > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:cron:integration:sync')
-            ->addOption(
-                'integration',
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'If option exists sync will be performed for given integration id'
-            )
-            ->addOption(
-                'connector',
-                'con',
-                InputOption::VALUE_OPTIONAL,
-                'If option exists sync will be performed for given connector name'
-            )
             ->addArgument(
                 'connector-parameters',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-                'Additional connector parameters array. Format - parameterKey=parameterValue',
+                'Connector parameters',
                 []
             )
-            ->setDescription('Runs synchronization for integration');
+            ->addOption('integration', 'i', InputOption::VALUE_OPTIONAL, 'Integration ID')
+            ->addOption('connector', 'con', InputOption::VALUE_OPTIONAL, 'Connector name')
+            ->setDescription('Schedules synchronization for integrations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command schedules synchronization for all active integrations.
+This command only schedules the job by adding a message to the message queue, so ensure
+that the message consumer processes (<info>oro:message-queue:consume</info>) are running
+or the scheduled synchronization(s) will not be performed otherwise.
+
+  <info>php %command.full_name%</info>
+
+Any additional integration connector parameters can be passed as arguments
+using <comment>name=value</comment> format:
+
+  <info>php %command.full_name% --integration=<ID> param1=value1 param2=value2 paramN=valueN</info>
+
+The <info>--connector</info> option can be used to limit the scope of synchronization to
+a specific connector within an integration (all connectors are processed otherwise):
+
+  <info>php %command.full_name% --integration=<ID> --connector=<connector-name></info>
+
+HELP
+            )
+            ->addUsage('--integration=<ID>')
+            ->addUsage('--integration=<ID> param1=value1 param2=value2 paramN=valueN')
+            ->addUsage('--connector=<connector-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('Started integration sync scheduling');
         $connector = $input->getOption('connector');
         $integrationId = $input->getOption('integration');
         $connectorParameters = $this->getConnectorParameters($input);
 
         /** @var ChannelRepository $integrationRepository */
-        $integrationRepository = $this->getEntityManager()->getRepository(Integration::class);
+        $integrationRepository = $this->entityManager->getRepository(Integration::class);
 
         if ($integrationId) {
             $integration = $integrationRepository->getOrLoadById($integrationId);
@@ -100,9 +138,6 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
             $integrations = $integrationRepository->getConfiguredChannelsForSync(null, true);
         }
 
-        $jobProcessor = $this->container->get('oro_message_queue.job.processor');
-        $translator = $this->container->get('translator');
-
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
             $output->writeln(sprintf('Schedule sync for "%s" integration.', $integration->getName()));
@@ -110,7 +145,7 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
             // check if the integration job with `new` or `in progress` status already exists.
             // Temporary solution. should be refacored during BAP-14803.
             $jobName = 'oro_integration:sync_integration:'.$integration->getId();
-            $existingJob = $jobProcessor->findNotStaleRootJobyJobNameAndStatuses(
+            $existingJob = $this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses(
                 $jobName,
                 [Job::STATUS_NEW, Job::STATUS_RUNNING]
             );
@@ -119,26 +154,28 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
                     sprintf(
                         'Skip new sync for "%s" integration because such job already exists with "%s" status',
                         $integration->getName(),
-                        $translator->trans($existingJob->getStatus())
+                        $this->translator->trans($existingJob->getStatus())
                     )
                 );
 
                 continue;
             }
 
-            $this->getSyncScheduler()->schedule($integration->getId(), $connector, $connectorParameters);
+            $this->syncScheduler->schedule($integration->getId(), $connector, $connectorParameters);
         }
+        $output->writeln('Integration sync scheduling complete');
+
+        return 0;
     }
 
     /**
      * Get connector additional parameters array from the input
      *
-     * @param InputInterface $input
-     *
      * @return array key - parameter name, value - parameter value
+     *
      * @throws \LogicException
      */
-    protected function getConnectorParameters(InputInterface $input)
+    protected function getConnectorParameters(InputInterface $input): array
     {
         $result = [];
         $connectorParameters = $input->getArgument('connector-parameters');
@@ -156,21 +193,5 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
         }
 
         return $result;
-    }
-
-    /**
-     * @return GenuineSyncScheduler
-     */
-    private function getSyncScheduler()
-    {
-        return $this->container->get('oro_integration.genuine_sync_scheduler');
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    private function getEntityManager()
-    {
-        return $this->container->get('doctrine.orm.entity_manager');
     }
 }

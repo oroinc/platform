@@ -33,8 +33,6 @@ class OroEmbeddedFormBundleInstaller implements Installation
 
     /**
      * Create oro_embedded_form table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmbeddedFormTable(Schema $schema)
     {

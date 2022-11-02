@@ -1,18 +1,30 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class IndexCommandTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $indexer;
+
+    /** @var IndexCommand */
+    private $command;
+
+    protected function setUp(): void
     {
-        new IndexCommand();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->indexer = $this->createMock(IndexerInterface::class);
+
+        $this->command = new IndexCommand($this->doctrine, $this->indexer);
     }
 
     public function testShouldThrowExceptionIfClassArgumentIsMissing()
@@ -20,9 +32,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "class")');
 
-        $command = new IndexCommand();
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'identifiers' => '123',
         ]);
@@ -33,9 +43,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "identifiers")');
 
-        $command = new IndexCommand();
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'class' => 'class-name',
         ]);
@@ -46,24 +54,14 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Entity manager was not found for class: "class-name"');
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with('class-name')
-            ->will($this->returnValue(null))
-        ;
+            ->willReturn(null);
+        $this->indexer->expects($this->never())
+            ->method('save');
 
-        $indexer = $this->createSearchIndexerMock();
-
-        $container = new Container();
-        $container->set('oro_search.async.indexer', $indexer);
-        $container->set('doctrine', $doctrine);
-
-        $command = new IndexCommand();
-        $command->setContainer($container);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'class' => 'class-name',
             'identifiers' => ['id'],
@@ -74,66 +72,27 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createEntityMangerMock();
-        $em
-            ->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
             ->method('getReference')
             ->with('class-name', 'id')
-            ->will($this->returnValue($entity))
-        ;
+            ->willReturn($entity);
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with('class-name')
-            ->will($this->returnValue($em))
-        ;
+            ->willReturn($em);
 
-        $indexer = $this->createSearchIndexerMock();
-        $indexer
-            ->expects($this->once())
+        $this->indexer->expects($this->once())
             ->method('save')
-            ->with([$entity])
-        ;
+            ->with([$entity]);
 
-        $container = new Container();
-        $container->set('oro_search.async.indexer', $indexer);
-        $container->set('doctrine', $doctrine);
-
-        $command = new IndexCommand();
-        $command->setContainer($container);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'class' => 'class-name',
             'identifiers' => ['id'],
         ]);
 
-        $this->assertContains('Started index update for entities.', $tester->getDisplay());
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
-     */
-    private function createEntityMangerMock()
-    {
-        return $this->createMock(EntityManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
-     */
-    private function createDoctrineMock()
-    {
-        return $this->createMock(RegistryInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|IndexerInterface
-     */
-    private function createSearchIndexerMock()
-    {
-        return $this->createMock(IndexerInterface::class);
+        self::assertStringContainsString('Started index update for entities.', $tester->getDisplay());
     }
 }

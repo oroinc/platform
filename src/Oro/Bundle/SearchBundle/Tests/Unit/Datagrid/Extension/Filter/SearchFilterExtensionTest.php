@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Filter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension\AbstractFilterExtensionTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
@@ -18,14 +19,17 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
     /** @var SearchDatasource|\PHPUnit\Framework\MockObject\MockObject */
     private $datasource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->extension = new SearchFilterExtension(
             $this->configurationProvider,
+            $this->filterBag,
+            $this->filtersProvider,
+            $this->filtersMetadataProvider,
             $this->filtersStateProvider,
-            $this->translator
+            new FilterExecutionContext()
         );
 
         $this->datasource = $this->createMock(SearchDatasource::class);
@@ -33,9 +37,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 
     /**
      * @dataProvider isApplicableDataProvider
-     *
-     * @param array $datagridConfigArray
-     * @param bool $expectedResult
      */
     public function testIsApplicable(array $datagridConfigArray, bool $expectedResult): void
     {
@@ -46,9 +47,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         self::assertSame($expectedResult, $this->extension->isApplicable($datagridConfig));
     }
 
-    /**
-     * @return array
-     */
     public function isApplicableDataProvider(): array
     {
         return [
@@ -82,7 +80,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 
     public function testVisitDataSourceWhenNoFilters(): void
     {
-        $datagridConfig = $this->createDatagridConfig(['name' => static::DATAGRID_NAME]);
+        $datagridConfig = $this->createDatagridConfig(['name' => self::DATAGRID_NAME]);
 
         $this->mockFiltersState([]);
         $this->mockDatasource();
@@ -91,13 +89,9 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
-    /**
-     * @param array $filtersState
-     */
     private function mockFiltersState(array $filtersState): void
     {
-        $this->filtersStateProvider
-            ->expects(self::once())
+        $this->filtersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
             ->willReturn($filtersState);
@@ -105,8 +99,7 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 
     private function mockDatasource(): void
     {
-        $this->datasource
-            ->expects(self::once())
+        $this->datasource->expects(self::once())
             ->method('getSearchQuery')
             ->willReturn($this->createMock(SearchQueryInterface::class));
     }
@@ -119,11 +112,10 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->mockFiltersState([]);
         $this->mockDatasource();
 
-        $filter
-            ->expects(self::never())
+        $filter->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
@@ -133,51 +125,47 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $datagridConfig = $this->createCommonDatagridConfig();
         $filter = $this->assertFilterInitialized();
 
-        $this->mockFiltersState([static::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
+        $this->mockFiltersState([self::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
         $this->mockDatasource();
 
         $filterForm = $this->mockFilterForm($filter);
-
-        $filterForm
-            ->expects(self::once())
+        $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
 
-        $filter
-            ->expects(self::never())
+        $filter->expects(self::never())
             ->method('apply');
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
     public function testVisitDataSource(): void
     {
+        $filtersState = [self::FILTER_NAME => ['value' => 'sampleFilterValue1']];
+        $formData = ['value' => 'sampleFilterValue1'];
+
         $datagridConfig = $this->createCommonDatagridConfig();
         $filter = $this->assertFilterInitialized();
 
-        $this->mockFiltersState([static::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
+        $this->mockFiltersState($filtersState);
         $this->mockDatasource();
 
         $filterForm = $this->mockFilterForm($filter);
-
-        $filterForm
-            ->expects(self::once())
+        $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
-
-        $filterForm
-            ->expects(self::once())
+        $filterForm->expects(self::once())
             ->method('getData')
-            ->willReturn($formData = ['value' => 'SampleFilterValueSubmitted1']);
+            ->willReturn($formData);
 
-        $filter
-            ->expects(self::once())
+        $filter->expects(self::once())
             ->method('apply')
-            ->with(self::isInstanceOf(SearchFilterDatasourceAdapter::class), $formData);
+            ->with(self::isInstanceOf(SearchFilterDatasourceAdapter::class), $formData)
+            ->willReturn(true);
 
-        $this->extension->addFilter(static::FILTER_TYPE, $filter);
+        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }

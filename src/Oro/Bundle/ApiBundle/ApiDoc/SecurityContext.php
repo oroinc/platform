@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -14,12 +18,13 @@ class SecurityContext implements SecurityContextInterface
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
-    public function __construct(TokenStorageInterface $tokenStorage)
+    /** @var RequestStack|null */
+    private $requestStack;
+
+    public function __construct(TokenStorageInterface $tokenStorage, RequestStack $requestStack = null)
     {
         $this->tokenStorage = $tokenStorage;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -28,6 +33,48 @@ class SecurityContext implements SecurityContextInterface
     public function hasSecurityToken(): bool
     {
         return null !== $this->tokenStorage->getToken();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizations(): array
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
+            return [];
+        }
+
+        $user = $token->getUser();
+        if (!$user instanceof AbstractUser) {
+            return [];
+        }
+
+        $result = [];
+        $organizations = $user->getOrganizations(true);
+        foreach ($organizations as $organization) {
+            $result[(string)$organization->getId()] = $organization->getName();
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganization(): ?string
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
+            return null;
+        }
+
+        $organization = $token->getOrganization();
+        if (null === $organization) {
+            return null;
+        }
+
+        return (string)$organization->getId();
     }
 
     /**
@@ -68,7 +115,16 @@ class SecurityContext implements SecurityContextInterface
             return null;
         }
 
-        return $apiKeyKeys->first()->getApiKey();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $organization = $token->getOrganization();
+            foreach ($apiKeyKeys as $apiKeyKey) {
+                if ($apiKeyKey->getOrganization()->getId() === $organization->getId()) {
+                    return $apiKeyKey->getApiKey();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -80,6 +136,33 @@ class SecurityContext implements SecurityContextInterface
             'To use WSSE authentication you need to generate API key for the current logged-in user.'
             . ' To do this, go to the My User page and click Generate Key near to API Key.'
             . ' After that reload this page.';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCsrfCookieName(): ?string
+    {
+        if (null === $this->requestStack) {
+            return null;
+        }
+
+        $request = $this->requestStack->getMainRequest();
+        if (null === $request) {
+            return null;
+        }
+
+        return $request->isSecure()
+            ? 'https-' . CsrfRequestManager::CSRF_TOKEN_ID
+            : CsrfRequestManager::CSRF_TOKEN_ID;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSwitchOrganizationRoute(): ?string
+    {
+        return 'oro_security_switch_organization';
     }
 
     /**

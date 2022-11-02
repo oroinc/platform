@@ -1,26 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var EmailEditorComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var _ = require('underscore');
-    var EmailEditorView = require('../views/email-editor-view');
-    var emailTemplatesProvider = require('../../util/email-templates-provider');
-    var EmailEditorModel = require('../models/email-editor-model');
-    var EmailModel = require('../models/email-model');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const _ = require('underscore');
+    const EmailEditorView = require('../views/email-editor-view');
+    const emailTemplatesProvider = require('../../util/email-templates-provider');
+    const EmailEditorModel = require('../models/email-editor-model');
+    const EmailModel = require('../models/email-model');
 
-    EmailEditorComponent = BaseComponent.extend({
-        options: null,
+    const EmailEditorComponent = BaseComponent.extend({
+        options: {
+            editorComponentName: 'oro_email_email_body'
+        },
 
         listen: {
             parentResize: 'passResizeEvent'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailEditorComponent() {
-            EmailEditorComponent.__super__.constructor.apply(this, arguments);
+        constructor: function EmailEditorComponent(options) {
+            EmailEditorComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -28,21 +29,22 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.options = options;
+            this.options = _.defaults(options || {}, this.options);
             this._deferredInit();
             this.view = new EmailEditorView({
                 el: options._sourceElement,
                 model: this.createEditorModelFromComponentOptions(options),
-                templatesProvider: emailTemplatesProvider
+                templatesProvider: emailTemplatesProvider,
+                editorComponentName: this.options.editorComponentName
             });
             this.view.render();
-            this.view.renderPromise.done(_.bind(function() {
+            this.view.renderPromise.done(() => {
                 this._resolveDeferredInit();
-            }, this));
+            });
         },
 
         createEditorModelFromComponentOptions: function(options) {
-            var $el = options._sourceElement;
+            const $el = options._sourceElement;
             return new EmailEditorModel({
                 appendSignature: options.appendSignature,
                 isSignatureEditable: options.isSignatureEditable,
@@ -61,7 +63,7 @@ define(function(require) {
         },
 
         passResizeEvent: function() {
-            var component = this.view.pageComponent('wrap_oro_email_email_body');
+            const component = this.view.pageComponent('wrap_' + this.options.editorComponentName);
             component.trigger('parentResize');
         }
     });

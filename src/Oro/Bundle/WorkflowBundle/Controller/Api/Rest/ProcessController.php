@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -12,9 +10,9 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\NamePrefix("oro_api_process_")
+ * REST API controller for Process entity.
  */
-class ProcessController extends FOSRestController
+class ProcessController extends AbstractFOSRestController
 {
     /**
      * Activate process
@@ -22,11 +20,6 @@ class ProcessController extends FOSRestController
      * Returns
      * - HTTP_OK (200)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/process/activate/{processDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Activate process", resource=true)
      * @Acl(
      *      id="oro_process_definition_update",
@@ -52,7 +45,7 @@ class ProcessController extends FOSRestController
                     'message'    => $this->get('translator')->trans('oro.workflow.notification.process.activated'),
                     'successful' => true,
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -63,11 +56,6 @@ class ProcessController extends FOSRestController
      * Returns
      * - HTTP_OK (204)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/process/deactivate/{processDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Deactivate process", resource=true)
      * @AclAncestor("oro_process_definition_update")
      *
@@ -88,7 +76,7 @@ class ProcessController extends FOSRestController
                     'message'    => $this->get('translator')->trans('oro.workflow.notification.process.deactivated'),
                     'successful' => true,
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }
@@ -96,7 +84,7 @@ class ProcessController extends FOSRestController
     /**
      * Get entity Manager
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \Doctrine\Persistence\ObjectManager
      */
     protected function getManager()
     {

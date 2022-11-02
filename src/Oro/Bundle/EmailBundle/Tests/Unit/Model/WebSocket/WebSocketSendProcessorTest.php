@@ -2,48 +2,32 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\WebSocket;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $websocketClient;
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $websocketClient;
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $connectionChecker;
 
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $connectionChecker;
+    /** @var EmailUser|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailUser;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $emailUser;
+    /** @var WebSocketSendProcessor */
+    private $processor;
 
-    /**
-     * @var WebSocketSendProcessor
-     */
-    protected $processor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
-        $this->email = $this->createMock(Email::class);
-
-        $this->emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['getOwner', 'getOrganization'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->emailUser = $this->createMock(EmailUser::class);
 
         $this->processor = new WebSocketSendProcessor($this->websocketClient, $this->connectionChecker);
     }
@@ -55,7 +39,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setId(1);
 
-        $this->emailUser->expects($this->exactly(1))
+        $this->emailUser->expects($this->once())
             ->method('getOwner')
             ->willReturn($user);
 
@@ -84,7 +68,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setId(1);
 
-        $this->emailUser->expects($this->exactly(1))
+        $this->emailUser->expects($this->once())
             ->method('getOwner')
             ->willReturn($user);
 
@@ -131,23 +115,18 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getUserTopicDataProvider
-     *
-     * @param User|string $user
-     * @param Organization $organization
-     * @param string $expected
      */
-    public function testGetUserTopic($user, $organization, $expected)
+    public function testGetUserTopic(User|string $user, ?Organization $organization, string $expected)
     {
         $this->assertEquals($expected, WebSocketSendProcessor::getUserTopic($user, $organization));
     }
 
-    /**
-     * @return array
-     */
-    public function getUserTopicDataProvider()
+    public function getUserTopicDataProvider(): array
     {
-        $user = $this->getEntity(User::class, ['id' => 123]);
-        $organization = $this->getEntity(Organization::class, ['id' => 321]);
+        $organization = new Organization();
+        $organization->setId(321);
+        $user = new User();
+        $user->setId(123);
 
         return [
             'user is object' => [

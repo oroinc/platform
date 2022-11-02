@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument;
-use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
@@ -16,9 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BuildListResultDocumentTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentBuilderFactory */
-    private $documentBuilderFactory;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterRegistry */
     private $errorCompleterRegistry;
 
@@ -28,16 +24,14 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     /** @var BuildListResultDocument */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->documentBuilderFactory = $this->createMock(DocumentBuilderFactory::class);
         $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processor = new BuildListResultDocument(
-            $this->documentBuilderFactory,
             $this->errorCompleterRegistry,
             $this->logger
         );
@@ -46,81 +40,102 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     public function testProcessContextWithoutErrorsOnEmptyResult()
     {
         $result = [];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
-        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $this->documentBuilderFactory->expects(self::once())
-            ->method('createDocumentBuilder')
-            ->with($this->context->getRequestType())
-            ->willReturn($documentBuilder);
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
 
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
+        $documentBuilder->expects(self::never())
+            ->method('setMetadata');
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
             ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
+        $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setResult($result);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
-        self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
-        self::assertFalse($this->context->hasResult());
+        self::assertEquals($result, $this->context->getResult());
     }
 
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
     {
         $result = [new \stdClass()];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
-        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $this->documentBuilderFactory->expects(self::once())
-            ->method('createDocumentBuilder')
-            ->with($this->context->getRequestType())
-            ->willReturn($documentBuilder);
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
 
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
+        $documentBuilder->expects(self::never())
+            ->method('setMetadata');
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
             ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
+        $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setResult($result);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
-        self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
-        self::assertFalse($this->context->hasResult());
+        self::assertEquals($result, $this->context->getResult());
+    }
+
+    public function testProcessContextWithoutErrorsAndWithInfoRecords()
+    {
+        $result = [new \stdClass()];
+        $metadata = new EntityMetadata('Test\Entity');
+        $infoRecords = ['' => ['key' => 'value']];
+
+        $this->errorCompleterRegistry->expects(self::never())
+            ->method('getErrorCompleter');
+
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
+        $documentBuilder->expects(self::once())
+            ->method('setMetadata')
+            ->with($infoRecords);
+        $documentBuilder->expects(self::once())
+            ->method('setDataCollection')
+            ->with($result, $this->context->getRequestType(), $metadata);
+        $documentBuilder->expects(self::never())
+            ->method('getDocument');
+
+        $this->context->setResponseDocumentBuilder($documentBuilder);
+        $this->context->setResult($result);
+        $this->context->setMetadata($metadata);
+        $this->context->setInfoRecords($infoRecords);
+        $this->processor->process($this->context);
+        self::assertEquals($result, $this->context->getResult());
     }
 
     public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode()
     {
-        $this->documentBuilderFactory->expects(self::never())
-            ->method('createDocumentBuilder');
+        $result = [new \stdClass()];
+
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
 
+        $this->context->setResponseDocumentBuilder($this->createMock(DocumentBuilderInterface::class));
         $this->context->setResponseStatusCode(Response::HTTP_BAD_REQUEST);
-        $this->context->setResult([new \stdClass()]);
+        $this->context->setResult($result);
         $this->processor->process($this->context);
-        self::assertNull($this->context->getResponseDocumentBuilder());
-        self::assertFalse($this->context->hasResult());
+        self::assertEquals($result, $this->context->getResult());
     }
 
     public function testProcessWithErrors()
     {
         $error = new Error();
 
-        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $this->documentBuilderFactory->expects(self::once())
-            ->method('createDocumentBuilder')
-            ->with($this->context->getRequestType())
-            ->willReturn($documentBuilder);
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
 
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
+        $documentBuilder->expects(self::never())
+            ->method('setMetadata');
         $documentBuilder->expects(self::never())
             ->method('setDataCollection');
         $documentBuilder->expects(self::never())
@@ -129,11 +144,11 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
             ->method('setErrorCollection')
             ->with([$error]);
 
+        $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setClassName(User::class);
         $this->context->addError($error);
         $this->context->setResult([]);
         $this->processor->process($this->context);
-        self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
         self::assertFalse($this->context->hasResult());
 
         self::assertFalse($this->context->hasErrors());
@@ -143,17 +158,15 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     {
         $exception = new \LogicException();
 
-        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
-        $this->documentBuilderFactory->expects(self::once())
-            ->method('createDocumentBuilder')
-            ->with($this->context->getRequestType())
-            ->willReturn($documentBuilder);
         $errorCompleter = $this->createMock(ErrorCompleterInterface::class);
         $this->errorCompleterRegistry->expects(self::once())
             ->method('getErrorCompleter')
             ->with($this->context->getRequestType())
             ->willReturn($errorCompleter);
 
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
+        $documentBuilder->expects(self::never())
+            ->method('setMetadata');
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
             ->willThrowException($exception);
@@ -168,9 +181,9 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
         $this->logger->expects(self::once())
             ->method('error');
 
+        $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setResult(null);
         $this->processor->process($this->context);
-        self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
         self::assertFalse($this->context->hasResult());
 
         self::assertEquals(500, $this->context->getResponseStatusCode());

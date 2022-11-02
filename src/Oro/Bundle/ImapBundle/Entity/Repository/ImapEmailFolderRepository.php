@@ -3,12 +3,16 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
+/**
+ * Doctrine repository for ImapEmailFolder entity.
+ */
 class ImapEmailFolderRepository extends EntityRepository
 {
     /**
@@ -50,7 +54,7 @@ class ImapEmailFolderRepository extends EntityRepository
                 'folder',
                 'COALESCE(folder.synchronizedAt, :minDate) AS HIDDEN nullsFirstDate'
             );
-        $qb->setParameter('minDate', new \DateTime('1970-01-01', new \DateTimeZone('UTC')));
+        $qb->setParameter('minDate', new \DateTime('1970-01-01', new \DateTimeZone('UTC')), Types::DATETIME_MUTABLE);
         if ($syncEnabled !== EmailFolder::SYNC_ENABLED_IGNORE) {
             $qb->andWhere('folder.syncEnabled = :syncEnabled')
                 ->setParameter('syncEnabled', (bool)$syncEnabled);
@@ -59,15 +63,12 @@ class ImapEmailFolderRepository extends EntityRepository
 
         $imapFolders = $qb->getQuery()->getResult();
         if ($sortByFailedCount) {
-            usort($imapFolders, function (ImapEmailFolder $imapFolder1, ImapEmailFolder $imapFolder2) {
-                $failedCount1 = $imapFolder1->getFolder()->getFailedCount();
-                $failedCount2 = $imapFolder2->getFolder()->getFailedCount();
-                if ($failedCount1 === $failedCount2) {
-                    return 0;
+            usort(
+                $imapFolders,
+                function (ImapEmailFolder $imapFolder1, ImapEmailFolder $imapFolder2) {
+                    return $imapFolder1->getFolder()->getFailedCount() <=> $imapFolder2->getFolder()->getFailedCount();
                 }
-
-                return ($failedCount1 < $failedCount2) ? -1 : 1;
-            });
+            );
         }
 
         return $imapFolders;

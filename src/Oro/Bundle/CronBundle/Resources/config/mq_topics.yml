@@ -1,0 +1,7 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\CronBundle\Async\Topic\RunCommandTopic: ~
+    Oro\Bundle\CronBundle\Async\Topic\RunCommandDelayedTopic: ~

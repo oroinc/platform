@@ -4,53 +4,57 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * The repository for TranslationKey entity.
+ */
 class TranslationKeyRepository extends EntityRepository
 {
     /**
-     * @return int
+     * Gets the total number of translation keys.
      */
-    public function getCount()
+    public function getCount(): int
     {
-        $qb = $this->createQueryBuilder('k')
-            ->select('COUNT(k.id)');
-
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int)$this->createQueryBuilder('k')
+            ->select('COUNT(k.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**
-     * Returns the list of all existing in the database translation domains.
+     * Gets the list of all translation domains.
      *
-     * @return array ['domain' => 'domain']
+     * @return string[]
      */
-    public function findAvailableDomains()
+    public function findAvailableDomains(): array
     {
-        $qb = $this->createQueryBuilder('k')
+        $rows = $this->createQueryBuilder('k')
             ->distinct(true)
-            ->select('k.domain');
-
-        $data = array_values(array_column($qb->getQuery()->getArrayResult(), 'domain'));
-
-        return array_combine($data, $data);
-    }
-
-    /**
-     * @return array
-     */
-    public function getTranslationKeysData()
-    {
-        $queryBuilder = $this->createQueryBuilder('tk');
-        $translationKeysData = $queryBuilder
-            ->select('tk.id, tk.key, tk.domain')
-            ->addOrderBy($queryBuilder->expr()->asc('tk.key'))
-            ->addOrderBy($queryBuilder->expr()->asc('tk.domain'))
+            ->select('k.domain')
             ->getQuery()
             ->getArrayResult();
 
-        $translationKeys = [];
-        foreach ($translationKeysData as $item) {
-            $translationKeys[$item['domain']][$item['key']] = $item['id'];
+        return array_values(array_column($rows, 'domain'));
+    }
+
+    /**
+     * Gets information about translation keys grouped by domain.
+     *
+     * @return array [domain => [translation key => TranslationKey entity id, ...], ...]
+     */
+    public function getTranslationKeysData(): array
+    {
+        $rows = $this->createQueryBuilder('k')
+            ->select('k.id, k.key, k.domain')
+            ->addOrderBy('k.key')
+            ->addOrderBy('k.domain')
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['domain']][$row['key']] = $row['id'];
         }
 
-        return $translationKeys;
+        return $result;
     }
 }

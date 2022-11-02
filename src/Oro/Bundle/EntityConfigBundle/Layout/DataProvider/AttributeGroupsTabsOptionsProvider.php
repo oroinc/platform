@@ -22,10 +22,6 @@ class AttributeGroupsTabsOptionsProvider
      */
     private $localizationHelper;
 
-    /**
-     * @param AttributeRenderRegistry $attributeRenderRegistry
-     * @param LocalizationHelper $localizationHelper
-     */
     public function __construct(
         AttributeRenderRegistry $attributeRenderRegistry,
         LocalizationHelper $localizationHelper

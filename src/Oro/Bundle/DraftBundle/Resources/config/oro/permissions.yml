@@ -1,0 +1,42 @@
+oro_permissions:
+    CREATE_DRAFT:
+        label: oro.draft.permission.create.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface
+
+    VIEW_ALL_DRAFTS:
+        label: oro.draft.permission.view_all.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface
+
+    EDIT_ALL_DRAFTS:
+        label: oro.draft.permission.edit_all.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface
+
+    DELETE_DRAFT:
+        label: oro.draft.permission.delete_own.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface
+
+    DELETE_ALL_DRAFTS:
+        label: oro.draft.permission.delete_all.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface
+
+    PUBLISH_DRAFT:
+        label: oro.draft.permission.publish.label
+        apply_to_all: false
+        group_names: ""
+        apply_to_interfaces:
+            - Oro\Bundle\DraftBundle\Entity\DraftableInterface

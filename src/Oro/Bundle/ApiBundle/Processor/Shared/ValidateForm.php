@@ -15,9 +15,6 @@ class ValidateForm implements ProcessorInterface
     /** @var FormValidationHandler */
     private $validator;
 
-    /**
-     * @param FormValidationHandler $validator
-     */
     public function __construct(FormValidationHandler $validator)
     {
         $this->validator = $validator;

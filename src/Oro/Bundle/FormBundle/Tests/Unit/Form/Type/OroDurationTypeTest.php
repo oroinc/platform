@@ -37,9 +37,6 @@ class OroDurationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param $value
-     * @param $expected
      */
     public function testSubmit($value, $expected)
     {
@@ -50,10 +47,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'default' => [

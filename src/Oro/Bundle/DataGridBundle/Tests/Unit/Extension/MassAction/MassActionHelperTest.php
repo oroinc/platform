@@ -17,20 +17,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const MASS_ACTION_NAME = 'massActionName';
-    const HANDLER_SERVICE_ID = 'handlerServiceId';
+    private const MASS_ACTION_NAME = 'massActionName';
+    private const HANDLER_SERVICE_ID = 'handlerServiceId';
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var MassActionHelper
-     */
-    protected $massActionHelper;
+    /** @var MassActionHelper */
+    private $massActionHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->massActionHelper = new MassActionHelper($this->container);
@@ -53,8 +49,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
         $massAction = $this->creatMassAction(ActionConfiguration::create(['handler' => self::HANDLER_SERVICE_ID]));
 
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('has')
             ->with(self::HANDLER_SERVICE_ID)
             ->willReturn(false);
@@ -68,14 +63,12 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
         $massAction = $this->creatMassAction(ActionConfiguration::create(['handler' => self::HANDLER_SERVICE_ID]));
 
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('has')
             ->with(self::HANDLER_SERVICE_ID)
             ->willReturn(true);
 
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('get')
             ->with(self::HANDLER_SERVICE_ID)
             ->willReturn(new \stdClass());
@@ -87,15 +80,13 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
     {
         $massAction = $this->creatMassAction(ActionConfiguration::create(['handler' => self::HANDLER_SERVICE_ID]));
 
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('has')
             ->with(self::HANDLER_SERVICE_ID)
             ->willReturn(true);
 
         $handler = $this->createMock(MassActionHandlerInterface::class);
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('get')
             ->with(self::HANDLER_SERVICE_ID)
             ->willReturn($handler);
@@ -105,10 +96,8 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMassActionByNameWhenNoMassActionExtension()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
-        /** @var ExtensionVisitorInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionVisitorInterface::class);
 
         $this->setDatagridExtensions($dataGrid, [$extension]);
@@ -121,13 +110,10 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMassActionByNameWhenNoMassAction()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
-        /** @var MassActionExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(MassActionExtension::class);
-        $extension
-            ->expects($this->once())
+        $extension->expects($this->once())
             ->method('getMassAction')
             ->with(self::MASS_ACTION_NAME, $dataGrid)
             ->willReturn(null);
@@ -142,16 +128,12 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMassActionByName()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(DatagridInterface::class);
 
-        /** @var MassActionInterface $massAction */
         $massAction = $this->createMock(MassActionInterface::class);
 
-        /** @var MassActionExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(MassActionExtension::class);
-        $extension
-            ->expects($this->once())
+        $extension->expects($this->once())
             ->method('getMassAction')
             ->with(self::MASS_ACTION_NAME, $dataGrid)
             ->willReturn($massAction);
@@ -163,10 +145,8 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsRequestMethodAllowed()
     {
-        /** @var MassActionInterface|\PHPUnit\Framework\MockObject\MockObject $massAction */
         $massAction = $this->createMock(MassActionInterface::class);
-        $massAction
-            ->expects($this->any())
+        $massAction->expects($this->any())
             ->method('getOptions')
             ->willReturn(
                 ActionConfiguration::create(
@@ -181,41 +161,28 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $datagrid
+     * @param DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid
      * @param array $extensions
      */
-    private function setDatagridExtensions($datagrid, array $extensions)
+    private function setDatagridExtensions(DatagridInterface $datagrid, array $extensions)
     {
         $acceptor = $this->createMock(Acceptor::class);
-
-        $acceptor
-            ->expects($this->once())
+        $acceptor->expects($this->once())
             ->method('getExtensions')
             ->willReturn($extensions);
 
-        /** @var Acceptor|\PHPUnit\Framework\MockObject\MockObject $datagrid */
-        $datagrid
-            ->expects($this->once())
+        $datagrid->expects($this->once())
             ->method('getAcceptor')
             ->willReturn($acceptor);
     }
 
-    /**
-     * @param ActionConfiguration $actionConfiguration
-     * @return MassActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function creatMassAction(ActionConfiguration $actionConfiguration)
+    private function creatMassAction(ActionConfiguration $actionConfiguration): MassActionInterface
     {
-        /** @var MassActionInterface|\PHPUnit\Framework\MockObject\MockObject $massAction **/
         $massAction = $this->createMock(MassActionInterface::class);
-
-        $massAction
-            ->expects($this->any())
+        $massAction->expects($this->any())
             ->method('getName')
             ->willReturn(self::MASS_ACTION_NAME);
-
-        $massAction
-            ->expects($this->any())
+        $massAction->expects($this->any())
             ->method('getOptions')
             ->willReturn($actionConfiguration);
 

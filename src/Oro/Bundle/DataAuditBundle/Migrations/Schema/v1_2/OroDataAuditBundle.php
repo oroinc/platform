@@ -18,8 +18,6 @@ class OroDataAuditBundle implements Migration
 
     /**
      * Adds organization_id field
-     *
-     * @param Schema $schema
      */
     public static function addOrganizationFields(Schema $schema)
     {

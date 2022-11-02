@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -9,10 +10,8 @@ class JobResultTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new JobResult();
 
@@ -21,14 +20,14 @@ class JobResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('context', $this->getMockForAbstractClass('Oro\Bundle\ImportExportBundle\Context\ContextInterface')),
-            array('jobId', 'test'),
-            array('jobCode', 'test'),
-            array('successful', true)
-        );
+        return [
+            ['context', $this->createMock(ContextInterface::class)],
+            ['jobId', 'test'],
+            ['jobCode', 'test'],
+            ['successful', true]
+        ];
     }
 
     public function testFailureExceptions()
@@ -36,6 +35,6 @@ class JobResultTest extends \PHPUnit\Framework\TestCase
         $obj = new JobResult();
         $obj->addFailureException('Error 1');
         $obj->addFailureException('Error 2');
-        $this->assertEquals(array('Error 1', 'Error 2'), $obj->getFailureExceptions());
+        $this->assertEquals(['Error 1', 'Error 2'], $obj->getFailureExceptions());
     }
 }

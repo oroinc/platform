@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 
 trait LocalizedEntityTrait
@@ -98,6 +98,6 @@ trait LocalizedEntityTrait
      */
     protected function getLocalizationMethodName($fieldName, $prefix)
     {
-        return $prefix . ucfirst(Inflector::camelize($fieldName));
+        return $prefix . ucfirst((new InflectorFactory())->build()->camelize($fieldName));
     }
 }

@@ -3,23 +3,27 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension;
 
 class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 {
-    /** {@inheritdoc} */
-    protected function getExtension()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtension(): AbstractFieldsExtension
     {
         $extension = new AdditionalFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock(),
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->fieldsHelper
         );
         $extension->setParameters(new ParameterBag());
@@ -106,7 +110,10 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    protected function getDatagridConfiguration(array $options = [])
+    /**
+     * {@inheritDoc}
+     */
+    protected function getDatagridConfiguration(array $options = []): DatagridConfiguration
     {
         return DatagridConfiguration::create(
             array_merge(
@@ -121,9 +128,15 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    /** {@inheritdoc} */
-    protected function setExpectationForGetFields($className, $fieldName, $fieldType, array $extendFieldConfig = [])
-    {
+    /**
+     * {@inheritDoc}
+     */
+    protected function setExpectationForGetFields(
+        string $className,
+        string $fieldName,
+        string $fieldType,
+        array $extendFieldConfig = []
+    ) {
         $extendConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
@@ -146,27 +159,27 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
-            ->will($this->returnValue($entityFieldConfig));
+            ->willReturn($entityFieldConfig);
         $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
-            ->will($this->returnValue($datagridFieldConfig));
+            ->willReturn($datagridFieldConfig);
         $this->viewConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
-            ->will($this->returnValue($viewFieldConfig));
+            ->willReturn($viewFieldConfig);
     }
 }

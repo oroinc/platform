@@ -1,14 +1,10 @@
-parameters:
-    oro_cron.entity.schedule.class:   Oro\Bundle\CronBundle\Entity\Schedule
-    oro_cron.schedule_manager.class:  Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
-
 services:
     oro_cron.schedule_manager:
-        class: '%oro_cron.schedule_manager.class%'
+        class: Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
         arguments:
             - '@doctrine'
             - '@oro_cron.filter.schedules_by_arguments'
-            - '%oro_cron.entity.schedule.class%'
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
 
     oro_cron.deferred_scheduler:
         class: Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler
@@ -16,25 +12,26 @@ services:
             - '@oro_cron.schedule_manager'
             - '@doctrine'
             - '@oro_cron.filter.schedules_by_arguments'
-            - '%oro_cron.entity.schedule.class%'
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
 
     oro_cron.command_args_tokenizer:
-        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer'
+        class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer
         public: false
         calls:
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.default' ] ]
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.pgsql92' ] ]
 
     oro_cron.command_args_normalizer.default:
-        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer'
+        class: Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer
         public: false
 
     oro_cron.command_args_normalizer.pgsql92:
-        class: 'Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer'
+        class: Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer
         public: false
 
     oro_cron.command_with_args_string_filter:
         class: Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -42,50 +39,53 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
-    oro_cron.helper.cron:
-        class: 'Oro\Bundle\CronBundle\Helper\CronHelper'
+    oro_cron.command_feature_checker:
+        class: Oro\Bundle\CronBundle\Command\CronCommandFeatureChecker
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
 
+    oro_cron.cron_helper:
+        class: Oro\Bundle\CronBundle\Tools\CronHelper
 
     oro_cron.engine.command_runner:
         class: Oro\Bundle\CronBundle\Engine\CommandRunner
         arguments:
             - '@kernel'
 
-    oro_cron.async.command_runner_message_processor:
-        class: Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor
-        arguments:
-            - '@oro_message_queue.job.runner'
-            - '@logger'
-            - '@oro_message_queue.client.message_producer'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
     oro_cron.async.command_runner_processor:
         class: Oro\Bundle\CronBundle\Async\CommandRunnerProcessor
         arguments:
-            - '@oro_cron.engine.command_runner'
             - '@oro_message_queue.job.runner'
-            - '@logger'
+            - '@oro_cron.engine.command_runner'
+        calls:
+            - ['setLogger', ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_cron.async.command_runner:
         class: Oro\Bundle\CronBundle\Async\CommandRunner
+        public: true
         arguments:
             - '@oro_message_queue.client.message_producer'
 
     oro_cron.listener.schema_column_definition:
         class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
         tags:
-            - {name: doctrine.event_listener, event: onSchemaColumnDefinition, method: onSchemaColumnDefinition}
+            - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
 
-    oro_cron.repository.schedule:
-        class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
-        factory: ['@doctrine', getRepository]
+    oro_cron.event_listener.cron_command:
+        class: Oro\Bundle\CronBundle\EventListener\CronCommandListener
         arguments:
-            - 'Oro\Bundle\CronBundle\Entity\Schedule'
-        calls:
-            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+            - '@oro_cron.command_feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
+
+    oro_cron.schedule.datagrid_helper:
+        class: Oro\Bundle\CronBundle\Datagrid\ScheduleDatagridHelper
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_cron.configuration.feature_configuration_extension:
         class: Oro\Bundle\CronBundle\Configuration\FeatureConfigurationExtension
@@ -96,17 +96,17 @@ services:
         class: 'Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilter'
 
     oro_cron.validator.schedule_intervals_intersection:
-        class: 'Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator'
+        class: Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_cron_schedule_intervals_intersection_validator }
+            - { name: validator.constraint_validator }
 
     oro_cron.form.type.schedule_interval:
-        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType'
+        class: Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType
         tags:
             - { name: form.type, alias: oro_cron_schedule_interval }
 
     oro_cron.form.type.schedule_intervals_collection:
-        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType'
+        class: Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType
         tags:
             - { name: form.type, alias: oro_cron_schedule_intervals_collection }
 

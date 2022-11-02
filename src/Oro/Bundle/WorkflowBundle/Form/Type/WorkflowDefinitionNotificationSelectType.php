@@ -17,9 +17,6 @@ class WorkflowDefinitionNotificationSelectType extends AbstractType
     /** @var WorkflowRegistry $workflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;

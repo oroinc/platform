@@ -19,8 +19,6 @@ class OroUserBundle implements Migration
 
     /**
      * Adds organization_id field to oro_user_api table
-     *
-     * @param Schema $schema
      */
     public static function oroUserApiKeyAddOrganizationField(Schema $schema)
     {
@@ -37,8 +35,6 @@ class OroUserBundle implements Migration
 
     /**
      * Drop unique user index, fk. Add new ones
-     *
-     * @param Schema $schema
      */
     public static function oroUserApiKeyIndexes(Schema $schema)
     {

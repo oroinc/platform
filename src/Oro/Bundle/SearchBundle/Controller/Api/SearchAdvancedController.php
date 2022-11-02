@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -13,10 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("search_advanced")
- * @NamePrefix("oro_api_")
+ * REST API controller for advanced search.
  */
-class SearchAdvancedController extends FOSRestController
+class SearchAdvancedController extends AbstractFOSRestController
 {
     /**
      * Get advanced search result.
@@ -121,10 +118,10 @@ class SearchAdvancedController extends FOSRestController
 
         $dispatcher = $this->container->get('event_dispatcher');
         foreach ($result->getElements() as $item) {
-            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }
 
-        return $this->get('fos_rest.view_handler')->handle(
+        return $this->handleView(
             $view->setData($result->toSearchResultData())
         );
     }

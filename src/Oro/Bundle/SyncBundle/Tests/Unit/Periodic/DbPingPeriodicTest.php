@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Statement;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
@@ -19,7 +19,7 @@ class DbPingPeriodicTest extends \PHPUnit\Framework\TestCase
     /** @var DbPingPeriodic */
     private $dbPing;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->dbPing = new DbPingPeriodic($this->doctrine);
@@ -80,6 +80,8 @@ class DbPingPeriodicTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$connection]);
 
         $this->assertLoggerErrorMethodCalled();
+
+        $this->expectException(DBALException::class);
 
         $this->dbPing->tick();
     }

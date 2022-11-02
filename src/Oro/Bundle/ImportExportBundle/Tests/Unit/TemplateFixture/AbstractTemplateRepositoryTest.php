@@ -2,30 +2,33 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test\Entity';
 
     /** @var TemplateEntityRegistry */
-    protected $entityRegistry;
+    private $entityRegistry;
 
     /** @var TemplateManager */
-    protected $templateManager;
+    private $templateManager;
 
     /** @var AbstractTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $templateRepository;
+    private $templateRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityRegistry  = new TemplateEntityRegistry();
+        $this->entityRegistry = new TemplateEntityRegistry();
         $this->templateManager = new TemplateManager($this->entityRegistry);
 
         $this->templateRepository = $this->getMockForAbstractClass(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository',
+            AbstractTemplateRepository::class,
             [],
             '',
             true,
@@ -38,18 +41,18 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->templateRepository->expects($this->any())
             ->method('getEntityClass')
-            ->will($this->returnValue(self::ENTITY_CLASS));
+            ->willReturn(self::ENTITY_CLASS);
     }
 
     public function testGetEntity()
     {
         $entityKey = 'test1';
-        $entity    = new \stdClass();
+        $entity = new \stdClass();
 
         $this->templateRepository->expects($this->once())
             ->method('createEntity')
             ->with($entityKey)
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
 
         // test that new entity is created
         $this->assertSame(
@@ -75,26 +78,24 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityData()
     {
         $entityKey = 'test1';
-        $entity    = new \stdClass();
+        $entity = new \stdClass();
 
-        $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue(self::ENTITY_CLASS));
+            ->willReturn(self::ENTITY_CLASS);
         $this->templateManager->addEntityRepository($repository);
 
         $this->templateRepository->expects($this->once())
             ->method('createEntity')
             ->with($entityKey)
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
         $repository->expects($this->once())
             ->method('fillEntityData')
             ->with($entityKey, $this->identicalTo($entity));
 
         // test that new entity is created
-        $data = $this->callProtectedMethod($this->templateRepository, 'getEntityData', [$entityKey]);
+        $data = ReflectionUtil::callMethod($this->templateRepository, 'getEntityData', [$entityKey]);
         $data = iterator_to_array($data);
         $this->assertSame(
             $entity,
@@ -106,7 +107,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         );
 
         // test that existing entity is returned
-        $data = $this->callProtectedMethod($this->templateRepository, 'getEntityData', [$entityKey]);
+        $data = ReflectionUtil::callMethod($this->templateRepository, 'getEntityData', [$entityKey]);
         $data = iterator_to_array($data);
         $this->assertSame(
             $entity,
@@ -118,31 +119,14 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Unknown entity: "stdClass"; key: "test1".
-     */
     public function testFillEntityData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unknown entity: "stdClass"; key: "test1".');
+
         $entityKey = 'test1';
-        $entity    = new \stdClass();
+        $entity = new \stdClass();
 
         $this->templateRepository->fillEntityData($entityKey, $entity);
-    }
-
-    /**
-     * @param mixed  $obj
-     * @param string $methodName
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    public function callProtectedMethod($obj, $methodName, array $args)
-    {
-        $class  = new \ReflectionClass($obj);
-        $method = $class->getMethod($methodName);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($obj, $args);
     }
 }

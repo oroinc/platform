@@ -2,15 +2,12 @@ oro_behat_extension:
   elements:
     TypeSelectElement:
       selector: '.select2-choice'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     TypeSelectList:
       selector: '.select2-results'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     SearchSuggestionList:
       selector: '.search-suggestion-list'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Search Form:
       selector: '#oro_website_search_search'
@@ -19,11 +16,13 @@ oro_behat_extension:
         mapping:
           Query: 'search'
 
+    Search Form Field:
+      selector: '#oro_website_search_search [name="search"]'
+
     Search Submit:
       selector:
          type: xpath
          locator: '//button[@type="submit"][text()="Search"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Theme Form:
       selector: 'form[name="theme"]'
@@ -39,14 +38,19 @@ oro_behat_extension:
       class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
       route: 'oro_search_results'
 
+    Tag Search Result:
+      class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
+      route: 'oro_tag_search'
+
   suites:
     OroSearchBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
-        - OroDataGridBundle::GridContext
-        - OroFormBundle::FormContext
-        - OroSearchBundle::SearchContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
       paths:
         - '@OroSearchBundle/Tests/Behat/Features'
 

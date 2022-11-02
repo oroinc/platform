@@ -4,77 +4,60 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var CredentialsNotificationSenderPass */
+    private $compiler;
+
+    protected function setUp(): void
+    {
+        $this->compiler = new CredentialsNotificationSenderPass();
+    }
+
     public function testProcessNoMainService()
     {
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $container = new ContainerBuilder();
 
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_imap.origin_credentials.issue_manager')
-            ->willReturn(false);
-
-        $containerBuilder->expects($this->never())
-            ->method('getDefinition');
-        $containerBuilder->expects($this->never())
-            ->method('findTaggedServiceIds');
-
-        $pass = new CredentialsNotificationSenderPass();
-        $pass->process($containerBuilder);
+        $this->compiler->process($container);
     }
 
     public function testProcess()
     {
-        $definition = new Definition();
+        $container = new ContainerBuilder();
+        $issueManagerDef = $container->register('oro_imap.origin_credentials.issue_manager');
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $container->register('notification_sender_1')
+            ->addTag('oro_imap.origin_credentials.notification_sender');
+        $container->register('notification_sender_2')
+            ->addTag('oro_imap.origin_credentials.notification_sender');
 
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_imap.origin_credentials.issue_manager')
-            ->willReturn(true);
+        $container->register('user_notification_sender_1')
+            ->addTag('oro_imap.origin_credentials.user_notification_sender');
+        $container->register('user_notification_sender_2')
+            ->addTag('oro_imap.origin_credentials.user_notification_sender');
 
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_imap.origin_credentials.issue_manager')
-            ->willReturn($definition);
+        $this->compiler->process($container);
 
-        $containerBuilder->expects($this->exactly(2))
-            ->method('findTaggedServiceIds')
-            ->willReturnMap(
-                [
-                    [
-                        'oro_imap.origin_credentials.notification_sender',
-                        false,
-                        ['first_service' => [], 'second_service' => []]
-                    ],
-                    [
-                        'oro_imap.origin_credentials.user_notification_sender',
-                        false,
-                        ['first_user_service' => []]
-                    ],
-                ]
-            );
+        self::assertEquals(
+            [
+                ['addNotificationSender', [new Reference('notification_sender_1')]],
+                ['addNotificationSender', [new Reference('notification_sender_2')]],
+                ['addUserNotificationSender', [new Reference('user_notification_sender_1')]],
+                ['addUserNotificationSender', [new Reference('user_notification_sender_2')]]
+            ],
+            $issueManagerDef->getMethodCalls()
+        );
+    }
 
-        $pass = new CredentialsNotificationSenderPass();
-        $pass->process($containerBuilder);
+    public function testProcessWhenNoSenders()
+    {
+        $container = new ContainerBuilder();
+        $issueManagerDef = $container->register('oro_imap.origin_credentials.issue_manager');
 
-        $calls = $definition->getMethodCalls();
-        $this->assertCount(3, $calls);
+        $this->compiler->process($container);
 
-        $this->assertEquals('addNotificationSender', $calls[0][0]);
-        $this->assertEquals([new Reference('first_service')], $calls[0][1]);
-
-        $this->assertEquals('addNotificationSender', $calls[1][0]);
-        $this->assertEquals([new Reference('second_service')], $calls[1][1]);
-
-        $this->assertEquals('addUserNotificationSender', $calls[2][0]);
-        $this->assertEquals([new Reference('first_user_service')], $calls[2][1]);
+        self::assertSame([], $issueManagerDef->getMethodCalls());
     }
 }

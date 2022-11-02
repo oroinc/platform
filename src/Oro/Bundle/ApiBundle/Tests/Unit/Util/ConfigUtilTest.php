@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testConvertObjectsToArrayDoNotTreatEmptyAsNull()
@@ -91,5 +94,15 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         $field->setExcluded();
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
+    }
+
+    public function testGetAssociationTargetTypeForSingleValuedAssociation()
+    {
+        self::assertEquals(ConfigUtil::TO_ONE, ConfigUtil::getAssociationTargetType(false));
+    }
+
+    public function testGetAssociationTargetTypeForCollectionValuedAssociation()
+    {
+        self::assertEquals(ConfigUtil::TO_MANY, ConfigUtil::getAssociationTargetType(true));
     }
 }

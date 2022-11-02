@@ -3,23 +3,32 @@
 namespace Oro\Bundle\IntegrationBundle\Authentication\Token;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Updates security token with Integration Organization and `owner_description` attribute.
+ */
 trait IntegrationTokenAwareTrait
 {
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
     /**
      * @param Integration $integration
+     * @return void
      */
-    private function setTemporaryIntegrationToken(Integration $integration)
+    private function setTemporaryIntegrationToken(Integration $integration): void
     {
-        $integrationToken = new OrganizationToken($integration->getOrganization());
-        $integrationToken->setAttribute('owner_description', 'Integration: '. $integration->getName());
-        $this->tokenStorage->setToken($integrationToken);
+        $token = $this->tokenStorage->getToken();
+        if ($token === null) {
+            return;
+        }
+
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $token->setOrganization($integration->getOrganization());
+        }
+        $token->setAttribute('owner_description', 'Integration: '. $integration->getName());
+
+        $this->tokenStorage->setToken($token);
     }
 }

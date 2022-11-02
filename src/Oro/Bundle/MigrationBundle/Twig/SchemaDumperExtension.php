@@ -2,27 +2,27 @@
 
 namespace Oro\Bundle\MigrationBundle\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SchemaDumperExtension extends \Twig_Extension
+/**
+ * Provides a Twig function used in generator of data migration classes:
+ *   - oro_migration_get_schema_column_options
+ */
+class SchemaDumperExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var AbstractPlatform */
-    protected $platform;
-
-    /** @var Column */
-    protected $defaultColumn;
-
-    /** @var array */
-    protected $defaultColumnOptions = [];
-
-    /** @var array */
-    protected $optionNames = [
+    private ContainerInterface $container;
+    private ?AbstractPlatform $platform = null;
+    private ?Column $defaultColumn = null;
+    private array $defaultColumnOptions = [];
+    private array $optionNames = [
         'default',
         'notnull',
         'length',
@@ -33,20 +33,9 @@ class SchemaDumperExtension extends \Twig_Extension
         'autoincrement'
     ];
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ContainerInterface $container)
     {
-        $this->doctrine = $doctrine;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'schema_dumper_extension';
+        $this->container = $container;
     }
 
     /**
@@ -55,15 +44,11 @@ class SchemaDumperExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_migration_get_schema_column_options', [$this, 'getColumnOptions']),
+            new TwigFunction('oro_migration_get_schema_column_options', [$this, 'getColumnOptions']),
         ];
     }
 
-    /**
-     * @param Column $column
-     * @return array
-     */
-    public function getColumnOptions(Column $column)
+    public function getColumnOptions(Column $column): array
     {
         $defaultOptions = $this->getDefaultOptions();
         $platform = $this->getPlatform();
@@ -87,37 +72,28 @@ class SchemaDumperExtension extends \Twig_Extension
         return $options;
     }
 
-    /**
-     * @param Column $column
-     * @param string $optionName
-     * @return mixed
-     */
-    protected function getColumnOption(Column $column, $optionName)
+    private function getColumnOption(Column $column, string $optionName): mixed
     {
-        $method = "get" . $optionName;
+        $method = 'get' . $optionName;
 
         return $column->$method();
     }
 
-    /**
-     * @return AbstractPlatform
-     */
-    protected function getPlatform()
+    private function getPlatform(): AbstractPlatform
     {
-        if (!$this->platform) {
-            $this->platform = $this->doctrine->getConnection()->getDatabasePlatform();
+        if (null === $this->platform) {
+            $this->platform = $this->container->get(ManagerRegistry::class)
+                ->getConnection()
+                ->getDatabasePlatform();
         }
 
         return $this->platform;
     }
 
-    /**
-     * @return array
-     */
-    protected function getDefaultOptions()
+    private function getDefaultOptions(): array
     {
-        if (!$this->defaultColumn) {
-            $this->defaultColumn = new Column('_template_', Type::getType(Type::STRING));
+        if (null === $this->defaultColumn) {
+            $this->defaultColumn = new Column('_template_', Type::getType(Types::STRING));
         }
         if (!$this->defaultColumnOptions) {
             foreach ($this->optionNames as $optionName) {
@@ -126,5 +102,15 @@ class SchemaDumperExtension extends \Twig_Extension
         }
 
         return $this->defaultColumnOptions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            ManagerRegistry::class,
+        ];
     }
 }

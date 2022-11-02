@@ -14,7 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * A base class for data mappers that are used in "add_relationship" and "delete_relationship" Data API actions.
+ * A base class for data mappers that are used in "add_relationship" and "delete_relationship" API actions.
  */
 abstract class AbstractRelationshipMapper implements DataMapperInterface
 {
@@ -24,10 +24,6 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     /** @var EntityMapper|null */
     protected $entityMapper;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param EntityMapper              $entityMapper
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor, EntityMapper $entityMapper = null)
     {
         $this->propertyAccessor = $propertyAccessor;

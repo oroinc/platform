@@ -7,9 +7,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 class DateModifierProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateModifierProvider */
-    protected $dateModifierProvider;
+    private $dateModifierProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateModifierProvider = new DateModifierProvider();
     }

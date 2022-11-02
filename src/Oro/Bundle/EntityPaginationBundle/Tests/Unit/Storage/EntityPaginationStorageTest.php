@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,57 +12,44 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME = 'stdClass';
-    const FIELD_NAME  = 'id';
-    const HASH        = '9b59e3bbc14e88a044c112a5b5e914a4';
+    private const ENTITY_NAME = 'stdClass';
+    private const HASH = '9b59e3bbc14e88a044c112a5b5e914a4';
 
     public static $entityIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $paginationManager;
-
-    /** @var EntityPaginationStorage */
-    protected $storage;
-
-    /** @var \stdClass */
-    protected $entity;
+    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $paginationManager;
 
     /** @var RequestStack */
     private $requestStack;
 
-    protected function setUp()
+    /** @var \stdClass */
+    private $entity;
+
+    /** @var EntityPaginationStorage */
+    private $storage;
+
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->paginationManager = $this->getMockBuilder(
-            'Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->paginationManager = $this->createMock(EntityPaginationManager::class);
         $this->requestStack = new RequestStack();
+        $this->entity = new \stdClass();
+
         $this->storage = new EntityPaginationStorage(
             $this->doctrineHelper,
             $this->paginationManager,
             $this->requestStack
         );
-        $this->entity = new \stdClass();
     }
 
     /**
-     * @param bool $enabled
-     * @param bool $request
-     * @param array $source
-     * @param bool $expected
-     *
      * @dataProvider setDataDataProvider
      */
-    public function testSetData($enabled, $request, array $source, $expected)
+    public function testSetData(bool $enabled, bool $request, array $source, bool $expected)
     {
         $this->setEnabled($enabled);
 
@@ -73,10 +61,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function setDataDataProvider()
+    public function setDataDataProvider(): array
     {
         return [
             'is set request' => [
@@ -110,15 +95,9 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $enabled
-     * @param bool $request
-     * @param string $entityName
-     * @param string $hash
-     * @param bool $expected
-     *
      * @dataProvider hasDataDataProvider
      */
-    public function testHasData($enabled, $request, $entityName, $hash, $expected)
+    public function testHasData(bool $enabled, bool $request, string $entityName, string $hash, bool $expected)
     {
         $this->setEnabled($enabled);
 
@@ -132,10 +111,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function hasDataDataProvider()
+    public function hasDataDataProvider(): array
     {
         return [
             'not enabled' => [
@@ -177,29 +153,23 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param int $expected
-     *
      * @dataProvider getCurrentPositionDataProvider
      */
-    public function testGetCurrentPosition(array $source, $expected)
+    public function testGetCurrentPosition(array $source, int|bool $expected)
     {
         $this->setStorage($source['storage_data']);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->with($this->entity)
-            ->will($this->returnValue($source['entity_id']));
+            ->willReturn($source['entity_id']);
 
         $result = $this->storage->getCurrentPosition($this->entity, $source['scope']);
 
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getCurrentPositionDataProvider()
+    public function getCurrentPositionDataProvider(): array
     {
         return [
             'valid case view' => [
@@ -245,29 +215,23 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param boolean $expected
-     *
      * @dataProvider isEntityInStorageDataProvider
      */
-    public function testIsEntityInStorage($source, $expected)
+    public function testIsEntityInStorage(array $source, bool $expected)
     {
         $this->setStorage($source['storage_data']);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->with($this->entity)
-            ->will($this->returnValue($source['entity_id']));
+            ->willReturn($source['entity_id']);
 
         $result = $this->storage->isEntityInStorage($this->entity, $source['scope']);
 
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function isEntityInStorageDataProvider()
+    public function isEntityInStorageDataProvider(): array
     {
         return [
             'valid case view' => [
@@ -326,9 +290,6 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider unsetIdentifierDataProvider
      */
     public function testUnsetIdentifier(array $source, array $expected)
@@ -340,10 +301,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function unsetIdentifierDataProvider()
+    public function unsetIdentifierDataProvider(): array
     {
         return [
             'valid case view' => [
@@ -363,14 +321,9 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $enabled
-     * @param boolean $request
-     * @param array $source
-     * @param boolean $expected
-     *
      * @dataProvider clearDataDataProvider
      */
-    public function testClearData($enabled, $request, $source, $expected)
+    public function testClearData(bool $enabled, bool $request, array $source, array $expected)
     {
         $this->setEnabled($enabled);
 
@@ -390,7 +343,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function clearDataDataProvider()
+    public function clearDataDataProvider(): array
     {
         return [
             'not valid environment' => [
@@ -489,12 +442,9 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param bool $enabled
-     * @param array $storage
      * @dataProvider isInfoMessageShownDataProvider
      */
-    public function testIsInfoMessageShown($expected, $enabled = false, array $storage = null)
+    public function testIsInfoMessageShown(?bool $expected, bool $enabled = false, array $storage = null)
     {
         $this->setEnabled($enabled);
 
@@ -508,10 +458,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function isInfoMessageShownDataProvider()
+    public function isInfoMessageShownDataProvider(): array
     {
         return [
             'invalid environment' => [
@@ -535,12 +482,9 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param bool $enabled
-     * @param bool $shown
      * @dataProvider setInfoMessageShownDataProvider
      */
-    public function testSetInfoMessageShown($expected, $enabled = false, $shown = false)
+    public function testSetInfoMessageShown(bool $expected, bool $enabled = false, ?bool $shown = false)
     {
         $this->setEnabled($enabled);
 
@@ -558,7 +502,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function setInfoMessageShownDataProvider()
+    public function setInfoMessageShownDataProvider(): array
     {
         return [
             'invalid environment' => [
@@ -579,10 +523,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $storageData
-     */
-    protected function setStorage(array $storageData)
+    private function setStorage(array $storageData): void
     {
         $session = new Session(new MockArraySessionStorage());
         $session->set(
@@ -594,17 +535,14 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->push($request);
     }
 
-    /**
-     * @param boolean $isEnabled
-     */
-    protected function setEnabled($isEnabled)
+    private function setEnabled(bool $isEnabled): void
     {
         $this->paginationManager->expects($this->any())
             ->method('isEnabled')
-            ->will($this->returnValue($isEnabled));
+            ->willReturn($isEnabled);
     }
 
-    protected function setRequest()
+    private function setRequest(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();

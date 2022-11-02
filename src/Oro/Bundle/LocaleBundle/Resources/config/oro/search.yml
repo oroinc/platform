@@ -1,13 +1,16 @@
 search:
     Oro\Bundle\LocaleBundle\Entity\Localization:
         alias:                oro_localization
-        title_fields:         [name]
         route:
             name:              oro_locale_localization_view
             parameters:
                 id:            id
-        search_template:       OroLocaleBundle:Localization:searchResult.html.twig
+        search_template:       '@OroLocale/Localization/searchResult.html.twig'
         fields:
+            -
+                name:          id
+                target_type:   integer
+                target_fields: [id]
             -
                 name:          name
                 target_type:   text

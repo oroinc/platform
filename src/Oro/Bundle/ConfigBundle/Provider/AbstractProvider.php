@@ -6,101 +6,94 @@ use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Event\ConfigSettingsFormOptionsEvent;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * The base realization a service that provides configuration of a system configuration form.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractProvider implements ProviderInterface
 {
-    const CORRECT_FIELDS_NESTING_LEVEL = 5;
-    const CORRECT_MENU_NESTING_LEVEL = 3;
+    protected const CORRECT_FIELDS_NESTING_LEVEL = 5;
+    protected const CORRECT_MENU_NESTING_LEVEL = 3;
 
-    /** @var ConfigBag */
-    protected $configBag;
+    protected ConfigBag $configBag;
+    protected TranslatorInterface $translator;
+    protected FormFactoryInterface $formFactory;
+    protected FormRegistryInterface $formRegistry;
+    protected AuthorizationCheckerInterface $authorizationChecker;
+    protected ChainSearchProvider $searchProvider;
+    protected FeatureChecker $featureChecker;
+    protected EventDispatcherInterface $eventDispatcher;
+    protected array $processedTrees = [];
+    protected array $processedJsTrees = [];
+    protected array $processedSubTrees = [];
 
-    /** @var array */
-    protected $processedTrees = [];
-
-    /** @var array */
-    protected $processedJsTrees = [];
-
-    /** @var array */
-    protected $processedSubTrees = [];
-
-    /** @var FeatureChecker */
-    protected $featureChecker;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var FormFactoryInterface */
-    protected $factory;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var  ChainSearchProvider */
-    protected $searchProvider;
-
-    /** @var FormRegistryInterface  */
-    protected $formRegistry;
-
-    /**
-     * @param ConfigBag $configBag
-     * @param TranslatorInterface $translator
-     * @param FormFactoryInterface $factory
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ChainSearchProvider $searchProvider
-     * @param FormRegistryInterface $formRegistry
-     */
     public function __construct(
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $factory,
+        FormRegistryInterface $formRegistry,
         AuthorizationCheckerInterface $authorizationChecker,
         ChainSearchProvider $searchProvider,
-        FormRegistryInterface $formRegistry
+        FeatureChecker $featureChecker,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configBag = $configBag;
         $this->translator = $translator;
-        $this->factory = $factory;
+        $this->formFactory = $factory;
+        $this->formRegistry = $formRegistry;
         $this->authorizationChecker = $authorizationChecker;
         $this->searchProvider = $searchProvider;
-        $this->formRegistry = $formRegistry;
+        $this->featureChecker = $featureChecker;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * Use default checkbox label
-     *
-     * @return string
+     * Gets the name of the configuration tree section.
      */
-    abstract protected function getParentCheckboxLabel();
+    abstract protected function getTreeName(): string;
 
     /**
-     * @param FeatureChecker $featureChecker
+     * Gets the label for "Use Default" checkbox.
      */
-    public function setFeatureChecker(FeatureChecker $featureChecker)
+    abstract protected function getParentCheckboxLabel(): string;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTree(): GroupNodeDefinition
     {
-        $this->featureChecker = $featureChecker;
+        return $this->getTreeData($this->getTreeName(), self::CORRECT_FIELDS_NESTING_LEVEL);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getApiTree($path = null)
+    public function getJsTree(): array
+    {
+        return $this->getJsTreeData($this->getTreeName(), self::CORRECT_MENU_NESTING_LEVEL);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getApiTree(?string $path = null): ?SectionDefinition
     {
         $sections = empty($path) ? [] : explode('/', $path);
         array_unshift($sections, ProcessorDecorator::API_TREE_ROOT);
@@ -124,20 +117,19 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSubtree($subtreeRootName)
+    public function getSubTree(string $subTreeName): GroupNodeDefinition
     {
-        if (!isset($this->processedSubTrees[$subtreeRootName])) {
+        if (!isset($this->processedSubTrees[$subTreeName])) {
             $treeData = $this->getTree();
-            $subtree  = TreeUtils::findNodeByName($treeData, $subtreeRootName);
-
+            $subtree = TreeUtils::findNodeByName($treeData, $subTreeName);
             if ($subtree === null) {
-                throw new ItemNotFoundException(sprintf('Subtree "%s" not found', $subtreeRootName));
+                throw new ItemNotFoundException(sprintf('Subtree "%s" not found', $subTreeName));
             }
 
-            $this->processedSubTrees[$subtreeRootName] = $subtree;
+            $this->processedSubTrees[$subTreeName] = $subtree;
         }
 
-        return $this->processedSubTrees[$subtreeRootName];
+        return $this->processedSubTrees[$subTreeName];
     }
 
     /**
@@ -155,10 +147,7 @@ abstract class AbstractProvider implements ProviderInterface
                 throw new ItemNotFoundException(sprintf('Tree "%s" is not defined.', $treeName));
             }
 
-            $definition = $treeRoot;
-            if ($this->featureChecker) {
-                $definition = $this->filterDisabledNodes($definition);
-            }
+            $definition = $this->filterDisabledNodes($treeRoot);
             $data = $this->buildGroupNode($definition, $correctFieldsLevel);
             $tree = new GroupNodeDefinition($treeName, $definition, $data);
             $this->processedTrees[$tree->getName()] = $tree;
@@ -182,33 +171,52 @@ abstract class AbstractProvider implements ProviderInterface
                 throw new ItemNotFoundException(sprintf('Tree "%s" is not defined.', $treeName));
             }
 
-            if ($this->featureChecker) {
-                $treeRoot = $this->filterDisabledNodes($treeRoot);
-            }
-
-            $this->processedJsTrees[$treeName] = $this->buildJsTree($treeRoot, $correctMenuLevel);
+            $nodes = $this->filterDisabledNodes($treeRoot);
+            $nodes = $this->removeEmptyNodes($nodes);
+            $this->processedJsTrees[$treeName] = $this->buildJsTree(
+                $nodes,
+                $correctMenuLevel
+            );
         }
 
         return $this->processedJsTrees[$treeName];
     }
 
-    /**
-     * @param array $definition
-     * @return array
-     */
-    protected function filterDisabledNodes(array $definition)
+    protected function filterDisabledNodes(array $definition): array
     {
-        foreach ($definition as $key => &$definitionRow) {
-            if (is_string($definitionRow)
+        foreach ($definition as $key => $definitionRow) {
+            if (\is_string($definitionRow)
                 && !$this->featureChecker->isResourceEnabled($definitionRow, 'configuration')
             ) {
                 unset($definition[$key]);
-            } elseif (is_array($definitionRow) && array_key_exists('children', $definitionRow)) {
+            } elseif (\is_array($definitionRow) && \array_key_exists('children', $definitionRow)) {
                 if ($this->featureChecker->isResourceEnabled($key, 'configuration')) {
-                    $definitionRow['children'] = $this->filterDisabledNodes($definitionRow['children']);
+                    $definition[$key]['children'] = $this->filterDisabledNodes($definitionRow['children']);
                 } else {
                     unset($definition[$key]);
                 }
+            }
+        }
+
+        return $definition;
+    }
+
+    private function removeEmptyNodes(array $definition): array
+    {
+        if (isset($definition['priority'], $definition['children'])) {
+            $definition = [
+                'children' => $definition['children'],
+                'priority' => $definition['priority']
+            ];
+        }
+
+        foreach ($definition as $key => $value) {
+            if (is_array($value)) {
+                $definition[$key] = $this->removeEmptyNodes($value);
+            }
+
+            if (empty($definition[$key]) || ('priority' === $key && 1 === count($definition))) {
+                unset($definition[$key]);
             }
         }
 
@@ -243,8 +251,9 @@ abstract class AbstractProvider implements ProviderInterface
                 $nodes[$node->getName()] = $node;
             } else {
                 if ($level !== $correctFieldsLevel) {
+                    $field = is_string($node) ? $node : $name;
                     throw new \Exception(
-                        sprintf('Field "%s" will not be ever rendered. Please check nesting level', $node)
+                        sprintf('Field "%s" will not be ever rendered. Please check nesting level', $field)
                     );
                 }
                 $nodes[$name] = $this->buildFieldNode($node);
@@ -292,7 +301,7 @@ abstract class AbstractProvider implements ProviderInterface
      * @param array $node
      * @return array
      */
-    public function buildJsTreeItem($name, $parentName, array $node)
+    protected function buildJsTreeItem($name, $parentName, array $node)
     {
         $group = $this->configBag->getGroupsNode($name);
 
@@ -368,13 +377,7 @@ abstract class AbstractProvider implements ProviderInterface
         return new FieldNodeDefinition($node, $fieldsRoot);
     }
 
-    /**
-     * @param string $sectionName
-     * @param array  $tree
-     *
-     * @return SectionDefinition
-     */
-    protected function buildApiTree($sectionName, array $tree)
+    protected function buildApiTree(string $sectionName, array $tree): SectionDefinition
     {
         $section = new SectionDefinition($sectionName);
         foreach ($tree as $key => $val) {
@@ -398,7 +401,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataTransformer($key)
+    public function getDataTransformer(string $key): ?DataTransformerInterface
     {
         return $this->configBag->getDataTransformer($key);
     }
@@ -406,45 +409,65 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getForm($group)
+    public function getForm(string $groupName, ConfigManager $configManager): FormInterface
     {
-        $block = $this->getSubtree($group);
-
-        $toAdd = [];
-        $bc = $block->toBlockConfig();
-
+        $toAddFields = [];
+        $block = $this->getSubTree($groupName);
+        $blockConfig = $block->toBlockConfig();
         if (!$block->isEmpty()) {
-            $sbc = [];
-
-            /** @var $subblock GroupNodeDefinition */
-            foreach ($block as $subblock) {
-                $sbc += $subblock->toBlockConfig();
-                if (!$subblock->isEmpty()) {
-                    /** @var $field FieldNodeDefinition */
-                    foreach ($subblock as $field) {
-                        $field->replaceOption('block', $block->getName())
-                            ->replaceOption('subblock', $subblock->getName());
-
-                        $toAdd[] = $field;
+            $blockName = $block->getName();
+            $subBlockConfig = [];
+            /** @var GroupNodeDefinition $subBlock */
+            foreach ($block as $subBlock) {
+                $subBlockConfig += $subBlock->toBlockConfig();
+                if (!$subBlock->isEmpty()) {
+                    /** @var FieldNodeDefinition $field */
+                    foreach ($subBlock as $field) {
+                        if (!$field->getAclResource() || $this->checkIsGranted($field->getAclResource())) {
+                            $field->replaceOption('block', $blockName);
+                            $field->replaceOption('subblock', $subBlock->getName());
+                            $toAddFields[] = $field;
+                        }
                     }
                 }
             }
-
-            $bc[$block->getName()]['subblocks'] = $sbc;
+            $blockConfig[$blockName]['subblocks'] = $subBlockConfig;
         }
 
-        $fb = $this->factory->createNamedBuilder($group, FormType::class, null, ['block_config' => $bc]);
-        foreach ($toAdd as $field) {
-            $this->addFieldToForm($fb, $field);
+        $formOptions = [];
+        foreach ($toAddFields as $field) {
+            $formOptions[$field->getPropertyPath()] = $this->getFieldFormOptions($field);
         }
 
-        return $fb->getForm();
+        $event = new ConfigSettingsFormOptionsEvent($configManager, $formOptions);
+        $this->eventDispatcher->dispatch($event, ConfigSettingsFormOptionsEvent::SET_OPTIONS);
+        $formOptions = $event->getAllFormOptions();
+
+        $formBuilder = $this->formFactory->createNamedBuilder(
+            $groupName,
+            FormType::class,
+            null,
+            ['block_config' => $blockConfig]
+        );
+        foreach ($formOptions as $propertyPath => $options) {
+            $formBuilder->add(
+                str_replace(
+                    ConfigManager::SECTION_MODEL_SEPARATOR,
+                    ConfigManager::SECTION_VIEW_SEPARATOR,
+                    $propertyPath
+                ),
+                FormFieldType::class,
+                $options
+            );
+        }
+
+        return $formBuilder->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function chooseActiveGroups($activeGroup, $activeSubGroup)
+    public function chooseActiveGroups(?string $activeGroup, ?string $activeSubGroup): array
     {
         $tree = $this->getTree();
 
@@ -480,50 +503,30 @@ abstract class AbstractProvider implements ProviderInterface
         return $this->authorizationChecker->isGranted($resourceName);
     }
 
-    /**
-     * @param FormBuilderInterface $form
-     * @param FieldNodeDefinition  $fieldDefinition
-     */
-    protected function addFieldToForm(FormBuilderInterface $form, FieldNodeDefinition $fieldDefinition)
+    protected function getFieldFormOptions(FieldNodeDefinition $fieldDefinition): array
     {
-        if ($fieldDefinition->getAclResource() && !$this->checkIsGranted($fieldDefinition->getAclResource())) {
-            // field is not allowed to be shown, do nothing
-            return;
-        }
-
-        $name = str_replace(
-            ConfigManager::SECTION_MODEL_SEPARATOR,
-            ConfigManager::SECTION_VIEW_SEPARATOR,
-            $fieldDefinition->getPropertyPath()
-        );
-
         // take config field options form field definition
-        $configFieldOptions = array_intersect_key(
-            $fieldDefinition->getOptions(),
+        $fieldDefinitionOptions = $fieldDefinition->getOptions();
+        $options = array_intersect_key(
+            $fieldDefinitionOptions,
             array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'resettable'])
         );
         // pass only options needed to "value" form type
-        $fieldFormType = $fieldDefinition->getType();
-        $configFieldOptions['target_field_type'] = $fieldFormType;
-        $configFieldOptions['target_field_alias'] = $this->formRegistry->getType($fieldFormType)->getBlockPrefix();
-        $configFieldOptions['target_field_options'] = array_diff_key(
-            $fieldDefinition->getOptions(),
-            $configFieldOptions
-        );
+        $formType = $fieldDefinition->getType();
+        $options['target_field_type'] = $formType;
+        $options['target_field_alias'] = $this->formRegistry->getType($formType)->getBlockPrefix();
+        $options['target_field_options'] = array_diff_key($fieldDefinitionOptions, $options);
 
         if ($fieldDefinition->needsPageReload()) {
-            $configFieldOptions['target_field_options']['attr']['data-needs-page-reload'] = '';
-            $configFieldOptions['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
+            $options['target_field_options']['attr']['data-needs-page-reload'] = '';
+            $options['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
         }
-        $configFieldOptions['parent_checkbox_label'] = $this->getParentCheckboxLabel();
-        $form->add($name, FormFieldType::class, $configFieldOptions);
+        $options['use_parent_field_label'] = $this->getParentCheckboxLabel();
+
+        return $options;
     }
 
-    /**
-     * @param array $children
-     * @return array
-     */
-    private function sortChildrenByPriority(array $children)
+    private function sortChildrenByPriority(array $children): array
     {
         uasort($children, function ($childA, $childB) {
             $priorityA = $childA['priority'] ?? 0;

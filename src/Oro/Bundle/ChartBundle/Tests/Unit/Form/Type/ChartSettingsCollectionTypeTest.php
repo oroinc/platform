@@ -4,6 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -11,11 +12,9 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @param array $chartConfigs
-     *
      * @dataProvider chartConfigsProvider
      */
-    public function testBuildForm($chartConfigs)
+    public function testBuildForm(array $chartConfigs)
     {
         $form = $this->factory->create(ChartSettingsCollectionType::class, null, ['chart_configs' => $chartConfigs]);
 
@@ -24,10 +23,7 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function chartConfigsProvider()
+    public function chartConfigsProvider(): array
     {
         return [
             'name' => [
@@ -59,18 +55,12 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
         ];
     }
 
-
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
-        $configProvider = $this
-            ->getMockBuilder('Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $childType = new ChartSettingsType($configProvider);
+        $childType = new ChartSettingsType($this->createMock(ConfigProvider::class));
 
         return [
             new PreloadedExtension(

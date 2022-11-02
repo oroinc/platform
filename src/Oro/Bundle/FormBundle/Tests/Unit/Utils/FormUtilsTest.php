@@ -2,54 +2,61 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
-use Oro\Bundle\FormBundle\Tests\Unit\Stub\StubTransformer;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
+use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\Form\Test\FormInterface;
 
 class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider optionsProvider
-     *
-     * @param array $expectedOptions
-     * @param array $modifyOptions
-     * @param array $unsetOptions
      */
-    public function testReplaceField($expectedOptions = [], $modifyOptions = [], $unsetOptions = [])
-    {
+    public function testReplaceField(
+        array $expectedOptions = [],
+        array $modifyOptions = [],
+        array $unsetOptions = []
+    ): void {
         $testFieldName = 'testField';
-        $testOptions   = ['required' => true, 'auto_initialize' => true];
+        $testOptions = ['required' => true, 'auto_initialize' => true];
 
-        $rootForm   = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $childForm  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType->expects($this->any())->method('getInnerType')->willReturn(new EntityType([]));
+        $rootForm = $this->createMock(FormInterface::class);
+        $childForm = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formType = $this->createMock(ResolvedFormTypeInterface::class);
+        $formType->expects(self::any())
+            ->method('getInnerType')
+            ->willReturn(new EntityType([]));
 
-        $rootForm->expects($this->once())->method('get')->with($testFieldName)
-            ->will($this->returnValue($childForm));
+        $rootForm->expects(self::once())
+            ->method('get')
+            ->with($testFieldName)
+            ->willReturn($childForm);
 
-        $childForm->expects($this->once())->method('getConfig')
-            ->will($this->returnValue($formConfig));
+        $childForm->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
 
-        $formConfig->expects($this->once())->method('getType')
-            ->will($this->returnValue($formType));
+        $formConfig->expects(self::once())
+            ->method('getType')
+            ->willReturn($formType);
+        $formConfig->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($testOptions);
 
-        $formConfig->expects($this->once())->method('getOptions')
-            ->will($this->returnValue($testOptions));
-
-        $rootForm->expects($this->once())->method('add')
+        $rootForm->expects(self::once())
+            ->method('add')
             ->with($testFieldName, EntityType::class, $expectedOptions);
 
         FormUtils::replaceField($rootForm, $testFieldName, $modifyOptions, $unsetOptions);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsProvider()
+    public function optionsProvider(): array
     {
         return [
             'should pass original options except auto_initialize' => [
@@ -70,172 +77,164 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider viewVariablesProvider
-     *
-     * @param array        $vars
-     * @param string|array $classToAppend
-     * @param array        $expectedVars
-     */
-    public function testAddClass($vars, $classToAppend, $expectedVars)
+    public function testAppendClassForSingleClass(): void
     {
-        $formView       = new FormView();
-        $formView->vars = $vars;
+        $formView = new FormView();
+        $formView->vars = [];
 
-        FormUtils::appendClass($formView, $classToAppend);
-        $this->assertSame($expectedVars, $formView->vars);
+        FormUtils::appendClass($formView, 'singleClass');
+        self::assertSame(['attr' => ['class' => 'singleClass']], $formView->vars);
     }
 
     /**
-     * @return array
+     * @dataProvider viewVariablesProvider
      */
-    public function viewVariablesProvider()
+    public function testAppendClassForMultipleClasses(array $vars, array $classToAppend, array $expectedVars): void
+    {
+        $formView = new FormView();
+        $formView->vars = $vars;
+
+        FormUtils::appendClass($formView, $classToAppend);
+        self::assertSame($expectedVars, $formView->vars);
+    }
+
+    public function viewVariablesProvider(): array
     {
         return [
-            'add single class'            => [
-                '$vars'          => [],
-                '$classToAppend' => 'singleClass',
-                '$expectedVars'  => ['attr' => ['class' => 'singleClass']]
-            ],
             'add multiple classes'        => [
-                '$vars'          => [],
-                '$classToAppend' => ['1stClass', '2ndClass'],
-                '$expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass']]
+                'vars'          => [],
+                'classToAppend' => ['1stClass', '2ndClass'],
+                'expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass']]
             ],
             'should append, not override' => [
-                '$vars'          => ['attr' => ['class' => '1stClass'], 'another' => 'not overridden'],
-                '$classToAppend' => ['2ndClass'],
-                '$expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass'], 'another' => 'not overridden']
+                'vars'          => ['attr' => ['class' => '1stClass'], 'another' => 'not overridden'],
+                'classToAppend' => ['2ndClass'],
+                'expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass'], 'another' => 'not overridden']
             ]
         ];
     }
 
     /**
      * @dataProvider transformerProvider
-     *
-     * @param array                    $existingTransformers
-     * @param string                   $type
-     * @param DataTransformerInterface $toReplace
-     * @param array                    $expected
      */
-    public function testReplaceTransformer(array $existingTransformers, $type, $toReplace, array $expected)
-    {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+    public function testReplaceTransformer(
+        array $existingTransformers,
+        string $type,
+        DataTransformerInterface $toReplace,
+        array $expected
+    ): void {
+        $builder = $this->createMock(FormBuilderInterface::class);
 
         $model = 'model' === $type;
-        $builder->expects($this->once())->method($model ? 'getModelTransformers' : 'getViewTransformers')
+        $builder->expects(self::once())
+            ->method($model ? 'getModelTransformers' : 'getViewTransformers')
             ->willReturn($existingTransformers);
-        $builder->expects($this->once())->method($model ? 'resetModelTransformers' : 'resetViewTransformers');
+        $builder->expects(self::once())
+            ->method($model ? 'resetModelTransformers' : 'resetViewTransformers');
 
         $newTransformers = [];
-        $builder->expects($this->any())->method($model ? 'addModelTransformer' : 'addViewTransformer')
-            ->willReturnCallback(
-                function ($transformer) use (&$newTransformers) {
-                    $newTransformers [] = $transformer;
-                }
-            );
-
+        $builder->expects(self::any())
+            ->method($model ? 'addModelTransformer' : 'addViewTransformer')
+            ->willReturnCallback(function ($transformer) use (&$newTransformers) {
+                $newTransformers [] = $transformer;
+            });
 
         FormUtils::replaceTransformer($builder, $toReplace, $type);
 
-        $this->assertSame($expected, $newTransformers);
+        self::assertSame($expected, $newTransformers);
     }
 
-    /**
-     * @return array
-     */
-    public function transformerProvider()
+    public function transformerProvider(): array
     {
-        $newTransformer = new StubTransformer();
-
-        $transformerOrigin = new StubTransformer();
-        $transformer1      = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
-        $transformer3      = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $newTransformer = new DataTransformerChain([]);
+        $transformerOrigin = new DataTransformerChain([]);
+        $transformer1 = $this->createMock(DataTransformerInterface::class);
+        $transformer3 = $this->createMock(DataTransformerInterface::class);
 
         return [
             'should append view transformer'                => [
-                '$existingTransformers' => [],
-                '$type'                 => 'view',
-                '$toReplace'            => $newTransformer,
-                '$expected'             => [$newTransformer],
+                'existingTransformers' => [],
+                'type'                 => 'view',
+                'toReplace'            => $newTransformer,
+                'expected'             => [$newTransformer],
             ],
             'should append model transformer'               => [
-                '$existingTransformers' => [],
-                '$type'                 => 'model',
-                '$toReplace'            => $newTransformer,
-                '$expected'             => [$newTransformer],
+                'existingTransformers' => [],
+                'type'                 => 'model',
+                'toReplace'            => $newTransformer,
+                'expected'             => [$newTransformer],
             ],
             'should replace view transformer'               => [
-                '$existingTransformers' => [$transformerOrigin, $transformer1],
-                '$type'                 => 'view',
-                '$toReplace'            => $newTransformer,
-                '$expected'             => [$newTransformer, $transformer1],
+                'existingTransformers' => [$transformerOrigin, $transformer1],
+                'type'                 => 'view',
+                'toReplace'            => $newTransformer,
+                'expected'             => [$newTransformer, $transformer1],
             ],
             'should replace model transformer keep sotring' => [
-                '$existingTransformers' => [$transformer1, $transformerOrigin, $transformer3],
-                '$type'                 => 'model',
-                '$toReplace'            => $newTransformer,
-                '$expected'             => [$transformer1, $newTransformer, $transformer3],
+                'existingTransformers' => [$transformer1, $transformerOrigin, $transformer3],
+                'type'                 => 'model',
+                'toReplace'            => $newTransformer,
+                'expected'             => [$transformer1, $newTransformer, $transformer3],
             ],
         ];
     }
 
     /**
      * @dataProvider replaceOptionsDataProvider
-     *
-     * @param array $fieldOptions
-     * @param array $replaceOptions
-     * @param array $expectedOptions
      */
-    public function testReplaceFieldOptionsRecursive($fieldOptions = [], $replaceOptions = [], $expectedOptions = [])
-    {
+    public function testReplaceFieldOptionsRecursive(
+        array $fieldOptions = [],
+        array $replaceOptions = [],
+        array $expectedOptions = []
+    ): void {
         $testFieldName = 'testField';
 
         $typeStub = new EntityType([], 'test_type');
-        $rootForm   = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $childForm  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType
-            ->expects($this->any())
+        $rootForm = $this->createMock(FormInterface::class);
+        $childForm = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formType = $this->createMock(ResolvedFormTypeInterface::class);
+        $formType->expects(self::any())
             ->method('getInnerType')
             ->willReturn($typeStub);
 
-        $rootForm->expects($this->once())->method('get')->with($testFieldName)
-            ->will($this->returnValue($childForm));
+        $rootForm->expects(self::once())
+            ->method('get')
+            ->with($testFieldName)
+            ->willReturn($childForm);
 
-        $childForm->expects($this->once())->method('getConfig')
-            ->will($this->returnValue($formConfig));
+        $childForm->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
 
-        $formConfig->expects($this->once())->method('getType')
-            ->will($this->returnValue($formType));
+        $formConfig->expects(self::once())
+            ->method('getType')
+            ->willReturn($formType);
+        $formConfig->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($fieldOptions);
 
-        $formConfig->expects($this->once())->method('getOptions')
-            ->will($this->returnValue($fieldOptions));
-
-        $rootForm->expects($this->once())->method('add')
+        $rootForm->expects(self::once())
+            ->method('add')
             ->with($testFieldName, EntityType::class, $expectedOptions);
 
         FormUtils::replaceFieldOptionsRecursive($rootForm, $testFieldName, $replaceOptions);
     }
 
-    /**
-     * @return array
-     */
-    public function replaceOptionsDataProvider()
+    public function replaceOptionsDataProvider(): array
     {
         return [
-            'no options modified' => [
+            'no options modified'                                      => [
                 ['required' => true, 'attr' => ['readonly' => true]],
                 [],
                 ['required' => true, 'attr' => ['readonly' => true]]
             ],
-            'disabled option is merged and replaces existing option' => [
+            'disabled option is merged and replaces existing option'   => [
                 ['attr' => ['disabled' => true]],
                 ['attr' => ['disabled' => false]],
                 ['attr' => ['disabled' => false]]
             ],
-            'string option is replaced' => [
+            'string option is replaced'                                => [
                 ['required' => true],
                 ['required' => false],
                 ['required' => false]

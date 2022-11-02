@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig'] %}
 
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
@@ -7,6 +7,8 @@
 {% set formAction = path('oro_user_profile_update') %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
@@ -45,13 +47,22 @@
             'entityTitle': fullname,
         }
         %}
-        {% set avatar = oro_configured_image_url(form.vars.value, 'avatar') %}
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
+
+{% block pageTitleIcon %}
+    <div class="page-title__icon">
+        {%- include '@OroAttachment/Twig/picture.html.twig' with {
+            file: form.vars.value.avatar,
+            filter: 'avatar_med',
+            img_attrs: { alt: form.vars.value|oro_format_name }
+        } -%}
+    </div>
+{% endblock %}
 
 {% block stats %}
     <li>{{ 'oro.ui.created_at'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
@@ -61,6 +72,8 @@
 {% endblock stats %}
 
 {% block content_data %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
 <div class="user-profile-cols">
     {% set id = 'user-profile' %}
 
@@ -87,7 +100,7 @@
                 'title': '',
                 'data': [
                     form_row(form.email),
-                    UI.collectionField(form.emails, 'oro.user.emails.label'|trans, 'Add another email'|trans),
+                    form_row_collection(form.emails),
                     form_row(form.phone),
                     form.signature is defined ? form_row(form.signature) : '',
                 ]
@@ -95,20 +108,7 @@
         ]
     }] %}
 
-    {% set additionalData = [] %}
-    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-        {% set additionalData = additionalData|merge([form_row(child)]) %}
-    {% endfor %}
-    {% if additionalData is not empty %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional'|trans,
-            'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
-            }]
-        }] ) %}
-    {% endif %}
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
     {% if form.change_password is defined %}
         {% set dataBlocks = dataBlocks|merge( [{

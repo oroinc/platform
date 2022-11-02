@@ -1,4 +1,8 @@
-assets:
-    css:
-        'oroattachment':
-            - 'bundles/oroattachment/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroattachment/css/scss/variables/variables.scss'
+        - 'bundles/oroattachment/css/scss/variables/mobile-variables.scss'
+
+        # Styles
+        - 'bundles/oroattachment/css/scss/main.scss'

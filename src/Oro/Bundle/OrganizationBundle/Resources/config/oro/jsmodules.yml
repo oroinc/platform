@@ -1,0 +1,7 @@
+aliases:
+    oro/select2-bu-tree-autocomplete-component$: oroorganization/js/app/components/select2-bu-tree-autocomplete-component
+    oro/select2-parent-business-units-autocomplete-component$: oroorganization/js/app/components/select2-parent-business-units-autocomplete-component
+dynamic-imports:
+    commons:
+        - oro/select2-bu-tree-autocomplete-component
+        - oro/select2-parent-business-units-autocomplete-component

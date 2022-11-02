@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block;
 use Oro\Component\Layout\BlockTypeHelperInterface;
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\RawLayout;
@@ -11,27 +12,28 @@ use Oro\Component\Layout\RawLayout;
 class BlockTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
     /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $typeHelper;
+    private $typeHelper;
 
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var DataAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $data;
+    private $data;
 
     /** @var Block */
-    protected $block;
+    private $block;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->rawLayout  = new RawLayout();
-        $this->typeHelper = $this->createMock('Oro\Component\Layout\BlockTypeHelperInterface');
-        $this->context    = new LayoutContext();
-        $this->data       = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-        $this->block      = new Block(
+        $this->rawLayout = new RawLayout();
+        $this->typeHelper = $this->createMock(BlockTypeHelperInterface::class);
+        $this->context = new LayoutContext();
+        $this->data = $this->createMock(DataAccessorInterface::class);
+
+        $this->block = new Block(
             $this->rawLayout,
             $this->typeHelper,
             $this->context,
@@ -65,7 +67,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeName()
     {
-        $id   = 'test_id';
+        $id = 'test_id';
         $name = 'test_name';
 
         $this->rawLayout->add($id, null, $name);
@@ -77,13 +79,13 @@ class BlockTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
     {
-        $id   = 'test_id';
+        $id = 'test_id';
         $name = 'test_name';
 
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         $this->rawLayout->add($id, null, $type);
 

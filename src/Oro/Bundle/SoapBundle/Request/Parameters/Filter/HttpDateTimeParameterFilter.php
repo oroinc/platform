@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 
+/**
+ * The filter for DateTime parameters.
+ */
 class HttpDateTimeParameterFilter implements ParameterFilterInterface
 {
     /**
@@ -14,7 +17,7 @@ class HttpDateTimeParameterFilter implements ParameterFilterInterface
         $value = str_replace(' ', '+', $rawValue);
 
         // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
-        // TODO: should be fixed in BAP-8710. Need to use timezone from system config instead of UTC.
+        // This should be fixed in BAP-8710. Need to use timezone from system config instead of UTC.
         return new \DateTime($value, new \DateTimeZone('UTC'));
     }
 }

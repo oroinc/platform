@@ -7,23 +7,21 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnitValidator;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
+class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var OwnerTreeInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownerTree;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ownerTree = $this->createMock(OwnerTreeInterface::class);
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createValidator()
+    protected function createValidator(): ParentBusinessUnitValidator
     {
         $ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
         $ownerTreeProvider->expects($this->any())
@@ -33,11 +31,17 @@ class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
         return new ParentBusinessUnitValidator($ownerTreeProvider);
     }
 
+    public function testGetTargets()
+    {
+        $constraint = new ParentBusinessUnit();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
+    }
+
     public function testValidateWithEmptyOwnerBusinessUnit()
     {
         $entity = new BusinessUnit();
-        $constraint = new ParentBusinessUnit();
 
+        $constraint = new ParentBusinessUnit();
         $this->validator->validate($entity, $constraint);
 
         $this->assertNoViolation();
@@ -56,9 +60,7 @@ class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
             ->with(1)
             ->willReturn([4, 6, 7]);
 
-
         $constraint = new ParentBusinessUnit();
-
         $this->validator->validate($entity, $constraint);
 
         $this->assertNoViolation();
@@ -77,9 +79,7 @@ class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
             ->with(1)
             ->willReturn([4, 5, 6, 7]);
 
-
         $constraint = new ParentBusinessUnit();
-
         $this->validator->validate($entity, $constraint);
 
         $this->buildViolation($constraint->message)

@@ -80,24 +80,6 @@ final class BigDecimal extends BigNumber
     }
 
     /**
-     * Returns a BigDecimal with the current value and the specified scale.
-     *
-     * @deprecated Use `toScale()`.
-     *
-     * @param int $scale
-     * @param int $roundingMode
-     *
-     * @return BigDecimal
-     */
-    public function withScale($scale, $roundingMode = RoundingMode::UNNECESSARY)
-    {
-        /** @var BrickBigDecimal $brickBigDecimal */
-        $brickBigDecimal = $this->getTargetObject()->withScale($scale, $roundingMode);
-
-        return new self($brickBigDecimal);
-    }
-
-    /**
      * Returns a copy of this BigDecimal with the decimal point moved $n places to the left.
      *
      * @param int $number
@@ -147,7 +129,7 @@ final class BigDecimal extends BigNumber
      */
     public function unscaledValue()
     {
-        return $this->getTargetObject()->unscaledValue();
+        return $this->getTargetObject()->getUnscaledValue();
     }
 
     /**
@@ -157,7 +139,7 @@ final class BigDecimal extends BigNumber
      */
     public function scale()
     {
-        return $this->getTargetObject()->scale();
+        return $this->getTargetObject()->getScale();
     }
 
     /**
@@ -169,7 +151,7 @@ final class BigDecimal extends BigNumber
      */
     public function integral()
     {
-        return $this->getTargetObject()->integral();
+        return $this->getTargetObject()->getIntegralPart();
     }
 
     /**
@@ -183,7 +165,7 @@ final class BigDecimal extends BigNumber
      */
     public function fraction()
     {
-        return $this->getTargetObject()->fraction();
+        return $this->getTargetObject()->getFractionalPart();
     }
 
     /**
@@ -197,7 +179,7 @@ final class BigDecimal extends BigNumber
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {
             throw new \LogicException('unserialize() must not be called directly.');

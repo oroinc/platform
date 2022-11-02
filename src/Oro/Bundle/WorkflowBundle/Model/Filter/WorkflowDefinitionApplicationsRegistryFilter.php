@@ -11,9 +11,6 @@ class WorkflowDefinitionApplicationsRegistryFilter implements WorkflowDefinition
     /** @var CurrentApplicationProviderInterface */
     private $currentApplicationProvider;
 
-    /**
-     * @param CurrentApplicationProviderInterface $currentApplicationProvider
-     */
     public function __construct(CurrentApplicationProviderInterface $currentApplicationProvider)
     {
         $this->currentApplicationProvider = $currentApplicationProvider;

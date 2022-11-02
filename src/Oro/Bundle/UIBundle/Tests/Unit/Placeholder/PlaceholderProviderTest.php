@@ -3,55 +3,51 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_PLACEHOLDER = 'test_placeholder';
+    private const TEST_PLACEHOLDER = 'test_placeholder';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ResolverInterface
-     */
-    protected $resolver;
+    /** @var ResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $resolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface
-     */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->resolver       = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver = $this->createMock(ResolverInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
     }
 
     public function testOnlyTemplateDefined()
     {
-        $items = ['placeholder_item' => [
+        $items = [
+            'placeholder_item' => [
                 'template' => 'template'
-        ]];
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
 
-        $this->resolver->expects($this->at(0))
+        $this->resolver->expects($this->once())
             ->method('resolve')
             ->with($items['placeholder_item'], $variables)
-            ->will($this->returnValue($items['placeholder_item']));
+            ->willReturn($items['placeholder_item']);
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
         $this->assertSame(
@@ -62,18 +58,20 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testTemplateAndDataDefined()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'data' => '@service->getData($entity$)'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'data'     => '@service->getData($entity$)'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->resolver->expects($this->at(0))
+        $this->resolver->expects($this->once())
             ->method('resolve')
             ->with($items['placeholder_item'], $variables)
-            ->will($this->returnValue($items['placeholder_item']));
+            ->willReturn($items['placeholder_item']);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
@@ -85,24 +83,29 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableStringConditionSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => '@service1->isApplicable($entity$)'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => '@service1->isApplicable($entity$)'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->resolver->expects($this->at(0))
-            ->method('resolve')
-            ->with(['applicable' => $items['placeholder_item']['applicable']], $variables)
-            ->will($this->returnValue(['applicable' => true]));
+        $config1 = ['applicable' => $items['placeholder_item']['applicable']];
         unset($items['placeholder_item']['applicable']);
-        $this->resolver->expects($this->at(1))
+        $config2 = $items['placeholder_item'];
+        $this->resolver->expects($this->exactly(2))
             ->method('resolve')
-            ->with($items['placeholder_item'], $variables)
-            ->will($this->returnValue($items['placeholder_item']));
-
+            ->withConsecutive(
+                [$config1, $variables],
+                [$config2, $variables]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['applicable' => true],
+                $config2
+            );
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
@@ -114,28 +117,32 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableArrayConditionsSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->resolver->expects($this->at(0))
-            ->method('resolve')
-            ->with(['applicable' => $items['placeholder_item']['applicable'][0]], $variables)
-            ->will($this->returnValue(['applicable' => true]));
-        $this->resolver->expects($this->at(1))
-            ->method('resolve')
-            ->with(['applicable' => $items['placeholder_item']['applicable'][1]], $variables)
-            ->will($this->returnValue(['applicable' => true]));
+        $config1 = ['applicable' => $items['placeholder_item']['applicable'][0]];
+        $config2 = ['applicable' => $items['placeholder_item']['applicable'][1]];
         unset($items['placeholder_item']['applicable']);
-        $this->resolver->expects($this->at(2))
+        $config3 = $items['placeholder_item'];
+        $this->resolver->expects($this->exactly(3))
             ->method('resolve')
-            ->with($items['placeholder_item'], $variables)
-            ->will($this->returnValue($items['placeholder_item']));
-
+            ->withConsecutive(
+                [$config1, $variables],
+                [$config2, $variables],
+                [$config3, $variables]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['applicable' => true],
+                ['applicable' => true],
+                $config3
+            );
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
@@ -147,19 +154,20 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableArrayConditionsFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->resolver->expects($this->at(0))
+        $this->resolver->expects($this->once())
             ->method('resolve')
             ->with(['applicable' => $items['placeholder_item']['applicable'][0]], $variables)
-            ->will($this->returnValue(['applicable' => false]));
-
+            ->willReturn(['applicable' => false]);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
@@ -168,19 +176,20 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionStringSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => 'acl_ancestor'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => 'acl_ancestor'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('acl_ancestor')
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
@@ -189,19 +198,20 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionStringFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => 'acl_ancestor'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => 'acl_ancestor'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('acl_ancestor')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
@@ -210,29 +220,25 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionArraySuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => ['acl_ancestor1', 'acl_ancestor2']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->with('acl_ancestor1')
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with('acl_ancestor2')
-            ->will($this->returnValue(true));
+            ->withConsecutive(['acl_ancestor1'], ['acl_ancestor2'])
+            ->willReturn(true);
         unset($items['placeholder_item']['acl']);
-        $this->resolver->expects($this->at(0))
+        $this->resolver->expects($this->once())
             ->method('resolve')
             ->with($items['placeholder_item'], $variables)
-            ->will($this->returnValue($items['placeholder_item']));
-
+            ->willReturn($items['placeholder_item']);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
@@ -241,42 +247,44 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionArrayFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => ['acl_ancestor1', 'acl_ancestor2']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
         $provider = $this->createProvider($items);
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('acl_ancestor1')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
         $this->assertSame([], $actual);
     }
 
-    /**
-     * @param array $items
-     * @return PlaceholderProvider
-     */
-    protected function createProvider(array $items)
+    private function createProvider(array $items): PlaceholderProvider
     {
-        $placeholders = [
-            'placeholders' => [
-                self::TEST_PLACEHOLDER => [
-                    'items' => array_keys($items)
-                ]
-            ],
-            'items' => $items
-        ];
+        $configProvider = $this->createMock(PlaceholderConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getPlaceholderItems')
+            ->willReturnCallback(function ($placeholderName) use ($items) {
+                return self::TEST_PLACEHOLDER === $placeholderName
+                    ? array_keys($items)
+                    : null;
+            });
+        $configProvider->expects(self::any())
+            ->method('getItemConfiguration')
+            ->willReturnCallback(function ($itemName) use ($items) {
+                return $items[$itemName] ?? null;
+            });
 
         return new PlaceholderProvider(
-            $placeholders,
+            $configProvider,
             $this->resolver,
             $this->authorizationChecker,
             $this->featureChecker

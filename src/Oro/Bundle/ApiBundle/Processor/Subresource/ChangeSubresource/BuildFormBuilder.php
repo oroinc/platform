@@ -24,10 +24,6 @@ class BuildFormBuilder implements ProcessorInterface
     /** @var bool */
     protected $enableFullValidation;
 
-    /**
-     * @param FormHelper $formHelper
-     * @param bool       $enableFullValidation
-     */
     public function __construct(FormHelper $formHelper, bool $enableFullValidation = false)
     {
         $this->formHelper = $formHelper;
@@ -63,11 +59,6 @@ class BuildFormBuilder implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface|null
-     */
     protected function getFormBuilder(ChangeSubresourceContext $context): ?FormBuilderInterface
     {
         if (null === $context->getConfig()) {
@@ -83,26 +74,15 @@ class BuildFormBuilder implements ProcessorInterface
         return $formBuilder;
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface
-     */
     protected function createFormBuilder(ChangeSubresourceContext $context): FormBuilderInterface
     {
-        $formBuilder = $this->formHelper->createFormBuilder(
+        return $this->formHelper->createFormBuilder(
             FormType::class,
             $context->getResult(),
             $this->getFormOptions($context)
         );
-
-        return $formBuilder;
     }
 
-    /**
-     * @param FormBuilderInterface     $formBuilder
-     * @param ChangeSubresourceContext $context
-     */
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
         $entryFormOptions = $this->getEntryFormOptions($context);
@@ -116,29 +96,18 @@ class BuildFormBuilder implements ProcessorInterface
         );
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return array
-     */
     protected function getFormOptions(ChangeSubresourceContext $context): array
     {
         $formOptions = [];
         $options = $context->getConfig()->getFormOptions();
-        if (!empty($options)) {
-            unset($options['entry_options']);
-            $formOptions = \array_replace($formOptions, $options);
+        if (!empty($options) && isset($options['validation_groups'])) {
+            $formOptions['validation_groups'] = $options['validation_groups'];
         }
         $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
 
         return $formOptions;
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return array
-     */
     protected function getEntryFormOptions(ChangeSubresourceContext $context): array
     {
         $config = $context->getConfig();
@@ -148,11 +117,9 @@ class BuildFormBuilder implements ProcessorInterface
             'config'   => $config
         ];
         $options = $config->getFormOptions();
-        if (!empty($options) && \array_key_exists('entry_options', $options)) {
-            $entryOptions = $options['entry_options'];
-            if (!empty($entryOptions)) {
-                $entryFormOptions = \array_replace($entryFormOptions, $entryOptions);
-            }
+        if (!empty($options)) {
+            unset($options['validation_groups']);
+            $entryFormOptions = array_replace($entryFormOptions, $options);
         }
         $entryFormOptions[CustomizeFormDataHandler::API_CONTEXT] = $context;
 

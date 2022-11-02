@@ -1,12 +1,11 @@
 search:
     Oro\Bundle\ReportBundle\Entity\Report:
         alias:                          oro_report
-        title_fields:                   [name]
         route:
             name:                       oro_report_view
             parameters:
                 id:                     id
-        search_template:                OroReportBundle:Search:result.html.twig
+        search_template:                '@OroReport/Search/result.html.twig'
         fields:
             -
                 name:                   name

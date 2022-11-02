@@ -3,18 +3,20 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileConfigType */
-    protected $type;
+    private $type;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
+
         $this->type = new FileConfigType($configManager);
     }
 
@@ -25,7 +27,7 @@ class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT);
@@ -36,15 +38,10 @@ class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(
-                [
-                    'mapped' => false,
-                    'label'  => false
-                ]
-            );
+            ->with(['mapped' => false, 'label' => false]);
 
         $this->type->configureOptions($resolver);
     }

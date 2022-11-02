@@ -1,27 +1,30 @@
 define(function(require) {
     'use strict';
 
-    var FormValidateView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
-    FormValidateView = BaseView.extend({
+    const FormValidateView = BaseView.extend({
         keepElement: true,
 
         autoRender: true,
 
         validationOptions: null,
 
-        /**
-         * @inheritDoc
-         */
-        constructor: function FormValidateView() {
-            FormValidateView.__super__.constructor.apply(this, arguments);
+        events: {
+            doReset: 'onReset'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
+         */
+        constructor: function FormValidateView(options) {
+            FormValidateView.__super__.constructor.call(this, options);
+        },
+
+        /**
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'validationOptions'));
@@ -29,11 +32,31 @@ define(function(require) {
         },
 
         render: function() {
-            this.validator = this.$el.validate(this.validationOptions || {});
+            if (this.$el.data('validator')) {
+                // form already has initialized validator
+                return this;
+            }
+
+            this._deferredRender();
+            this.validator = this.$el.validate({
+                ...(this.validationOptions || {}),
+                onMethodsLoaded: () => this._resolveDeferredRender()
+            });
+
             return this;
         },
 
+        onReset: function() {
+            if (this.validator) {
+                this.validator.resetForm();
+            }
+        },
+
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
             delete this.validationOptions;
             if (this.validator) {
                 this.validator.destroy();

@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
  */
 class NormalizeEntityType extends AbstractProcessor
 {
-    const REQUIREMENT = '[a-zA-Z][\w\\\\]+';
+    private const REQUIREMENT = '[a-zA-Z][\w\\\\]+';
 
     /** @var EntityAliasResolverRegistry */
     private $entityAliasResolverRegistry;
@@ -19,9 +19,6 @@ class NormalizeEntityType extends AbstractProcessor
     /** @var EntityAliasResolver|null */
     private $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
-     */
     public function __construct(EntityAliasResolverRegistry $entityAliasResolverRegistry)
     {
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
@@ -56,7 +53,7 @@ class NormalizeEntityType extends AbstractProcessor
      */
     protected function isValueNormalizationRequired($value)
     {
-        return false !== strpos($value, '\\');
+        return str_contains($value, '\\');
     }
 
     /**

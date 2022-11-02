@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -14,15 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("configuration")
- * @NamePrefix("oro_api_")
+ * REST API controller for system configuration.
  */
-class ConfigurationController extends FOSRestController
+class ConfigurationController extends AbstractFOSRestController
 {
     /**
      * Get the list of all configuration sections
      *
-     * @Get("/configuration")
      * @ApiDoc(
      *      description="Get the list of all configuration sections",
      *      resource=true
@@ -38,7 +32,7 @@ class ConfigurationController extends FOSRestController
         $data = $manager->getSections();
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 
@@ -48,9 +42,6 @@ class ConfigurationController extends FOSRestController
      * @param Request $request
      * @param string $path The configuration section path. For example: look-and-feel/grid
      *
-     * @Get("/configuration/{path}",
-     *      requirements={"path"="[\w-]+[\w-\/]*"}
-     * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",
      *      resource=true,
@@ -70,11 +61,11 @@ class ConfigurationController extends FOSRestController
         try {
             $data = $manager->getData($path, $request->get('scope', 'user'));
         } catch (ItemNotFoundException $e) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
+            $this->view($data, Response::HTTP_OK)
         );
     }
 }

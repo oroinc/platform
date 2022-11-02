@@ -2,19 +2,21 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 /**
  * The API manager for dictionaries and enums.
@@ -35,22 +37,21 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @param ObjectManager $om
-     * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param ConfigManager $entityConfigManager
-     * @param EntityNameResolver $entityNameResolver
-     */
+    /** @var AclHelper */
+    private $aclHelper;
+
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
         ConfigManager $entityConfigManager,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        AclHelper $aclHelper
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->entityConfigManager = $entityConfigManager;
         $this->entityNameResolver = $entityNameResolver;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -119,15 +120,17 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
             foreach ($searchFields as $searchField) {
+                QueryBuilderUtil::checkIdentifier($searchField);
                 $qb->orWhere('e.' . $searchField . ' LIKE :translated_title');
             }
             $qb->setParameter('translated_title', '%' . $searchQuery . '%');
         }
 
-        $query = $qb->getQuery();
+        $query = $this->aclHelper->apply($qb);
+
         $query->setHint(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            TranslatableSqlWalker::class
         );
         $this->addTranslatableLocaleHint($query, $this->getObjectManager());
         $results = $query->getResult();

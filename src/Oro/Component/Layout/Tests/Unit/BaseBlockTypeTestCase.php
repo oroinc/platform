@@ -2,7 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
@@ -10,6 +9,7 @@ use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\LayoutFactoryInterface;
+use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\Layouts;
 
 /**
@@ -23,7 +23,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /** @var LayoutFactoryInterface */
     protected $layoutFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new LayoutContext();
 
@@ -35,14 +35,11 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $this->layoutFactory = $layoutFactoryBuilder->getLayoutFactory();
     }
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $layoutFactoryBuilder->addRenderer(
             'test',
-            $this->createMock('Oro\Component\Layout\LayoutRendererInterface')
+            $this->createMock(LayoutRendererInterface::class)
         );
     }
 

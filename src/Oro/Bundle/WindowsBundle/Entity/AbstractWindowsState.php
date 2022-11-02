@@ -74,17 +74,6 @@ abstract class AbstractWindowsState implements CreatedAtAwareInterface, UpdatedA
     }
 
     /**
-     * Get JSON data
-     *
-     * @return string
-     * @deprecated use getData method instead
-     */
-    public function getJsonData()
-    {
-        return json_encode($this->data);
-    }
-
-    /**
      * Returns flag that window was rendered successfully
      *
      * @return bool

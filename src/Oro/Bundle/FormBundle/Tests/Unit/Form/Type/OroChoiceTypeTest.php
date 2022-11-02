@@ -5,61 +5,96 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroChoiceTypeTest extends FormIntegrationTestCase
 {
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $formType = new OroChoiceType();
-        $this->assertEquals(Select2ChoiceType::class, $formType->getParent());
-    }
-
-    public function testGetName()
-    {
-        $formType = new OroChoiceType();
-        $this->assertEquals('oro_choice', $formType->getName());
+        self::assertEquals(Select2ChoiceType::class, $formType->getParent());
     }
 
     /**
-     * @param float $data
+     * @dataProvider buildFormDataProvider
+     *
+     * @param string $data
      * @param array $viewData
      * @param array $options
-     * @dataProvider buildFormDataProvider
      */
     public function testBuildForm(
-        $data,
+        string $data,
         array $viewData,
         array $options = []
-    ) {
+    ): void {
         $form = $this->factory->create(OroChoiceType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
-            $this->assertArrayHasKey($key, $view->vars);
-            $this->assertSame($value, $view->vars[$key]);
+            self::assertArrayHasKey($key, $view->vars);
+            self::assertSame($value, $view->vars[$key]);
         }
     }
 
     /**
      * @return array
      */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
         return [
             'empty' => [
-                'data'     => '',
+                'data' => '',
                 'viewData' => [
-                    'value' => ''
+                    'value' => '',
                 ],
             ],
             'select one choice' => [
-                'data'     => 'c1',
+                'data' => 'c1',
                 'viewData' => [
-                    'value' => 'c1'
+                    'value' => 'c1',
                 ],
                 'options' => [
-                    'choices' => ['c1', 'c2', 'c3']
-                ]
+                    'choices' => ['c1', 'c2', 'c3'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider configureOptionsDataProvider
+     *
+     * @param array $options
+     * @param array $expected
+     */
+    public function testConfigureOptions(array $options, array $expected): void
+    {
+        $formType = new OroChoiceType();
+        $optionsResolver = new OptionsResolver();
+        $formType->configureOptions($optionsResolver);
+
+        self::assertEquals(
+            $expected,
+            $optionsResolver->resolve($options),
+        );
+    }
+
+    public function configureOptionsDataProvider(): array
+    {
+        $defaults = [
+            'placeholder' => 'oro.form.choose_value',
+            'allowClear' => true,
+        ];
+
+        return [
+            'empty options' => [
+                'options' => [],
+                'expected' => [
+                    'configs' => $defaults,
+                ],
+            ],
+            'with extra option' => [
+                'options' => ['configs' => ['extra_key' => 'extra_value']],
+                'expected' => ['configs' => ['extra_key' => 'extra_value'] + $defaults],
             ],
         ];
     }

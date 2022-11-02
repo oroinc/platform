@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExtendableCondition extends AbstractCondition implements ContextAccessorAwareInterface
 {
@@ -44,11 +44,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     private $options;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param FlashBag $flashBag
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FlashBag $flashBag,
@@ -70,7 +65,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
                 continue;
             }
 
-            $this->eventDispatcher->dispatch($eventName, $event);
+            $this->eventDispatcher->dispatch($event, $eventName);
         }
 
         if ($event->hasErrors()) {
@@ -103,9 +98,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         $this->options = $resolver->resolve($options);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('events');
@@ -131,9 +123,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         return $this->optionsResolver;
     }
 
-    /**
-     * @param ExtendableConditionEvent $event
-     */
     protected function processErrors(ExtendableConditionEvent $event)
     {
         $errors = [];

@@ -7,39 +7,39 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Grid extension that prepares data for tag search results grid
+ */
 class TagSearchResultsExtension extends AbstractExtension
 {
     const TYPE_PATH  = '[columns][entity][type]';
     const TYPE_VALUE = 'tag-search-result';
 
-    /** @var ResultFormatter */
-    protected $resultFormatter;
+    protected ResultFormatter $resultFormatter;
 
-    /** @var ObjectMapper */
-    protected $mapper;
+    protected ObjectMapper $mapper;
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    protected EventDispatcherInterface $dispatcher;
 
-    /**
-     * @param ResultFormatter          $formatter
-     * @param ObjectMapper             $mapper
-     * @param EventDispatcherInterface $dispatcher
-     */
+    protected EntityNameResolver $nameResolver;
+
     public function __construct(
-        ResultFormatter $formatter,
+        ResultFormatter $resultFormatter,
         ObjectMapper $mapper,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        EntityNameResolver $nameResolver
     ) {
-        $this->resultFormatter = $formatter;
-        $this->mapper          = $mapper;
-        $this->dispatcher      = $dispatcher;
+        $this->resultFormatter = $resultFormatter;
+        $this->mapper = $mapper;
+        $this->dispatcher = $dispatcher;
+        $this->nameResolver = $nameResolver;
     }
 
     /**
@@ -74,7 +74,7 @@ class TagSearchResultsExtension extends AbstractExtension
                     $entityClass,
                     $entityId,
                     null,
-                    null,
+                    [],
                     $entityConfig
                 );
             },
@@ -89,7 +89,8 @@ class TagSearchResultsExtension extends AbstractExtension
             $entityClass = $item->getEntityName();
             $entityId    = $item->getRecordId();
             $entity      = $entities[$entityClass][$entityId];
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
+            $item->setSelectedData(['name' => $entity ? $this->nameResolver->getName($entity) : '']);
+            $this->dispatcher->dispatch(new PrepareResultItemEvent($item, $entity), PrepareResultItemEvent::EVENT_NAME);
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }
 

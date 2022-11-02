@@ -1,15 +1,15 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {%- block list_wrapper -%}
     {% if item.hasChildren %}
         {% if item.level == 1 %}
-            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__placeholder">
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__placeholder" data-role="sub-menu" aria-hidden="true">
                 <div class="dropdown-menu-wrapper dropdown-menu-wrapper__scrollable">
                     {{- block('list') -}}
                 </div>
             </div>
         {% elseif item.level == 2 %}
-            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__child">
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__child" data-role="sub-menu" aria-hidden="true">
                 {{- block('list') -}}
             </div>
         {% else %}
@@ -23,7 +23,7 @@
         {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) %}
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu', 'dropdown-menu-level-' ~ item.level]) %}
     {%- else -%}
-        {%- set classes = classes|merge(['dropdown-menu-single-item', 'dropdown-menu-level-' ~ item.level]) %}
+        {%- set classes = classes|merge(['dropdown-menu-single-item', 'dropdown-level-' ~ item.level]) %}
     {%- endif -%}
     {%- if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined -%}
         {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
@@ -35,11 +35,13 @@
     {% if item.level == 1 %}
         {% set hasValidChildren = false %}
 
-        {% for sub_item in item if not hasValidChildren %}
-            {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
-            {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
-            {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
-                {% set hasValidChildren = true %}
+        {% for sub_item in item %}
+            {% if not hasValidChildren %}
+                {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
+                {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
+                {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
+                    {% set hasValidChildren = true %}
+                {% endif %}
             {% endif %}
         {% endfor %}
 
@@ -52,7 +54,7 @@
 {%- endblock -%}
 
 {% block linkElement %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
 
     {% if isDesktopVersion() %}
     {% set linkAttributes = linkAttributes|merge({
@@ -60,7 +62,7 @@
     }) %}
     {% endif %}
 
-    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
+    {% if item.hasChildren and item.displayChildren and item.level is same as(0) %}
         {% set linkAttributes = linkAttributes|merge({
             'data-toggle': 'dropdown'
         }) %}
@@ -81,7 +83,7 @@
     {%- set content -%}
         {{- parent() -}}
     {%- endset -%}
-    {% if content and item.level is sameas(1) %}
+    {% if content and item.level is same as(1) %}
         {%- set labelAttributes = item.labelAttributes %}
         <li class="dropdown-menu-title {{ 'dropdown-menu-title-level-' ~ item.level }}">{{ block('spanElement') }}</li>
         <li class="divider"><span></span></li>

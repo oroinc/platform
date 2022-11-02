@@ -1,10 +1,5 @@
-framework:
-    assets:
-        packages:
-            routing:
-                version: '%assets_version%'
-                version_format: '%%s?dynamic_version=%%s'
-                # the default format cannot be used due to the problem with urlArgs in require js
-                # in case if both static and dynamic versions exist, we have duplicate of asset version parameter.
-                # something like this: routes.js?version=v123&version=v123-1
-                # version_format: ~ # use the default format
+knp_gaufrette:
+    filesystems:
+        public_js:
+            adapter: public
+            alias: public_js_filesystem

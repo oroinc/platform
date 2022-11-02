@@ -2,27 +2,23 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * CountryRegions controller
- * @RouteResource("country/regions")
- * @NamePrefix("oro_api_country_")
- * BAP-17635 Discuss ACL impl.
+ * REST API controller to get regions by country.
  */
-class CountryRegionsController extends FOSRestController
+class CountryRegionsController extends RestGetController
 {
     /**
      * REST GET regions by country
      *
-     * @param Country $country
+     * @param Country|null $country
      *
      * @ApiDoc(
      *      description="Get regions by country id",
@@ -32,18 +28,24 @@ class CountryRegionsController extends FOSRestController
      */
     public function getAction(Country $country = null)
     {
-        if (!$country) {
-            return $this->handleView(
-                $this->view(null, Codes::HTTP_NOT_FOUND)
-            );
+        if (null === $country) {
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
-        /** @var $regionRepository RegionRepository */
-        $regionRepository = $this->getDoctrine()->getRepository('OroAddressBundle:Region');
+        /** @var RegionRepository $regionRepository */
+        $regionRepository = $this->getDoctrine()->getRepository(Region::class);
         $regions = $regionRepository->getCountryRegions($country);
+        $manager = $this->getManager();
+        $serializedRegions = $manager->serializeEntities($regions);
 
-        return $this->handleView(
-            $this->view($regions, Codes::HTTP_OK)
-        );
+        return new JsonResponse($serializedRegions, Response::HTTP_OK);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->get('oro_address.api.manager.region');
     }
 }

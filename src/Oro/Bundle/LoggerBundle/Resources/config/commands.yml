@@ -1,12 +1,19 @@
 services:
-    Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand
+
+    Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand:
+        arguments:
+            - '@validator'
+            - '@?oro_config.global'
         tags:
             - { name: console.command }
 
     Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand:
-        public: false
-        class: Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand
+        arguments:
+            - '@?oro_config.global'
+            - '@?oro_config.user'
+            - '@oro_logger.cache'
+            - '@?oro_user.manager'
         tags:
             - { name: console.command }

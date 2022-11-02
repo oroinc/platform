@@ -1,5 +1,12 @@
-<ul>
-    {% for group in value if group is not empty %}
-        <li>{{ group.name }}</li>
+{% set listItems -%}
+    {% for group in value %}
+        {% if group is not empty %}
+            <li>{{ group.name }}</li>
+        {% endif %}
     {% endfor %}
+{%- endset %}
+{% if listItems is not empty %}
+<ul>
+    {{ listItems|raw }}
 </ul>
+{% endif %}

@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\CurrencyBundle\Entity;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-
 trait CurrencyAwareTrait
 {
     /**
      * @var string
      *
-     * @ORM\Column(name="currency", type="string", nullable=true)
-     * @ConfigField(
+     * @Doctrine\ORM\Mapping\Column(name="currency", type="string", nullable=true)
+     * @Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField(
      *  defaultValues={
      *      "dataaudit"={"auditable"=true, "immutable"=true},
      *      "importexport"={

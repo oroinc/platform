@@ -6,20 +6,12 @@ use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
 
 class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MsMimeTypeGuesser
-     */
-    protected $guesser;
+    /** @var MsMimeTypeGuesser */
+    private $guesser;
 
-    /**
-     * @var array
-     */
-    private $files = [];
+    private array $files = [];
 
-    /**
-     * @var array
-     */
-    private static $fileDefaults = [
+    private static array $fileDefaults = [
         'name'     => null,
         'tmp_name' => null,
         'error'    => 0,
@@ -27,42 +19,37 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         'type'     => ''
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new MsMimeTypeGuesser();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             unlink($file);
         }
     }
 
-    /**
-     * @dataProvider guessDataProvider
-     *
-     * @param string      $path
-     * @param array       $files
-     * @param string|null $expectedMimeType
-     */
-    public function testGuess($path, array $files, $expectedMimeType)
+    public function testIsGuesserSupported(): void
     {
-        $GLOBALS['_FILES'] = $files;
-        $this->assertEquals($expectedMimeType, $this->guesser->guess($path));
+        $this->assertTrue($this->guesser->isGuesserSupported());
     }
 
     /**
-     * @return array
+     * @dataProvider guessDataProvider
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function testGuessMimeType(string $path, array $files, ?string $expectedMimeType): void
+    {
+        $GLOBALS['_FILES'] = $files;
+        $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function guessDataProvider()
+    public function guessDataProvider(): array
     {
         $correctFile = realpath(__DIR__ . '/../Fixtures/testFile/test.msg');
         $incorrectFile = realpath(__DIR__ . '/../Fixtures/testFile/invalid.msg');
@@ -177,12 +164,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $files
-     *
-     * @return array
-     */
-    private function buildFilesArraySimple(array $files)
+    private function buildFilesArraySimple(array $files): array
     {
         $result = [];
         foreach ($files as $index => $file) {
@@ -196,17 +178,9 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param array $files
-     * @param int   $level
-     *
-     * @return array
-     */
-    private function buildFilesArrayComplex(array $files, $level = 1)
+    private function buildFilesArrayComplex(array $files, int $level = 1): array
     {
-        $level = (int)$level ?: 1;
         $result = [];
-
         foreach (self::$fileDefaults as $fileKey => $defaultValue) {
             $data = [];
             foreach ($files as $index => $file) {
@@ -214,7 +188,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
                 if (!array_key_exists('name', $file)) {
                     $file['name'] = pathinfo($file['tmp_name'], PATHINFO_BASENAME);
                 }
-                $data[$key] = isset($file[$fileKey]) ? $file[$fileKey] : $defaultValue;
+                $data[$key] = $file[$fileKey] ?? $defaultValue;
             }
 
             for ($i = $level; $i > 0; --$i) {

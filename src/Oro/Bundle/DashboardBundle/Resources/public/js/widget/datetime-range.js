@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var WidgetConfigDateTimeRangeFilter;
-    var DateTimeFilter = require('oro/filter/datetime-filter');
-    var tools = require('oroui/js/tools');
+    const DateTimeFilter = require('oro/filter/datetime-filter');
+    const tools = require('oroui/js/tools');
 
-    WidgetConfigDateTimeRangeFilter = DateTimeFilter.extend({
+    const WidgetConfigDateTimeRangeFilter = DateTimeFilter.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'change .datetime-visual-element': '_onClickUpdateCriteria'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoUpdateRangeFilterType: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WidgetConfigDateTimeRangeFilter() {
-            WidgetConfigDateTimeRangeFilter.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetConfigDateTimeRangeFilter(options) {
+            WidgetConfigDateTimeRangeFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -38,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
@@ -56,7 +55,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _updateDOMValue: function() {
             return this._writeDOMValue(this._formatRawValue(this.getValue()));

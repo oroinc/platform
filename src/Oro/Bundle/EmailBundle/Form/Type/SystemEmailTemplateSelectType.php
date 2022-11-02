@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
@@ -17,9 +17,6 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     protected $em;
 
-    /**
-     * @param ObjectManager $objectManager
-     */
     public function __construct(ObjectManager $objectManager)
     {
         $this->em  = $objectManager;

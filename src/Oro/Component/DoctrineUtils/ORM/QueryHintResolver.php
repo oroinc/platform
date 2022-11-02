@@ -3,68 +3,31 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\ORM\Query;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Resolve query hints to a registered walkers.
+ */
 class QueryHintResolver implements QueryHintResolverInterface
 {
-    /** @var array */
-    protected $walkers = [];
+    /** @var array [hint => ['class' => walker class, 'output' => bool, 'hint_provider' => hint provider id], ...] */
+    private $walkers;
 
-    /** @var string */
-    protected $aliases = [];
+    /** @var ContainerInterface */
+    private $walkerHintProviders;
 
-    /**
-     * Maps a query hint to a tree walker
-     *
-     * @param string                                $hint               The name of the query hint
-     * @param string                                $walkerClass        The FQCN of the walker
-     * @param QueryWalkerHintProviderInterface|null $walkerHintProvider The provider of the walker parameters
-     * @param string|null                           $alias              The alias of the query hint
-     */
-    public function addTreeWalker(
-        $hint,
-        $walkerClass,
-        QueryWalkerHintProviderInterface $walkerHintProvider = null,
-        $alias = null
-    ) {
-        $this->walkers[$hint] = [
-            'class'         => $walkerClass,
-            'output'        => false,
-            'hint_provider' => $walkerHintProvider
-        ];
-        if ($alias) {
-            $this->aliases[$alias] = $hint;
-        }
-    }
+    /** @var array [hint alias => hint, ...] */
+    private $aliases;
 
-    /**
-     * Maps a query hint to an output walker
-     *
-     * @param string                                $hint               The name of the query hint
-     * @param string                                $walkerClass        The FQCN of the walker
-     * @param QueryWalkerHintProviderInterface|null $walkerHintProvider The provider of the walker parameters
-     * @param string|null                           $alias              The alias of the query hint
-     */
-    public function addOutputWalker(
-        $hint,
-        $walkerClass,
-        QueryWalkerHintProviderInterface $walkerHintProvider = null,
-        $alias = null
-    ) {
-        $this->walkers[$hint] = [
-            'class'         => $walkerClass,
-            'output'        => true,
-            'hint_provider' => $walkerHintProvider
-        ];
-        if ($alias) {
-            $this->aliases[$alias] = $hint;
-        }
+    public function __construct(array $walkers, ContainerInterface $walkerHintProviders, array $aliases)
+    {
+        $this->walkers = $walkers;
+        $this->walkerHintProviders = $walkerHintProviders;
+        $this->aliases = $aliases;
     }
 
     /**
      * Resolves query hints
-     *
-     * @param Query $query
-     * @param array $hints
      */
     public function resolveHints(Query $query, array $hints = [])
     {
@@ -74,14 +37,17 @@ class QueryHintResolver implements QueryHintResolverInterface
         foreach ($query->getHints() as $hintName => $hintVal) {
             if (false !== $hintVal && isset($this->walkers[$hintName])) {
                 $walker = $this->walkers[$hintName];
-                $added  = $this->addHint(
-                    $query,
-                    $walker['output'] ? Query::HINT_CUSTOM_OUTPUT_WALKER : Query::HINT_CUSTOM_TREE_WALKERS,
-                    $walker['class']
-                );
+                $added = true;
+                if (\is_string($walker['class'])) {
+                    $added = $this->addHint(
+                        $query,
+                        $this->getHintName($walker),
+                        $walker['class']
+                    );
+                }
                 if ($added && isset($walker['hint_provider'])) {
                     /** @var QueryWalkerHintProviderInterface $walkerHintProvider */
-                    $walkerHintProvider = $walker['hint_provider'];
+                    $walkerHintProvider = $this->walkerHintProviders->get($walker['hint_provider']);
                     foreach ($walkerHintProvider->getHints($hintVal) as $walkerHint => $walkerHintVal) {
                         $this->addHint($query, $walkerHint, $walkerHintVal);
                     }
@@ -93,9 +59,9 @@ class QueryHintResolver implements QueryHintResolverInterface
     /**
      * Adds a hint to a query object
      *
-     * @param Query  $query
+     * @param Query $query
      * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return bool TRUE if the hint is added; otherwise, FALSE
      */
@@ -119,20 +85,17 @@ class QueryHintResolver implements QueryHintResolverInterface
 
     /**
      * Adds hints to a query object
-     *
-     * @param Query $query
-     * @param array $hints
      */
     public function addHints(Query $query, array $hints)
     {
         foreach ($hints as $hint) {
-            if (is_array($hint)) {
+            if (\is_array($hint)) {
                 $this->addHint(
                     $query,
                     $this->resolveHintName($hint['name']),
                     isset($hint['value']) ? $this->resolveHintValue($query, $hint['value']) : true
                 );
-            } elseif (is_string($hint)) {
+            } elseif (\is_string($hint)) {
                 $this->addHint($query, $this->resolveHintName($hint), true);
             }
         }
@@ -148,8 +111,8 @@ class QueryHintResolver implements QueryHintResolverInterface
         if (isset($this->aliases[$name])) {
             return $this->aliases[$name];
         }
-        if (defined("Doctrine\\ORM\\Query::$name")) {
-            return constant("Doctrine\\ORM\\Query::$name");
+        if (\defined("Doctrine\\ORM\\Query::$name")) {
+            return \constant("Doctrine\\ORM\\Query::$name");
         }
 
         return $name;
@@ -163,19 +126,24 @@ class QueryHintResolver implements QueryHintResolverInterface
      */
     private function resolveHintValue(Query $query, $value)
     {
-        if (is_string($value) && $value[0] === ':') {
+        if (\is_string($value) && $value[0] === ':') {
             $parameterName = substr($value, 1);
             if ($query->getParameter($parameterName) !== null) {
                 return $query->getParameter($parameterName)->getValue();
             }
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $key => $item) {
                 $value[$key] = $this->resolveHintValue($query, $item);
             }
         }
 
         return $value;
+    }
+
+    private function getHintName(array $walker): string
+    {
+        return $walker['output'] ? Query::HINT_CUSTOM_OUTPUT_WALKER : Query::HINT_CUSTOM_TREE_WALKERS;
     }
 }

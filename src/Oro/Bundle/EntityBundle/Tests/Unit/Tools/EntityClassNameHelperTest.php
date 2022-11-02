@@ -3,47 +3,42 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_ALIAS = 'alias';
-    const TEST_ENTITY_PLURAL_ALIAS = 'plural_alias';
-    const TEST_ENTITY_CLASS = 'Test\Class';
-    const TEST_ENTITY_URL_SAFE_CLASS = 'Test_Class';
-    const TEST_CUSTOM_ENTITY_CLASS = 'Extend\Entity\test_entity';
-    const TEST_CUSTOM_ENTITY_URL_SAFE_CLASS = 'Extend_Entity_test_entity';
+    private const TEST_ENTITY_ALIAS = 'alias';
+    private const TEST_ENTITY_PLURAL_ALIAS = 'plural_alias';
+    private const TEST_ENTITY_CLASS = 'Test\Class';
+    private const TEST_ENTITY_URL_SAFE_CLASS = 'Test_Class';
+    private const TEST_CUSTOM_ENTITY_CLASS = 'Extend\Entity\test_entity';
+    private const TEST_CUSTOM_ENTITY_URL_SAFE_CLASS = 'Extend_Entity_test_entity';
 
     /** @var EntityClassNameHelper */
-    protected $entityClassNameHelper;
+    private $entityClassNameHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $entityAliasResolver->expects($this->any())
             ->method('getClassByAlias')
-            ->willReturnCallback(
-                function ($alias) {
-                    if (self::TEST_ENTITY_ALIAS === $alias) {
-                        return self::TEST_ENTITY_CLASS;
-                    }
-
-                    throw new EntityAliasNotFoundException($alias);
+            ->willReturnCallback(function ($alias) {
+                if (self::TEST_ENTITY_ALIAS === $alias) {
+                    return self::TEST_ENTITY_CLASS;
                 }
-            );
+
+                throw new EntityAliasNotFoundException($alias);
+            });
         $entityAliasResolver->expects($this->any())
             ->method('getClassByPluralAlias')
-            ->willReturnCallback(
-                function ($pluralAlias) {
-                    if (self::TEST_ENTITY_PLURAL_ALIAS === $pluralAlias) {
-                        return self::TEST_ENTITY_CLASS;
-                    }
-
-                    throw new EntityAliasNotFoundException($pluralAlias);
+            ->willReturnCallback(function ($pluralAlias) {
+                if (self::TEST_ENTITY_PLURAL_ALIAS === $pluralAlias) {
+                    return self::TEST_ENTITY_CLASS;
                 }
-            );
+
+                throw new EntityAliasNotFoundException($pluralAlias);
+            });
 
         $this->entityClassNameHelper = new EntityClassNameHelper($entityAliasResolver);
     }
@@ -51,7 +46,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveEntityClassProvider
      */
-    public function testResolveEntityClass($className, $isPluralAlias, $expected)
+    public function testResolveEntityClass(?string $className, bool $isPluralAlias, ?string $expected)
     {
         $this->assertEquals(
             $expected,
@@ -59,7 +54,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function resolveEntityClassProvider()
+    public function resolveEntityClassProvider(): array
     {
         return [
             [null, false, null],
@@ -80,7 +75,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUrlSafeClassNameProvider
      */
-    public function testGetUrlSafeClassName($className, $expected)
+    public function testGetUrlSafeClassName(string $className, string $expected)
     {
         $this->assertEquals(
             $expected,
@@ -88,7 +83,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getUrlSafeClassNameProvider()
+    public function getUrlSafeClassNameProvider(): array
     {
         return [
             [self::TEST_ENTITY_CLASS, self::TEST_ENTITY_URL_SAFE_CLASS],

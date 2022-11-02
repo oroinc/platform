@@ -10,7 +10,7 @@
 #}
 {% macro sendEmailLink(email, entity, parameters) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{- UI.clientLink({
             'dataUrl': path(
                 'oro_email_email_create', {
@@ -19,6 +19,7 @@
                     entityId: entity.id
             }),
             'class': parameters.cssClass is defined ? parameters.cssClass : '',
+            'dir': 'ltr',
             'iCss': parameters.iCss is defined ? parameters.iCss : '',
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
             'label': email,
@@ -28,13 +29,15 @@
                 'reload-grid-name': 'activity-email-grid',
                 'options': {
                     'alias': 'email-dialog',
+                    'method': 'POST',
                     'dialogOptions' : {
                         'title' : 'oro.email.send_email'|trans,
                         'allowMaximize': true,
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
             }
@@ -44,7 +47,7 @@
 
 {% macro replyAllButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
         id: emailEntity.id
         } -%}
@@ -69,7 +72,8 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
             }
@@ -79,7 +83,7 @@
 
 {% macro replyButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
         } -%}
@@ -104,7 +108,8 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
             }
@@ -114,7 +119,7 @@
 
 {% macro forwardButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
         } -%}
@@ -139,7 +144,8 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
             }
@@ -149,7 +155,7 @@
 
 {% macro createEmailButton(parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path('oro_email_email_create', parameters),
             'label': 'oro.email.menu.compose'|trans,
@@ -160,13 +166,15 @@
                 'reload-grid-name': 'user-email-grid',
                 'options': {
                     'alias': 'email-dialog',
+                    'method': 'POST',
                     'dialogOptions' : {
                         'title' : 'oro.email.send_email'|trans,
                         'allowMaximize': true,
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
             }
@@ -176,7 +184,7 @@
 
 {% macro addMarkUnreadButton(emailEntity) -%}
     {% if is_granted('oro_email_email_user_edit', emailEntity) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(
                 'oro_email_mark_seen', {

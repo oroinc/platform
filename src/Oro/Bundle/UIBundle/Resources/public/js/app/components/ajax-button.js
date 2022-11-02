@@ -1,20 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var options = {};
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const options = {};
 
     function onClick(e) {
         e.preventDefault();
 
-        var method = $(e.currentTarget).data('method');
-        var url = $(e.currentTarget).data('url');
-        var redirect = $(e.currentTarget).data('redirect');
-        var successMessage = $(e.currentTarget).data('success-message');
-        var errorMessage = $(e.currentTarget).data('error-message');
+        const method = $(e.currentTarget).data('method');
+        const url = $(e.currentTarget).data('url');
+        const redirect = $(e.currentTarget).data('redirect');
+        const successMessage = $(e.currentTarget).data('success-message');
+        const errorMessage = $(e.currentTarget).data('error-message');
 
         mediator.execute('showLoading');
 
@@ -29,7 +29,10 @@ define(function(require) {
                 );
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
             },
-            errorHandlerMessage: __(errorMessage),
+            errorHandlerMessage: function(event, response) {
+                const responseText = $.parseJSON(response.responseText);
+                return responseText.message ? responseText.message : __(errorMessage);
+            },
             complete: function() {
                 mediator.execute('hideLoading');
             }
@@ -38,8 +41,7 @@ define(function(require) {
 
     return function(additionalOptions) {
         _.extend(options, additionalOptions || {});
-        var button;
-        button = options._sourceElement;
-        button.click($.proxy(onClick, null));
+        const button = options._sourceElement;
+        button.click(onClick);
     };
 });

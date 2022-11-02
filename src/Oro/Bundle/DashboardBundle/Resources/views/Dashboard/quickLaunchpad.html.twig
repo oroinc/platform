@@ -1,9 +1,9 @@
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
 
 {% set widgetType = 'quick-launchpad' %}
 
 {% block content %}
-    {% spaceless %}
+    {% apply spaceless %}
         <ul class="quick-launchpad-toolbar quick-launchpad-toolbar--with-{{ items|length }}-items">
             {% for item in items %}
                 <li class="quick-launchpad-toolbar__item{% if (item.class is defined) %} {{ item.class }}{% endif %}">
@@ -17,6 +17,6 @@
                 </li>
             {% endfor %}
         </ul>
-    {% endspaceless %}
+    {% endapply %}
     {{ parent() }}
 {% endblock %}

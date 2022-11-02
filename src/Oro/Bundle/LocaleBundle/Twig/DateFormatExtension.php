@@ -3,35 +3,27 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DateFormatExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to format dates:
+ *   - oro_datetime_formatter_list
+ *   - oro_day_format
+ *   - oro_date_format
+ *   - oro_time_format
+ *   - oro_datetime_format
+ */
+class DateFormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?DateTimeFormatConverterRegistry $dateTimeFormatConverterRegistry = null;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return DateTimeFormatConverterRegistry
-     */
-    protected function getDateTimeFormatConverterRegistry()
-    {
-        return $this->container->get('oro_locale.format_converter.date_time.registry');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_dateformat';
     }
 
     /**
@@ -40,11 +32,11 @@ class DateFormatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_datetime_formatter_list', [$this, 'getDateTimeFormatterList']),
-            new \Twig_SimpleFunction('oro_day_format', [$this, 'getDayFormat']),
-            new \Twig_SimpleFunction('oro_date_format', [$this, 'getDateFormat']),
-            new \Twig_SimpleFunction('oro_time_format', [$this, 'getTimeFormat']),
-            new \Twig_SimpleFunction('oro_datetime_format', [$this, 'getDateTimeFormat']),
+            new TwigFunction('oro_datetime_formatter_list', [$this, 'getDateTimeFormatterList']),
+            new TwigFunction('oro_day_format', [$this, 'getDayFormat']),
+            new TwigFunction('oro_date_format', [$this, 'getDateFormat']),
+            new TwigFunction('oro_time_format', [$this, 'getTimeFormat']),
+            new TwigFunction('oro_datetime_format', [$this, 'getDateTimeFormat']),
         ];
     }
 
@@ -110,5 +102,26 @@ class DateFormatExtension extends \Twig_Extension
         return $this->getDateTimeFormatConverterRegistry()
             ->getFormatConverter($type)
             ->getDateTimeFormat($dateType, $timeType, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_locale.format_converter.date_time.registry' => DateTimeFormatConverterRegistry::class,
+        ];
+    }
+
+    private function getDateTimeFormatConverterRegistry(): DateTimeFormatConverterRegistry
+    {
+        if (null === $this->dateTimeFormatConverterRegistry) {
+            $this->dateTimeFormatConverterRegistry = $this->container->get(
+                'oro_locale.format_converter.date_time.registry'
+            );
+        }
+
+        return $this->dateTimeFormatConverterRegistry;
     }
 }

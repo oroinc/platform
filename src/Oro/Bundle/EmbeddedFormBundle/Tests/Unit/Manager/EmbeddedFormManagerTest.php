@@ -2,213 +2,133 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRegistryInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldBeConstructedWithContainerAndFormFactory()
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formRegistry;
+
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
+
+    /** @var EmbeddedFormManager */
+    private $manager;
+
+    protected function setUp(): void
     {
-        new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
+        $this->formRegistry = $this->createMock(FormRegistryInterface::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+
+        $this->manager = new EmbeddedFormManager($this->formRegistry, $this->formFactory);
     }
 
-    /**
-     * @test
-     */
-    public function shouldCreateForm()
+    public function testShouldCreateForm()
     {
         $type = 'type';
-        $formRegistry = $this->createFormRegistryMock();
-        $formFactory = $this->createFormFactoryMock();
-        $manager = new EmbeddedFormManager($formRegistry, $formFactory);
 
         $formInstance = new \stdClass();
 
-        $formFactory->expects($this->once())
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with($type, null, [])
-            ->will($this->returnValue($formInstance));
+            ->willReturn($formInstance);
 
-        $this->assertSame($formInstance, $manager->createForm($type));
+        $this->assertSame($formInstance, $this->manager->createForm($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldAllowToAddFormType()
+    public function testShouldReturnEmptyLabelForNotAddedType()
     {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $type = uniqid();
-        $manager->addFormType($type);
+        $type = 'Test\Type';
+        $this->assertNull($this->manager->getLabelByType($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldAllowToAddFormTypeWithLabel()
+    public function testShouldReturnLabelForAddedType()
     {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $type = uniqid();
-        $label = uniqid('label');
-        $manager->addFormType($type, $label);
+        $type = 'Test\Type';
+        $label = 'test_label';
+        $this->manager->addFormType($type, $label);
+        $this->assertEquals($label, $this->manager->getLabelByType($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnEmptyLabelForNotAddedType()
+    public function testShouldReturnTypeAsLabelForAddedTypeWithoutLabel()
     {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $type = uniqid();
-        $this->assertNull($manager->getLabelByType($type));
+        $type = 'Test\Type';
+        $this->manager->addFormType($type);
+        $this->assertEquals($type, $this->manager->getLabelByType($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnLabelForAddedType()
-    {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $type = uniqid();
-        $label = uniqid('label');
-        $manager->addFormType($type, $label);
-        $this->assertEquals($label, $manager->getLabelByType($type));
-    }
-
-
-    /**
-     * @test
-     */
-    public function shouldReturnTypeAsLabelForAddedTypeWithoutLabel()
-    {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $type = uniqid();
-        $manager->addFormType($type);
-        $this->assertEquals($type, $manager->getLabelByType($type));
-    }
-
-    /**
-     * @test
-     */
-    public function shouldReturnAllAddedTypes()
+    public function testShouldReturnAllAddedTypes()
     {
         $types = [
-            $type1 = uniqid('type') => uniqid('label'),
-            $type2 = uniqid('type') => uniqid('label'),
+            $type1 = 'Test\Type1' => 'test_label_1',
+            $type2 = 'Test\Type2' => 'test_label_2'
         ];
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type1, $types[$type1]);
-        $manager->addFormType($type2, $types[$type2]);
+        $this->manager->addFormType($type1, $types[$type1]);
+        $this->manager->addFormType($type2, $types[$type2]);
 
-        $this->assertEquals($types, $manager->getAll());
+        $this->assertEquals($types, $this->manager->getAll());
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnEmptyDefaultCss()
+    public function testShouldReturnEmptyDefaultCss()
     {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $this->assertEquals('', $manager->getDefaultCssByType(uniqid('type')));
+        $this->assertEquals('', $this->manager->getDefaultCssByType('Test\Type'));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnDefaultCss()
+    public function testShouldReturnDefaultCss()
     {
         $type = 'type';
-        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
-        $formRegistry = $this->createFormRegistryMock($typeInstance);
-        $formFactory = $this->createFormFactoryMock();
+        $typeInstance = $this->createMock(EmbeddedFormInterface::class);
         $defaultCss = 'my default css';
+
+        $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
+        $resolvedFormType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn($typeInstance);
+        $this->formRegistry->expects($this->once())
+            ->method('getType')
+            ->willReturn($resolvedFormType);
 
         $typeInstance->expects($this->once())
             ->method('getDefaultCss')
-            ->will($this->returnValue($defaultCss));
+            ->willReturn($defaultCss);
 
-        $manager = new EmbeddedFormManager($formRegistry, $formFactory);
-        $this->assertEquals($defaultCss, $manager->getDefaultCssByType($type));
+        $this->assertEquals($defaultCss, $this->manager->getDefaultCssByType($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnDefaultSuccessMessage()
+    public function testShouldReturnDefaultSuccessMessage()
     {
         $type = 'type';
-        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
-        $formRegistry = $this->createFormRegistryMock($typeInstance);
-        $formFactory = $this->createFormFactoryMock();
+        $typeInstance = $this->createMock(EmbeddedFormInterface::class);
         $defaultMessage = 'my default message';
+
+        $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
+        $resolvedFormType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn($typeInstance);
+        $this->formRegistry->expects($this->once())
+            ->method('getType')
+            ->willReturn($resolvedFormType);
 
         $typeInstance->expects($this->once())
             ->method('getDefaultSuccessMessage')
-            ->will($this->returnValue($defaultMessage));
+            ->willReturn($defaultMessage);
 
-        $manager = new EmbeddedFormManager($formRegistry, $formFactory);
-        $this->assertEquals($defaultMessage, $manager->getDefaultSuccessMessageByType($type));
+        $this->assertEquals($defaultMessage, $this->manager->getDefaultSuccessMessageByType($type));
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnEmptyDefaultSuccessMessage()
+    public function testShouldReturnEmptyDefaultSuccessMessage()
     {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $this->assertEquals('', $manager->getDefaultSuccessMessageByType(uniqid('type')));
-    }
-
-    /**
-     * @test
-     */
-    public function shouldReturnEmptyCustomFormLayoutByFormType()
-    {
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $this->assertEquals('', $manager->getCustomFormLayoutByFormType(uniqid('type')));
-    }
-
-    /**
-     * @test
-     * @dataProvider customLayoutTypesProvider
-     * @param object $typeInstance
-     * @param object $expectedLayout
-     */
-    public function shouldReturnCustomFormLayoutByFormType($typeInstance, $expectedLayout)
-    {
-        $formRegistry = $this->createFormRegistryMock($typeInstance);
-        $formFactory = $this->createFormFactoryMock();
-
-        $type = 'type';
-        $manager = new EmbeddedFormManager($formRegistry, $formFactory);
-        $this->assertEquals($expectedLayout, $manager->getCustomFormLayoutByFormType($type));
-    }
-
-    /**
-     * @return array
-     */
-    public function customLayoutTypesProvider()
-    {
-        $customLayout = 'layout.html.twig';
-        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
-        $newInterfaceTypeInstance = $this
-            ->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface');
-
-        $typeInstance->expects($this->any())->method('geFormLayout')
-            ->will($this->returnValue($customLayout));
-
-        $newInterfaceTypeInstance->expects($this->any())->method('getFormLayout')
-            ->will($this->returnValue($customLayout));
-
-        return [
-            'not custom layout aware form'         => [null, ''],
-            'deprecated interface, should be used' => [$typeInstance, $customLayout],
-            'new interface, should be used'        => [$newInterfaceTypeInstance, $customLayout],
-        ];
+        $this->assertEquals('', $this->manager->getDefaultSuccessMessageByType('Test\Type'));
     }
 
     public function testGetAllChoices()
@@ -217,35 +137,23 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $typeLabel1 = 'Type 1';
         $type2 = 'type2';
         $typeLabel2 = 'Type 2';
-        $manager = new EmbeddedFormManager($this->createFormRegistryMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type1, $typeLabel1);
-        $manager->addFormType($type2, $typeLabel2);
+        $this->manager->addFormType($type1, $typeLabel1);
+        $this->manager->addFormType($type2, $typeLabel2);
 
-        $this->assertEquals([$typeLabel1 => $type1, $typeLabel2 => $type2], $manager->getAllChoices());
+        $this->assertEquals([$typeLabel1 => $type1, $typeLabel2 => $type2], $this->manager->getAllChoices());
     }
 
-    /**
-     * @return FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createFormFactoryMock()
+    public function testGetTypeInstance()
     {
-        return $this->createMock(FormFactoryInterface::class);
-    }
+        $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
+        $resolvedFormType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn(IntegerType::class);
+        $this->formRegistry->expects($this->once())
+            ->method('getType')
+            ->willReturn($resolvedFormType);
 
-    /**
-     * @param null|object $typeInstance
-     * @return FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createFormRegistryMock($typeInstance = null)
-    {
-        $fromRegistry = $this->createMock(FormRegistryInterface::class);
-
-        if ($typeInstance) {
-            $fromRegistry->expects($this->once())
-                ->method('getType')
-                ->willReturn($typeInstance);
-        }
-
-        return $fromRegistry;
+        $this->assertEquals(null, $this->manager->getTypeInstance(null));
+        $this->assertEquals(IntegerType::class, $this->manager->getTypeInstance(AbstractType::class));
     }
 }

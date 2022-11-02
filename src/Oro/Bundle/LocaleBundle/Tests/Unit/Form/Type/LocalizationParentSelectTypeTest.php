@@ -6,6 +6,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,16 +15,11 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var LocalizationParentSelectType */
-    protected $formType;
+    private $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new LocalizationParentSelectType();
-    }
-
-    public function tearDown()
-    {
-        unset($this->formType);
     }
 
     public function testGetParent()
@@ -38,10 +34,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver */
-        $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $optionsResolver = $this->createMock(OptionsResolver::class);
         $optionsResolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'))
@@ -64,21 +57,20 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->configureOptions($optionsResolver);
     }
 
-
     /**
      * @dataProvider buildViewDataProvider
-     *
-     * @param object|null $parentData
-     * @param int|null $expectedParentId
-     * @param array $expectedIds
      */
-    public function testBuildView($parentData, $expectedParentId, array $expectedIds)
+    public function testBuildView(?object $parentData, ?int $expectedParentId, array $expectedIds)
     {
-        $parentForm = $this->createMock('Symfony\Component\Form\FormInterface');
-        $parentForm->expects($this->once())->method('getData')->willReturn($parentData);
+        $parentForm = $this->createMock(FormInterface::class);
+        $parentForm->expects($this->once())
+            ->method('getData')
+            ->willReturn($parentData);
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
-        $form->expects($this->once())->method('getParent')->willReturn($parentForm);
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn($parentForm);
 
         $formView = new FormView();
 
@@ -89,16 +81,13 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedParentId, $formView->vars['configs']['entityId']);
 
         $this->assertArrayHasKey('grid_parameters', $formView->vars);
-        $this->assertInternalType('array', $formView->vars['grid_parameters']);
+        $this->assertIsArray($formView->vars['grid_parameters']);
         $this->assertArrayHasKey('ids', $formView->vars['grid_parameters']);
-        $this->assertInternalType('array', $formView->vars['grid_parameters']['ids']);
+        $this->assertIsArray($formView->vars['grid_parameters']['ids']);
         $this->assertEquals($expectedIds, $formView->vars['grid_parameters']['ids']);
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         return [
             'without entity' => [

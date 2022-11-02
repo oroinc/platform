@@ -1,0 +1,8 @@
+features:
+    email:
+        configuration:
+            - 'google_imap_settings'
+        commands:
+            - 'oro:cron:imap-sync'
+        cron_jobs:
+            - 'oro:cron:imap-sync'

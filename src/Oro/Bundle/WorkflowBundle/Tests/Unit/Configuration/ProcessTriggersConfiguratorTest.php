@@ -2,66 +2,57 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationBuilder;
+    /** @var ProcessConfigurationBuilder|MockObject */
+    private $configurationBuilder;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    /** @var ManagerRegistry|MockObject */
+    private $managerRegistry;
 
-    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
-    protected $triggerEntityClass;
+    /** @var string|MockObject */
+    private $triggerEntityClass;
 
-    /** @var ProcessTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $processCronScheduler;
+    /** @var ProcessTriggerCronScheduler|MockObject */
+    private $processCronScheduler;
+
+    /** @var ProcessTriggerRepository|MockObject */
+    private $repository;
+
+    /** @var ObjectManager|MockObject */
+    private $objectManager;
+
+    /** @var LoggerInterface|MockObject */
+    private $logger;
 
     /** @var ProcessTriggersConfigurator */
-    protected $processTriggersConfigurator;
+    private $processTriggersConfigurator;
 
-    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $objectManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationBuilder = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'
-        );
-
-        $this->repository = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
-        )->disableOriginalConstructor()->getMock();
-
-        $this->objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->processCronScheduler = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->triggerEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger';
-
+        $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);
+        $this->repository = $this->createMock(ProcessTriggerRepository::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->processCronScheduler = $this->createMock(ProcessTriggerCronScheduler::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->triggerEntityClass = ProcessTrigger::class;
 
         $this->processTriggersConfigurator = new ProcessTriggersConfigurator(
             $this->configurationBuilder,
@@ -93,44 +84,61 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
 
-        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $mockExistentTrigger */
         $mockExistentTrigger = $this->createMock($this->triggerEntityClass);
 
         $nonExistentNewTrigger->setDefinition($definition)->setCron('42 * * * *');
-        $mockExistentTrigger->expects($this->once())->method('import')->with($existentNewTrigger);
-        $mockExistentTrigger->expects($this->once())->method('isDefinitiveEqual')->willReturn(true);
-        $mockExistentTrigger->expects($this->any())->method('getDefinition')->willReturn($definition);
-        $mockExistentTrigger->expects($this->any())->method('getCron')->willReturn('43 * * * *');
+        $mockExistentTrigger->expects($this->once())
+            ->method('import')
+            ->with($existentNewTrigger);
+        $mockExistentTrigger->expects($this->once())
+            ->method('isDefinitiveEqual')
+            ->willReturn(true);
+        $mockExistentTrigger->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
+        $mockExistentTrigger->expects($this->any())
+            ->method('getCron')
+            ->willReturn('43 * * * *');
 
         $mockUnaffectedTrigger = $this->createMock($this->triggerEntityClass);
-        $mockUnaffectedTrigger->expects($this->any())->method('isDefinitiveEqual')->willReturn(false);
+        $mockUnaffectedTrigger->expects($this->any())
+            ->method('isDefinitiveEqual')
+            ->willReturn(false);
 
         $this->repository->expects($this->once())
-            ->method('findByDefinitionName')->willReturn([$mockExistentTrigger, $mockUnaffectedTrigger]);
+            ->method('findByDefinitionName')
+            ->willReturn([$mockExistentTrigger, $mockUnaffectedTrigger]);
 
         //delete unaffected
-        $mockUnaffectedTrigger->expects($this->any())->method('getCron')->willReturn('string'); //in dropSchedule
-        $this->processCronScheduler->expects($this->once())->method('removeSchedule')->with($mockUnaffectedTrigger);
+        $mockUnaffectedTrigger->expects($this->any())
+            ->method('getCron')
+            ->willReturn('string'); //in dropSchedule
+        $this->processCronScheduler->expects($this->once())
+            ->method('removeSchedule')
+            ->with($mockUnaffectedTrigger);
 
-        $this->logger->expects($this->at(0))
+        $this->logger->expects($this->exactly(3))
             ->method('info')
-            ->with(
-                '>> process trigger: {definition_name} [{type}] - {action}',
-                ['definition_name' => 'definition_name', 'action' => 'updated', 'type' => 'cron:43 * * * *']
-            );
-        $this->logger->expects($this->at(1))
-            ->method('info')
-            ->with(
-                '>> process trigger: {definition_name} [{type}] - {action}',
-                ['definition_name' => 'definition_name', 'action' => 'created', 'type' => 'cron:42 * * * *']
+            ->withConsecutive(
+                [
+                    '>> process trigger: {definition_name} [{type}] - {action}',
+                    ['definition_name' => 'definition_name', 'action' => 'updated', 'type' => 'cron:43 * * * *']
+                ],
+                [
+                    '>> process trigger: {definition_name} [{type}] - {action}',
+                    ['definition_name' => 'definition_name', 'action' => 'created', 'type' => 'cron:42 * * * *']
+                ],
+                [
+                    '>> process trigger: {definition_name} [{type}] - {action}',
+                    ['definition_name' => '', 'type' => 'cron:string', 'action' => 'deleted']
+                ]
             );
 
         $this->processTriggersConfigurator->configureTriggers($triggersConfiguration, $definitions);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processTriggersConfigurator);
-
-        $this->assertAttributeEquals([$mockUnaffectedTrigger], 'forRemove', $this->processTriggersConfigurator);
-        $this->assertAttributeEquals([$nonExistentNewTrigger], 'forPersist', $this->processTriggersConfigurator);
+        self::assertTrue($this->getDirtyPropertyValue());
+        self::assertEquals([$mockUnaffectedTrigger], $this->getForRemovePropertyValue());
+        self::assertEquals([$nonExistentNewTrigger], $this->getForPersistPropertyValue());
     }
 
     public function testRemoveDefinitionTriggers()
@@ -142,10 +150,14 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $trigger = (new ProcessTrigger())->setCron('42 * * * *')->setDefinition($definition);
 
-        $this->repository->expects($this->once())->method('findByDefinitionName')->with('definition_name')
+        $this->repository->expects($this->once())
+            ->method('findByDefinitionName')
+            ->with('definition_name')
             ->willReturn([$trigger]);
 
-        $this->processCronScheduler->expects($this->once())->method('removeSchedule')->with($trigger);
+        $this->processCronScheduler->expects($this->once())
+            ->method('removeSchedule')
+            ->with($trigger);
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -156,39 +168,36 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processTriggersConfigurator->removeDefinitionTriggers($definition);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processTriggersConfigurator);
-        $this->assertAttributeEquals([$trigger], 'forRemove', $this->processTriggersConfigurator);
+        self::assertTrue($this->getDirtyPropertyValue());
+        self::assertEquals([$trigger], $this->getForRemovePropertyValue());
     }
 
     /**
      * @dataProvider flushDataProvider
-     * @param bool $dirty
-     * @param array $triggers
-     * @param $expectedSchedulesCount
      */
-    public function testFlush($dirty, array $triggers, $expectedSchedulesCount)
+    public function testFlush(bool $dirty, array $triggers, int $expectedSchedulesCount)
     {
         $this->setValue($this->processTriggersConfigurator, 'dirty', $dirty);
         $this->setValue($this->processTriggersConfigurator, 'triggers', $triggers);
 
-        $this->processCronScheduler->expects($this->exactly($expectedSchedulesCount))->method('add');
+        $this->processCronScheduler->expects($this->exactly($expectedSchedulesCount))
+            ->method('add');
 
         if ($dirty) {
             $this->assertManagerRegistryCalled($this->triggerEntityClass);
-            $this->objectManager->expects($this->once())->method('flush');
+            $this->objectManager->expects($this->once())
+                ->method('flush');
         } else {
-            $this->objectManager->expects($this->never())->method('flush');
+            $this->objectManager->expects($this->never())
+                ->method('flush');
         }
 
         $this->processTriggersConfigurator->flush();
 
-        $this->assertAttributeEquals(false, 'dirty', $this->processTriggersConfigurator);
+        self::assertFalse($this->getDirtyPropertyValue());
     }
 
-    /**
-     * @return array
-     */
-    public function flushDataProvider()
+    public function flushDataProvider(): array
     {
         $triggerWithCron = new ProcessTrigger();
         $triggerWithCron->setCron('* * * * *');
@@ -222,10 +231,17 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
 
-        $this->objectManager->expects($this->once())->method('contains')->with($trigger)->willReturn(true);
-        $this->objectManager->expects($this->once())->method('remove')->with($trigger);
-        $this->objectManager->expects($this->once())->method('flush');
-        $this->processCronScheduler->expects($this->once())->method('flush');
+        $this->objectManager->expects($this->once())
+            ->method('contains')
+            ->with($trigger)
+            ->willReturn(true);
+        $this->objectManager->expects($this->once())
+            ->method('remove')
+            ->with($trigger);
+        $this->objectManager->expects($this->once())
+            ->method('flush');
+        $this->processCronScheduler->expects($this->once())
+            ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -243,9 +259,13 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
 
-        $this->objectManager->expects($this->once())->method('persist')->with($trigger);
-        $this->objectManager->expects($this->once())->method('flush');
-        $this->processCronScheduler->expects($this->once())->method('flush');
+        $this->objectManager->expects($this->once())
+            ->method('persist')
+            ->with($trigger);
+        $this->objectManager->expects($this->once())
+            ->method('flush');
+        $this->processCronScheduler->expects($this->once())
+            ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -254,10 +274,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processTriggersConfigurator->flush();
     }
 
-    /**
-     * @param string $entityClass
-     */
-    public function assertManagerRegistryCalled($entityClass)
+    private function assertManagerRegistryCalled(string $entityClass): void
     {
         $this->managerRegistry->expects($this->atLeastOnce())
             ->method('getManagerForClass')
@@ -265,14 +282,35 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->objectManager);
     }
 
-    /**
-     * @param string $entityClass
-     */
-    public function assertObjectManagerCalledForRepository($entityClass)
+    private function assertObjectManagerCalledForRepository(string $entityClass): void
     {
         $this->objectManager->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDirtyPropertyValue()
+    {
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'dirty');
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getForRemovePropertyValue()
+    {
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'forRemove');
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getForPersistPropertyValue()
+    {
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'forPersist');
     }
 }

@@ -7,7 +7,6 @@ use Oro\Component\ChainProcessor\ContextInterface;
 trait ValidateTransitionContextTrait
 {
     /**
-     * @param ContextInterface $context
      * @throws \InvalidArgumentException
      */
     private function validateContextType(ContextInterface $context)

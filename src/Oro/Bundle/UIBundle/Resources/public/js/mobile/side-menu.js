@@ -1,4 +1,4 @@
-define(['../side-menu', '../mediator'], function($, mediator) {
+define(['../side-menu', '../mediator', 'oroui/js/tools/scroll-helper'], function($, mediator, scrollHelper) {
     'use strict';
 
     $.widget('oroui.mobileSideMenu', $.oroui.sideMenu, {
@@ -10,14 +10,14 @@ define(['../side-menu', '../mediator'], function($, mediator) {
         _create: function() {
             this._super();
 
-            this.listener.listenTo(mediator, 'page:request', $.proxy(this._hide, this));
+            this.listener.listenTo(mediator, 'page:request', this._hide.bind(this));
 
             // handler for hiding menu on outside click
-            this._onOutsideClick = $.proxy(function(e) {
+            this._onOutsideClick = function(e) {
                 if (!$.contains(this.element.get(0), e.target)) {
                     this._hide();
                 }
-            }, this);
+            }.bind(this);
         },
 
         /**
@@ -39,7 +39,7 @@ define(['../side-menu', '../mediator'], function($, mediator) {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
             $('#main-menu').show();
             $(document).on('click shown.bs.dropdown', this._onOutsideClick);
-            $('html').addClass('modal-dropdown-shown');
+            scrollHelper.disableBodyTouchScroll();
         },
 
         /**
@@ -51,7 +51,7 @@ define(['../side-menu', '../mediator'], function($, mediator) {
             this.$toggle.removeClass('open');
             $('#main-menu').hide();
             $(document).off('click shown.bs.dropdown', this._onOutsideClick);
-            $('html').removeClass('modal-dropdown-shown');
+            scrollHelper.enableBodyTouchScroll();
         },
 
         /**

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -10,7 +9,10 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector;
 
-class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class ActivityContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
@@ -180,6 +182,45 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Assert that activity item has excepted actions
+     * Example: I should see following actions on "Task For Charlie" in activity list:
+     *            | Start progress |
+     *            | Close          |
+     *
+     * @Given /^(?:|I )should see (?P<only>|only )following actions on "(?P<content>[\w\s]*)" in activity list:$/
+     */
+    public function iShouldSeeFollowingActionsInActivityItem(bool $only, string $content, TableNode $actions): void
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('Activity List');
+        $item = $activityList->getActivityListItem($content);
+
+        $actualActions = $item->getActions();
+
+        $errors = [];
+        foreach ($actions->getRows() as $action) {
+            foreach ($actualActions as $key => $actualAction) {
+                if (preg_match(sprintf('/%s/i', $action[0]), $actualAction->getText())) {
+                    unset($actualActions[$key]);
+                    continue 2;
+                }
+            }
+
+            $errors[] = sprintf('   - "%s"', $action[0]);
+        }
+
+        if ($only && $actualActions) {
+            foreach ($actualActions as $actualAction) {
+                $errors[] = sprintf('   + "%s"', $actualAction->getText());
+            }
+        }
+
+        if ($errors) {
+            self::fail(sprintf('Action list not expected: %s', PHP_EOL . implode(PHP_EOL, $errors)));
+        }
+    }
+
+    /**
      * Assert that email body in activity list has substring
      * Example: Then I should see "We have new role for you" in email body
      *
@@ -210,7 +251,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
-        $icon = $item->find('css', 'div.icon i');
+        $icon = $item->find('css', 'div.icon span');
 
         self::assertTrue(
             $icon->hasClass('icon-email-thread'),
@@ -258,13 +299,31 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      *
      * @Then /^(?:|I )should see (?P<text>.+) text in activity$/
      */
-    public function iShouldSeeTextInCollapsedActivityItem($text)
+    public function iShouldSeeTextInCollapsedActivityItem(string $text)
     {
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
 
         self::assertNotFalse(
+            stripos($collapsedItem->getText(), $text),
+            sprintf('Can\'t find "%s" in collapsed activity item', $text)
+        );
+    }
+
+    /**
+     * Search text in current collapsed activity
+     * Example: Then I should not see Ask how his mood text in activity
+     *
+     * @Then /^(?:|I )should not see (?P<text>.+) text in activity$/
+     */
+    public function iShouldNotSeeTextInCollapsedActivityItem(string $text)
+    {
+        /** @var ActivityList $activityList */
+        $activityList = $this->createElement('Activity List');
+        $collapsedItem = $activityList->getCollapsedItem();
+
+        self::assertFalse(
             stripos($collapsedItem->getText(), $text),
             sprintf('Can\'t find "%s" in collapsed activity item', $text)
         );

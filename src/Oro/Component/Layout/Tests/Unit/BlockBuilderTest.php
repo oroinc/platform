@@ -4,40 +4,36 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockBuilder;
 use Oro\Component\Layout\BlockTypeHelperInterface;
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManipulatorInterface;
-use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\RawLayout;
 
 class BlockBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
     /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $typeHelper;
+    private $typeHelper;
 
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $layoutManipulator;
+    private $layoutManipulator;
 
     /** @var BlockBuilder */
-    protected $blockBuilder;
+    private $blockBuilder;
 
-    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->rawLayout         = new RawLayout();
-        $this->typeHelper        = $this->createMock('Oro\Component\Layout\BlockTypeHelperInterface');
-        $this->context           = new LayoutContext();
-        $this->layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $this->registry          = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->rawLayout = new RawLayout();
+        $this->typeHelper = $this->createMock(BlockTypeHelperInterface::class);
+        $this->context = new LayoutContext();
+        $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
 
-        $this->blockBuilder      = new BlockBuilder(
+        $this->blockBuilder = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,
             $this->typeHelper,
@@ -71,7 +67,7 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeName()
     {
-        $id   = 'test_id';
+        $id = 'test_id';
         $name = 'test_name';
 
         $this->rawLayout->add($id, null, $name);
@@ -83,13 +79,13 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
     {
-        $id   = 'test_id';
+        $id = 'test_id';
         $name = 'test_name';
 
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         $this->rawLayout->add($id, null, $type);
 

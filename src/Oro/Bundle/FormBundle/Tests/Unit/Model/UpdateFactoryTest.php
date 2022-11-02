@@ -26,7 +26,7 @@ class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateFactory */
     private $updateFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handlerRegistry = $this->createMock(FormHandlerRegistry::class);
         $this->dataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);

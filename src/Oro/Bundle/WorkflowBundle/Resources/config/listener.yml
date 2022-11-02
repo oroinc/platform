@@ -1,36 +1,38 @@
 services:
     oro_workflow.listener.process_data_serialize:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener
         arguments:
-            - '@oro_workflow.serializer.process.serializer.link'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\ProcessJob, event: postLoad }
+            - { name: container.service_subscriber, id: oro_workflow.serializer.process.serializer }
 
     oro_workflow.listener.workflow_data_serialize:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
         arguments:
-            - '@oro_workflow.serializer.data.serializer.link'
+            - '@Psr\Container\ContainerInterface'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postLoad }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem, event: postLoad }
+            - { name: container.service_subscriber, id: oro_workflow.serializer.data.serializer }
 
     oro_workflow.listener.workflow_item:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.entity_connector'
             - '@oro_workflow.cache.entity_aware'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem, event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
 
     oro_workflow.listener.workflow_transition_record:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener
         arguments:
             - '@event_dispatcher'
             - '@security.token_storage'
@@ -38,7 +40,7 @@ services:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord, event: postPersist }
 
     oro_workflow.listener.start_workflow:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener
         arguments:
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.cache.entity_aware'
@@ -47,7 +49,9 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
 
     oro_workflow.listener.event_trigger_collector:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener
+        arguments:
+            - !tagged_iterator oro_workflow.listener.event_trigger_collector.extension
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
@@ -56,7 +60,7 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_workflow.listener.extension.process_trigger:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension'
+        class: Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
@@ -69,7 +73,7 @@ services:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
     oro_workflow.listener.extension.transition_trigger_event:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension'
+        class: Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.cache.transition_trigger_event'
@@ -80,27 +84,28 @@ services:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
     oro_workflow.entity_listener.workflow_definition:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener
         arguments:
-            - '@service_container'
+            - '@oro_workflow.cache.entities_with_workflow'
+            - '@oro_workflow.registry.system'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preRemove }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: preRemove }
 
     oro_workflow.event_listener.workflow_definition_repository_cache_invalidator:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionRepositoryCacheInvalidationListener
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postPersist, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postUpdate, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postRemove, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: postPersist, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: postUpdate, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition, event: postRemove, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.activated, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.deactivated, method: invalidateCache }
 
     oro_workflow.event_listener.transition_triggers:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener
         arguments:
             - '@oro_workflow.transition_trigger_assembler'
             - '@oro_workflow.transition_trigger_updater'
@@ -108,7 +113,7 @@ services:
             - { name: oro_workflow.changes.subscriber }
 
     oro_workflow.listener.workflow_definition_scope:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionScopeListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionScopeListener
         arguments:
             - '@oro_workflow.manager.workflow_scope'
         tags:
@@ -118,7 +123,7 @@ services:
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }
 
     oro_workflow.listener.workflow_definition_validate:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionValidateListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionValidateListener
         arguments:
             - '@oro_workflow.workflow_assembler'
         tags:
@@ -126,7 +131,7 @@ services:
             - { name: oro_workflow.changes.listener, event: oro.workflow.before_update, method: onUpdateWorkflowDefinition }
 
     oro_workflow.event_listener.role_page_listener:
-        class: 'Oro\Bundle\WorkflowBundle\EventListener\RolePageListener'
+        class: Oro\Bundle\WorkflowBundle\EventListener\RolePageListener
         arguments:
             - '@translator'
             - '@request_stack'

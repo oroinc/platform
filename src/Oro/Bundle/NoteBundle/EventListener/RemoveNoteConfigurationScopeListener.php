@@ -14,14 +14,8 @@ use Oro\Bundle\NoteBundle\Migration\RemoveNoteConfigurationScopeMigration;
  */
 class RemoveNoteConfigurationScopeListener
 {
-    /**
-     * @var bool
-     */
-    protected $isApplicable;
+    protected bool $isApplicable = false;
 
-    /**
-     * @param PostMigrationEvent $event
-     */
     public function onPostUp(PostMigrationEvent $event)
     {
         if ($this->isApplicable) {
@@ -29,13 +23,10 @@ class RemoveNoteConfigurationScopeListener
         }
     }
 
-    /**
-     * @param PreMigrationEvent $event
-     */
     public function onPreUp(PreMigrationEvent $event)
     {
         $version = $event->getLoadedVersion('OroNoteBundle');
-        if ($version && version_compare($version, 'v1_3', '<')) {
+        if ($version && version_compare($version, 'v1_3', '<=')) {
             $this->isApplicable = true;
         }
     }

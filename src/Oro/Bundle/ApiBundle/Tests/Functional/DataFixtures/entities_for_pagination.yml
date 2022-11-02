@@ -1,0 +1,15 @@
+Extend\Entity\TestApiE1:
+    entity1_{1..31}:
+        name: 'Entity 1 (<current()>)'
+        #biO2M: [entity2_1 .. entity2_101]
+    entity1_32:
+        name: 'Entity 1 (32)'
+        #biO2MnD: [entity2_1 .. entity2_101]
+Extend\Entity\TestApiE2:
+    entity2_{1..101}:
+        name: 'Entity 2 (<current()>)'
+        biO2MOwner: '@entity1_1'
+        biO2MnDOwner: '@entity1_32'
+    entity2_102:
+        name: 'Entity 2 (102)'
+        biO2MOwner: '@entity1_32'

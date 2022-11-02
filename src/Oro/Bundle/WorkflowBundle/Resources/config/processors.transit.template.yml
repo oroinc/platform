@@ -15,6 +15,7 @@ services:
     oro_workflow.transit.result.form_submit.template_response.processor:
         class: Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor
         arguments:
+            - '@oro_workflow.workflow_item_serializer'
             - '@fos_rest.view_handler'
             - '@twig'
         tags:

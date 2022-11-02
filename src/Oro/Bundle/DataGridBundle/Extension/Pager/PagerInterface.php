@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
+/**
+ * Represents a datagrid pager.
+ */
 interface PagerInterface
 {
     /**
@@ -15,14 +18,6 @@ interface PagerInterface
 
     const MINIFIED_PAGE_PARAM     = 'i';
     const MINIFIED_PER_PAGE_PARAM = 'p';
-
-    /**
-     * @deprecated Since 1.12, will be removed after 1.14.
-     * @see \Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject::TOTAL_RECORDS_PATH
-     * @see \Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject::getTotalRecords
-     * @see \Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject::setTotalRecords
-     */
-    const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /**
      * Set max records per page

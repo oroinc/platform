@@ -16,9 +16,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
  */
 class ExpressionResult
 {
-    const TYPE_INT      = 1;
-    const TYPE_DATE     = 2;
-    const TYPE_TIME     = 3;
+    const TYPE_INT = 1;
+    const TYPE_DATE = 2;
+    const TYPE_TIME = 3;
     const TYPE_DAYMONTH = 4;
     const TYPE_DATETIME = 5;
 
@@ -33,67 +33,108 @@ class ExpressionResult
     /** @var mixed */
     private $value;
 
-    public function __construct($value, $timezone = null)
+    /**
+     * @param Token|int $value
+     * @param string|null $timezone
+     */
+    public function __construct(Token|int $value, ?string $timezone = null)
     {
-        $timezone = $timezone ? : 'UTC';
-        if (is_numeric($value)) {
-            $this->value      = $value;
-            $this->sourceType = self::TYPE_INT;
-        } elseif ($value instanceof Token) {
-            if ($value->is(Token::TYPE_VARIABLE)) {
-                $dateValue = Carbon::now(new \DateTimeZone($timezone));
-
-                switch ($value->getValue()) {
-                    case DateModifierInterface::VAR_TODAY:
-                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
-                        $dateValue->startOfDay();
-                        break;
-                    case DateModifierInterface::VAR_SOW:
-                    case DateModifierInterface::VAR_THIS_WEEK:
-                        //do not use start of the week due to it always use monday as 1 day
-                        $dateValue->modify('this week');
-                        $dateValue->startOfDay();
-                        break;
-                    case DateModifierInterface::VAR_SOM:
-                    case DateModifierInterface::VAR_THIS_MONTH:
-                    case DateModifierInterface::VAR_THIS_MONTH_W_Y:
-                        $dateValue->firstOfMonth();
-                        break;
-                    case DateModifierInterface::VAR_FMQ:
-                    case DateModifierInterface::VAR_SOQ:
-                    case DateModifierInterface::VAR_THIS_QUARTER:
-                    case DateModifierInterface::VAR_FDQ:
-                        $dateValue->firstOfQuarter();
-                        break;
-                    case DateModifierInterface::VAR_SOY:
-                    case DateModifierInterface::VAR_THIS_YEAR:
-                        $dateValue->firstOfYear();
-                        break;
-                }
-
-                $this->value = $dateValue;
-
-                $this->variableType  = (int)$value->getValue();
-                $this->variableLabel = (string)$value;
-                $this->sourceType    = self::TYPE_DATE;
-            } elseif ($value->is(Token::TYPE_TIME)) {
-                $dateValue = Carbon::parse('now', new \DateTimeZone($timezone));
-                call_user_func_array([$dateValue, 'setTime'], explode(':', $value->getValue()));
-
-                $this->value      = $dateValue;
-                $this->sourceType = self::TYPE_TIME;
-            } elseif ($value->is(Token::TYPE_DATE)) {
-                $this->sourceType = self::TYPE_DATE;
-                $this->value      = Carbon::parse($value->getValue(), new \DateTimeZone($timezone));
-            } elseif ($value->is(Token::TYPE_INTEGER)) {
-                $this->sourceType = self::TYPE_INT;
-                $this->value      = $value->getValue();
-            } elseif ($value->is(Token::TYPE_DAYMONTH)) { //03-20, [month]-[day]
-                $this->sourceType = self::TYPE_DAYMONTH;
-                //don't worry about date(Y), later we get only day and month
-                $this->value      = Carbon::parse(date('Y').'-'.$value->getValue(), new \DateTimeZone($timezone));
+        $timezone = $timezone ?: 'UTC';
+        if ($value instanceof Token) {
+            switch ($value->getType()) {
+                case Token::TYPE_VARIABLE:
+                    $this->processTypeVariable($value, $timezone);
+                    break;
+                case Token::TYPE_TIME:
+                    $this->processTypeTime($value);
+                    break;
+                case Token::TYPE_DATE:
+                    $this->processTypeDate($value);
+                    break;
+                case Token::TYPE_INTEGER:
+                    $this->processTypeInteger($value);
+                    break;
+                case Token::TYPE_DAYMONTH:
+                    $this->processTypeDayMonth($value, $timezone);
+                    break;
             }
+        } else {
+            $this->processTypeInteger($value);
         }
+    }
+
+    private function processTypeVariable(Token $token, string $timezone): void
+    {
+        $dateValue = Carbon::now($timezone);
+
+        switch ($token->getValue()) {
+            case DateModifierInterface::VAR_THIS_DAY:
+            case DateModifierInterface::VAR_TODAY:
+            case DateModifierInterface::VAR_THIS_DAY_W_Y:
+                $dateValue->startOfDay();
+                break;
+            case DateModifierInterface::VAR_SOW:
+            case DateModifierInterface::VAR_THIS_WEEK:
+                //do not use start of the week due to it always use monday as 1 day
+                $dateValue->modify('this week');
+                $dateValue->startOfDay();
+                break;
+            case DateModifierInterface::VAR_SOM:
+            case DateModifierInterface::VAR_THIS_MONTH:
+            case DateModifierInterface::VAR_THIS_MONTH_W_Y:
+                $dateValue->firstOfMonth();
+                break;
+            case DateModifierInterface::VAR_FMQ:
+            case DateModifierInterface::VAR_SOQ:
+            case DateModifierInterface::VAR_THIS_QUARTER:
+            case DateModifierInterface::VAR_FDQ:
+                $dateValue->firstOfQuarter();
+                break;
+            case DateModifierInterface::VAR_SOY:
+            case DateModifierInterface::VAR_THIS_YEAR:
+                $dateValue->firstOfYear();
+                break;
+        }
+
+        $this->value = $dateValue;
+        $this->variableType = (int)$token->getValue();
+        $this->variableLabel = (string)$token;
+        $this->sourceType = self::TYPE_DATE;
+    }
+
+    private function processTypeTime(Token $token): void
+    {
+        $dateValue = Carbon::parse('now');
+        call_user_func_array([$dateValue, 'setTime'], explode(':', $token->getValue()));
+
+        $this->value = $dateValue;
+        $this->sourceType = self::TYPE_TIME;
+    }
+
+    private function processTypeDate(Token $token): void
+    {
+        $this->sourceType = self::TYPE_DATE;
+        $this->value = Carbon::parse($token->getValue());
+    }
+
+    /**
+     * @param Token|int $token
+     */
+    private function processTypeInteger(Token|int $token): void
+    {
+        $this->sourceType = self::TYPE_INT;
+        if (is_numeric($token)) {
+            $this->value = $token;
+        } else {
+            $this->value = $token->getValue();
+        }
+    }
+
+    private function processTypeDayMonth(Token $token, string $timeZone): void
+    {
+        $this->sourceType = self::TYPE_DAYMONTH;
+        //don't worry about date(Y), later we get only day and month
+        $this->value = Carbon::parse(date('Y') . '-' . $token->getValue(), $timeZone);
     }
 
     /**
@@ -268,8 +309,6 @@ class ExpressionResult
 
     /**
      * Merges two results by rules
-     *
-     * @param ExpressionResult $expression
      *
      * @throws SyntaxException
      */

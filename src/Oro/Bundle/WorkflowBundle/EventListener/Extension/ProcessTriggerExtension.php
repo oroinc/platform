@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Async\Topics;
+use Oro\Bundle\WorkflowBundle\Async\Topic\ExecuteProcessJobTopic;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
@@ -20,6 +20,9 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Extension for process triggers.
+ */
 class ProcessTriggerExtension extends AbstractEventTriggerExtension
 {
     /** @var ProcessHandler */
@@ -42,14 +45,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
      */
     private $messageProducer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ProcessHandler $handler
-     * @param ProcessLogger $logger
-     * @param EventTriggerCache $triggerCache
-     * @param ProcessSchedulePolicy $schedulePolicy
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ProcessHandler $handler,
@@ -106,7 +101,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     }
 
     /**
-     * @param ObjectManager $manager
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ObjectManager $manager)
     {
@@ -248,7 +243,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                         $message->setDelay($timeShift);
                     }
 
-                    $this->messageProducer->send(Topics::EXECUTE_PROCESS_JOB, $message);
+                    $this->messageProducer->send(ExecuteProcessJobTopic::getName(), $message);
                     $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
                 }
             }

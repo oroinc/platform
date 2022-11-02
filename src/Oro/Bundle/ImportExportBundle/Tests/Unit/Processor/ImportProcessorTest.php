@@ -2,119 +2,114 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ImportProcessor;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
+use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ImportProcessor
-     */
-    protected $processor;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $serializer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    /**
-     * @var array
-     */
-    protected $item = array('test' => 'test');
+    /** @var ContextAwareProcessor */
+    protected $processor;
 
-    /**
-     * @var object
-     */
-    protected $object;
+    private array $item = ['test' => 'test'];
+    private \stdClass $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new \stdClass();
-
-        $this->context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
-            ->setMethods(array('getOption', 'addFailureException'))
-            ->getMockForAbstractClass();
-
-        $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')
-            ->getMockForAbstractClass();
+        $this->context = $this->createMock(Context::class);
+        $this->serializer = $this->createMock(SerializerInterface::class);
 
         $this->processor = new ImportProcessor();
         $this->processor->setSerializer($this->serializer);
         $this->processor->setImportExportContext($this->context);
     }
 
-    protected function setProcessExpects()
+    private function setProcessExpects(): void
     {
-        $this->context->expects($this->once())
-            ->method('getOption', 'addFailureException')
+        $this->context->expects(self::once())
+            ->method('getOption')
             ->with('entityName')
-            ->will($this->returnValue('\stdClass'));
-        $this->context
+            ->willReturn(\stdClass::class);
+
+        $this->context->expects(self::any())
             ->method('setValue')
-            ->withConsecutive(...[['rawItemData', $this->anything()], ['itemData', $this->item]]);
-        $this->context->expects($this->any())
+            ->withConsecutive(
+                ['rawItemData', self::anything()],
+                ['itemData', $this->item]
+            );
+
+        $this->context->expects(self::any())
             ->method('getConfiguration')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $this->serializer->expects($this->once())
-            ->method('deserialize')
-            ->with($this->item, '\stdClass', null)
-            ->will($this->returnValue($this->object));
+        $this->serializer->expects(self::once())
+            ->method('denormalize')
+            ->with($this->item, \stdClass::class, '')
+            ->willReturn($this->object);
     }
 
-    public function testProcessMinimum()
+    public function testProcessMinimum(): void
     {
         $this->setProcessExpects();
 
-        $this->assertEquals($this->object, $this->processor->process($this->item));
+        self::assertEquals($this->object, $this->processor->process($this->item));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->setProcessExpects();
 
-        $this->context->expects($this->never())
+        $this->context->expects(self::never())
             ->method('addFailureException');
 
-        $converter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface')
-            ->setMethods(array('convertToImportFormat'))
-            ->getMockForAbstractClass();
-        $converter->expects($this->once())
+        $converter = $this->createMock(DataConverterInterface::class);
+        $converter->expects(self::once())
             ->method('convertToImportFormat')
             ->with($this->item)
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
-        $strategy = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface')
-            ->setMethods(array('process'))
-            ->getMockForAbstractClass();
-        $strategy->expects($this->once())
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy->expects(self::once())
             ->method('process')
             ->with($this->object)
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->processor->setDataConverter($converter);
         $this->processor->setStrategy($strategy);
-        $this->assertEquals($this->object, $this->processor->process($this->item));
+        self::assertEquals($this->object, $this->processor->process($this->item));
     }
 
-    public function testSetEntityName()
+    public function testSetEntityName(): void
     {
         $entityName = 'TestEntity';
 
-        $dataConverter
-            = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
-        $dataConverter->expects($this->once())->method('setEntityName')->with($entityName);
+        $dataConverter = $this->createMock(EntityNameAwareDataConverter::class);
+        $dataConverter->expects(self::once())
+            ->method('setEntityName')
+            ->with($entityName);
 
-        $strategy = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy');
-        $strategy->expects($this->once())->method('setEntityName')->with($entityName);
+        $strategy = $this->createMock(EntityNameAwareStrategy::class);
+        $strategy->expects(self::once())
+            ->method('setEntityName')
+            ->with($entityName);
 
         $this->processor->setDataConverter($dataConverter);
         $this->processor->setStrategy($strategy);
         $this->processor->setEntityName($entityName);
-        $this->assertAttributeEquals($entityName, 'entityName', $this->processor);
+
+        self::assertEquals($entityName, ReflectionUtil::getPropertyValue($this->processor, 'entityName'));
     }
 }

@@ -8,19 +8,14 @@ use Oro\Bundle\QueryDesignerBundle\Model\ExpressionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\Restriction;
 
 /**
- * Represents ORM data source adapter which allows to combine restrictions in groups,
- * thus it allows to specify priority of restrictions
+ * The adapter to an ORM data source which allows to combine restrictions in groups,
+ * thus it allows to specify priority of restrictions.
  */
 class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
 {
     /** @var ExpressionBuilder */
-    protected $expressionBuilder;
+    private $expressionBuilder;
 
-    /**
-     * Constructor
-     *
-     * @param QueryBuilder $qb
-     */
     public function __construct(QueryBuilder $qb)
     {
         parent::__construct($qb);
@@ -35,18 +30,26 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
         $this->expressionBuilder->addRestriction(new Restriction($restriction, $condition, $isComputed));
     }
 
+    /**
+     * Starts a new restriction group.
+     *
+     * @param string $condition
+     */
     public function beginRestrictionGroup($condition)
     {
         $this->expressionBuilder->beginGroup($condition);
     }
 
+    /**
+     * Ends a restriction group previously added by {@see addRestriction} method.
+     */
     public function endRestrictionGroup()
     {
         $this->expressionBuilder->endGroup();
     }
 
     /**
-     * Applies all restrictions previously added using addRestriction and addRestrictionOperator methods
+     * Applies all restrictions previously added by {@see addRestriction} method.
      */
     public function applyRestrictions()
     {

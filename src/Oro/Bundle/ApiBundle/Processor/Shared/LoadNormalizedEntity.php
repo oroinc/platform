@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -52,7 +52,7 @@ class LoadNormalizedEntity implements ProcessorInterface
 
         $entityId = $context->getId();
         if (null !== $entityId) {
-            $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
+            $getProcessor = $this->processorBag->getProcessor(ApiAction::GET);
             $getContext = $this->createGetContext($context, $getProcessor);
             $getProcessor->process($getContext);
             $this->processGetResult($getContext, $context);
@@ -79,23 +79,21 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
+        $getContext->setSharedData($context->getSharedData());
+        $getContext->setHateoas($context->isHateoasEnabled());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
         if ($this->reuseExistingEntity && $context->hasResult()) {
             $getContext->setResult($context->getResult());
         }
-        $getContext->skipGroup('security_check');
-        $getContext->skipGroup('data_security_check');
-        $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $getContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
+        $getContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $getContext->setSoftErrorsHandling(true);
 
         return $getContext;
     }
 
-    /**
-     * @param GetContext        $getContext
-     * @param SingleItemContext $context
-     */
     protected function processGetResult(GetContext $getContext, SingleItemContext $context)
     {
         if ($getContext->hasErrors()) {
@@ -105,8 +103,9 @@ class LoadNormalizedEntity implements ProcessorInterface
             }
         } else {
             $context->setConfigExtras($getContext->getConfigExtras());
-            if ($getContext->hasConfig()) {
-                $context->setConfig($getContext->getConfig());
+            $getConfig = $getContext->getConfig();
+            if (null !== $getConfig) {
+                $context->setConfig($getConfig);
             }
             $getConfigSections = $getContext->getConfigSections();
             foreach ($getConfigSections as $configSection) {
@@ -115,16 +114,18 @@ class LoadNormalizedEntity implements ProcessorInterface
                 }
             }
 
-            if ($getContext->hasMetadata()) {
-                $context->setMetadata($getContext->getMetadata());
+            $getMetadata = $getContext->getMetadata();
+            if (null !== $getMetadata) {
+                $context->setMetadata($getMetadata);
             }
 
-            $getResponseHeaders = $getContext->getResponseHeaders();
             $responseHeaders = $context->getResponseHeaders();
+            $getResponseHeaders = $getContext->getResponseHeaders();
             foreach ($getResponseHeaders as $key => $value) {
                 $responseHeaders->set($key, $value);
             }
 
+            $context->setInfoRecords($getContext->getInfoRecords());
             $context->setResult($getContext->getResult());
         }
     }

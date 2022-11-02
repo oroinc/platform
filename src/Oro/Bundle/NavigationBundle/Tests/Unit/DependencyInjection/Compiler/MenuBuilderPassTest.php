@@ -1,106 +1,139 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
+use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessSkip()
+    private ContainerBuilder $container;
+
+    private Definition $chainMenuBuilder;
+
+    private Definition $itemFactory;
+
+    private MenuBuilderPass $compiler;
+
+    protected function setUp(): void
     {
-        $menuHelperDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->getMock();
+        $this->container = new ContainerBuilder();
+        $this->chainMenuBuilder = $this->container->register('oro_menu.builder_chain');
+        $this->itemFactory = $this->container->register('oro_navigation.item.factory');
 
-        $containerMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->getMock();
-        $containerMock->expects($this->exactly(2))
-            ->method('hasDefinition')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('oro_menu.builder_chain'),
-                    $this->equalTo('oro_navigation.item.factory')
-                )
-            )
-            ->will($this->returnValue(false));
-        $containerMock->expects($this->once())
-            ->method('getDefinition')
-            ->with('knp_menu.helper')
-            ->willReturn($menuHelperDefinition);
-        $containerMock->expects($this->never())
-            ->method('findTaggedServiceIds');
-
-        $menuHelperDefinition->expects(self::once())
-            ->method('setPublic')
-            ->with(true);
-
-        $compilerPass = new MenuBuilderChainPass();
-        $compilerPass->process($containerMock);
+        $this->compiler = new MenuBuilderPass();
     }
 
-    public function testProcess()
+    public function testProcessWhenNoTaggedServices(): void
     {
-        $menuHelperDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->getMock();
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->getMock();
-        $definition->expects($this->exactly(4))
-            ->method('addMethodCall');
-        $definition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('addBuilder', array(new Reference('service1'), 'test'));
-        $definition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addBuilder', array(new Reference('service2'), 'test'));
-        $definition->expects($this->at(3))
-            ->method('addMethodCall')
-            ->with('addBuilder', array(new Reference('service1')));
-        $definition->expects($this->at(5))
-            ->method('addMethodCall')
-            ->with('addBuilder', array(new Reference('service2')));
+        $this->compiler->process($this->container);
 
-        $serviceIds = array(
-            'service1' => array(array('alias' => 'test')),
-            'service2' => array(array('alias' => 'test'))
+        self::assertEquals([], $this->chainMenuBuilder->getArgument('$builders'));
+
+        $serviceLocatorReference = $this->chainMenuBuilder->getArgument('$builderContainer');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
+
+        $serviceLocatorReference = $this->itemFactory->getArgument('$builders');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
+    }
+
+    public function testProcessMenu(): void
+    {
+        $this->container->setDefinition('tagged_service_1', new Definition())
+            ->addTag('oro_menu.builder', ['alias' => 'item1']);
+        $this->container->setDefinition('tagged_service_2', new Definition())
+            ->addTag('oro_menu.builder', ['alias' => 'item2']);
+        $this->container->setDefinition('tagged_service_3', new Definition())
+            ->addTag('oro_menu.builder', ['alias' => 'item3']);
+        $this->container->setDefinition('tagged_service_4', new Definition())
+            ->addTag('oro_menu.builder', ['alias' => 'item2', 'priority' => -10]);
+        $this->container->setDefinition('tagged_service_5', new Definition())
+            ->addTag('oro_menu.builder', ['alias' => 'item3', 'priority' => 10]);
+
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                'item1' => ['tagged_service_1'],
+                'item2' => ['tagged_service_4', 'tagged_service_2'],
+                'item3' => ['tagged_service_3', 'tagged_service_5']
+            ],
+            $this->chainMenuBuilder->getArgument('$builders')
         );
 
-        $containerMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->getMock();
+        $serviceLocatorReference = $this->chainMenuBuilder->getArgument('$builderContainer');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'tagged_service_1' => new ServiceClosureArgument(new Reference('tagged_service_1')),
+                'tagged_service_2' => new ServiceClosureArgument(new Reference('tagged_service_2')),
+                'tagged_service_3' => new ServiceClosureArgument(new Reference('tagged_service_3')),
+                'tagged_service_4' => new ServiceClosureArgument(new Reference('tagged_service_4')),
+                'tagged_service_5' => new ServiceClosureArgument(new Reference('tagged_service_5'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
+    }
 
-        $containerMock->expects($this->exactly(2))
-            ->method('hasDefinition')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('oro_menu.builder_chain'),
-                    $this->equalTo('oro_navigation.item.factory')
-                )
-            )
-            ->will($this->returnValue(true));
+    public function testProcessItems(): void
+    {
+        $this->container->setDefinition('tagged_service_1', new Definition())
+            ->addTag('oro_navigation.item.builder', ['alias' => 'item1']);
+        $this->container->setDefinition('tagged_service_2', new Definition())
+            ->addTag('oro_navigation.item.builder', ['alias' => 'item2']);
+        $this->container->setDefinition('tagged_service_3', new Definition())
+            ->addTag('oro_navigation.item.builder', ['alias' => 'item3']);
+        $this->container->setDefinition('tagged_service_4', new Definition())
+            ->addTag('oro_navigation.item.builder', ['alias' => 'item2', 'priority' => -10]);
+        $this->container->setDefinition('tagged_service_5', new Definition())
+            ->addTag('oro_navigation.item.builder', ['alias' => 'item3', 'priority' => 10]);
 
-        $containerMock->expects($this->exactly(5))
-            ->method('getDefinition')
-            ->willReturnMap([
-                ['knp_menu.helper', $menuHelperDefinition],
-                ['oro_menu.builder_chain', $definition],
-                ['oro_navigation.item.factory', $definition],
-                ['service1', $definition],
-                ['service2', $definition],
-            ]);
+        $this->compiler->process($this->container);
 
-        $containerMock->expects($this->exactly(2))
-            ->method('findTaggedServiceIds')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('oro_menu.builder'),
-                    $this->equalTo('oro_navigation.item.builder')
-                )
-            )
-            ->will($this->returnValue($serviceIds));
+        $serviceLocatorReference = $this->itemFactory->getArgument('$builders');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'item1' => new ServiceClosureArgument(new Reference('tagged_service_1')),
+                'item2' => new ServiceClosureArgument(new Reference('tagged_service_4')),
+                'item3' => new ServiceClosureArgument(new Reference('tagged_service_3'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
 
-        $menuHelperDefinition->expects(self::once())
-            ->method('setPublic')
-            ->with(true);
-
-        $compilerPass = new MenuBuilderChainPass();
-        $compilerPass->process($containerMock);
+        self::assertEquals(
+            ['item1'],
+            $this->container->getDefinition('tagged_service_1')->getArguments()
+        );
+        self::assertEquals(
+            [],
+            $this->container->getDefinition('tagged_service_2')->getArguments()
+        );
+        self::assertEquals(
+            ['item3'],
+            $this->container->getDefinition('tagged_service_3')->getArguments()
+        );
+        self::assertEquals(
+            ['item2'],
+            $this->container->getDefinition('tagged_service_4')->getArguments()
+        );
+        self::assertEquals(
+            [],
+            $this->container->getDefinition('tagged_service_5')->getArguments()
+        );
     }
 }

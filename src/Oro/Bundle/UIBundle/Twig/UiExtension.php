@@ -2,88 +2,79 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
+use Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\Event\Events;
+use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
- * The extension adds:
- *  - common php functions as twig filters (uniqid, ceil, floor)
- *  - isMobileVersion and isDesktopVersion functions
- *  - series of processors for HTML (oro_form_process, oro_widget_render and other)
+ * Provides Twig functions for miscellaneous HTML processing tasks:
+ *   - oro_ui_scroll_data_before
+ *   - render_block
+ *   - oro_widget_render
+ *   - oro_form_process
+ *   - oro_view_process
+ *   - oro_get_content
+ *   - isMobileVersion
+ *   - isDesktopVersion
+ *   - oro_url_add_query
+ *   - oro_is_url_local
+ *   - skype_button
+ *   - oro_form_additional_data (Returns Additional section data which is used for rendering)
+ *
+ * Provides Twig filters that expose some common PHP functions:
+ *   - oro_js_template_content
+ *   - merge_recursive
+ *   - uniqid
+ *   - floor
+ *   - ceil
+ *   - oro_preg_replace
+ *   - oro_sort_by
+ *   - url_decode
+ *   - array_unique
+ *
+ * Provides a Twig tag to work with placeholders:
+ *   - placeholder
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UiExtension extends \Twig_Extension
+class UiExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
+    // Big number is set to guarantee Additional section is rendered at the end
+    public const ADDITIONAL_SECTION_PRIORITY = 10000;
 
-    /** @var ContainerInterface */
-    protected $container;
+    // Represents key which is used for Additional section in array of blocks to identify it and make possible to work
+    public const ADDITIONAL_SECTION_KEY = 'oro_additional_section_key';
 
-    /**
-     * Protect extension from infinite loop during a widget rendering
-     *
-     * @var bool
-     */
-    protected $renderedWidgets = [];
+    private const SKYPE_BUTTON_TEMPLATE = '@OroUI/skype_button.html.twig';
 
-    /**
-     * @param ContainerInterface $container
-     */
+    protected ContainerInterface $container;
+    /** Protect extension from infinite loop during a widget rendering */
+    private array $renderedWidgets = [];
+    private ?bool $isMobile = null;
+    private ?bool $isDesktop = null;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return EventDispatcherInterface
-     */
-    protected function getEventDispatcher()
-    {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * @return Request|null
-     */
-    protected function getRequest()
-    {
-        return $this->container->get('request_stack')->getCurrentRequest();
-    }
-
-    /**
-     * @return ContentProviderManager
-     */
-    protected function getContentProviderManager()
-    {
-        return $this->container->get('oro_ui.content_provider.manager');
-    }
-
-    /**
-     * @return UserAgentProviderInterface
-     */
-    protected function getUserAgentProvider()
-    {
-        return $this->container->get('oro_ui.user_agent_provider');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_ui';
     }
 
     /**
@@ -102,16 +93,19 @@ class UiExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
-            new \Twig_SimpleFilter(
-                'merge_recursive',
-                ['Oro\Component\PhpUtils\ArrayUtil', 'arrayMergeRecursiveDistinct']
-            ),
-            new \Twig_SimpleFilter('uniqid', 'uniqid'),
-            new \Twig_SimpleFilter('floor', 'floor'),
-            new \Twig_SimpleFilter('ceil', 'ceil'),
-            new \Twig_SimpleFilter('oro_preg_replace', [$this, 'pregReplace']),
-            new \Twig_SimpleFilter('oro_sort_by', [$this, 'sortBy'])
+            new TwigFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
+            new TwigFilter('merge_recursive', [ArrayUtil::class, 'arrayMergeRecursiveDistinct']),
+            new TwigFilter('uniqid', 'uniqid'),
+            new TwigFilter('floor', 'floor'),
+            new TwigFilter('ceil', 'ceil'),
+            new TwigFilter('render_content', static function ($string) {
+                return $string;
+            }),
+            new TwigFilter('oro_preg_replace', [$this, 'pregReplace']),
+            new TwigFilter('oro_sort_by', [$this, 'sortBy']),
+            new TwigFilter('url_decode', 'urldecode'),
+            new TwigFilter('url_add_query_parameters', [$this, 'urlAddQueryParameters']),
+            new TwigFilter('array_unique', 'array_unique'),
         ];
     }
 
@@ -121,125 +115,168 @@ class UiExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_ui_scroll_data_before',
                 [$this, 'scrollDataBefore'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'render_block',
                 [$this, 'renderBlock'],
                 ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_widget_render',
                 [$this, 'renderWidget'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_form_process',
                 [$this, 'processForm'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
+                'oro_form_additional_data',
+                [$this, 'renderAdditionalData'],
+                ['needs_environment' => true]
+            ),
+            new TwigFunction(
                 'oro_view_process',
                 [$this, 'processView'],
                 ['needs_environment' => true]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_get_content',
                 [$this, 'getContent'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction('isMobileVersion', [$this, 'isMobile']),
-            new \Twig_SimpleFunction('isDesktopVersion', [$this, 'isDesktop']),
-            new \Twig_SimpleFunction('oro_url_add_query', [$this, 'addUrlQuery']),
-            new \Twig_SimpleFunction('oro_is_url_local', [$this, 'isUrlLocal']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('isMobileVersion', [$this, 'isMobile']),
+            new TwigFunction('isDesktopVersion', [$this, 'isDesktop']),
+            new TwigFunction('oro_url_add_query', [$this, 'addUrlQuery']),
+            new TwigFunction('oro_is_url_local', [$this, 'isUrlLocal']),
+            new TwigFunction(
                 'skype_button',
                 [$this, 'getSkypeButton'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
+            new TwigFunction('oro_default_page', [$this, 'getDefaultPage']),
         ];
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param string            $pageIdentifier
      * @param array             $data
      * @param object            $entity
-     * @param FormView          $formView
+     * @param FormView|null     $formView
      * @return array
      */
     public function scrollDataBefore(
-        \Twig_Environment $environment,
+        TwigEnvironment $environment,
         $pageIdentifier,
         array $data,
         $entity,
         FormView $formView = null
     ) {
         $event = new BeforeListRenderEvent($environment, new ScrollData($data), $entity, $formView);
-        $this->getEventDispatcher()->dispatch('oro_ui.scroll_data.before.' . $pageIdentifier, $event);
+        $this->getEventDispatcher()->dispatch($event, 'oro_ui.scroll_data.before.' . $pageIdentifier);
 
         return $event->getScrollData()->getData();
     }
 
     /**
-     * @param \Twig_Environment $env
-     * @param array             $context
-     * @param string            $template
-     * @param string            $block
-     * @param array             $extraContext
+     * @param TwigEnvironment $env
+     * @param array $context
+     * @param string $template
+     * @param string $block
+     * @param array $extraContext
      *
      * @return string
+     * @throws \Throwable
      */
-    public function renderBlock(\Twig_Environment $env, $context, $template, $block, $extraContext = [])
+    public function renderBlock(TwigEnvironment $env, $context, $template, $block, $extraContext = []): string
     {
-        /** @var \Twig_Template $template */
-        $template = $env->loadTemplate($template);
+        $templateWrapper = $env->load($template);
 
-        return $template->renderBlock($block, array_merge($context, $extraContext));
+        return $templateWrapper->renderBlock($block, array_merge($context, $extraContext));
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $data
      * @param FormView          $form
      * @param object|null       $entity
      *
      * @return array
      */
-    public function processForm(\Twig_Environment $environment, array $data, FormView $form, $entity = null)
+    public function processForm(TwigEnvironment $environment, array $data, FormView $form, $entity = null)
     {
         $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
-        $this->getEventDispatcher()->dispatch(Events::BEFORE_UPDATE_FORM_RENDER, $event);
+        $this->getEventDispatcher()->dispatch($event, Events::BEFORE_UPDATE_FORM_RENDER);
 
         return $event->getFormData();
     }
 
+    public function renderAdditionalData(
+        TwigEnvironment $environment,
+        FormView $form,
+        string $label,
+        array $additionalData = []
+    ): array {
+        foreach ($form->children as $child) {
+            if (empty($child->vars['extra_field']) || $child->isRendered()) {
+                continue;
+            }
+
+            $additionalData[$child->vars['name']] = $environment->render(
+                '@OroUI/form_row.html.twig',
+                ['child' => $child]
+            );
+        }
+
+        if ($additionalData) {
+            $additionalData = [
+                self::ADDITIONAL_SECTION_KEY =>
+                    [
+                        'title' => $label,
+                        'priority' => self::ADDITIONAL_SECTION_PRIORITY,
+                        'subblocks' => [
+                            [
+                                'title' => '',
+                                'useSpan' => false,
+                                'data' => $additionalData
+                            ]
+                        ]
+                    ]
+            ];
+        }
+
+        return $additionalData;
+    }
+
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $data
      * @param object            $entity
      *
      * @return array
      */
-    public function processView(\Twig_Environment $environment, array $data, $entity)
+    public function processView(TwigEnvironment $environment, array $data, $entity)
     {
         $event = new BeforeViewRenderEvent($environment, $data, $entity);
-        $this->getEventDispatcher()->dispatch(Events::BEFORE_VIEW_RENDER, $event);
+        $this->getEventDispatcher()->dispatch($event, Events::BEFORE_VIEW_RENDER);
 
         return $event->getData();
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param array             $options
      *
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function renderWidget(\Twig_Environment $environment, array $options = [])
+    public function renderWidget(TwigEnvironment $environment, array $options = [])
     {
         $optionsHash = md5(json_encode($options));
 
@@ -260,7 +297,7 @@ class UiExtension extends \Twig_Extension
 
         $elementId = 'widget-container-' . $options['wid'];
 
-        if (!array_key_exists('elementFirst', $options)) {
+        if (!\array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;
         }
 
@@ -274,7 +311,7 @@ class UiExtension extends \Twig_Extension
             $options['url'],
             $widgetType,
             $options['wid'],
-            isset($options['widgetTemplate']) ? $options['widgetTemplate'] : null
+            $options['widgetTemplate'] ?? null
         );
 
         $request = $this->getRequest();
@@ -283,7 +320,7 @@ class UiExtension extends \Twig_Extension
         }
 
         return $environment->render(
-            'OroUIBundle::widget_loader.html.twig',
+            '@OroUI/widget_loader.html.twig',
             [
                 'elementId'  => $elementId,
                 'options'    => $options,
@@ -293,17 +330,15 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param array $options
-     *
      * @throws \InvalidArgumentException
      */
     protected function validateOptions(array $options)
     {
-        if (!array_key_exists('url', $options)) {
+        if (!\array_key_exists('url', $options)) {
             throw new \InvalidArgumentException('Option url is required');
         }
 
-        if (!array_key_exists('widgetType', $options)) {
+        if (!\array_key_exists('widgetType', $options)) {
             throw new \InvalidArgumentException('Option widgetType is required');
         }
     }
@@ -318,13 +353,13 @@ class UiExtension extends \Twig_Extension
      */
     protected function getUrlWithContainer($url, $widgetType, $wid, $widgetTemplate = null)
     {
-        if (strpos($url, '_widgetContainer=') === false) {
+        if (!str_contains($url, '_widgetContainer=')) {
             $parts = parse_url($url);
             $widgetPart = '_widgetContainer=' . $widgetType . '&_wid=' . $wid;
             if ($widgetTemplate && $widgetTemplate !== $widgetType) {
                 $widgetPart .= '&_widgetContainerTemplate=' . $widgetTemplate;
             }
-            if (array_key_exists('query', $parts)) {
+            if (\array_key_exists('query', $parts)) {
                 $separator = $parts['query'] ? '&' : '';
                 $newQuery = $parts['query'] . $separator . $widgetPart;
                 $url = str_replace($parts['query'], $newQuery, $url);
@@ -378,7 +413,7 @@ class UiExtension extends \Twig_Extension
      */
     public function getContent(array $additionalContent = null, array $keys = null)
     {
-        $content = $this->getContentProviderManager()->getContent($keys);
+        $content = $this->getTwigContentProviderManager()->getContent($keys);
         if ($additionalContent) {
             $content = array_merge($content, $additionalContent);
         }
@@ -438,32 +473,56 @@ class UiExtension extends \Twig_Extension
      */
     public function pregReplace($subject, $pattern, $replacement, $limit = -1)
     {
-        if (is_string($subject) && !empty($subject)) {
+        if (\is_string($subject) && !empty($subject)) {
             $subject = preg_replace($pattern, $replacement, $subject, $limit);
         }
 
         return $subject;
     }
 
-    /**
-     * Check by user-agent if request was from mobile device
-     *
-     * @return bool
-     */
-    public function isMobile()
+    public function urlAddQueryParameters(string $url, array $parameters): string
     {
-        return $this->getUserAgentProvider()->getUserAgent()->isMobile();
+        $urlParts = parse_url($url);
+        $queryParameters = [];
+        if (isset($urlParts['query'])) {
+            parse_str($urlParts['query'], $queryParameters);
+        }
+
+        $queryParameters = ArrayUtil::arrayMergeRecursiveDistinct($queryParameters, $parameters);
+        $urlParts['query'] = http_build_query($queryParameters);
+
+        return sprintf(
+            '%s%s%s%s%s',
+            isset($urlParts['scheme'])? $urlParts['scheme'] . '://' : '',
+            $urlParts['host'] ?? '',
+            isset($urlParts['port']) ? ':' . $urlParts['port'] : '',
+            $urlParts['path'] ?? '',
+            $urlParts['query'] ? '?' . $urlParts['query']: ''
+        );
     }
 
+    /**
+     * Check by user-agent if request was from mobile device.
+     */
+    public function isMobile(): bool
+    {
+        if (null === $this->isMobile) {
+            $this->isMobile = $this->getUserAgent()->isMobile();
+        }
+
+        return $this->isMobile;
+    }
 
     /**
-     * Check by user-agent if request was not from mobile device
-     *
-     * @return bool
+     * Check by user-agent if request was not from mobile device.
      */
-    public function isDesktop()
+    public function isDesktop(): bool
     {
-        return $this->getUserAgentProvider()->getUserAgent()->isDesktop();
+        if (null === $this->isDesktop) {
+            $this->isDesktop = $this->getUserAgent()->isDesktop();
+        }
+
+        return $this->isDesktop;
     }
 
     /**
@@ -549,7 +608,7 @@ class UiExtension extends \Twig_Extension
      */
     public function sortBy(array $array, array $options = [])
     {
-        $sortingType = self::getOption($options, 'sorting-type', 'number');
+        $sortingType = $options['sorting-type'] ?? 'number';
         if ($sortingType === 'number') {
             $sortingFlags = SORT_NUMERIC;
         } else {
@@ -561,8 +620,8 @@ class UiExtension extends \Twig_Extension
 
         ArrayUtil::sortBy(
             $array,
-            self::getOption($options, 'reverse', false),
-            self::getOption($options, 'property', 'priority'),
+            $options['reverse'] ?? false,
+            $options['property'] ?? 'priority',
             $sortingFlags
         );
 
@@ -570,29 +629,15 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
-     */
-    protected static function getOption($options, $name, $defaultValue = null)
-    {
-        return isset($options[$name])
-            ? $options[$name]
-            : $defaultValue;
-    }
-
-    /**
      * Skype.UI wrapper
      *
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment   $environment
      * @param string            $skypeUserName
      * @param array             $options
      *
      * @return int
      */
-    public function getSkypeButton(\Twig_Environment $environment, $skypeUserName, $options = [])
+    public function getSkypeButton(TwigEnvironment $environment, $skypeUserName, $options = [])
     {
         if (!isset($options['element'])) {
             $options['element'] = 'skype_button_' . md5($skypeUserName) . '_' . mt_rand(1, 99999);
@@ -604,9 +649,56 @@ class UiExtension extends \Twig_Extension
             $options['name'] = 'call';
         }
 
-        $templateName = isset($options['template']) ? $options['template'] : self::SKYPE_BUTTON_TEMPLATE;
+        $templateName = $options['template'] ?? self::SKYPE_BUTTON_TEMPLATE;
         unset($options['template']);
 
         return $environment->render($templateName, ['options' => $options]);
+    }
+
+    public function getDefaultPage(): string
+    {
+        return $this->getRouter()->generate('oro_default');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,
+            'oro_ui.user_agent_provider' => UserAgentProviderInterface::class,
+            EventDispatcherInterface::class,
+            RouterInterface::class,
+            RequestStack::class,
+        ];
+    }
+
+    protected function getTwigContentProviderManager(): TwigContentProviderManager
+    {
+        return $this->container->get('oro_ui.content_provider.manager.twig');
+    }
+
+    protected function getUserAgent(): UserAgent
+    {
+        /** @var UserAgentProviderInterface $userAgentProvider */
+        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
+
+        return $userAgentProvider->getUserAgent();
+    }
+
+    protected function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
+    }
+
+    protected function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

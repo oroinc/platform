@@ -28,11 +28,6 @@ class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
         }
     }
 
-    public function getClass()
-    {
-        return 'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail';
-    }
-
     public function getEmailFields()
     {
         return null;

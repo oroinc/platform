@@ -3,7 +3,7 @@ define([
 ], function(emailUtil) {
     'use strict';
 
-    var data = [
+    const data = [
         {
             fullEmailAddress: 'john@example.com',
             pureEmailAddress: 'john@example.com'

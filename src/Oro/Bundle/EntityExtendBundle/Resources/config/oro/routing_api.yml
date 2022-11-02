@@ -1,3 +1,0 @@
-oro_entity_extend_enum_api:
-    resource: "@OroEntityExtendBundle/Controller/Api/Rest/EnumController.php"
-    type:     rest

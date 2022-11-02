@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validation;
 
 class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var FormContext|SingleItemContext */
@@ -30,7 +30,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -38,17 +38,12 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context = $this->createContext();
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
-        $this->context->setConfigExtras(
-            [
-                new EntityDefinitionConfigExtra($this->context->getAction())
-            ]
-        );
+        $this->context->setConfigExtras([
+            new EntityDefinitionConfigExtra($this->context->getAction())
+        ]);
     }
 
-    /**
-     * @return FormContext
-     */
-    protected function createContext()
+    protected function createContext(): FormContext
     {
         return new FormContextStub($this->configProvider, $this->metadataProvider);
     }
@@ -58,7 +53,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
      *
      * @return FormBuilder
      */
-    protected function createFormBuilder(array $extensions = [])
+    protected function createFormBuilder(array $extensions = []): FormBuilder
     {
         $formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
@@ -71,10 +66,11 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getFormExtensions()
+    protected function getFormExtensions(): array
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(new AnnotationReader())
+            ->enableAnnotationMapping(true)
+            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         return [new ValidatorExtension($validator)];

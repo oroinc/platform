@@ -10,14 +10,15 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionRepositoryCacheInv
 class WorkflowDefinitionRepositoryCacheInvalidationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var WorkflowDefinitionRepositoryCacheInvalidationListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->listener = new WorkflowDefinitionRepositoryCacheInvalidationListener($this->doctrineHelper);
     }
 
@@ -30,7 +31,8 @@ class WorkflowDefinitionRepositoryCacheInvalidationListenerTest extends \PHPUnit
             ->with(WorkflowDefinition::class)
             ->willReturn($repo);
 
-        $repo->expects($this->once())->method('invalidateCache');
+        $repo->expects($this->once())
+            ->method('invalidateCache');
 
         $this->listener->invalidateCache();
     }

@@ -17,10 +17,6 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param ConfigManager   $configManager
-     * @param FieldTypeHelper $fieldTypeHelper
-     */
     public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
     {
         $this->configManager   = $configManager;

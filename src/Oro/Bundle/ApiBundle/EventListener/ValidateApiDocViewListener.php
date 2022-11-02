@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use Nelmio\ApiDocBundle\Controller\ApiDocController;
+use Oro\Bundle\ApiBundle\Controller\RestApiDocController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Checks whether the requested API view is valid for REST API sandbox.
- * This implemented as a listener by several reasons:
- * * to avoid overriding of "NelmioApiDocBundle:layout.html.twig"
- *   template that uses "nelmio_api_doc_index" directly
- * * to allow introduce new controllers for REST API sandbox with different views
+ * This implemented as a listener to allow introduce new controllers for REST API sandbox with different views.
  * Also makes sure that "view" request attribute contains the correct default API view
  * if a view was not requested explicitly.
  */
@@ -39,19 +36,13 @@ class ValidateApiDocViewListener
         $this->defaultView = $defaultView;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
-        if (\is_array($controller)
-            && $controller[0] instanceof ApiDocController
-            && 'indexAction' === $controller[1]
-        ) {
+        if (\is_array($controller) && $this->isApiDocController($controller)) {
             $request = $event->getRequest();
             if (!$this->isValidView($request)) {
-                throw new NotFoundHttpException(\sprintf('Invalid API view "%s".', $this->getView($request)));
+                throw new NotFoundHttpException(sprintf('Invalid API view "%s".', $this->getView($request)));
             }
 
             $defaultView = $this->getDefaultView($request);
@@ -64,11 +55,11 @@ class ValidateApiDocViewListener
         }
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
+    protected function isApiDocController(array $controller): bool
+    {
+        return $controller[0] instanceof RestApiDocController;
+    }
+
     protected function isValidView(Request $request): bool
     {
         $view = $this->getView($request);
@@ -76,36 +67,21 @@ class ValidateApiDocViewListener
         return !$view || \in_array($view, $this->views, true);
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return string|null
-     */
     protected function getView(Request $request): ?string
     {
         return $request->attributes->get('view');
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return string|null
-     */
     protected function getDefaultView(Request $request): ?string
     {
         return $this->defaultView;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     protected function isDefaultViewRequested(Request $request): bool
     {
         $pathInfo = $request->getPathInfo();
         $pos = \strpos($pathInfo, $this->basePath);
 
-        return false === $pos || !\substr($pathInfo, $pos + 9);
+        return false === $pos || !substr($pathInfo, $pos + 9);
     }
 }

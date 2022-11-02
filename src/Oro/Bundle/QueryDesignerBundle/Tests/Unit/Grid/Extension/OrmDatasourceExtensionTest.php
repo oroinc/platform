@@ -3,113 +3,151 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
+
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $configManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $calendarFactory = $this->createMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
-        $localeSettings = new LocaleSettings($configManager, $calendarFactory);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->localeSettings->expects(self::any())
+            ->method('getTimeZone')
+            ->willReturn('America/Los_Angeles');
+        $this->localeSettings->expects(self::any())
+            ->method('getTimeZone')
+            ->willReturn('UTC');
+        $this->localeSettings->expects(self::any())
+            ->method('getLocale')
+            ->willReturn('en');
 
-        $mock = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
 
-        $subscriber = new MutableFormEventSubscriber($mock);
+        $numberFormatter = new NumberFormatter(
+            $this->localeSettings,
+            new IntlNumberFormatterFactory($this->localeSettings)
+        );
 
         $this->formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions(
-                array(
-                    new PreloadedExtension(
-                        array(
-                            'oro_type_text_filter'           => new TextFilterType($translator),
-                            'oro_type_datetime_range_filter' =>
-                                new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
-                            'oro_type_date_range_filter'     =>
-                                new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
-                            'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
-                            'oro_type_date_range'            => new DateRangeType($localeSettings),
-                            'oro_type_filter'                => new FilterType($translator),
+            ->addExtensions([
+                new PreloadedExtension(
+                    [
+                        'oro_type_text_filter'           => new TextFilterType($translator),
+                        'oro_type_number_filter'         => new NumberFilterType(
+                            $translator,
+                            $numberFormatter
                         ),
-                        array()
-                    ),
-                    new CsrfExtension(
-                        $this->createMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')
-                    )
+                        'oro_type_datetime_range_filter' => new DateTimeRangeFilterType(
+                            $translator,
+                            new DateModifierProvider(),
+                            $subscriber
+                        ),
+                        'oro_type_date_range_filter'     => new DateRangeFilterType(
+                            $translator,
+                            new DateModifierProvider(),
+                            $subscriber
+                        ),
+                        'oro_type_datetime_range'        => new DateTimeRangeType(),
+                        'oro_type_date_range'            => new DateRangeType($this->localeSettings),
+                        'oro_type_filter'                => new FilterType($translator),
+                    ],
+                    []
+                ),
+                new CsrfExtension(
+                    $this->createMock(CsrfTokenManagerInterface::class)
                 )
-            )
+            ])
             ->getFormFactory();
     }
 
     /**
      * @dataProvider visitDatasourceProvider
      */
-    public function testVisitDatasource($source, $expected)
+    public function testVisitDatasource(array $source, string $expected, bool $enableGrouping = false): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['user.id', 'user.name as user_name', 'user.status as user_status'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'user')
-            ->join('user.address', 'address');
+            ->from(CmsUser::class, 'user')
+            ->join('user.address', 'address')
+            ->join('user.shippingAddresses', 'shippingAddresses');
 
-        $manager = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $manager->expects($this->any())
+        $manager = $this->createMock(Manager::class);
+        $manager->expects(self::any())
             ->method('createFilter')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $params) {
-                        return $this->createFilter($name, $params);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($name, $params) {
+                return $this->createFilter($name, $params);
+            });
 
-        $extension  = new OrmDatasourceExtension(new RestrictionBuilder($manager));
-        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource->expects($this->once())
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_query_designer.conditions_group_merge_same_entity_conditions')
+            ->willReturn($enableGrouping);
+
+        $filterExecutionContext = new FilterExecutionContext();
+        $filterExecutionContext->enableValidation();
+        $extension = new OrmDatasourceExtension(
+            new RestrictionBuilder($manager, $configManager, $filterExecutionContext)
+        );
+
+        $datasource = $this->createMock(OrmDatasource::class);
+        $datasource->expects(self::once())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         $config = DatagridConfiguration::create($source);
         $config->setName('test_grid');
 
         $extension->visitDatasource($config, $datasource);
-        $result  = $qb->getDQL();
+        $result = $qb->getDQL();
         $counter = 0;
-        $result  = preg_replace_callback(
+        $result = preg_replace_callback(
             '/(:[a-z]+)(\d+)/',
             function ($matches) use (&$counter) {
                 return $matches[1] . (++$counter);
@@ -117,192 +155,18 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             $result
         );
 
-        $this->assertEquals($expected, $result);
+        $expected = str_replace([PHP_EOL, '( ', ' )'], [' ', '(', ')'], preg_replace('/\s+/', ' ', $expected));
+        // Check that generated DQL is valid and may be converted to SQL
+        self::assertNotEmpty($qb->getQuery()->getSQL());
+        // Check that generated DQL is expected
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
-     */
-    public function visitDatasourceProvider()
+    public function visitDatasourceProvider(): array
     {
-        return [
-            'test with group and simple restrictions' => [
-                'source'   => [
-                    'source' => [
-                        'query_config' => [
-                            'filters' => [
-                                [
-                                    'column'      => 'user_name',
-                                    'filter'      => 'string',
-                                    'filterData'  => [
-                                        'type'  => '2',
-                                        'value' => 'test_user_name'
-                                    ],
-                                    'columnAlias' => 'user_name'
-                                ],
-                                'AND',
-                                [
-                                    [
-                                        'column'     => 'user_status',
-                                        'filter'     => 'datetime',
-                                        'filterData' => [
-                                            'type'  => '2',
-                                            'value' => [
-                                                'start' => '2013-11-20 10:30',
-                                                'end'   => '2013-11-25 11:30',
-                                            ]
-                                        ]
-                                    ],
-                                    'AND',
-                                    [
-                                        [
-                                            [
-                                                'column'      => 'address.country',
-                                                'filter'      => 'string',
-                                                'filterData'  => [
-                                                    'type'  => '1',
-                                                    'value' => 'test_address_country'
-                                                ],
-                                                'columnAlias' => 'address_country'
-                                            ],
-                                            'OR',
-                                            [
-                                                'column'     => 'address.city',
-                                                'filter'     => 'string',
-                                                'filterData' => [
-                                                    'type'  => '1',
-                                                    'value' => 'test_address_city'
-                                                ]
-                                            ],
-                                        ],
-                                        'OR',
-                                        [
-                                            'column'     => 'address.zip',
-                                            'filter'     => 'string',
-                                            'filterData' => [
-                                                'type'  => '1',
-                                                'value' => 'address_zip'
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'expected' =>
-                    'SELECT user.id, user.name as user_name, user.status as user_status '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
-                    . 'INNER JOIN user.address address '
-                    . 'WHERE user_name NOT LIKE :string1 AND ('
-                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
-                    . 'AND (address.country LIKE :string4 '
-                    . 'OR address.city LIKE :string5 OR '
-                    . 'address.zip LIKE :string6))'
-            ],
-            'test with OR conditions' => [
-                'source'   => [
-                    'source' => [
-                        'query_config' => [
-                            'filters' => [
-                                [
-                                    'column'      => 'user_name',
-                                    'filter'      => 'string',
-                                    'filterData'  => [
-                                        'type'  => '2',
-                                        'value' => 'test_user_name'
-                                    ],
-                                    'columnAlias' => 'user_name'
-                                ],
-                                'OR',
-                                [
-                                    [
-                                        'column'     => 'user_status',
-                                        'filter'     => 'datetime',
-                                        'filterData' => [
-                                            'type'  => '2',
-                                            'value' => [
-                                                'start' => '2013-11-20 10:30',
-                                                'end'   => '2013-11-25 11:30',
-                                            ]
-                                        ]
-                                    ],
-                                    'OR',
-                                    [
-                                        'column'      => 'address.country',
-                                        'filter'      => 'string',
-                                        'filterData'  => [
-                                            'type'  => '1',
-                                            'value' => 'test_address_country'
-                                        ],
-                                        'columnAlias' => 'address_country'
-                                    ],
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'expected' =>
-                    'SELECT user.id, user.name as user_name, user.status as user_status '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
-                    . 'INNER JOIN user.address address '
-                    . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . 'user_status < :datetime2 OR user_status >= :datetime3 '
-                    . 'OR address.country LIKE :string4)'
-            ],
-            'test with OR filters between simple and group conditions' => [
-                'source'   => [
-                    'source' => [
-                        'query_config' => [
-                            'filters' => [
-                                [
-                                    'column'      => 'user_name',
-                                    'filter'      => 'string',
-                                    'filterData'  => [
-                                        'type'  => '2',
-                                        'value' => 'test_user_name'
-                                    ],
-                                    'columnAlias' => 'user_name'
-                                ],
-                                'OR',
-                                [
-                                    [
-                                        'column'     => 'user_status',
-                                        'filter'     => 'datetime',
-                                        'filterData' => [
-                                            'type'  => '2',
-                                            'value' => [
-                                                'start' => '2013-11-20 10:30',
-                                                'end'   => '2013-11-25 11:30',
-                                            ]
-                                        ]
-                                    ],
-                                    'AND',
-                                    [
-                                        'column'      => 'address.country',
-                                        'filter'      => 'string',
-                                        'filterData'  => [
-                                            'type'  => '1',
-                                            'value' => 'test_address_country'
-                                        ],
-                                        'columnAlias' => 'address_country'
-                                    ],
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'expected' =>
-                    'SELECT user.id, user.name as user_name, user.status as user_status '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
-                    . 'INNER JOIN user.address address '
-                    . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
-                    . 'AND address.country LIKE :string4)'
-            ],
-        ];
+        return Yaml::parse(
+            file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, 'fixtures', 'orm_datasource_data.yml']))
+        );
     }
 
     /**
@@ -313,9 +177,8 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      * @param array  $params An additional parameters of a new filter
      *
      * @return FilterInterface
-     * @throws \Exception
      */
-    public function createFilter($name, array $params = null)
+    private function createFilter(string $name, array $params = null): FilterInterface
     {
         $defaultParams = [
             'type' => $name
@@ -323,22 +186,23 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         if ($params !== null && !empty($params)) {
             $params = array_merge($defaultParams, $params);
         }
+        $util = new FilterUtility();
 
         switch ($name) {
             case 'string':
-                $filter = new StringFilter($this->formFactory, new FilterUtility());
+                $filter = new StringFilter($this->formFactory, $util);
+                break;
+            case 'number':
+                $filter = new NumberFilter($this->formFactory, $util);
                 break;
             case 'datetime':
-                $localeSetting = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-                    ->disableOriginalConstructor()->getMock();
-                $localeSetting->expects($this->any())->method('getTimeZone')->will($this->returnValue('UTC'));
-                $compiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
-                    ->disableOriginalConstructor()->getMock();
-
+                $compiler = $this->createMock(Compiler::class);
                 $filter = new DateTimeRangeFilter(
                     $this->formFactory,
-                    new FilterUtility(),
-                    new DateFilterUtility($localeSetting, $compiler)
+                    $util,
+                    new DateFilterUtility($this->localeSettings, $compiler),
+                    $this->localeSettings,
+                    new DateFilterModifier($compiler)
                 );
                 break;
             default:

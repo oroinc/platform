@@ -12,6 +12,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 /**
  * A set of reusable static methods to help building of queries.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class QueryBuilderUtil
 {
@@ -57,6 +58,30 @@ class QueryBuilderUtil
     }
 
     /**
+     * Returns a string contains the expression of SELECT clause.
+     *
+     * @param QueryBuilder $qb
+     *
+     * @return string|null
+     */
+    public static function getSelectExpr(QueryBuilder $qb)
+    {
+        $parts = [];
+        /** @var \Doctrine\ORM\Query\Expr\Select $selectPart */
+        foreach ($qb->getDQLPart('select') as $selectPart) {
+            foreach ($selectPart->getParts() as $part) {
+                $parts[] = $part;
+            }
+        }
+
+        if (empty($parts)) {
+            return null;
+        }
+
+        return implode(', ', $parts);
+    }
+
+    /**
      * Returns an expression in SELECT clause by its alias
      *
      * @param QueryBuilder $qb
@@ -90,31 +115,54 @@ class QueryBuilderUtil
      *
      * @return string|null
      *
-     * @throws QueryException
+     * @throws QueryException if the given query builder does not have a root alias or has more than one root aliases
      */
     public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
         $rootAliases = $qb->getRootAliases();
-
-        $result = null;
-        if (count($rootAliases) !== 1) {
-            if ($throwException) {
-                $errorReason = count($rootAliases) === 0
-                    ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));
-
-                throw new QueryException(
-                    sprintf(
-                        'Can\'t get single root alias for the given query. Reason: %s.',
-                        $errorReason
-                    )
-                );
-            }
-        } else {
-            $result = $rootAliases[0];
+        if (count($rootAliases) === 1) {
+            return $rootAliases[0];
         }
 
-        return $result;
+        if ($throwException) {
+            throw new QueryException(sprintf(
+                'Can\'t get single root alias for the given query. Reason: %s.',
+                count($rootAliases) === 0
+                    ? 'the query has no any root aliases'
+                    : sprintf('the query has several root aliases: %s.', implode(', ', $rootAliases))
+            ));
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the root entity of the query.
+     *
+     * @param QueryBuilder $qb             The query builder
+     * @param bool         $throwException Whether to throw exception in case the query does not have a root entity
+     *
+     * @return string|null
+     *
+     * @throws QueryException if the given query builder does not have a root entity or has more than one root entities
+     */
+    public static function getSingleRootEntity(QueryBuilder $qb, $throwException = true)
+    {
+        $rootEntities = $qb->getRootEntities();
+        if (count($rootEntities) === 1) {
+            return $rootEntities[0];
+        }
+
+        if ($throwException) {
+            throw new QueryException(sprintf(
+                'Can\'t get single root entity for the given query. Reason: %s.',
+                count($rootEntities) === 0
+                    ? 'the query has no any root entities'
+                    : sprintf('the query has several root entities: %s.', implode(', ', $rootEntities))
+            ));
+        }
+
+        return null;
     }
 
     /**
@@ -135,10 +183,10 @@ class QueryBuilderUtil
             self::checkIdentifier($key);
             if (empty($val)) {
                 $qb->leftJoin($rootAlias . '.' . $key, $key);
-            } elseif (is_array($val)) {
+            } elseif (\is_array($val)) {
                 if (isset($val['join'])) {
                     $join = $val['join'];
-                    if (false === strpos($join, '.')) {
+                    if (!str_contains($join, '.')) {
                         $join = $rootAlias . '.' . $join;
                     }
                 } else {
@@ -147,7 +195,7 @@ class QueryBuilderUtil
                 $condition     = null;
                 $conditionType = null;
                 if (isset($val['condition'])) {
-                    $condition     = $val['condition'];
+                    $condition = $val['condition'];
                     $conditionType = Expr\Join::WITH;
                 }
                 if (isset($val['conditionType'])) {
@@ -180,7 +228,7 @@ class QueryBuilderUtil
         }
 
         foreach ($optimizedValues[self::IN_BETWEEN] as $range) {
-            list($min, $max) = $range;
+            [$min, $max] = $range;
             $minParam = self::generateParameterName($field);
             $maxParam = self::generateParameterName($field);
 
@@ -209,7 +257,7 @@ class QueryBuilderUtil
 
         $ranges = ArrayUtil::intRanges($values);
         foreach ($ranges as $range) {
-            list($min, $max) = $range;
+            [$min, $max] = $range;
             if ($min === $max) {
                 $result[self::IN][] = $min;
             } else {
@@ -242,8 +290,6 @@ class QueryBuilderUtil
 
     /**
      * Removes unused parameters from query builder
-     *
-     * @param QueryBuilder $qb
      */
     public static function removeUnusedParameters(QueryBuilder $qb)
     {
@@ -278,7 +324,7 @@ class QueryBuilderUtil
             $aliasToClassMap[$from->getAlias()] = $from->getFrom();
         }
 
-        list($parentAlias, $field) = explode('.', $join->getJoin());
+        [$parentAlias, $field] = explode('.', $join->getJoin());
         $parentClass = $aliasToClassMap[$parentAlias]
             ?? self::getJoinClass($qb, self::findJoinByAlias($qb, $parentAlias));
 
@@ -341,7 +387,7 @@ class QueryBuilderUtil
         $metadata = $em->getClassMetadata($rootEntities[0]);
         $startIndex = count($joins) - 1;
         for ($i = $startIndex; $i >= 0; $i--) {
-            list(, $field) = explode('.', $joins[$i]);
+            [, $field] = explode('.', $joins[$i]);
             if (!isset($metadata->associationMappings[$field])) {
                 return false;
             }
@@ -362,7 +408,7 @@ class QueryBuilderUtil
      * Query safe replacement for sprintf
      *
      * @param string $format
-     * @param array ...$args
+     * @param string|int|float|bool ...$args
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -396,8 +442,8 @@ class QueryBuilderUtil
      */
     public static function checkField($str)
     {
-        if (strpos($str, '.') !== false) {
-            list($alias, $field) = explode('.', $str, 2);
+        if (str_contains($str, '.')) {
+            [$alias, $field] = explode('.', $str, 2);
             self::checkIdentifier($alias);
             self::checkIdentifier($field);
         } else {
@@ -427,7 +473,7 @@ class QueryBuilderUtil
      */
     public static function checkParameter($str)
     {
-        if (strpos($str, ':') === 0) {
+        if (str_starts_with($str, ':')) {
             self::checkIdentifier(substr($str, 1));
         }
     }
@@ -457,7 +503,7 @@ class QueryBuilderUtil
         foreach ($joinPart as $joins) {
             foreach ($joins as $join) {
                 if ($join->getAlias() === $alias) {
-                    list($parentAlias) = explode('.', $join->getJoin());
+                    [$parentAlias] = explode('.', $join->getJoin());
 
                     return [$parentAlias => $join->getJoin()];
                 }

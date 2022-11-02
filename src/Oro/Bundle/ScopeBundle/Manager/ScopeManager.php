@@ -2,81 +2,80 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Creates / finds scopes and scope criteria.
  *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ScopeManager
+class ScopeManager implements ResetInterface
 {
-    const BASE_SCOPE = 'base_scope';
+    public const BASE_SCOPE = 'base_scope';
 
-    /**
-     * @var ScopeEntityStorage
-     */
-    protected $entityStorage;
+    /** @var ContainerInterface */
+    private $providerContainer;
 
-    /**
-     * @var EntityFieldProvider
-     */
-    protected $entityFieldProvider;
+    /** @var array [scope type => [scope criteria provider id, ...], ...] */
+    private $providers;
 
-    /**
-     * @var ServiceLink
-     */
-    protected $entityFieldProviderLink;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    /** @var ScopeDataAccessor */
+    private $dataAccessor;
 
-    /**
-     * @var array
-     */
-    protected $fields;
+    /** @var ScopeCollection */
+    private $scheduledForInsertScopes;
 
-    /**
-     * @param ScopeEntityStorage $entityStorage
-     * @param ServiceLink $entityFieldProviderLink
-     */
-    public function __construct(ScopeEntityStorage $entityStorage, ServiceLink $entityFieldProviderLink)
-    {
-        $this->entityStorage = $entityStorage;
-        $this->entityFieldProviderLink = $entityFieldProviderLink;
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
+
+    /** @var array|null */
+    private $nullContext;
+
+    /** @var array [scope type => [ScopeCriteriaProviderInterface, ...], ...] */
+    private $loadedProviders = [];
+
+    public function __construct(
+        array $providers,
+        ContainerInterface $providerContainer,
+        ManagerRegistry $doctrine,
+        ScopeDataAccessor $dataAccessor,
+        ScopeCollection $scheduledForInsertScopes,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
+        $this->providers = $providers;
+        $this->providerContainer = $providerContainer;
+        $this->doctrine = $doctrine;
+        $this->dataAccessor = $dataAccessor;
+        $this->scheduledForInsertScopes = $scheduledForInsertScopes;
+        $this->propertyAccessor = $propertyAccessor;
     }
-
-    /**
-     * @var ScopeCriteriaProviderInterface[]
-     */
-    protected $providers = [];
-
-    /**
-     * @var array|null
-     */
-    protected $nullContext = null;
 
     /**
      * @param string            $scopeType
      * @param array|object|null $context
+     *
      * @return Scope|null
      */
-    public function find($scopeType, $context = null)
+    public function find(string $scopeType, $context = null): ?Scope
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
-        $scope = $this->getScopeRepository()->findOneByCriteria($criteria);
-        if (!$scope) {
-            $scope = $this->entityStorage->getScheduledForInsertByCriteria($criteria);
+        $scope = $this->dataAccessor->findOneByCriteria($criteria);
+        if (null === $scope) {
+            $scope = $this->scheduledForInsertScopes->get($criteria);
         }
 
         return $scope;
@@ -85,31 +84,43 @@ class ScopeManager
     /**
      * @param string            $scopeType
      * @param array|object|null $context
-     * @return Scope
+     *
+     * @return int|null
      */
-    public function findMostSuitable($scopeType, $context = null)
+    public function findId(string $scopeType, $context = null): ?int
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
-        return $this->getScopeRepository()->findMostSuitable($criteria);
+        return $this->dataAccessor->findIdentifierByCriteria($criteria);
     }
 
     /**
      * @param string            $scopeType
      * @param array|object|null $context
-     * @return BufferedQueryResultIterator|\Oro\Bundle\ScopeBundle\Entity\Scope[]
+     *
+     * @return Scope|null
      */
-    public function findBy($scopeType, $context = null)
+    public function findMostSuitable(string $scopeType, $context = null): ?Scope
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
-        return $this->getScopeRepository()->findByCriteria($criteria);
+        return $this->dataAccessor->findMostSuitableByCriteria($criteria);
     }
 
     /**
-     * @return Scope
+     * @param string            $scopeType
+     * @param array|object|null $context
+     *
+     * @return BufferedQueryResultIteratorInterface|Scope[]
      */
-    public function findDefaultScope()
+    public function findBy(string $scopeType, $context = null): iterable
+    {
+        $criteria = $this->getCriteria($scopeType, $context);
+
+        return $this->dataAccessor->findByCriteria($criteria);
+    }
+
+    public function findDefaultScope(): ?Scope
     {
         return $this->find(self::BASE_SCOPE, $this->getNullContext());
     }
@@ -117,51 +128,54 @@ class ScopeManager
     /**
      * @param string            $scopeType
      * @param array|object|null $context
+     *
      * @return BufferedQueryResultIteratorInterface|Scope[]
      */
-    public function findRelatedScopes($scopeType, $context = null)
+    public function findRelatedScopes(string $scopeType, $context = null): iterable
     {
         $criteria = $this->getCriteriaForRelatedScopes($scopeType, $context);
 
-        return $this->getScopeRepository()->findByCriteria($criteria);
-    }
-
-    /**
-     * @param string            $scopeType
-     * @param array|object|null $context
-     * @return array
-     */
-    public function findRelatedScopeIds($scopeType, $context = null)
-    {
-        $criteria = $this->getCriteriaForRelatedScopes($scopeType, $context);
-
-        return $this->getScopeRepository()->findIdentifiersByCriteria($criteria);
+        return $this->dataAccessor->findByCriteria($criteria);
     }
 
     /**
      * @param string            $scopeType
      * @param array|object|null $context
      *
-     * @return array
+     * @return int[]
      */
-    public function findRelatedScopeIdsWithPriority($scopeType, $context = null)
+    public function findRelatedScopeIds(string $scopeType, $context = null): array
+    {
+        $criteria = $this->getCriteriaForRelatedScopes($scopeType, $context);
+
+        return $this->dataAccessor->findIdentifiersByCriteria($criteria);
+    }
+
+    /**
+     * @param string            $scopeType
+     * @param array|object|null $context
+     *
+     * @return int[]
+     */
+    public function findRelatedScopeIdsWithPriority(string $scopeType, $context = null): array
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
-        return $this->getScopeRepository()->findIdentifiersByCriteriaWithPriority($criteria);
+        return $this->dataAccessor->findIdentifiersByCriteriaWithPriority($criteria);
     }
 
     /**
      * @param string            $scopeType
      * @param array|object|null $context
      * @param bool              $flush
+     *
      * @return Scope
      */
-    public function findOrCreate($scopeType, $context = null, $flush = true)
+    public function findOrCreate(string $scopeType, $context = null, bool $flush = true): Scope
     {
-        $scope = $this->find($scopeType, $context);
-        if (!$scope) {
-            $criteria = $this->getCriteria($scopeType, $context);
+        $criteria = $this->getCriteria($scopeType, $context);
+        $scope = $this->dataAccessor->findOneByCriteria($criteria);
+        if (null === $scope) {
             $scope = $this->createScopeByCriteria($criteria, $flush);
         }
 
@@ -171,25 +185,27 @@ class ScopeManager
     /**
      * @param ScopeCriteria $criteria
      * @param bool          $flush
+     *
      * @return Scope
      */
-    public function createScopeByCriteria(ScopeCriteria $criteria, $flush = true)
+    public function createScopeByCriteria(ScopeCriteria $criteria, $flush = true): Scope
     {
-        if ($scheduledScope = $this->entityStorage->getScheduledForInsertByCriteria($criteria)) {
+        $scheduledScope = $this->scheduledForInsertScopes->get($criteria);
+        if (null !== $scheduledScope) {
             return $scheduledScope;
         }
 
         $scope = new Scope();
-        $propertyAccessor = $this->getPropertyAccessor();
         foreach ($criteria as $fieldName => $value) {
             if ($value !== null) {
-                $propertyAccessor->setValue($scope, $fieldName, $value);
+                $this->propertyAccessor->setValue($scope, $fieldName, $value);
             }
         }
 
-        $this->entityStorage->scheduleForInsert($scope, $criteria);
+        $this->scheduledForInsertScopes->add($scope, $criteria);
         if ($flush) {
-            $this->entityStorage->flush();
+            $this->doctrine->getManagerForClass(Scope::class)
+                ->flush($this->scheduledForInsertScopes->getAll());
         }
 
         return $scope;
@@ -197,18 +213,10 @@ class ScopeManager
 
     /**
      * @param string $scopeType
-     * @param        $provider
+     *
+     * @return array [criteria filed => criteria value type, ...]
      */
-    public function addProvider($scopeType, $provider)
-    {
-        $this->providers[$scopeType][] = $provider;
-    }
-
-    /**
-     * @param string $scopeType
-     * @return array
-     */
-    public function getScopeEntities($scopeType)
+    public function getScopeEntities(string $scopeType): array
     {
         $entities = [];
 
@@ -221,27 +229,35 @@ class ScopeManager
     }
 
     /**
-     * @param Scope  $scope
-     * @param string $type
+     * @param Scope             $scope
+     * @param string            $scopeType
+     * @param array|object|null $context
+     *
      * @return ScopeCriteria
      */
-    public function getCriteriaByScope(Scope $scope, $type)
+    public function getCriteriaByScope(Scope $scope, string $scopeType, $context = null): ScopeCriteria
     {
         $criteria = $this->getNullContext();
-        foreach ($this->getProviders($type) as $provider) {
+        $providers = $this->getProviders($scopeType);
+        foreach ($providers as $provider) {
             $field = $provider->getCriteriaField();
-            $criteria[$field] = $this->getPropertyAccessor()->getValue($scope, $field);
+            $value = $this->getCriteriaValueFromContext($context, $provider);
+            if (false === $value) {
+                $value = $this->propertyAccessor->getValue($scope, $field);
+            }
+            $criteria[$field] = $value;
         }
 
-        return new ScopeCriteria($criteria, $this->getFields());
+        return new ScopeCriteria($criteria, $this->getClassMetadataFactory());
     }
 
     /**
      * @param string            $scopeType
      * @param array|object|null $context
+     *
      * @return ScopeCriteria
      */
-    public function getCriteria($scopeType, $context = null)
+    public function getCriteria(string $scopeType, $context = null): ScopeCriteria
     {
         $criteria = [];
         if (self::BASE_SCOPE === $scopeType && is_array($context)) {
@@ -250,9 +266,12 @@ class ScopeManager
             $providers = $this->getProviders($scopeType);
             foreach ($providers as $provider) {
                 if (null === $context) {
-                    $criteria = array_merge($criteria, $provider->getCriteriaForCurrentScope());
+                    $criteria[$provider->getCriteriaField()] = $provider->getCriteriaValue();
                 } else {
-                    $criteria = array_merge($criteria, $provider->getCriteriaByContext($context));
+                    $value = $this->getCriteriaValueFromContext($context, $provider);
+                    if (false !== $value) {
+                        $criteria[$provider->getCriteriaField()] = $value;
+                    }
                 }
             }
         }
@@ -262,22 +281,13 @@ class ScopeManager
             }
         }
 
-        return new ScopeCriteria($criteria, $this->getFields());
+        return new ScopeCriteria($criteria, $this->getClassMetadataFactory());
     }
 
-
-    /**
-     * @param Scope $scope
-     * @param ScopeCriteria $criteria
-     * @param string $scopeType
-     *
-     * @return bool
-     */
-    public function isScopeMatchCriteria(Scope $scope, ScopeCriteria $criteria, $scopeType)
+    public function isScopeMatchCriteria(Scope $scope, ScopeCriteria $criteria, string $scopeType): bool
     {
         $criteriaContext = $criteria->toArray();
-        $scopeCriteriaContext = $this->getCriteriaByScope($scope, $scopeType)
-            ->toArray();
+        $scopeCriteriaContext = $this->getCriteriaByScope($scope, $scopeType)->toArray();
 
         foreach ($scopeCriteriaContext as $field => $value) {
             if (null !== $value && $criteriaContext[$field] !== $value) {
@@ -289,100 +299,114 @@ class ScopeManager
     }
 
     /**
-     * @return array
+     * @param string            $scopeType
+     * @param array|object|null $context
+     *
+     * @return ScopeCriteria
      */
-    protected function getNullContext()
+    public function getCriteriaForRelatedScopes(string $scopeType, $context = null): ScopeCriteria
     {
-        if ($this->nullContext === null) {
-            $this->nullContext = [];
-            foreach ($this->getFields() as $field) {
-                $this->nullContext[$field['name']] = null;
+        $criteria = $this->getNullContext();
+        $providers = $this->getProviders($scopeType);
+        foreach ($providers as $provider) {
+            $value = $this->getCriteriaValueFromContext($context, $provider);
+            if (false === $value) {
+                $value = ScopeCriteria::IS_NOT_NULL;
             }
+            $criteria[$provider->getCriteriaField()] = $value;
+        }
+
+        return new ScopeCriteria($criteria, $this->getClassMetadataFactory());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->loadedProviders = [];
+    }
+
+    /**
+     * @param array|object|null              $context
+     * @param ScopeCriteriaProviderInterface $provider
+     *
+     * @return mixed
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function getCriteriaValueFromContext($context, ScopeCriteriaProviderInterface $provider)
+    {
+        if (!is_object($context) && !is_array($context)) {
+            return false;
+        }
+
+        $propertyPath = $provider->getCriteriaField();
+        if (is_array($context)) {
+            $propertyPath = '[' . $propertyPath . ']';
+        }
+        try {
+            $value = $this->propertyAccessor->getValue($context, $propertyPath);
+            if (null === $value) {
+                return false;
+            }
+        } catch (AccessException $e) {
+            return false;
+        }
+
+        if (!is_a($value, $provider->getCriteriaValueType())
+            && !is_array($value)
+            && ScopeCriteria::IS_NOT_NULL !== $value
+        ) {
+            throw new NotSupportedCriteriaValueException(sprintf(
+                'The type %s is not supported for context[%s]. Expected %s, null, array or "%s".',
+                is_object($value) ? get_class($value) : gettype($value),
+                $provider->getCriteriaField(),
+                $provider->getCriteriaValueType(),
+                ScopeCriteria::IS_NOT_NULL
+            ));
+        }
+
+        return $value;
+    }
+
+    private function getNullContext(): array
+    {
+        if (null === $this->nullContext) {
+            $this->nullContext = array_fill_keys(
+                $this->getClassMetadataFactory()->getMetadataFor(Scope::class)->getAssociationNames(),
+                null
+            );
         }
 
         return $this->nullContext;
     }
 
     /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
-    }
-
-    /**
+     * Gets providers for the given scope type.
+     * The providers are sorted by the priority, the higher the priority,
+     * the closer the provider to the top of the list.
+     *
      * @param string $scopeType
+     *
      * @return ScopeCriteriaProviderInterface[]
      */
-    protected function getProviders($scopeType)
+    private function getProviders(string $scopeType): array
     {
-        $rawProviders = empty($this->providers[$scopeType]) ? [] : $this->providers[$scopeType];
-        $providers = [];
-        foreach ($rawProviders as $provider) {
-            if ($provider instanceof ServiceLink) {
-                $provider = $provider->getService();
+        if (!isset($this->loadedProviders[$scopeType])) {
+            $providers = [];
+            if (isset($this->providers[$scopeType])) {
+                foreach ($this->providers[$scopeType] as $providerId) {
+                    $providers[] = $this->providerContainer->get($providerId);
+                }
             }
-            $providers[] = $provider;
+            $this->loadedProviders[$scopeType] = $providers;
         }
 
-        return $providers;
+        return $this->loadedProviders[$scopeType];
     }
 
-    /**
-     * @return ScopeRepository
-     */
-    protected function getScopeRepository()
+    private function getClassMetadataFactory(): ClassMetadataFactory
     {
-        return $this->entityStorage->getRepository();
-    }
-
-    /**
-     * @param string            $scopeType
-     * @param array|object|null $context
-     * @return ScopeCriteria
-     */
-    public function getCriteriaForRelatedScopes($scopeType, $context)
-    {
-        $criteria = $this->getNullContext();
-        /** @var ScopeCriteriaProviderInterface[] $providers */
-        $providers = $this->getProviders($scopeType);
-        foreach ($providers as $provider) {
-            $localCriteria = $provider->getCriteriaByContext($context);
-            if (count($localCriteria) === 0) {
-                $localCriteria = [$provider->getCriteriaField() => ScopeCriteria::IS_NOT_NULL];
-            }
-            $criteria = array_merge($criteria, $localCriteria);
-        }
-
-        return new ScopeCriteria($criteria, $this->getFields());
-    }
-
-    /**
-     * @return EntityFieldProvider
-     */
-    protected function getEntityFieldProvider()
-    {
-        if (!$this->entityFieldProvider) {
-            $this->entityFieldProvider = $this->entityFieldProviderLink->getService();
-        }
-
-        return $this->entityFieldProvider;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFields()
-    {
-        if ($this->fields === null) {
-            $this->fields = $this->getEntityFieldProvider()->getRelations(Scope::class, false, true, false);
-        }
-
-        return $this->fields;
+        return $this->doctrine->getManagerForClass(Scope::class)->getMetadataFactory();
     }
 }

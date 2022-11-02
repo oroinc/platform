@@ -1,15 +1,15 @@
-<script type="text/html" id="template-datagrid-toolbar">
+<script type="text/html" class="datagrid_templates" data-identifier="template-datagrid-toolbar">
     <div class="grid-toolbar">
      {% if isDesktopVersion() %}
         <div class="grid-toolbar__part grid-toolbar__part--start">
+            <div class="pagination" data-grid-pagination></div>
+            <div data-grid-items-counter></div>
+        </div>
+        <div class="grid-toolbar__part grid-toolbar__part--center">
             <div class="sorting" data-grid-sorting></div>
             <div class="grid-toolbar-mass-actions">
                 <div class="extra-actions-panel" data-grid-extra-actions-panel></div>
             </div>
-        </div>
-        <div class="grid-toolbar__part grid-toolbar__part--center">
-            <div class="pagination" data-grid-pagination></div>
-            <div data-grid-items-counter></div>
         </div>
         <div class="grid-toolbar__part grid-toolbar__part--end">
             <div class="grid-toolbar-tools">

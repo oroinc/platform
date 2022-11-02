@@ -1,0 +1,57 @@
+/* @theme: admin.oro; */
+
+$content-padding: 24px;
+$content-padding-medium: 16px;
+$content-padding-small: $content-padding-medium * .5;
+$horizontal-padding: $content-padding;
+$vertical-padding: $content-padding;
+$top-padding: $content-padding;
+$bottom-padding: $content-padding;
+$margin-bottom-box: $content-padding;
+
+$base-font-size: 14px;
+$base-font-size--xxl: 32px;
+$base-font-size--xl: 24px;
+$base-font-size--l: 18px;
+$base-font-size--m: 16px;
+$base-font-size--sm: 13px;
+$base-font-size--s: 12px;
+$base-font-size--xs: 11px;
+
+// Fonts weights
+$font-weights: (
+    // Thin (Hairline)
+        'thin': 100,
+    // Extra Light (Ultra Light)
+        'extra': 200,
+    // Light
+        'light': 300,
+    // Normal
+        'normal': 400,
+    // Medium
+        'medium': 500,
+    // Semi Bold (Demi Bold)
+        'semi-bold': 600,
+    // Bold
+        'bold': 700,
+    // Extra Bold (Ultra Bold)
+        'extra-bold': 800,
+    // Black (Heavy)
+        'black': 900
+) !default;
+
+$enable-safe-area: true;
+
+// Screen sizes
+$side-bar-closed-width: 33px;
+$side-bar-opened-width: 200px;
+$body-min-width: 375px !default;
+// Loading
+
+$loader-size: 32px !default;
+$loader-width: 6px !default;
+$loader-color: $primary-700 !default;
+
+$icon-font-size: $base-font-size--m !default;
+
+$backdrop-shadow: rgba(0 0 0 / 10%) !default;

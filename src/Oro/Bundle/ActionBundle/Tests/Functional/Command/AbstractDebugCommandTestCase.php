@@ -10,34 +10,34 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     /** @var FactoryWithTypesInterface */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->factory = $this->getContainer()->get($this->getFactoryServiceId());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $typeNames = array_keys($this->factory->getTypes());
         $result = $this->runCommand($this->getCommandName());
-        $this->assertContains('Short Description', $result);
+        self::assertStringContainsString('Short Description', $result);
         foreach ($typeNames as $name) {
-            $this->assertContains($name, $result);
+            self::assertStringContainsString($name, $result);
         }
     }
 
-    public function testExecuteWithArgument()
+    public function testExecuteWithArgument(): void
     {
         $types = $this->factory->getTypes();
         $typeNames = array_keys($types);
         $name = array_shift($typeNames);
         $result = $this->runCommand($this->getCommandName(), [$name]);
-        $this->assertContains('Full Description', $result);
-        $this->assertContains($name, $result);
-        $this->assertContains(array_shift($types), $result);
+        self::assertStringContainsString('Full Description', $result);
+        self::assertStringContainsString($name, $result);
+        self::assertStringContainsString(array_shift($types), $result);
     }
 
-    public function testExecuteWithNotExistsArgument()
+    public function testExecuteWithNotExistsArgument(): void
     {
         $name = 'some_not_exists_name';
         $result = $this->runCommand($this->getCommandName(), [$name]);
@@ -45,13 +45,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $this->assertEquals(sprintf('Type "%s" is not found', $name), $result);
     }
 
-    /**
-     * @return string
-     */
-    abstract protected function getFactoryServiceId();
+    abstract protected function getFactoryServiceId(): string;
 
-    /**
-     * @return string
-     */
-    abstract protected function getCommandName();
+    abstract protected function getCommandName(): string;
 }

@@ -5,19 +5,24 @@ namespace Oro\Bundle\OrganizationBundle\Twig;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class OrganizationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to deal with entity owners:
+ *   - oro_get_owner_type
+ *   - oro_get_entity_owner
+ *   - oro_get_owner_field_name
+ *   - oro_get_business_units_count
+ */
+class OrganizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_owner_type';
-
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -28,7 +33,7 @@ class OrganizationExtension extends \Twig_Extension
      */
     protected function getConfigManager()
     {
-        return $this->container->get('oro_entity_config.config_manager');
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -53,10 +58,10 @@ class OrganizationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_get_owner_type', [$this, 'getOwnerType']),
-            new \Twig_SimpleFunction('oro_get_entity_owner', [$this, 'getEntityOwner']),
-            new \Twig_SimpleFunction('oro_get_owner_field_name', [$this, 'getOwnerFieldName']),
-            new \Twig_SimpleFunction('oro_get_business_units_count', [$this, 'getBusinessUnitCount']),
+            new TwigFunction('oro_get_owner_type', [$this, 'getOwnerType']),
+            new TwigFunction('oro_get_entity_owner', [$this, 'getEntityOwner']),
+            new TwigFunction('oro_get_owner_field_name', [$this, 'getOwnerFieldName']),
+            new TwigFunction('oro_get_business_units_count', [$this, 'getBusinessUnitCount']),
         ];
     }
 
@@ -115,8 +120,12 @@ class OrganizationExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::EXTENSION_NAME;
+        return [
+            ConfigManager::class,
+            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
+            'oro_organization.business_unit_manager' => BusinessUnitManager::class,
+        ];
     }
 }

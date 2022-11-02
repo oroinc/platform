@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType as SymfonyIntegerType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This form type is just a wrapper around standard 'integer' form type, but
@@ -18,6 +19,20 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as SymfonyIntegerType
  */
 class IntegerType extends AbstractConfigType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults(
+            [
+                'schema_update_required' => static fn ($newVal, $oldVal) => (int)$newVal !== (int)$oldVal,
+            ]
+        );
+    }
+
     /**
      * {@inheritdoc}
      */

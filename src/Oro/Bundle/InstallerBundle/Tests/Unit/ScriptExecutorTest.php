@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,22 +13,18 @@ class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
     {
         $testScriptFile = realpath(__DIR__ . '/Fixture/src/TestPackage/install.php');
 
-        $output = $this->getMockBuilder('Symfony\Component\Console\Output\StreamOutput')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $output->expects($this->at(0))
+        $output = $this->createMock(StreamOutput::class);
+        $output->expects($this->exactly(2))
             ->method('writeln')
-            ->with($this->stringContains(sprintf('Launching "Test Package Installer" (%s) script', $testScriptFile)));
-        $output->expects($this->at(1))
-            ->method('writeln')
-            ->with('Test Package Installer data');
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+            ->withConsecutive(
+                [$this->stringContains(sprintf('Launching "Test Package Installer" (%s) script', $testScriptFile))],
+                ['Test Package Installer data']
+            );
 
-        $commandExecutor = $this->getMockBuilder('Oro\Bundle\InstallerBundle\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = $this->createMock(ContainerInterface::class);
+        $commandExecutor = $this->createMock(CommandExecutor::class);
+
         $scriptExecutor = new ScriptExecutor($output, $container, $commandExecutor);
-
         $scriptExecutor->runScript($testScriptFile);
     }
 }

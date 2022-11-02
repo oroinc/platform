@@ -15,9 +15,6 @@ class WorkflowListConfiguration implements ConfigurationInterface
      */
     protected $workflowConfiguration;
 
-    /**
-     * @param WorkflowConfiguration $workflowConfiguration
-     */
     public function __construct(WorkflowConfiguration $workflowConfiguration)
     {
         $this->workflowConfiguration = $workflowConfiguration;
@@ -40,8 +37,8 @@ class WorkflowListConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_WORKFLOWS);
+        $treeBuilder = new TreeBuilder(self::NODE_WORKFLOWS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode->useAttributeAsKey('name');
         $this->workflowConfiguration->addWorkflowNodes($rootNode->prototype('array')->children());
 

@@ -9,28 +9,28 @@ use Symfony\Component\HttpFoundation\Response;
 class ContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request */
-    protected $request;
+    private $request;
 
     /** @var Response */
-    protected $response;
+    private $response;
 
     /** @var string */
-    protected $action;
+    private $action;
 
     /** @var object */
-    protected $controllerObject;
+    private $controllerObject;
 
     /** @var array */
-    protected $values = ['testKey' => 'testValue'];
+    private $values = ['testKey' => 'testValue'];
 
     /** @var Context */
-    protected $context;
+    private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->request          = Request::create(uniqid('uri'));
-        $this->response         = new Response();
-        $this->action           = uniqid('actionName');
+        $this->request = Request::create('test_uri');
+        $this->response = new Response();
+        $this->action = 'test_action';
         $this->controllerObject = new \stdClass();
 
         $this->context = new Context(
@@ -40,11 +40,6 @@ class ContextTest extends \PHPUnit\Framework\TestCase
             $this->action,
             $this->values
         );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->context, $this->request, $this->response, $this->controllerObject, $this->action);
     }
 
     public function testGetRequest()
@@ -66,11 +61,11 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testValuesAccessor()
     {
         $this->assertTrue($this->context->has('testKey'));
-        $this->assertEquals($this->context->get('testKey'), 'testValue');
+        $this->assertEquals('testValue', $this->context->get('testKey'));
 
-        $this->assertEquals($this->context->get('notExistingOne', 'testDefaultValue'), 'testDefaultValue');
+        $this->assertEquals('testDefaultValue', $this->context->get('notExistingOne', 'testDefaultValue'));
 
         $this->context->set('testSecondKey', 'testSecondValue');
-        $this->assertEquals($this->context->get('testSecondKey'), 'testSecondValue');
+        $this->assertEquals('testSecondValue', $this->context->get('testSecondKey'));
     }
 }

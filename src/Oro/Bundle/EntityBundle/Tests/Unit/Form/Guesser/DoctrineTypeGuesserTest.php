@@ -2,37 +2,31 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineTypeGuesser
-     */
-    protected $guesser;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $managerRegistry;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityConfigProvider;
+    /** @var DoctrineTypeGuesser */
+    private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->guesser = new DoctrineTypeGuesser(
             $this->managerRegistry,
@@ -40,23 +34,19 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->managerRegistry);
-        unset($this->entityConfigProvider);
-        unset($this->guesser);
-    }
-
     public function testAddDoctrineTypeMapping()
     {
         $doctrineType = 'doctrine_type';
         $formType = 'test_form_type';
-        $formOptions = array('form' => 'options');
-        $expectedMappings = array($doctrineType => array('type' => $formType, 'options' => $formOptions));
+        $formOptions = ['form' => 'options'];
+        $expectedMappings = [$doctrineType => ['type' => $formType, 'options' => $formOptions]];
 
         $this->guesser->addDoctrineTypeMapping($doctrineType, $formType, $formOptions);
 
-        $this->assertAttributeEquals($expectedMappings, 'doctrineTypeMappings', $this->guesser);
+        self::assertEquals(
+            $expectedMappings,
+            ReflectionUtil::getPropertyValue($this->guesser, 'doctrineTypeMappings')
+        );
     }
 
     public function testGuessNoMetadata()
@@ -78,21 +68,21 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $doctrineType = 'string';
         $formType = 'text';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($this->isType('string'))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $metadata->expects($this->any())
             ->method('getTypeOfField')
             ->with($this->isType('string'))
-            ->will($this->returnValueMap(array(array($firstField, $doctrineType), array($secondField, 'object'))));
+            ->willReturnMap([[$firstField, $doctrineType], [$secondField, 'object']]);
         $this->setEntityMetadata($class, $metadata);
 
         $this->guesser->addDoctrineTypeMapping($doctrineType, $formType);
 
         $guess = $this->guesser->guessType($class, $firstField);
-        $this->assertGuess($guess, $formType, array(), TypeGuess::HIGH_CONFIDENCE);
+        $this->assertGuess($guess, $formType, [], TypeGuess::HIGH_CONFIDENCE);
 
         $this->assertDefaultGuess($this->guesser->guessType($class, $secondField));
     }
@@ -103,25 +93,25 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProperty';
         $associationClass = 'Test\Association\Class';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $metadata->expects($this->any())
             ->method('getAssociationTargetClass')
             ->with($property)
-            ->will($this->returnValue($associationClass));
+            ->willReturn($associationClass);
         $metadata->expects($this->any())
             ->method('isCollectionValuedAssociation')
             ->with($property)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->setEntityMetadata($class, $metadata);
 
         $this->assertGuess(
             $this->guesser->guessType($class, $property),
             EntityType::class,
-            array('class' => $associationClass, 'multiple' => false),
+            ['class' => $associationClass, 'multiple' => false],
             TypeGuess::HIGH_CONFIDENCE
         );
     }
@@ -132,66 +122,53 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProperty';
         $associationClass = 'Test\Association\Class';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $metadata->expects($this->any())
             ->method('getAssociationTargetClass')
             ->with($property)
-            ->will($this->returnValue($associationClass));
+            ->willReturn($associationClass);
         $metadata->expects($this->any())
             ->method('isCollectionValuedAssociation')
             ->with($property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->setEntityMetadata($class, $metadata);
 
         $this->assertGuess(
             $this->guesser->guessType($class, $property),
             EntityType::class,
-            array('class' => $associationClass, 'multiple' => true),
+            ['class' => $associationClass, 'multiple' => true],
             TypeGuess::HIGH_CONFIDENCE
         );
     }
 
-    /**
-     * @param string $class
-     * @param mixed $metadata
-     */
-    protected function setEntityMetadata($class, $metadata)
+    private function setEntityMetadata(string $class, ?ClassMetadata $metadata): void
     {
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $this->managerRegistry->expects($this->any())->method('getManagerForClass')->with($class)
-            ->will($this->returnValue($entityManager));
+        $this->managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($entityManager);
     }
 
-    /**
-     * @param TypeGuess $guess
-     * @param string $type
-     * @param array $options
-     * @param $confidence
-     */
-    protected function assertGuess($guess, $type, array $options, $confidence)
+    private function assertGuess(TypeGuess $guess, string $type, array $options, int $confidence): void
     {
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $guess);
+        $this->assertInstanceOf(TypeGuess::class, $guess);
         $this->assertEquals($type, $guess->getType());
         $this->assertEquals($options, $guess->getOptions());
         $this->assertEquals($confidence, $guess->getConfidence());
     }
 
-    /**
-     * @param TypeGuess $guess
-     */
-    protected function assertDefaultGuess($guess)
+    private function assertDefaultGuess(TypeGuess $guess): void
     {
-        $this->assertGuess($guess, TextType::class, array(), TypeGuess::LOW_CONFIDENCE);
+        $this->assertGuess($guess, TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
 }

@@ -4,24 +4,24 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * This subscriber adds and removes entities from relation collections.
+ */
 class MultipleEntitySubscriber implements EventSubscriberInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -38,9 +38,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSet(FormEvent $event)
     {
         $form       = $event->getForm();
@@ -59,9 +56,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         $form->get('removed')->setData($removed);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -71,7 +65,7 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         $removed = $form->get('removed')->getData();
 
         $parent = $form->getParent()->getData();
-        $parentMetadata = $this->doctrineHelper->getEntityMetadata(
+        $parentMetadata = !$parent ? null : $this->doctrineHelper->getEntityMetadata(
             ClassUtils::getClass($parent),
             false
         );
@@ -84,7 +78,10 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
             ) {
                 $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, $parent);
             }
-            $children->add($child);
+
+            if (!$children->contains($child)) {
+                $children->add($child);
+            }
         }
         foreach ($removed as $child) {
             if (null !== $parentMetadata
@@ -161,6 +158,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
      */
     protected function getSetterName($mappedBy)
     {
-        return 'set' . Inflector::classify($mappedBy);
+        return 'set' . InflectorFactory::create()->classify($mappedBy);
     }
 }

@@ -1,10 +1,11 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set isWidgetContext=true %}
 {% set formAction = app.request.uri  %}
 {% embed transition.getFormTemplate() with {'formAction': formAction}%}
     {% block widget_context %}
     {% endblock widget_context %}
     {% block content %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {% if saved %}
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroui/js/app/components/widget-form-component',

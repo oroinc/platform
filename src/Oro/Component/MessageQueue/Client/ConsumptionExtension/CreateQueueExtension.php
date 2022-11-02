@@ -15,10 +15,6 @@ class CreateQueueExtension extends AbstractExtension
     /** @var QueueCollection */
     private $createdQueues;
 
-    /**
-     * @param DriverInterface      $driver
-     * @param QueueCollection|null $createdQueues
-     */
     public function __construct(DriverInterface $driver, QueueCollection $createdQueues = null)
     {
         $this->driver = $driver;
@@ -28,9 +24,6 @@ class CreateQueueExtension extends AbstractExtension
         $this->createdQueues = $createdQueues;
     }
 
-    /**
-     * @param Context $context
-     */
     public function onBeforeReceive(Context $context)
     {
         $queueName = $context->getQueueName();

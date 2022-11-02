@@ -4,10 +4,9 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Base class for filter that supports multi choices.
+ * The base class for filters that support multi choices.
  */
 abstract class BaseMultiChoiceFilter extends AbstractFilter
 {
@@ -42,45 +41,57 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
     }
 
     /**
-     * Return a value depending on comparison type
-     *
-     * @param array $value
-     *
-     * @return mixed
-     */
-    protected function parseValue($value)
-    {
-        return count($value) === 1 ? $value[0] : $value;
-    }
-
-    /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritdoc}
      */
     protected function parseData($data)
     {
-        $type = array_key_exists('type', $data) ? $data['type'] : null;
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)
-            && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
-        ) {
+        $data = parent::parseData($data);
+
+        if (!\is_array($data)) {
             return false;
         }
 
-        $data['value'] = (array) $data['value'];
-        if (count($data['value']) === 1) {
-            switch ($type) {
-                case DictionaryFilterType::TYPE_NOT_IN:
-                    $type = DictionaryFilterType::NOT_EQUAL;
-                    break;
-                case DictionaryFilterType::TYPE_IN:
-                    $type = DictionaryFilterType::EQUAL;
-                    break;
-            }
+        if (!$this->isValueRequired($data['type'])) {
+            return $data;
         }
 
-        $data['type']  = $type;
-        $data['value'] = $this->parseValue($data['value']);
+        if (!isset($data['value']) || '' === $data['value']) {
+            return false;
+        }
+
+        $value = $data['value'];
+        if (\is_array($value) && count($value) === 1) {
+            $value = reset($value);
+            $data['value'] = $value;
+        }
+
+        $data = $this->parseComparisonType($data);
+
+        return $data;
+    }
+
+    protected function parseComparisonType(array $data): array
+    {
+        $type = $data['type'];
+        if ($type) {
+            $type = (int)$type;
+            if (\is_array($data['value'])) {
+                if (DictionaryFilterType::EQUAL === $type) {
+                    $type = DictionaryFilterType::TYPE_IN;
+                } elseif (DictionaryFilterType::NOT_EQUAL === $type) {
+                    $type = DictionaryFilterType::TYPE_NOT_IN;
+                }
+            } elseif (DictionaryFilterType::TYPE_IN === $type) {
+                $type = DictionaryFilterType::EQUAL;
+            } elseif (DictionaryFilterType::TYPE_NOT_IN === $type) {
+                $type = DictionaryFilterType::NOT_EQUAL;
+            }
+        } else {
+            $type = \is_array($data['value'])
+                ? DictionaryFilterType::TYPE_IN
+                : DictionaryFilterType::EQUAL;
+        }
+        $data['type'] = $type;
 
         return $data;
     }

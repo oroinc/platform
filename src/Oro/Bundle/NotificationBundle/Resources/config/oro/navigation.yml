@@ -12,6 +12,11 @@ navigation:
                 route: 'oro_notification_massnotification_index'
                 extras:
                     routes: ['oro_notification_massnotification_*']
+            oro_notification_notificationalerts_list:
+                label: 'oro.notification.menu.notification_alerts.label'
+                route: 'oro_notification_notificationalert_index'
+                acl_resource_id: 'oro_notification_notificationalert_view'
+
         tree:
             application_menu:
                 children:
@@ -21,6 +26,7 @@ navigation:
                               children:
                                   oro_notification_emailnotification_list: ~
                                   oro_notification_massnotification_list: ~
+                          oro_notification_notificationalerts_list: ~
 
     titles:
         oro_notification_emailnotification_index: ~
@@ -28,3 +34,4 @@ navigation:
         oro_notification_emailnotification_create: "Add Notification Rule"
 
         oro_notification_massnotification_index: ~
+        oro_notification_notificationalert_index: ~

@@ -1,0 +1,49 @@
+/* @theme: admin.oro; */
+
+.currency-select-enabled {
+    .input-append,
+    .base-currency {
+        input {
+            &:first-child {
+                width: $currency-select-enabled-base-currency-input-width;
+            }
+        }
+
+        @include selector-width($currency-select-enabled-base-currency-select-width);
+
+        .selector {
+            margin-left: $currency-select-enabled-base-currency-selector-offset-left;
+            font-size: $currency-select-enabled-base-currency-selector-font-size;
+            flex-shrink: 0;
+
+            @include border-start-radius(0);
+
+            &.active {
+                outline: $currency-select-enabled-base-currency-selector-active-outline;
+            }
+        }
+    }
+
+    .default-currency-equivalent {
+        margin-top: $currency-select-enabled-default-currency-equivalent-offset-top;
+
+        color: $currency-select-enabled-default-currency-equivalent-color;
+
+        &:empty {
+            margin-top: 0;
+        }
+    }
+
+    .base-currency-field {
+        margin-top: $currency-select-enabled-base-currency-field-offset-top;
+
+        .add-on {
+            display: $currency-select-enabled-base-currency-field-add-on-display;
+            width: $currency-select-enabled-base-currency-field-add-on-width;
+            padding: $currency-select-enabled-base-currency-field-add-on-inner-offset;
+            overflow: hidden;
+
+            text-align: $currency-select-enabled-base-currency-field-add-on-text-align;
+        }
+    }
+}

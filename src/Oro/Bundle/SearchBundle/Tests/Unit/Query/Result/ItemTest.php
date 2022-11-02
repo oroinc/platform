@@ -3,29 +3,17 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Result;
 
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Item|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $item;
+    /** @var Item|\PHPUnit\Framework\MockObject\MockObject */
+    private $item;
 
-    /**
-     * @var Product
-     */
-    protected $product;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->product = new Product();
-        $this->product->setName('test product');
-
         $this->item = new Item(
             'OroTestBundle:test',
             1,
-            'test title',
             'http://example.com',
             [],
             [
@@ -51,20 +39,11 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->item->getRecordId());
     }
 
-
-
     public function testToArray()
     {
         $result = $this->item->toArray();
         $this->assertEquals('OroTestBundle:test', $result['entity_name']);
         $this->assertEquals(1, $result['record_id']);
-        $this->assertEquals('test title', $result['record_string']);
-    }
-
-    public function testRecordTitle()
-    {
-        $this->item->setRecordTitle('test title');
-        $this->assertEquals('test title', $this->item->getRecordTitle());
     }
 
     public function testRecordUrl()

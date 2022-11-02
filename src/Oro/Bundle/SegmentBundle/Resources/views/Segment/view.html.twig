@@ -1,16 +1,27 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+{% import '@OroSegment/macros.html.twig' as segmentQD %}
 {% oro_title_set({params : {"%segment.name%": entity.name, "%segment.group%": segmentGroup|trans} }) %}
 {% set pageTitle = entity.name %}
+{% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ segmentQD.runButton(entity, true) }}
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_segment_update', {'id': entity.id}),
             'entity_label': 'oro.segment.entity_label'|trans
+        }) }}
+    {% endif %}
+    {% if isDesktopVersion() and is_granted('CREATE', entity) %}
+        {{ UI.button({
+            'path' : path('oro_segment_clone', {'id': entity.id}),
+            'iCss': 'fa-files-o',
+            'title': 'oro.segment.action.clone.button.title'|trans,
+            'label': 'oro.segment.action.clone.button.label'|trans,
         }) }}
     {% endif %}
     {% if isDesktopVersion() and is_granted('DELETE', entity) %}
@@ -42,7 +53,7 @@
             '_grid_view': {'_disabled': true},
             '_tags'     : {'_disabled': true}
         } %}
-        {% if oro_config_value('oro_report.display_sql_query') %}
+        {% if displaySQL %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams) %}
@@ -51,9 +62,16 @@
         <div class="container-fluid">
             <div class="grid-container">
                 <div class="no-data">
-                    <span>{{ 'Invalid segment configuration'|trans }}</span>
+                    {{ 'Invalid segment configuration'|trans }}
                 </div>
             </div>
         </div>
     {% endif %}
 {% endblock content_data %}
+
+{% block content %}
+    {{ parent() }}
+    {% if displaySQL %}
+        <div class="sql-query-panel" data-role="sql-query-panel"></div>
+    {% endif %}
+{% endblock content %}

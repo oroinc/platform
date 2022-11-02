@@ -32,8 +32,13 @@
             {% set metaData = metaData|merge({enableFloatingHeaderPlugin: isMobileVersion()}) %}
         {% endif %}
         {% set metaData = metaData|merge({
-            responsiveGrids: renderParams.responsiveGrids|default({enable: false}),
-            swipeActionsGrid: renderParams.swipeActionsGrid|default({enable: true})
+            responsiveGrids: {
+                enable: renderParams.responsiveGrids.enable|default(false)
+            },
+            swipeActionsGrid: {
+                enable: renderParams.swipeActionsGrid.enable|default(false)
+            },
+            rowLinkEnabled: oro_config_value('oro_data_grid.row_link_enabled')
         }) %}
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
@@ -48,7 +53,7 @@
         {% set options  = {
             el: '#' ~ gridId,
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
-            builders: metaData.requireJSModules|merge(renderParams.requireJSModules|default([])),
+            builders: metaData.jsmodules|merge(renderParams.jsmodules|default([])),
             metadata: metaData,
             data: data,
             enableFilters: enableFilters,
@@ -70,8 +75,20 @@
              data-page-component-options="{{ options|json_encode }}"
              {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}>
              {% if renderParams.viewLoading|default(false) %}
-                 {% include "OroUIBundle::view_loading.html.twig" %}
+                 {% include "@OroUI/view_loading.html.twig" %}
              {% endif %}
         </div>
     {% endif %}
+{% endmacro %}
+
+{#
+    Renders element that represents blank value
+
+    parameters:
+        class: css class for the element
+#}
+{% macro renderBlankCellValue(parameters = {}) %}
+    <span {% if (parameters.class is defined) %}class="{{ parameters.class }}"{% endif %}
+          aria-label="{{ 'oro.datagrid.cell.blank.aria_label'|trans }}"
+          data-blank-content="{{ 'oro.datagrid.cell.blank.placeholder'|trans }}"></span>
 {% endmacro %}

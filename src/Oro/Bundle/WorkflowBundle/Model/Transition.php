@@ -11,6 +11,8 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
+ * A model that stores all the necessary functionality for transferring between workflow states.
+ *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -104,9 +106,6 @@ class Transition
     /** @var TransitionOptionsResolver */
     protected $optionsResolver;
 
-    /**
-     * @param TransitionOptionsResolver $optionsResolver
-     */
     public function __construct(TransitionOptionsResolver $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
@@ -366,22 +365,29 @@ class Transition
     /**
      * Run transition process.
      *
-     * @param WorkflowItem $workflowItem
      * @throws ForbiddenTransitionException
      */
-    public function transit(WorkflowItem $workflowItem)
+    public function transit(WorkflowItem $workflowItem, Collection $errors = null)
     {
-        if ($this->isAllowed($workflowItem)) {
-            $stepTo = $this->getStepTo();
-            $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
-
-            if ($this->action) {
-                $this->action->execute($workflowItem);
-            }
+        if ($this->isAllowed($workflowItem, $errors)) {
+            $this->transitUnconditionally($workflowItem);
         } else {
             throw new ForbiddenTransitionException(
                 sprintf('Transition "%s" is not allowed.', $this->getName())
             );
+        }
+    }
+
+    /**
+     * Makes transition without checking for preconditions and conditions.
+     */
+    public function transitUnconditionally(WorkflowItem $workflowItem): void
+    {
+        $stepTo = $this->getStepTo();
+        $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
+
+        if ($this->action) {
+            $this->action->execute($workflowItem);
         }
     }
 

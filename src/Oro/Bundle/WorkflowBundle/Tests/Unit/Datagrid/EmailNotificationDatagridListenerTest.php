@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -8,29 +8,27 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var EmailNotificationDatagridListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($key, array $parameters, $domain) {
-                    $this->assertEmpty($parameters);
-                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+            ->willReturnCallback(function ($key, array $parameters, $domain) {
+                $this->assertEmpty($parameters);
+                $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
 
-                    return sprintf('*%s*', $key);
-                }
-            );
+                return sprintf('*%s*', $key);
+            });
 
         $this->listener = new EmailNotificationDatagridListener($this->translator);
     }
@@ -81,11 +79,12 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return BuildBefore|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getBuildBeforeEvent()
+    private function getBuildBeforeEvent()
     {
-        /** @var BuildBefore|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(BuildBefore::class);
-        $event->expects($this->any())->method('getConfig')->willReturn(DatagridConfiguration::create([]));
+        $event->expects($this->any())
+            ->method('getConfig')
+            ->willReturn(DatagridConfiguration::create([]));
 
         return $event;
     }
@@ -94,11 +93,12 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
      * @param array $records
      * @return OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getOrmResultAfterEvent(array $records = [])
+    private function getOrmResultAfterEvent(array $records = [])
     {
-        /** @var OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(OrmResultAfter::class);
-        $event->expects($this->any())->method('getRecords')->willReturn($records);
+        $event->expects($this->any())
+            ->method('getRecords')
+            ->willReturn($records);
 
         return $event;
     }
@@ -108,7 +108,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
      * @param string $transitionName
      * @return ResultRecord
      */
-    protected function getResultRecord($workflowName = null, $transitionName = null)
+    private function getResultRecord($workflowName = null, $transitionName = null)
     {
         $data = [];
 

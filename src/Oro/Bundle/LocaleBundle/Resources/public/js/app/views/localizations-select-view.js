@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var LocalizationsSelectView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
 
-    LocalizationsSelectView = BaseView.extend({
+    const LocalizationsSelectView = BaseView.extend({
         /**
          * @property {Object}
          */
         options: {
-            selectSelector: 'select'
+            selectSelector: 'select',
+            useParentSelector: 'input[type="checkbox"]'
         },
 
         /**
@@ -21,29 +21,37 @@ define(function(require) {
         $select: null,
 
         /**
-         * @inheritDoc
+         * @property {jQuery.Element}
          */
-        constructor: function LocalizationsSelectView() {
-            LocalizationsSelectView.__super__.constructor.apply(this, arguments);
+        $useParent: null,
+
+        /**
+         * @inheritdoc
+         */
+        constructor: function LocalizationsSelectView(options) {
+            LocalizationsSelectView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.extend({}, this.options, options);
 
             this.$select = this.$el.find(this.options.selectSelector);
-            this.$select.on('change' + this.eventNamespace(), _.bind(this.onChange, this));
+            this.$select.on('change' + this.eventNamespace(), this.onSelectChange.bind(this));
+            this.$useParent = this.$el.find(this.options.useParentSelector);
+
+            mediator.on('default_localization:use_parent_scope', this.onDefaultLocalizationUseParentScope, this);
         },
 
         /**
-         * Handle change select
+         * Handles change event of the select field
          */
-        onChange: function() {
-            var options = this.$select.find('option:selected');
-            var selected = options.map(function(index, option) {
-                var $option = $(option);
+        onSelectChange: function() {
+            const options = this.$select.find('option:selected');
+            const selected = options.map(function(index, option) {
+                const $option = $(option);
 
                 return {
                     id: $option.val(),
@@ -55,7 +63,14 @@ define(function(require) {
         },
 
         /**
-         * {@inheritDoc}
+         * @param {Boolean} data
+         */
+        onDefaultLocalizationUseParentScope: function(data) {
+            this.$useParent.prop('checked', data).change();
+        },
+
+        /**
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -63,6 +78,7 @@ define(function(require) {
             }
 
             this.$select.off('change' + this.eventNamespace());
+            mediator.off(null, null, this);
 
             LocalizationsSelectView.__super__.dispose.call(this);
         }

@@ -1,15 +1,15 @@
-{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI%}
-{% import 'OroEmailBundle::actions.html.twig' as EA %}
+{% extends '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI%}
+{% import '@OroEmail/actions.html.twig' as EA %}
 
 {% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
 
 {% block activityIcon %}
     <% if(is_head && !ignoreHead) { %>
-        <i class="icon-email-thread"></i>
+        <span class="icon-email-thread" aria-hidden="true"></span>
     <% } else { %>
-        <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
+        <span class="{{ oro_entity_config_value(entityClass, 'icon')|e('html_attr') }}" aria-hidden="true"></span>
     <% } %>
 {% endblock %}
 
@@ -35,20 +35,23 @@
         { interpolate: /\{\{(.+?)\}\}/g }
     )({
         user: ownerLink,
-        date: '<i class="date">' + updatedAt + '</i>'
+        date: '<span class="date">' + updatedAt + '</span>'
     }) %>
 {% endblock %}
 
 {% block activityActions %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set action %}
         {% if is_granted('oro_email_email_user_edit') %}
-            <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+            <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|e('html_attr') }}"
                class="dropdown-item"
-               data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
-                    {{ UI.renderWidgetDataAttributes({
+               data-url="<%- routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
+                    {{ UI.renderWidgetAttributes({
                     'type' : 'dialog',
                     'multiple' : true,
                     'refresh-widget-alias': 'activity-list-widget',
+                    'createOnEvent' : 'click',
                     'options' : {
                         'alias': 'activity-context-dialog',
                         'dialogOptions' : {
@@ -59,11 +62,12 @@
                             'dblclick': 'maximize',
                             'maximizedHeightDecreaseBy': 'minimize-bar',
                             'width': 1000,
+                            'minWidth': 'expanded',
                             'height': 600
                         }
                     }
-                    }) }}><span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</span>
-                {{ 'oro.activity.contexts.placeholder'|trans|raw }}
+                    }) }}><span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans }}</span>
+                {{ 'oro.activity.contexts.placeholder'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -73,11 +77,12 @@
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.reply'|trans }}"
                class="dropdown-item"
-               data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               data-url="<%- routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'email-dialog',
                     'dialogOptions': {
@@ -86,11 +91,12 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
-            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans|raw }}</span>
-                {{ 'oro.email.reply'|trans|raw }}
+            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans }}</span>
+                {{ 'oro.email.reply'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -98,13 +104,14 @@
 
     {% set action %}
     {% if is_granted('oro_email_email_create') %}
-        <a href="#" title="{{ 'oro.email.reply_all'|trans|raw }}"
+        <a href="#" title="{{ 'oro.email.reply_all'|trans|e('html_attr') }}"
            class="dropdown-item"
-           data-url="<%= routing.generate('oro_email_email_reply_all', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-                {{ UI.renderWidgetDataAttributes({
+           data-url="<%- routing.generate('oro_email_email_reply_all', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
+                {{ UI.renderWidgetAttributes({
                     'type': 'dialog',
                     'multiple': true,
                     'refresh-widget-alias': 'activity-list-widget',
+                    'createOnEvent' : 'click',
                     'options': {
                         'alias': 'email-dialog',
                         'dialogOptions': {
@@ -113,11 +120,12 @@
                             'allowMinimize': true,
                             'dblclick': 'maximize',
                             'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                            'width': 1000,
+                            'minWidth': 'expanded'
                         }
                     }
-                }) }}><span class="fa-reply-all hide-text" aria-hidden="true">{{ 'oro.email.reply_all'|trans|raw }}</span>
-            {{ 'oro.email.reply_all'|trans|raw }}
+                }) }}><span class="fa-reply-all hide-text" aria-hidden="true">{{ 'oro.email.reply_all'|trans }}</span>
+            {{ 'oro.email.reply_all'|trans }}
         </a>
     {% endif %}
     {% endset %}
@@ -127,11 +135,12 @@
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.forward'|trans }}"
                class="dropdown-item"
-               data-url="<%= routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               data-url="<%- routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'forward-dialog',
                     'dialogOptions': {
@@ -140,22 +149,23 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
-            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans|raw }}</span>
-                {{ 'oro.email.forward'|trans|raw }}
+            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans }}</span>
+                {{ 'oro.email.forward'|trans }}
             </a>
         {% endif %}
     {% endset %}
     {% set actions = actions|merge([action]) %}
 
     {% set action %}
-        <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
+        <a href="<%- routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
            class="dropdown-item"
-           title="{{ 'oro.email.view'|trans|raw }}"><span
-                class="fa-eye hide-text" aria-hidden="true">{{ 'oro.email.view'|trans|raw }}</span>
-            {{ 'oro.email.view'|trans|raw }}
+           title="{{ 'oro.email.view'|trans|e('html_attr') }}"><span
+                class="fa-eye hide-text" aria-hidden="true">{{ 'oro.email.view'|trans }}</span>
+            {{ 'oro.email.view'|trans }}
         </a>
     {% endset %}
     {% set actions = actions|merge([action]) %}
@@ -164,6 +174,8 @@
 {% endblock %}
 
 {% block activityContent %}
-    {# Do NOT remove. Placeholder for activity view #}
-    <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%= data.entityId %>"></div>
+    <div class="activity-item-email-content">
+        {# Do NOT remove. Placeholder for activity view #}
+        <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%- data.entityId %>"></div>
+    </div>
 {% endblock %}

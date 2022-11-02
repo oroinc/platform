@@ -2,120 +2,116 @@
 
 namespace Oro\Bundle\LocaleBundle\Translation\Strategy;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Provides a tree of locale fallbacks configured by a user.
  */
-class LocalizationFallbackStrategy implements TranslationStrategyInterface
+class LocalizationFallbackStrategy implements TranslationStrategyInterface, CacheWarmerInterface
 {
-    const NAME = 'oro_localization_fallback_strategy';
-    const CACHE_KEY = 'localization_fallbacks';
+    private const CACHE_KEY = 'localization_fallbacks';
 
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    private ManagerRegistry $doctrine;
+    private CacheInterface $cacheProvider;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cacheProvider;
-
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param CacheProvider $cacheProvider
-     */
-    public function __construct(ManagerRegistry $registry, CacheProvider $cacheProvider)
+    public function __construct(ManagerRegistry $doctrine, CacheInterface $cacheProvider)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->cacheProvider = $cacheProvider;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplicable()
-    {
-        return true;
-    }
-
-    /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return static::NAME;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getLocaleFallbacks()
+    public function isApplicable(): bool
     {
-        $fallbacks = $this->cacheProvider->fetch(static::CACHE_KEY);
-        if (false === $fallbacks) {
-            /** All localizations always should have only one parent that equals to default language */
-            $fallbacks = [
-                Configuration::DEFAULT_LOCALE => array_reduce(
-                    $this->getRootLocalizations(),
-                    function ($result, Localization $localization) {
-                        return array_merge($result, $this->localizationToArray($localization));
-                    },
-                    []
-                )
-            ];
-
-            $this->cacheProvider->save(static::CACHE_KEY, $fallbacks);
-        }
-
-        return $fallbacks;
-    }
-
-    public function clearCache()
-    {
-        $this->cacheProvider->delete(static::CACHE_KEY);
+        return true;
     }
 
     /**
-     * @return array|Localization[]
+     * {@inheritDoc}
      */
-    protected function getRootLocalizations()
+    public function getName(): string
     {
-        /** @var LocalizationRepository $repository */
-        $repository = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
-
-        return $repository->findRootsWithChildren();
+        return 'oro_localization_fallback_strategy';
     }
 
     /**
-     * @param Localization $localization
-     * @return array
+     * {@inheritDoc}
      */
-    protected function localizationToArray(Localization $localization)
+    public function getLocaleFallbacks(): array
     {
-        $children = [];
-        foreach ($localization->getChildLocalizations() as $child) {
-            $children = array_merge($children, $this->localizationToArray($child));
+        return $this->cacheProvider->get(self::CACHE_KEY, function () {
+            return $this->getActualLocaleFallbacks();
+        });
+    }
+
+    public function clearCache(): void
+    {
+        $this->cacheProvider->delete(self::CACHE_KEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function warmUp($cacheDir): void
+    {
+        try {
+            $this->clearCache();
+            $this->getLocaleFallbacks();
+        } catch (InvalidFieldNameException $exception) {
+            // Cache warming can be used during upgrade from the app version where not all required columns yet exist.
+            // Silently skips warming of locale fallbacks in this case, considering as not an error.
         }
-        return [$localization->getLanguageCode() => $children];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isOptional(): bool
+    {
+        return true;
+    }
+
+    private function getActualLocaleFallbacks(): array
+    {
+        /** All localizations always should have only one parent that equals to default language */
+        return [
+            Configuration::DEFAULT_LOCALE => $this->getLocalizationThree()
+        ];
+    }
+
+    private function getLocalizationThree(): array
+    {
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Localization::class);
+        $rows = $em->createQueryBuilder()
+            ->select('loc.id, IDENTITY(loc.parentLocalization) AS parentId, lang.code AS langCode')
+            ->from(Localization::class, 'loc')
+            ->innerJoin('loc.language', 'lang')
+            ->getQuery()
+            ->getArrayResult();
+
+        return $this->buildLocalizationThree($rows);
+    }
+
+    private function buildLocalizationThree(array $rows, ?int $parentLocalizationId = null): array
+    {
+        $result = [];
+        foreach ($rows as $row) {
+            $parentId = isset($row['parentId']) ? (int)$row['parentId'] : null;
+            if ($parentLocalizationId === $parentId) {
+                $result[$row['langCode']] = $this->buildLocalizationThree($rows, (int)$row['id']);
+            }
+        }
+
+        return $result;
     }
 }

@@ -11,7 +11,7 @@ namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\Composite;
 
 /**
- * When applied to an array (or Traversable object), this constraint allows you to apply
+ * When applied to an array (or Traversable object), this constraint allows to apply
  * a collection of constraints to each element of the array.
  * The difference with Symfony constraint is that uninitialized lazy collection is not validated.
  * @see \Symfony\Component\Validator\Constraints\All

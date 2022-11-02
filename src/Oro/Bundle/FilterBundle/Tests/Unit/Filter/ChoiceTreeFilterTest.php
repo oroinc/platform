@@ -6,36 +6,34 @@ use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
 
 class ChoiceTreeFilterTest extends OrmTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
-    protected $formFactory;
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
+
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
 
     /** @var ChoiceTreeFilter */
-    protected $filter;
+    private $filter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
-    protected $router;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    protected $dispatcher;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
-        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->disableOriginalConstructor()
-            ->getMock();
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
-
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->filter = new ChoiceTreeFilter(
             $this->formFactory,
             new FilterUtility(),
-            $registry,
             $this->router,
             $this->dispatcher
         );
@@ -100,13 +98,11 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $expectedMetadata = $this->getDefaultExpectedData();
         $expectedMetadata['autocomplete_url'] = 'test_url';
 
-
         $this->filter->init('filter', $params);
         $metadata = $this->filter->getMetadata();
 
         self::assertEquals($expectedMetadata, $metadata);
     }
-
 
     public function testMetadataParameterRenderedPropertyName()
     {
@@ -118,14 +114,13 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $expectedMetadata = $this->getDefaultExpectedData();
         $expectedMetadata['renderedPropertyName'] = 'test_field_name';
 
-
         $this->filter->init('filter', $params);
         $metadata = $this->filter->getMetadata();
 
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    protected function getDefaultExpectedData()
+    private function getDefaultExpectedData()
     {
         return [
             'name' => 'filter',
@@ -140,15 +135,20 @@ class ChoiceTreeFilterTest extends OrmTestCase
         ];
     }
 
-    protected function initMockFormFactory()
+    private function initMockFormFactory()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $formViewType = $this->getMockBuilder('Symfony\Component\Form\FormView')
-            ->disableOriginalConstructor()->getMock();
+        $form = $this->createMock(Form::class);
+        $formViewType = $this->createMock(FormView::class);
         $formViewType->vars['choices'] = [];
-        $formView = $this->getMockBuilder('Symfony\Component\Form\FormView')->disableOriginalConstructor()->getMock();
+        $formView = $this->createMock(FormView::class);
         $formView->children['type'] = $formViewType;
         $form->expects(self::once())->method('createView')->willReturn($formView);
         $this->formFactory->expects(self::once())->method('create')->willReturn($form);
+    }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
     }
 }

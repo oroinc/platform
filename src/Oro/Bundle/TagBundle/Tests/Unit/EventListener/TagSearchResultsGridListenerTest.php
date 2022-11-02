@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener;
@@ -9,143 +14,113 @@ use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
 class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $parameters;
+    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
+    private $parameters;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SecurityProvider */
-    protected $securityProvider;
+    /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $securityProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
+    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $datagrid;
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagrid;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
     /** @var TagSearchResultsGridListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
-
-        $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->datagrid = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface')
-            ->getMock();
+        $this->parameters = $this->createMock(ParameterBag::class);
+        $this->securityProvider = $this->createMock(SecurityProvider::class);
+        $this->datagrid = $this->createMock(DatagridInterface::class);
+        $this->event = $this->createMock(BuildAfter::class);
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
 
         $this->datagrid->expects($this->any())
             ->method('getParameters')
-            ->will($this->returnValue($this->parameters));
-
-        $this->event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildAfter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn($this->parameters);
 
         $this->listener = new TagSearchResultsGridListener($this->securityProvider, $this->entityAliasResolver);
     }
 
     /**
      * @dataProvider onBuildAfterDataProvider
-     *
-     * @param string                       $alias
-     * @param string|null                  $entityClass
-     * @param EntityAliasNotFoundException $exception
      */
-    public function testOnBuildAfter($alias, $entityClass = null, EntityAliasNotFoundException $exception = null)
-    {
+    public function testOnBuildAfter(
+        string $alias,
+        string $entityClass = null,
+        EntityAliasNotFoundException $exception = null
+    ) {
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
-        $qb = $this->assertOrmDataSource();
-        $this->assertAclCall($qb);
+        $qb = $this->createMock(QueryBuilder::class);
+        $datasource = $this->createMock(OrmDatasource::class);
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($qb);
+        $this->datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->willReturn($datasource);
+        $this->securityProvider->expects($this->once())
+            ->method('applyAcl')
+            ->with($qb, 'tt');
         $tagId = 100;
 
-        $this->parameters->expects($this->at(0))
+        $this->parameters->expects($this->exactly(2))
             ->method('get')
-            ->with('tag_id', 0)
-            ->will($this->returnValue($tagId));
+            ->withConsecutive(
+                ['tag_id', 0],
+                ['from', '']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $tagId,
+                $alias
+            );
 
-        $qb
-            ->expects($this->at(0))
-            ->method('setParameter')
-            ->with('tag', $tagId);
+        $setParameters = [
+            ['tag', $tagId]
+        ];
 
-        $this->parameters->expects($this->at(1))
-            ->method('get')
-            ->with('from', '')
-            ->will($this->returnValue($alias));
-
-        if (strlen($alias) > 0) {
-            $earMockBuilder = $this->entityAliasResolver
-                ->expects($this->once())
+        if ($alias) {
+            $earMockBuilder = $this->entityAliasResolver->expects($this->once())
                 ->method('getClassByAlias')
                 ->with($alias);
             if (null !== $entityClass) {
                 $earMockBuilder->willReturn($entityClass);
-                $qb
-                    ->expects($this->at(1))
+                $qb->expects($this->once())
                     ->method('andWhere')
                     ->with('tt.entityName = :entityClass')
-                    ->willReturn($qb);
-                $qb
-                    ->expects($this->at(2))
-                    ->method('setParameter')
-                    ->with('entityClass', $entityClass);
+                    ->willReturnSelf();
+                $setParameters[] = ['entityClass', $entityClass];
             } else {
                 $earMockBuilder->willThrowException($exception);
-                $qb
-                    ->expects($this->at(1))
+                $qb->expects($this->once())
                     ->method('andWhere')
-                    ->with('1 = 0');
+                    ->with('1 = 0')
+                    ->willReturnSelf();
             }
         }
+
+        $qb->expects($this->exactly(count($setParameters)))
+            ->method('setParameter')
+            ->withConsecutive(...$setParameters)
+            ->willReturnSelf();
 
         $this->listener->onBuildAfter($this->event);
     }
 
-    public function onBuildAfterDataProvider()
+    public function onBuildAfterDataProvider(): array
     {
         return [
             'empty parameter' => [''],
             'existing alias' => ['testalias', 'testEntity'],
             'not existing alias' => ['testalias', null, new EntityAliasNotFoundException()]
         ];
-    }
-
-    protected function assertAclCall($qb)
-    {
-        $this->securityProvider->expects($this->once())
-            ->method('applyAcl')
-            ->with($qb, 'tt');
-    }
-
-    protected function assertOrmDataSource()
-    {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource->expects($this->once())
-            ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
-
-        $this->datagrid->expects($this->once())
-            ->method('getDatasource')
-            ->will($this->returnValue($datasource));
-
-        return $qb;
     }
 }

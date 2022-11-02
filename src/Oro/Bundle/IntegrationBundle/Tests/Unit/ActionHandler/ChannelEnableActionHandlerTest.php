@@ -8,17 +8,13 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelEnableActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /**
-     * @var ChannelEnableActionHandler
-     */
+    /** @var ChannelEnableActionHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
@@ -27,13 +23,14 @@ class ChannelEnableActionHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleAction()
     {
-        $this->entityManager->expects(static::once())->method('flush');
+        $this->entityManager->expects(self::once())
+            ->method('flush');
 
         $channel = new Channel();
         $channel->setEnabled(false);
 
-        static::assertTrue($this->handler->handleAction($channel));
-        static::assertTrue($channel->isEnabled());
-        static::assertFalse($channel->getPreviouslyEnabled());
+        self::assertTrue($this->handler->handleAction($channel));
+        self::assertTrue($channel->isEnabled());
+        self::assertFalse($channel->getPreviouslyEnabled());
     }
 }

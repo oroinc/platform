@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LoadIntegrationThemesEvent extends Event
 {
@@ -15,10 +15,6 @@ class LoadIntegrationThemesEvent extends Event
     /** @var array */
     protected $themes;
 
-    /**
-     * @param FormView $formView
-     * @param array    $themes
-     */
     public function __construct(FormView $formView, array $themes = [])
     {
         $this->formView = $formView;
@@ -49,9 +45,6 @@ class LoadIntegrationThemesEvent extends Event
         $this->themes[] = $theme;
     }
 
-    /**
-     * @param array $themes
-     */
     public function setThemes(array $themes)
     {
         $this->themes = $themes;

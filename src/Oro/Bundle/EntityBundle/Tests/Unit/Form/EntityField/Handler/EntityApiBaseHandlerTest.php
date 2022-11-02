@@ -2,64 +2,54 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
+class EntityApiBaseHandlerTest extends TestCase
 {
-    /**
-     * @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processor;
+    /** @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $processor;
 
-    /**
-     * @var EntityApiBaseHandler
-     */
-    protected $handler;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var Registry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var EntityApiBaseHandler */
+    private $handler;
 
-    /**
-     * @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityClassNameHelper;
-
-    protected function setUp()
+    public function methodsDataProvider(): array
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->processor = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassNameHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return [
+            'POST' => ['POST', true],
+            'PUT' => ['PUT', true],
+            'PATCH' => ['PATCH', false],
+        ];
+    }
 
-        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, $this->entityClassNameHelper);
+    protected function setUp(): void
+    {
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->processor = $this->createMock(EntityApiHandlerProcessor::class);
+
+        $this->handler = new EntityApiBaseHandler($this->doctrine, $this->processor, new PropertyAccessor());
     }
 
     public function testProcessUnsupportedMethod()
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => 1];
         $method = 'UNSUP';
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->never())
@@ -69,99 +59,93 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessDataEmpty()
+    /**
+     * @dataProvider methodsDataProvider
+     */
+    public function testProcessDataEmpty(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = [];
-        $method = 'PATCH';
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
 
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessInvalid()
+    /**
+     * @dataProvider methodsDataProvider
+     */
+    public function testProcessInvalid(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => '1', 'b' => '2'];
-        $method = 'PATCH';
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('beforeProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('afterProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('invalidateProcess')
             ->with($entity);
 
         $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
-    public function testProcessValid()
+    /**
+     * @dataProvider methodsDataProvider
+     */
+    public function testProcessValid(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => '1', 'b' => '2'];
-        $method = 'PATCH';
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
             ->method('submit')
-            ->with($data);
+            ->with($data, $clearMissing);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('beforeProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('afterProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('invalidateProcess')
             ->with($entity);
-      
+
         $this->initManager();
 
         $this->assertEquals([
@@ -172,18 +156,16 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         ], $this->handler->process($entity, $form, $data, $method));
     }
 
-    protected function initManager()
+    private function initManager()
     {
-        $manager = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $manager = $this->createMock(EntityManager::class);
         $manager->expects($this->any())
             ->method('persist');
         $manager->expects($this->any())
             ->method('flush');
 
-
-        $this->registry->expects($this->any())->method('getManager')->willReturn($manager);
+        $this->doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
     }
 }

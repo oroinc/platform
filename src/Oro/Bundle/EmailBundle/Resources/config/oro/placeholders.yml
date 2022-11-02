@@ -8,9 +8,9 @@ placeholders:
             items:
                 email_filter_templates:
                     order: 5
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                email_requirejs_config:
+                email_js_modules_config:
                     order: 100
         email_actions:
             items:
@@ -19,20 +19,20 @@ placeholders:
 
     items:
         oro_send_email_button:
-            template: OroEmailBundle:Email:activityButton.html.twig
+            template: '@@OroEmail/Email/activityButton.html.twig'
             acl: oro_email_email_create
         oro_send_email_link:
-            template: OroEmailBundle:Email:activityLink.html.twig
+            template: '@@OroEmail/Email/activityLink.html.twig'
             acl: oro_email_email_create
         dots_menu_email:
-            action: OroEmailBundle:Email:placeholderLast
+            action: Oro\Bundle\EmailBundle\Controller\EmailController::placeholderLastAction
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         email_filter_templates:
-            template: OroEmailBundle:Js:default_templates.js.twig
-        email_requirejs_config:
-            template: OroEmailBundle::requirejs.config.js.twig
+            template: '@@OroEmail/Js/default_templates.js.twig'
+        email_js_modules_config:
+            template: '@@OroEmail/js_modules_config.html.twig'
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         oro_email_action_send_email_button:
             applicable: "@oro_email.placeholder.send_email.filter->isApplicable($entity$)"
-            template: OroEmailBundle:Email/action:sendEmailButton.html.twig
+            template: '@@OroEmail/Email/action/sendEmailButton.html.twig'
             acl: oro_email_email_create

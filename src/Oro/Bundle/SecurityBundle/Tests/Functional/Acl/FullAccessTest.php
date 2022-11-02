@@ -2,34 +2,36 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Acl;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FullAccessTest extends WebTestCase
 {
     /** @var TestEntity */
-    protected $testEntity;
+    private $testEntity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
+        /** @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(User::class);
+        $user = $em->getRepository(User::class)->findOneBy(['email' => self::AUTH_USER]);
+        $organization = $em->getRepository(Organization::class)->find(self::AUTH_ORGANIZATION);
 
-        $user = $em->getRepository('OroUserBundle:User')->findOneBy(['email' => self::AUTH_USER]);
-        $organization = $em->getRepository('OroOrganizationBundle:Organization')->find(self::AUTH_ORGANIZATION);
-
-        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
+        $this->updateUserSecurityToken(self::AUTH_USER);
 
         $this->testEntity = $em->getRepository(TestEntity::class)
             ->createQueryBuilder('e')
@@ -48,10 +50,7 @@ class FullAccessTest extends WebTestCase
         }
     }
 
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         return $this->getContainer()->get('security.authorization_checker');
     }

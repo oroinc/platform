@@ -3,31 +3,36 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
- * Used to call number formatter to format numbers, currencies, percents etc
- * according to locale and additional parameters
+ * Provides Twig functions to access locale data:
+ *   - oro_locale_number_attribute
+ *   - oro_locale_number_text_attribute
+ *   - oro_locale_number_symbol
+ *   - oro_currency_symbol_prepend
+ *
+ * Provides Twig filters for number and currency formatting:
+ *   - oro_format_number
+ *   - oro_format_currency
+ *   - oro_format_decimal
+ *   - oro_format_percent
+ *   - oro_format_spellout
+ *   - oro_format_duration
+ *   - oro_format_ordinal
  */
-class NumberExtension extends \Twig_Extension
+class NumberExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?NumberFormatter $numberFormatter = null;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return NumberFormatter
-     */
-    protected function getNumberFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.number');
     }
 
     /**
@@ -36,26 +41,10 @@ class NumberExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
-                'oro_locale_number_attribute',
-                [$this, 'getAttribute'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFunction(
-                'oro_locale_number_text_attribute',
-                [$this, 'getTextAttribute'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFunction(
-                'oro_locale_number_symbol',
-                [$this, 'getSymbol'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFunction(
-                'oro_currency_symbol_prepend',
-                [$this, 'isCurrencySymbolPrepend'],
-                ['is_safe' => ['html']]
-            )
+            new TwigFunction('oro_locale_number_attribute', [$this, 'getAttribute']),
+            new TwigFunction('oro_locale_number_text_attribute', [$this, 'getTextAttribute']),
+            new TwigFunction('oro_locale_number_symbol', [$this, 'getSymbol']),
+            new TwigFunction('oro_currency_symbol_prepend', [$this, 'isCurrencySymbolPrepend'])
         ];
     }
 
@@ -65,41 +54,13 @@ class NumberExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
-                'oro_format_number',
-                [$this, 'format'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_currency',
-                [$this, 'formatCurrency'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_decimal',
-                [$this, 'formatDecimal'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_percent',
-                [$this, 'formatPercent'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_spellout',
-                [$this, 'formatSpellout'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_duration',
-                [$this, 'formatDuration'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_format_ordinal',
-                [$this, 'formatOrdinal'],
-                ['is_safe' => ['html']]
-            ),
+            new TwigFilter('oro_format_number', [$this, 'format']),
+            new TwigFilter('oro_format_currency', [$this, 'formatCurrency'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_format_decimal', [$this, 'formatDecimal']),
+            new TwigFilter('oro_format_percent', [$this, 'formatPercent']),
+            new TwigFilter('oro_format_spellout', [$this, 'formatSpellout']),
+            new TwigFilter('oro_format_duration', [$this, 'formatDuration']),
+            new TwigFilter('oro_format_ordinal', [$this, 'formatOrdinal']),
         ];
     }
 
@@ -111,7 +72,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $locale
      * @param array $attributes
      *
-     * @return int
+     * @return bool|int
      */
     public function getAttribute($attribute, $style = null, $locale = null, $attributes = [])
     {
@@ -125,7 +86,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $style
      * @param string|null $locale
      *
-     * @return string
+     * @return bool|int
      */
     public function getTextAttribute($attribute, $style = null, $locale = null)
     {
@@ -139,7 +100,7 @@ class NumberExtension extends \Twig_Extension
      * @param string|null $style
      * @param string|null $locale
      *
-     * @return string
+     * @return bool|int
      */
     public function getSymbol($symbol, $style = null, $locale = null)
     {
@@ -174,13 +135,14 @@ class NumberExtension extends \Twig_Extension
      */
     public function format($value, $style, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->format($value, $style, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->format(
+            $value,
+            $style,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -211,14 +173,16 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatCurrency($value, array $options = [])
     {
-        $currency = $this->getOption($options, 'currency');
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
+        $formattedValue = $this->getNumberFormatter()->formatCurrency(
+            $value,
+            $options['currency'] ?? null,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
 
-        return $this->getNumberFormatter()
-            ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+        return strip_tags($formattedValue);
     }
 
     /**
@@ -248,13 +212,13 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatDecimal($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatDecimal($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatDecimal(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -284,13 +248,13 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatPercent($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatPercent($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatPercent(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -320,13 +284,13 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatSpellout($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatSpellout($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatSpellout(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -357,14 +321,14 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatDuration($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-        $default = $this->getOption($options, 'default', false);
-
-        return $this->getNumberFormatter()
-            ->formatDuration($value, $attributes, $textAttributes, $symbols, $locale, $default);
+        return $this->getNumberFormatter()->formatDuration(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null,
+            $options['default'] ?? false
+        );
     }
 
     /**
@@ -394,13 +358,13 @@ class NumberExtension extends \Twig_Extension
      */
     public function formatOrdinal($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatOrdinal($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatOrdinal(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -415,24 +379,21 @@ class NumberExtension extends \Twig_Extension
     }
 
     /**
-     * Gets option or default value if option not exist
-     *
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    protected function getOption(array $options, $name, $default = null)
-    {
-        return isset($options[$name]) ? $options[$name] : $default;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_locale_number';
+        return [
+            'oro_locale.formatter.number' => NumberFormatter::class,
+        ];
+    }
+
+    private function getNumberFormatter(): NumberFormatter
+    {
+        if (null === $this->numberFormatter) {
+            $this->numberFormatter = $this->container->get('oro_locale.formatter.number');
+        }
+
+        return $this->numberFormatter;
     }
 }

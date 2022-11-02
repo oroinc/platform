@@ -33,10 +33,6 @@ class Select2Type extends AbstractType
      */
     private $blockPrefix;
 
-    /**
-     * @param $parentForm
-     * @param $blockPrefix
-     */
     public function __construct($parentForm, $blockPrefix)
     {
         $this->parentForm = $parentForm;
@@ -98,9 +94,6 @@ class Select2Type extends AbstractType
         return $this->blockPrefix;
     }
 
-    /**
-     * @param FormView $view
-     */
     private function addSelect2BlockPrefix(FormView $view)
     {
         $blockPrefixes = $view->vars['block_prefixes'];
@@ -112,10 +105,6 @@ class Select2Type extends AbstractType
         }
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     private function addHiddenTypeTransformer(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['configs']['multiple'])) {

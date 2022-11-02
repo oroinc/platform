@@ -8,7 +8,6 @@ use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
 use Nelmio\ApiDocBundle\Util\DocCommentExtractor;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -36,18 +35,16 @@ class CachingApiDocExtractor extends BaseExtractor implements
      * @param RouterInterface      $router
      * @param Reader               $reader
      * @param DocCommentExtractor  $commentExtractor
-     * @param ControllerNameParser $controllerNameParser
      * @param array                $handlers
      * @param array                $annotationsProviders
      * @param string               $cacheFile
-     * @param bool|false           $debug
+     * @param bool                 $debug
      */
     public function __construct(
         ContainerInterface $container,
         RouterInterface $router,
         Reader $reader,
         DocCommentExtractor $commentExtractor,
-        ControllerNameParser $controllerNameParser,
         array $handlers,
         array $annotationsProviders,
         $cacheFile,
@@ -58,7 +55,6 @@ class CachingApiDocExtractor extends BaseExtractor implements
             $router,
             $reader,
             $commentExtractor,
-            $controllerNameParser,
             $handlers,
             $annotationsProviders,
             $cacheFile,
@@ -86,19 +82,7 @@ class CachingApiDocExtractor extends BaseExtractor implements
      */
     public function all($view = ApiDoc::DEFAULT_VIEW)
     {
-        /**
-         * disabling the garbage collector gives a significant performance gain (about 2 times)
-         * because a lot of config and metadata objects with short lifetime are used
-         * this happens because we work with clones of these objects
-         * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
-         * @see \Oro\Bundle\ApiBundle\Provider\RelationConfigProvider::getRelationConfig
-         * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
-         */
-        gc_disable();
-        $result = parent::all($this->resolveView($view));
-        gc_enable();
-
-        return $result;
+        return parent::all($this->resolveView($view));
     }
 
     /**

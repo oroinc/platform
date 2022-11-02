@@ -3,38 +3,22 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
+use Oro\Component\Exception\UnexpectedTypeException;
 
 class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $dateTimeFormatter;
+    /** @var DateTimeFormatter */
+    private $dateTimeFormatter;
 
-    /**
-     * @inheritDoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateTimeFormatter = new DateTimeFormatter();
     }
 
     /**
-     * @inheritDoc
-     */
-    protected function tearDown()
-    {
-        unset($this->dateTimeFormatter);
-    }
-
-    /**
      * @dataProvider formatProvider
-     *
-     * @param string $dateTimeString
-     * @param string $dateTimeZone
-     * @param string $expectedDateTimeString
      */
-    public function testFormat($dateTimeString, $dateTimeZone, $expectedDateTimeString)
+    public function testFormat(string $dateTimeString, string $dateTimeZone, string $expectedDateTimeString)
     {
         $dateTime = new \DateTime($dateTimeString, new \DateTimeZone($dateTimeZone));
         $this->assertEquals(
@@ -43,7 +27,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatProvider()
+    public function formatProvider(): array
     {
         return [
             [
@@ -57,5 +41,13 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'expectedDateTimeString' => '2017-08-20 22:00:00'
             ]
         ];
+    }
+
+    public function testFormatInvalidValue()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "\DateTime", "string" given');
+
+        $this->dateTimeFormatter->format('2017-08-21 00:00:00');
     }
 }

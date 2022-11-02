@@ -16,13 +16,20 @@ class Select2Entities extends Element implements ClearableInterface
      */
     public function setValue($values)
     {
+        $this->getDriver()->waitForAjax();
         $this->clear();
         $this->focus();
         $values = true === is_array($values) ? $values : [$values];
 
         foreach ($values as $value) {
             $this->type($value);
-            $searchResults = $this->getSearchResults();
+            $searchResults = array_filter(
+                $this->getSearchResults(),
+                static function ($element) {
+                    return !empty(trim($element->getText()));
+                }
+            );
+
             self::assertCount(
                 1,
                 $searchResults,
@@ -118,13 +125,21 @@ class Select2Entities extends Element implements ClearableInterface
     }
 
     /**
+     * Close search results dropdown
+     */
+    public function close()
+    {
+        $this->getDriver()->keyDown($this->getXpath(), 27);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function clear()
     {
         $driver = $this->getDriver();
         $closeLinks = $this->getParent()->getParent()
-            ->findAll('css', 'a.select2-search-choice-close');
+            ->findAll('css', '.select2-search-choice-close');
 
         if (!$closeLinks) {
             return;

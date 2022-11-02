@@ -7,29 +7,34 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class EntityListener implements OptionalListenerInterface
+/**
+ * Handles Email entity related changes.
+ */
+class EntityListener implements OptionalListenerInterface, ServiceSubscriberInterface
 {
-    /** @var EmailOwnerManager */
-    protected $emailOwnerManager;
+    use OptionalListenerTrait;
 
-    /** @var ServiceLink */
-    protected $emailActivityManagerLink;
+    /** @var  MessageProducerInterface */
+    protected $producer;
 
-    /** @var ServiceLink */
-    protected $emailThreadManagerLink;
+    /** @var ContainerInterface */
+    protected $container;
 
     /** @var Email[] */
     protected $emailsToRemove = [];
@@ -46,56 +51,31 @@ class EntityListener implements OptionalListenerInterface
     /** @var EmailAddress[] */
     protected $newEmailAddresses = [];
 
-    /** @var EmailActivityUpdates */
-    protected $emailActivityUpdates;
+    private $processedAddresses = [];
 
-    /** @var  MessageProducerInterface */
-    protected $producer;
-
-    /**
-     * @var bool
-     */
-    protected $enabled = true;
-    /**
-     * @var EmailAddressManager
-     */
-    private $emailAddressManager;
-
-    /**
-     * @param EmailOwnerManager        $emailOwnerManager
-     * @param ServiceLink              $emailActivityManagerLink
-     * @param ServiceLink              $emailThreadManagerLink
-     * @param EmailActivityUpdates     $emailActivityUpdates
-     * @param MessageProducerInterface $producer
-     * @param EmailAddressManager      $emailAddressManager
-     */
     public function __construct(
-        EmailOwnerManager    $emailOwnerManager,
-        ServiceLink          $emailActivityManagerLink,
-        ServiceLink          $emailThreadManagerLink,
-        EmailActivityUpdates $emailActivityUpdates,
         MessageProducerInterface $producer,
-        EmailAddressManager $emailAddressManager
+        ContainerInterface $container
     ) {
-        $this->emailOwnerManager        = $emailOwnerManager;
-        $this->emailActivityManagerLink = $emailActivityManagerLink;
-        $this->emailThreadManagerLink   = $emailThreadManagerLink;
-        $this->emailActivityUpdates     = $emailActivityUpdates;
         $this->producer = $producer;
-        $this->emailAddressManager = $emailAddressManager;
+        $this->container = $container;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setEnabled($enabled = true)
+    public static function getSubscribedServices()
     {
-        $this->enabled = $enabled;
+        return [
+            'oro_email.email.owner.manager' => EmailOwnerManager::class,
+            'oro_email.email.thread.manager' => EmailThreadManager::class,
+            'oro_email.email.activity.manager' => EmailActivityManager::class,
+            'oro_email.model.email_activity_updates' => EmailActivityUpdates::class,
+            'oro_email.email.address.manager' => EmailAddressManager::class,
+            'oro_email.email_address_visibility.manager' => EmailAddressVisibilityManager::class
+        ];
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     public function onFlush(OnFlushEventArgs $event)
     {
         if (!$this->enabled) {
@@ -105,8 +85,12 @@ class EntityListener implements OptionalListenerInterface
         $em = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
 
-        $emailAddressData = $this->emailOwnerManager->createEmailAddressData($uow);
-        list($updatedEmailAddresses, $created) = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
+        $emailOwnerManager = $this->getEmailOwnerManager();
+        $emailAddressData = $emailOwnerManager->createEmailAddressData($uow);
+        [$updatedEmailAddresses, $created, $processedAddresses] = $emailOwnerManager->handleChangedAddresses(
+            $emailAddressData
+        );
+        $this->processedAddresses = array_merge($this->processedAddresses, $processedAddresses);
         foreach ($updatedEmailAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
@@ -126,13 +110,10 @@ class EntityListener implements OptionalListenerInterface
             )
         );
 
-        $this->emailActivityUpdates->processUpdatedEmailAddresses($updatedEmailAddresses);
+        $this->getEmailActivityUpdates()->processUpdatedEmailAddresses($updatedEmailAddresses);
         $this->newEmailAddresses = array_merge($this->newEmailAddresses, $created);
     }
 
-    /**
-     * @param PostFlushEventArgs $event
-     */
     public function postFlush(PostFlushEventArgs $event)
     {
         if (!$this->enabled) {
@@ -171,20 +152,23 @@ class EntityListener implements OptionalListenerInterface
             $this->emailsToRemove = [];
             $em->flush();
         }
+
+        if ($this->processedAddresses) {
+            $this->getEmailAddressVisibilityManager()->collectEmailAddresses($this->processedAddresses);
+            $this->processedAddresses = [];
+        }
     }
 
-    /**
-     * @param PostFlushEventArgs $event
-     */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        $entities = $this->emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
-        $this->emailActivityUpdates->clearPendingEntities();
+        $emailActivityUpdates = $this->getEmailActivityUpdates();
+        $entities = $emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
+        $emailActivityUpdates->clearPendingEntities();
 
         if (!$entities) {
             return;
         }
-        
+
         $entitiesIdsByClass = [];
         foreach ($entities as $entity) {
             $class = ClassUtils::getClass($entity);
@@ -192,16 +176,13 @@ class EntityListener implements OptionalListenerInterface
         }
 
         foreach ($entitiesIdsByClass as $class => $ids) {
-            $this->producer->send(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
+            $this->producer->send(UpdateEmailOwnerAssociationsTopic::getName(), [
                 'ownerClass' => $class,
                 'ownerIds' => $ids,
             ]);
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function postRemove(LifecycleEventArgs $args)
     {
         if (!$this->enabled) {
@@ -240,31 +221,19 @@ class EntityListener implements OptionalListenerInterface
         };
     }
 
-    /**
-     * @return EmailThreadManager
-     */
-    public function getEmailThreadManager()
-    {
-        return $this->emailThreadManagerLink->getService();
-    }
-
-    /**
-     * @return EmailActivityManager
-     */
-    protected function getEmailActivityManager()
-    {
-        return $this->emailActivityManagerLink->getService();
-    }
-
-    /**
-     * @param EntityManager $em
-     */
-    private function saveNewEmailAddresses(EntityManager $em)
+    protected function saveNewEmailAddresses(EntityManager $em)
     {
         $flush = false;
 
+        $newEmails = [];
         foreach ($this->newEmailAddresses as $newEmailAddress) {
-            $emailAddress = $this->emailAddressManager
+            $newEmail = $newEmailAddress->getEmail();
+            if (array_key_exists($newEmail, $newEmails)) {
+                continue;
+            }
+            $newEmails[$newEmail] = true;
+
+            $emailAddress = $this->getEmailAddressManager()
                 ->getEmailAddressRepository()
                 ->findOneBy(['email' => $newEmailAddress->getEmail()]);
             if ($emailAddress === null) {
@@ -278,5 +247,41 @@ class EntityListener implements OptionalListenerInterface
         if ($flush) {
             $em->flush();
         }
+    }
+
+    private function getEmailAddressVisibilityManager(): EmailAddressVisibilityManager
+    {
+        return $this->container->get('oro_email.email_address_visibility.manager');
+    }
+
+    protected function getEmailOwnerManager(): EmailOwnerManager
+    {
+        return $this->container->get('oro_email.email.owner.manager');
+    }
+
+    /**
+     * @return EmailThreadManager
+     */
+    protected function getEmailThreadManager()
+    {
+        return $this->container->get('oro_email.email.thread.manager');
+    }
+
+    /**
+     * @return EmailActivityManager
+     */
+    protected function getEmailActivityManager()
+    {
+        return $this->container->get('oro_email.email.activity.manager');
+    }
+
+    protected function getEmailActivityUpdates(): EmailActivityUpdates
+    {
+        return $this->container->get('oro_email.model.email_activity_updates');
+    }
+
+    protected function getEmailAddressManager(): EmailAddressManager
+    {
+        return $this->container->get('oro_email.email.address.manager');
     }
 }

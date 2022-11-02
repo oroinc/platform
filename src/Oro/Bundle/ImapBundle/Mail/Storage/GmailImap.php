@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+/**
+ * Gmail IMAP protocol implementation.
+ */
 class GmailImap extends Imap
 {
     const DEFAULT_GMAIL_HOST = 'imap.gmail.com';
@@ -32,7 +35,7 @@ class GmailImap extends Imap
     {
         if (!empty($criteria)) {
             $lastItem = end($criteria);
-            if (strpos($lastItem, '"') === 0 && substr($lastItem, -strlen('"')) === '"') {
+            if (str_starts_with($lastItem, '"') && str_ends_with($lastItem, '"')) {
                 array_unshift($criteria, 'X-GM-RAW');
             }
         }

@@ -25,23 +25,15 @@ class DataNormalizer
         return $data;
     }
 
-    /**
-     * @param array        $rows
-     * @param EntityConfig $config
-     */
     protected function normalizeRows(array &$rows, EntityConfig $config)
     {
-        foreach ($rows as &$row) {
-            if (is_array($row)) {
+        foreach ($rows as $key => &$row) {
+            if (ConfigUtil::INFO_RECORD_KEY !== $key && \is_array($row)) {
                 $this->normalizeRow($row, $config);
             }
         }
     }
 
-    /**
-     * @param array        $row
-     * @param EntityConfig $config
-     */
     protected function normalizeRow(array &$row, EntityConfig $config)
     {
         $fields = $config->getFields();
@@ -51,10 +43,10 @@ class DataNormalizer
             }
 
             $targetConfig = $fieldConfig->getTargetEntity();
-            if (null !== $targetConfig && !empty($row[$field]) && is_array($row[$field])) {
+            if (null !== $targetConfig && !empty($row[$field]) && \is_array($row[$field])) {
                 if ($fieldConfig->isCollapsed() && $targetConfig->get(ConfigUtil::COLLAPSE_FIELD)) {
                     $this->normalizeCollapsed($row, $field, $targetConfig->get(ConfigUtil::COLLAPSE_FIELD));
-                } elseif (array_key_exists(0, $row[$field])) {
+                } elseif (\array_key_exists(0, $row[$field])) {
                     $this->normalizeRows($row[$field], $targetConfig);
                 } else {
                     $this->normalizeRow($row[$field], $targetConfig);
@@ -71,11 +63,14 @@ class DataNormalizer
      */
     protected function normalizeCollapsed(array &$row, $field, $targetField)
     {
-        if (array_key_exists(0, $row[$field])) {
+        if (\array_key_exists(0, $row[$field])) {
             // to-many association
             $values = [];
             foreach ($row[$field] as $key => $value) {
-                if (is_array($value) && array_key_exists($targetField, $value)) {
+                if (ConfigUtil::INFO_RECORD_KEY !== $key
+                    && \is_array($value)
+                    && \array_key_exists($targetField, $value)
+                ) {
                     $value = $value[$targetField];
                 }
                 $values[$key] = $value;
@@ -83,16 +78,12 @@ class DataNormalizer
             $row[$field] = $values;
         } else {
             // to-one association
-            if (array_key_exists($targetField, $row[$field])) {
+            if (\array_key_exists($targetField, $row[$field])) {
                 $row[$field] = $row[$field][$targetField];
             }
         }
     }
 
-    /**
-     * @param array        $row
-     * @param EntityConfig $config
-     */
     protected function removeExcludedFields(array &$row, EntityConfig $config)
     {
         $excludedFields = $config->get(ConfigUtil::EXCLUDED_FIELDS);

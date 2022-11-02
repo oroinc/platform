@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
@@ -15,23 +15,21 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     use EntityTrait;
 
     /** @var EntityVirtualStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /** @var ChainVirtualFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $virtualFieldProvider;
+    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $virtualFieldProvider;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->virtualFieldProvider = $this->createMock(ChainVirtualFieldProvider::class);
+        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);
     }
 
     public function testOnOptionsRequest()
     {
-        $fieldStructure = (new EntityFieldStructure())->setName('field1');
+        $fieldStructure = new EntityFieldStructure();
+        $fieldStructure->setName('field1');
         $entityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -40,17 +38,14 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ]
         );
 
-        $this->virtualFieldProvider
-            ->expects($this->once())
+        $this->virtualFieldProvider->expects($this->once())
             ->method('isVirtualField')
             ->with($entityStructure->getClassName(), 'field1')
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityVirtualStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = clone $fieldStructure;
+        $expectedFieldStructure->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -65,7 +60,8 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     public function testOnOptionsRequestUnidirectional()
     {
         $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
-        $fieldStructure = (new EntityFieldStructure())->setName($fieldName);
+        $fieldStructure = new EntityFieldStructure();
+        $fieldStructure->setName($fieldName);
         $entityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -74,17 +70,14 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ]
         );
 
-        $this->virtualFieldProvider
-            ->expects($this->once())
+        $this->virtualFieldProvider->expects($this->once())
             ->method('isVirtualField')
             ->with('class', 'field')
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
-        $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityVirtualStructureOptionsListener::OPTION_NAME,
-            true
-        );
+        $expectedFieldStructure = clone $fieldStructure;
+        $expectedFieldStructure->addOption('virtual', true);
         $expectedEntityStructure = $this->getEntity(
             EntityStructure::class,
             [

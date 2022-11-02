@@ -15,9 +15,6 @@ class EntityInstantiator
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -39,11 +36,6 @@ class EntityInstantiator
             : $this->instantiateViaReflection($reflClass);
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return bool
-     */
     private function isInstantiableViaConstructor(\ReflectionClass $reflClass): bool
     {
         $constructor = $reflClass->getConstructor();
@@ -97,11 +89,6 @@ class EntityInstantiator
         return $entity;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return ClassMetadata|null
-     */
     private function getEntityMetadata(\ReflectionClass $reflClass): ?ClassMetadata
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($reflClass->getName(), false);

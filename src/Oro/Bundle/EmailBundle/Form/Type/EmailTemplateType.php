@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
+use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -23,41 +21,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailTemplateType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     private $userConfig;
 
-    /**
-     * @var LocaleSettings
-     */
-    private $localeSettings;
-
-    /**
-     * @var LocalizationManager
-     */
+    /** @var LocalizationManager */
     private $localizationManager;
 
-    /**
-     * @var array
-     */
-    private $languages = [];
-
-    /**
-     * @param ConfigManager $userConfig
-     * @param LocaleSettings    $localeSettings
-     */
-    public function __construct(ConfigManager $userConfig, LocaleSettings $localeSettings)
+    public function __construct(ConfigManager $userConfig, LocalizationManager $localizationManager)
     {
-        $this->userConfig     = $userConfig;
-        $this->localeSettings = $localeSettings;
-    }
-
-    /**
-     * @param LocalizationManager $localizationManager
-     */
-    public function setLocalizationManager(LocalizationManager $localizationManager)
-    {
+        $this->userConfig = $userConfig;
         $this->localizationManager = $localizationManager;
     }
 
@@ -66,68 +38,51 @@ class EmailTemplateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'name',
-            TextType::class,
-            array(
-                'label'    => 'oro.email.emailtemplate.name.label',
-                'required' => true
-            )
-        );
-        $builder->add(
-            'type',
-            ChoiceType::class,
-            array(
-                'label'    => 'oro.email.emailtemplate.type.label',
+        $localizations = $this->localizationManager->getLocalizations();
+
+        $builder
+            ->add('name', TextType::class, [
+                'label' => 'oro.email.emailtemplate.name.label',
+                'required' => true,
+            ])
+            ->add('type', ChoiceType::class, [
+                'label' => 'oro.email.emailtemplate.type.label',
                 'multiple' => false,
                 'expanded' => true,
-                'choices'  => [
+                'choices' => [
                     'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
                     'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',
                 ],
-                'required' => true
-            )
-        );
-        $builder->add(
-            'entityName',
-            EntityChoiceType::class,
-            array(
-                'label'    => 'oro.email.emailtemplate.entity_name.label',
-                'tooltip'  => 'oro.email.emailtemplate.entity_name.tooltip',
+                'required' => true,
+            ])
+            ->add('entityName', EmailTemplateEntityChoiceType::class, [
+                'label' => 'oro.email.emailtemplate.entity_name.label',
+                'tooltip' => 'oro.email.emailtemplate.entity_name.tooltip',
                 'required' => false,
-                'configs'  => ['allowClear' => true]
-            )
-        );
-
-        $this->languages = array_unique(array_merge($this->getLanguages(), $options['additional_language_codes']));
-        $builder->add(
-            'translations',
-            EmailTemplateTranslationType::class,
-            array(
-                'label'    => 'oro.email.emailtemplate.translations.label',
-                'required' => false,
-                'locales'  => $this->languages,
-                'labels'   => $this->getLocaleLabels(),
-                'content_options' => ['wysiwyg_options' => $this->getWysiwygOptions()],
-            )
-        );
-        $builder->add(
-            'translation',
-            HiddenType::class,
-            [
+                'configs' => ['allowClear' => true],
+            ])
+            ->add('translations', EmailTemplateTranslationCollectionType::class, [
+                'localizations' => $localizations,
+                'wysiwyg_enabled' => $this->userConfig->get('oro_form.wysiwyg_enabled') ?? false,
+                'wysiwyg_options' => $this->getWysiwygOptions(),
+            ])
+            ->add('activeLocalization', HiddenType::class, [
                 'mapped' => false,
-                'attr' => ['class' => 'translation']
-            ]
-        );
+                'attr' => ['class' => 'active-localization'],
+            ])
+            ->add('parentTemplate', HiddenType::class, [
+                'label' => 'oro.email.emailtemplate.parent.label',
+                'property_path' => 'parent',
+            ]);
 
-        $builder->add(
-            'parentTemplate',
-            HiddenType::class,
-            array(
-                'label'         => 'oro.email.emailtemplate.parent.label',
-                'property_path' => 'parent'
-            )
-        );
+        $builder->get('activeLocalization')->addModelTransformer(new CallbackTransformer(
+            function ($data) {
+                return null;
+            },
+            function ($data) use ($localizations) {
+                return $localizations[(int)$data] ?? null;
+            }
+        ));
 
         // disable some fields for non editable email template
         $setDisabled = function (&$options) {
@@ -136,7 +91,7 @@ class EmailTemplateType extends AbstractType
             }
             $options['disabled'] = true;
         };
-        $factory     = $builder->getFormFactory();
+        $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($factory, $setDisabled) {
@@ -146,7 +101,12 @@ class EmailTemplateType extends AbstractType
                     // entityName field
                     $options = $form->get('entityName')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('entityName', EntityChoiceType::class, null, $options));
+                    $form->add($factory->createNamed(
+                        'entityName',
+                        EmailTemplateEntityChoiceType::class,
+                        null,
+                        $options
+                    ));
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);
@@ -160,6 +120,8 @@ class EmailTemplateType extends AbstractType
                 }
             }
         );
+
+        $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
     }
 
     /**
@@ -168,20 +130,11 @@ class EmailTemplateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'csrf_token_id' => 'emailtemplate',
-                'additional_language_codes' => [],
-            )
+            ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**
@@ -195,53 +148,22 @@ class EmailTemplateType extends AbstractType
     /**
      * @return array
      */
-    protected function getLanguages()
-    {
-        $languages = $this->userConfig->get('oro_locale.languages');
-        $localizations = array_map(function (Localization $localization) {
-            return $localization->getLanguageCode();
-        }, $this->getEnabledLocalizations());
-
-        return array_unique(array_merge($languages, [$this->localeSettings->getLanguage()], $localizations));
-    }
-
-    /**
-     * @return Localization[]
-     */
-    private function getEnabledLocalizations()
-    {
-        if (!$this->localizationManager) {
-            return [];
-        }
-
-        $ids = array_map(function ($id) {
-            return (int)$id;
-        }, (array)$this->userConfig->get(Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS)));
-
-        return $this->localizationManager->getLocalizations($ids);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getLocaleLabels()
-    {
-        return $this->localeSettings->getLocalesByCodes($this->languages, $this->localeSettings->getLanguage());
-    }
-
-    /**
-     * @return array
-     */
     protected function getWysiwygOptions()
     {
+        $options = [
+            'convert_urls' => false
+        ];
+
         if ($this->userConfig->get('oro_email.sanitize_html')) {
-            return [];
+            return $options;
         }
 
-        return [
+        return array_merge($options, [
             'valid_elements' => null, //all elements are valid
             'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
-            'relative_urls' => true,
-        ];
+            'relative_urls' => false,
+            'forced_root_block' => '',
+            'entity_encoding' => 'raw',
+        ]);
     }
 }

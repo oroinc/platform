@@ -2,31 +2,31 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
-use Oro\Bundle\DataGridBundle\Extension\Export\Configuration;
-use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides the ability to control of the Grid
  */
-class GridController extends Controller
+class GridController extends AbstractController
 {
     /**
      * @Route(
@@ -64,7 +64,7 @@ class GridController extends Controller
      */
     public function getAction($gridName)
     {
-        $gridManager = $this->get('oro_datagrid.datagrid.manager');
+        $gridManager = $this->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
@@ -81,7 +81,8 @@ class GridController extends Controller
                 return new JsonResponse(
                     [
                         'type'    => UserInputErrorExceptionInterface::TYPE,
-                        'message' => $this->get('translator')->trans($e->getMessageTemplate(), $e->getMessageParams())
+                        'message' => $this
+                            ->get(TranslatorInterface::class)->trans($e->getMessageTemplate(), $e->getMessageParams())
                     ],
                     500
                 );
@@ -99,7 +100,7 @@ class GridController extends Controller
     {
         $filterNames = $request->query->get('filterNames', []);
 
-        $gridManager = $this->get('oro_datagrid.datagrid.manager');
+        $gridManager = $this->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
@@ -140,24 +141,20 @@ class GridController extends Controller
     {
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
-        $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
-        $parameters = [
-            'gridName' => $gridName,
-            'gridParameters' => $gridParameters,
-            FormatterProvider::FORMAT_TYPE => $formatType,
-        ];
+        $gridParameters = $this->container->get(RequestParameterBagFactory::class)->fetchParameters($gridName);
 
-        $gridConfiguration = $this->getGridManager()->getConfigurationForGrid($gridName);
-        $exportOptions = $gridConfiguration->offsetGetByPath(ExportExtension::EXPORT_OPTION_PATH);
-        if (isset($exportOptions[$format][Configuration::OPTION_PAGE_SIZE])) {
-            $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
-        }
-
-        $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
-            'format' => $format,
-            'parameters' => $parameters,
-            'notificationTemplate' => 'datagrid_export_result',
-        ]);
+        $this->container->get(MessageProducerInterface::class)
+            ->send(
+                DatagridPreExportTopic::getName(),
+                [
+                    'outputFormat' => $format,
+                    'contextParameters' => [
+                        'gridName' => $gridName,
+                        'gridParameters' => $gridParameters,
+                        FormatterProvider::FORMAT_TYPE => $formatType,
+                    ],
+                ]
+            );
 
         return new JsonResponse([
             'successful' => true,
@@ -168,8 +165,10 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/massAction/{actionName}",
      *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:\-]+", "actionName"="[\w\-]+"}
      * )
+     * @CsrfProtection()
+     *
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
@@ -179,19 +178,17 @@ class GridController extends Controller
      */
     public function massActionAction(Request $request, $gridName, $actionName)
     {
-        /* @var $tokenManager CsrfTokenManagerInterface */
-        $tokenManager = $this->get('security.csrf.token_manager');
-        if (!$tokenManager->isTokenValid(new CsrfToken($actionName, $request->get('token')))) {
-            return new JsonResponse('Invalid CSRF Token', JsonResponse::HTTP_FORBIDDEN);
-        }
-
-        /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+        $massActionDispatcher = $this->get(MassActionDispatcher::class);
 
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
         } catch (LogicException $e) {
-            return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
+            if ($this->get(KernelInterface::class)->isDebug()) {
+                throw $e;
+            } else {
+                $this->get(LoggerInterface::class)->error($e->getMessage());
+                return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
+            }
         }
 
         $data = [
@@ -230,26 +227,21 @@ class GridController extends Controller
     }
 
     /**
-     * @return MessageProducerInterface
+     * {@inheritdoc}
      */
-    protected function getMessageProducer()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
-     * @return RequestParameterBagFactory
-     */
-    protected function getRequestParametersFactory()
-    {
-        return $this->get('oro_datagrid.datagrid.request_parameters_factory');
-    }
-
-    /**
-     * @return Manager
-     */
-    protected function getGridManager()
-    {
-        return $this->get('oro_datagrid.datagrid.manager');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                MessageProducerInterface::class,
+                MassActionDispatcher::class,
+                RequestParameterBagFactory::class,
+                Manager::class,
+                KernelInterface::class,
+                LoggerInterface::class,
+            ]
+        );
     }
 }

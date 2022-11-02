@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ViewportComponent;
-    var viewportManager = require('oroui/js/viewport-manager');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
-    var _ = require('underscore');
+    const viewportManager = require('oroui/js/viewport-manager');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
 
-    ViewportComponent = BaseComponent.extend({
+    const ViewportComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -29,14 +28,14 @@ define(function(require) {
         component: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ViewportComponent() {
-            ViewportComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ViewportComponent(options) {
+            ViewportComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.extend({}, this.options, _.pick(options, ['viewport', 'component']));
@@ -44,7 +43,7 @@ define(function(require) {
 
             this.resolveComponent();
 
-            tools.loadModules(this.options.component, _.bind(this.onComponentLoaded, this));
+            loadModules(this.options.component, this.onComponentLoaded, this);
         },
 
         resolveComponent: function() {
@@ -59,14 +58,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
                 return;
             }
             mediator.off(null, null, this);
-            return ViewportComponent.__super__.dispose.apply(this, arguments);
+            return ViewportComponent.__super__.dispose.call(this);
         },
 
         onComponentLoaded: function(Component) {

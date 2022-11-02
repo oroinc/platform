@@ -1,0 +1,14 @@
+# tests searching entity which have configured field without `target_fields` parameter
+request:
+    search: 'watt'
+    offset: ~
+    max_results: ~
+response:
+    records_count: 1
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Product
+                entity_label: oro.testframework.product.entity_label
+                record_url: http://localhost%oro_default_prefix%search/

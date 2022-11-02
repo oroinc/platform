@@ -1,59 +1,63 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Cron command that runs processing the invalid email origins that was failed during sync.
+ * Sends notifications if email origin sync failed due to invalid credentials.
  */
-class SendCredentialNotificationsCommand extends ContainerAwareCommand implements CronCommandInterface
+class SendCredentialNotificationsCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    /**
-     * Command name
-     */
-    const COMMAND_NAME = 'oro:cron:imap-credential-notifications';
+    /** @var string */
+    protected static $defaultName = 'oro:cron:imap-credential-notifications';
+
+    private SyncCredentialsIssueManager $syncCredentialsIssueManager;
+
+    public function __construct(SyncCredentialsIssueManager $syncCredentialsIssueManager)
+    {
+        parent::__construct();
+        $this->syncCredentialsIssueManager = $syncCredentialsIssueManager;
+    }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '0 4 * * *';
     }
 
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-
-        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Send wrong email credentials notifications');
+            ->setDescription('Sends notifications if email origin sync failed due to invalid credentials.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command sends notifications
+if email origin sync failed due to invalid credentials.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Process the invalid credentials origins</info>');
-        $processedOrigins = $this->getContainer()
-            ->get('oro_imap.origin_credentials.issue_manager')
-            ->processInvalidOrigins();
+        $processedOrigins = $this->syncCredentialsIssueManager->processInvalidOrigins();
         if (count($processedOrigins)) {
             $output->writeln('<info>Processed origins:</info>', OutputInterface::VERBOSITY_DEBUG);
             foreach ($processedOrigins as $processedOrigin) {

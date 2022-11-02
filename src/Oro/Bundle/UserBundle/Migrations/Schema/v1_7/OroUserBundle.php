@@ -103,8 +103,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_organization
-     *
-     * @param Schema $schema
      */
     public static function oroUserOrganizationTable(Schema $schema)
     {
@@ -121,8 +119,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_organization
-     *
-     * @param Schema $schema
      */
     public static function oroUserOrganizationForeignKeys(Schema $schema)
     {
@@ -144,8 +140,6 @@ class OroUserBundle implements Migration
 
     /**
      * Adds organization_id field
-     *
-     * @param Schema $schema
      */
     public static function addOrganizationFields(Schema $schema)
     {

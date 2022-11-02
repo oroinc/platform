@@ -18,8 +18,6 @@ class OroReminderBundle implements Migration
 
     /**
      * Generate table oro_reminder
-     *
-     * @param Schema $schema
      */
     public static function oroReminderTable(Schema $schema)
     {

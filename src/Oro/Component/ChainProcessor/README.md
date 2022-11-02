@@ -51,8 +51,10 @@ class AcmeTextRepresentationBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(
             new LoadAndBuildProcessorsCompilerPass(
                 'text_representation.processor_bag_config_provider',
@@ -61,8 +63,9 @@ class AcmeTextRepresentationBundle extends Bundle
         );
         $container->addCompilerPass(
             new CleanUpProcessorsCompilerPass(
-                'text_representation.simple_processor_factory',
-                'text_representation.processor'
+                'text_representation.simple_processor_registry',
+                'text_representation.processor',
+                'text_representation.simple_processor_registry.inner'
             ),
             PassConfig::TYPE_BEFORE_REMOVING
         );
@@ -106,8 +109,6 @@ class TextRepresentationProcessor extends ActionProcessor
 <?php
 
 namespace Acme\Bundle\TextRepresentationBundle;
-
-use Oro\Component\ChainProcessor\Context;
 
 class ObjectToStringConverter
 {
@@ -163,7 +164,7 @@ services:
         public: false
         arguments:
             - '@text_representation.processor_bag_config_provider'
-            - '@text_representation.processor_factory'
+            - '@text_representation.processor_registry'
             - '%kernel.debug%'
 
     text_representation.processor_bag_config_provider:
@@ -173,22 +174,19 @@ services:
             - # groups
                 'get_text_representation': ['prepare_data', 'format']
 
-    text_representation.processor_factory:
-        class: Oro\Component\ChainProcessor\ChainProcessorFactory
-        public: false
-        calls:
-            - [addFactory, ['@text_representation.simple_processor_factory', 10]]
-            - [addFactory, ['@text_representation.di_processor_factory']]
-
-    text_representation.simple_processor_factory:
-        class: Oro\Component\ChainProcessor\SimpleProcessorFactory
-        public: false
-
-    text_representation.di_processor_factory:
-        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+    text_representation.processor_registry:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
         public: false
         arguments:
-            - '@service_container'
+            - ~ # service locator; it is set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+
+    text_representation.simple_processor_registry:
+        class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
+        public: false
+        decorates: text_representation.processor_registry
+        arguments:
+            - [] # processors; they are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - '@.inner'
 ```
 
 - Implement a simple processor that will get an object identifier and register it in `prepare_data` group
@@ -261,7 +259,7 @@ class FormatClassNameIdPair implements ProcessorInterface
              - { name: text_representation.processor, action: get_text_representation, group: format, priority: -10 }
 ```
 
-Now we can get a test representation for almost all entities:
+Now we can get a text representation for almost all entities:
 
 ```php
     $converter = $this->getContainer()->get('text_representation.object_to_string_converter');
@@ -383,6 +381,16 @@ There is a list of existing applicable checkers that are registered in the proce
 - [SkipGroupApplicableChecker](./SkipGroupApplicableChecker.php) - It allows to skip processors included in some groups. To manage skipped groups  you can use `skipGroup` and `undoGroupSkipping` methods of the context.
 - [MatchApplicableChecker](./MatchApplicableChecker.php) - It allows to filter processors based on data stored in the context.
 
+The [ExpressionParser](./ExpressionParser.php) can be used to parse a string representation of expressions.
+This class and [MatchApplicableChecker](./MatchApplicableChecker.php) support the following operators:
+
+| Operator | Description |
+|----------|-------------|
+| `!` | logical NOT |
+| `&` | logical AND |
+| `|` | logical OR |
+| `exists` | checks if an attribute exists in the execution context |
+
 ## Key Classes
 
 Here is a list of key classes:
@@ -390,7 +398,9 @@ Here is a list of key classes:
 - [ActionProcessor](./ActionProcessor.php) - The base class for processors for your actions. This class executes processors registered in [ProcessorBag](./ProcessorBag.php) and suitable for the specified [Context](./Context.php).
 - [Context](./Context.php) - The base implementation of an execution context.
 - [ProcessorBag](./ProcessorBag.php) - A container for processors and applicable checkers.
-- [ProcessorBagConfigBuilder](./ProcessorBagConfigBuilder.php) - A builder for processors map used in the ProcessorBag.
+- [ProcessorBagConfigBuilder](./ProcessorBagConfigBuilder.php) - A builder for the processors map used in the ProcessorBag.
+- [ProcessorBagConfigProvider](./ProcessorBagConfigProvider.php) - A provider for the processors map used in the ProcessorBag.
+- [LazyProcessorBagConfigProvider](./LazyProcessorBagConfigProvider.php) - A provider for the processors map used in the ProcessorBag for case when each action has own configuration provider.
 - [ProcessorInterface](./ProcessorInterface.php) - An interface of processors.
 - [ApplicableCheckerInterface](./ApplicableCheckerInterface.php) - An interface of applicable checkers.
 - [ProcessorBagAwareApplicableCheckerInterface](./ProcessorBagAwareApplicableCheckerInterface.php) - An interface that should be implemented by applicable checkers that need access to the processor bag.

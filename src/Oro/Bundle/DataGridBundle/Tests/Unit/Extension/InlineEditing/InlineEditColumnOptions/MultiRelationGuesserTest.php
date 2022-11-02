@@ -1,37 +1,30 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser;
 
-/**
- * Class MultiRelationGuesserTest
- * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption
- */
 class MultiRelationGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MultiRelationGuesser */
-    protected $guesser;
+    private $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new MultiRelationGuesser();
     }
 
     /**
-     * @param array $column
-     * @param array $expected
-     *
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess($column, $expected)
+    public function testRelationGuess(array $column, array $expected)
     {
         $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
 
         $this->assertEquals($expected, $guessed);
     }
 
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
         return [
             'empty' => [

@@ -12,15 +12,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowRegistry;
+    private $workflowRegistry;
 
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var WorkflowDeactivationHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
@@ -55,14 +55,12 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->translationHelper->expects($this->any())
             ->method('findWorkflowTranslation')
-            ->willReturnMap(
-                [
-                    ['workflow1', 'workflow1', null, 'Workflow1 Name'],
-                    ['workflow2', 'workflow2', null, 'Workflow2 Name'],
-                    ['workflow3', 'workflow3', null, 'Workflow3 Name'],
-                    ['workflow4', 'workflow4', null, 'Workflow4 Name'],
-                ]
-            );
+            ->willReturnMap([
+                ['workflow1', 'workflow1', null, 'Workflow1 Name'],
+                ['workflow2', 'workflow2', null, 'Workflow2 Name'],
+                ['workflow3', 'workflow3', null, 'Workflow3 Name'],
+                ['workflow4', 'workflow4', null, 'Workflow4 Name'],
+            ]);
 
         $this->assertEquals(
             [$workflow3->getName() => 'Workflow3 Name', $workflow4->getName() => 'Workflow4 Name'],
@@ -91,7 +89,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
      * @param array $xclusiveActiveGroups
      * @return WorkflowDefinition
      */
-    protected function getWorkflowDefinition($name, array $xclusiveActiveGroups = [])
+    private function getWorkflowDefinition($name, array $xclusiveActiveGroups = [])
     {
         $definition = new WorkflowDefinition();
         $definition->setName($name)->setExclusiveActiveGroups($xclusiveActiveGroups);
@@ -104,11 +102,15 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
      * @param array $exclusiveActiveGroups
      * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getWorkflow($name, array $exclusiveActiveGroups = [])
+    private function getWorkflow($name, array $exclusiveActiveGroups = [])
     {
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('getName')->willReturn($name);
-        $workflow->expects($this->any())->method('getLabel')->willReturn($name);
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $workflow->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($name);
         $workflow->expects($this->any())
             ->method('getDefinition')
             ->willReturn($this->getWorkflowDefinition($name, $exclusiveActiveGroups));

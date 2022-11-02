@@ -11,40 +11,31 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectConfiguration
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfiguration\DuplicateConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpKernel\Kernel;
 
 class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessDefinitionListConfiguration
-     */
-    protected $definitionConfiguration;
+    private ProcessDefinitionListConfiguration $definitionConfiguration;
+    private ProcessTriggerListConfiguration $triggerConfiguration;
+    private Kernel $kernel;
 
-    /**
-     * @var ProcessTriggerListConfiguration
-     */
-    protected $triggerConfiguration;
-
-    protected function setUp()
+    protected function setUp(): void
     {
+        $this->kernel = $this->createMock(Kernel::class);
         $this->definitionConfiguration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
         $this->triggerConfiguration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }
 
-    protected function tearDown()
-    {
-        unset($this->definitionConfiguration, $this->triggerConfiguration);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
-        $bundles = array(new IncorrectConfigurationBundle());
+        $this->expectException(InvalidConfigurationException::class);
+        $bundles = [new IncorrectConfigurationBundle()];
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
         $configurationProvider->getProcessConfiguration();
     }
@@ -55,10 +46,11 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
-        static::assertEquals(
+        self::assertEquals(
             $this->getExpectedProcessConfiguration('DuplicateConfiguration'),
             $configurationProvider->getProcessConfiguration()
         );
@@ -66,11 +58,12 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWorkflowDefinitions()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [new CorrectConfigurationBundle(), new EmptyConfigurationBundle()];
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $this->assertEquals(
@@ -81,22 +74,23 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWorkflowDefinitionsFilterByDirectory()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [new CorrectConfigurationBundle(), new EmptyConfigurationBundle()];
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $this->assertEquals(
             $this->getExpectedProcessConfiguration('CorrectConfiguration'),
             $configurationProvider->getProcessConfiguration(
-                array(__DIR__ . '/Stub/CorrectConfiguration')
+                [__DIR__ . '/Stub/CorrectConfiguration']
             )
         );
 
         $emptyConfiguration = $configurationProvider->getProcessConfiguration(
-            array(__DIR__ . '/Stub/EmptyConfiguration')
+            [__DIR__ . '/Stub/EmptyConfiguration']
         );
         $this->assertEmpty($emptyConfiguration[ProcessConfigurationProvider::NODE_DEFINITIONS]);
         $this->assertEmpty($emptyConfiguration[ProcessConfigurationProvider::NODE_TRIGGERS]);
@@ -104,11 +98,12 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWorkflowDefinitionsFilterByProcess()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [new CorrectConfigurationBundle(), new EmptyConfigurationBundle()];
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $expectedConfiguration = $this->getExpectedProcessConfiguration('CorrectConfiguration');
@@ -118,13 +113,13 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             $expectedConfiguration,
             $configurationProvider->getProcessConfiguration(
                 null,
-                array('test_definition')
+                ['test_definition']
             )
         );
 
         $emptyConfiguration = $configurationProvider->getProcessConfiguration(
             null,
-            array('not_existing_definition')
+            ['not_existing_definition']
         );
         $this->assertEmpty($emptyConfiguration[ProcessConfigurationProvider::NODE_DEFINITIONS]);
         $this->assertEmpty($emptyConfiguration[ProcessConfigurationProvider::NODE_TRIGGERS]);
@@ -134,10 +129,11 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      * @param string $bundleName
      * @return array
      */
-    protected function getExpectedProcessConfiguration($bundleName)
+    private function getExpectedProcessConfiguration($bundleName)
     {
         $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/processes.php';
         $this->assertFileExists($fileName);
+
         return include $fileName;
     }
 }

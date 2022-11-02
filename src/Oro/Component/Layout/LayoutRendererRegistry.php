@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\Layout\Exception;
-
 class LayoutRendererRegistry implements LayoutRendererRegistryInterface
 {
     /** @var LayoutRendererInterface[] */

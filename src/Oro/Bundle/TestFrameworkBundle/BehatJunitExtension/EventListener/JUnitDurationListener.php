@@ -10,10 +10,13 @@ use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\KeywordNodeInterface;
 use Behat\Gherkin\Node\ScenarioLikeInterface;
 use Behat\Testwork\Counter\Timer;
+use Behat\Testwork\Event\Event;
 use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Output\Node\EventListener\EventListener;
-use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Listener to collect behat feature duration statistics and returns feature and scenario durations
+ */
 final class JUnitDurationListener implements EventListener
 {
     /**
@@ -76,25 +79,16 @@ final class JUnitDurationListener implements EventListener
         return array_key_exists($key, $this->featureResultStore) ? $this->featureResultStore[$key] : '';
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     private function captureBeforeFeatureTested(BeforeFeatureTested $event)
     {
         $this->featureTimerStore[$this->getHash($event->getFeature())] = $this->startTimer();
     }
 
-    /**
-     * @param BeforeScenarioTested $event
-     */
     private function captureBeforeScenarioEvent(BeforeScenarioTested $event)
     {
         $this->scenarioTimerStore[$this->getHash($event->getScenario())] = $this->startTimer();
     }
 
-    /**
-     * @param AfterScenarioTested $event
-     */
     private function captureAfterScenarioEvent(AfterScenarioTested $event)
     {
         $key = $this->getHash($event->getScenario());
@@ -105,9 +99,6 @@ final class JUnitDurationListener implements EventListener
         }
     }
 
-    /**
-     * @param AfterFeatureTested $event
-     */
     private function captureAfterFeatureEvent(AfterFeatureTested $event)
     {
         $key = $this->getHash($event->getFeature());

@@ -1,9 +1,11 @@
 {% extends bap.layout %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 {% set buttonsPlaceholderData = {} %}
 {% if entity_class is defined %}
     {% set buttonsPlaceholderData = {'entity_class': entity_class} %}
+{% elseif entity is defined %}
+    {% set buttonsPlaceholderData = {'entity_class': oro_class_name(entity)} %}
 {% endif %}
 
 {% block before_content_addition %}
@@ -12,7 +14,13 @@
 
 {% block content %}
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra navbar-extra-right">
+        {% set pageActionsBlock -%}
+            {% block pageActions -%}
+                {% placeholder index_pageActions with buttonsPlaceholderData %}
+            {%- endblock pageActions %}
+        {%- endset %}
+
+        <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
@@ -28,11 +36,22 @@
                     {% placeholder index_navButtons_after with buttonsPlaceholderData %}
                 </div>
                 <div class="page-title-center"
+                     data-role="filters-state-view-container"
                      data-page-component-module="oroui/js/app/components/view-component"
                      data-page-component-options="{{ {'view': 'oroui/js/app/views/page-center-title-view'}|json_encode }}">
-                    <div class="filters-state-view-container"></div>
                 </div>
             </div>
+            {% if pageActionsBlock|trim %}
+            <div class="row inline-info">
+                <div class="pull-right">
+                    <div class="inline-decorate-container">
+                        <ul class="inline-decorate">
+                            {{ pageActionsBlock }}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% block content_datagrid %}
@@ -44,13 +63,13 @@
                 'enableFullScreenLayout': true,
                 'enableViews': true,
                 'showViewsInNavbar': true,
-                'filtersStateElement': '.filters-state-view-container'
+                'filtersStateElement': '[data-role="filters-state-view-container"]'
             }
             |merge(renderParams|default({})) %}
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orodatagrid/js/app/components/datagrid-allow-tracking-component',

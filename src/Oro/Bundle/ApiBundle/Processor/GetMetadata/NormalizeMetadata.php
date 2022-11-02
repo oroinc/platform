@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -26,6 +27,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Updates overridden entity class names in the acceptable target class names for associations
  * that has the target class name equal to "Oro\Bundle\ApiBundle\Model\EntityIdentifier".
  * By performance reasons all these actions are done in one processor.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NormalizeMetadata implements ProcessorInterface
 {
@@ -41,12 +43,6 @@ class NormalizeMetadata implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityMetadataFactory          $entityMetadataFactory
-     * @param MetadataProvider               $metadataProvider
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityMetadataFactory $entityMetadataFactory,
@@ -85,10 +81,7 @@ class NormalizeMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityMetadata         $entityMetadata
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $processLinkedProperties
-     * @param MetadataContext        $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeMetadata(
         EntityMetadata $entityMetadata,
@@ -113,6 +106,7 @@ class NormalizeMetadata implements ProcessorInterface
                             $fieldName,
                             $propertyPath,
                             $config,
+                            $field,
                             $context
                         );
                         if ($isPropertyAdded) {
@@ -139,10 +133,6 @@ class NormalizeMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityMetadata                  $entityMetadata
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     */
     private function normalizeAcceptableTargetClassNames(
         EntityMetadata $entityMetadata,
         EntityOverrideProviderInterface $entityOverrideProvider
@@ -166,20 +156,12 @@ class NormalizeMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     * @param EntityDefinitionConfig $config
-     * @param MetadataContext        $context
-     *
-     * @return bool
-     */
     private function processLinkedProperty(
         EntityMetadata $entityMetadata,
         string $fieldName,
         string $propertyPath,
         EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field,
         MetadataContext $context
     ): bool {
         $associationPath = ConfigUtil::explodePropertyPath($propertyPath);
@@ -193,12 +175,17 @@ class NormalizeMetadata implements ProcessorInterface
                 $context
             );
             if (null !== $targetEntityMetadata) {
-                return $this->copyLinkedProperty(
+                $result = $this->copyLinkedProperty(
                     $entityMetadata,
                     $linkedPropertyName,
                     $fieldName,
                     $targetEntityMetadata
                 );
+                if ($result && $field->hasDirection()) {
+                    $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+                }
+
+                return $result;
             }
         }
 
@@ -210,7 +197,7 @@ class NormalizeMetadata implements ProcessorInterface
             return false;
         }
 
-        return $this->addLinkedProperty(
+        $result = $this->addLinkedProperty(
             $entityMetadata,
             $linkedPropertyName,
             $fieldName,
@@ -219,16 +206,13 @@ class NormalizeMetadata implements ProcessorInterface
             $targetClassMetadata,
             $context
         );
+        if ($result && $field->hasDirection()) {
+            $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+        }
+
+        return $result;
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param string         $linkedPropertyName
-     * @param string         $fieldName
-     * @param EntityMetadata $targetEntityMetadata
-     *
-     * @return bool
-     */
     private function copyLinkedProperty(
         EntityMetadata $entityMetadata,
         string $linkedPropertyName,
@@ -251,17 +235,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $isPropertyAdded;
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param string                 $linkedPropertyName
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     * @param EntityDefinitionConfig $config
-     * @param ClassMetadata          $targetClassMetadata
-     * @param MetadataContext        $context
-     *
-     * @return bool
-     */
     private function addLinkedProperty(
         EntityMetadata $entityMetadata,
         string $linkedPropertyName,
@@ -309,6 +282,15 @@ class NormalizeMetadata implements ProcessorInterface
         return $isPropertyAdded;
     }
 
+    private function setLinkedPropertyDirection(
+        EntityMetadata $entityMetadata,
+        string $fieldName,
+        EntityDefinitionFieldConfig $field
+    ): void {
+        $entityMetadata->getProperty($fieldName)
+            ->setDirection($field->isInput(), $field->isOutput());
+    }
+
     /**
      * @param EntityDefinitionConfig $config
      * @param string[]               $associationPath
@@ -353,13 +335,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $targetEntityMetadata;
     }
 
-    /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param MetadataContext        $context
-     *
-     * @return EntityMetadata
-     */
     private function getMetadata(
         string $entityClass,
         EntityDefinitionConfig $config,
@@ -379,13 +354,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $targetMetadata;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig
-     */
     private function getTargetConfig(
         EntityDefinitionConfig $config,
         string $fieldName,

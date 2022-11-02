@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% if feature_enabled('email') %}
 <script type="text/template" id="email-notification-item-template">
     <div class="info" data-id="<%- id %>">
@@ -16,10 +16,10 @@
         <i class="mail-icon highlight" title="{{ 'oro.email.datagrid.emails.action.mark_as_read'|trans }}" data-role="toggle-read-status"></i>
         <% } %>
     </div>
-    <div class="footer row-fluid">
+    <div class="footer">
         <span class="from-name">
             <% if (linkFromName) { %>
-                <a href="<%- linkFromName %>"><%- fromName %></a>
+                <a href="<%- linkFromName %>" dir="ltr"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
@@ -27,7 +27,7 @@
         <span class="forward-action-wrapper">
             <span class="forward-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= forwardRoute %>",
+                    'dataUrlRaw': "<%- forwardRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.forward'|trans,
                     'widget': {
@@ -41,7 +41,8 @@
                                 'allowMinimize': true,
                                 'dblclick': 'maximize',
                                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                                'width': 1000
+                                'width': 1000,
+                                'minWidth': 'expanded'
                             }
                         }
                     }
@@ -49,7 +50,7 @@
             </span>
             <span class="reply-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= replyRoute %>",
+                    'dataUrlRaw': "<%- replyRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.reply'|trans,
                     'widget': {
@@ -63,7 +64,8 @@
                                 'allowMinimize': true,
                                 'dblclick': 'maximize',
                                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                                'width': 1000
+                                'width': 1000,
+                                'minWidth': 'expanded'
                             }
                         }
                     }
@@ -71,7 +73,7 @@
             </span>
             <span class="reply-all-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= replyAllRoute %>",
+                    'dataUrlRaw': "<%- replyAllRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.reply_all'|trans,
                     'widget': {
@@ -85,7 +87,8 @@
                                 'allowMinimize': true,
                                 'dblclick': 'maximize',
                                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                                'width': 1000
+                                'width': 1000,
+                                'minWidth': 'expanded'
                             }
                         }
                     }
@@ -121,7 +124,7 @@
     {% endif %}
 </li>
 {% else %}
-    <li {{ UI.renderPageComponentAttributes({
+    <li class="hide" {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/new-email-flash-message-component'
     }) }}></li>
 {% endif %}

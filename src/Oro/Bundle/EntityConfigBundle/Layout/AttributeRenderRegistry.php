@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Layout;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 class AttributeRenderRegistry
 {
@@ -15,10 +14,6 @@ class AttributeRenderRegistry
     /** @var array */
     private $renderedAttributesByFamily = [];
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param AttributeGroup  $attributeGroup
-     */
     public function setGroupRendered(AttributeFamily $attributeFamily, AttributeGroup $attributeGroup)
     {
         $this->renderedGroupsByFamily[$attributeFamily->getCode()][$attributeGroup->getCode()] = true;

@@ -1,7 +1,6 @@
 services:
     oro_api.create.processor:
         class: Oro\Bundle\ApiBundle\Processor\CreateProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - create
@@ -48,11 +47,11 @@ services:
     # security_check
     #
 
-    oro_api.create.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.create.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - CREATE
         tags:
@@ -90,10 +89,18 @@ services:
     # save_data
     #
 
+    oro_api.create.persist_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Create\PersistEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -8 }
+
     oro_api.create.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Create\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
 
@@ -116,7 +123,7 @@ services:
     oro_api.create.rest.set_location_header:
         class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
         arguments:
-            - '@oro_api.rest.routes'
+            - '@oro_api.rest.routes_registry'
             - '@router'
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'

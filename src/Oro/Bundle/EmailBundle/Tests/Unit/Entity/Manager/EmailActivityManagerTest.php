@@ -2,63 +2,59 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 {
-    protected $owners;
+    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityManager;
 
-    protected $activityManager;
-    protected $emailActivityListProvider;
-    protected $emailThreadProvider;
-    protected $tokenStorage;
-    protected $serviceLink;
-    protected $em;
+    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailActivityListProvider;
 
-    protected $emailActivityManager;
+    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailThreadProvider;
 
-    protected function setUp()
+    /** @var TokenStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
+
+    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
+    private $serviceLink;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var array|null */
+    private $owners;
+
+    /** @var EmailActivityManager */
+    private $emailActivityManager;
+
+    protected function setUp(): void
     {
-        $this->owners = [
-            new TestUser('1'),
-            new TestUser('2'),
-            new TestUser('3'),
-            new TestUser('4')
-        ];
-
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailActivityListProvider = $this
-            ->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->tokenStorage = $this
-            ->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->activityManager = $this->createMock(ActivityManager::class);
+        $this->emailActivityListProvider = $this->createMock(EmailActivityListProvider::class);
+        $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
+        $this->tokenStorage = $this->createMock(TokenStorage::class);
         $this->serviceLink = $this->createMock(ServiceLink::class);
-
-        $this->entityOwnerAccessorLink = $this->createMock(ServiceLink::class);
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->emailActivityManager = new EmailActivityManager(
             $this->activityManager,
@@ -78,7 +74,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         $this->activityManager->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($email), $this->identicalTo($target))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue(
             $this->emailActivityManager->addAssociation($email, $target)
@@ -87,51 +83,45 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataHandlePostFlushProvider
-     *
-     * @param $email
-     * @param $email2
-     * @param $params
-     * @param $methods
      */
-    public function testHandlePostFlushWithoutQueue($email, $email2, $params, $methods)
+    public function testHandlePostFlushWithoutQueue(Email $email, Email $email2, array $params, array $methods)
     {
         $emails = [];
         if (isset($params['createQueue']) && $params['createQueue'] === 1) {
             $emails[] = $email;
         }
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->setMethods(['findByThread'])
+        $repository = $this->getMockBuilder(EntityRepository::class)
+            ->addMethods(['findByThread'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $repository->expects($this->exactly($methods['repository.findByThread']['amountCall']))
             ->method('findByThread')
             ->withAnyParameters()
-            ->will($this->returnValue([$email2]));
+            ->willReturn([$email2]);
 
         $this->em->expects($this->exactly($methods['entityManager.getRepository']['amountCall']))
             ->method('getRepository')
-            ->with(Email::ENTITY_CLASS)
-            ->will($this->returnValue($repository));
+            ->with(Email::class)
+            ->willReturn($repository);
 
         $this->emailActivityListProvider->expects($this->exactly($methods['getTargetEntities']['amountCall']))
             ->method('getTargetEntities')
-            ->will($this->returnValue($methods['getTargetEntities']['return']));
-
+            ->willReturn($methods['getTargetEntities']['return']);
 
         $this->emailThreadProvider->expects($this->exactly($methods['getEmailReferences']['amountCall']))
             ->method('getEmailReferences')
-            ->will($this->returnValue([$email2]));
+            ->willReturn([$email2]);
 
         $this->emailActivityManager->updateActivities($emails);
     }
 
     public function testHandlePostFlushEmptyThread()
     {
-        $this->emailActivityListProvider
+        $this->emailActivityListProvider->expects($this->any())
             ->method('getTargetEntities')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->emailActivityManager->updateActivities([$this->getEmailEntity()]);
     }
@@ -150,31 +140,43 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         $contexts1 = [$user, $anotherUser, $thirdUser];
         $otherContexts1 = [$user, $thirdUser];
         $result1 = $this->emailActivityManager->getContextsDiff($contexts1, $otherContexts1);
-        $this->assertEquals($result1, [$anotherUser]);
+        $this->assertEquals([$anotherUser], $result1);
 
-        $contexts2 = ["one", "two", "three"];
-        $otherContexts2 = ["two", "three"];
+        $contexts2 = ['one', 'two', 'three'];
+        $otherContexts2 = ['two', 'three'];
         $result2 = $this->emailActivityManager->getContextsDiff($contexts2, $otherContexts2);
-        $this->assertEquals($result2, ["one"]);
+        $this->assertEquals(['one'], $result2);
     }
 
-    /**
-     * @param integer $id
-     * @param integer $thread
-
-     * @return Email|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEmailEntity($id = null, $thread = null)
+    private function getEmailEntity(int $id = null, int $threadId = null): Email
     {
-        /** @var Email $email */
-        $email = $this->createPartialMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
+        if (!$this->owners) {
+            $this->owners = [
+                new TestUser('1'),
+                new TestUser('2'),
+                new TestUser('3'),
+                new TestUser('4')
+            ];
+        }
 
-        $email->method('getId')
-            ->will($this->returnValue($id));
+        $email = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['addActivityTarget', 'getId'])
+            ->getMock();
 
-        $email->setThread($thread);
+        $email->expects($this->any())
+            ->method('getId')
+            ->willReturn($id);
 
-        $this->addEmailSender($email, $this->owners[0]);
+        if (null !== $threadId) {
+            $thread = new EmailThread();
+            ReflectionUtil::setId($thread, $threadId);
+            $email->setThread($thread);
+        }
+
+        $senderEmailAddress = new EmailAddress();
+        $senderEmailAddress->setOwner($this->owners[0]);
+        $email->setFromEmailAddress($senderEmailAddress);
 
         $this->addEmailRecipient($email, $this->owners[1]);
         $this->addEmailRecipient($email, $this->owners[2]);
@@ -186,34 +188,18 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         return $email;
     }
 
-    /**
-     * @param Email       $email
-     * @param object|null $owner
-     */
-    protected function addEmailSender(Email $email, $owner = null)
+    private function addEmailRecipient(Email $email, ?EmailOwnerInterface $owner): void
     {
-        $emailAddr = new EmailAddress();
-        $emailAddr->setOwner($owner);
-
-        $email->setFromEmailAddress($emailAddr);
-    }
-
-    /**
-     * @param Email       $email
-     * @param object|null $owner
-     */
-    protected function addEmailRecipient(Email $email, $owner = null)
-    {
-        $emailAddr = new EmailAddress();
-        $emailAddr->setOwner($owner);
+        $emailAddress = new EmailAddress();
+        $emailAddress->setOwner($owner);
 
         $recipient = new EmailRecipient();
-        $recipient->setEmailAddress($emailAddr);
+        $recipient->setEmailAddress($emailAddress);
 
         $email->addRecipient($recipient);
     }
 
-    public function dataHandlePostFlushProvider()
+    public function dataHandlePostFlushProvider(): array
     {
         return [
             'empty Queue' => $this->getProviderConfigEmptyQueue(),
@@ -223,10 +209,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getProviderConfigEmptyQueue()
+    private function getProviderConfigEmptyQueue(): array
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -252,10 +235,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getProviderConfigWithTargetEntities()
+    private function getProviderConfigWithTargetEntities(): array
     {
         return [
             'email' => $this->getEmailEntity(1, 1),
@@ -284,10 +264,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getProviderConfigEmptyThread()
+    private function getProviderConfigEmptyThread(): array
     {
         return [
             'email' => $this->getEmailEntity(1),
@@ -316,10 +293,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getProviderConfigWithoutTargetEntities()
+    private function getProviderConfigWithoutTargetEntities(): array
     {
         return [
             'email' => $this->getEmailEntity(1, 1),

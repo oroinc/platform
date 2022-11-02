@@ -4,34 +4,30 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockOptionsResolver;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
 
 class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
     /** @var BlockOptionsResolver */
-    protected $blockOptionsResolver;
+    private $blockOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry             = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->registry = $this->createMock(LayoutRegistryInterface::class);
+
         $this->blockOptionsResolver = new BlockOptionsResolver($this->registry);
     }
 
     public function testResolveOptionsByBlockName()
     {
-        $this->registry->expects($this->at(0))
-            ->method('getType')
-            ->with('logo')
-            ->will($this->returnValue(new LogoType()));
-        $this->registry->expects($this->at(1))
-            ->method('getType')
-            ->with(BaseType::NAME)
-            ->will($this->returnValue(new BaseType()));
         $this->registry->expects($this->exactly(2))
-            ->method('getType');
+            ->method('getType')
+            ->withConsecutive(['logo'], [BaseType::NAME])
+            ->willReturnOnConsecutiveCalls(new LogoType(), new BaseType());
 
         $result = $this->blockOptionsResolver->resolveOptions(
             'logo',
@@ -46,7 +42,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with(BaseType::NAME)
-            ->will($this->returnValue(new BaseType()));
+            ->willReturn(new BaseType());
 
         $result = $this->blockOptionsResolver->resolveOptions(
             new LogoType(),
@@ -61,7 +57,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with(BaseType::NAME)
-            ->will($this->returnValue(new BaseType()));
+            ->willReturn(new BaseType());
 
         $result = $this->blockOptionsResolver->resolveOptions(
             BaseType::NAME,

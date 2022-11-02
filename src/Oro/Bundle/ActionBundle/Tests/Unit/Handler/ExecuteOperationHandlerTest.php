@@ -21,48 +21,41 @@ use Symfony\Component\HttpFoundation\Response;
 class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formProvider;
+    private $formProvider;
 
     /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextHelper;
+    private $contextHelper;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
-    protected $operation;
+    private $operation;
 
     /** @var ActionData|\PHPUnit\Framework\MockObject\MockObject */
-    protected $actionData;
+    private $actionData;
 
     /** @var ExecuteOperationHandler */
-    protected $handler;
+    private $handler;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->formProvider = $this->createMock(FormProvider::class);
         $this->contextHelper = $this->createMock(ContextHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-
         $this->actionData = new ActionData();
         $this->operation = $this->createMock(Operation::class);
 
-        $this->contextHelper
-            ->expects($this->once())
+        $this->contextHelper->expects($this->once())
             ->method('getActionData')
             ->willReturn($this->actionData);
-        $this->operation
-            ->expects($this->any())
+        $this->operation->expects($this->any())
             ->method('getName')
             ->willReturn('test_operation');
-
 
         $this->handler = new ExecuteOperationHandler(
             $this->requestStack,
@@ -75,34 +68,28 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessSuccess()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $executionForm = $this->createMock(FormInterface::class);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
         $definition = new OperationDefinition();
         $definition->setPageReload(true);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('isAvailable')
             ->willReturn(true);
 
@@ -115,23 +102,19 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessSuccessWithoutRequest()
     {
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn(null);
 
-        $this->formProvider
-            ->expects($this->never())
+        $this->formProvider->expects($this->never())
             ->method('getOperationExecutionForm');
 
         $definition = new OperationDefinition();
         $definition->setPageReload(true);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('isAvailable')
             ->willReturn(true);
 
@@ -145,35 +128,29 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessInvalidForm()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $executionForm = $this->createMock(FormInterface::class);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
         $definition = new OperationDefinition();
         $definition->setPageReload(true);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with('Execution of operation "{operation}" failed')
             ->willReturnCallback(function ($message, array $context) {
@@ -195,33 +172,27 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessOperationNotAvailable()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $executionForm = $this->createMock(FormInterface::class);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
         $definition = new OperationDefinition();
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('isAvailable')
             ->willReturnCallback(function (ActionData $data, Collection $errors) {
                 $errors->add(['message' => 'some error']);
@@ -229,8 +200,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
                 return false;
             });
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with('Execution of operation "{operation}" failed')
             ->willReturnCallback(function ($message, array $context) {
@@ -258,23 +228,19 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessFormNotConfigured()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $definition = new OperationDefinition();
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->willThrowException(new InvalidConfigurationException('execution form error'));
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with('Execution of operation "{operation}" failed')
             ->willReturnCallback(function ($message, array $context) {
@@ -292,30 +258,25 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessAlreadySubmitted()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $executionForm = $this->createMock(FormInterface::class);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('handleRequest')
             ->willThrowException(new AlreadySubmittedException('form already submitted'));
 
         $definition = new OperationDefinition();
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with('Execution of operation "{operation}" failed')
             ->willReturnCallback(function ($message, array $context) {
@@ -333,42 +294,34 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessExecuteException()
     {
         $request = new Request();
-        $this->requestStack
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
         $executionForm = $this->createMock(FormInterface::class);
-        $this->formProvider
-            ->expects($this->once())
+        $this->formProvider->expects($this->once())
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $executionForm
-            ->expects($this->once())
+        $executionForm->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
         $definition = new OperationDefinition();
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('isAvailable')
             ->willReturn(true);
-        $this->operation
-            ->expects($this->once())
+        $this->operation->expects($this->once())
             ->method('execute')
             ->willThrowException(new ForbiddenOperationException('operation execution error'));
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with('Execution of operation "{operation}" failed')
             ->willReturnCallback(function ($message, array $context) {
@@ -381,17 +334,5 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $result->getCode());
         $this->assertFalse($result->isSuccess());
         $this->assertEquals('operation execution error', $result->getExceptionMessage());
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->handler,
-            $this->actionData,
-            $this->operation,
-            $this->contextHelper,
-            $this->formProvider,
-            $this->requestStack
-        );
     }
 }

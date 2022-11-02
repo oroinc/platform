@@ -2,69 +2,54 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Mailer\Processor;
+use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * Provides a set of methods to simplify manage of the User entity.
  */
 class UserManager extends BaseUserManager
 {
-    const AUTH_STATUS_ENUM_CODE = 'auth_status';
-    const STATUS_ACTIVE = 'active';
-    const STATUS_EXPIRED = 'expired';
+    public const STATUS_ACTIVE  = 'active';
+    public const STATUS_EXPIRED = 'expired';
+
+    private const AUTH_STATUS_ENUM_CODE = 'auth_status';
 
     /** @var EnumValueProvider */
-    protected $enumValueProvider;
+    private $enumValueProvider;
 
-    /** @var ConfigManager */
-    private $configManager;
+    /** @var ServiceLink */
+    private $emailProcessorLink;
 
-    /**
-     * @param string $class
-     * @param ManagerRegistry $registry
-     * @param EncoderFactoryInterface $encoderFactory
-     * @param EnumValueProvider $enumValueProvider
-     * @param ConfigManager $configManager
-     */
     public function __construct(
-        $class,
-        ManagerRegistry $registry,
+        UserLoaderInterface $userLoader,
+        ManagerRegistry $doctrine,
         EncoderFactoryInterface $encoderFactory,
         EnumValueProvider $enumValueProvider,
-        ConfigManager $configManager
+        ServiceLink $emailProcessor
     ) {
-        parent::__construct($class, $registry, $encoderFactory);
-
+        parent::__construct($userLoader, $doctrine, $encoderFactory);
         $this->enumValueProvider = $enumValueProvider;
-        $this->configManager = $configManager;
+        $this->emailProcessorLink = $emailProcessor;
     }
 
     /**
-     * Return related repository
-     *
-     * @param User $user
-     * @param Organization $organization
-     *
-     * @return UserApi
+     * Return UserApi entity for the given user and organization
      */
-    public function getApi(User $user, Organization $organization)
+    public function getApi(User $user, Organization $organization): ?UserApi
     {
-        return $this->getStorageManager()->getRepository('OroUserBundle:UserApi')->getApi($user, $organization);
+        return $this->getEntityManager()->getRepository(UserApi::class)->getApi($user, $organization);
     }
 
     /**
-     * Sets AuthStatus with enum value id
-     *
-     * @param User $user
-     * @param string $authStatus EnumValueId
+     * Sets the given authentication status for a user
      */
-    public function setAuthStatus(User $user, $authStatus)
+    public function setAuthStatus(User $user, string $authStatus): void
     {
         $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode(self::AUTH_STATUS_ENUM_CODE, $authStatus));
     }
@@ -72,79 +57,28 @@ class UserManager extends BaseUserManager
     /**
      * {@inheritdoc}
      */
-    public function updateUser(UserInterface $user, $flush = true)
+    public function updateUser(UserInterface $user, bool $flush = true): void
     {
         // make sure user has a default status
         if ($user instanceof User && null === $user->getAuthStatus()) {
-            $defaultStatus = $this->enumValueProvider->getDefaultEnumValuesByCode(self::AUTH_STATUS_ENUM_CODE);
-            $defaultStatus = is_array($defaultStatus) ? reset($defaultStatus) : $defaultStatus;
-
-            $user->setAuthStatus($defaultStatus);
+            $defaultStatus = $this->enumValueProvider->getDefaultEnumValueByCode(self::AUTH_STATUS_ENUM_CODE);
+            if (null !== $defaultStatus) {
+                $user->setAuthStatus($defaultStatus);
+            }
         }
 
-        return parent::updateUser($user, $flush);
+        parent::updateUser($user, $flush);
     }
 
-    /**
-     * Generates a random string that can be used as a password for a user.
-     *
-     * @param int $maxLength
-     *
-     * @return string
-     */
-    public function generatePassword($maxLength = 30)
+    public function sendResetPasswordEmail(User $user): void
     {
-        return str_shuffle(
-            substr(
-                sprintf(
-                    '%s%s%s',
-                    // get one random upper case letter
-                    substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 1),
-                    // get one random digit
-                    substr(str_shuffle('1234567890'), 0, 1),
-                    // get some random string
-                    strtr(base64_encode(hash('sha256', uniqid((string)mt_rand(), true), true)), '+/=', '___')
-                ),
-                0,
-                $maxLength
-            )
-        );
+        $user->setConfirmationToken($user->generateToken());
+        $this->getEmailProcessor()->sendResetPasswordEmail($user);
+        $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function assertRoles(UserInterface $user)
+    private function getEmailProcessor(): Processor
     {
-        if (count($user->getRoles()) === 0) {
-            $storageManager = $this->getStorageManager();
-
-            $roleClassName = $storageManager
-                ->getClassMetadata(ClassUtils::getClass($user))
-                ->getAssociationTargetClass('roles');
-            if (!is_a($roleClassName, RoleInterface::class, true)) {
-                throw new \RuntimeException(
-                    sprintf('Expected %s, %s given', RoleInterface::class, $roleClassName)
-                );
-            }
-
-            /** @var RoleInterface|null $role */
-            $role = $storageManager
-                ->getRepository($roleClassName)
-                ->findOneBy(['role' => User::ROLE_DEFAULT]);
-            if (!$role) {
-                throw new \RuntimeException('Default user role not found');
-            }
-
-            $user->addRole($role);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isCaseInsensitiveEmailAddressesEnabled(): bool
-    {
-        return (bool) $this->configManager->get('oro_user.case_insensitive_email_addresses_enabled');
+        return $this->emailProcessorLink->getService();
     }
 }

@@ -2,121 +2,76 @@
 
 namespace Oro\Bundle\ImapBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
-use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 
 /**
- * This entity listener handles prePersist doctrine entity event
- * and creates ImapEmailFolder entities based on information from UserEmailOrigin
+ * This entity listener handles next doctrine entity events:
+ * - prePersist: creates ImapEmailFolder entities based on information from UserEmailOrigin;
+ * - preUpdate: enables sync of the UserEmailOrigin if refresh token has changed.
  */
 class UserEmailOriginListener
 {
-    /**
-     * @var SymmetricCrypterInterface
-     */
-    protected $crypter;
+    private NotificationAlertManager $notificationAlertManager;
 
-    /**
-     * @var ImapConnectorFactory
-     */
-    protected $connectorFactory;
-
-    /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
-     * @var ImapEmailGoogleOauth2Manager
-     */
-    protected $imapEmailGoogleOauth2Manager;
-
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     * @param ImapConnectorFactory $connectorFactory
-     * @param Registry $doctrine
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
-     */
-    public function __construct(
-        SymmetricCrypterInterface $crypter,
-        ImapConnectorFactory $connectorFactory,
-        Registry $doctrine,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
-    ) {
-        $this->crypter = $crypter;
-        $this->connectorFactory = $connectorFactory;
-        $this->doctrine = $doctrine;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+    public function __construct(NotificationAlertManager $notificationAlertManager)
+    {
+        $this->notificationAlertManager = $notificationAlertManager;
     }
 
     /**
      * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
-     *
-     * @param UserEmailOrigin    $origin
-     * @param LifecycleEventArgs $args
      */
-    public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $args)
+    public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $event)
     {
         if (!$origin->getFolders()->isEmpty()) {
-            $manager = $this->createManager($origin);
             $folders = $origin->getRootFolders();
 
-            $this->createImapEmailFolders($folders, $manager);
+            $this->createImapEmailFolders($folders, $event->getEntityManager());
         }
     }
 
-    /**
-     * @param ArrayCollection|EmailFolder[] $folders
-     * @param ImapEmailFolderManager $manager
-     */
-    protected function createImapEmailFolders($folders, ImapEmailFolderManager $manager)
+    public function preUpdate(UserEmailOrigin $origin, PreUpdateEventArgs $args): void
+    {
+        if ($args->hasChangedField('refreshToken')
+            && false === $origin->isSyncEnabled()
+            && $args->getOldValue('refreshToken') !== $args->getNewValue('refreshToken')
+        ) {
+            $origin->setIsSyncEnabled(true);
+            $em = $args->getEntityManager();
+            $em->getUnitOfWork()->recomputeSingleEntityChangeSet(
+                $em->getClassMetadata(UserEmailOrigin::class),
+                $origin
+            );
+
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser(
+                EmailSyncNotificationAlert::ALERT_TYPE_AUTH
+            );
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser(
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN
+            );
+        }
+    }
+
+    protected function createImapEmailFolders(iterable $folders, EntityManager $em): void
     {
         foreach ($folders as $folder) {
             if ($folder->getId() === null) {
-                $uidValidity = $manager->getUidValidity($folder);
+                $imapEmailFolder = new ImapEmailFolder();
+                $imapEmailFolder->setUidValidity(0);
+                $imapEmailFolder->setFolder($folder);
 
-                if ($uidValidity !== null) {
-                    $imapEmailFolder = new ImapEmailFolder();
-                    $imapEmailFolder->setUidValidity($uidValidity);
-                    $imapEmailFolder->setFolder($folder);
-
-                    $this->doctrine->getManager()->persist($imapEmailFolder);
-                }
+                $em->persist($imapEmailFolder);
 
                 if ($folder->hasSubFolders()) {
-                    $this->createImapEmailFolders($folder->getSubFolders(), $manager);
+                    $this->createImapEmailFolders($folder->getSubFolders(), $em);
                 }
             }
         }
-    }
-
-    /**
-     * @param UserEmailOrigin $origin
-     *
-     * @return ImapEmailFolderManager
-     */
-    protected function createManager(UserEmailOrigin $origin)
-    {
-        $config = new ImapConfig(
-            $origin->getImapHost(),
-            $origin->getImapPort(),
-            $origin->getImapEncryption(),
-            $origin->getUser(),
-            $this->crypter->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
-        );
-
-        $connector = $this->connectorFactory->createImapConnector($config);
-
-        return new ImapEmailFolderManager($connector, $this->doctrine->getManager(), $origin);
     }
 }

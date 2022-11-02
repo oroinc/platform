@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
@@ -10,13 +12,11 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {
-        $config1 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config2 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config1 = $this->createMock(ConfigInterface::class);
+        $config2 = $this->createMock(ConfigInterface::class);
         $configs = ['scope1' => $config1, 'scope2' => $config2];
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $event = new PreFlushConfigEvent($configs, $configManager);
 
@@ -29,13 +29,11 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClass()
     {
-        $config1 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config2 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config1 = $this->createMock(ConfigInterface::class);
+        $config2 = $this->createMock(ConfigInterface::class);
         $configs = ['scope1' => $config1, 'scope2' => $config2];
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $className = 'Test\Entity';
 
@@ -57,13 +55,11 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsFieldConfig($configId, $expectedResult)
     {
-        $config1 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config2 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config1 = $this->createMock(ConfigInterface::class);
+        $config2 = $this->createMock(ConfigInterface::class);
         $configs = ['scope1' => $config1, 'scope2' => $config2];
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $event = new PreFlushConfigEvent($configs, $configManager);
 
@@ -91,13 +87,11 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsEntityConfig($configId, $expectedResult)
     {
-        $config1 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config2 = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config1 = $this->createMock(ConfigInterface::class);
+        $config2 = $this->createMock(ConfigInterface::class);
         $configs = ['scope1' => $config1, 'scope2' => $config2];
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $event = new PreFlushConfigEvent($configs, $configManager);
 

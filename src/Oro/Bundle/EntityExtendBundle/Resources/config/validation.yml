@@ -10,6 +10,8 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
         - oro_entity_extend:DefaultRelationField: {groups: [UniqueField, ChangeTypeField]}
         - oro_entity_extend:MultiEnumSnapshotField: {groups: [UniqueField, ChangeTypeField]}
         - oro_entity_extend:UniqueExtendEntityMethodName: {groups: UniqueMethod}
+        - oro_entity_extend:AttributeField: {groups: AttributeField}
+        - oro_entity_extend:AttributeConfiguration: {groups: AttributeField}
     properties:
         fieldName:
             - NotBlank: ~

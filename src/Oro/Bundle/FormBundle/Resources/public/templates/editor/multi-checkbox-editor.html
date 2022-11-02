@@ -1,20 +1,22 @@
-<div class="inline-editor__fields">
-    <select multiple>
-        <% _.each(options, function (option) { %>
-        <option value="<%= option.id %>" title="<%- option.text %>"
-        <% if (_.indexOf(value, option.id) !== -1) { %> selected="selected"<% } %>>
-        <%- option.text %>
-        </option>
-        <% }); %>
-    </select>
-</div>
-<div class="inline-editor__actions inline-editor__actions--over-multiselect">
-    <button class="inline-editor__action-item" type="submit" data-role="apply"
-            title="<%= _.__('oro.form.inlineEditing.action.save') %>">
-        <span class="fa-check" aria-hidden="true"></span>
-    </button>
-    <button class="inline-editor__action-item" data-action="cancel"
-            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>">
-        <span class="fa-ban" aria-hidden="true"></span>
-    </button>
+<div class="inline-editor__inner">
+    <div class="inline-editor__fields">
+        <select multiple>
+            <% _.each(options, function (option) { %>
+            <option value="<%- option.id %>" title="<%- option.text %>"
+            <% if (_.indexOf(value, option.id) !== -1) { %> selected="selected"<% } %>>
+            <%- option.text %>
+            </option>
+            <% }); %>
+        </select>
+    </div>
+    <div class="inline-editor__actions inline-editor__actions--over-multiselect">
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" type="submit" data-role="apply"
+                title="<%- _.__('oro.form.inlineEditing.action.save') %>">
+            <span class="fa-check" aria-hidden="true"></span>
+        </button>
+        <button class="btn btn-icon btn-square-light inline-editor__action-item" data-action="cancel"
+                title="<%- _.__('oro.form.inlineEditing.action.cancel') %>">
+            <span class="fa-ban" aria-hidden="true"></span>
+        </button>
+    </div>
 </div>

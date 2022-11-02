@@ -1,38 +1,33 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\EventListener\MergeField;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\MergeField;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener;
+use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CascadeRemoveAssociationListener
-     */
-    protected $listener;
+    /** @var AccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $accessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $accessor;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var CascadeRemoveAssociationListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->accessor = $this
-            ->createMock('Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface');
-
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->accessor = $this->createMock(AccessorInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->listener = new CascadeRemoveAssociationListener($this->accessor, $this->doctrineHelper);
     }
@@ -46,106 +41,66 @@ class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
         $barEntity = new EntityStub(2);
         $bazEntity = new EntityStub(2);
 
-        $entities = array($fooEntity, $barEntity, $bazEntity);
-        $entitiesToClear = array($barEntity, $bazEntity);
-
         $masterEntity = $fooEntity;
 
-        $equalValueMap = array(
-            array($masterEntity, $fooEntity, true),
-            array($masterEntity, $barEntity, false),
-            array($masterEntity, $bazEntity, false),
-        );
-
-        $this->doctrineHelper->expects($this->exactly(count($equalValueMap)))
+        $this->doctrineHelper->expects($this->exactly(3))
             ->method('isEntityEqual')
-            ->will($this->returnValueMap($equalValueMap));
+            ->willReturnMap([
+                [$masterEntity, $fooEntity, true],
+                [$masterEntity, $barEntity, false],
+                [$masterEntity, $bazEntity, false],
+            ]);
 
-        $fieldData = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityData = $this->createMock(EntityData::class);
+        $fieldData = $this->createMock(FieldData::class);
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
+        $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
 
-        $fieldMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldData
-            ->expects($this->once())
-            ->method('getMetadata')
-            ->will($this->returnValue($fieldMetadata));
-
-        $fieldData
-            ->expects($this->once())
-            ->method('getMode')
-            ->will($this->returnValue(MergeModes::REPLACE));
-
-        $entityData = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldData
-            ->expects($this->once())
+        $fieldData->expects($this->once())
             ->method('getEntityData')
-            ->will($this->returnValue($entityData));
+            ->willReturn($entityData);
+        $fieldData->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn($fieldMetadata);
+        $fieldData->expects($this->once())
+            ->method('getMode')
+            ->willReturn(MergeModes::REPLACE);
 
-        $entityData
-            ->expects($this->once())
+        $entityData->expects($this->once())
             ->method('getEntities')
-            ->will($this->returnValue($entities));
-
-        $entityData
-            ->expects($this->once())
+            ->willReturn([$fooEntity, $barEntity, $bazEntity]);
+        $entityData->expects($this->once())
             ->method('getMasterEntity')
-            ->will($this->returnValue($masterEntity));
+            ->willReturn($masterEntity);
 
-        $fieldMetadata
-            ->expects($this->once())
+        $fieldMetadata->expects($this->once())
             ->method('hasDoctrineMetadata')
-            ->will($this->returnValue(true));
-
-        $fieldMetadata
-            ->expects($this->once())
+            ->willReturn(true);
+        $fieldMetadata->expects($this->atLeastOnce())
+            ->method('getDoctrineMetadata')
+            ->willReturn($doctrineMetadata);
+        $fieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(true));
-
-        $fieldMetadata
-            ->expects($this->once())
+            ->willReturn(true);
+        $fieldMetadata->expects($this->once())
             ->method('isCollection')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $doctrineMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineMetadata
-            ->expects($this->any())
+        $doctrineMetadata->expects($this->any())
             ->method('isAssociation')
-            ->will($this->returnValue(true));
-
-        $doctrineMetadata
-            ->expects($this->once())
+            ->willReturn(true);
+        $doctrineMetadata->expects($this->once())
             ->method('get')
             ->with('cascade')
-            ->will($this->returnValue(array('remove')));
+            ->willReturn(['remove']);
 
-        $fieldMetadata
-            ->expects($this->atLeastOnce())
-            ->method('getDoctrineMetadata')
-            ->will($this->returnValue($doctrineMetadata));
+        $this->accessor->expects($this->exactly(2))
+            ->method('setValue')
+            ->withConsecutive(
+                [$this->identicalTo($barEntity), $this->identicalTo($fieldMetadata), $this->isNull()],
+                [$this->identicalTo($bazEntity), $this->identicalTo($fieldMetadata), $this->isNull()]
+            );
 
-        foreach ($entitiesToClear as $index => $entity) {
-            $this->accessor
-                ->expects($this->at($index))
-                ->method('setValue')
-                ->with($entity, $fieldMetadata, null);
-        }
-
-        $event = new FieldDataEvent($fieldData);
-
-        $this->listener->afterMergeField($event);
+        $this->listener->afterMergeField(new FieldDataEvent($fieldData));
     }
 }

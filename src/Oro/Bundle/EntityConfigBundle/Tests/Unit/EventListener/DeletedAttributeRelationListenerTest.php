@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -13,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
@@ -20,50 +22,41 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $messageProducer;
+    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
 
-    /**
-     * @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $deletedAttributeProvider;
+    private DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject $deletedAttributeProvider;
 
-    /**
-     * @var DeletedAttributeRelationListener
-     */
-    protected $listener;
+    private DeletedAttributeRelationListener $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
         $this->deletedAttributeProvider = $this->createMock(DeletedAttributeProviderInterface::class);
         $this->listener = new DeletedAttributeRelationListener(
             $this->messageProducer,
-            $this->deletedAttributeProvider
+            $this->deletedAttributeProvider,
+            (new InflectorFactory())->build()
         );
     }
 
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $attributeFamilyId = 333;
         $movedAttributeId = 777;
         $deletedAttributeId = 888;
         $attributeFamily = $this->getFilledAttributeFamily($attributeFamilyId, $movedAttributeId);
-        
+
         $uow = new UnitOfWork();
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $movedAttributeId));
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $deletedAttributeId));
         $uow->addDeletion(new \stdClass());
 
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        
-        $this->deletedAttributeProvider->expects($this->once())
+
+        $this->deletedAttributeProvider->expects(self::once())
             ->method('getAttributesByIds')
             ->with([$deletedAttributeId])
             ->willReturn([new FieldConfigModel('field_name')]);
@@ -71,31 +64,30 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $event = new OnFlushEventArgs($entityManager);
         $this->listener->onFlush($event);
 
-        $reflectionProperty = $this->getDeletedAttributesReflectionProperty();
-        $this->assertEquals(
-            [$attributeFamilyId => ['fieldName']],
-            $reflectionProperty->getValue($this->listener)
+        self::assertEquals(
+            [$attributeFamilyId => ['field_name']],
+            ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes')
         );
     }
-    
-    public function testPostFlush()
+
+    public function testPostFlush(): void
     {
         $emptyFamilyId = 1;
         $filledFamilyId = 2;
         $filledFamilyAttributeNames = ['name'];
         $topicName = 'topic';
 
-        $reflectionProperty = $this->getDeletedAttributesReflectionProperty();
-        $reflectionProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $this->listener,
+            'deletedAttributes',
             [
                 $emptyFamilyId => [],
                 $filledFamilyId => $filledFamilyAttributeNames,
             ]
         );
-        
+
         $this->listener->setTopic($topicName);
-        $this->messageProducer->expects($this->once())
+        $this->messageProducer->expects(self::once())
             ->method('send')
             ->with(
                 $topicName,
@@ -106,15 +98,10 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->listener->postFlush();
-        $this->assertEmpty($reflectionProperty->getValue($this->listener));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes'));
     }
 
-    /**
-     * @param int $attributeFamilyId
-     * @param int $movedAttributeId
-     * @return AttributeFamily
-     */
-    protected function getFilledAttributeFamily($attributeFamilyId, $movedAttributeId)
+    private function getFilledAttributeFamily(int $attributeFamilyId, int $movedAttributeId): AttributeFamily
     {
         $attributeRelation = new AttributeGroupRelation();
         $attributeRelation->setEntityConfigFieldId($movedAttributeId);
@@ -129,32 +116,17 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         return $attributeFamily;
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param int $attributeId
-     * @return AttributeGroupRelation
-     */
-    protected function getFilledAttributeGroupRelation(AttributeFamily $attributeFamily, $attributeId)
-    {
+    private function getFilledAttributeGroupRelation(
+        AttributeFamily $attributeFamily,
+        int $attributeId
+    ): AttributeGroupRelation {
         $attributeGroup = new AttributeGroup();
         $attributeGroup->setAttributeFamily($attributeFamily);
 
         $attributeGroupRelation = new AttributeGroupRelation();
         $attributeGroupRelation->setEntityConfigFieldId($attributeId);
         $attributeGroupRelation->setAttributeGroup($attributeGroup);
-        
-        return $attributeGroupRelation;
-    }
 
-    /**
-     * @return \ReflectionProperty
-     */
-    protected function getDeletedAttributesReflectionProperty()
-    {
-        $reflectionClass = new \ReflectionClass($this->listener);
-        $reflectionProperty = $reflectionClass->getProperty('deletedAttributes');
-        $reflectionProperty->setAccessible(true);
-        
-        return $reflectionProperty;
+        return $attributeGroupRelation;
     }
 }

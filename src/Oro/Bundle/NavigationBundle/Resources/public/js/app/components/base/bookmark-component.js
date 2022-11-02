@@ -1,21 +1,24 @@
 define(function(require) {
     'use strict';
 
-    var BaseBookmarkComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var Collection = require('oronavigation/js/app/models/base/collection');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseNavigationItemCollection = require('oronavigation/js/app/models/base/collection');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    BaseBookmarkComponent = BaseComponent.extend({
+    const BaseBookmarkComponent = BaseComponent.extend({
         /**
          * Keeps separately extended options,
          * to prevent disposing the view each time by Composer
          */
         _options: {},
 
+        collectionModel: BaseNavigationItemCollection,
+
         typeName: null,
+
+        route: 'oro_api_get_navigationitems',
 
         listen: {
             'toAdd collection': 'toAdd',
@@ -23,40 +26,44 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseBookmarkComponent(options) {
             BaseBookmarkComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            var $dataEl = $(options.dataSource);
-            var data = $dataEl.data('data');
-            var extraOptions = $dataEl.data('options');
+            const $dataEl = $(options.dataSource);
+            const extraOptions = $dataEl.data('options');
             $dataEl.remove();
 
-            this.collection = new Collection();
+            this.collection = new this.collectionModel;
 
             // create own property _options (not spoil prototype)
             this._options = _.defaults(_.omit(options, '_subPromises'), extraOptions);
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
 
-            var route = options._sourceElement.data('navigation-items-route');
-            if (!_.isEmpty(route)) {
-                this.collection.model.prototype.route = route;
+            this.route = options._sourceElement.data('navigation-items-route') || this.route;
+            if (!_.isEmpty(this.route)) {
+                this.collection.model = this.collection.model.extend({route: this.route});
             }
 
-            var typeName = options._sourceElement.data('type-name');
+            const typeName = options._sourceElement.data('type-name');
             if (!_.isEmpty(typeName)) {
                 this.typeName = typeName;
             }
 
-            this.collection.reset(data);
-            this._createSubViews();
+            const data = $dataEl.data('data');
+            if (data) {
+                this.collection.reset(data);
+            }
+
+            // wait for controller to be ready before initializing views
+            this.listenToOnce(mediator, 'page:update', this._createSubViews.bind(this));
         },
 
         _createSubViews: function() {
@@ -80,13 +87,11 @@ define(function(require) {
         },
 
         toAdd: function(model) {
-            var collection;
-            collection = this.collection;
+            const collection = this.collection;
             this.actualizeAttributes(model);
             model.save(null, {
                 success: function() {
-                    var item;
-                    item = collection.find(function(item) {
+                    const item = collection.find(function(item) {
                         return item.get('url') === model.get('url');
                     });
                     if (item) {

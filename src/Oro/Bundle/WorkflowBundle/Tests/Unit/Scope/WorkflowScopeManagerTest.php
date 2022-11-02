@@ -3,12 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Scope;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
@@ -17,9 +18,9 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const FIELD_NAME = 'testField';
-    const ENTITY_CLASS = 'stdClass';
-    const ENTITY_ID = 42;
+    private const FIELD_NAME = 'testField';
+    private const ENTITY_CLASS = 'stdClass';
+    private const ENTITY_ID = 42;
 
     /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
@@ -36,7 +37,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowScopeManager */
     private $workflowScopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(ObjectRepository::class);
 
@@ -46,26 +47,19 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->repository);
 
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturnMap(
-                [
-                    [self::ENTITY_CLASS, $this->manager],
-                    [WorkflowDefinition::class, $this->manager]
-                ]
-            );
+            ->willReturnMap([
+                [self::ENTITY_CLASS, $this->manager],
+                [WorkflowDefinition::class, $this->manager]
+            ]);
 
-        $this->scopeManager = $this->getMockBuilder(ScopeManager::class)->disableOriginalConstructor()->getMock();
+        $this->scopeManager = $this->createMock(ScopeManager::class);
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager, $this->logger);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->workflowScopeManager, $this->repository, $this->manager, $this->scopeManager, $this->logger);
     }
 
     public function testUpdateScopes()
@@ -90,26 +84,31 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
             );
         $this->scopeManager->expects($this->exactly(2))
             ->method('findOrCreate')
-            ->willReturnMap(
-                [
-                    [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], true, $scope1],
-                    [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], true, $scope2]
-                ]
-            );
+            ->willReturnMap([
+                [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], true, $scope1],
+                [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], true, $scope2]
+            ]);
 
-        $this->repository->expects($this->exactly(2))->method('find')->with(self::ENTITY_ID)->willReturn($entity);
-        $this->manager->expects($this->once())->method('flush');
+        $this->repository->expects($this->exactly(2))
+            ->method('find')
+            ->with(self::ENTITY_ID)
+            ->willReturn($entity);
+        $this->manager->expects($this->once())
+            ->method('flush');
 
         $this->workflowScopeManager->updateScopes($definition);
 
         $this->assertEquals([$scope1, $scope2], array_values($definition->getScopes()->toArray()));
     }
 
-    public function testUpdateScopesWithresetFlag()
+    public function testUpdateScopesWithResetFlag()
     {
-        $this->scopeManager->expects($this->never())->method($this->anything());
-        $this->repository->expects($this->never())->method($this->anything());
-        $this->manager->expects($this->once())->method('flush');
+        $this->scopeManager->expects($this->never())
+            ->method($this->anything());
+        $this->repository->expects($this->never())
+            ->method($this->anything());
+        $this->manager->expects($this->once())
+            ->method('flush');
 
         $definition = $this->createWorkflowDefinition(
             [[self::FIELD_NAME => self::ENTITY_ID], ['extraField' => self::ENTITY_ID]],
@@ -124,13 +123,12 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider updateScopesExceptionDataProvider
-     *
-     * @param WorkflowDefinition $definition
-     * @param string $exception
-     * @param string $exceptionMessage
      */
-    public function testUpdateScopesException(WorkflowDefinition $definition, $exception, $exceptionMessage)
-    {
+    public function testUpdateScopesException(
+        WorkflowDefinition $definition,
+        string $exception,
+        string $exceptionMessage
+    ) {
         $this->scopeManager->expects($this->once())
             ->method('getScopeEntities')
             ->with(WorkflowScopeManager::SCOPE_TYPE)
@@ -153,33 +151,27 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->workflowScopeManager->updateScopes($definition);
     }
 
-    /**
-     * @return array
-     */
-    public function updateScopesExceptionDataProvider()
+    public function updateScopesExceptionDataProvider(): array
     {
         return [
             [
                 'definition' => $this->createWorkflowDefinition([['test' => self::ENTITY_ID]]),
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException',
+                'exception' => WorkflowScopeConfigurationException::class,
                 'exceptionMessage' => 'Unknown field name "test" for scope type "workflow_definition".'
             ],
             [
                 'definition' => $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]),
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException',
+                'exception' => WorkflowScopeConfigurationException::class,
                 'exceptionMessage' => 'Cannot find entity "stdClass" with id "42".'
             ]
         ];
     }
 
-    /**
-     * @param array $scopesConfig
-     * @param array $scopes
-     * @param bool $active
-     * @return WorkflowDefinition
-     */
-    protected function createWorkflowDefinition(array $scopesConfig = [], array $scopes = [], $active = true)
-    {
+    private function createWorkflowDefinition(
+        array $scopesConfig = [],
+        array $scopes = [],
+        bool $active = true
+    ): WorkflowDefinition {
         return $this->getEntity(
             WorkflowDefinition::class,
             [
@@ -190,11 +182,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $id
-     * @return \stdClass
-     */
-    protected function createEntity($id)
+    private function createEntity(int $id): object
     {
         $class = self::ENTITY_CLASS;
 
@@ -204,11 +192,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         return $obj;
     }
 
-    /**
-     * @param int $id
-     * @return Scope
-     */
-    protected function createScope($id)
+    private function createScope(int $id): Scope
     {
         return $this->getEntity(Scope::class, ['id' => $id]);
     }

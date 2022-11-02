@@ -9,30 +9,24 @@ use Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener;
 class SearchAliasesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchAliasesListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listener = new SearchAliasesListener();
     }
 
     public function testAddEmailAliasEventSkipped()
     {
-        $expectedAliases = [];
-        $targetClasses = [];
-        $aliases = [];
-        $event = new SearchAliasesEvent($aliases, $targetClasses);
+        $event = new SearchAliasesEvent([], []);
         $this->listener->addEmailAliasEvent($event);
-        $this->assertEquals($expectedAliases, $event->getAliases());
+        $this->assertEquals([], $event->getAliases());
     }
 
     public function testAddEmailAliasEvent()
     {
-        $expectedAliases = ['oro_email'];
-        $targetClasses = [Email::ENTITY_CLASS];
-        $aliases = [];
-        $event = new SearchAliasesEvent($aliases, $targetClasses);
+        $event = new SearchAliasesEvent([], [Email::class]);
         $this->listener->addEmailAliasEvent($event);
-        $this->assertEquals($expectedAliases, $event->getAliases());
+        $this->assertEquals(['oro_email'], $event->getAliases());
     }
 }

@@ -5,86 +5,49 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class OptionalPriceValidatorTest extends \PHPUnit\Framework\TestCase
+class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var Constraints\OptionalPrice
-     */
-    protected $constraint;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface
-     */
-    protected $context;
-
-    /**
-     * @var Constraints\OptionalPriceValidator
-     */
-    protected $validator;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function createValidator(): Constraints\OptionalPriceValidator
     {
-        $this->context      = $this->createMock(ExecutionContextInterface::class);
-        $this->constraint   = new Constraints\OptionalPrice();
-        $this->validator    = new Constraints\OptionalPriceValidator();
-        $this->validator->initialize($this->context);
+        return new Constraints\OptionalPriceValidator();
     }
 
-    public function testConfiguration()
+    public function testGetTargets()
     {
-        $this->assertEquals([Constraint::CLASS_CONSTRAINT], $this->constraint->getTargets());
+        $constraint = new Constraints\OptionalPrice();
+        $this->assertEquals([Constraint::CLASS_CONSTRAINT], $constraint->getTargets());
     }
 
     /**
-     * @param boolean $isValid
-     * @param mixed $inputData
-     * @dataProvider validateProvider
+     * @dataProvider validValueDataProvider
      */
-    public function testValidate($isValid, $inputData)
+    public function testValidateValidValue(Price $value)
     {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($isValid ? $this->never() : $this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder);
-        $builder->expects($isValid ? $this->never() : $this->once())
-            ->method('atPath')
-            ->with('currency')
-            ->willReturnSelf();
-        $builder->expects($isValid ? $this->never() : $this->once())
-            ->method('addViolation');
-
-        $this->validator->validate($inputData, $this->constraint);
+        $constraint = new Constraints\OptionalPrice();
+        $this->validator->validate($value, $constraint);
+        $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
-    public function validateProvider()
+    public function validValueDataProvider(): array
     {
         return [
-            'empty data' => [
-                'isValid'   => true,
-                'inputData' => Price::create(null, null),
-            ],
-            'empty value' => [
-                'isValid'   => true,
-                'inputData' => Price::create(null, 'USD'),
-            ],
-            'empty currency' => [
-                'isValid'   => false,
-                'inputData' => Price::create(11, null),
-            ],
-            'valid value' => [
-                'isValid'   => true,
-                'inputData' => Price::create(11, 'USD'),
-            ],
+            'empty data' => [Price::create(null, null)],
+            'empty value' => [Price::create(null, 'USD')],
+            'valid value' => [Price::create(11, 'USD')],
         ];
+    }
+
+    public function testValidateEmptyCurrency()
+    {
+        $value = Price::create(11, null);
+
+        $constraint = new Constraints\OptionalPrice();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->atPath('property.path.currency')
+            ->assertRaised();
     }
 }

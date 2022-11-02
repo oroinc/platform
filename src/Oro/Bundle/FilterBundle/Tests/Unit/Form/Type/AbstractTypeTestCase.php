@@ -9,59 +9,34 @@ use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
-    /**
-     * @var \Symfony\Component\Form\FormFactory
-     */
+    /** @var \Symfony\Component\Form\FormFactory */
     protected $factory;
 
-    /**
-     * @var string
-     */
-    protected $defaultLocale = null;
+    /** @var string */
+    protected $defaultTimezone;
 
-    /**
-     * @var string
-     */
-    protected $defaultTimezone = null;
-
-    /**
-     * @var string
-     */
-    private $oldLocale;
-
-    /**
-     * @var string
-     */
+    /** @var string */
     private $oldTimezone;
 
-    /**
-     * @var FormExtensionInterface[]
-     */
-    protected $formExtensions = array();
+    /** @var FormExtensionInterface[] */
+    protected $formExtensions = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        if ($this->defaultLocale) {
-            $this->oldLocale = \Locale::getDefault();
-            \Locale::setDefault($this->defaultLocale);
-        }
         if ($this->defaultTimezone) {
             $this->oldTimezone = date_default_timezone_get();
             date_default_timezone_set($this->defaultTimezone);
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
-        if ($this->defaultLocale) {
-            \Locale::setDefault($this->oldLocale);
-        }
         if ($this->defaultTimezone) {
             date_default_timezone_set($this->oldTimezone);
         }
@@ -72,11 +47,11 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function createMockTranslator()
     {
-        $translator = $this->getMockForAbstractClass('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->with($this->anything(), array())
-            ->will($this->returnArgument(0));
+            ->with($this->anything(), [])
+            ->willReturnArgument(0);
 
         return $translator;
     }
@@ -86,26 +61,28 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function createMockOptionsResolver()
     {
-        return $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(OptionsResolver::class);
     }
 
     /**
      * @dataProvider configureOptionsDataProvider
-     * @param array $defaultOptions
-     * @param array $requiredOptions
      */
     public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
     {
         $resolver = $this->createMockOptionsResolver();
 
         if ($defaultOptions) {
-            $resolver->expects($this->once())->method('setDefaults')->with($defaultOptions)->will($this->returnSelf());
+            $resolver->expects($this->once())
+                ->method('setDefaults')
+                ->with($defaultOptions)
+                ->willReturnSelf();
         }
 
         if ($requiredOptions) {
-            $resolver->expects($this->once())->method('setRequired')->with($requiredOptions)->will($this->returnSelf());
+            $resolver->expects($this->once())
+                ->method('setRequired')
+                ->with($requiredOptions)
+                ->willReturnSelf();
         }
 
         $this->getTestFormType()->configureOptions($resolver);
@@ -120,16 +97,12 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 
     /**
      * @dataProvider bindDataProvider
-     * @param array $bindData
-     * @param array $formData
-     * @param array $viewData
-     * @param array $customOptions
      */
     public function testBindData(
         array $bindData,
         array $formData,
         array $viewData,
-        array $customOptions = array()
+        array $customOptions = []
     ) {
         $form = $this->factory->create(get_class($this->getTestFormType()), null, $customOptions);
 
@@ -177,9 +150,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     public function getMockSubscriber($class, array $events = [])
     {
-        $mock = $this->getMockBuilder($class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock = $this->createMock($class);
 
         $eventListener = new MutableFormEventSubscriber($mock);
         $eventListener->setSubscribedEvents($events);

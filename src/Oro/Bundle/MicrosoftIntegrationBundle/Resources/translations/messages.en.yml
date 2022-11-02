@@ -1,0 +1,14 @@
+oro:
+    microsoft_integration:
+        system_configuration:
+                groups:
+                    microsoft_settings.title: Microsoft Settings
+                    microsoft_integration_settings.title: Azure Active Directory Application Settings
+                    microsoft_integration_settings.tooltip: Please read <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal" target="_blank">instructions</a> for creating a new Azure application
+                    microsoft_integrations.title: Microsoft 365 Integrations
+                fields:
+                    client_id.label: Application (client) ID
+                    client_secret.label: Client Secret
+                    tenant.label: Directory (tenant) ID
+                    redirect_uri.label: Redirect URI
+                    redirect_uri.tooltip: Copy this value and add it to the trusted redirect URIs of your Azure application.

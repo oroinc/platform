@@ -2,59 +2,49 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
+use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
+use Oro\Component\Config\Resolver\ResolverInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
+
+    /** @var ResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $resolver;
+
+    /** @var ConfigValueProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $valueProvider;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
     /** @var WidgetConfigs */
-    protected $target;
+    private $target;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $resolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $valueProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $widgetConfigVisibilityFilter;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->resolver = $this->createMock(ResolverInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->valueProvider = $this->createMock(ConfigValueProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
-
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-
-        $this->valueProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        $widgetConfigVisibilityFilter = $this
-            ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $widgetConfigVisibilityFilter = $this->createMock(WidgetConfigVisibilityFilter::class);
         $widgetConfigVisibilityFilter->expects($this->any())
             ->method('filterConfigs')
-            ->will($this->returnCallback(function (array $configs) {
+            ->willReturnCallback(function (array $configs) {
                 return array_filter(
                     $configs,
                     function ($config) {
@@ -63,7 +53,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
                             (!isset($config['applicable']) || $config['applicable'] === '@true');
                     }
                 );
-            }));
+            });
 
         $this->target = new WidgetConfigs(
             $this->configProvider,
@@ -80,7 +70,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
     public function testGetWidgetAttributesForTwig()
     {
         $expectedWidgetName = 'widget_name';
-        $configs            = [
+        $configs = [
             'route'            => 'sample route',
             'route_parameters' => 'sample params',
             'acl'              => 'view_acl',
@@ -88,7 +78,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
             'test-param'       => 'param',
             'configuration'    => []
         ];
-        $expected           = [
+        $expected = [
             'widgetName'          => $expectedWidgetName,
             'widgetTestParam'     => 'param',
             'widgetConfiguration' => []
@@ -96,7 +86,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
             ->with($expectedWidgetName)
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
 
         $actual = $this->target->getWidgetAttributesForTwig($expectedWidgetName);
         $this->assertEquals($expected, $actual);
@@ -105,26 +95,26 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
     public function testGetWidgetItems()
     {
         $expectedWidgetName = 'widget_name';
-        $notAllowedAcl      = 'invalid_acl';
-        $allowedAcl         = 'valid_acl';
-        $expectedItem       = 'expected_item';
-        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
-        $notGrantedItem     = 'not_granted_item';
-        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
-        $applicableItem     = 'applicable_item';
-        $applicable         = [
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
+        $expectedItem = 'expected_item';
+        $expectedValue = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
+        $notGrantedItem = 'not_granted_item';
+        $notGrantedValue = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
+        $applicableItem = 'applicable_item';
+        $applicable = [
             'label'      => 'applicable is set and resolved to true',
             'applicable' => '@true',
             'enabled'    => true
         ];
         $notApplicableItem  = 'not_applicable_item';
-        $notApplicable      = [
+        $notApplicable = [
             'label'      => 'applicable is set and resolved to false',
             'applicable' => '@false',
             'enabled'    => true
         ];
-        $disabledItem       = 'not_applicable_item';
-        $disabled           = [
+        $disabledItem = 'not_applicable_item';
+        $disabled = [
             'label'   => 'applicable is set and resolved to false',
             'acl'     => $allowedAcl,
             'enabled' => false
@@ -141,7 +131,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
             ->with($expectedWidgetName)
-            ->will($this->returnValue(['items' => $configs]));
+            ->willReturn(['items' => $configs]);
 
         $result = $this->target->getWidgetItems($expectedWidgetName);
         $this->assertArrayHasKey($applicableItem, $result);
@@ -150,25 +140,25 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWidgetConfigs()
     {
-        $notAllowedAcl     = 'invalid_acl';
-        $allowedAcl        = 'valid_acl';
-        $expectedItem      = 'expected_item';
-        $expectedValue     = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
-        $notGrantedItem    = 'not_granted_item';
-        $notGrantedValue   = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
-        $applicableItem    = 'applicable_item';
-        $applicable        = [
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
+        $expectedItem = 'expected_item';
+        $expectedValue = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
+        $notGrantedItem = 'not_granted_item';
+        $notGrantedValue = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
+        $applicableItem = 'applicable_item';
+        $applicable = [
             'label'      => 'applicable is set and resolved to true',
             'applicable' => '@true',
             'enabled'    => true
         ];
         $notApplicableItem = 'not_applicable_item';
-        $notApplicable     = [
+        $notApplicable = [
             'label'      => 'applicable is set and resolved to false',
             'applicable' => '@false',
             'enabled'    => true
         ];
-        $configs           = [
+        $configs = [
             $expectedItem      => $expectedValue,
             $notGrantedItem    => $notGrantedValue,
             $applicableItem    => $applicable,
@@ -177,7 +167,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
 
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfigs')
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
 
         $result = $this->target->getWidgetConfigs();
         $this->assertArrayHasKey($applicableItem, $result);

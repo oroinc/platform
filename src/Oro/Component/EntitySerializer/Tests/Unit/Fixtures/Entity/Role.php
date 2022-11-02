@@ -19,8 +19,6 @@ class Role
     protected $code;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
     protected $label;
@@ -28,7 +26,7 @@ class Role
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     **/
+     */
     protected $category;
 
     /**

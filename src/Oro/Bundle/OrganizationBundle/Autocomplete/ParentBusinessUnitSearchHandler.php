@@ -12,9 +12,6 @@ class ParentBusinessUnitSearchHandler extends BusinessUnitOwnerSearchHandler
     /** @var OwnerTreeProviderInterface */
     private $ownerTreeProvider;
 
-    /**
-     * @param OwnerTreeProviderInterface $ownerTreeProvider
-     */
     public function setOwnerTreeProvider(OwnerTreeProviderInterface $ownerTreeProvider)
     {
         $this->ownerTreeProvider = $ownerTreeProvider;

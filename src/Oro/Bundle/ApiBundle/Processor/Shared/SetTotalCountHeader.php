@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -26,16 +26,9 @@ class SetTotalCountHeader implements ProcessorInterface
     public const RESPONSE_HEADER_NAME = 'X-Include-Total-Count';
     public const REQUEST_HEADER_VALUE = 'totalCount';
 
-    /** @var CountQueryBuilderOptimizer */
-    private $countQueryBuilderOptimizer;
+    private CountQueryBuilderOptimizer $countQueryBuilderOptimizer;
+    private QueryResolver $queryResolver;
 
-    /** @var QueryResolver */
-    private $queryResolver;
-
-    /**
-     * @param CountQueryBuilderOptimizer $countQueryOptimizer
-     * @param QueryResolver $queryResolver
-     */
     public function __construct(
         CountQueryBuilderOptimizer $countQueryOptimizer,
         QueryResolver $queryResolver
@@ -67,11 +60,16 @@ class SetTotalCountHeader implements ProcessorInterface
         $totalCountCallback = $context->getTotalCountCallback();
         if (null !== $totalCountCallback) {
             $totalCount = $this->executeTotalCountCallback($totalCountCallback);
-        }
-
-        $query = $context->getQuery();
-        if (null !== $query && null === $totalCount) {
-            $totalCount = $this->calculateTotalCount($query, $context->getConfig());
+        } else {
+            $query = $context->getQuery();
+            if (null !== $query) {
+                $totalCount = $this->calculateTotalCount($query, $context->getConfig());
+            } else {
+                $data = $context->getResult();
+                if (\is_array($data)) {
+                    $totalCount = count($data);
+                }
+            }
         }
 
         if (null !== $totalCount) {
@@ -79,23 +77,18 @@ class SetTotalCountHeader implements ProcessorInterface
         }
     }
 
-    /**
-     * @param callable $callback
-     *
-     * @return int
-     */
-    private function executeTotalCountCallback($callback)
+    private function executeTotalCountCallback(mixed $callback): int
     {
         if (!\is_callable($callback)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'Expected callable for "totalCount", "%s" given.',
                 \is_object($callback) ? \get_class($callback) : gettype($callback)
             ));
         }
 
-        $totalCount = \call_user_func($callback);
+        $totalCount = $callback();
         if (!\is_int($totalCount)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'Expected integer as result of "totalCount" callback, "%s" given.',
                 \is_object($totalCount) ? \get_class($totalCount) : gettype($totalCount)
             ));
@@ -104,73 +97,52 @@ class SetTotalCountHeader implements ProcessorInterface
         return $totalCount;
     }
 
-    /**
-     * @param mixed                       $query
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return int
-     */
-    private function calculateTotalCount($query, EntityDefinitionConfig $config = null)
+    private function calculateTotalCount(mixed $query, ?EntityDefinitionConfig $config): int
     {
         if ($query instanceof QueryBuilder) {
             $countQuery = $this->countQueryBuilderOptimizer
                 ->getCountQueryBuilder($query)
-                ->getQuery();
+                ->getQuery()
+                ->setMaxResults(null)
+                ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof Query) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = QueryUtil::cloneQuery($query)
                 ->setMaxResults(null)
                 ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof SqlQueryBuilder) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = (clone $query)
                 ->setMaxResults(null)
                 ->setFirstResult(null)
                 ->getQuery();
         } elseif ($query instanceof SqlQuery) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = (clone $query)
                 ->getQueryBuilder()
                 ->setMaxResults(null)
                 ->setFirstResult(null);
         } else {
-            throw new \RuntimeException(\sprintf(
-                'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
-                . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'
-                . ' or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given.',
+            throw new \RuntimeException(sprintf(
+                'Expected instance of %s, %s, %s or %s, "%s" given.',
+                QueryBuilder::class,
+                Query::class,
+                SqlQueryBuilder::class,
+                SqlQuery::class,
                 \is_object($query) ? \get_class($query) : gettype($query)
             ));
         }
 
-        $paginator = new Paginator($countQuery);
-        $paginator->setUseOutputWalkers(false);
+        if ($countQuery instanceof Query) {
+            return QueryCountCalculator::calculateCountDistinct($countQuery);
+        }
 
-        return $paginator->count();
+        return QueryCountCalculator::calculateCount($countQuery);
     }
 
-    /**
-     * @param Query                       $query
-     * @param EntityDefinitionConfig|null $config
-     */
-    private function resolveQuery(Query $query, EntityDefinitionConfig $config = null)
+    private function resolveQuery(Query $query, ?EntityDefinitionConfig $config): void
     {
         if (null !== $config) {
             $this->queryResolver->resolveQuery($query, $config);
         }
-    }
-
-    /**
-     * Makes full clone of the given query, including its parameters and hints
-     *
-     * @param object $query
-     *
-     * @return object
-     */
-    private function cloneQuery($query)
-    {
-        if ($query instanceof Query) {
-            return QueryUtil::cloneQuery($query);
-        }
-
-        return clone $query;
     }
 }

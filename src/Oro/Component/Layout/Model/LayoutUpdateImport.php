@@ -70,9 +70,7 @@ class LayoutUpdateImport
     {
         return $this->parent;
     }
-    /**
-     * @param LayoutUpdateImport $parent
-     */
+
     public function setParent(LayoutUpdateImport $parent)
     {
         $this->parent = $parent;

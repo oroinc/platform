@@ -10,9 +10,6 @@ class RequireJoinsFieldVisitorFactory
     /** @var RequireJoinsDecisionMakerInterface */
     private $decisionMaker;
 
-    /**
-     * @param RequireJoinsDecisionMakerInterface $decisionMaker
-     */
     public function __construct(RequireJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;

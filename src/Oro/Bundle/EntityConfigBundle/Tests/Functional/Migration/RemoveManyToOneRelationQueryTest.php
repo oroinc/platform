@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -13,20 +13,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class RemoveManyToOneRelationQueryTest extends WebTestCase
 {
     /** @var Connection */
-    protected $connection;
+    private $connection;
 
     /** @var ArrayLogger */
-    protected $logger;
+    private $logger;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([
-            LoadExtendedRelationsData::class
-        ]);
+        $this->loadFixtures([LoadExtendedRelationsData::class]);
 
         $this->logger = new ArrayLogger();
         $this->connection = $this->getContainer()->get('doctrine')->getConnection();
@@ -90,7 +85,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
 
         $this->assertSame(
             [
-                "Removal of relation config is possible only from owning side"
+                'Removal of relation config is possible only from owning side'
             ],
             $this->logger->getMessages()
         );
@@ -104,7 +99,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
         $relationKey = 'manyToOne|Extend\Entity\TestEntity1|Extend\Entity\TestEntity2|uniM2OTarget';
 
         $entityRow = $this->getEntityRow($entityClass);
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
         unset(
             $entityData['extend']['relation'][$relationKey],
             $entityData['extend']['schema']['relation'][$entityField],
@@ -129,7 +124,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
                 '[1] = ' . $fieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Types::ARRAY),
                 '[2] = ' . $entityClass,
             ],
             $this->logger->getMessages()
@@ -144,7 +139,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
         $relationKey = 'manyToOne|Extend\Entity\TestEntity1|Extend\Entity\TestEntity2|biM2OTarget';
 
         $entityRow = $this->getEntityRow($entityClass);
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
         unset(
             $entityData['extend']['relation'][$relationKey],
             $entityData['extend']['schema']['relation'][$entityField],
@@ -154,7 +149,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
 
         $targetEntityClass = \Extend\Entity\TestEntity2::class;
         $targetEntityRow = $this->getEntityRow($targetEntityClass);
-        $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Type::TARRAY);
+        $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Types::ARRAY);
         unset(
             $targetEntityData['extend']['relation'][$relationKey],
             $targetEntityData['extend']['schema']['relation'][$targetEntityField],
@@ -180,26 +175,21 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
                 '[1] = ' . $fieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Types::ARRAY),
                 '[2] = ' . $entityClass,
                 'DELETE FROM oro_entity_config_field WHERE id = ?',
                 'Parameters:',
                 '[1] = ' . $targetFieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($targetEntityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($targetEntityData, Types::ARRAY),
                 '[2] = ' . $targetEntityClass
             ],
             $this->logger->getMessages()
         );
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    protected function getEntityRow($entityClass)
+    private function getEntityRow(string $entityClass): array
     {
         $getEntitySql = 'SELECT e.data 
                 FROM oro_entity_config as e 
@@ -212,13 +202,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $entityField
-     *
-     * @return array
-     */
-    protected function getFieldRow($entityClass, $entityField)
+    private function getFieldRow(string $entityClass, string $entityField): array
     {
         $getFieldSql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f

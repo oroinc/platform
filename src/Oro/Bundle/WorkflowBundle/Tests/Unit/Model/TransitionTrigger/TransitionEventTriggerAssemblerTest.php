@@ -10,17 +10,13 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTr
 
 class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TransitionEventTriggerVerifierInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TransitionEventTriggerVerifierInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $verifier;
 
-    /**
-     * @var TransitionEventTriggerAssembler
-     */
+    /** @var TransitionEventTriggerAssembler */
     private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->verifier = $this->createMock(TransitionEventTriggerVerifierInterface::class);
         $this->assembler = new TransitionEventTriggerAssembler($this->verifier);
@@ -77,11 +73,10 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $workflowDefinitionOpt = new WorkflowDefinition();
 
         $this->verifier->expects($this->once())
-            ->method('verifyTrigger')->with($this->isInstanceOf(TransitionEventTrigger::class));
+            ->method('verifyTrigger')
+            ->with($this->isInstanceOf(TransitionEventTrigger::class));
 
-        /**
-         * @var TransitionEventTrigger $trigger
-         */
+        /** @var TransitionEventTrigger $trigger */
         $trigger = $this->assembler->assemble(
             [
                 'event' => $eventOpt,
@@ -126,11 +121,10 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $workflowDefinitionOpt->setRelatedEntity($entityClassOpt);
 
         $this->verifier->expects($this->once())
-            ->method('verifyTrigger')->with($this->isInstanceOf(TransitionEventTrigger::class));
+            ->method('verifyTrigger')
+            ->with($this->isInstanceOf(TransitionEventTrigger::class));
 
-        /**
-         * @var TransitionEventTrigger $trigger
-         */
+        /** @var TransitionEventTrigger $trigger */
         $trigger = $this->assembler->assemble(
             [
                 'event' => $eventOpt,

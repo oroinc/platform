@@ -1,7 +1,9 @@
-define(['underscore', 'orotranslation/js/translator'], function(_, __) {
+define(function(require) {
     'use strict';
 
-    var defaultParam = {
+    const __ = require('orotranslation/js/translator');
+
+    const defaultParam = {
         message: 'This value is not valid.',
         callback: null
     };
@@ -12,15 +14,15 @@ define(['underscore', 'orotranslation/js/translator'], function(_, __) {
     return [
         'Callback',
         function(value, element, param) {
-            if (!_.isFunction(param.callback)) {
+            if (typeof param.callback !== 'function') {
                 throw new Error('Validation[Callback method]: "callback" param is not a function');
             }
             return param.callback(value, element, param);
         },
         function(param, element) {
-            var value = this.elementValue(element);
-            var placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            const value = this.elementValue(element);
+            const placeholders = {};
+            param = Object.assign({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);
         }

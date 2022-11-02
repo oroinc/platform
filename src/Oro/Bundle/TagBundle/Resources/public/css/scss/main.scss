@@ -1,11 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/mixins";
-
-@import "./tag-grid";
-@import "./tags-container";
-@import "./form";
-@import "./config";
-
-@import "./mobile/main";
+@import 'tag-grid';
+@import 'tags-container';
+@import 'form';
+@import 'config';

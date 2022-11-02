@@ -1,12 +1,14 @@
 <?php
 
-
 namespace Oro\Bundle\ImapBundle\Connector;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Iterator for Imap messages.
+ */
 class ImapMessageIterator implements \Iterator, \Countable
 {
     use LoggerAwareTrait;
@@ -35,8 +37,8 @@ class ImapMessageIterator implements \Iterator, \Countable
     /** @var int|null */
     private $iterationMin;
 
-    /** @var int|null */
-    private $iterationMax;
+    /** @var int */
+    private $iterationMax = 0;
 
     /** @var int|null */
     private $iterationPos;
@@ -90,11 +92,26 @@ class ImapMessageIterator implements \Iterator, \Countable
     }
 
     /**
+     * Sets a callback function to handle message convertation errors.
+     * If this callback set then the iterator will work in fail safe mode
+     * and invalid messages will just skipped.
+     *
+     * @param \Closure|null $callback The callback function.
+     *                                function (\Exception)
+     */
+    public function setConvertErrorCallback(\Closure $callback = null)
+    {
+        if (null !== $callback) {
+            $this->imap->setConvertErrorCallback($callback);
+        }
+    }
+
+    /**
      * The number of messages in this iterator
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         $this->ensureInitialized();
 
@@ -108,7 +125,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      *
      * @return Message
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->batch[$this->iterationPos];
     }
@@ -116,7 +133,7 @@ class ImapMessageIterator implements \Iterator, \Countable
     /**
      * Move forward to next element
      */
-    public function next()
+    public function next(): void
     {
         $this->increasePosition($this->iterationPos);
 
@@ -156,7 +173,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      *
      * @return int on success, or null on failure.
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->iterationPos;
     }
@@ -166,7 +183,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      *
      * @return boolean Returns true on success or false on failure.
      */
-    public function valid()
+    public function valid(): bool
     {
         $this->ensureInitialized();
 
@@ -176,7 +193,7 @@ class ImapMessageIterator implements \Iterator, \Countable
     /**
      * Rewind the Iterator to the first element
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->initialize();
 
@@ -206,7 +223,7 @@ class ImapMessageIterator implements \Iterator, \Countable
     {
         if ($this->ids === null) {
             $this->iterationMin = 1;
-            $this->iterationMax = $this->imap->count();
+            $this->iterationMax = (int)$this->imap->count();
         } else {
             $this->iterationMin = 0;
             $this->iterationMax = count($this->ids) - 1;

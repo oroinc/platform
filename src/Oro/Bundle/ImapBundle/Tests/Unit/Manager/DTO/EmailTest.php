@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
+use Laminas\Mail\Header\ContentType;
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
@@ -11,7 +12,6 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
-use Zend\Mail\Header\ContentType;
 
 class EmailTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,7 +21,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /** @var Email */
     private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->message = $this->createMock(Message::class);
 
@@ -30,12 +30,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getBodyDataProvider
-     *
-     * @param ContentType|null $contentType
-     * @param bool $bodyIsText
-     * @param string $expectedContentType
      */
-    public function testGetBody($contentType, $bodyIsText, $expectedContentType)
+    public function testGetBody(?ContentType $contentType, bool $bodyIsText, string $expectedContentType)
     {
         $this->assertGetBodyCalled($contentType, $bodyIsText);
 
@@ -50,10 +46,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($body, $this->email->getBody());
     }
 
-    /**
-     * @return array
-     */
-    public function getBodyDataProvider()
+    public function getBodyDataProvider(): array
     {
         return [
             'text/plain content type' => [
@@ -74,11 +67,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param ContentType|null $contentType
-     * @param null $bodyIsText
-     */
-    protected function assertGetBodyCalled($contentType, $bodyIsText)
+    protected function assertGetBodyCalled(?ContentType $contentType, bool $bodyIsText)
     {
         $srcBodyContent = $this->createMock(Content::class);
         $srcBodyContent->expects($this->once())
@@ -88,7 +77,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $srcBody = $this->createMock(Body::class);
         $srcBody->expects($this->once())
             ->method('getContent')
-            ->with($this->equalTo(!$bodyIsText))
+            ->with(!$bodyIsText)
             ->willReturn($srcBodyContent);
 
         $this->message->expects($this->once())
@@ -102,16 +91,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getAttachmentsDataProvider
-     *
-     * @param array $attachments
-     * @param bool $getBodyCalled
-     * @param ContentType|null $contentType
-     * @param Attachment|null $msgAsAttachment
-     * @param array $expected
      */
     public function testGetAttachments(
         array $attachments,
-        $getBodyCalled,
+        bool $getBodyCalled,
         ContentType $contentType = null,
         Attachment $msgAsAttachment = null,
         array $expected = []
@@ -133,10 +116,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->email->getAttachments());
     }
 
-    /**
-     * @return array
-     */
-    public function getAttachmentsDataProvider()
+    public function getAttachmentsDataProvider(): array
     {
         $attachment = new EmailAttachment();
         $attachment
@@ -240,7 +220,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testXMessageId', $this->email->getXMessageId());
         $this->assertEquals('testXThreadId', $this->email->getXThreadId());
         $this->assertCount(2, $this->email->getMultiMessageId());
-        $this->assertInternalType('array', $this->email->getMultiMessageId());
+        $this->assertIsArray($this->email->getMultiMessageId());
 
         $this->message->expects($this->exactly(2))
             ->method('getFlags')

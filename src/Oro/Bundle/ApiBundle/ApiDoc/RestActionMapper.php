@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,9 +14,6 @@ class RestActionMapper
     /** @var RestRoutes */
     private $routes;
 
-    /**
-     * @param RestRoutes $routes
-     */
     public function __construct(RestRoutes $routes)
     {
         $this->routes = $routes;
@@ -32,33 +29,34 @@ class RestActionMapper
         switch ($templateRouteName) {
             case $this->routes->getItemRouteName():
                 return [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET,
-                    ApiActions::DELETE,
-                    ApiActions::UPDATE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET,
+                    ApiAction::DELETE,
+                    ApiAction::UPDATE
                 ];
             case $this->routes->getListRouteName():
                 return [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_LIST,
-                    ApiActions::DELETE_LIST,
-                    ApiActions::CREATE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_LIST,
+                    ApiAction::DELETE_LIST,
+                    ApiAction::CREATE,
+                    ApiAction::UPDATE_LIST
                 ];
             case $this->routes->getSubresourceRouteName():
                 return [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_SUBRESOURCE,
-                    ApiActions::UPDATE_SUBRESOURCE,
-                    ApiActions::ADD_SUBRESOURCE,
-                    ApiActions::DELETE_SUBRESOURCE
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_SUBRESOURCE,
+                    ApiAction::UPDATE_SUBRESOURCE,
+                    ApiAction::ADD_SUBRESOURCE,
+                    ApiAction::DELETE_SUBRESOURCE
                 ];
             case $this->routes->getRelationshipRouteName():
                 return [
-                    ApiActions::OPTIONS,
-                    ApiActions::GET_RELATIONSHIP,
-                    ApiActions::UPDATE_RELATIONSHIP,
-                    ApiActions::ADD_RELATIONSHIP,
-                    ApiActions::DELETE_RELATIONSHIP
+                    ApiAction::OPTIONS,
+                    ApiAction::GET_RELATIONSHIP,
+                    ApiAction::UPDATE_RELATIONSHIP,
+                    ApiAction::ADD_RELATIONSHIP,
+                    ApiAction::DELETE_RELATIONSHIP
                 ];
         }
 
@@ -71,19 +69,15 @@ class RestActionMapper
     public function getActionsForResourcesWithoutIdentifier(): array
     {
         return [
-            ApiActions::OPTIONS,
-            ApiActions::GET,
-            ApiActions::DELETE,
-            ApiActions::CREATE,
-            ApiActions::UPDATE
+            ApiAction::OPTIONS,
+            ApiAction::GET,
+            ApiAction::DELETE,
+            ApiAction::CREATE,
+            ApiAction::UPDATE
         ];
     }
 
     /**
-     * @param string $action
-     *
-     * @return string
-     *
      * @throws \LogicException if the given API action cannot be mapped to any HTTP method
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -91,25 +85,26 @@ class RestActionMapper
     public function getMethod(string $action): string
     {
         switch ($action) {
-            case ApiActions::GET:
-            case ApiActions::GET_LIST:
-            case ApiActions::GET_SUBRESOURCE:
-            case ApiActions::GET_RELATIONSHIP:
+            case ApiAction::GET:
+            case ApiAction::GET_LIST:
+            case ApiAction::GET_SUBRESOURCE:
+            case ApiAction::GET_RELATIONSHIP:
                 return Request::METHOD_GET;
-            case ApiActions::DELETE:
-            case ApiActions::DELETE_LIST:
-            case ApiActions::DELETE_SUBRESOURCE:
-            case ApiActions::DELETE_RELATIONSHIP:
+            case ApiAction::DELETE:
+            case ApiAction::DELETE_LIST:
+            case ApiAction::DELETE_SUBRESOURCE:
+            case ApiAction::DELETE_RELATIONSHIP:
                 return Request::METHOD_DELETE;
-            case ApiActions::UPDATE:
-            case ApiActions::UPDATE_SUBRESOURCE:
-            case ApiActions::UPDATE_RELATIONSHIP:
+            case ApiAction::UPDATE:
+            case ApiAction::UPDATE_SUBRESOURCE:
+            case ApiAction::UPDATE_RELATIONSHIP:
+            case ApiAction::UPDATE_LIST:
                 return Request::METHOD_PATCH;
-            case ApiActions::CREATE:
-            case ApiActions::ADD_SUBRESOURCE:
-            case ApiActions::ADD_RELATIONSHIP:
+            case ApiAction::CREATE:
+            case ApiAction::ADD_SUBRESOURCE:
+            case ApiAction::ADD_RELATIONSHIP:
                 return Request::METHOD_POST;
-            case ApiActions::OPTIONS:
+            case ApiAction::OPTIONS:
                 return Request::METHOD_OPTIONS;
         }
 

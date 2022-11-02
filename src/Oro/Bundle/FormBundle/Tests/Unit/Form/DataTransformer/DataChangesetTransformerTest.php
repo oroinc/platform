@@ -1,40 +1,32 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Form\DataTransformer\DataChangesetTransformer;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class DataChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DataChangesetTransformer
-     */
-    protected $transformer;
+    private DataChangesetTransformer $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new DataChangesetTransformer();
     }
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param mixed $value
-     * @param array $expected
      */
-    public function testTransform($value, array $expected)
+    public function testTransform(mixed $value, array $expected)
     {
         $this->assertEquals($expected, $this->transformer->transform($value));
     }
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param mixed $expected
-     * @param array $value
      */
-    public function testReverseTransform($expected, array $value)
+    public function testReverseTransform(mixed $expected, array $value)
     {
         if (!$expected) {
             $expected = new ArrayCollection();
@@ -43,10 +35,7 @@ class DataChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [null,[]],
@@ -64,12 +53,11 @@ class DataChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
     public function testReverseTransformException()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
         $this->transformer->reverseTransform('test');
     }
 }

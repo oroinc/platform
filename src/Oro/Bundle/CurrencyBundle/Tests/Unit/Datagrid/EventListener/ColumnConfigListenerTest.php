@@ -8,33 +8,27 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY = 'Test:Entity';
+    private const ENTITY = 'Test:Entity';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityClassResolver;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
 
-    /** @var ColumnConfigListener  */
-    protected $columnListener;
+    /** @var ColumnConfigListener */
+    private $columnListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
         $this->columnListener = new ColumnConfigListener($this->entityClassResolver);
     }
 
     /**
      * @dataProvider buildBeforeEventDataProvider
-     *
-     * @param array $inputConfig
-     * @param array $expectedConfig
      */
     public function testBuildBeforeEvent(array $inputConfig, array $expectedConfig)
     {
@@ -50,10 +44,8 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function buildBeforeEventDataProvider()
+    public function buildBeforeEventDataProvider(): array
     {
         return [
             'Not applicable column type' => [
@@ -293,18 +285,12 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
      * @param array $configuration
      * @return BuildBefore
      */
-    protected function createBuildBeforeEvent(array $configuration)
+    private function createBuildBeforeEvent(array $configuration)
     {
-        $datagridConfiguration = DatagridConfiguration::create($configuration);
-
-        $event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildBefore')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->any())
+        $event = $this->createMock(BuildBefore::class);
+        $event->expects($this->any())
             ->method('getConfig')
-            ->willReturn($datagridConfiguration);
+            ->willReturn(DatagridConfiguration::create($configuration));
 
         return $event;
     }

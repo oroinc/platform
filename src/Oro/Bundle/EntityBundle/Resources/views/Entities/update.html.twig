@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
 
 {% set entityName = entity.id
     ? entity|oro_format_name|default('oro.entity.item'|trans({'%id%': entity.id}))
@@ -9,11 +9,13 @@
 
 {% set formAction = path('oro_entity_update', {entityName: entity_name, id: entity.id}) %}
 
-{% set audit_entity_class = entity_config.getId.getClassName|replace('\\', '_') %}
+{% set audit_entity_class = entity_config.getId.getClassName|replace({'\\':'_'}) %}
 {% set audit_entity_id = entity.id %}
 {% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if entity.id and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_entity_delete', {'entityName': entity_class, 'id': entity.id}),

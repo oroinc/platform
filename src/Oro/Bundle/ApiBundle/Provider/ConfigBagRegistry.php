@@ -4,13 +4,14 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * The registry that allows to get the Data API resources configuration bag
+ * The registry that allows to get the API resources configuration bag
  * for a specific request type.
  */
-class ConfigBagRegistry
+class ConfigBagRegistry implements ResetInterface
 {
     /** @var array [[config bag service id, request type expression], ...] */
     private $configBags;
@@ -42,10 +43,6 @@ class ConfigBagRegistry
     /**
      * Returns the config bag that contains API resources configuration for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ConfigBagInterface
-     *
      * @throws \LogicException if a config bag does not exist for the given request type
      */
     public function getConfigBag(RequestType $requestType): ConfigBagInterface
@@ -55,23 +52,35 @@ class ConfigBagRegistry
             return $this->cache[$cacheKey];
         }
 
-        $configBagServiceId = null;
-        foreach ($this->configBags as list($serviceId, $expression)) {
+        /** @var ConfigBagInterface|null $configBag */
+        $configBag = null;
+        foreach ($this->configBags as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
-                $configBagServiceId = $serviceId;
+                $configBag = $this->container->get($serviceId);
                 break;
             }
         }
-        if (null === $configBagServiceId) {
+        if (null === $configBag) {
             throw new \LogicException(
                 sprintf('Cannot find a config bag for the request "%s".', (string)$requestType)
             );
         }
 
-        /** @var ConfigBagInterface $configBag */
-        $configBag = $this->container->get($configBagServiceId);
         $this->cache[$cacheKey] = $configBag;
 
         return $configBag;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        foreach ($this->cache as $configBag) {
+            if ($configBag instanceof ResetInterface) {
+                $configBag->reset();
+            }
+        }
+        $this->cache = [];
     }
 }

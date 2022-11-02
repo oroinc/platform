@@ -145,10 +145,6 @@ class MigrateOptionSetsToEnums implements
         return $enumCode;
     }
 
-    /**
-     * @param QueryBag $queries
-     * @param array    $optionSets
-     */
     protected function fillEnumValues(QueryBag $queries, array &$optionSets)
     {
         foreach ($optionSets as &$optionSet) {
@@ -180,10 +176,6 @@ class MigrateOptionSetsToEnums implements
         }
     }
 
-    /**
-     * @param QueryBag $queries
-     * @param array    $optionSets
-     */
     protected function assignEnumValues(QueryBag $queries, array $optionSets)
     {
         foreach ($optionSets as $optionSet) {
@@ -369,10 +361,6 @@ class MigrateOptionSetsToEnums implements
         return $snapshot;
     }
 
-    /**
-     * @param QueryBag $queries
-     * @param array    $optionSets
-     */
     protected function removeOptionSetAttributes(QueryBag $queries, array $optionSets)
     {
         $configFieldIds = array_map(

@@ -2,38 +2,32 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter;
 
 class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TagsTypeFormatter */
-    protected $formatter;
+    private $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = new TagsTypeFormatter();
     }
 
     /**
      * @dataProvider formatTypeDataProvider
-     *
-     * @param $value
-     * @param $type
-     * @param $exception
-     * @param $expected
      */
-    public function testFormatType($value, $type, $exception, $expected)
+    public function testFormatType(array $value, string $type, ?string $exception, string $expected)
     {
         if ($exception) {
             $this->expectException($exception);
         }
 
-        $val = $this->formatter->formatType($value, $type);
-
-        $this->assertEquals($val, $expected);
+        $this->assertEquals($expected, $this->formatter->formatType($value, $type));
     }
 
-    public function formatTypeDataProvider()
+    public function formatTypeDataProvider(): array
     {
         $value    = [
             ['name' => 1],
@@ -46,13 +40,13 @@ class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
             'default'                => [
                 'value'     => $value,
                 'type'      => 'tags',
-                'exception' => false,
+                'exception' => null,
                 'expected'  => $expected
             ],
             'Invalid type exception' => [
                 'value'     => $value,
                 'type'      => 'not_exists_type',
-                'exception' => 'Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException',
+                'exception' => InvalidArgumentException::class,
                 'expected'  => $expected
             ]
         ];

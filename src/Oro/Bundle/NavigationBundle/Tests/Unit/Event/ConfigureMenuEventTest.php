@@ -7,27 +7,20 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
 class ConfigureMenuEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FactoryInterface
-     */
-    protected $factory;
+    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $factory;
 
-    /**
-     * @var ItemInterface
-     */
-    protected $menu;
+    /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $menu;
 
-    /**
-     * @var ConfigureMenuEvent
-     */
-    protected $event;
+    /** @var ConfigureMenuEvent */
+    private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->factory = $this->getMockBuilder('Knp\Menu\FactoryInterface')
-            ->getMock();
-        $this->menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
+        $this->factory = $this->createMock(FactoryInterface::class);
+        $this->menu = $this->createMock(ItemInterface::class);
+
         $this->event = new ConfigureMenuEvent($this->factory, $this->menu);
     }
 

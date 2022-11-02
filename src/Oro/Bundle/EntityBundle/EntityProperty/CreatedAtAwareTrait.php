@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-
+/**
+ * Add create date support to entities
+ */
 trait CreatedAtAwareTrait
 {
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
+     * @Doctrine\ORM\Mapping\Column(name="created_at", type="datetime")
+     * @Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField(
      *      defaultValues={
      *          "entity"={
      *              "label"="oro.ui.created_at"

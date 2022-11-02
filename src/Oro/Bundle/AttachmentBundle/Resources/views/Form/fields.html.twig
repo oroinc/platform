@@ -1,110 +1,195 @@
 {% block oro_file_widget %}
-    {% spaceless %}
-        <div class="control-group" style="margin-bottom: 0">
-            {{ form_widget(form.file) }}
-            {% if form_errors(form.file) %}
-                <div style="clear:both; float:left">
+    {% apply spaceless %}
+        <div class="control-group control-group--column file-widget">
+            <div class="controls">
+                {{ form_widget(form.file) }}
+                {% if form_errors(form.file) %}
+                    {% set file_has_errors = true %}
                     {{ form_errors(form.file) }}
-                </div>
-            {% endif %}
-        </div>
-        {% if value is not empty %}
-            {% if value.originalFilename is not empty %}
-                {% set parentEntity = form.parent.vars.value %}
-                {% set fieldName = form.vars.name %}
-
-                {% if form.emptyFile is defined%}
-                {% set inputId = form.emptyFile.vars.id %}
-                {% set divId = inputId ~ 'div' %}
-
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-                <div id="{{ divId }}" class="well well-small oro_attachment_file" {{ UI.renderPageComponentAttributes({
-                    view: 'oroattachment/js/app/views/attachment-view',
-                    options: {
-                        inputSelector: '#' ~ inputId,
-                    }
-                }) }}>
-
-                    {{ oro_file_view(parentEntity, fieldName, value) }}
-                    {{ form_row(form.emptyFile) }}
-                    {% if form.vars.allow_delete %}
-                        <button data-role="remove"
-                                class="btn btn-action btn-link delete"
-                                type="button"
-                                data-related="{{ form.emptyFile.vars.name }}"
-                                {% if form.emptyFile.vars.disabled %}disabled="disabled"{% endif %}
-                        ></button>
-                    {% endif %}
-                </div>
-                {% else %}
-                    <div class="well well-small oro_attachment_file">
-                        {{ oro_file_view(parentEntity, fieldName, value) }}
-                    </div>
                 {% endif %}
-            {% endif %}
+                {{ form_widget(form.emptyFile) }}
+            </div>
+        </div>
+        {% if value is not empty and value.id and not value.emptyFile %}
+            {% set filename = value.originalFilename|default(value.filename) %}
+            <div class="control-group file-widget-preview">
+                <div class="controls">
+                    {% import '@OroUI/macros.html.twig' as UI %}
+
+                    <div class="attachment-item" {{ UI.renderPageComponentAttributes({
+                        view: 'oroattachment/js/app/views/attachment-view',
+                        options: form.vars.attachmentViewOptions
+                    }) }}>
+                        {% if file_has_errors is not defined %}
+                            <i class="attachment-item__icon fa {{ oro_attachment_icon(value) }}" aria-hidden="true"></i>
+                            <a href="{{ file_url(value, 'download', true) }}" class="no-hash attachment-item__filename" title="{{ filename }}">
+                                {{ filename }}
+                            </a>
+                            <span class="attachment-item__file-size">({{ file_size(value.fileSize) }})</span>
+
+                            {% if form.vars.allowDelete %}
+                                <button data-role="remove"
+                                        class="btn btn-action btn-link delete"
+                                        type="button"
+                                        data-related="{{ form.emptyFile.vars.name }}"
+                                        {% if form.emptyFile.vars.disabled %}disabled="disabled"{% endif %}
+                                >
+                                    <span class="fa-close" aria-hidden="true"></span>
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_image_widget %}
-    {% spaceless %}
-        <div class="control-group" style="margin-bottom: 0">
-            {%  if form.vars.name == 'attachment'  %}
-                <div class="attachment-file">
-                    {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}
-                    {{ form_widget(form.file,
-                        {'attr': {'data-input-widget-options': jsonParams }
-                        })
-                    }}
+    {% apply spaceless %}
+        <div class="control-group control-group--column image-widget">
+            {% if form.vars.name == 'attachment' %}
+                <div class="controls">
+                    <div class="attachment-file">
+                        {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}
+                        {{ form_widget(form.file, {'attr': {'data-input-widget-options': jsonParams } }) }}
+                    </div>
                 </div>
-            {%  else %}
+            {% else %}
                 {{ form_widget(form.file) }}
+                {{ form_widget(form.emptyFile) }}
             {% endif %}
             {% if form_errors(form.file) %}
-                <div style="clear:both; float:left">
-                    {{ form_errors(form.file) }}
-                </div>
+                {% set file_has_errors = true %}
+                {{ form_errors(form.file) }}
             {% endif %}
         </div>
-        {% if value is not empty %}
-            {% if value.originalFilename is not empty %}
-                {% set parentEntity = form.parent.vars.value %}
-                {% set fieldName = form.vars.name %}
+        {% if value is not empty and value.id and not value.emptyFile and file_has_errors is not defined %}
+            {% set filename = value.originalFilename|default(value.filename) %}
+            <div class="control-group image-widget-preview">
+                <div class="controls">
+                    {% import '@OroUI/macros.html.twig' as UI %}
 
-                {% if form.emptyFile is defined%}
-                {% set inputId = form.emptyFile.vars.id %}
-                {% set divId = inputId ~ 'div' %}
+                    <div class="attachment-item" {{ UI.renderPageComponentAttributes({
+                        view: 'oroattachment/js/app/views/attachment-view',
+                        options: form.vars.attachmentViewOptions
+                    }) }}>
+                        {% if file_has_errors is not defined %}
+                            <a href="{{ file_url(value, 'download', true) }}" class="no-hash attachment-item__filename" title="{{ filename }}">
+                                {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                    sources: oro_resized_picture_sources(value),
+                                    img_attrs: { alt: filename }
+                                } %}
+                                {{ filename }}
+                            </a>
+                            <span class="attachment-item__file-size">({{ file_size(value.fileSize) }})</span>
 
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-                <div id="{{ divId }}" class="attachment_item" {{ UI.renderPageComponentAttributes({
-                    view: 'oroattachment/js/app/views/attachment-view',
-                    options: {
-                        inputSelector: '#' ~ inputId,
-                    }
-                }) }}>
-                    <i class="fa-paperclip"></i>
-                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
-                        {{  value.originalFilename }}
-                    </a>
-                    ({{ file_size(value.fileSize) }})
-                    {{ form_row(form.emptyFile) }}
-                    <i data-role="remove"
-                       class="btn btn-link fa-close remove-attachment"
-                       type="button"
-                       data-related="{{ form.emptyFile.vars.name }}"
-                    ></i>
-                </div>
-                {% else %}
-                    <div class="well well-small oro_attachment_file">
-                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
-                            <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
-                            {{ value.originalFilename }}
-                        </a>
+                            {% if form.vars.allowDelete %}
+                                <button data-role="remove"
+                                        class="btn btn-action btn-link delete"
+                                        type="button"
+                                        data-related="{{ form.emptyFile.vars.name }}"
+                                        {% if form.emptyFile.vars.disabled %}disabled="disabled"{% endif %}
+                                >
+                                    <span class="fa-close" aria-hidden="true"></span>
+                                </button>
+                            {% endif %}
+                        {% endif %}
                     </div>
-                {% endif %}
-            {% endif %}
+                </div>
+            </div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
+{% endblock %}
+
+{% macro oro_attachment_multi_file_item_prototype(widget, attributes) %}
+    {% if 'collection' in widget.vars.block_prefixes %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.full_name ~ '[' ~ widget.vars.prototype.vars.name ~ ']' %}
+        {% set disabled = widget.vars.disabled %}
+        {% set allow_delete = widget.vars.allow_delete %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+        {% set disabled = widget.parent.vars.disabled %}
+        {% set allow_delete = widget.parent.vars.allow_delete %}
+    {% endif %}
+
+    <tr data-content="{{ name }}" data-validation-optional-group {{ attributes }}>
+        <td class="sort-order">
+            {{ form_widget(form.sortOrder) }}
+        </td>
+        <td class="file">
+            {{ form_widget(form.file) }}
+        </td>
+        {% if allow_delete %}
+            <td>
+                <button type="button" class="removeRow btn btn-icon btn-square-lighter" aria-label="{{ 'Remove row'|trans }}">
+                    <span class="fa-trash-o" aria-hidden="true"></span>
+                </button>
+            </td>
+        {% endif %}
+    </tr>
+{% endmacro %}
+
+{% block oro_attachment_multi_file_widget %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% import _self as fields %}
+    {% apply spaceless %}
+        {% if prototype is defined %}
+            {% set prototype_html = fields.oro_attachment_multi_file_item_prototype(form) %}
+        {% endif %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ ' file-collection' }) %}
+        {% set prototype_name = form.vars.prototype_name %}
+
+        <div class="row-oro attachment-fileitems" {{ UI.renderPageComponentAttributes({
+            module: 'oroattachment/js/app/components/multi-file-control-component',
+            options: {
+                maxNumber: form.vars.maxNumber
+            }
+        }) }}>
+            <div {{ block('widget_container_attributes') }}>
+                <table class="grid grid-main-container table-hover table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="sort-order"><span>{{ 'oro.attachment.fileitem.sort_order.label'|trans }}</span></th>
+                            <th class="file"><span>{{ fileLabel|default('oro.attachment.fileitem.file.label')|trans }}</span></th>
+                            {% if form.vars.allow_delete %}
+                                <th class="remove"></th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody data-last-index="{{ form.children|length}}"
+                           data-row-count-add="{{ form.vars.row_count_add }}"
+                           data-prototype-name="{{ prototype_name }}"
+                           {% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}
+                    >
+                        {% if form.children|length %}
+                            {% for child in form.children %}
+                                {{ fields.oro_attachment_multi_file_item_prototype(child) }}
+                            {% endfor %}
+                        {% elseif show_form_when_empty and prototype_html is defined %}
+                            {% for i in 0..(form.vars.row_count_initial - 1) %}
+                                {{ prototype_html|replace({(prototype_name): i})|raw }}
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% if allow_add %}
+                    <a class="btn add-list-item" data-container=".file-collection tbody" href="javascript: void(0);">
+                        {{ addLabel|default('oro.attachment.fileitem.file.add.label')|trans }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endapply %}
+{% endblock %}
+
+{% block oro_attachment_multi_file_row %}
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+{% endblock %}
+
+{% block oro_attachment_multi_image_widget %}
+    {{ form_widget(form, {addLabel: 'oro.attachment.fileitem.image.add.label', fileLabel: 'oro.attachment.fileitem.image.label'}) }}
 {% endblock %}

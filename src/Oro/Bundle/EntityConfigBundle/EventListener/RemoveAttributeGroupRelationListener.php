@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
@@ -16,17 +16,11 @@ class RemoveAttributeGroupRelationListener
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param PostFlushConfigEvent $event
-     */
     public function onPostFlushConfig(PostFlushConfigEvent $event)
     {
         $configManager = $event->getConfigManager();

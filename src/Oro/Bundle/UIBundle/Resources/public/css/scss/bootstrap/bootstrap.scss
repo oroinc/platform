@@ -2,48 +2,36 @@
 // Base file for import of customized bootstrap settings
 
 // Required
-@import "functions";
-@import "variables";
-@import "mixins";
+@import 'functions';
+@import 'variables';
+@import 'mixins';
 
 // Optional
-@import "bowerassets/bootstrap/scss/root";
-@import "reboot";
-@import "bowerassets/bootstrap/scss/type";
-@import "bowerassets/bootstrap/scss/images";
-@import "bowerassets/bootstrap/scss/code";
-// @import "bowerassets/bootstrap/scss/grid";
-// @import "bowerassets/bootstrap/scss/tables";
-@import "bowerassets/bootstrap/scss/forms";
-@import "buttons";
-@import "bowerassets/bootstrap/scss/transitions";
-@import "dropdown";
-@import "button-group";
-@import "bowerassets/bootstrap/scss/input-group";
-@import "bowerassets/bootstrap/scss/custom-forms";
-@import "bowerassets/bootstrap/scss/nav";
-// @import "bowerassets/bootstrap/scss/navbar";
-@import "bowerassets/bootstrap/scss/card";
-@import "breadcrumb";
-@import "pagination";
-@import "badge";
-// @import "bowerassets/bootstrap/scss/jumbotron";
-@import "bowerassets/bootstrap/scss/alert";
-@import "bowerassets/bootstrap/scss/progress";
-@import "bowerassets/bootstrap/scss/media";
-@import "bowerassets/bootstrap/scss/list-group";
-@import "bowerassets/bootstrap/scss/close";
-@import "modal";
-@import "bowerassets/bootstrap/scss/tooltip";
-@import "popover";
-@import "bowerassets/bootstrap/scss/carousel";
-@import "bowerassets/bootstrap/scss/utilities";
-@import "bowerassets/bootstrap/scss/print";
-
-.hide {
-    @extend .d-none;
-}
-
-.control-group {
-    @include clearfix();
-}
+@import '~@oroinc/bootstrap/scss/root';
+@import 'reboot';
+@import '~@oroinc/bootstrap/scss/type';
+@import '~@oroinc/bootstrap/scss/images';
+@import '~@oroinc/bootstrap/scss/code';
+@import '~@oroinc/bootstrap/scss/forms';
+@import '~@oroinc/bootstrap/scss/transitions';
+@import 'dropdown';
+@import 'buttons';
+@import 'button-group';
+@import '~@oroinc/bootstrap/scss/input-group';
+@import '~@oroinc/bootstrap/scss/custom-forms';
+@import '~@oroinc/bootstrap/scss/nav';
+@import '~@oroinc/bootstrap/scss/card';
+@import 'breadcrumb';
+@import 'pagination';
+@import 'badge';
+@import 'alert';
+@import '~@oroinc/bootstrap/scss/progress';
+@import '~@oroinc/bootstrap/scss/media';
+@import '~@oroinc/bootstrap/scss/list-group';
+@import '~@oroinc/bootstrap/scss/close';
+@import 'modal';
+@import '~@oroinc/bootstrap/scss/tooltip';
+@import 'popover';
+@import '~@oroinc/bootstrap/scss/carousel';
+@import '~@oroinc/bootstrap/scss/utilities';
+@import '~@oroinc/bootstrap/scss/print';

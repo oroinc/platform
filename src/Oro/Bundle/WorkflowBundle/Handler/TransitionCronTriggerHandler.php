@@ -14,6 +14,9 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
+/**
+ * This handler performs the actual processing of transition trigger messages produced by transition cron triggers
+ */
 class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
 {
     /** @var WorkflowManager */
@@ -22,16 +25,9 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     /** @var TransitionCronTriggerHelper */
     private $helper;
 
-    /**
-     * @var FeatureChecker
-     */
+    /** * @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param TransitionCronTriggerHelper $helper
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         TransitionCronTriggerHelper $helper,
@@ -53,7 +49,7 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
         if (!$trigger instanceof TransitionCronTrigger) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Trigger should be instance of %s, %s instace given',
+                    'Cron trigger should be an instance of %s, %s instance given',
                     TransitionCronTrigger::class,
                     ClassUtils::getClass($trigger)
                 )
@@ -87,10 +83,6 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
         return true;
     }
 
-    /**
-     * @param TransitionCronTrigger $trigger
-     * @param Workflow $workflow
-     */
     protected function processStartTransition(TransitionCronTrigger $trigger, Workflow $workflow)
     {
         $entities = $this->helper->fetchEntitiesWithoutWorkflowItems($trigger, $workflow);
@@ -106,8 +98,6 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     }
 
     /**
-     * @param TransitionCronTrigger $trigger
-     * @param Workflow $workflow
      * @throws \Exception
      */
     protected function processTransition(TransitionCronTrigger $trigger, Workflow $workflow)

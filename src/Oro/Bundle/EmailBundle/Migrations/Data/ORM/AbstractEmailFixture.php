@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -121,10 +121,6 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
         $manager->persist($emailTemplate);
     }
 
-    /**
-     * @param EmailTemplate $emailTemplate
-     * @param array $template
-     */
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {
         $emailTemplate->setContent($template['content']);

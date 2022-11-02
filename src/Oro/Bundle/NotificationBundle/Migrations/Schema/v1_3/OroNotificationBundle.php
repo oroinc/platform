@@ -16,9 +16,6 @@ class OroNotificationBundle implements Migration
         $this->addAdditionalEmailAssociationsField($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function addAdditionalEmailAssociationsField(Schema $schema)
     {
         $table = $schema->getTable('oro_notification_recip_list');

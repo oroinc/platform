@@ -19,11 +19,6 @@ class MakeAnnotationReaderServicesPersistentPass extends RegisterPersistentServi
         $result = [];
         if ($container->hasAlias('annotation_reader')) {
             $result[] = 'annotation_reader';
-            $alias = (string)$container->getAlias('annotation_reader');
-            if ('annotations.cached_reader' === $alias) {
-                // annotation cache
-                $result[] = (string)$container->getDefinition('annotations.cached_reader')->getArgument(1);
-            }
         }
 
         return $result;

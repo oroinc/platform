@@ -1,5 +1,5 @@
 oro.entity_pagination:
-    pager_of_%total%_record|pager_of_%total%_records: 'of %total% Record|of %total% Records'
+    pager_of_%count%_record|pager_of_%count%_records: 'of %count% Record|of %count% Records'
     first: 'First'
     last: 'Last'
 
@@ -14,7 +14,7 @@ oro.entity_pagination:
         fields:
             enabled:
                 label: 'Record Pagination'
-                tooltip: 'Navigate to the previous or the next record from a view page'
+                tooltip: "Select the option to enable a user to navigate to the previous < or > the next record from the record's view page."
             limit:
                 label: 'Record Pagination limit'
-                tooltip: 'The maximum number of records supported by Record Pagination'
+                tooltip: 'The maximum number of records displayed in the page navigation bar. If the number of existing records exceeds this limit, the page navigation bar is hidden.'

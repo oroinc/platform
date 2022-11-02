@@ -66,22 +66,20 @@ class UserAgentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($userAgent, $agent->toString());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessSetThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $agent                        = new UserAgent('');
         $agent[UserAgent::USER_AGENT] = 'val';
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessUnsetThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $agent = new UserAgent('');
         unset($agent[UserAgent::USER_AGENT]);
     }

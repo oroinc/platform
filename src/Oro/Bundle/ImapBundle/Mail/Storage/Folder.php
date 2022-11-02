@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Laminas\Mail\Storage\Folder as BaseFolder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Zend\Mail\Storage\Folder as BaseFolder;
 
+/**
+ * Imap mail folder.
+ */
 class Folder extends BaseFolder
 {
     const FLAG_SENT   = 'Sent';
@@ -68,15 +71,16 @@ class Folder extends BaseFolder
             return false;
         }
 
-        if (false == is_array($flags)) {
+        if (!\is_array($flags)) {
             $flags = [$flags];
         }
 
         $flags = array_map(
             function ($item) {
-                if (false === strpos($item, '\\')) {
+                if (!str_contains($item, '\\')) {
                     $item = '\\' . $item;
                 }
+
                 return $item;
             },
             $flags
@@ -84,9 +88,9 @@ class Folder extends BaseFolder
 
         if (count($flags) > 1) {
             return count(array_intersect($this->flags, $flags)) > 0;
-        } else {
-            return in_array($flags[0], $this->flags);
         }
+
+        return \in_array($flags[0], $this->flags, true);
     }
 
     /**
@@ -115,9 +119,9 @@ class Folder extends BaseFolder
     public function addFlag($flag)
     {
         if ($this->flags === null) {
-            $this->flags = array();
+            $this->flags = [];
         }
-        if (!(strpos($flag, '\\') === 0)) {
+        if (!str_starts_with($flag, '\\')) {
             $flag = '\\' . $flag;
         }
         if (!in_array($flag, $this->flags)) {
@@ -133,7 +137,7 @@ class Folder extends BaseFolder
     public function deleteFlag($flag)
     {
         if ($this->flags !== null) {
-            if (!(strpos($flag, '\\') === 0)) {
+            if (!str_starts_with($flag, '\\')) {
                 $flag = '\\' . $flag;
             }
             unset($this->flags[$flag]);

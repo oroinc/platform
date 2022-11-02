@@ -5,8 +5,6 @@ define([
 ], function(_, $, Backbone) {
     'use strict';
 
-    var AbstractListener;
-
     /**
      * Abstarct listener for datagrid
      *
@@ -14,7 +12,7 @@ define([
      * @class   orodatagrid.datagrid.listener.AbstractListener
      * @extends Backbone.Model
      */
-    AbstractListener = Backbone.Model.extend({
+    const AbstractListener = Backbone.Model.extend({
         /** @param {String|Array} Column name of cells that will be listened for changing their values */
         columnName: 'id',
 
@@ -22,10 +20,10 @@ define([
         dataField: 'id',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AbstractListener() {
-            AbstractListener.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractListener(...args) {
+            AbstractListener.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -43,7 +41,7 @@ define([
                 this.dataField = options.dataField;
             }
 
-            AbstractListener.__super__.initialize.apply(this, arguments);
+            AbstractListener.__super__.initialize.call(this, options);
 
             if (!options.$gridContainer) {
                 throw new Error('gridSelector is not specified');
@@ -55,7 +53,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -83,8 +81,8 @@ define([
          * @returns {Object}
          */
         getGridEvents: function() {
-            var events = {};
-            events['datagrid:change:' + this.gridName] = _.bind(this._onModelEdited, this);
+            const events = {};
+            events['datagrid:change:' + this.gridName] = this._onModelEdited.bind(this);
             return events;
         },
 
@@ -100,7 +98,7 @@ define([
                 return;
             }
 
-            var value = model.get(this.dataField);
+            const value = model.get(this.dataField);
 
             if (!_.isUndefined(value)) {
                 this._processValue(value, model);

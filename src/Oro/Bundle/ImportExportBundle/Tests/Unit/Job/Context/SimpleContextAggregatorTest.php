@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -12,13 +12,13 @@ use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 
 class SimpleContextAggregatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
     /** @var SimpleContextAggregator */
     private $aggregator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
@@ -49,14 +49,16 @@ class SimpleContextAggregatorTest extends \PHPUnit\Framework\TestCase
             ->method('getStepExecutions')
             ->willReturn($stepExecutions);
 
-        $this->contextRegistry->expects(self::at(0))
+        $this->contextRegistry->expects(self::exactly(2))
             ->method('getByStepExecution')
-            ->with(self::identicalTo($stepExecution1))
-            ->willReturn($stepExecution1Context);
-        $this->contextRegistry->expects(self::at(1))
-            ->method('getByStepExecution')
-            ->with(self::identicalTo($stepExecution2))
-            ->willReturn($stepExecution2Context);
+            ->withConsecutive(
+                [self::identicalTo($stepExecution1)],
+                [self::identicalTo($stepExecution2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $stepExecution1Context,
+                $stepExecution2Context
+            );
 
         $result = $this->aggregator->getAggregatedContext($jobExecution);
         self::assertInstanceOf(ContextInterface::class, $result);

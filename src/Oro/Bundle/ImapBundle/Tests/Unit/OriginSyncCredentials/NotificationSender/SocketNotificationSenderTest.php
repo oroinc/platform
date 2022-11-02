@@ -10,20 +10,16 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $websocketClient;
+
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $connectionChecker;
+
     /** @var SocketNotificationSender */
     private $sender;
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $websocketClient;
-
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $connectionChecker;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);

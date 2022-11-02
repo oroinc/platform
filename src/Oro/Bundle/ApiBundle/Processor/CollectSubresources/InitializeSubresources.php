@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Initializes sub-resources for all API resources based on API configuration and metadata.
+ * Initializes sub-resources based on associations from API metadata.
  */
 class InitializeSubresources extends LoadSubresources
 {
@@ -42,14 +42,6 @@ class InitializeSubresources extends LoadSubresources
         }
     }
 
-    /**
-     * @param ApiResource $resource
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $accessibleResources
-     *
-     * @return ApiResourceSubresources|null
-     */
     private function createEntitySubresources(
         ApiResource $resource,
         string $version,
@@ -68,7 +60,7 @@ class InitializeSubresources extends LoadSubresources
 
         $entitySubresources = new ApiResourceSubresources($entityClass);
         $associations = $metadata->getAssociations();
-        if (!empty($associations) && $this->isSubresourcesEnabled($resource)) {
+        if (!empty($associations) && SubresourceUtil::isSubresourcesEnabled($resource)) {
             $subresourceExcludedActions = $this->getSubresourceExcludedActions($resource);
             foreach ($associations as $associationName => $association) {
                 if ($this->isExcludedAssociation($associationName, $config)) {

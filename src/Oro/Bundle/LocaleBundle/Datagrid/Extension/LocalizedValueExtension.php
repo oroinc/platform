@@ -3,8 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Datagrid\Extension;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -17,8 +18,12 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Show localized values in grid according to the current localization
+ */
 class LocalizedValueExtension extends AbstractExtension
 {
     use LocalizationQueryTrait;
@@ -34,22 +39,20 @@ class LocalizedValueExtension extends AbstractExtension
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
+    private Inflector $inflector;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param LocalizationHelper  $localizationHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
-        LocalizationHelper $localizationHelper
+        LocalizationHelper $localizationHelper,
+        Inflector $inflector
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->localizationHelper = $localizationHelper;
 
         $this->propertyAccessor = new PropertyAccessor();
+        $this->inflector = $inflector;
     }
 
     /**
@@ -91,6 +94,7 @@ class LocalizedValueExtension extends AbstractExtension
     }
 
     /**
+     * @param OrmDatasource $datasource
      * {@inheritdoc}
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
@@ -106,23 +110,24 @@ class LocalizedValueExtension extends AbstractExtension
 
         $properties = $this->getProperties($config);
 
-        /** @var OrmDatasource $datasource */
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $datasource->getQueryBuilder();
-
+        $exprBuilder = $queryBuilder->expr();
         foreach ($properties as $name => $definition) {
+            QueryBuilderUtil::checkIdentifier($name);
             $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
 
-            $shouldAllowEmpty = array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
+            $shouldAllowEmpty = \array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
             $joinType = $shouldAllowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
 
-            if (false === strpos($propertyPath, '.')) {
+            if (!str_contains($propertyPath, '.')) {
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
             }
 
             $this->joinDefaultLocalizedValue(
                 $queryBuilder,
-                Inflector::pluralize($propertyPath),
-                Inflector::pluralize($name),
+                $this->inflector->pluralize($propertyPath),
+                $this->inflector->pluralize($name),
                 $name,
                 $joinType
             );
@@ -131,10 +136,9 @@ class LocalizedValueExtension extends AbstractExtension
             if ($shouldAllowEmpty) {
                 $localizedEntityAliasValues = explode('.', $propertyPath);
                 $queryBuilder->andWhere(
-                    sprintf(
-                        '%s.id IS NOT NULL or %s.id IS NULL',
-                        Inflector::pluralize($name),
-                        reset($localizedEntityAliasValues)
+                    $exprBuilder->orX(
+                        $exprBuilder->isNotNull(QueryBuilderUtil::getField($this->inflector->pluralize($name), 'id')),
+                        $exprBuilder->isNull(QueryBuilderUtil::getField(reset($localizedEntityAliasValues), 'id'))
                     )
                 );
             }

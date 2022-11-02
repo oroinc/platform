@@ -14,9 +14,6 @@ class RemoveExcludedEntities implements ProcessorInterface
     /** @var ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
 
-    /**
-     * @param ExclusionProviderRegistry $exclusionProviderRegistry
-     */
     public function __construct(ExclusionProviderRegistry $exclusionProviderRegistry)
     {
         $this->exclusionProviderRegistry = $exclusionProviderRegistry;

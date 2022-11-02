@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
@@ -13,19 +14,17 @@ use Symfony\Component\Validator\Validation;
 
 class UniqueKeyTypeTest extends TypeTestCase
 {
-    /**
-     * @var array
-     */
-    private $fields = [
+    private array $fields = [
         'First Name' => 'firstName',
         'Last Name' => 'lastName',
         'Email' => 'email',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(new AnnotationReader())
+            ->enableAnnotationMapping(true)
+            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         $this->factory =
@@ -33,47 +32,48 @@ class UniqueKeyTypeTest extends TypeTestCase
                 ->addExtensions([new ValidatorExtension($validator)])
                 ->getFormFactory();
 
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    public function testRequiredKeyChoiceOption()
+    public function testRequiredKeyChoiceOption(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "key_choices" is missing.');
         $this->factory->create(UniqueKeyType::class);
     }
 
-    public function testType()
+    public function testType(): void
     {
-        $formData = array(
+        $formData = [
             'name' => 'test',
-            'key'  => array('firstName', 'lastName', 'email')
-        );
+            'key'  => ['firstName', 'lastName', 'email'],
+        ];
 
         $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
         $form->submit($formData);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
     }
 
-    public function testSubmitNotValidData()
+    public function testSubmitNotValidData(): void
     {
         $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
 
-        $formData = array(
+        $formData = [
             'name' => '',
-            'key'  => []
-        );
+            'key'  => [],
+        ];
 
         $form->submit($formData);
-        $this->assertFalse($form->isValid());
+        self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
     }
 
-    public function testNames()
+    public function testNames(): void
     {
         $type = new UniqueKeyType();
-        $this->assertEquals('oro_entity_extend_unique_key_type', $type->getName());
+        self::assertEquals('oro_entity_extend_unique_key_type', $type->getName());
     }
 }

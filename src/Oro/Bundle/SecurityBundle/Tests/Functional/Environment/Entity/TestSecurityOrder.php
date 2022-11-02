@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
@@ -64,41 +63,26 @@ class TestSecurityOrder implements TestFrameworkEntityInterface
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
     public function getPoNumber(): string
     {
         return $this->poNumber;
     }
 
-    /**
-     * @param string $poNumber
-     */
     public function setPoNumber(string $poNumber): void
     {
         $this->poNumber = $poNumber;
     }
 
-    /**
-     * @return TestSecurityPerson
-     */
     public function getPerson(): TestSecurityPerson
     {
         return $this->person;
     }
 
-    /**
-     * @param TestSecurityPerson $person
-     */
     public function setPerson(TestSecurityPerson $person): void
     {
         $this->person = $person;

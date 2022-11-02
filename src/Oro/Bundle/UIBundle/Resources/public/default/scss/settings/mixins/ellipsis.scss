@@ -1,0 +1,8 @@
+/* @theme: default; */
+
+// Ellipsis text
+@mixin ellipsis() {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

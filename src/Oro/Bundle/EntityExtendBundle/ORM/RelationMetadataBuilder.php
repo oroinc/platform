@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Mapping\Builder\AssociationBuilder;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -26,18 +26,16 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /**
-     * RelationMetadataBuilder constructor.
-     *
-     * @param ConfigManager $configManager
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
+    private Inflector $inflector;
+
     public function __construct(
         ConfigManager $configManager,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        Inflector $inflector
     ) {
         $this->configManager = $configManager;
         $this->nameGenerator = $nameGenerator;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -79,11 +77,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToOneRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -92,7 +85,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $targetEntity = $relation['target_entity'];
         $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
         $cascade = $this->getCascadeOption($relation);
-        $cascade[] = 'detach';
 
         $builder = $metadataBuilder->createManyToOne($fieldId->getFieldName(), $targetEntity);
         if (!empty($relation['target_field_id'])) {
@@ -124,7 +116,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     ) {
         $targetEntity = $relation['target_entity'];
         $cascade = $this->getCascadeOption($relation);
-        $cascade[] = 'detach';
 
         $builder = $metadataBuilder->createOneToMany($fieldId->getFieldName(), $targetEntity);
         if (!empty($relation['target_field_id'])) {
@@ -132,6 +123,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
         $this->setCascadeOptions($builder, $cascade);
         $this->setFetchOption($builder, $this->getFetchOption($relation));
+        $this->setOrphanRemoval($builder, $relation);
+
         $builder->build();
 
         if (!$relation['owner']
@@ -142,11 +135,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToManyRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -169,11 +157,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToManyOwningSideRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -215,6 +198,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $builder->addInverseJoinColumn($targetJoinTableColumnName, $targetIdColumn, false, false, 'CASCADE');
         $this->setCascadeOptions($builder, $this->getCascadeOption($relation));
         $this->setFetchOption($builder, $this->getFetchOption($relation));
+        $this->setOrphanRemoval($builder, $relation);
         $builder->build();
     }
 
@@ -241,7 +225,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param ClassMetadataBuilder $metadataBuilder
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
-     *
      */
     protected function buildDefaultRelation(
         ClassMetadataBuilder $metadataBuilder,
@@ -361,12 +344,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             return true;
         }
 
-        $nullable = $relation['nullable'];
-        if (null === $nullable) {
-            $nullable = true;
-        }
-
-        return $nullable;
+        return (bool) ($relation['nullable'] ?? true);
     }
 
     /**
@@ -408,16 +386,19 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param AssociationBuilder $builder
-     * @param string             $fetch
-     */
     private function setFetchOption(AssociationBuilder $builder, string $fetch)
     {
-        $method = Inflector::camelize('fetch_' . $fetch);
+        $method = $this->inflector->camelize('fetch_' . $fetch);
 
         if (method_exists($builder, $method)) {
             $builder->$method();
+        }
+    }
+
+    private function setOrphanRemoval(AssociationBuilder $builder, array $relation): void
+    {
+        if (isset($relation['orphanRemoval']) && $relation['orphanRemoval']) {
+            $builder->orphanRemoval();
         }
     }
 }

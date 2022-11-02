@@ -3,12 +3,16 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
-use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SearchBundleWebTestCase extends WebTestCase
 {
-    use SearchExtensionTrait;
+    use SearchExtensionTrait {
+        reindex as traitReindex;
+    }
+
+    /** @var array */
+    protected static $entitiesToClear = [];
 
     /**
      * For InnoDB, all DML operations (INSERT, UPDATE, DELETE) involving columns with full-text indexes are
@@ -36,10 +40,62 @@ class SearchBundleWebTestCase extends WebTestCase
     {
     }
 
-
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->clearTestData();
+        if (static::isDbIsolationPerTest()) {
+            static::clear();
+        }
+
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (!static::isDbIsolationPerTest()) {
+            static::clear();
+        }
+
+        parent::tearDownAfterClass();
+    }
+
+    protected function loadFixture(string $entityClass, string $fixtureClass, int $expectedCount): void
+    {
+        $doReindex = static::isDbIsolationPerTest() || !$this->isLoadedFixture($fixtureClass);
+
+        $this->loadFixtures([$fixtureClass]);
+
+        if ($doReindex) {
+            $this->reindex($entityClass, $expectedCount);
+        }
+    }
+
+    protected function reindex(string $entityClass, int $expectedCount): void
+    {
+        static::$entitiesToClear[] = $entityClass;
+
+        static::clearIndex($entityClass);
+
+        static::traitReindex($entityClass);
+
+        $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
+        static::ensureItemsLoaded($alias, $expectedCount);
+    }
+
+    protected static function clearIndex(string $entityClass): void
+    {
+        static::getSearchIndexer()->resetIndex($entityClass);
+
+        $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
+        static::ensureItemsLoaded($alias, 0);
+    }
+
+    protected static function clear(): void
+    {
+        foreach (static::$entitiesToClear as $entityClass) {
+            static::clearIndex($entityClass);
+            static::clearTestData($entityClass);
+        }
+
+        static::$entitiesToClear = [];
     }
 }

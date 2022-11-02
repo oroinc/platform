@@ -7,25 +7,33 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorBag;
+
+    /** @var ParameterBag */
+    private $sharedData;
 
     /** @var LoadNormalizedEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
+
+        $this->sharedData = new ParameterBag();
+        $this->sharedData->set('someKey', 'someSharedValue');
+        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
@@ -34,7 +42,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $normalizedResult = ['key' => 'value'];
 
         $this->processorBag->expects(self::never())
@@ -50,7 +58,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->processorBag->expects(self::never())
             ->method('getProcessor');
@@ -65,7 +73,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityIdDoesNotExistInContextButEntityHasIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->processorBag->expects(self::never())
@@ -81,7 +89,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenNormalizedEntityAlreadyLoaded()
     {
-        $this->processorBag->expects(static::never())
+        $this->processorBag->expects(self::never())
             ->method('getProcessor')
             ->with('get');
 
@@ -89,6 +97,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWhenGetActionSuccess()
     {
         $getResult = ['key' => 'value'];
@@ -101,11 +112,12 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $getConfigSections = [
             'test_section' => ['test_section_key' => 'test_section_value']
         ];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
         $getResponseHeaders = [
             'test-response-header' => 'some response header value'
         ];
+        $getInfoRecords = ['' => ['key' => 'value']];
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -120,17 +132,24 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
-        $expectedGetContext->skipGroup('security_check');
-        $expectedGetContext->skipGroup('data_security_check');
-        $expectedGetContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
 
         $getProcessor->expects(self::once())
@@ -144,7 +163,8 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
                     $getConfig,
                     $getConfigSections,
                     $getMetadata,
-                    $getResponseHeaders
+                    $getResponseHeaders,
+                    $getInfoRecords
                 ) {
                     self::assertEquals($expectedGetContext, $context);
 
@@ -157,6 +177,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
                     foreach ($getResponseHeaders as $key => $value) {
                         $context->getResponseHeaders()->set($key, $value);
                     }
+                    $context->setInfoRecords($getInfoRecords);
                     $context->setResult($getResult);
                 }
             );
@@ -166,7 +187,11 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setMasterRequest(true);
+        $expectedContext->setCorsRequest(true);
+        $expectedContext->setHateoas(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
         $expectedContext->setConfigExtras($getConfigExtras);
@@ -178,6 +203,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         foreach ($getResponseHeaders as $key => $value) {
             $expectedContext->getResponseHeaders()->set($key, $value);
         }
+        $expectedContext->setInfoRecords($getInfoRecords);
         $expectedContext->setResult($getResult);
         $expectedContext->setProcessed(LoadNormalizedEntity::OPERATION_NAME);
 
@@ -204,11 +230,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $getProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (GetContext $context) use ($getError) {
-                    $context->addError($getError);
-                }
-            );
+            ->willReturnCallback(function (GetContext $context) use ($getError) {
+                $context->addError($getError);
+            });
 
         $this->processor->process($this->context);
 

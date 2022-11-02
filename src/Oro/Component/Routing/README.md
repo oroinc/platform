@@ -20,93 +20,24 @@ services:
     acme.routing_loader:
         class: Oro\Component\Routing\Loader\CumulativeRoutingFileLoader
         arguments:
-            - @kernel
-            - @acme.routing_options_resolver
+            - '@kernel'
+            - '@acme.routing_options_resolver'
             - [Resources/config/acme/routing.yml]
             - acme_auto
         calls:
-            - [setResolver, [@routing.resolver]]
+            - [setResolver, ['@routing.resolver']]
         tags:
             - { name: routing.loader }
+```
 
+Here we also have registered the chain route options resolver service which allows to add resolvers from any bundle. There are several ways how to allow a bundle to register own route options resolver in the chain resolver, but most common way is to use DI container tags. The following example shows how to register tagged resolvers:
+
+``` yaml
+services:
     acme.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
-        public: false
-```
-
-Here we also have registered the chain route options resolver service which allows to add resolvers from any bundle. There are several ways how to allow a bundle to register own route options resolver in the chain resolver, but most common way is to use DI container tags. The following example shows implementation a compiler pass for DI container to load tagged resolvers:
-
-``` php
-<?php
-
-namespace Acme\Bundle\AppBundle\DependencyInjection\Compiler;
-
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-
-class RoutingOptionsResolverPass implements CompilerPassInterface
-{
-    const CHAIN_RESOLVER_SERVICE = 'acme.routing_options_resolver';
-    const RESOLVER_TAG_NAME = 'routing.options_resolver';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition(self::CHAIN_RESOLVER_SERVICE)) {
-            return;
-        }
-
-        // find resolvers
-        $resolvers      = [];
-        $taggedServices = $container->findTaggedServiceIds(self::RESOLVER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $resolvers[$priority][] = new Reference($id);
-        }
-        if (empty($resolvers)) {
-            return;
-        }
-
-        // sort by priority and flatten
-        ksort($resolvers);
-        $resolvers = call_user_func_array('array_merge', $resolvers);
-
-        // register
-        $chainResolverDef = $container->getDefinition(self::CHAIN_RESOLVER_SERVICE);
-        foreach ($resolvers as $resolver) {
-            $chainResolverDef->addMethodCall('addResolver', [$resolver]);
-        }
-    }
-}
-```
-
-Now you need to register this compiler pass:
-
-``` php
-<?php
-
-namespace Acme\Bundle\AppBundle;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Acme\Bundle\AppBundle\DependencyInjection\Compiler\RoutingOptionsResolverPass;
-
-class AcmeAppBundle extends Bundle
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new RoutingOptionsResolverPass());
-    }
-}
+        arguments:
+            - !tagged_iterator routing.options_resolver
 ```
 
 The last thing you need to do is to register a root routing resource for your application in `config/routing.yml`:
@@ -186,40 +117,24 @@ To enable this feature you need to override some services in DI container:
 
 namespace Acme\Bundle\AppBundle\DependencyInjection\Compiler;
 
+use Oro\Component\Routing\Matcher\PhpMatcherDumper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Replaces `router.default` service options with PhpMatcherDumper instead of CompiledUrlMatcherDumper
+ */
 class HiddenRoutesPass implements CompilerPassInterface
 {
-    const MATCHER_DUMPER_CLASS_PARAM    = 'router.options.matcher_dumper_class';
-    const EXPECTED_MATCHER_DUMPER_CLASS = 'Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper';
-    const NEW_MATCHER_DUMPER_CLASS      = 'Oro\Component\Routing\Matcher\PhpMatcherDumper';
-
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(self::MATCHER_DUMPER_CLASS_PARAM)) {
-            $newClass = $this->getNewRoutingMatcherDumperClass(
-                $container->getParameter(self::MATCHER_DUMPER_CLASS_PARAM)
-            );
-            if ($newClass) {
-                $container->setParameter(self::MATCHER_DUMPER_CLASS_PARAM, $newClass);
-            }
-        }
-    }
-
-    /**
-     * @param string $currentClass
-     *
-     * @return string|null
-     */
-    protected function getNewRoutingMatcherDumperClass($currentClass)
-    {
-        return self::EXPECTED_MATCHER_DUMPER_CLASS === $currentClass
-            ? self::NEW_MATCHER_DUMPER_CLASS
-            : null;
+        $definition = $container->getDefinition('router.default');
+        $options = $definition->getArgument(2);
+        $options['matcher_dumper_class'] = PhpMatcherDumper::class;
+        $definition->setArgument(2, $options);
     }
 }
 ```
@@ -240,7 +155,7 @@ class AcmeAppBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -349,7 +264,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      */
     protected function hasAttribute(Route $route, $placeholder)
     {
-        return false !== strpos($route->getPath(), $placeholder);
+        return str_contains($route->getPath(), $placeholder);
     }
 }
 ```
@@ -357,15 +272,16 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 The common route can be registered in `routing.yml` file, for example:
 
 ``` yaml
-acme_dictionary_api:
-    resource: "@AcmeProductBundle/Controller/Api/Rest/DictionaryController.php"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+acme_api_get_dictionary_values:
+    path: '/api/rest/{version}/{dictionary}.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Acme\Bundle\ProductBundle\Controller\Api\Rest\DictionaryController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
     options:
         group: dictionary_entity
 ```

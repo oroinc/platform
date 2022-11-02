@@ -3,34 +3,68 @@ oro_dashboard:
     type:         annotation
     prefix:       /
 
-oro_dashboard_widget_api:
-    resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController
-    type: rest
-    prefix: api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format: json
-    defaults:
-        version: latest
 
-oro_dashboard_api:
-    resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\DashboardController
-    type: rest
-    prefix: api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format: json
-    defaults:
-        version: latest
+#
+# OLD REST API ROUTES
+#
 
-# deprecated API route
-oro_api_post_dashboard_widget_add_widget_deprecated:
-    path:            /api/rest/{version}/dashboard/widget/add/widget.{_format}
-    methods:         [POST]
+oro_api_put_dashboard_widget:
+    path: '/api/rest/{version}/dashboards/{dashboardId}/widgets/{widgetId}.{_format}'
+    methods: [PUT]
     defaults:
-        _controller: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::postAddWidgetAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::putAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        dashboardId: \d+
+        widgetId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_dashboard_widget:
+    path: '/api/rest/{version}/dashboards/{dashboardId}/widgets/{widgetId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        dashboardId: \d+
+        widgetId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_put_dashboard_widget_positions:
+    path: '/api/rest/{version}/dashboards/{dashboardId}/widget/positions.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::putPositionsAction'
+        _format: json
+        version: latest
+    requirements:
+        dashboardId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_dashboard_widget_add_widget:
+    path: '/api/rest/{version}/dashboards/widgets/adds/widgets.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::postAddWidgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_delete_dashboard:
+    path: '/api/rest/{version}/dashboards/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\DashboardBundle\Controller\Api\Rest\DashboardController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1

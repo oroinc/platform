@@ -9,8 +9,6 @@ interface RestDocViewDetectorAwareInterface
 {
     /**
      * Sets the API view detector.
-     *
-     * @param RestDocViewDetector $docViewDetector
      */
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector);
 }

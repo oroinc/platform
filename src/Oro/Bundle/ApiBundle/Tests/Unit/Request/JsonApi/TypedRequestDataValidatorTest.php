@@ -8,9 +8,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +26,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var TypedRequestDataValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,27 +34,26 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         $this->validator = new TypedRequestDataValidator(function ($entityType) {
-            return ValueNormalizerUtil::convertToEntityClass(
+            return ValueNormalizerUtil::tryConvertToEntityClass(
                 $this->valueNormalizer,
                 $entityType,
-                $this->requestType,
-                false
+                $this->requestType
             );
         });
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('products')
-            ->willReturn(Product::class);
+            ->willReturnCallback(function ($entityType) {
+                if ('products' === $entityType) {
+                    return Product::class;
+                }
+                if ('test' === $entityType) {
+                    return 'Test\Entity';
+                }
+                throw new EntityAliasNotFoundException($entityType);
+            });
     }
 
-    /**
-     * @param array  $expectedErrors
-     * @param array  $expectedPointers
-     * @param string $expectedTitle
-     * @param int    $expectedStatusCode
-     * @param array  $errors
-     */
     private function assertValidationErrors(
         array $expectedErrors,
         array $expectedPointers,
@@ -71,7 +73,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectProvider
      */
-    public function testValidResourceObject($requestData)
+    public function testValidResourceObject(array $requestData)
     {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -85,7 +87,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectWithIncludedResources($requestData)
+    public function testValidResourceObjectWithIncludedResources(array $requestData)
     {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -96,7 +98,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($errors);
     }
 
-    public function validResourceObjectProvider()
+    public function validResourceObjectProvider(): array
     {
         return [
             [
@@ -113,11 +115,41 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => []]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => []]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => ['test' => null]]
             ]
         ];
     }
 
-    public function validResourceObjectWithIncludedResourcesProvider()
+    public function validResourceObjectWithIncludedResourcesProvider(): array
     {
         return array_merge($this->validResourceObjectProvider(), [
             [
@@ -158,7 +190,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionProvider
      */
-    public function testValidResourceObjectCollection($requestData)
+    public function testValidResourceObjectCollection(array $requestData)
     {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -172,7 +204,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectCollectionWithIncludedResources($requestData)
+    public function testValidResourceObjectCollectionWithIncludedResources(array $requestData)
     {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -183,7 +215,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($errors);
     }
 
-    public function validResourceObjectCollectionProvider()
+    public function validResourceObjectCollectionProvider(): array
     {
         return [
             [
@@ -200,11 +232,41 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => [['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => []]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => ['test' => null]]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => []]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => ['test' => null]]]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => ['test' => null]]
             ]
         ];
     }
 
-    public function validResourceObjectCollectionWithIncludedResourcesProvider()
+    public function validResourceObjectCollectionWithIncludedResourcesProvider(): array
     {
         return array_merge($this->validResourceObjectCollectionProvider(), [
             [
@@ -246,11 +308,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectProvider
      */
     public function testInvalidResourceObject(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -265,11 +327,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIncludedResourcesProvider
      */
     public function testInvalidResourceObjectWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string|array $expectedError,
+        string|array $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -283,13 +345,18 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectProvider()
+    public function invalidResourceObjectProvider(): array
     {
         return [
             [[], 'The primary data object should exist', '/data'],
             [['data' => null], 'The primary data object should not be empty', '/data'],
             [['data' => []], 'The primary data object should not be empty', '/data'],
             [['data' => ['test']], 'The \'type\' property is required', '/data/type'],
+            [
+                ['data' => ['type' => 'products', 'included' => []]],
+                'The \'included\' property is not allowed for a resource object',
+                '/data'
+            ],
             [
                 ['data' => ['id' => null, 'type' => 'products', 'attributes' => ['test' => null]]],
                 'The \'id\' property should not be null',
@@ -436,6 +503,81 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'The \'id\' property should be a string',
                 '/data/relationships/test/data/0/id'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => null]],
+                'The \'meta\' property should be an array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => 'test']],
+                'The \'meta\' property should be an array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => ['test']]],
+                'The \'meta\' property should be an associative array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => null]],
+                'The \'links\' property should be an array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => 'test']],
+                'The \'links\' property should be an array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => ['test']]],
+                'The \'links\' property should be an associative array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => null],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => 'test'],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => ['test']],
+                'The \'jsonapi\' property should be an associative array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => null],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => 'test'],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => ['test']],
+                'The \'meta\' property should be an associative array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => null],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => 'test'],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => ['test']],
+                'The \'links\' property should be an associative array',
+                '/links'
             ]
         ];
     }
@@ -443,7 +585,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectWithIncludedResourcesProvider()
+    public function invalidResourceObjectWithIncludedResourcesProvider(): array
     {
         return array_merge($this->invalidResourceObjectProvider(), [
             [
@@ -455,6 +597,26 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ['data' => ['type' => 'products'], 'included' => []],
                 'The \'included\' property should not be empty',
                 '/included'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'test' => '1']
+                    ]
+                ],
+                'The \'test\' property is not allowed for a resource object',
+                '/included/0'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        'test'
+                    ]
+                ],
+                ['The related resource should be an object'],
+                ['/included/0']
             ],
             [
                 [
@@ -553,11 +715,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionProvider
      */
     public function testInvalidResourceObjectCollection(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -572,11 +734,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithIncludedResourcesProvider
      */
     public function testInvalidResourceObjectCollectionWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string|array $expectedError,
+        string|array $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -590,14 +752,23 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectCollectionProvider()
+    public function invalidResourceObjectCollectionProvider(): array
     {
         return [
             [[], 'The primary data object collection should exist', '/data'],
             [['data' => null], 'The primary data object collection should not be empty', '/data'],
             [['data' => []], 'The primary data object collection should not be empty', '/data'],
             [['data' => 'test'], 'The primary data object collection should be an array', '/data'],
-            [['data' => ['key' => 'value']], 'The primary data object collection should be an array', '/data'],
+            [
+                ['data' => ['key' => 'value']],
+                'The primary data object collection should be an array',
+                '/data'
+            ],
+            [
+                ['data' => [['type' => 'products', 'key' => 'value']]],
+                'The \'key\' property is not allowed for a resource object',
+                '/data/0'
+            ],
             [['data' => [null]], 'The primary resource object should be an object', '/data/0'],
             [['data' => ['test']], 'The primary resource object should be an object', '/data/0'],
             [['data' => [[]]], 'The \'type\' property is required', '/data/0/type'],
@@ -761,6 +932,81 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'The \'id\' property should be a string',
                 '/data/0/relationships/test/data/0/id'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => null]]],
+                'The \'meta\' property should be an array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => 'test']]],
+                'The \'meta\' property should be an array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => ['test']]]],
+                'The \'meta\' property should be an associative array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => null]]],
+                'The \'links\' property should be an array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => 'test']]],
+                'The \'links\' property should be an array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => ['test']]]],
+                'The \'links\' property should be an associative array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => null],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => 'test'],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => ['test']],
+                'The \'jsonapi\' property should be an associative array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => null],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => 'test'],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => ['test']],
+                'The \'meta\' property should be an associative array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => null],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => 'test'],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => ['test']],
+                'The \'links\' property should be an associative array',
+                '/links'
             ]
         ];
     }
@@ -768,7 +1014,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectCollectionWithIncludedResourcesProvider()
+    public function invalidResourceObjectCollectionWithIncludedResourcesProvider(): array
     {
         return array_merge($this->invalidResourceObjectCollectionProvider(), [
             [
@@ -780,6 +1026,16 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ['data' => [['type' => 'products']], 'included' => []],
                 'The \'included\' property should not be empty',
                 '/included'
+            ],
+            [
+                [
+                    'data'     => [['type' => 'products']],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'test' => '1']
+                    ]
+                ],
+                'The \'test\' property is not allowed for a resource object',
+                '/included/0'
             ],
             [
                 [
@@ -878,11 +1134,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIdProvider
      */
     public function testInvalidResourceObjectWithId(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -898,11 +1154,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIdProvider
      */
     public function testInvalidResourceObjectWithIdWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -914,7 +1170,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
     }
 
-    public function invalidResourceObjectWithIdProvider()
+    public function invalidResourceObjectWithIdProvider(): array
     {
         return [
             [
@@ -924,7 +1180,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => ['type' => 'products', 'id' => '2', 'attributes' => ['foo' => 'bar']]],
-                'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
+                'The \'id\' property of the primary data object should match \'id\' parameter of the query string',
                 '/data/id',
                 Constraint::CONFLICT,
                 409
@@ -936,11 +1192,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider
      */
     public function testInvalidResourceObjectCollectionWithRequiredPrimaryResourceId(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -956,11 +1212,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider
      */
     public function testInvalidResourceObjectCollectionWithRequiredPrimaryResourceIdWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -972,7 +1228,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
     }
 
-    public function invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider()
+    public function invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider(): array
     {
         return [
             [
@@ -1032,7 +1288,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidMetaObjectProvider
      */
-    public function testInvalidMetaObject($requestData, $expectedError, $pointer)
+    public function testInvalidMetaObject(array $requestData, string|array $expectedError, string|array $pointer)
     {
         $errors = $this->validator->validateMetaObject($requestData);
 
@@ -1045,7 +1301,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidMetaObjectProvider()
+    public function invalidMetaObjectProvider(): array
     {
         return [
             [[], 'The primary meta object should exist', '/meta'],

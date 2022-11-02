@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -16,18 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("entity")
- * @NamePrefix("oro_api_")
+ * REST API controller for entity field metadata.
  */
-class EntityFieldController extends FOSRestController implements ClassResourceInterface
+class EntityFieldController extends AbstractFOSRestController
 {
     /**
      * Get entity fields.
      *
      * @param Request $request
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
-     *
-     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      *
      * @QueryParam(
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
@@ -63,18 +55,17 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
 
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
+        $options = EntityFieldProvider::OPTION_TRANSLATE;
+        $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withEntityDetails ? EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $options |= $applyExclusions ? EntityFieldProvider::OPTION_APPLY_EXCLUSIONS : 0;
         try {
-            $result = $provider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                $withEntityDetails,
-                $withUnidirectional,
-                $applyExclusions
-            );
+            $result = $provider->getEntityFields($entityName, $options);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 

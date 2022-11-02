@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
@@ -13,52 +13,38 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    protected ConfigManager $configManager;
 
-    /** @var GlobalScopeManager */
-    protected $globalScopeManager;
+    protected SymmetricCrypterInterface $encryptor;
 
-    /** @var SymmetricCrypterInterface */
-    protected $encryptor;
+    private ApplicationState $applicationState;
 
-    /**
-     * SmtpSettingsProvider constructor.
-     *
-     * @param ConfigManager      $configManager
-     * @param GlobalScopeManager $globalScopeManager
-     * @param SymmetricCrypterInterface $encryptor
-     */
     public function __construct(
         ConfigManager $configManager,
-        GlobalScopeManager $globalScopeManager,
-        SymmetricCrypterInterface $encryptor
+        SymmetricCrypterInterface $encryptor,
+        ApplicationState $applicationState
     ) {
         $this->configManager = $configManager;
-        $this->globalScopeManager = $globalScopeManager;
         $this->encryptor = $encryptor;
+        $this->applicationState = $applicationState;
     }
 
     /**
      * @inheritdoc
      */
-    abstract public function getSmtpSettings($scopeIdentifier = null);
-
-    /**
-     * @return SmtpSettings
-     */
-    protected function getGlobalSmtpSettings()
-    {
-        return $this->getConfigurationSmtpSettings($this->globalScopeManager->getScopeId());
-    }
+    abstract public function getSmtpSettings($scopeIdentifier = null): SmtpSettings;
 
     /**
      * @param null|int|object $scopeIdentifier
      *
      * @return SmtpSettings
      */
-    protected function getConfigurationSmtpSettings($scopeIdentifier = null)
+    protected function getConfigurationSmtpSettings($scopeIdentifier = null): SmtpSettings
     {
+        if (!$this->applicationState->isInstalled()) {
+            return new SmtpSettings();
+        }
+
         $host = $this->configManager->get(
             Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_HOST),
             false,
@@ -71,7 +57,7 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterfac
             false,
             $scopeIdentifier
         );
-        $encryption  = $this->configManager->get(
+        $encryption = $this->configManager->get(
             Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_ENC),
             false,
             false,

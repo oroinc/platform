@@ -15,17 +15,17 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     CellEventList.prototype = {
         getEventsMap: function() {
             if (!this.cachedEventList) {
-                var cellEventsList = {};
+                const cellEventsList = {};
                 this.columns.each(function(column) {
                     if (!column.get('renderable')) {
                         return;
                     }
-                    var Cell = column.get('cell');
+                    const Cell = column.get('cell');
                     if (Cell.prototype.delegatedEventBinding && !_.isFunction(Cell.prototype.events)) {
-                        var events = Cell.prototype.events;
+                        const events = Cell.prototype.events;
                         // prevent CS error 'cause we must completely repeat Backbone behaviour
                         // eslint-disable-next-line guard-for-in
-                        for (var eventName in events) {
+                        for (const eventName in events) {
                             if (!cellEventsList.hasOwnProperty(eventName)) {
                                 cellEventsList[eventName] = true;
                             }

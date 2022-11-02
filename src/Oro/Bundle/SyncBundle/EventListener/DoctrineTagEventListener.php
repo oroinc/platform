@@ -4,74 +4,43 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * Collects changes in entities and sends tags to websocket server using DataUpdateTopicSender.
+ * Collects changes in entities and sends tags to websocket server.
  */
-class DoctrineTagEventListener
+class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubscriberInterface
 {
-    /**
-     * @var bool
-     */
-    private $isApplicationInstalled;
+    use OptionalListenerTrait;
 
-    /**
-     * @var array
-     */
-    private $skipTrackingFor = [];
+    private ContainerInterface $container;
+    private ApplicationState $applicationState;
+    private array $skipTrackingFor = [];
+    private array $collectedTags = [];
+    private array $processedEntities = [];
 
-    /**
-     * @var DataUpdateTopicSender
-     */
-    private $dataUpdateTopicSender;
-
-    /**
-     * @var array
-     */
-    private $collectedTags = [];
-
-    /**
-     * @var array
-     */
-    private $processedEntities = [];
-
-    /**
-     * @var TagGeneratorInterface
-     */
-    private $tagGenerator;
-
-    /**
-     * @param DataUpdateTopicSender $dataUpdateTopicSender
-     * @param TagGeneratorInterface $tagGenerator
-     * @param bool|string|null      $isApplicationInstalled
-     */
-    public function __construct(
-        DataUpdateTopicSender $dataUpdateTopicSender,
-        TagGeneratorInterface $tagGenerator,
-        $isApplicationInstalled
-    ) {
-        $this->dataUpdateTopicSender = $dataUpdateTopicSender;
-        $this->isApplicationInstalled = !empty($isApplicationInstalled);
-        $this->tagGenerator = $tagGenerator;
+    public function __construct(ContainerInterface $container, ApplicationState $applicationState)
+    {
+        $this->container = $container;
+        $this->applicationState = $applicationState;
     }
 
     /**
-     * Collect changes that were done
-     * Generates tags and store in protected variable
-     *
-     * @param OnFlushEventArgs $event
+     * Collects changes that were done, generates and stores tags in memory.
      */
-    public function onFlush(OnFlushEventArgs $event)
+    public function onFlush(OnFlushEventArgs $event): void
     {
-        if (!$this->isApplicationInstalled) {
+        if (!$this->enabled || !$this->applicationState->isInstalled()) {
             return;
         }
 
         $uow = $event->getEntityManager()->getUnitOfWork();
-
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $this->addEntityTags($entity, true);
         }
@@ -90,15 +59,22 @@ class DoctrineTagEventListener
     }
 
     /**
-     * Send collected tags to publisher
-     *
-     * @param PostFlushEventArgs $event
+     * Sends collected tags to websocket server.
      */
-    public function postFlush(PostFlushEventArgs $event)
+    public function postFlush(): void
     {
-        $this->dataUpdateTopicSender->send(array_unique($this->collectedTags));
+        if (!$this->enabled || !$this->applicationState->isInstalled()) {
+            return;
+        }
+        if (!$this->collectedTags) {
+            return;
+        }
+
+        $collectedTags = array_unique($this->collectedTags);
         $this->collectedTags = [];
         $this->processedEntities = [];
+
+        $this->getDataUpdateTopicSender()->send($collectedTags);
     }
 
     /**
@@ -106,25 +82,17 @@ class DoctrineTagEventListener
      * to do not send update tags whenever your entity modified
      *
      * @param string $className The FQCN of an entity to be skipped
-     *
-     * @throws \InvalidArgumentException
      */
-    public function markSkipped($className)
+    public function markSkipped(string $className): void
     {
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException(
-                sprintf('The class "%s" does not exist.', $className)
-            );
+            throw new \InvalidArgumentException(sprintf('The class "%s" does not exist.', $className));
         }
 
         $this->skipTrackingFor[$className] = true;
     }
 
-    /**
-     * @param object $entity
-     * @param bool   $includeCollectionTag
-     */
-    private function addEntityTags($entity, $includeCollectionTag = false)
+    private function addEntityTags(object $entity, bool $includeCollectionTag = false): void
     {
         $hash = spl_object_hash($entity);
         if (!isset($this->processedEntities[$hash])
@@ -132,9 +100,30 @@ class DoctrineTagEventListener
         ) {
             $this->collectedTags = array_merge(
                 $this->collectedTags,
-                $this->tagGenerator->generate($entity, $includeCollectionTag)
+                $this->getTagGenerator()->generate($entity, $includeCollectionTag)
             );
             $this->processedEntities[$hash] = true;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
+            'oro_sync.content.data_update_topic_sender' => DataUpdateTopicSender::class
+        ];
+    }
+
+    private function getTagGenerator(): TagGeneratorInterface
+    {
+        return $this->container->get('oro_sync.content.tag_generator');
+    }
+
+    private function getDataUpdateTopicSender(): DataUpdateTopicSender
+    {
+        return $this->container->get('oro_sync.content.data_update_topic_sender');
     }
 }

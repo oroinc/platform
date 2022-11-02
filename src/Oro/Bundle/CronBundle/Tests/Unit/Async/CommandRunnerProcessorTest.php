@@ -3,143 +3,136 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Async;
 
 use Oro\Bundle\CronBundle\Async\CommandRunnerProcessor;
-use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
 class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedTopics()
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRunner;
+
+    /** @var CommandRunnerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $commandRunner;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var CommandRunnerProcessor */
+    private $commandRunnerProcessor;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
-        self::assertEquals([Topics::RUN_COMMAND_DELAYED], CommandRunnerProcessor::getSubscribedTopics());
+        $this->jobRunner = $this->createMock(JobRunner::class);
+        $this->commandRunner = $this->createMock(CommandRunnerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->commandRunnerProcessor = new CommandRunnerProcessor($this->jobRunner, $this->commandRunner);
+        $this->commandRunnerProcessor->setLogger($this->logger);
     }
 
-    public function testShouldRunCommandWithEmptyArgumentsAndLogOutput()
+    /**
+     * @dataProvider jobDataProvider
+     *
+     * @param bool $jobResult
+     * @param string $expectedResult
+     */
+    public function testProcessUniqueJob($jobResult, $expectedResult)
     {
-        $testCommandName = 'oro:cron:test';
-        $testCommandOutput = 'Command OK';
-        $message = new NullMessage();
-        $message->setBody(json_encode(['command' => $testCommandName, 'jobId' => 1]));
+        $commandName = 'test:command';
+        $commandArguments = ['argKey' => 'argVal'];
 
-        $commandRunner = $this->createCommandRunnerMock();
-        $logger = $this->createLoggerMock();
+        $message = new Message();
+        $message->setBody([
+            'command' => $commandName,
+            'arguments' => $commandArguments,
+        ]);
 
-        $commandRunner
-            ->expects(self::once())
-            ->method('run')
-            ->with($testCommandName, [])
-            ->willReturn($testCommandOutput);
+        $this->logger->expects($this->never())
+            ->method('critical');
 
-        $logger
-            ->expects(self::once())
-            ->method('info')
+        $this->jobRunner->expects($this->once())
+            ->method('runUnique')
             ->with(
-                'Ran command '.$testCommandName.'. Got output '.$testCommandOutput,
-                [
-                    'command' => $testCommandName,
-                    'arguments' => [],
-                    'output' => $testCommandOutput
-                ]
-            );
+                null,
+                'oro:cron:run_command:test:command-argKey=argVal',
+                function () use ($commandName, $commandArguments) {
+                }
+            )
+            ->willReturn($jobResult);
+        $this->jobRunner->expects($this->never())
+            ->method('runDelayed');
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects(self::once())
-            ->method('runDelayed')
-            ->will(self::returnCallback(function ($ownerId, $callback) use ($jobRunner) {
-                $callback($jobRunner);
-
-                return true;
-            }));
-
-        $processor = new CommandRunnerProcessor($commandRunner, $jobRunner, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        $session = $this->createMock(SessionInterface::class);
+        $result = $this->commandRunnerProcessor->process($message, $session);
+        $this->assertEquals($expectedResult, $result);
     }
 
-    public function testShouldRunCommandWithArgumentsAndLogOutput()
+    /**
+     * @dataProvider jobDataProvider
+     *
+     * @param bool $jobResult
+     * @param string $expectedResult
+     */
+    public function testProcessDelayedJob($jobResult, $expectedResult)
     {
-        $testCommandName = 'oro:cron:test';
-        $testCommandOutput = 'Command OK';
-        $testArguments = ['--a1' => 'v1', 'a2'];
-        $message = new NullMessage();
-        $message->setBody(
-            json_encode(['command' => $testCommandName, 'arguments' => $testArguments, 'jobId' => 1])
-        );
+        $jobId = 'job_id';
+        $commandName = 'test:command';
+        $commandArguments = ['argKey' => 'argVal'];
 
-        $commandRunner = $this->createCommandRunnerMock();
-        $logger = $this->createLoggerMock();
+        $message = new Message();
+        $message->setBody([
+            'jobId' => $jobId,
+            'command' => $commandName,
+            'arguments' => $commandArguments,
+        ]);
 
-        $commandRunner
-            ->expects(self::once())
-            ->method('run')
-            ->with($testCommandName, $testArguments)
-            ->willReturn($testCommandOutput);
+        $this->logger->expects($this->never())
+            ->method('critical');
 
-        $logger
-            ->expects(self::once())
-            ->method('info')
+        $this->jobRunner->expects($this->never())
+            ->method('runUnique');
+        $this->jobRunner->expects($this->once())
+            ->method('runDelayed')
             ->with(
-                'Ran command '.$testCommandName.'. Got output '.$testCommandOutput,
-                [
-                    'command' => $testCommandName,
-                    'arguments' => $testArguments,
-                    'output' => $testCommandOutput
-                ]
-            );
+                $jobId,
+                function () use ($commandName, $commandArguments) {
+                }
+            )
+            ->willReturn($jobResult);
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects(self::once())
-            ->method('runDelayed')
-            ->will(self::returnCallback(function ($ownerId, $callback) use ($jobRunner) {
-                $callback($jobRunner);
-
-                return true;
-            }));
-
-        $processor = new CommandRunnerProcessor($commandRunner, $jobRunner, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        $session = $this->createMock(SessionInterface::class);
+        $result = $this->commandRunnerProcessor->process($message, $session);
+        $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | JobRunner
-     */
-    private function createJobRunnerMock()
+    public function argumentsDataProvider(): array
     {
-        return $this->getMockBuilder(JobRunner::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return [
+            'bool' => [true],
+            'int' => [1],
+            'float' => [1.01],
+            'string' => ['John Doe'],
+        ];
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
-     */
-    private function createLoggerMock()
+    public function jobDataProvider(): array
     {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | CommandRunnerInterface
-     */
-    private function createCommandRunnerMock()
-    {
-        return $this->createMock(CommandRunnerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
+        return [
+            'ACK' => [
+                'jobResult' => true,
+                'expectedResult' => MessageProcessorInterface::ACK
+            ],
+            'REJECT' => [
+                'jobResult' => false,
+                'expectedResult' => MessageProcessorInterface::REJECT
+            ]
+        ];
     }
 }

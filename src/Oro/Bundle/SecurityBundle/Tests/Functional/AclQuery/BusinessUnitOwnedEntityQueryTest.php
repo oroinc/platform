@@ -7,12 +7,15 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadRolesData;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityDepartment;
 
+/**
+ * @dbIsolationPerTest
+ */
 class BusinessUnitOwnedEntityQueryTest extends AclTestCase
 {
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

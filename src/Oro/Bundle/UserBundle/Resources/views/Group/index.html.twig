@@ -1,9 +1,11 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set gridName = 'groups-grid' %}
 {% set pageTitle = 'oro.user.group.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_user_group_create') %}
         {{ UI.addButton({
             'path': path('oro_user_group_create'),

@@ -3,8 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Listener adds AttributeFamily info to ScrollData
+ */
 class AttributeFamilyFormViewListener
 {
     /**
@@ -12,21 +15,15 @@ class AttributeFamilyFormViewListener
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param BeforeListRenderEvent $event
-     */
     public function onEdit(BeforeListRenderEvent $event)
     {
         $template = $event->getEnvironment()->render(
-            'OroEntityConfigBundle:AttributeFamily:familyField.html.twig',
+            '@OroEntityConfig/AttributeFamily/familyField.html.twig',
             ['form' => $event->getFormView()]
         );
 

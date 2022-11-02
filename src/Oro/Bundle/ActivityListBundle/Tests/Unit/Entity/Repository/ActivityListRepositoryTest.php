@@ -2,107 +2,80 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
+
     /** @var ActivityListRepository */
-    protected $repository;
+    private $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder'))
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
 
         $this->repository = new ActivityListRepository(
             $this->entityManager,
-            new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
+            new ClassMetadata(ActivityList::class)
         );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entityManager, $this->repository);
     }
 
     /**
      * @dataProvider paramsProvider
-     *
-     * @param string    $entityClass
-     * @param integer   $entityId
-     * @param array     $activityClasses
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param integer   $andWhereCount Number of andWhere() calls
-     * @param integer   $setParameterCount Number of setParameter() calls
      */
     public function testGetActivityListQueryBuilder(
-        $entityClass,
-        $entityId,
-        $activityClasses,
-        $dateFrom,
-        $dateTo,
-        $andWhereCount,
-        $setParameterCount
+        string $entityClass,
+        int $entityId,
+        array $activityClasses,
+        ?\DateTime $dateFrom,
+        ?\DateTime $dateTo,
+        int $andWhereCount,
+        int $setParameterCount
     ) {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $expr = $this->createMock('Doctrine\ORM\Query\Expr');
-
+        $qb = $this->createMock(QueryBuilder::class);
+        $expr = $this->createMock(Expr::class);
         $qb->expects($this->once())
             ->method('select')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('from')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('where')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->exactly(2))
             ->method('leftJoin')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->any())
             ->method('orderBy')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->never())
             ->method('groupBy')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->any())
             ->method('expr')
-            ->will($this->returnValue($expr));
-
+            ->willReturn($expr);
         $expr->expects($this->any())
             ->method('in');
-
         $expr->expects($this->any())
             ->method('between');
-
         $qb->expects($this->exactly($andWhereCount))
             ->method('andWhere')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $qb->expects($this->exactly($setParameterCount))
             ->method('setParameter')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         $this->repository->getActivityListQueryBuilder(
             $entityClass,
@@ -113,15 +86,12 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function paramsProvider()
+    public function paramsProvider(): array
     {
-        $now          = new \DateTime();
-        $past         = clone $now;
-        $past         = $past->sub(new \DateInterval("P2M"));
-        $className    = 'Acme\Bundle\AcmeBundle\Entity\Test';
+        $now = new \DateTime();
+        $past = clone $now;
+        $past = $past->sub(new \DateInterval('P2M'));
+        $className = 'Acme\Bundle\AcmeBundle\Entity\Test';
         $activityName = 'Acme\Bundle\AcmeBundle\Activity\Test';
 
         return [

@@ -1,8 +1,3 @@
-doctrine:
-    dbal:
-        types:
-            html_escaped: Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLEscapedType
-
 oro_message_queue:
     persistent_services:
         - 'oro_entity_extend.orm.metadata_factory'

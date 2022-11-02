@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm\Configs;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
+/**
+ * Processes YAML configuration for datagrid's ORM source.
+ */
 class YamlProcessor implements ConfigProcessorInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -22,6 +22,7 @@ class YamlProcessor implements ConfigProcessorInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function processQuery(array $config)
     {

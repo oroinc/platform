@@ -1,7 +1,7 @@
 @ticket-BAP-9497
 @ticket-BAP-15092
 Feature: DataAudit logs acl protection
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+
   Scenario: Create different window session
     Given sessions active:
     | Admin |first_session |

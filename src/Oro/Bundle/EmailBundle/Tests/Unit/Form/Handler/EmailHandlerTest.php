@@ -4,79 +4,83 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    private Form|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /** @var Request */
-    protected $request;
+    private Request $request;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $emailProcessor;
+    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var EmailHandler */
-    protected $handler;
+    private EmailHandler $handler;
 
-    /** @var Email */
-    protected $model;
+    private Email $model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->form                = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(Form::class);
 
-        $this->request             = new Request();
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
 
-        $this->emailProcessor      = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger              = $this->createMock('Psr\Log\LoggerInterface');
-
+        $this->emailModelSender = $this->createMock(EmailModelSender::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->model = new Email();
 
         $this->handler = new EmailHandler(
             $this->form,
             $requestStack,
-            $this->emailProcessor,
+            $this->emailModelSender,
             $this->logger
         );
     }
 
-    public function testProcessGetRequestWithEmptyQueryString()
+    public function testProcessGetRequest(): void
     {
         $this->request->setMethod('GET');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->never())
+        $this->form->expects(self::never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->model));
+        self::assertFalse($this->handler->process($this->model));
+    }
+
+    public function testProcessPostRequestWithInitParam(): void
+    {
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod('POST');
+        $this->request->request->set('_widgetInit', true);
+
+        $this->form->expects(self::once())
+            ->method('setData')
+            ->with($this->model);
+
+        $this->form->expects(self::never())
+            ->method('submit');
+
+        self::assertFalse($this->handler->process($this->model));
     }
 
     /**
-     * @param string $method
-     * @param bool $valid
-     * @param bool $assert
-     *
      * @dataProvider processData
      */
-    public function testProcessData($method, $valid, $assert)
+    public function testProcessData(string $method, bool $valid, bool $assert): void
     {
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
@@ -86,35 +90,33 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
         if (in_array($method, ['POST', 'PUT'])) {
-            $this->form->expects($this->once())
+            $this->form->expects(self::once())
                 ->method('submit')
                 ->with(self::FORM_DATA);
 
-            $this->form->expects($this->once())
+            $this->form->expects(self::once())
                 ->method('isValid')
-                ->will($this->returnValue($valid));
+                ->willReturn($valid);
 
             if ($valid) {
-                $this->emailProcessor->expects($this->once())
-                    ->method('process')
+                $this->emailModelSender->expects(self::once())
+                    ->method('send')
                     ->with($this->model);
             }
         }
 
-        $this->assertEquals($assert, $this->handler->process($this->model));
+        self::assertEquals($assert, $this->handler->process($this->model));
     }
 
     /**
-     * @param string $method
-     *
      * @dataProvider methodsData
      */
-    public function testProcessException($method)
+    public function testProcessException(string $method): void
     {
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
@@ -124,40 +126,40 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('submit')
             ->with(self::FORM_DATA);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $exception = new \Exception('TEST');
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
             ->with($this->model)
-            ->will(
-                $this->returnCallback(
-                    function () use ($exception) {
-                        throw $exception;
-                    }
-                )
-            );
+            ->willReturnCallback(function () use ($exception) {
+                throw $exception;
+            });
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
-            ->with('Email sending failed.', ['exception' => $exception]);
-        $this->form->expects($this->once())
+            ->with(
+                'Failed to send email model to to@example.com: TEST',
+                ['exception' => $exception, 'emailModel' => $this->model]
+            );
+        $this->form->expects(self::once())
             ->method('addError')
-            ->with($this->isInstanceOf('Symfony\Component\Form\FormError'));
-        $this->assertFalse($this->handler->process($this->model));
+            ->with(self::isInstanceOf(FormError::class));
+
+        self::assertFalse($this->handler->process($this->model));
     }
 
-    public function processData()
+    public function processData(): array
     {
         return [
             ['POST', true, true],
@@ -171,7 +173,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function methodsData()
+    public function methodsData(): array
     {
         return [
             ['POST'],

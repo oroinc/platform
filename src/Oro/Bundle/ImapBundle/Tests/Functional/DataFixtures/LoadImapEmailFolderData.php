@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
@@ -31,9 +31,6 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadEmailFolders(ObjectManager $manager)
     {
         $data = [
@@ -65,9 +62,6 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadImapEmailFolders(ObjectManager $manager)
     {
         $data = [

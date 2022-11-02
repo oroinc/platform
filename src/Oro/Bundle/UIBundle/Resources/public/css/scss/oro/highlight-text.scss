@@ -2,11 +2,12 @@
 
 .highlight {
     &-text {
-        span& {
+        @at-root mark#{&} {
             text-decoration: underline;
+            color: inherit;
             background-color: $highlight-text-color;
             font-family: inherit;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             font-size: inherit;
             line-height: inherit;
 
@@ -16,29 +17,32 @@
     }
 
     &-element {
-        &:first-letter {
+        &::first-letter {
             text-transform: none;
         }
 
-        label& {
-            span {
-                font-weight: normal;
+        @at-root label#{&} {
+            mark {
+                font-weight: font-weight('light');
             }
         }
     }
 
-    &-element[class^="fa-"],
-    &-element[class*=" fa-"] {
+    &-element[class^='fa-'],
+    &-element[class*=' fa-'] {
         background-color: $highlight-text-color;
-        box-shadow: 0 -1px 0 0 $highlight-text-color,
-                    2px 0 0 0 $highlight-text-color,
-                    0 1px 0 0 $highlight-text-color,
-                    -2px 0 0 0 $highlight-text-color;
+        box-shadow: $highlight-box-shadow;
+
+        &.tooltip-icon {
+            color: $primary-550;
+        }
     }
 
-    &-element.selector,
-    input&-element,
-    textarea&-element {
+    &-element.selector {
+        background: $highlight-text-color;
+    }
+
+    &-element > .select2-container {
         background: $highlight-text-color;
     }
 
@@ -50,6 +54,8 @@
         padding: $highlight-text-items-switcher-inner-offset;
 
         &__control {
+            font-size: $base-font-size;
+
             &:last-child {
                 display: none;
             }
@@ -66,5 +72,20 @@
                 }
             }
         }
+    }
+}
+
+.select2-container-disabled,
+.selector.disabled {
+    mark {
+        background-color: transparent;
+    }
+}
+
+input,
+textarea,
+select[multiple] {
+    &.highlight-element:not([disabled]) {
+        background: $highlight-text-color;
     }
 }

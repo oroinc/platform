@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var JobQueueView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    JobQueueView = BaseView.extend({
+    const JobQueueView = BaseView.extend({
         events: {
             'click [data-action-name=run-daemon]': 'changeDemonState',
             'click [data-action-name=stop-daemon]': 'changeDemonState',
@@ -19,23 +19,23 @@ define(function(require) {
         intervalId: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function JobQueueView() {
-            JobQueueView.__super__.constructor.apply(this, arguments);
+        constructor: function JobQueueView(options) {
+            JobQueueView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['intervalUpdate']));
-            this.intervalId = setInterval(_.bind(this.checkStatus, this), this.intervalUpdate);
-            JobQueueView.__super__.initialize.apply(this, arguments);
+            this.intervalId = setInterval(this.checkStatus.bind(this), this.intervalUpdate);
+            JobQueueView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -45,7 +45,7 @@ define(function(require) {
                 clearInterval(this.intervalId);
                 this.intervalId = null;
             }
-            JobQueueView.__super__.dispose.apply(this, arguments);
+            JobQueueView.__super__.dispose.call(this);
         },
 
         /**
@@ -56,25 +56,25 @@ define(function(require) {
         changeDemonState: function(e) {
             e.preventDefault();
 
-            var $link = this.$(e.currentTarget);
-            var $loader = this.getActionElement('status').closest('div').find('img');
+            const $link = this.$(e.currentTarget);
+            const $loader = this.getActionElement('status').closest('div').find('img');
 
             $loader.show();
 
-            $.getJSON($link.attr('href'), _.bind(function(data) {
+            $.getJSON($link.attr('href'), data => {
                 if (!data.error) {
                     $link.closest('div')
                         .find('span:first')
                         .toggleClass('label-success label-important')
-                        .text($.isNumeric(data.message) ? __('Running') : __('Not running'))
+                        .text(tools.isNumeric(data.message) ? __('Running') : __('Not running'))
                         .end()
                         .closest('div').find('span:last').text(data.message).end();
 
-                    this.updateButtons(!$.isNumeric(data.message));
+                    this.updateButtons(!tools.isNumeric(data.message));
                 }
 
                 $loader.hide();
-            }, this));
+            });
         },
 
         /**
@@ -85,8 +85,8 @@ define(function(require) {
         toggleStateTrace: function(e) {
             e.preventDefault();
 
-            var $link = this.$(e.currentTarget);
-            var $traces = $link.closest('.stack-trace').find('.traces');
+            const $link = this.$(e.currentTarget);
+            const $traces = $link.closest('.stack-trace').find('.traces');
 
             if ($link.next('.trace').length) {
                 $link.next('.trace').toggle();
@@ -102,15 +102,15 @@ define(function(require) {
          * Checks state of the daemon
          */
         checkStatus: function() {
-            var $statusLink = this.getActionElement('status');
-            var $loader = $statusLink.closest('div').find('img');
+            const $statusLink = this.getActionElement('status');
+            const $loader = $statusLink.closest('div').find('img');
             if (!$statusLink.length) {
                 return;
             }
 
             $loader.show();
 
-            $.get($statusLink.attr('href'), _.bind(function(data) {
+            $.get($statusLink.attr('href'), data => {
                 data = parseInt(data, 10);
 
                 $statusLink
@@ -125,7 +125,7 @@ define(function(require) {
                 this.updateButtons(!data);
 
                 $loader.hide();
-            }, this));
+            });
         },
 
         /**

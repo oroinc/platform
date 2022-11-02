@@ -12,9 +12,7 @@ trait MessageQueueAssertTrait
 {
     use AbstractMessageQueueAssertTrait;
 
-    /**
-     * @var MessageCollector|null
-     */
+    /** @var MessageCollector|null */
     private static $messageCollector;
 
     /**
@@ -43,7 +41,10 @@ trait MessageQueueAssertTrait
         return self::$messageCollector;
     }
 
-    public function clearMessageCollector()
+    /**
+     * Removes all collected sent messages.
+     */
+    protected static function clearMessageCollector()
     {
         if (!isset(self::$messageCollector)) {
             return;

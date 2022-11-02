@@ -13,7 +13,7 @@
         float: left;
 
         input[type='checkbox'] {
-            margin: -2px 2px 0 0;
+            margin: -3px 2px 0 0;
         }
     }
 
@@ -26,6 +26,7 @@
     &__contacts {
         float: left;
         max-width: calc(100% - 84px);
+        margin-left: 6px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -40,7 +41,7 @@
 
         .email-body {
             white-space: normal;
-            color: #777;
+            color: $primary-500;
         }
     }
 }
@@ -52,5 +53,35 @@
 
     .grid-row:not(:first-child) {
         border-top: 1px solid $general-border-color;
+    }
+}
+
+.ui-dialog {
+    .email-form {
+        .form-horizontal {
+            width: 100%;
+
+            .control-group {
+                max-width: 100%;
+
+                /* stylelint-disable selector-max-compound-selectors */
+                .controls {
+                    &:first-child {
+                        margin-left: 0;
+                    }
+                }
+
+                > .control-label {
+                    width: 100%;
+                }
+
+                .email-body-action {
+                    display: block;
+                    margin-right: 0;
+                    margin-bottom: 6px;
+                }
+                /* stylelint-enable selector-max-compound-selectors */
+            }
+        }
     }
 }

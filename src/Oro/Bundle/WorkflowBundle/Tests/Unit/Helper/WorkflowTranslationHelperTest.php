@@ -5,13 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
@@ -26,25 +28,13 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationHelper */
     private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
-        $this->manager = $this->getMockBuilder(TranslationManager::class)->disableOriginalConstructor()->getMock();
-
+        $this->translator = $this->createMock(Translator::class);
+        $this->manager = $this->createMock(TranslationManager::class);
         $this->translationHelper = $this->createMock(TranslationHelper::class);
 
         $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->translator, $this->manager, $this->helper, $this->translationHelper);
     }
 
     public function testFindWorkflowTranslations()
@@ -67,43 +57,40 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findTranslationProvider
-     *
-     * @param string|null $locale
-     * @param string|null $value
      */
-    public function testFindWorkflowTranslation($locale, $value)
+    public function testFindWorkflowTranslation(?string $locale, ?string $value)
     {
         $key = 'oro.workflow.test_workflow.test.key';
         $workflowName = 'test_workflow';
         $translatorLocale = 'jp';
         $fallbackValue = 'fallback data';
 
-        $this->translator->expects($this->any())->method('getLocale')->willReturn($translatorLocale);
+        $this->translator->expects($this->any())
+            ->method('getLocale')
+            ->willReturn($translatorLocale);
 
         $this->translationHelper->expects($this->any())
             ->method('findValues')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
-                        $locale,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        ['key1' => 'value1', 'key2' => 'value2', $key => $value]
-                    ],
-                    [
-                        WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
-                        $translatorLocale,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        ['key1' => 'value1', 'key2' => 'value2', $key => $value]
-                    ],
-                    [
-                        WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
-                        Translator::DEFAULT_LOCALE,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        ['key1' => 'value1', 'key2' => 'value2', $key => $fallbackValue]
-                    ],
-                ]
-            );
+                    WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
+                    $locale,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    ['key1' => 'value1', 'key2' => 'value2', $key => $value]
+                ],
+                [
+                    WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
+                    $translatorLocale,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    ['key1' => 'value1', 'key2' => 'value2', $key => $value]
+                ],
+                [
+                    WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
+                    Translator::DEFAULT_LOCALE,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    ['key1' => 'value1', 'key2' => 'value2', $key => $fallbackValue]
+                ],
+            ]);
 
         $this->assertEquals(
             $value ?: $fallbackValue,
@@ -113,7 +100,9 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveTranslation()
     {
-        $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
+        $this->translator->expects($this->exactly(2))
+            ->method('getLocale')
+            ->willReturn('en');
         $this->manager->expects($this->exactly(2))
             ->method('saveTranslation')
             ->with(
@@ -129,19 +118,26 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveTranslationWithNotDefaultLocale()
     {
-        $this->translator->expects($this->once())->method('getLocale')->willReturn('pl');
+        $this->translator->expects($this->once())
+            ->method('getLocale')
+            ->willReturn('pl');
 
-        $this->manager->expects($this->at(0))
+        $this->manager->expects($this->exactly(2))
             ->method('saveTranslation')
-            ->with('test_key', 'test_value', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        $this->manager->expects($this->at(1))
-            ->method('saveTranslation')
-            ->with(
-                'test_key',
-                'test_value',
-                Translator::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                Translation::SCOPE_UI
+            ->withConsecutive(
+                [
+                    'test_key',
+                    'test_value',
+                    'pl',
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                ],
+                [
+                    'test_key',
+                    'test_value',
+                    Translator::DEFAULT_LOCALE,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    Translation::SCOPE_UI
+                ]
             );
 
         $this->helper->saveTranslation('test_key', 'test_value');
@@ -149,7 +145,9 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveTranslationAsSystem()
     {
-        $this->translator->expects($this->once())->method('getLocale')->willReturn('en');
+        $this->translator->expects($this->once())
+            ->method('getLocale')
+            ->willReturn('en');
         $this->manager->expects($this->once())
             ->method('saveTranslation')
             ->with(
@@ -164,50 +162,44 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findTranslationProvider
-     *
-     * @param string|null $locale
-     * @param string $value
      */
-    public function testFindTranslation($locale, $value)
+    public function testFindTranslation(?string $locale, ?string $value)
     {
         $key = 'oro.workflow.test_workflow.test.key';
         $translatorLocale = 'jp';
         $fallbackValue = 'fallback data';
 
-        $this->translator->expects($this->any())->method('getLocale')->willReturn($translatorLocale);
+        $this->translator->expects($this->any())
+            ->method('getLocale')
+            ->willReturn($translatorLocale);
 
         $this->translationHelper->expects($this->any())
             ->method('findValue')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        $key,
-                        $locale,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        $value
-                    ],
-                    [
-                        $key,
-                        $translatorLocale,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        $value
-                    ],
-                    [
-                        $key,
-                        Translator::DEFAULT_LOCALE,
-                        WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                        $fallbackValue
-                    ],
-                ]
-            );
+                    $key,
+                    $locale,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    $value
+                ],
+                [
+                    $key,
+                    $translatorLocale,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    $value
+                ],
+                [
+                    $key,
+                    Translator::DEFAULT_LOCALE,
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                    $fallbackValue
+                ],
+            ]);
 
         $this->assertEquals($value ?: $fallbackValue, $this->helper->findTranslation($key, $locale));
     }
 
-    /**
-     * @return array
-     */
-    public function findTranslationProvider()
+    public function findTranslationProvider(): array
     {
         return [
             'with locale' => [
@@ -227,37 +219,34 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFlushTranslations()
     {
-        $this->manager->expects($this->once())->method('flush');
+        $this->manager->expects($this->once())
+            ->method('flush');
 
         $this->helper->flushTranslations();
     }
 
     /**
-     * @param string|null $expected
-     *
      * @dataProvider findValueDataProvider
      */
-    public function testFindValue($expected)
+    public function testFindValue(?string $expected)
     {
         $key = 'key';
         $locale = null;
 
-        $this->translationHelper->expects($this->once())->method('findValue')->with(
-            $key,
-            $locale,
-            WorkflowTranslationHelper::TRANSLATION_DOMAIN
-        )->willReturn($expected);
+        $this->translationHelper->expects($this->once())
+            ->method('findValue')
+            ->with($key, $locale, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $this->helper->findValue($key, $locale));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function findValueDataProvider()
+    public function findValueDataProvider(): array
     {
-        yield 'string value' => ['expected' => 'string'];
-        yield 'null value' => ['expected' => null];
+        return [
+            'string value' => ['expected' => 'string'],
+            'null value' => ['expected' => null]
+        ];
     }
 
     public function testGenerateDefinitionTranslationKeys()
@@ -309,19 +298,5 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
             ],
             $this->helper->generateDefinitionTranslationKeys($definition)
         );
-    }
-
-    /**
-     * @param string $workflowName
-     * @return TranslationKeySource
-     */
-    protected function getWorkflowSource($workflowName)
-    {
-        $translationKeySource = new TranslationKeySource(
-            new WorkflowTemplate(),
-            ['workflow_name' => $workflowName]
-        );
-
-        return $translationKeySource;
     }
 }

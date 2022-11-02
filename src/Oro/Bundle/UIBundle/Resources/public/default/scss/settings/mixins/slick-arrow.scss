@@ -1,0 +1,128 @@
+/* @theme: default; */
+
+// mixin for Slick Arrows
+@mixin slick-arrow(
+    $slick-arrow-position: absolute,
+    $slick-arrow-top: 50%,
+    $slick-arrow-transform: translateY(-50%),
+    $slick-arrow-z-index: z('base'),
+
+    $slick-arrow-width: auto,
+    $slick-arrow-height: auto,
+    $slick-arrow-display: null,
+    $slick-arrow-inner-offset: 0,
+
+    $slick-arrow-font-size: 0,
+    $slick-arrow-line-height: 0,
+    $slick-arrow-text-align: center,
+    $slick-arrow-outline: null,
+    $slick-arrow-color: transparent,
+
+    $slick-arrow-background: none,
+    $slick-arrow-hover-background: null,
+    $slick-arrow-border: none,
+    $slick-arrow-border-radius: null,
+
+    $slick-arrow-focus-visible: $base-ui-bth-focus-style,
+
+    $slick-arrow-focus-background: null,
+
+    $slick-arrow-next-right: 0,
+    $slick-arrow-prev-left: 0,
+
+    $slick-arrow-icon-size: $base-font-size,
+    $slick-arrow-icon-color: get-color('additional', 'middle'),
+    $slick-arrow-icon-hover-color: get-color('additional', 'dark'),
+    $slick-arrow-icon-focus-color: get-color('additional', 'dark'),
+    $slick-arrow-icon-display: block,
+
+    $slick-arrow-prev-icon: var(--fa-var-angle-left),
+    $slick-arrow-next-icon: var(--fa-var-angle-right),
+
+    $slick-arrow-next-icon-offset: null,
+    $slick-arrow-prev-icon-offset: null,
+
+    $slick-arrow-disabled-opacity: .5,
+    $slick-arrow-disabled-cursor: default
+) {
+    .slick-arrow {
+        position: $slick-arrow-position;
+        top: $slick-arrow-top;
+        transform: $slick-arrow-transform;
+        z-index: $slick-arrow-z-index;
+
+        width: $slick-arrow-width;
+        height: $slick-arrow-height;
+        display: $slick-arrow-display;
+        padding: $slick-arrow-inner-offset;
+
+        outline: $slick-arrow-outline;
+        font-size: $slick-arrow-font-size;
+        line-height: $slick-arrow-line-height;
+        text-align: $slick-arrow-text-align;
+
+        background: $slick-arrow-background;
+        color: $slick-arrow-color;
+        border: $slick-arrow-border;
+        border-radius: $slick-arrow-border-radius;
+
+        cursor: pointer;
+
+        &.focus-visible {
+            box-shadow: $slick-arrow-focus-visible;
+        }
+
+        &::before,
+        &::after {
+            display: $slick-arrow-icon-display;
+
+            font-size: $slick-arrow-icon-size;
+
+            color: $slick-arrow-icon-color;
+        }
+
+        @include element-state('hover') {
+            background: $slick-arrow-hover-background;
+
+            &::before,
+            &::after {
+                color: $slick-arrow-icon-hover-color;
+            }
+        }
+
+        @include element-state('focus') {
+            background: $slick-arrow-focus-background;
+
+            &::before,
+            &::after {
+                color: $slick-arrow-icon-focus-color;
+            }
+        }
+    }
+
+    .slick-prev {
+        left: $slick-arrow-prev-left;
+
+        @include fa-icon($slick-arrow-prev-icon, before, false, true);
+
+        &::before {
+            margin: $slick-arrow-prev-icon-offset;
+        }
+    }
+
+    .slick-next {
+        right: $slick-arrow-next-right;
+
+        @include fa-icon($slick-arrow-next-icon, after, false, true);
+
+        &::after {
+            margin: $slick-arrow-next-icon-offset;
+        }
+    }
+
+    .slick-disabled {
+        cursor: $slick-arrow-disabled-cursor;
+
+        opacity: $slick-arrow-disabled-opacity;
+    }
+}

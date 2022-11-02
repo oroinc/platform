@@ -13,6 +13,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Config\Common\ConfigObject;
 
 /**
+ * Responsibility of channel is to split on groups transport/connectors by third party application type.
+ *
  * @ORM\Table(
  *      name="oro_integration_channel",
  *      indexes={
@@ -32,9 +34,6 @@ use Oro\Component\Config\Common\ConfigObject;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true
@@ -363,26 +362,6 @@ class Channel implements OrganizationAwareInterface
     }
 
     /**
-     * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
-     * @see \Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
-     * @param string $connector
-     * @param int|null $codeFilter
-     *
-     * @return ArrayCollection
-     */
-    public function getStatusesForConnector($connector, $codeFilter = null)
-    {
-        return $this->statuses->filter(
-            function (Status $status) use ($connector, $codeFilter) {
-                $connectorFilter = $status->getConnector() === $connector;
-                $codeFilter      = $codeFilter === null ? true : $status->getCode() == $codeFilter;
-
-                return $connectorFilter && $codeFilter;
-            }
-        );
-    }
-
-    /**
      * @param User $owner
      *
      * @return $this
@@ -432,16 +411,6 @@ class Channel implements OrganizationAwareInterface
         $this->enabled = $enabled;
 
         return $this;
-    }
-
-    /**
-     *
-     * @deprecated in favor of isEnabled since 1.4.1 will be removed in 1.6
-     * @return boolean
-     */
-    public function getEnabled()
-    {
-        return $this->isEnabled();
     }
 
     /**

@@ -4,43 +4,45 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\ObjectType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class ObjectTypeTest extends TypeTestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class ObjectTypeTest extends ApiFormTypeTestCase
 {
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
                 [new ObjectType($this->getFormHelper())],
-                []
+                $this->getApiTypeExtensions()
             )
         ];
     }
 
-    /**
-     * @return FormHelper
-     */
-    protected function getFormHelper()
+    private function getFormHelper(): FormHelper
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(DataTypeGuesser::class),
             $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );
@@ -48,7 +50,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
 
         $config = new EntityDefinitionConfig();
@@ -71,7 +73,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForRenamedField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'))
             ->setPropertyPath('name');
 
@@ -95,7 +97,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForFieldWithFormType()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
 
         $config = new EntityDefinitionConfig();
@@ -118,7 +120,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForFieldWithFormOptions()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'));
 
         $config = new EntityDefinitionConfig();
@@ -141,7 +143,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForIgnoredField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -165,7 +167,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForFieldIgnoredOnlyForGetActions()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
 
         $config = new EntityDefinitionConfig();
@@ -189,7 +191,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testBuildFormForAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('integer');
 
         $config = new EntityDefinitionConfig();
@@ -215,7 +217,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testCreateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -246,7 +248,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testCreateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -277,7 +279,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsNull()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -308,7 +310,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -339,7 +341,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testUpdateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -372,7 +374,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testUpdateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -405,7 +407,7 @@ class ObjectTypeTest extends TypeTestCase
 
     public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 

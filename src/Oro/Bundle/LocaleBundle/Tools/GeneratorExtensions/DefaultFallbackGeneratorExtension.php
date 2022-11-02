@@ -1,165 +1,136 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions;
 
-use CG\Generator\PhpClass;
-use CG\Generator\PhpParameter;
-use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
+use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
+use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;
+use Oro\Component\PhpUtils\ClassGenerator;
 
+/**
+ * Generates getters and setters for default fallback fields.
+ */
 class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
 {
-    /**
-     * @var array Array contains classes and fields which are configured to be extended with default getter
-     */
-    protected $methodExtensions = [];
+    private EntityFallbackFieldsStorage $storage;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(array $schema)
-    {
-        return isset($schema['class'], $this->methodExtensions[$schema['class']]);
+    private DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider;
+
+    public function __construct(
+        EntityFallbackFieldsStorage $storage,
+        DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider
+    ) {
+        $this->storage = $storage;
+        $this->defaultFallbackMethodsNamesProvider = $defaultFallbackMethodsNamesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(array $schema, PhpClass $class)
+    public function supports(array $schema): bool
+    {
+        return isset($schema['class'], $this->storage->getFieldMap()[$schema['class']]);
+    }
+
+    public function generate(array $schema, ClassGenerator $class): void
     {
         if (!$this->supports($schema)) {
             return;
         }
 
-        $fields = $this->methodExtensions[$schema['class']];
-
+        $fields = $this->storage->getFieldMap()[$schema['class']];
         if (empty($fields)) {
             return;
         }
 
-        $class->setParentClassName(ExtendFallback::class);
-        $class->addUseStatement(Localization::class);
-        $class->addUseStatement(LocalizedFallbackValue::class);
+        $class->setExtends(ExtendFallback::class);
 
         foreach ($fields as $singularName => $fieldName) {
             $this->generateGetter($singularName, $fieldName, $class);
             $this->generateDefaultGetter($singularName, $fieldName, $class);
             $this->generateDefaultSetter($singularName, $fieldName, $class);
         }
+
+        $this->generateCloneLocalizedFallbackValueAssociationsMethod($fields, $class);
     }
 
     /**
-     * Add class name and fields to data structure which contains the name of the classes and their fields,
-     * which will be extended
-     *
-     * @param string $className
-     * @param array $fields
+     * Generates code for a getter method
      */
-    public function addDefaultMethodFields($className, array $fields)
+    protected function generateGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        if (isset($this->methodExtensions[$className])) {
-            $this->methodExtensions[$className] = array_merge($this->methodExtensions[$className], $fields);
-        } else {
-            $this->methodExtensions[$className] = $fields;
-        }
-    }
-
-    /**
-     * Generate the code for getter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
-     */
-    protected function generateGetter($singularName, $fieldName, PhpClass $class)
-    {
-        $getter = $this->getMethodName($singularName, 'get');
-        $methodBody = sprintf('return $this->getFallbackValue($this->%s, $localization);', $fieldName);
-
-        $localization = PhpParameter::create('localization')
-            ->setType(Localization::class)
-            ->setDefaultValue(null);
-
-        $method = $this->generateClassMethod($getter, $methodBody);
-        $method->setDocblock(
-            $this->generateDocblock(
-                ['Localization|null' =>'$localization'],
-                'LocalizedFallbackValue|null'
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getGetterMethodName($singularName))
+            ->addBody(\sprintf('return $this->getFallbackValue($this->%s, $localization);', $fieldName))
+            ->addComment(
+                $this->generateDocblock(
+                    [\sprintf('\%s|null', Localization::class) =>'$localization'],
+                    \sprintf('\%s|null', LocalizedFallbackValue::class)
+                )
             )
-        );
-        $method->setParameters([$localization]);
-        $class->setMethod($method);
+            ->addParameter('localization')->setType(Localization::class)->setDefaultValue(null);
     }
 
     /**
-     * Generate the code for default getter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
+     * Generates code for the default getter method
      */
-    protected function generateDefaultGetter($singularName, $fieldName, PhpClass $class)
+    protected function generateDefaultGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $defaultGetter = $this->getMethodName($singularName, 'getDefault');
-        $methodBody = sprintf('return $this->getDefaultFallbackValue($this->%s);', $fieldName);
-
-        $method = $this->generateClassMethod($defaultGetter, $methodBody);
-        $method->setDocblock($this->generateDocblock([], 'LocalizedFallbackValue|null'));
-        $class->setMethod($method);
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getDefaultGetterMethodName($singularName))
+            ->addBody(\sprintf('return $this->getDefaultFallbackValue($this->%s);', $fieldName))
+            ->addComment($this->generateDocblock([], \sprintf('\%s|null', LocalizedFallbackValue::class)));
     }
 
     /**
-     * Generate the code for default setter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
+     * Generates code for the default setter method
      */
-    protected function generateDefaultSetter($singularName, $fieldName, PhpClass $class)
+    protected function generateDefaultSetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $defaultSetter = $this->getMethodName($singularName, 'setDefault');
-
-        $methodBody = sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName);
-
-        $method = $this->generateClassMethod($defaultSetter, $methodBody);
-        $method->setDocblock($this->generateDocblock(['string' =>  '$value'], '$this'));
-        $method->setParameters([PhpParameter::create('value')]);
-
-        $class->setMethod($method);
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getDefaultSetterMethodName($singularName))
+            ->addBody(\sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName))
+            ->addComment($this->generateDocblock(['string' => '$value'], '$this'))
+            ->addParameter('value');
     }
 
     /**
-     * @param array $params
-     * @param string $return
-     * @return string
+     * Generates code for the cloneLocalizedFallbackValueAssociations method
      */
-    protected function generateDocblock(array $params, $return = null)
+    protected function generateCloneLocalizedFallbackValueAssociationsMethod(array $fields, ClassGenerator $class): void
     {
-        $parts = ['/**'];
+        $fieldNames = !empty($fields) ? '["' . implode('", "', $fields) . '"]' : '[]';
+
+        $methodBody = <<<METHOD_BODY
+foreach ($fieldNames as \$propertyName) {
+    \$newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+
+    foreach (\$this->\$propertyName as \$element) {
+        \$newCollection->add(clone \$element);
+    }
+
+    \$this->\$propertyName = \$newCollection;
+}
+
+return \$this;
+METHOD_BODY;
+
+        $class->addMethod('cloneLocalizedFallbackValueAssociations')
+            ->addBody($methodBody)
+            ->addComment('Clones a collections of LocalizedFallbackValue associations.')
+            ->setReturnType('self');
+    }
+
+    protected function generateDocblock(array $params, string $return = null): string
+    {
+        $parts = [];
 
         foreach ($params as $type => $param) {
-            $parts[] = sprintf(' * @param %s %s', $type, $param);
+            $parts[] = \sprintf('@param %s %s', $type, $param);
         }
 
         if ($return) {
-            $parts[] = sprintf(' * @return %s', $return);
+            $parts[] = \sprintf('@return %s', $return);
         }
 
-        $parts[] = ' */';
-
-        return implode("\n", $parts);
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $prefix
-     * @return string
-     */
-    protected function getMethodName($fieldName, $prefix)
-    {
-        return $prefix . ucfirst(Inflector::camelize($fieldName));
+        return \implode("\n", $parts);
     }
 }

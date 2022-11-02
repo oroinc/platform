@@ -16,9 +16,6 @@ class SearchResultProperty extends TwigTemplateProperty
     /**  @var SearchMappingProvider */
     protected $mappingProvider;
 
-    /**
-     * @param SearchMappingProvider $mappingProvider
-     */
     public function setMappingProvider(SearchMappingProvider $mappingProvider)
     {
         $this->mappingProvider = $mappingProvider;
@@ -44,7 +41,8 @@ class SearchResultProperty extends TwigTemplateProperty
             $this->params->offsetSet('template', $searchTemplate);
         }
 
-        return $this->getTemplate()->render(
+        return $this->environment->render(
+            $this->get(self::TEMPLATE_KEY),
             [
                 'indexer_item' => $record->getValue('indexer_item'),
                 'entity'       => $record->getValue('entity'),

@@ -16,7 +16,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
@@ -29,13 +29,6 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     /** @var AbstractRole */
     protected $role;
 
-    /**
-     * @param TranslatorInterface           $translator
-     * @param PermissionManager             $permissionManager
-     * @param AclRoleHandler                $aclRoleHandler
-     * @param RolePrivilegeCategoryProvider $categoryProvider
-     * @param ConfigManager                 $configEntityManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,

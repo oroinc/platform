@@ -9,5 +9,3 @@ response:
     count: 3
     rest:
         data: []
-    soap:
-        item: []

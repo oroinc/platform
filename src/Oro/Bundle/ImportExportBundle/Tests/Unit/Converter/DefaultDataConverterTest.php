@@ -3,23 +3,19 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var DefaultDataConverter */
+    private $dataConverter;
 
-    /**
-     * @var DefaultDataConverter
-     */
-    protected $dataConverter;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataConverter = new DefaultDataConverter();
     }
 
     /**
-     * @param array $importedRecord
-     * @param array $exportedRecord
      * @dataProvider convertDataProvider
      */
     public function testConvertImportExport(array $importedRecord, array $exportedRecord)
@@ -28,47 +24,44 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($importedRecord, $this->dataConverter->convertToImportFormat($exportedRecord));
     }
 
-    /**
-     * @return array
-     */
-    public function convertDataProvider()
+    public function convertDataProvider(): array
     {
-        return array(
-            'no data' => array(
-                'importedRecord' => array(),
-                'exportedRecord' => array(),
-            ),
-            'plain data' => array(
-                'importedRecord' => array(
+        return [
+            'no data' => [
+                'importedRecord' => [],
+                'exportedRecord' => [],
+            ],
+            'plain data' => [
+                'importedRecord' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                ),
-                'exportedRecord' => array(
+                ],
+                'exportedRecord' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                ),
-            ),
-            'complex data' => array(
-                'importedRecord' => array(
+                ],
+            ],
+            'complex data' => [
+                'importedRecord' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                    'emails' => array(
+                    'emails' => [
                         'john@qwerty.com',
                         'doe@qwerty.com',
-                    ),
-                    'addresses' => array(
-                        array(
+                    ],
+                    'addresses' => [
+                        [
                             'street'     => 'First Street',
                             'postalCode' => '12345',
-                        ),
-                        array(
+                        ],
+                        [
                             'street'     => 'Second Street',
                             'street2'    => '2nd',
                             'postalCode' => '98765',
-                        ),
-                    ),
-                ),
-                'exportedRecord' => array(
+                        ],
+                    ],
+                ],
+                'exportedRecord' => [
                     'firstName'              => 'John',
                     'lastName'               => 'Doe',
                     'emails:0'               => 'john@qwerty.com',
@@ -78,9 +71,9 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
                     'addresses:1:street'     => 'Second Street',
                     'addresses:1:street2'    => '2nd',
                     'addresses:1:postalCode' => '98765',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     public function testConvertToExportFormatTypeCasting()
@@ -107,29 +100,27 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->dataConverter->convertToExportFormat($testData));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Delimiter ":" is not allowed in keys
-     */
     public function testConvertToExportFormatIncorrectKey()
     {
-        $invalidImportedRecord = array(
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Delimiter ":" is not allowed in keys');
+
+        $invalidImportedRecord = [
             'owner:firstName' => 'John'
-        );
+        ];
 
         $this->dataConverter->convertToExportFormat($invalidImportedRecord);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Can't set nested value under key "owner"
-     */
     public function testConvertToImportIncorrectKey()
     {
-        $invalidExportedRecord = array(
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Can\'t set nested value under key "owner"');
+
+        $invalidExportedRecord = [
             'owner'           => 'John Doe',
             'owner:firstName' => 'John',
-        );
+        ];
 
         $this->dataConverter->convertToImportFormat($invalidExportedRecord);
     }

@@ -39,9 +39,6 @@ abstract class TemplateTestCase extends \PHPUnit\Framework\TestCase
         $this->assertSame($name, $this->getTemplateInstance()->getName());
     }
 
-    /**
-     * @param array $templates
-     */
     protected function assertKeyTemplates(array $templates)
     {
         $this->assertEquals($templates, $this->getTemplateInstance()->getKeyTemplates());

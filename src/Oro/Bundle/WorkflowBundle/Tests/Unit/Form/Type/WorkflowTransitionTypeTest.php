@@ -2,29 +2,29 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
-    /**
-     * @var WorkflowTransitionType
-     */
-    protected $type;
+    /** @var WorkflowTransitionType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new WorkflowTransitionType();
     }
 
-    /**
-     * @return array
-     */
     protected function getExtensions()
     {
         return [
@@ -44,34 +44,28 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testBuildForm()
     {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(FormBuilderInterface::class);
 
         $workflowItem = new WorkflowItem();
 
         $transitionName = 'test';
-        $transition = $this->createMock('Oro\Bundle\WorkflowBundle\Model\Transition');
-        $transition->expects($this->once())->method('getName')->will($this->returnValue($transitionName));
+        $transition = $this->createMock(Transition::class);
+        $transition->expects($this->once())
+            ->method('getName')
+            ->willReturn($transitionName);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $aclManager = $this->createMock(AclManager::class);
+        $restrictionManager = $this->createMock(RestrictionManager::class);
 
         $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
-        $workflow->getTransitionManager()->setTransitions(array($transition));
+        $workflow->getTransitionManager()->setTransitions([$transition]);
 
-        $options = array(
+        $options = [
             'workflow' => $workflow,
             'workflow_item' => $workflowItem,
             'transition_name' => $transitionName,
-        );
+        ];
         $this->type->buildForm($builder, $options);
     }
 

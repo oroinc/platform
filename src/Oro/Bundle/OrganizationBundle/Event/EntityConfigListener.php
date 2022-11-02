@@ -7,10 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
+/**
+ * Updates entity 'ownership' config.
+ */
 class EntityConfigListener
 {
     /**
-     * @param PreFlushConfigEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preFlush(PreFlushConfigEvent $event)
     {

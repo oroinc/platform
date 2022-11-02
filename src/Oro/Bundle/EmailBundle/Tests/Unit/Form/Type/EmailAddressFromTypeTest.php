@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -10,21 +12,15 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class EmailAddressFromTypeTest extends TypeTestCase
 {
-    protected $tokenAccessor;
-    protected $relatedEmailsProvider;
-    protected $mailboxManager;
+    private $tokenAccessor;
+    private $relatedEmailsProvider;
+    private $mailboxManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
+        $this->mailboxManager = $this->createMock(MailboxManager::class);
 
         parent::setUp();
     }
@@ -41,15 +37,15 @@ class EmailAddressFromTypeTest extends TypeTestCase
         $user = new User();
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->relatedEmailsProvider->expects($this->once())
             ->method('getEmails')
-            ->will($this->returnValue($relatedEmails));
+            ->willReturn($relatedEmails);
 
         $this->mailboxManager->expects($this->once())
             ->method('findAvailableMailboxEmails')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $form = $this->factory->create(EmailAddressFromType::class);
 
@@ -60,6 +56,9 @@ class EmailAddressFromTypeTest extends TypeTestCase
         $this->assertEquals($formData, $form->getData());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getExtensions()
     {
         return [

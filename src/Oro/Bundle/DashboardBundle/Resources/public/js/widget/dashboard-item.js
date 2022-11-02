@@ -1,42 +1,34 @@
-define([
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oro/block-widget',
-    'oroui/js/delete-confirmation',
-    'tpl!orodashboard/templates/widget/dashboard-item.html'
-], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation, dashboardItemTpl) {
+define(function(require) {
     'use strict';
 
-    var DashboardItemWidget;
-    var $ = Backbone.$;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BlockWidget = require('oro/block-widget');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const dashboardItemTpl = require('tpl-loader!orodashboard/templates/widget/dashboard-item.html');
+    const $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
      * @class   orodashboard.DashboardItemWidget
      * @extends oro.BlockWidget
      */
-    DashboardItemWidget = BlockWidget.extend({
+    const DashboardItemWidget = BlockWidget.extend({
         /**
          * Widget events
          *
          * @property {Object}
          */
         widgetEvents: {
-            'click .collapse-expand-action-container .collapse-action': function(event) {
-                event.preventDefault();
-                if (this.state.expanded) {
-                    this.collapse();
-                } else {
-                    this.expand();
-                }
-            },
-            'click .default-actions-container .remove-action': function(event) {
+            'show.bs.collapse': 'onExpand',
+            'hide.bs.collapse': 'onCollapse',
+            'click [data-remove-action]'(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
             },
-            'click .default-actions-container .configure-action': function(event) {
+            'click [data-configure-action]'(event) {
                 event.preventDefault();
                 this.onConfigure();
             }
@@ -67,10 +59,10 @@ define([
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DashboardItemWidget() {
-            DashboardItemWidget.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardItemWidget(options) {
+            DashboardItemWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -78,17 +70,35 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.options.templateParams.allowEdit = this.options.allowEdit;
-            this.options.templateParams.collapsed = options.state.expanded;
-            this.options.templateParams.showConfig = this.options.showConfig;
+        initialize(options) {
+            this.options = Object.assign({}, this.options, options || {});
+            const {widgetName, allowEdit, state, showConfig} = this.options;
+            this.options.templateParams = Object.assign({}, this.options.templateParams, {
+                allowEdit,
+                expanded: state.expanded,
+                showConfig,
+                headerClass: widgetName ? widgetName.split('_').join('-') + '-widget-header' : ''
+            });
 
             if (!this.options.title) {
                 this.options.title = this.$el.data('widget-title');
             }
 
-            DashboardItemWidget.__super__.initialize.apply(this, arguments);
+            DashboardItemWidget.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritdoc
+         */
+        render() {
+            if (this.isCollapsed()) {
+                this.widgetContentContainer.attr('data-layout', 'separate');
+                this.listenToOnce(this, 'expand', () => {
+                    this.widgetContentContainer.removeAttr('data-layout');
+                    this.render();
+                });
+            }
+            return DashboardItemWidget.__super__.render.call(this);
         },
 
         /**
@@ -96,14 +106,14 @@ define([
          *
          * @param {Object} options
          */
-        initializeWidget: function(options) {
+        initializeWidget(options) {
             this._initState(options);
-            DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
+            DashboardItemWidget.__super__.initializeWidget.call(this, options);
         },
 
         _afterLayoutInit: function() {
             this.$el.removeClass('invisible');
-            DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
+            DashboardItemWidget.__super__._afterLayoutInit.call(this);
         },
 
         /**
@@ -112,105 +122,42 @@ define([
          * @param {Object} options
          * @private
          */
-        _initState: function(options) {
+        _initState(options) {
             if (options.state) {
                 this.state = _.extend({}, this.state, options.state);
             }
 
-            if (this.state.layoutPosition) {
-                this.state.layoutPosition = _.map(
-                    this.state.layoutPosition,
-                    function(value) {
-                        return parseInt(value);
-                    }
-                );
+            if (this.state.layoutPosition instanceof Array) {
+                this.state.layoutPosition = this.state.layoutPosition.map(value => parseInt(value));
+            } else {
+                this.state.layoutPosition = [0, 0];
             }
 
             if (!this.state.id) {
                 throw new Error('Dashboard widget id should be defined.');
             }
-
-            this.once('renderComplete', this._initWidgetCollapseState);
         },
 
         /**
-         * Set initial widget collapse state
+         * Handles bootstrap collapse hide event
          */
-        _initWidgetCollapseState: function() {
-            if (this.isCollapsed()) {
-                this._setCollapsed(true);
-            } else {
-                this._setExpanded(true);
-            }
-        },
-
-        /**
-         * Collapse widget
-         */
-        collapse: function() {
-            this._setCollapsed();
-        },
-
-        /**
-         * Set collapsed state
-         *
-         * @param {Boolean} isInit
-         */
-        _setCollapsed: function(isInit) {
-            if (this.widgetContentContainer.is(':animated')) {
-                return;
-            }
-
+        onCollapse() {
             this.state.expanded = false;
-            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
-            collapseControl.attr('title', collapseControl.data('collapsed-title')).toggleClass('collapsed');
 
-            if (isInit) {
-                this.widget.addClass('collapsed');
-                this.widgetContentContainer.slideUp('slow');
-            } else {
-                this.trigger('collapse', this.$el, this);
-                mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
-                var self = this;
-                this.widgetContentContainer.slideUp({
-                    complete: function() {
-                        self.widget.addClass('collapsed');
-                    }
-                });
-            }
+            this.trigger('collapse', this.$el, this);
+            mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
         },
 
         /**
-         * Expand widget
+         * Handles bootstrap collapse show event
          */
-        expand: function() {
-            this._setExpanded();
-        },
-
-        /**
-         * Set expanded state
-         *
-         * @param {Boolean} isInit
-         */
-        _setExpanded: function(isInit) {
-            if (this.widgetContentContainer.is(':animated')) {
-                return;
-            }
-
+        onExpand() {
             this.state.expanded = true;
 
-            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
-            var $chart = this.$el.find('.chart');
-            collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
+            this.trigger('expand', this.$el, this);
+            mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
 
-            this.widget.removeClass('collapsed');
-
-            if (!isInit) {
-                this.trigger('expand', this.$el, this);
-                mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
-                this.widgetContentContainer.slideDown();
-            }
-
+            const $chart = this.$el.find('.chart');
             if ($chart.length > 0) {
                 $chart.trigger('update');
             }
@@ -221,22 +168,21 @@ define([
          *
          * @returns {Boolean}
          */
-        isCollapsed: function() {
+        isCollapsed() {
             return !this.state.expanded;
         },
 
         /**
          * Trigger remove action
          */
-        onRemoveFromDashboard: function() {
-            var that = this;
-            var confirm = new DeleteConfirmation({
+        onRemoveFromDashboard() {
+            const confirm = new DeleteConfirmation({
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
 
-            confirm.on('ok', function() {
-                that.trigger('removeFromDashboard', that.$el, that);
-                mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);
+            confirm.on('ok', () => {
+                this.trigger('removeFromDashboard', this.$el, this);
+                mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
             });
             confirm.open();
         },
@@ -244,7 +190,7 @@ define([
         /**
          * Trigger configure action
          */
-        onConfigure: function() {
+        onConfigure() {
             this.trigger('configure', this.$el, this);
             mediator.trigger('widget:dashboard:configure:' + this.getWid(), this.$el, this);
         },
@@ -255,14 +201,14 @@ define([
          * @param {String} content
          * @private
          */
-        _onContentLoad: function(content) {
-            var title = $(content).data('widget-title');
+        _onContentLoad(content) {
+            const title = $(content).data('widget-title');
 
             if (title) {
                 this.setTitle(title);
             }
 
-            DashboardItemWidget.__super__._onContentLoad.apply(this, arguments);
+            DashboardItemWidget.__super__._onContentLoad.call(this, content);
         }
     });
 

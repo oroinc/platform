@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
@@ -31,7 +31,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -179,11 +179,21 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $repo = $this->createMock(EntityRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
-        $this->doctrine->expects($this->once())->method('getRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('setMaxResults')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
-        $query->expects($this->once())->method('getResult')->willReturn([$organization]);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([$organization]);
 
         $metadata = new OwnershipMetadata('USER', 'user', 'user', 'organization', 'organization');
         $this->metadataProvider->expects($this->once())

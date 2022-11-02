@@ -10,32 +10,22 @@ use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql;
 
 class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var PdoPgsql
-     */
+    /** @var PdoPgsql */
     private $testable;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $testEntityClass = 'testEntity';
 
-    /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $tableName = 'oro_test_entity';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 
@@ -47,19 +37,23 @@ class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
 
         $classMetadata = $this->createMock(ClassMetadata::class);
 
-        $classMetadata->method('getTableName')
+        $classMetadata->expects($this->any())
+            ->method('getTableName')
             ->willReturn($this->tableName);
 
         $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->method('getConnection')
+        $entityManager->expects($this->any())
+            ->method('getConnection')
             ->willReturn($this->connection);
 
-        $entityManager->method('getClassMetadata')
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
             ->with($this->testEntityClass)
             ->willReturn($classMetadata);
 
-        $this->doctrineHelper->method('getEntityManagerForClass')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
             ->with($this->testEntityClass)
             ->willReturn($entityManager);
     }

@@ -1,5 +1,6 @@
 datagrids:
     embedded-forms-grid:
+        extended_entity_name: 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm'
         acl_resource: oro_embedded_form_view
         source:
             type: orm
@@ -22,7 +23,7 @@ datagrids:
                 title:
                     data_name: embedded_form.title
             default:
-                title: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                title: ASC
 
         filters:
             columns:
@@ -71,5 +72,5 @@ datagrids:
                 icon: trash-o
                 link: delete_link
         options:
-            entityHint: embedded forms
+            entityHint: oro.embeddedform.entity_plural_label
             entity_pagination: true

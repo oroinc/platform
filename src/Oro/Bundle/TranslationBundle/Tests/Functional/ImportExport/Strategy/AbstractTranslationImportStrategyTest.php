@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -12,47 +12,27 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 abstract class AbstractTranslationImportStrategyTest extends WebTestCase
 {
-    /**
-     * @var AbstractImportStrategy
-     */
-    protected $strategy;
+    /** @var AbstractImportStrategy */
+    private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures(
-            [
-                LoadTranslations::class,
-            ]
-        );
+        $this->loadFixtures([LoadTranslations::class]);
 
         $this->strategy = $this->getStrategyObject();
         $this->strategy->setImportExportContext(new Context([]));
         $this->strategy->setEntityName(Translation::class);
     }
 
-    protected function tearDown()
-    {
-        unset($this->strategy);
-    }
-
-    /**
-     * @param string $locale
-     * @return int
-     */
-    protected function getTranslationsByLocaleCount($locale)
+    protected function getTranslationsByLocaleCount(string $locale): int
     {
         $language = $this->getReference($locale);
 
         return count($this->getEntityManager()->getRepository(Translation::class)->findBy(['language' => $language]));
     }
 
-    /**
-     * @param Translation $translation
-     * @return Translation
-     */
-    protected function processTranslation(Translation $translation)
+    protected function processTranslation(Translation $translation): Translation
     {
         $translation = $this->strategy->process($translation);
 
@@ -63,12 +43,7 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
         return $translation;
     }
 
-    /**
-     * @param TranslationKey $translationKey
-     *
-     * @return TranslationKey
-     */
-    protected function processTranslationKey(TranslationKey $translationKey)
+    protected function processTranslationKey(TranslationKey $translationKey): TranslationKey
     {
         $em = $this->getEntityManager();
         $em->persist($translationKey);
@@ -77,18 +52,10 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
         return $translationKey;
     }
 
-    /**
-     * @return ObjectManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(Translation::class);
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Translation::class);
     }
 
-    /**
-     * @return AbstractImportStrategy
-     */
-    abstract protected function getStrategyObject();
+    abstract protected function getStrategyObject(): AbstractImportStrategy;
 }

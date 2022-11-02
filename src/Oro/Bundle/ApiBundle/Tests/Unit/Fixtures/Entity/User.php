@@ -27,7 +27,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name", nullable=false)
-     **/
+     */
     protected $category;
 
     /**
@@ -47,7 +47,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
-     **/
+     */
     protected $owner;
 
     public function __construct()
@@ -120,9 +120,6 @@ class User implements UserInterface
         $this->groups = $groups;
     }
 
-    /**
-     * @param Group $group
-     */
     public function addGroup(Group $group)
     {
         if (!$this->groups->contains($group)) {
@@ -130,9 +127,6 @@ class User implements UserInterface
         }
     }
 
-    /**
-     * @param Group $group
-     */
     public function removeGroup(Group $group)
     {
         if ($this->groups->contains($group)) {
@@ -148,9 +142,6 @@ class User implements UserInterface
         return $this->products;
     }
 
-    /**
-     * @param Product $product
-     */
     public function addProduct(Product $product)
     {
         if (!$this->products->contains($product)) {
@@ -159,9 +150,6 @@ class User implements UserInterface
         }
     }
 
-    /**
-     * @param Product $product
-     */
     public function removeProduct(Product $product)
     {
         if ($this->products->contains($product)) {
@@ -178,9 +166,6 @@ class User implements UserInterface
         return $this->owner;
     }
 
-    /**
-     * @param User|null $owner
-     */
     public function setOwner(User $owner = null)
     {
         $this->owner = $owner;
@@ -214,8 +199,6 @@ class User implements UserInterface
 
     /**
      * Adder for extended manyToMany association
-     *
-     * @param $target
      */
     public function addTarget($target)
     {
@@ -229,8 +212,6 @@ class User implements UserInterface
 
     /**
      * Remover for extended manyToMany association
-     *
-     * @param $target
      */
     public function removeTarget($target)
     {

@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
+use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 
+/**
+ * Provides metadata about multi-enum attribute type.
+ */
 class MultiEnumAttributeType extends EnumAttributeType
 {
     use ArrayOrTraversableGuardTrait;
@@ -14,15 +17,7 @@ class MultiEnumAttributeType extends EnumAttributeType
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'multiEnum';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }
@@ -55,7 +50,7 @@ class MultiEnumAttributeType extends EnumAttributeType
         foreach ($originalValue as $enum) {
             $this->ensureSupportedType($enum);
 
-            $key = sprintf('%s_%s', $attribute->getFieldName(), $enum->getId());
+            $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getId());
 
             $value[$key] = 1;
         }

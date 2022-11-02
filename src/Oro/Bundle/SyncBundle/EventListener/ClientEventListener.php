@@ -7,14 +7,12 @@ use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientEventListener as GosClientEventListener;
-use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
-use Guzzle\Http\Message\Response;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Ratchet\ConnectionInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
@@ -24,41 +22,28 @@ class ClientEventListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var GosClientEventListener */
-    private $decoratedClientEventListener;
+    private WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider;
 
-    /** @var WebsocketAuthenticationProviderInterface */
-    private $websocketAuthenticationProvider;
+    private ClientStorageInterface $clientStorage;
 
-    /** @var ClientStorageInterface */
-    private $clientStorage;
-
-    /**
-     * @param GosClientEventListener $decoratedClientEventListener
-     * @param WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider
-     * @param ClientStorageInterface $clientStorage
-     */
     public function __construct(
-        GosClientEventListener $decoratedClientEventListener,
         WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider,
         ClientStorageInterface $clientStorage
     ) {
-        $this->decoratedClientEventListener = $decoratedClientEventListener;
         $this->websocketAuthenticationProvider = $websocketAuthenticationProvider;
         $this->clientStorage = $clientStorage;
         $this->logger = new NullLogger();
     }
 
     /**
-     * @param ClientEvent $event
-     *
      * @throws StorageException
      * @throws BadCredentialsException
      */
     public function onClientConnect(ClientEvent $event)
     {
+        $event->stopPropagation();
+
         $connection = $event->getConnection();
-        $connection->WAMP->clientStorageId = null;
         $connection->WAMP->username = null;
 
         $token = $this->websocketAuthenticationProvider->authenticate($connection);
@@ -71,7 +56,7 @@ class ClientEventListener implements LoggerAwareInterface
 
         try {
             $storageId = $this->clientStorage->getStorageId($connection);
-            $this->clientStorage->addClient($storageId, $token->getUser());
+            $this->clientStorage->addClient($storageId, $token);
         } catch (StorageException $exception) {
             $this->logger->error(
                 'Failed to add user to client storage for {username} with ticket {ticketId}',
@@ -80,8 +65,6 @@ class ClientEventListener implements LoggerAwareInterface
 
             throw $exception;
         }
-
-        $connection->WAMP->clientStorageId = $storageId;
 
         // Save username in WAMP connection to be able to restore user in ClientManipulator in case of
         // ClientStorage TTL expiration.
@@ -92,20 +75,11 @@ class ClientEventListener implements LoggerAwareInterface
         $this->logger->info('{username} connected', ['storage_id' => $storageId] + $loggerContext);
     }
 
-    /**
-     * @param ClientEvent $event
-     */
-    public function onClientDisconnect(ClientEvent $event)
-    {
-        $this->decoratedClientEventListener->onClientDisconnect($event);
-    }
-
-    /**
-     * @param ClientErrorEvent $event
-     */
     public function onClientError(ClientErrorEvent $event)
     {
-        $exception = $event->getException();
+        $event->stopPropagation();
+
+        $exception = $event->getThrowable();
         $connection = $event->getConnection();
 
         $loggerContext = [
@@ -114,8 +88,6 @@ class ClientEventListener implements LoggerAwareInterface
         ];
 
         if ($exception instanceof BadCredentialsException) {
-            $event->stopPropagation();
-
             $this->closeConnection($connection, 403);
 
             $this->logger->info(
@@ -127,18 +99,6 @@ class ClientEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param ClientRejectedEvent $event
-     */
-    public function onClientRejected(ClientRejectedEvent $event)
-    {
-        $this->decoratedClientEventListener->onClientRejected($event);
-    }
-
-    /**
-     * @param ConnectionInterface $connection
-     * @param int $status
-     */
     private function closeConnection(ConnectionInterface $connection, int $status): void
     {
         $response = new Response($status);

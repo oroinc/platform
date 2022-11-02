@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Reorganizes form fields on the attribute configuration page
+ */
 class AttributeConfigExtension extends AbstractTypeExtension
 {
     use AttributeConfigExtensionApplicableTrait;
@@ -25,11 +28,6 @@ class AttributeConfigExtension extends AbstractTypeExtension
     /** @var AttributeTypeRegistry */
     protected $attributeTypeRegistry;
 
-    /**
-     * @param ConfigProvider $attributeConfigProvider
-     * @param SerializedFieldProvider $serializedFieldProvider
-     * @param AttributeTypeRegistry $attributeTypeRegistry
-     */
     public function __construct(
         ConfigProvider $attributeConfigProvider,
         SerializedFieldProvider $serializedFieldProvider,
@@ -59,27 +57,20 @@ class AttributeConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param FieldConfigModel $configModel
-     */
     protected function ensureAttributeFields(FormBuilderInterface $builder, FieldConfigModel $configModel)
     {
         if (!$builder->has('attribute')) {
             return;
         }
 
-        $attribute = $builder->get('attribute');
-
         $attributeType = $this->attributeTypeRegistry->getAttributeType($configModel);
         if (!$attributeType) {
-            $attribute->remove('searchable');
-            $attribute->remove('filterable');
-            $attribute->remove('filter_by');
-            $attribute->remove('sortable');
+            $builder->remove('attribute');
 
             return;
         }
+
+        $attribute = $builder->get('attribute');
 
         if (!$attributeType->isSearchable($configModel)) {
             $attribute->remove('searchable');
@@ -95,33 +86,30 @@ class AttributeConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         $event->getForm()->remove('is_serialized');
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSubmit(FormEvent $event)
     {
         if ($event->getForm()->isValid()) {
             $configModel = $event->getForm()->getConfig()->getOption('config_model');
-            $data = $event->getData();
-            $data['extend']['is_serialized'] = $this->serializedFieldProvider->isSerializedByData($configModel, $data);
+            if (!$configModel->getId()) {
+                $data = $event->getData();
+                $isSerialized = $this->serializedFieldProvider->isSerializedByData($configModel, $data);
+                $data['extend']['is_serialized'] = $isSerialized;
 
-            $event->setData($data);
+                $event->setData($data);
+            }
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ConfigType::class;
+        return [ConfigType::class];
     }
 }

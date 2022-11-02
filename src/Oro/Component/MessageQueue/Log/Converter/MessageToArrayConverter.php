@@ -12,7 +12,7 @@ class MessageToArrayConverter implements MessageToArrayConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convert(MessageInterface $message)
+    public function convert(MessageInterface $message): array
     {
         $result = [
             'id'   => $message->getMessageId(),

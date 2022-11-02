@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -27,12 +27,9 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
     {
         $this->generateEntities($manager, [LoadWorkflowDefinitions::NO_START_STEP, LoadWorkflowDefinitions::MULTISTEP]);
         $this->generateEntities($manager, [LoadWorkflowDefinitions::WITH_START_STEP]);
+        $this->generateEntities($manager, ['test_active_flow1', 'test_active_flow2']);
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param array $workflowNames
-     */
     protected function generateEntities(ObjectManager $manager, array $workflowNames)
     {
         // load entities
@@ -50,7 +47,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         }
         $manager->flush();
 
-        $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
+        $workflowDefinitionRepository = $manager->getRepository(WorkflowDefinition::class);
 
         // create workflow items manually (to make it faster)
         foreach ($workflowNames as $workflowName) {

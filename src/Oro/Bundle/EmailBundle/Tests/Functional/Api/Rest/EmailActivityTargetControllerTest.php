@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityTargetControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(
@@ -18,7 +18,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
 
     public function testGetAllActivityTargetTypes()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activity_target_all_types')
         );
@@ -29,7 +29,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
 
     public function testGetActivityTypes()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activity_target_activity_types', ['entity' => 'users'])
         );
@@ -40,7 +40,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
 
     public function testGetActivities()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_activity_target_activities',

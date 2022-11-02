@@ -2,164 +2,112 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Translation\Strategy;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
-use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
-class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
+class LocalizationFallbackStrategyTest extends OrmTestCase
 {
-    use EntityTrait;
+    private const CACHE_KEY = 'localization_fallbacks';
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrine;
+    /** @var EntityManagerMock */
+    private $em;
 
-    /**
-     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $cache;
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /**
-     * @var LocalizationFallbackStrategy
-     */
-    protected $strategy;
+    /** @var LocalizationFallbackStrategy */
+    private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['fetch', 'save', 'delete'])->getMockForAbstractClass();
-        $this->strategy = new LocalizationFallbackStrategy($this->doctrine, $this->cache);
-        $this->strategy->setEntityClass('Oro\Bundle\LocaleBundle\Entity\Localization');
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+
+        $this->cache = $this->createMock(CacheInterface::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(Localization::class)
+            ->willReturn($this->em);
+
+        $this->strategy = new LocalizationFallbackStrategy($doctrine, $this->cache);
     }
 
     public function testIsApplicable()
     {
-        $this->assertTrue($this->strategy->isApplicable());
+        self::assertTrue($this->strategy->isApplicable());
     }
 
     /**
      * @dataProvider getLocaleFallbacksDataProvider
-     *
-     * @param array|null $entities
-     * @param array $localizations
      */
-    public function testGetLocaleFallbacks($entities, array $localizations)
+    public function testGetLocaleFallbacks(array $rows, array $localizations)
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY)
-            ->willReturn(false);
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with('Oro\Bundle\LocaleBundle\Entity\Localization')
-            ->willReturn($em);
-        /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
-        $repository = $this->createMock(LocalizationRepository::class);
-        $em->expects($this->once())->method('getRepository')->with(Localization::class)->willReturn($repository);
-        $repository->expects($this->once())
-            ->method('findRootsWithChildren')
-            ->willReturn($entities);
-        $repository->expects($this->once())
-            ->method('findRootsWithChildren')
-            ->willReturn($entities);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations)
-            ->willReturn((bool)$entities);
-        $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id_0, o0_.parent_id AS sclr_1, o1_.code AS code_2'
+            . ' FROM oro_localization o0_'
+            . ' INNER JOIN oro_language o1_ ON o0_.language_id = o1_.id',
+            $rows
+        );
+
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                return $callback($this->createMock(ItemInterface::class));
+            });
+
+        self::assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleFallbacksDataProvider()
+    public function getLocaleFallbacksDataProvider(): array
     {
-        $secondLevelLevelEn = $this->getEntity(
-            Localization::class,
-            [
-                'name' => 'English1',
-                'language' => $this->getEntity(Language::class, ['code' => 'en']),
-                'formattingCode' => 'en_FR',
-            ]
-        );
-        $firstLevelEn = $this->getEntity(
-            Localization::class,
-            [
-                'name' => 'English2',
-                'language' => $this->getEntity(Language::class, ['code' => 'en']),
-                'formattingCode' => 'en_EN',
-                'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])
-            ]
-        );
-        $en = $this->getEntity(
-            Localization::class,
-            [
-                'name' => 'English3',
-                'language' => $this->getEntity(Language::class, ['code' => 'en']),
-                'formattingCode' => 'en',
-                'childLocalizations' => new ArrayCollection([$firstLevelEn])
-            ]
-        );
-        $firstLevelRu = $this->getEntity(
-            Localization::class,
-            [
-                'name' => 'Russian1',
-                'language' => $this->getEntity(Language::class, ['code' => 'ru']),
-                'formattingCode' => 'ru_RU',
-            ]
-        );
-        $ru = $this->getEntity(
-            Localization::class,
-            [
-                'name' => 'Russian2',
-                'language' => $this->getEntity(Language::class, ['code' => 'ru']),
-                'formattingCode' => 'ru',
-                'childLocalizations' => new ArrayCollection([$firstLevelRu])
-            ]
-        );
-        $localizations = [
-            Configuration::DEFAULT_LOCALE => [
-                'en' => ['en' => ['en' => []]],
-                'ru' => ['ru' => []],
-            ]
-        ];
         return [
-            ['entities' => [$en, $ru], 'localizations' => $localizations],
+            [
+                'rows'          => [
+                    ['id_0' => 1, 'sclr_1' => null, 'code_2' => 'en'],
+                    ['id_0' => 2, 'sclr_1' => 1, 'code_2' => 'en_EN'],
+                    ['id_0' => 3, 'sclr_1' => 2, 'code_2' => 'en_FR'],
+                    ['id_0' => 4, 'sclr_1' => null, 'code_2' => 'ru'],
+                    ['id_0' => 5, 'sclr_1' => 4, 'code_2' => 'ru_RU'],
+                ],
+                'localizations' => [
+                    'en' => [
+                        'en' => ['en_EN' => ['en_FR' => []]],
+                        'ru' => ['ru_RU' => []],
+                    ]
+                ]
+            ]
         ];
     }
 
     /**
      * @dataProvider getLocaleFallbacksCacheDataProvider
-     *
-     * @param array $localizations
      */
     public function testGetLocaleFallbacksCache(array $localizations)
     {
-        $this->doctrine->expects($this->never())
-            ->method('getManagerForClass');
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY)
+        $this->getDriverConnectionMock($this->em)->expects(self::never())
+            ->method('query');
+
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::CACHE_KEY)
             ->willReturn($localizations);
-        $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
+
+        self::assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleFallbacksCacheDataProvider()
+    public function getLocaleFallbacksCacheDataProvider(): array
     {
         return [
             [
@@ -173,14 +121,58 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(LocalizationFallbackStrategy::NAME, $this->strategy->getName());
+        self::assertEquals('oro_localization_fallback_strategy', $this->strategy->getName());
     }
 
     public function testClearCache()
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('delete')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY);
+            ->with(self::CACHE_KEY);
+
         $this->strategy->clearCache();
+    }
+
+    public function testWarmup(): void
+    {
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id_0, o0_.parent_id AS sclr_1, o1_.code AS code_2'
+            . ' FROM oro_localization o0_'
+            . ' INNER JOIN oro_language o1_ ON o0_.language_id = o1_.id',
+            [
+                ['id_0' => 1, 'sclr_1' => null, 'code_2' => 'en']
+            ]
+        );
+
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                return $callback($this->createMock(ItemInterface::class));
+            });
+
+        $this->strategy->warmUp('sample/path');
+    }
+
+    public function testWarmupWhenInvalidFieldNameException(): void
+    {
+        $this->getDriverConnectionMock($this->em)->expects(self::once())
+            ->method('query')
+            ->willThrowException($this->createMock(InvalidFieldNameException::class));
+
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                return $callback($this->createMock(ItemInterface::class));
+            });
+
+        $this->strategy->warmUp('sample/path');
+    }
+
+    public function testIsOptional(): void
+    {
+        self::assertTrue($this->strategy->isOptional());
     }
 }

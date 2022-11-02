@@ -9,7 +9,7 @@
     } %}
     {% set labels = defaultLabels|merge(labels) %}
     {% set now = date('now', 'UTC') %}
-    <ul>
+    <ul class="schedule-list">
         {% set activityShown = false %}
         {% for schedule in schedules %}
             {% if schedule.activeAt < now %}

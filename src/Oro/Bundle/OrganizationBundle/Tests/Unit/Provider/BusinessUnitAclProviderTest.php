@@ -2,170 +2,182 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME='test';
-    const PERMISSION='VIEW';
+    private const ENTITY_NAME = 'test';
+    private const PERMISSION  = 'VIEW';
 
     /** @var BusinessUnitAclProvider */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclVoter;
+    private $aclVoter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $treeProvider;
+    private $treeProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $observer;
+    private $tree;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $user;
+    private $user;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $organization;
+    private $organization;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->aclVoter = $this->createMock(AclVoter::class);
+        $this->treeProvider = $this->createMock(OwnerTreeProvider::class);
+        $this->tree = $this->createMock(OwnerTreeInterface::class);
+        $this->user = $this->createMock(User::class);
+        $this->organization = $this->createMock(Organization::class);
 
-        $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->setMethods([
-                'getTree',
-                'getUserBusinessUnitIds',
-                'getUserSubordinateBusinessUnitIds',
-                'getAllBusinessUnitIds',
-                'getOrganizationBusinessUnitIds'
-            ])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->observer = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
-            ->setMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUser')
-            ->will($this->returnValue($this->user));
+            ->willReturn($this->user);
 
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getOrganization')
-            ->will($this->returnValue($this->organization));
+            ->willReturn($this->organization);
 
-        $this->provider = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider')
-            ->setMethods(['getAccessLevel'])
-            ->setConstructorArgs([
-                $this->authorizationChecker,
-                $this->tokenAccessor,
-                $this->aclVoter,
-                $this->treeProvider
-                ])
-            ->getMock();
+        $this->provider = new BusinessUnitAclProvider(
+            $this->authorizationChecker,
+            $this->tokenAccessor,
+            $this->aclVoter,
+            $this->treeProvider
+        );
+    }
+
+    /**
+     * @param int $returnedAccessLevel
+     */
+    private function expectIsGranted($returnedAccessLevel)
+    {
+        /** @var OneShotIsGrantedObserver $observer */
+        $observer = null;
+        $this->aclVoter->expects(self::once())
+            ->method('addOneShotIsGrantedObserver')
+            ->willReturnCallback(function (OneShotIsGrantedObserver $o) use (&$observer) {
+                $observer = $o;
+            });
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(self::PERMISSION, 'entity:' . self::ENTITY_NAME)
+            ->willReturnCallback(function () use (&$observer, $returnedAccessLevel) {
+                $observer->setAccessLevel($returnedAccessLevel);
+
+                return true;
+            });
     }
 
     public function testSystemLevel()
     {
-        $this->provider->expects($this->once())
-            ->method('getAccessLevel')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(AccessLevel::SYSTEM_LEVEL));
+        $ids = [1, 2];
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->expectIsGranted(AccessLevel::SYSTEM_LEVEL);
+
+        $this->treeProvider->expects(self::once())
             ->method('getTree')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($this->tree);
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->tree->expects(self::once())
             ->method('getAllBusinessUnitIds')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($ids);
 
-        $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
+        self::assertEquals(
+            $ids,
+            $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION)
+        );
     }
 
     public function testLocalLevel()
     {
-        $this->provider->expects($this->once())
-            ->method('getAccessLevel')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(AccessLevel::LOCAL_LEVEL));
+        $ids = [1, 2];
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->expectIsGranted(AccessLevel::LOCAL_LEVEL);
+
+        $this->treeProvider->expects(self::once())
             ->method('getTree')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($this->tree);
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->tree->expects(self::once())
             ->method('getUserBusinessUnitIds')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($ids);
 
-        $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
+        self::assertEquals(
+            $ids,
+            $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION)
+        );
     }
 
     public function testDeepLevel()
     {
-        $this->provider->expects($this->once())
-            ->method('getAccessLevel')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(AccessLevel::DEEP_LEVEL));
+        $ids = [1, 2];
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->expectIsGranted(AccessLevel::DEEP_LEVEL);
+
+        $this->treeProvider->expects(self::once())
             ->method('getTree')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($this->tree);
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->tree->expects(self::once())
             ->method('getUserSubordinateBusinessUnitIds')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($ids);
 
-        $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
+        self::assertEquals(
+            $ids,
+            $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION)
+        );
     }
 
     public function testGlobalLevel()
     {
-        $this->provider->expects($this->once())
-            ->method('getAccessLevel')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(AccessLevel::GLOBAL_LEVEL));
+        $ids = [1, 2];
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->expectIsGranted(AccessLevel::GLOBAL_LEVEL);
+
+        $this->treeProvider->expects(self::once())
             ->method('getTree')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($this->tree);
 
-        $this->treeProvider->expects($this->exactly(1))
+        $this->tree->expects(self::once())
             ->method('getOrganizationBusinessUnitIds')
-            ->will($this->returnValue($this->treeProvider));
+            ->willReturn($ids);
 
-        $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
+        self::assertEquals(
+            $ids,
+            $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION)
+        );
     }
 
     public function testAccessNotGranted()
     {
-        $this->treeProvider->expects($this->exactly(0))
+        $this->treeProvider->expects(self::never())
             ->method('getTree');
 
-        $this->assertEquals([], $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION));
+        self::assertEquals(
+            [],
+            $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION)
+        );
     }
 }

@@ -1,2 +1,3 @@
 lazy_services:
     - nelmio_api_doc.extractor.api_doc_extractor
+    - session.flash_bag # to avoid loading of the session for stateless requests, e.g. REST API requests

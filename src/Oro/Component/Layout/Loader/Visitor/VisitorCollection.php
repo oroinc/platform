@@ -4,11 +4,11 @@ namespace Oro\Component\Layout\Loader\Visitor;
 
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
+/**
+ * Contains list of Visitors
+ */
 class VisitorCollection extends \ArrayIterator
 {
-    /**
-     * @param array $conditions
-     */
     public function __construct(array $conditions = [])
     {
         $this->validate($conditions);
@@ -19,16 +19,13 @@ class VisitorCollection extends \ArrayIterator
     /**
      * {@inheritdoc}
      */
-    public function append($condition)
+    public function append($value): void
     {
-        $this->validate([$condition]);
+        $this->validate([$value]);
 
-        parent::append($condition);
+        parent::append($value);
     }
 
-    /**
-     * @param array $conditions
-     */
     protected function validate(array $conditions)
     {
         foreach ($conditions as $condition) {

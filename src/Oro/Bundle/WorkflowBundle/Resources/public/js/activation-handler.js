@@ -9,8 +9,8 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'
      * @class  oroworkflow.WorkflowActivationHandler
      */
     return function(url, name, label) {
-        var el = this;
-        var formWidget = new DialogWidget({
+        const el = this;
+        const formWidget = new DialogWidget({
             title: __('oro.workflow.workflowdefinition.activate', {label: label}),
             url: routing.generate('oro_workflow_definition_activate_from_widget', {name: name}),
             stateEnabled: false,

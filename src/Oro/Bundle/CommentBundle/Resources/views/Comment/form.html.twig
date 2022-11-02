@@ -1,31 +1,36 @@
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig', _self] %}
 
 <form method="post" class="comment-form">
     <fieldset class="form-horizontal">
-        <label>
-            {{ form_widget(form.message) }}
-        </label>
-        <div class="pull-left">
-            {{ form_widget(form.attachment) }}
-            <% if (attachmentURL) { %>
-            <div class="attachment-item">
-                <i class="fa-paperclip"></i>
-                <a href="<%- attachmentURL %>" class="no-hash" title="<%- attachmentFileName %>"><%- attachmentFileName %></a> (<%- attachmentSize %>)
-                <button class="btn btn-link fa-close remove-attachment" type="button"></button>
-            </div>
-            <% } %>
+        <div class="control-group">
+            <label class="comment-message-label">
+                {{ form_widget(form.message) }}
+            </label>
         </div>
-        <div class="widget-actions pull-right">
+        {{ form_widget(form.attachment) }}
+        <% if (attachmentURL) { %>
+        <div class="control-group">
+            <div class="attachment-item">
+                <span class="attachment-item__icon fa-paperclip" aria-hidden="true"></span>
+                <a href="<%- attachmentURL.url %>" class="no-hash attachment-item__filename" title="<%- attachmentFileName %>"><%- attachmentFileName %></a>
+                <span class="attachment-item__file-size">(<%- attachmentSize %>)</span>
+                <button class="btn btn-icon btn-square-lighter attachment-item__remove" type="button" data-role="remove">
+                    <span class="fa-close" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+        <% } %>
+        <div class="widget-actions">
             <button class="btn cancel-comment-button" type="reset">
-                <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
+                <%- _.__('oro.comment.from.button.cancel_comment.label')  %>
             </button>
             <% if (!isNew) { %>
             <button class="btn btn-primary" type="submit">
-                <%= _.__('oro.comment.from.button.edit_comment.label') %>
+                <%- _.__('oro.comment.from.button.edit_comment.label') %>
             </button>
             <% } else { %>
             <button class="btn btn-primary" type="submit">
-                <%= _.__('oro.comment.from.button.send_comment.label') %>
+                <%- _.__('oro.comment.from.button.send_comment.label') %>
             </button>
             <% } %>
         </div>

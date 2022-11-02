@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Event;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TransitionsAttributeEvent extends Event
 {

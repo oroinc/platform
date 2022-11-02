@@ -1,0 +1,44 @@
+<li class="{{ data.method|lower }} operation" id="{{ data.id }}">
+    <div class="heading toggler{% if data.deprecated %} deprecated{% endif %}" data-href="#{{ data.id }}">
+        <h3>
+            <span class="http_method">
+                <i>{{ data.method|upper }}</i>
+            </span>
+
+            {% if data.deprecated %}
+            <span class="deprecated">
+                <i>DEPRECATED</i>
+            </span>
+            {% endif %}
+
+            {% if data.https %}
+                <span class="icon lock" title="HTTPS"></span>
+            {% endif %}
+            {% if data.authentication %}
+                <span class="icon keys" title="Needs {{ data.authenticationRoles|length > 0 ? data.authenticationRoles|join(', ') : 'authentication' }}"></span>
+            {% endif %}
+
+            <span class="path">
+                {% if data.host is defined -%}
+                    {{ data.https ? 'https://' : 'http://' -}}
+                    {{ data.host -}}
+                {% endif -%}
+                {{ data.uri }}
+            </span>
+           {% if data.tags is defined %}
+                {% for tag, color_code in data.tags %}
+                    <span class="tag" {% if color_code is defined and color_code is not empty %}style="background-color:{{ color_code }};"{% endif %}>{{ tag }}</span>
+                {% endfor %}
+            {%  endif %}
+        </h3>
+        <ul class="options">
+            {% if data.description is defined %}
+                <li>{{ data.description }}</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="content" style="display: none;" data-state="collapsed">
+        Loading ...
+    </div>
+</li>

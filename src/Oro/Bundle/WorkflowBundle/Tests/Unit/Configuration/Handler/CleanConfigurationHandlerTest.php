@@ -10,12 +10,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var CleanConfigurationHandler */
-    protected $handler;
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
 
@@ -39,10 +39,8 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
                 'test_transition' => [
                     'preactions' => ['config'],
                     'preconditions' => ['config'],
-                    'pre_conditions' => ['config'],
                     'conditions' => ['config'],
                     'actions' => ['config'],
-                    'post_actions' => ['config'],
                     'other_node_name' => 'other_node_config'
                 ]
             ],
@@ -54,9 +52,6 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider handleDataProvider
-     *
-     * @param array $configuration
-     * @param array $expected
      */
     public function testHandle(array $configuration, array $expected)
     {
@@ -67,10 +62,8 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return \Generator
      */
-    public function handleDataProvider()
+    public function handleDataProvider(): \Generator
     {
         yield 'empty configuration' => [
             'configuration' => [],

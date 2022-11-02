@@ -6,6 +6,9 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration parameters recognized by DataGrid > Filters.
+ */
 class Configuration implements ConfigurationInterface
 {
     const FILTERS_PATH         = '[filters]';
@@ -15,9 +18,6 @@ class Configuration implements ConfigurationInterface
     /** @var array */
     protected $types;
 
-    /**
-     * @param $types
-     */
     public function __construct($types)
     {
         $this->types = $types;
@@ -28,9 +28,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('filters');
 
-        $builder->root('filters')
+        $builder->getRootNode()
             ->children()
                 ->arrayNode('columns')
                     ->useAttributeAsKey('name')
@@ -49,8 +49,9 @@ class Configuration implements ConfigurationInterface
                                 ->values(array(FilterUtility::CONDITION_AND, FilterUtility::CONDITION_OR))
                             ->end()
                             ->booleanNode(FilterUtility::BY_HAVING_KEY)->end()
-                            ->booleanNode(FilterUtility::ENABLED_KEY)->defaultTrue()->end()
+                            ->booleanNode(FilterUtility::RENDERABLE_KEY)->defaultTrue()->end()
                             ->booleanNode(FilterUtility::VISIBLE_KEY)->defaultTrue()->end()
+                            ->booleanNode(FilterUtility::DISABLED_KEY)->defaultFalse()->end()
                             ->booleanNode(FilterUtility::TRANSLATABLE_KEY)->defaultTrue()->end()
                             ->booleanNode(FilterUtility::FORCE_LIKE_KEY)->defaultFalse()->end()
                             ->booleanNode(FilterUtility::CASE_INSENSITIVE_KEY)->defaultTrue()->end()

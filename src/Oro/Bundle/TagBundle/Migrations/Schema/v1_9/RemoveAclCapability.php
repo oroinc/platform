@@ -1,11 +1,14 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_8;
+namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_9;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * Eliminates "oro_tag_unassign_global" capability.
+ */
 class RemoveAclCapability implements Migration
 {
     /**

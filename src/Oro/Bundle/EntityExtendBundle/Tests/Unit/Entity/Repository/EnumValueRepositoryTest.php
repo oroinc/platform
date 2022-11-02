@@ -2,56 +2,50 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENUM_VALUE_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue';
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private const ENUM_VALUE_CLASS_NAME = TestEnumValue::class;
 
     /** @var EnumValueRepository */
-    protected $repo;
+    private $repo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->repo = new EnumValueRepository(
-            $this->em,
+            $this->createMock(EntityManagerInterface::class),
             new ClassMetadata(self::ENUM_VALUE_CLASS_NAME)
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $name must not be empty.
-     */
     public function testCreateEnumValueWithNullName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$name must not be empty.');
+
         $this->repo->createEnumValue(null, 1, false);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $name must not be empty.
-     */
     public function testCreateEnumValueWithEmptyName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$name must not be empty.');
+
         $this->repo->createEnumValue('', 1, false);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $id length must be less or equal 32 characters. id: 123456789012345678901234567890123.
-     */
     public function testCreateEnumValueWithTooLongId()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            '$id length must be less or equal 32 characters. id: 123456789012345678901234567890123.'
+        );
+
         $this->repo->createEnumValue(
             'Test Value 1',
             1,

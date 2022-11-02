@@ -20,11 +20,6 @@ class EntityPaginationListener
     /** @var EntityPaginationManager  */
     protected $paginationManager;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityPaginationStorage $storage
-     * @param EntityPaginationManager $paginationManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityPaginationStorage $storage,
@@ -35,15 +30,12 @@ class EntityPaginationListener
         $this->paginationManager = $paginationManager;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         if (!$this->paginationManager->isEnabled()) {
             return;
         }
-        
+
         $dataGrid = $event->getDatagrid();
         if (!$this->paginationManager->isDatagridApplicable($dataGrid)) {
             return;

@@ -9,14 +9,22 @@ use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
  */
 class Comparison implements ExpressionInterface
 {
-    const EQ  = '=';
-    const NEQ = '<>';
-    const LT  = '<';
-    const LTE = '<=';
-    const GT  = '>';
-    const GTE = '>=';
-    const IN  = 'IN';
-    const NIN = 'NIN';
+    public const EQ  = '=';
+    public const NEQ = '<>';
+    public const LT  = '<';
+    public const LTE = '<=';
+    public const GT  = '>';
+    public const GTE = '>=';
+    /** Checks that the left operand matches any value in the list from the right operand. */
+    public const IN  = 'IN';
+    /** Checks that the left operand does not match any value in the list from the right operand. */
+    public const NIN = 'NIN';
+    /**
+     * For string fields, checks that the left operand contains a substring from the right operand.
+     * For array fields, checks that any value in the list from the left operand is matched any value
+     * in the list from the right operand.
+     */
+    public const CONTAINS = 'CONTAINS';
 
     /** @var Path|Value */
     private $leftOperand;
@@ -68,8 +76,6 @@ class Comparison implements ExpressionInterface
 
     /**
      * Returns comparison operator.
-     *
-     * @return string
      */
     public function getOperator(): string
     {

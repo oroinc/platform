@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NotificationBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -11,8 +9,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("emailnotication")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for EmailNotification entity.
  */
 class EmailNotificationController extends RestController
 {
@@ -33,7 +30,7 @@ class EmailNotificationController extends RestController
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

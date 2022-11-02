@@ -6,11 +6,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class MassControllersTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             array(),
-            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
+            $this->generateBasicAuthHeader()
         );
         $this->client->useHashNavigation(true);
         $this->loadFixtures(
@@ -35,6 +35,6 @@ class MassControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains($notification->getBody(), $result->getContent());
+        self::assertStringContainsString($notification->getBody(), $result->getContent());
     }
 }

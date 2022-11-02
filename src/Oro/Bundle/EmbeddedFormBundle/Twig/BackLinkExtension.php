@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-class BackLinkExtension extends \Twig_Extension
+/**
+ * Provides a Twig filter to generate a back link:
+ *   - back_link
+ */
+class BackLinkExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -24,7 +28,7 @@ class BackLinkExtension extends \Twig_Extension
      */
     protected function getRouter()
     {
-        return $this->container->get('router');
+        return $this->container->get(RouterInterface::class);
     }
 
     /**
@@ -32,24 +36,16 @@ class BackLinkExtension extends \Twig_Extension
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_embedded_form_back_link_extension';
-    }
-
-    /**
-     * @return \Twig_SimpleFilter[]
+     * @return TwigFilter[]
      */
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('back_link', [$this, 'backLinkFilter']),
+            new TwigFilter('back_link', [$this, 'backLinkFilter']),
         ];
     }
 
@@ -62,7 +58,7 @@ class BackLinkExtension extends \Twig_Extension
     {
         $backLinkRegexp = '/{back_link(?:\|([^}]+))?}/';
         preg_match($backLinkRegexp, $string, $matches);
-        list($placeholder, $linkText) = array_pad($matches, 2, '');
+        [$placeholder, $linkText] = array_pad($matches, 2, '');
         if (!$linkText) {
             $linkText = 'oro.embeddedform.back_link_default_text';
         }
@@ -72,6 +68,11 @@ class BackLinkExtension extends \Twig_Extension
         return str_replace($placeholder, $link, $string);
     }
 
+    /**
+     * @param string $id
+     * @param string $linkText
+     * @return string
+     */
     private function getLink($id, $linkText)
     {
         if (empty($id)) {
@@ -84,5 +85,16 @@ class BackLinkExtension extends \Twig_Extension
         $url = $this->getRouter()->generate('oro_embedded_form_submit', ['id' => $id]);
 
         return sprintf('<a href="%s">%s</a>', $url, $linkText);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            RouterInterface::class,
+            TranslatorInterface::class,
+        ];
     }
 }

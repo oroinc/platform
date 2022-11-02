@@ -1,15 +1,17 @@
 /* @theme: admin.oro; */
 
-html& {
+@at-root html#{&} {
     overflow-x: hidden;
     overflow-y: auto;
 
-    &.lock-page-scroll,
-    &.modal-dropdown-shown {
+    &.disable-touch-scrolling,
+    &.disable-touch-scrolling body {
         overflow: hidden;
+        height: 100%;
     }
 }
 
+// stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
 & {
     min-width: inherit;
     font-size: $base-font-size;
@@ -17,10 +19,6 @@ html& {
 
 .app-page.hidden-page {
     display: none;
-}
-
-.btn-group > .dropdown-menu li a {
-    font-size: $base-font-size;
 }
 
 .container,
@@ -34,6 +32,7 @@ html& {
 .dot-menu,
 #bookmark-buttons,
 #breadcrumb {
+    // stylelint-disable-next-line declaration-no-important
     display: none !important;
 }
 
@@ -55,10 +54,6 @@ html& {
             margin: 0;
         }
     }
-}
-
-#progressbar {
-    width: 200px;
 }
 
 #footer {

@@ -1,26 +1,34 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
-class LoggerLevelCommand extends ContainerAwareCommand
+/**
+ * Temporarily changes the configured logging level.
+ */
+class LoggerLevelCommand extends Command
 {
-    const LEVEL_PARAM         = 'level';
-    const DISABLE_AFTER_PARAM = 'disable-after';
-    const USER_PARAM          = 'user';
+    /** @var string */
+    protected static $defaultName = 'oro:logger:level';
 
-    /** @var array */
-    protected static $loggingLevels = [
+    private ConfigManager $globalConfigManager;
+    private ConfigManager $userConfigManager;
+    private CacheInterface $cache;
+    private UserManager $userManager;
+
+    protected static array $loggingLevels = [
         LogLevel::EMERGENCY,
         LogLevel::ALERT,
         LogLevel::CRITICAL,
@@ -31,54 +39,60 @@ class LoggerLevelCommand extends ContainerAwareCommand
         LogLevel::DEBUG,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(
+        ConfigManager $globalConfigManager,
+        ConfigManager $userConfigManager,
+        CacheInterface $cache,
+        UserManager $userManager
+    ) {
+        parent::__construct();
+
+        $this->globalConfigManager = $globalConfigManager;
+        $this->userConfigManager = $userConfigManager;
+        $this->cache = $cache;
+        $this->userManager = $userManager;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:logger:level')
-            ->addArgument(
-                self::LEVEL_PARAM,
-                InputArgument::REQUIRED,
-                'Log level (warning|notice|info|debug)'
-            )
-            ->addArgument(
-                self::DISABLE_AFTER_PARAM,
-                InputArgument::REQUIRED,
-                'Disable logging after interval. For example: "630 seconds", "1 hour + 30 minutes", etc. ' .
-                'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
-            )
-            ->addOption(
-                self::USER_PARAM,
-                'u',
-                InputOption::VALUE_REQUIRED,
-                'Email of existing user'
-            )
-            ->setDescription('Update logger level configuration')
+            ->addArgument('level', InputArgument::REQUIRED, 'Log level (warning, notice, info, debug)')
+            ->addArgument('disable-after', InputArgument::REQUIRED, 'Disable logging after specified time interval')
+            ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
+            ->setDescription('Temporarily changes the configured logging level.')
             ->setHelp(
-                'If “user” param is not set - update global scope, otherwise update user scope'
-            );
+                <<<'HELP'
+The <info>%command.name%</info> command temporarily increases the configured logging level for
+the specified duration of time. The second argument accepts any relative date/time
+format recognized by PHP (<comment>https://php.net/manual/datetime.formats.relative.php</comment>).
+
+  <info>php %command.full_name% <level> <disable-after></info>
+
+The <info>--user</info> option can be used to modify the logger level to the configuration
+scope of a specific user (the global configuration is changed otherwise):
+
+  <info>php %command.full_name% --user=<user-email> <level> <disable-after></info>
+
+HELP
+            )
+            ->addUsage('--user=<user-email> <level> <disable-after>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $user = null;
-        $level = $this->getLogLevel($input->getArgument(self::LEVEL_PARAM));
-        $disableAfter = $this->getDisableAfterDateTime($input->getArgument(self::DISABLE_AFTER_PARAM));
+        $level = $this->getLogLevel($input->getArgument('level'));
+        $disableAfter = $this->getDisableAfterDateTime($input->getArgument('disable-after'));
 
-        $user = $this->getUser($input->getOption(self::USER_PARAM));
+        $user = $this->getUser($input->getOption('user'));
 
         if ($user) {
-            /* @var ConfigManager $configManager */
-            $configManager = $this->getContainer()->get('oro_config.user');
+            $configManager = $this->userConfigManager;
             $configManager->setScopeIdFromEntity($user);
         } else {
-            /* @var ConfigManager $configManager */
-            $configManager = $this->getContainer()->get('oro_config.global');
+            $configManager = $this->globalConfigManager;
         }
 
         $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY), $level);
@@ -89,11 +103,7 @@ class LoggerLevelCommand extends ContainerAwareCommand
 
         $configManager->flush();
 
-        /** @var CacheProvider $cache */
-        $cache = $this->getContainer()->get('oro_logger.cache');
-        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
-            $cache->delete(Configuration::LOGS_LEVEL_KEY);
-        }
+        $this->cache->delete(Configuration::LOGS_LEVEL_KEY);
 
         if ($user) {
             $message = sprintf(
@@ -111,24 +121,18 @@ class LoggerLevelCommand extends ContainerAwareCommand
         }
 
         $output->writeln($message);
+
+        return 0;
     }
 
     /**
-     * @param string $value
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
-    public function getLogLevel($value)
+    public function getLogLevel(string $value): string
     {
         if (!in_array($value, self::$loggingLevels)) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    "Wrong '%s' value for '%s' argument",
-                    $value,
-                    self::LEVEL_PARAM
-                )
+                \sprintf("Wrong '%s' value for '%s' argument", $value, 'level')
             );
         }
 
@@ -136,25 +140,22 @@ class LoggerLevelCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $value
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return \DateTime
      */
-    public function getDisableAfterDateTime($value)
+    public function getDisableAfterDateTime(string $value): \DateTime
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter = clone $now;
-        $disableAfter->add(\DateInterval::createFromDateString($value));
+
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $interval = @\DateInterval::createFromDateString($value);
+        if ($interval instanceof \DateInterval) {
+            $disableAfter->add($interval);
+        }
 
         if ($disableAfter <= $now) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    "Value '%s' for '%s' argument should be valid date interval",
-                    $value,
-                    self::DISABLE_AFTER_PARAM
-                )
+                \sprintf("Value '%s' for '%s' argument should be valid date interval", $value, 'disable-after')
             );
         }
 
@@ -162,33 +163,19 @@ class LoggerLevelCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $email
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return User|null
      */
-    public function getUser($email)
+    public function getUser(?string $email): ?User
     {
         $user = null;
 
         if ($email) {
-            /** @var User $user */
-            $user = $this
-                ->getContainer()
-                ->get('oro_user.manager')
-                ->findUserByEmail($email);
-
+            $user = $this->userManager->findUserByEmail($email);
             if (is_null($user)) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        "User with email '%s' not exists.",
-                        $email
-                    )
-                );
+                throw new \InvalidArgumentException(\sprintf("User with email '%s' not exists.", $email));
             }
         }
-
+        /** @var User $user */
         return $user;
     }
 }

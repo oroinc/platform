@@ -8,17 +8,17 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    public function testShouldAllowGetMessageCollector()
+    public function testShouldAllowGetMessageCollector(): void
     {
         self::assertSame(self::$messageCollector, self::getMessageCollector());
     }
 
-    public function testShouldSentMessagesBeEmptyInEachTest()
+    public function testShouldSentMessagesBeEmptyInEachTest(): void
     {
         self::assertCount(0, self::getSentMessages());
     }
 
-    public function testShouldAllowGetSentMessages()
+    public function testShouldAllowGetSentMessages(): void
     {
         $topic = 'test topic';
         $message = 'test message';

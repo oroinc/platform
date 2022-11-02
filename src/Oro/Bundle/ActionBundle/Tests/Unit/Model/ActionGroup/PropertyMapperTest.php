@@ -9,35 +9,17 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PropertyMapperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextAccessor */
-    protected $mockContextAccessor;
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $mockContextAccessor;
 
     /** @var PropertyMapper */
-    protected $propertyMapper;
+    private $propertyMapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->mockContextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')->getMock();
+        $this->mockContextAccessor = $this->createMock(ContextAccessor::class);
+
         $this->propertyMapper = new PropertyMapper($this->mockContextAccessor);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->mockContextAccessor, $this->propertyMapper);
-    }
-
-    public function testAccessorUsage()
-    {
-        $this->assertAttributeSame($this->mockContextAccessor, 'accessor', $this->propertyMapper);
-    }
-
-    public function testAccessorEnsured()
-    {
-        $this->assertAttributeInstanceOf(
-            'Oro\Component\ConfigExpression\ContextAccessor',
-            'accessor',
-            $this->propertyMapper
-        );
     }
 
     public function testMapToArgs()
@@ -45,24 +27,25 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         $pp1 = new PropertyPath('contextParam1');
         $pp2 = new PropertyPath('contextParam2');
 
-        $this->mockContextAccessor
-            ->expects($this->at(0))
+        $this->mockContextAccessor->expects(self::exactly(2))
             ->method('getValue')
-            ->with([], $pp1)
-            ->willReturn('val1');
-        $this->mockContextAccessor
-            ->expects($this->at(1))
-            ->method('getValue')
-            ->with([], $pp2)
-            ->willReturn('val2');
+            ->withConsecutive(
+                [[], $pp1],
+                [[], $pp2]
+            )
+            ->willReturnOnConsecutiveCalls(
+                'val1',
+                'val2'
+            );
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroupExecutionArgs $mockExecutionArgs */
-        $mockExecutionArgs = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs')
-            ->disableOriginalConstructor()->getMock();
-
-        $mockExecutionArgs->expects($this->at(0))->method('addParameter')->with('arg1', 'val1');
-        $mockExecutionArgs->expects($this->at(1))->method('addParameter')->with('arg2', ['embedded' => 'val2']);
-        $mockExecutionArgs->expects($this->at(2))->method('addParameter')->with('arg3', 'simple value');
+        $mockExecutionArgs = $this->createMock(ActionGroupExecutionArgs::class);
+        $mockExecutionArgs->expects(self::exactly(3))
+            ->method('addParameter')
+            ->withConsecutive(
+                ['arg1', 'val1'],
+                ['arg2', ['embedded' => 'val2']],
+                ['arg3', 'simple value']
+            );
 
         $this->propertyMapper->toArgs(
             $mockExecutionArgs,
@@ -77,17 +60,16 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Parameters map must be array or implements \Traversable interface
-     */
     public function testNonTraversableAssertionException()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroupExecutionArgs $mockExecutionArgs */
-        $mockExecutionArgs = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs')
-            ->disableOriginalConstructor()->getMock();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parameters map must be array or implements \Traversable interface');
 
-        $this->propertyMapper->toArgs($mockExecutionArgs, (object)[], []);
+        $this->propertyMapper->toArgs(
+            $this->createMock(ActionGroupExecutionArgs::class),
+            new \stdClass(),
+            []
+        );
     }
 
     public function testTransfer()
@@ -97,12 +79,12 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
 
         $sourcePropertyPath = new PropertyPath('source');
 
-        $this->mockContextAccessor->expects($this->once())
+        $this->mockContextAccessor->expects(self::once())
             ->method('getValue')
             ->with($from, $sourcePropertyPath)
             ->willReturn('data');
 
-        $this->mockContextAccessor->expects($this->once())
+        $this->mockContextAccessor->expects(self::once())
             ->method('setValue')
             ->with($to, 'target', 'data');
 

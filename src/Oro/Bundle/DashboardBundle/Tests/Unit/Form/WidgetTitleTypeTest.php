@@ -5,31 +5,28 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
 
 class WidgetTitleTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetTitleType */
-    protected $formType;
+    private $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetTitleType();
     }
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with('title', TextType::class);
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('useDefault', CheckboxType::class);
+            ->withConsecutive(
+                ['title', TextType::class],
+                ['useDefault', CheckboxType::class]
+            );
+
         $this->formType->buildForm($builder, []);
     }
 }

@@ -1,7 +1,6 @@
 services:
     oro_api.get.processor:
         class: Oro\Bundle\ApiBundle\Processor\GetProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - get

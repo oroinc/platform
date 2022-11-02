@@ -16,16 +16,11 @@ interface FixtureInterface
 
     /**
      * Creates data in db which will be queried by segment filter
-     *
-     * @param EntityManager $em
      */
     public function createData(EntityManager $em);
 
     /**
      * Checks that created data are expected
-     *
-     * @param \PHPUnit\Framework\Assert $assertions
-     * @param array $actualData
      */
     public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData);
 }

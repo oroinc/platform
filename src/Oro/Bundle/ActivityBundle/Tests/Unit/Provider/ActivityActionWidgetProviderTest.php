@@ -2,27 +2,25 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider;
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
 class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityActionWidgetProvider */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $activityManager;
+    private $activityManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $placeholderProvider;
+    private $placeholderProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->placeholderProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->activityManager = $this->createMock(ActivityManager::class);
+        $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);
 
         $this->provider = new ActivityActionWidgetProvider(
             $this->activityManager,
@@ -41,12 +39,12 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
             ->with($entityClass)
-            ->will($this->returnValue($isSupported));
+            ->willReturn($isSupported);
 
         $this->assertEquals($isSupported, $this->provider->supports($entity));
     }
 
-    public function supportsProvider()
+    public function supportsProvider(): array
     {
         return [
             [true],
@@ -85,21 +83,17 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->placeholderProvider->expects($this->any())
             ->method('getItem')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['button_widget1', ['entity' => $entity], ['template' => 'button_template1']],
-                        ['link_widget1', ['entity' => $entity], ['template' => 'link_template1']],
-                        ['button_widget2', ['entity' => $entity], ['template' => 'button_template2']],
-                        ['link_widget2', ['entity' => $entity], null],
-                        ['button_widget3', ['entity' => $entity], null],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['button_widget1', ['entity' => $entity], ['template' => 'button_template1']],
+                ['link_widget1', ['entity' => $entity], ['template' => 'link_template1']],
+                ['button_widget2', ['entity' => $entity], ['template' => 'button_template2']],
+                ['link_widget2', ['entity' => $entity], null],
+                ['button_widget3', ['entity' => $entity], null],
+            ]);
         $this->activityManager->expects($this->once())
             ->method('getActivityActions')
             ->with($entityClass)
-            ->will($this->returnValue($activities));
+            ->willReturn($activities);
 
         $this->assertEquals(
             [

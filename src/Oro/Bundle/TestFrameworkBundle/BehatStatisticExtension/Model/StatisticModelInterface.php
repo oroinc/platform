@@ -4,15 +4,18 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * Interface for Statistic model.
+ */
 interface StatisticModelInterface
 {
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId();
+    public function getPath();
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isNew();
 

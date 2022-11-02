@@ -11,10 +11,14 @@
     $active-border: darken($border, 8%),
     $active-color: color-yiq($active-background),
     $active-box-shadow: null,
+    $focus-background: null,
     $focus-border: null,
-    $disabled-color: color-yiq($background),
-    $disabled-background-color: $background,
-    $disabled-border-color: $border
+    $focus-color: null,
+    $focus-box-shadow: null,
+    $disabled-color: $color,
+    $disabled-background: $background,
+    $disabled-border: $border,
+    $disabled-opacity: null
 ) {
     color: $color;
 
@@ -34,11 +38,15 @@
 
     &:focus,
     &.focus {
+        color: $focus-color;
+        background-color: $focus-background;
         border-color: $focus-border;
 
         // Avoid using mixin so we can pass custom focus shadow properly
         @if $enable-shadows {
             box-shadow: $btn-box-shadow;
+        } @else {
+            box-shadow: $focus-box-shadow;
         }
     }
 
@@ -46,8 +54,9 @@
     &.disabled,
     &:disabled {
         color: $disabled-color;
-        background-color: $disabled-background-color;
-        border-color: $disabled-border-color;
+        background-color: $disabled-background;
+        border-color: $disabled-border;
+        opacity: $disabled-opacity;
     }
 
     &:not(:disabled):not(.disabled):active,
@@ -56,8 +65,9 @@
         color: $active-color;
         background-color: $active-background;
 
+        // Remove the gradient for the pressed/active state
         @if $enable-gradients {
-            background-image: none; // Remove the gradient for the pressed/active state
+            background-image: none;
         }
 
         border-color: $active-border;

@@ -1,13 +1,10 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid',
-    './footer/footer-row',
-    './footer/footer-cell'
-], function(_, Backbone, Backgrid, FooterRow, FooterCell) {
+define(function(require) {
     'use strict';
 
-    var Footer;
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const FooterRow = require('./footer/footer-row');
+    const FooterCell = require('./footer/footer-cell');
 
     /**
      * Datagrid footer widget
@@ -16,7 +13,7 @@ define([
      * @class   orodatagrid.datagrid.Footer
      * @extends Backgrid.Footer
      */
-    Footer = Backgrid.Footer.extend({
+    const Footer = Backgrid.Footer.extend({
         /** @property */
         tagName: 'tfoot',
 
@@ -37,19 +34,17 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function Footer() {
-            Footer.__super__.constructor.apply(this, arguments);
+        constructor: function Footer(options) {
+            Footer.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['themeOptions']));
-            var state;
-
+            _.extend(this, _.pick(options, ['themeOptions', 'gridRowsCounter']));
             this.rows = [];
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
@@ -61,23 +56,26 @@ define([
             this.columns = options.columns;
             this.filteredColumns = options.filteredColumns;
 
-            state = options.collection.state || {};
+            const state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
+                let ariaRowIndex = this.gridRowsCounter.getHeaderRowsCount() + this.gridRowsCounter.getTotalRowsCount();
                 _.each(state.totals, function(total, rowName) {
+                    ariaRowIndex++;
                     this.rows[this.rows.length] = new this.row({
                         columns: this.columns,
                         collection: this.filteredColumns,
                         dataCollection: this.collection,
                         footerCell: this.footerCell,
-                        rowName: rowName
+                        rowName,
+                        ariaRowIndex
                     });
                 }, this);
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -89,6 +87,7 @@ define([
             delete this.rows;
             delete this.columns;
             delete this.filteredColumns;
+            delete this.gridRowsCounter;
             Footer.__super__.dispose.call(this);
         },
 
@@ -104,6 +103,21 @@ define([
             }
             this.delegateEvents();
             return this;
+        },
+
+        _attributes() {
+            return {
+                'aria-hidden': this.renderable ? null : true
+            };
+        },
+
+        /**
+         * Get a number of rendered rows in a footer
+         *
+         * @return {number}
+         */
+        getRowsCount() {
+            return this.rows.length;
         }
     });
 

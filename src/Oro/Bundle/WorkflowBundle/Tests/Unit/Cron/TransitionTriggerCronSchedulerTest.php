@@ -11,21 +11,16 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var TransitionTriggerCronScheduler
-     */
+    /** @var TransitionTriggerCronScheduler */
     private $scheduler;
 
-    /**
-     * @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
     private $deferredScheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->deferredScheduler = $this->getMockBuilder(DeferredScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->deferredScheduler = $this->createMock(DeferredScheduler::class);
+
         $this->scheduler = new TransitionTriggerCronScheduler($this->deferredScheduler);
     }
 
@@ -80,7 +75,8 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testFlush()
     {
-        $this->deferredScheduler->expects($this->once())->method('flush');
+        $this->deferredScheduler->expects($this->once())
+            ->method('flush');
         $this->scheduler->flush();
     }
 }

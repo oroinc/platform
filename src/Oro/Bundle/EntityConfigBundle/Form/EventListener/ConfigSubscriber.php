@@ -5,41 +5,35 @@ namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form listener to update configs and translatable values
+ */
 class ConfigSubscriber implements EventSubscriberInterface
 {
     const NEW_PENDING_VALUE_KEY = 1;
 
-    /**
-     * @var ConfigTranslationHelper
-     */
+    /** @var ConfigTranslationHelper */
     protected $translationHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ConfigTranslationHelper $translationHelper
-     * @param ConfigManager $configManager
-     * @param Translator $translator
-     */
     public function __construct(
         ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->translationHelper = $translationHelper;
         $this->configManager = $configManager;
@@ -51,30 +45,28 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::POST_SUBMIT  => ['postSubmit', -10],
             FormEvents::PRE_SET_DATA => 'preSetData'
-        );
+        ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
-        $configModel = $event->getForm()->getConfig()->getOption('config_model');
+        $formConfig = $event->getForm()->getConfig();
+
+        /** @var FieldConfigModel $configModel */
+        $configModel = $formConfig->getOption('config_model');
 
         $event->setData(
             $this->updateTranslatableValues(
+                $formConfig->getOption('field_name'),
                 $configModel,
                 $this->updateDataWithPendingChanges($configModel, $event->getData())
             )
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         $form        = $event->getForm();
@@ -83,14 +75,20 @@ class ConfigSubscriber implements EventSubscriberInterface
         $this->updateConfigs(
             $configModel,
             $this->updatePendingChanges($configModel, $event->getData()),
-            $form->isValid()
+            $form->isValid() && !$this->isClickedButton($form, ConfigType::PARTIAL_SUBMIT)
         );
+    }
+
+    private function isClickedButton(FormInterface $form, string $buttonName): string
+    {
+        return method_exists($form, 'getClickedButton') && $form->getClickedButton()?->getName() === $buttonName;
     }
 
     /**
      * @param ConfigModel $configModel
      * @param array $data
      * @param bool $flush
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function updateConfigs(ConfigModel $configModel, array $data, $flush)
     {
@@ -105,14 +103,17 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if (isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])) {
+                    if ($configModel->getId() &&
+                        $configModel instanceof FieldConfigModel &&
+                        isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])
+                    ) {
                         // we shouldn't overwrite config's value by data from form,
                         // if it was directly changed earlier by some form's listener or something like that
                         $value = $changeSet[$code][static::NEW_PENDING_VALUE_KEY];
                     }
                     if (in_array($code, $translatable, true)) {
                         // check if a label text was changed
-                        $labelKey = $config->get($code);
+                        $labelKey = (string) $config->get($code);
                         if (!$configModel->getId()) {
                             $labelsToBeUpdated[$labelKey] = $value;
                         } elseif ($value != $this->translator->trans($labelKey)) {
@@ -201,12 +202,13 @@ class ConfigSubscriber implements EventSubscriberInterface
      *  - field name (in case of creating new FieldConfigModel)
      *  - empty string (in case of editing FieldConfigModel)
      *
+     * @param string $fieldName
      * @param ConfigModel $configModel
      * @param array $data
      *
      * @return array
      */
-    protected function updateTranslatableValues(ConfigModel $configModel, array $data)
+    protected function updateTranslatableValues($fieldName, ConfigModel $configModel, array $data)
     {
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
@@ -216,13 +218,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable, true)) {
-                        if ($this->translator->hasTrans($value)) {
-                            $data[$scope][$code] = $this->translator->trans($value);
-                        } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
-                            $data[$scope][$code] = $configModel->getFieldName();
-                        } else {
-                            $data[$scope][$code] = '';
-                        }
+                        $data[$scope][$code] = $this->translationHelper->translateWithFallback($value, $fieldName);
                     }
                 }
             }

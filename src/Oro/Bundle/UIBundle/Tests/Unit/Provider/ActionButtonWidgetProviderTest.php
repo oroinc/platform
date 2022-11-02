@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider;
 
 class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $placeholderProvider;
+    /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $placeholderProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->placeholderProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);
     }
 
     public function testSupports()
@@ -41,14 +40,10 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->placeholderProvider->expects($this->exactly(2))
             ->method('getItem')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['button_widget', ['entity' => $entity], ['template' => 'button_template']],
-                        ['link_widget', ['entity' => $entity], ['template' => 'link_template']],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['button_widget', ['entity' => $entity], ['template' => 'button_template']],
+                ['link_widget', ['entity' => $entity], ['template' => 'link_template']],
+            ]);
 
         $this->assertEquals(
             [
@@ -79,7 +74,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->placeholderProvider->expects($this->once())
             ->method('getItem')
             ->with('button_widget', ['entity' => $entity])
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertEquals(
             [],
@@ -99,14 +94,10 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->placeholderProvider->expects($this->exactly(2))
             ->method('getItem')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['button_widget', ['entity' => $entity], ['template' => 'button_template']],
-                        ['link_widget', ['entity' => $entity], null],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['button_widget', ['entity' => $entity], ['template' => 'button_template']],
+                ['link_widget', ['entity' => $entity], null],
+            ]);
 
         $this->assertEquals(
             [
@@ -134,7 +125,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->placeholderProvider->expects($this->once())
             ->method('getItem')
             ->with('button_widget', ['entity' => $entity])
-            ->will($this->returnValue(['template' => 'button_template']));
+            ->willReturn(['template' => 'button_template']);
 
         $this->assertEquals(
             [

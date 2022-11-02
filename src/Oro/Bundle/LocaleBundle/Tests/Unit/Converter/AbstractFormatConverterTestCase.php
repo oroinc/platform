@@ -3,33 +3,28 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCase
 {
-    const LOCALE_EN = 'en';
-    const LOCALE_RU = 'ru';
+    protected const LOCALE_EN = 'en';
+    protected const LOCALE_RU = 'ru';
+    protected const LOCALE_AR = 'ar';
+    protected const LOCALE_PT_BR = 'pt_BR';
+    protected const LOCALE_ZH_CN = 'zh_CN';
 
-    /**
-     * @var DateTimeFormatConverterInterface
-     */
+    /** @var DateTimeFormatConverterInterface */
     protected $converter;
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    /**
-     * @var Translator
-     */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /**
-     * @var array
-     */
-    protected $localFormatMap = [
+    protected array $localFormatMap = [
         [null, null, self::LOCALE_EN, null, "MMM d, y h:mm a"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "MMMM d, y h:mm:ss a"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMMM d, y"],
@@ -49,122 +44,97 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "H:mm:ss"],
         [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "H:mm"],
         [\IntlDateFormatter::NONE, null, self::LOCALE_RU, null, "H:mm"],
+
+        [null, null, self::LOCALE_AR, null, "d MMMM y h:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, "d MMMM y h:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "d MMMM y"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, "dd‏/MM‏/y h:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "dd‏/MM‏/y"],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "d MMMM y"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, "h:mm:ss"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, "h:mm"],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_AR, null, "h:mm:ss"],
+
+        [null, null, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, "d 'de' MMM 'de' y HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMM 'de' y"],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, 'HH:mm'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
+        [null, null, self::LOCALE_ZH_CN, null, 'y年M月d日 HH:mm'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
     ];
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->setMethods(['getPattern'])
-            ->getMock();
-
-        $this->formatter->expects($this->any())
+        $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
+        $this->formatter->expects(self::any())
             ->method('getPattern')
-            ->will($this->returnValueMap($this->localFormatMap));
+            ->willReturnMap($this->localFormatMap);
 
-        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($one, $two, $tree, $locale) {
+                if ($locale === self::LOCALE_EN) {
+                    return 'MMM d';
+                }
 
-        $this->translator->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($one, $two, $tree, $locale) {
-                        if ($locale == self::LOCALE_EN) {
-                            return 'MMM d';
-                        }
+                if ($locale === self::LOCALE_RU) {
+                    return 'd.MMM';
+                }
 
-                        if ($locale == self::LOCALE_RU) {
-                            return 'd.MMM';
-                        }
-
-                        return '';
-                    }
-                )
-            );
+                return '';
+            });
 
         $this->converter = $this->createFormatConverter();
     }
 
-    protected function tearDown()
-    {
-        unset($this->formatter);
-        unset($this->converter);
-    }
+    abstract protected function createFormatConverter(): DateTimeFormatConverterInterface;
 
     /**
-     * @return DateTimeFormatConverterInterface
-     */
-    abstract protected function createFormatConverter();
-
-    /**
-     * @param string $expected
-     * @param int    $dateFormat
-     * @param string $locale
-     *
      * @dataProvider getDateFormatDataProvider
      */
-    public function testGetDateFormat($expected, $dateFormat, $locale)
+    public function testGetDateFormat(string $expected, ?int $dateFormat, string $locale): void
     {
-        $this->assertEquals($expected, $this->converter->getDateFormat($dateFormat, $locale));
+        self::assertEquals($expected, $this->converter->getDateFormat($dateFormat, $locale));
     }
 
-    /**
-     * @return array
-     */
-    abstract public function getDateFormatDataProvider();
+    abstract public function getDateFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param int    $timeFormat
-     * @param string $locale
-     *
      * @dataProvider getTimeFormatDataProvider
      */
-    public function testGetTimeFormat($expected, $timeFormat, $locale)
+    public function testGetTimeFormat(string $expected, ?int $timeFormat, string $locale): void
     {
-        $this->assertEquals($expected, $this->converter->getTimeFormat($timeFormat, $locale));
+        self::assertEquals($expected, $this->converter->getTimeFormat($timeFormat, $locale));
     }
 
-    /**
-     * @return array
-     */
-    abstract public function getTimeFormatDataProvider();
+    abstract public function getTimeFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param int    $dateFormat
-     * @param int    $timeFormat
-     * @param string $locale
-     *
      * @dataProvider getDateTimeFormatDataProvider
      */
-    public function testGetDateTimeFormat($expected, $dateFormat, $timeFormat, $locale)
+    public function testGetDateTimeFormat(string $expected, ?int $dateFormat, ?int $timeFormat, string $locale): void
     {
-        $this->assertEquals($expected, $this->converter->getDateTimeFormat($dateFormat, $timeFormat, $locale));
+        self::assertEquals($expected, $this->converter->getDateTimeFormat($dateFormat, $timeFormat, $locale));
     }
 
-    /**
-     * @return array
-     */
-    abstract public function getDateTimeFormatDataProvider();
+    abstract public function getDateTimeFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param string $locale
-     *
      * @dataProvider getDateFormatDayProvider
      */
-    public function testGetDayFormat($expected, $locale)
+    public function testGetDayFormat(string $expected, string $locale): void
     {
-        $this->assertEquals($expected, $this->converter->getDayFormat($locale));
+        self::assertEquals($expected, $this->converter->getDayFormat($locale));
     }
 
-    /**
-     * @return array
-     */
-    abstract public function getDateFormatDayProvider();
+    abstract public function getDateFormatDayProvider(): array;
 }

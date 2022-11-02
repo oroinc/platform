@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Serializer;
 
+use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -11,29 +12,16 @@ use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationManager;
+    private $translationManager;
 
     /** @var TranslationNormalizer */
-    protected $normalizer;
+    private $normalizer;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->normalizer = new TranslationNormalizer($this->translationManager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->translationManager, $this->normalizer);
     }
 
     public function testDenormalize()
@@ -66,35 +54,27 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Translation::SCOPE_UI, $translation->getScope());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Incorrect record format
-     */
     public function testDenormalizeEmpty()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Incorrect record format');
+
         $this->normalizer->denormalize([], Translation::class);
     }
 
     /**
-     * @param string $type
-     * @param string $languageCode
-     * @param bool $expected
-     *
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($type, $languageCode, $expected)
+    public function testSupportsDenormalization(string $type, string $languageCode, bool $expected)
     {
         $context = ['language_code' => $languageCode];
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization([], $type, null, $context));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
         return [
-            'wrong class' => ['\stdClass', 'en_US', false],
+            'wrong class' => [\stdClass::class, 'en_US', false],
             'empty class' => ['', 'en_US', false],
             'no language code' => [Translation::class, '', false],
             'right data' => [Translation::class, 'en_US', true],

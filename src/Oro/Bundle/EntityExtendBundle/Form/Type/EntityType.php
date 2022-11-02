@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Form type for EntityConfigModel.
+ */
 class EntityType extends AbstractType
 {
     /**
@@ -16,9 +19,6 @@ class EntityType extends AbstractType
      */
     protected $nameGenerator;
 
-    /**
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
@@ -37,7 +37,13 @@ class EntityType extends AbstractType
                 'block'       => 'general',
                 'subblock'    => 'second',
                 'constraints' => [
-                    new Assert\Length(['min' => 5, 'max' => $this->nameGenerator->getMaxCustomEntityNameSize()])
+                    new Assert\Length(
+                        [
+                            'min' => 5,
+                            'max' => $this->nameGenerator->getMaxCustomEntityNameSize(),
+                            'allowEmptyString' => false,
+                        ]
+                    ),
                 ],
             ]
         );

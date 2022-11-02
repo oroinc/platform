@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Model;
 
 /**
- * This class can be used if you need a base class for an association that can
+ * This class should be used if you need a base class for an association that can
  * contain different types of entities that are not implemented via Doctrine table inheritance
  * and as result do not have a common superclass.
  */
@@ -132,7 +132,7 @@ class EntityIdentifier implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->hasAttribute($offset);
     }
@@ -140,7 +140,7 @@ class EntityIdentifier implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->getAttribute($offset);
     }
@@ -148,7 +148,7 @@ class EntityIdentifier implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->setAttribute($offset, $value);
     }
@@ -156,7 +156,7 @@ class EntityIdentifier implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->removeAttribute($offset);
     }

@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+.activity-context-current-block {
+    display: inline-block;
+    margin-bottom: $activity-context-current-block-margin;
+
+    font-size: $activity-context-current-block-font-size;
+
+    color: $activity-context-current-block-color;
+
+    cursor: pointer;
+}

@@ -5,45 +5,57 @@ namespace Oro\Bundle\TagBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class TagListener implements ContainerAwareInterface
+/**
+ * Removes tags for deleted taggable entities.
+ */
+class TagListener implements ServiceSubscriberInterface
 {
-    /** @var TagManager */
-    protected $tagManager;
+    private ContainerInterface $container;
+    private ?TaggableHelper $taggableHelper = null;
+    private ?TagManager $tagManager = null;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var TaggableHelper */
-    protected $taggableHelper;
-
-    /** @param TaggableHelper $helper */
-    public function __construct(TaggableHelper $helper)
-    {
-        $this->taggableHelper = $helper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function preRemove(LifecycleEventArgs $args)
+    public function preRemove(LifecycleEventArgs $args): void
     {
         $entity = $args->getEntity();
-        if ($this->taggableHelper->isTaggable($entity)) {
-            if ((null === $this->tagManager) && $this->container) {
-                $this->tagManager = $this->container->get('oro_tag.tag.manager');
-            }
-            $this->tagManager->deleteTagging($entity, []);
+        if ($this->getTaggableHelper()->isTaggable($entity)) {
+            $this->getTagManager()->deleteTagging($entity, []);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_tag.helper.taggable_helper' => TaggableHelper::class,
+            'oro_tag.tag.manager' => TagManager::class
+        ];
+    }
+
+    private function getTaggableHelper(): TaggableHelper
+    {
+        if (null === $this->taggableHelper) {
+            $this->taggableHelper = $this->container->get('oro_tag.helper.taggable_helper');
+        }
+
+        return $this->taggableHelper;
+    }
+
+    private function getTagManager(): TagManager
+    {
+        if (null === $this->tagManager) {
+            $this->tagManager = $this->container->get('oro_tag.tag.manager');
+        }
+
+        return $this->tagManager;
     }
 }

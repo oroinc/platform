@@ -5,22 +5,122 @@ system_configuration:
             title:  oro.attachment.config.attachment.label
         attachment_mime_types_settings:
             title:  oro.attachment.config.mime_types.label
-
+        attachment_file_size_settings:
+            title:  oro.attachment.config.file_size_settings.label
+        externally_stored_files_settings:
+            title:  oro.attachment.config.externally_stored_files_settings.label
+        attachment_processors_settings:
+            title:  oro.attachment.config.attachment_processors_settings.label
+            description: oro.attachment.config.attachment_processors_settings.description
+            description_style: warning
+        attachment_webp_settings:
+            title: oro.attachment.config.webp_settings.label
+            description: oro.attachment.config.webp_settings.description
+            description_style: warning
+        attachment_file_names_settings:
+            title: oro.attachment.config.file_names.label
+            description: oro.attachment.config.file_names.description
+            description_style: warning
     fields:
+        oro_attachment.maxsize:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            options:
+                required: true
+                label: oro.attachment.config.file_size.label
+                empty_data: 1
+                tooltip: oro.attachment.max_size.tooltip
+                constraints:
+                    - NotBlank: ~
+                    - Type: integer
+                    - Range:
+                        min: 1
+                        max: 2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
+
         oro_attachment.upload_file_mime_types:
             data_type: string
-            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            search_type: text
+            type: Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
             options:
-                label:   oro.attachment.config.upload_file_mime_types.label
+                label: oro.attachment.config.upload_file_mime_types.label
                 tooltip: oro.attachment.config.upload_file_mime_types.tooltip
+                constraints:
+                    - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: { type: file }
+
         oro_attachment.upload_image_mime_types:
             data_type: string
-            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            search_type: text
+            type: Oro\Bundle\AttachmentBundle\Form\Type\ImageMimeTypeConfigType
             options:
                 label: oro.attachment.config.upload_image_mime_types.label
                 tooltip: oro.attachment.config.upload_image_mime_types.tooltip
+                constraints:
+                    - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: { type: image }
+
+        oro_attachment.external_file_allowed_urls_regexp:
+            data_type: string
+            type: \Symfony\Component\Form\Extension\Core\Type\TextType
+            options:
+                label: oro.attachment.config.external_file_allowed_urls_regexp.label
+                tooltip: oro.attachment.config.external_file_allowed_urls_regexp.tooltip
+                constraints:
+                    - Oro\Bundle\FormBundle\Validator\Constraints\RegExpSyntax: ~
+
+        oro_attachment.processors_allowed:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            page_reload: true
+            options:
+                label: oro.attachment.config.feature.attachment_processors_allowed.title
+                tooltip: oro.attachment.config.feature.attachment_processors_allowed.tooltip
+                resettable: true
+
+        oro_attachment.jpeg_quality:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            options:
+                required: true
+                label: oro.attachment.config.jpeg_quality
+                tooltip: oro.attachment.config.quality_tooltip
+                constraints:
+                    - NotBlank: ~
+                    - Type: integer
+                    - Range:
+                          min: 30
+                          max: 100
+
+        oro_attachment.png_quality:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+            search_type: choice
+            options:
+                label: oro.attachment.config.png_quality
+                tooltip: oro.attachment.config.quality_tooltip
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    oro.attachment.config.png_preserve_quality: 100
+                    oro.attachment.config.png_minimize_file_size: 35
+
+        oro_attachment.webp_quality:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            options:
+                required: true
+                label: oro.attachment.config.webp_quality.label
+                tooltip: oro.attachment.config.webp_quality.tooltip
+                constraints:
+                    - NotBlank: ~
+                    - Type: integer
+                    - Range:
+                          min: 30
+                          max: 100
+
+        oro_attachment.original_file_names_enabled:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.attachment.config.original_file_names_enabled.label
+                tooltip: oro.attachment.config.original_file_names_enabled.tooltip
 
     tree:
         system_configuration:
@@ -31,11 +131,27 @@ system_configuration:
                             attachment_settings:
                                 priority: -10
                                 children:
+                                    attachment_file_size_settings:
+                                        children:
+                                            - oro_attachment.maxsize
                                     attachment_mime_types_settings:
                                         children:
                                             - oro_attachment.upload_file_mime_types
                                             - oro_attachment.upload_image_mime_types
-
+                                    externally_stored_files_settings:
+                                        children:
+                                            - oro_attachment.external_file_allowed_urls_regexp
+                                    attachment_processors_settings:
+                                        children:
+                                            - oro_attachment.processors_allowed
+                                            - oro_attachment.jpeg_quality
+                                            - oro_attachment.png_quality
+                                    attachment_webp_settings:
+                                        children:
+                                            - oro_attachment.webp_quality
+                                    attachment_file_names_settings:
+                                        children:
+                                            - oro_attachment.original_file_names_enabled
     api_tree:
         attachments:
             oro_attachment.upload_file_mime_types: ~

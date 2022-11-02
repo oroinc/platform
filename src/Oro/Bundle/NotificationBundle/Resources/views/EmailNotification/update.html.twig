@@ -1,10 +1,10 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroUserBundle:Form:fields.html.twig',
-    'OroNotificationBundle:Form:fields.html.twig',
-    'OroEmailBundle:Form:fields.html.twig'
-]%}
+    '@OroForm/Form/fields.html.twig',
+    '@OroUser/Form/fields.html.twig',
+    '@OroEmail/Form/fields.html.twig'
+] %}
+
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
 {% endif %}
@@ -15,6 +15,8 @@
 %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_emailnotication', {'id': form.vars.value.id}),
@@ -56,22 +58,27 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.notification.emailnotification.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set id = 'emailnotificaton-edit' %}
+
+    {% if form.recipientList.vars.errors|length == 0 -%}
+        {% set subblocks = [UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans)] %}
+    {% else %}
+        {% set subblocks = [UI.renderHtmlProperty('', form_errors(form.recipientList))] %}
+    {%- endif %}
 
     {% set recipientList = {
         'title': 'oro.notification.emailnotification.recipient_list.label'|trans,
         'class': '',
         'subblocks': [{
             'title': '',
-            'data': [
-                UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans),
-                form_widget(form.children.recipientList),
-            ]
+            'data': subblocks|default([])|merge([form_widget(form.recipientList)])
         }]
     } %}
 
@@ -92,23 +99,21 @@
         ]
     } %}
 
-    <div data-page-component-module="oronotification/js/app/components/email-notification-form-component"
-         data-page-component-options="{{ {
-             'selectors': {
-                 'form': '#' ~ form.vars.id,
-                 'listenChangeElements': form.vars.listenChangeElements
-             }
-         }|json_encode }}"
-    >
+    <div class="responsive-form-inner">
         {{ parent() }}
     </div>
 {% endblock content_data %}
 
 {% block content %}
-    <div data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {
-              view: 'oronotification/js/app/views/email-notification-form-view'
-          }|json_encode }}">
+    <div class="scrollable-container"
+        data-page-component-module="oroui/js/app/components/view-component"
+        data-page-component-options="{{ {
+            view: 'oronotification/js/app/views/email-notification-form-view',
+            selectors: {
+                form: '#' ~ form.vars.id,
+                listenChangeElements: form.vars.listenChangeElements
+            }
+        }|json_encode }}">
         {{ parent() }}
     </div>
 {% endblock %}

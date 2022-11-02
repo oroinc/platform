@@ -15,7 +15,7 @@ class RestPrefixRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /** @var RestPrefixRouteOptionsResolver */
     private $routeOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $container = new Container();
         $container->setParameter('oro_api.rest.prefix', '/api/');

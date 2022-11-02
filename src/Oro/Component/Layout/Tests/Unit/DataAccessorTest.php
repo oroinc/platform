@@ -4,24 +4,28 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\DataProviderDecorator;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var DataAccessor */
-    protected $dataAccessor;
+    private $dataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->context  = new LayoutContext();
+        $this->registry = $this->createMock(LayoutRegistryInterface::class);
+        $this->context = new LayoutContext();
 
         $this->dataAccessor = new DataAccessor(
             $this->registry,
@@ -31,42 +35,34 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGet()
     {
-        $name         = 'foo';
+        $name = 'foo';
         $expectedData = new \stdClass();
 
-        $this->registry
-            ->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue($expectedData));
+            ->willReturn($expectedData);
 
-        $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
-            $this->dataAccessor->get($name)
-        );
+        $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor->get($name));
     }
 
     public function testArrayAccessGet()
     {
-        $name         = 'foo';
+        $name = 'foo';
         $expectedData = new \stdClass();
 
-        $this->registry
-            ->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue($expectedData));
+            ->willReturn($expectedData);
 
-        $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
-            $this->dataAccessor[$name]
-        );
+        $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor[$name]);
     }
 
     public function testGetFromContextData()
     {
-        $name                 = 'foo';
-        $expectedData         = new \stdClass();
+        $name = 'foo';
+        $expectedData = new \stdClass();
 
         $this->context[$name] = 'other';
         $this->context->getResolver()->setDefined([$name]);
@@ -76,15 +72,15 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertSame($expectedData, $this->dataAccessor->get($name));
     }
 
     public function testArrayAccessGetFromContextData()
     {
-        $name                 = 'foo';
-        $expectedData         = new \stdClass();
+        $name = 'foo';
+        $expectedData = new \stdClass();
 
         $this->context[$name] = 'other';
         $this->context->getResolver()->setDefined([$name]);
@@ -94,41 +90,39 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load the data provider "foo".
-     */
     public function testGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load the data provider "foo".');
+
         $name = 'foo';
         $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->dataAccessor->get($name);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load the data provider "foo".
-     */
     public function testArrayAccessGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load the data provider "foo".');
+
         $name = 'foo';
         $this->context->resolve();
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->dataAccessor[$name];
     }
@@ -141,14 +135,14 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertFalse(isset($this->dataAccessor[$name]));
     }
 
     public function testArrayAccessExists()
     {
-        $name         = 'foo';
+        $name = 'foo';
         $expectedData = new \stdClass();
 
         $this->context->resolve();
@@ -156,14 +150,11 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue($expectedData));
+            ->willReturn($expectedData);
 
         $this->assertTrue(isset($this->dataAccessor[$name]));
 
-        $this->assertEquals(
-            new DataProviderDecorator($expectedData, ['get', 'has', 'is']),
-            $this->dataAccessor[$name]
-        );
+        $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor[$name]);
     }
 
     public function testArrayAccessExistsForContextData()
@@ -175,26 +166,24 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertTrue(isset($this->dataAccessor[$name]));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessSetThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->dataAccessor['foo'] = 'bar';
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessRemoveThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         unset($this->dataAccessor['foo']);
     }
 }

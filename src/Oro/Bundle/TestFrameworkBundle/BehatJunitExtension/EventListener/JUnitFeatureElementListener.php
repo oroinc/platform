@@ -13,11 +13,14 @@ use Behat\Behat\Output\Node\Printer\FeaturePrinter;
 use Behat\Behat\Output\Node\Printer\SetupPrinter;
 use Behat\Behat\Output\Node\Printer\StepPrinter;
 use Behat\Gherkin\Node\FeatureNode;
+use Behat\Testwork\Event\Event;
 use Behat\Testwork\EventDispatcher\Event\AfterSetup;
 use Behat\Testwork\Output\Formatter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitScenarioPrinter;
-use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * listener to print feature and scenario duration
+ */
 class JUnitFeatureElementListener
 {
     /**
@@ -55,11 +58,6 @@ class JUnitFeatureElementListener
 
     /**
      * Initializes listener.
-     *
-     * @param FeaturePrinter $featurePrinter
-     * @param JUnitScenarioPrinter $scenarioPrinter
-     * @param StepPrinter $stepPrinter
-     * @param SetupPrinter $setupPrinter
      */
     public function __construct(
         FeaturePrinter $featurePrinter,
@@ -94,8 +92,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures scenario tested event.
-     *
-     * @param ScenarioTested $event
      */
     private function captureScenarioEvent(ScenarioTested $event)
     {
@@ -113,8 +109,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures feature on BEFORE event.
-     *
-     * @param Event $event
      */
     private function captureFeatureOnBeforeEvent(Event $event)
     {
@@ -127,8 +121,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures step tested event.
-     *
-     * @param Event $event
      */
     private function captureStepEvent(Event $event)
     {
@@ -142,9 +134,6 @@ class JUnitFeatureElementListener
 
     /**
      * Prints the feature on AFTER event.
-     *
-     * @param Formatter $formatter
-     * @param Event     $event
      */
     public function printFeatureOnAfterEvent(Formatter $formatter, Event $event)
     {

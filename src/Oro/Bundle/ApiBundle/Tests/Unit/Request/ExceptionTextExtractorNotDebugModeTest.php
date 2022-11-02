@@ -7,32 +7,49 @@ use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExceptionTextExtractor */
-    private $exceptionTextExtractor;
+    private ExceptionTextExtractor $exceptionTextExtractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->with(self::anything(), self::anything(), 'security')
+            ->willReturnCallback(function ($label, $parameters) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    $result .= sprintf(' (%s)', implode(',', array_keys($parameters)));
+                }
+
+                return $result;
+            });
+
         $this->exceptionTextExtractor = new ExceptionTextExtractor(
             false,
-            [\UnexpectedValueException::class]
+            $translator,
+            [\UnexpectedValueException::class],
+            [NotFoundExceptionInterface::class]
         );
     }
 
-    /**
-     * @param \Exception|null $innerException
-     * @param string          $processorId
-     *
-     * @return ExecutionFailedException
-     */
-    private function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
-    {
+    private function createExecutionFailedException(
+        \Exception $innerException = null,
+        string $processorId = 'processor1'
+    ): ExecutionFailedException {
         return new ExecutionFailedException(
             $processorId,
             null,
@@ -42,33 +59,38 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getExceptionStatusCodeDataProvider()
+     * @dataProvider getExceptionStatusCodeDataProvider
      */
-    public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode)
+    public function testGetExceptionStatusCode(\Exception $exception, int $expectedStatusCode): void
     {
-        self::assertEquals(
+        self::assertSame(
             $expectedStatusCode,
             $this->exceptionTextExtractor->getExceptionStatusCode($exception)
         );
     }
 
-    public function getExceptionStatusCodeDataProvider()
+    public function getExceptionStatusCodeDataProvider(): array
     {
         return [
             [new \UnexpectedValueException(), 500],
             [new BadRequestHttpException(), 400],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 400],
+            [new HttpException(400), 400],
+            [new HttpException(401), 401],
             [new AccessDeniedException(), 403],
             [new \InvalidArgumentException(), 500],
             [new RuntimeException(), 500],
             [new ActionNotAllowedException(), 405],
-            [new ForbiddenException('Reason.'), 403],
+            [new LockedException('Reason.'), 403],
+            [new DisabledException('Reason.'), 403],
+            [new UsernameNotFoundException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
+            [new ServiceNotFoundException('test'), 500],
             [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400]
         ];
     }
 
-    public function testGetExceptionCode()
+    public function testGetExceptionCode(): void
     {
         self::assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
     }
@@ -76,7 +98,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTypeDataProvider
      */
-    public function testExceptionType(\Exception $exception, $expectedType)
+    public function testExceptionType(\Exception $exception, string $expectedType): void
     {
         self::assertEquals(
             $expectedType,
@@ -84,7 +106,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getExceptionTypeDataProvider()
+    public function getExceptionTypeDataProvider(): array
     {
         return [
             [new \Exception(), 'exception'],
@@ -93,10 +115,17 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new \InvalidArgumentException(), 'invalid argument exception'],
             [new BadRequestHttpException(), 'bad request http exception'],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 'bad request http exception'],
+            [new HttpException(400), 'bad request http exception'],
+            [new HttpException(401), 'unauthorized http exception'],
             [new RuntimeException('Some error.'), 'runtime exception'],
             [new ActionNotAllowedException(), 'action not allowed exception'],
-            [new ForbiddenException('Reason.'), 'forbidden exception'],
+            [new AccessDeniedException('Reason.'), 'access denied exception'],
+            [new AccessDeniedHttpException('Reason.'), 'access denied exception'],
+            [new LockedException('Reason.'), 'authentication exception'],
+            [new DisabledException('Reason.'), 'authentication exception'],
+            [new UsernameNotFoundException('Reason.'), 'authentication exception'],
             [new ResourceNotAccessibleException(), 'resource not accessible exception'],
+            [new ServiceNotFoundException('test'), 'service not found exception'],
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
                 'not supported config operation exception'
@@ -107,15 +136,15 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTextDataProvider
      */
-    public function testExceptionText(\Exception $exception, $expectedText)
+    public function testExceptionText(\Exception $exception, ?string $expectedText): void
     {
-        self::assertEquals(
+        self::assertSame(
             $expectedText,
             $this->exceptionTextExtractor->getExceptionText($exception)
         );
     }
 
-    public function getExceptionTextDataProvider()
+    public function getExceptionTextDataProvider(): array
     {
         return [
             [
@@ -180,12 +209,24 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
                 'The action is not allowed.'
             ],
             [
-                new ForbiddenException('Reason.'),
-                'Reason.'
+                new LockedException('Reason.'),
+                'translated: Account is locked.'
+            ],
+            [
+                new DisabledException('Reason.'),
+                'translated: Account is disabled.'
+            ],
+            [
+                new UsernameNotFoundException('Reason.'),
+                'translated: Username could not be found. ({{ username }},{{ user_identifier }}).'
             ],
             [
                 new ResourceNotAccessibleException(),
                 'The resource is not accessible.'
+            ],
+            [
+                new ServiceNotFoundException('test'),
+                null
             ],
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),

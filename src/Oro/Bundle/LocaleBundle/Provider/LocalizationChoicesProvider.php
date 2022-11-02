@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
+/**
+ * Provides lists of languages and formatting codes translated on current system language.
+ */
 class LocalizationChoicesProvider
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
     /** @var LanguageCodeFormatter */
     protected $languageFormatter;
@@ -23,19 +26,13 @@ class LocalizationChoicesProvider
     /** @var LocalizationManager */
     protected $localizationManager;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param LanguageCodeFormatter $languageFormatter
-     * @param LanguageProvider $languageProvider
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(
-        ConfigManager $configManager,
+        LocaleSettings $localeSettings,
         LanguageCodeFormatter $languageFormatter,
         LanguageProvider $languageProvider,
         LocalizationManager $localizationManager
     ) {
-        $this->configManager = $configManager;
+        $this->localeSettings = $localeSettings;
         $this->languageFormatter = $languageFormatter;
         $this->languageProvider = $languageProvider;
         $this->localizationManager = $localizationManager;
@@ -62,7 +59,7 @@ class LocalizationChoicesProvider
      */
     public function getFormattingChoices()
     {
-        return array_flip(Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage()));
+        return array_flip(Locales::getNames($this->getSystemLanguage()));
     }
 
     /**
@@ -86,6 +83,6 @@ class LocalizationChoicesProvider
      */
     protected function getSystemLanguage()
     {
-        return $this->configManager->get('oro_locale.language');
+        return $this->localeSettings->getLanguage();
     }
 }

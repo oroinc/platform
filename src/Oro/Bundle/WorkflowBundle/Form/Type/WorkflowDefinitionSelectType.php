@@ -12,8 +12,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type provides functionality to select a WorkflowDefinition.
+ */
 class WorkflowDefinitionSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_definition_select';
@@ -24,10 +27,6 @@ class WorkflowDefinitionSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;
@@ -113,7 +112,7 @@ class WorkflowDefinitionSelectType extends AbstractType
         /** @var ChoiceView $choiceView */
         foreach ($view->vars['choices'] as $choiceView) {
             $choiceView->label = $this->translator->trans(
-                $choiceView->label,
+                (string) $choiceView->label,
                 [],
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );

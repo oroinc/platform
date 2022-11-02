@@ -2,15 +2,25 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Should be dispatched before or after the denormalization.
+ */
 class DenormalizeEntityEvent extends Event
 {
-    /** @var object */
-    protected $object;
+    private object $object;
 
-    /** @var array */
-    protected $data;
+    private array $data;
+
+    /**
+     * @var array
+     *  [
+     *      'fieldName1' => true, // Skipped field.
+     *      'fieldName2' => false, // Not skipped.
+     *  ]
+     */
+    private array $skippedFields = [];
 
     /**
      * @param object $object
@@ -36,5 +46,19 @@ class DenormalizeEntityEvent extends Event
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Marks a field as skipped.
+     * Skipped fields should not be taken into account during denormalization.
+     */
+    public function markAsSkipped(string $fieldName, bool $isSkipped = true): void
+    {
+        $this->skippedFields[$fieldName] = $isSkipped;
+    }
+
+    public function isFieldSkipped(string $fieldName): bool
+    {
+        return (bool) ($this->skippedFields[$fieldName] ?? false);
     }
 }

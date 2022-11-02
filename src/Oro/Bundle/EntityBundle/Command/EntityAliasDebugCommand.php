@@ -1,41 +1,57 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EntityAliasDebugCommand extends ContainerAwareCommand
+/**
+ * Displays entity aliases.
+ */
+class EntityAliasDebugCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:entity-alias:debug';
+
+    private EntityAliasResolver $entityAliasResolver;
+
+    public function __construct(EntityAliasResolver $entityAliasResolver)
+    {
+        $this->entityAliasResolver = $entityAliasResolver;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:entity-alias:debug')
-            ->setDescription('Displays entity aliases.');
+            ->setDescription('Displays entity aliases.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays singular and plural aliases for entity classes.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->outputEntityAliases($output);
+        return $this->outputEntityAliases($output);
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    protected function outputEntityAliases(OutputInterface $output)
+    protected function outputEntityAliases(OutputInterface $output): int
     {
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-
-        $entityAliases = $entityAliasResolver->getAll();
+        $entityAliases = $this->entityAliasResolver->getAll();
 
         // sort alphabetically by the entity class and move BAP entities at the top
         ksort($entityAliases);
@@ -43,13 +59,13 @@ class EntityAliasDebugCommand extends ContainerAwareCommand
             array_filter(
                 array_keys($entityAliases),
                 function ($class) {
-                    return strpos(strtolower($class), 'oro\\') === 0;
+                    return str_starts_with(strtolower($class), 'oro\\');
                 }
             ),
             array_filter(
                 array_keys($entityAliases),
                 function ($class) {
-                    return strpos(strtolower($class), 'oro\\') !== 0;
+                    return !str_starts_with(strtolower($class), 'oro\\');
                 }
             )
         );
@@ -84,5 +100,7 @@ class EntityAliasDebugCommand extends ContainerAwareCommand
                 OutputInterface::OUTPUT_RAW
             );
         }
+
+        return 0;
     }
 }

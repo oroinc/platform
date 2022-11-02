@@ -19,9 +19,6 @@ class DatepickerContext extends OroFeatureContext implements OroPageObjectAware
      *             | S | M | T | W | T | F | S |
      *
      * @Then /^(?:|I )should see following header in "(?P<datepicker>[^"]+)":$/
-     *
-     * @param string $datepicker
-     * @param TableNode $table
      */
     public function iShouldSeeFollowingHeaderInDatepicker(string $datepicker, TableNode $table)
     {

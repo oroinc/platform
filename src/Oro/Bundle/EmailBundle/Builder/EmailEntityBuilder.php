@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -21,11 +21,13 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
 
 /**
  * The builder that simplifies creation of the email related entities.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailEntityBuilder
 {
@@ -47,42 +49,38 @@ class EmailEntityBuilder
     /** @var array [entity class => [field name => length, ...], ...] */
     private $fieldLength = [];
 
-    /**
-     * @param EmailEntityBatchProcessor $batch
-     * @param EmailAddressManager       $emailAddressManager
-     * @param EmailAddressHelper        $emailAddressHelper
-     * @param ManagerRegistry           $doctrine
-     */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        LoggerInterface $logger
     ) {
         $this->batch = $batch;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
      * Create EmailUser entity object
      *
      * @param string               $subject             The email subject
-     * @param string $from                              The FROM email address,
+     * @param string               $from                The FROM email address,
      *                                                  for example: john@example.com or "John Smith" <john@example.c4m>
      * @param string|string[]|null $to                  The TO email address(es).
      *                                                  Example of email address see in description of $from parameter
-     * @param \DateTime            $sentAt              The date/time when email sent
-     * @param \DateTime            $receivedAt          The date/time when email received
-     * @param \DateTime            $internalDate        The date/time an email server returned in INTERNALDATE field
-     * @param integer $importance                       The email importance flag.
+     * @param \DateTimeInterface   $sentAt              The date/time when email sent
+     * @param \DateTimeInterface   $receivedAt          The date/time when email received
+     * @param \DateTimeInterface   $internalDate        The date/time an email server returned in INTERNALDATE field
+     * @param int                  $importance          The email importance flag.
      *                                                  Can be one of *_IMPORTANCE constants of Email class
      * @param string|string[]|null $cc                  The CC email address(es).
      *                                                  Example of email address see in description of $from parameter
      * @param string|string[]|null $bcc                 The BCC email address(es).
      *                                                  Example of email address see in description of $from parameter
-     * @param User|Mailbox|null $owner                  Owner of the email
+     * @param User|Mailbox|null    $owner               Owner of the email
      * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
@@ -155,6 +153,9 @@ class EmailEntityBuilder
         $cc = null,
         $bcc = null
     ) {
+        if (empty($from)) {
+            throw new EmailAddressParseException('Missed FROM part in email message.');
+        }
         $result = new Email();
         $result
             ->setSubject($subject)
@@ -182,10 +183,10 @@ class EmailEntityBuilder
     {
         if (!empty($email)) {
             if (is_string($email)) {
-                $obj->addRecipient($this->recipient($type, $email));
+                $this->addRecipient($obj, $type, $email);
             } elseif (is_array($email) || $email instanceof \Traversable) {
                 foreach ($email as $e) {
-                    $obj->addRecipient($this->recipient($type, $e));
+                    $this->addRecipient($obj, $type, $e);
                 }
             }
         }
@@ -214,8 +215,6 @@ class EmailEntityBuilder
 
     /**
      * Check is email address valid
-     *
-     * @param $email
      */
     private function validateEmailAddress($email)
     {
@@ -286,6 +285,24 @@ class EmailEntityBuilder
             ->setTextBody($this->getEmailBodyHelper()->getTrimmedClearText($content, !$isHtml));
 
         return $result;
+    }
+
+    /**
+     * Adds an attachment to EmailBody entity.
+     * If an attachment already belongs to another EmailBody entity, then adds a clone of it.
+     *
+     * @param EmailBody $emailBody
+     * @param EmailAttachment $emailAttachment
+     */
+    public function addEmailAttachmentEntity(EmailBody $emailBody, EmailAttachment $emailAttachment): void
+    {
+        if ($emailAttachment->getEmailBody() && $emailAttachment->getEmailBody()->getId() !== $emailBody->getId()) {
+            $emailAttachmentContent = clone $emailAttachment->getContent();
+            $emailAttachment = clone $emailAttachment;
+            $emailAttachment->setContent($emailAttachmentContent);
+        }
+
+        $emailBody->addAttachment($emailAttachment);
     }
 
     /**
@@ -565,5 +582,28 @@ class EmailEntityBuilder
         }
 
         return $this->fieldLength[$entityClass][$fieldName];
+    }
+
+    /**
+     * Add recipient to the Email object
+     *
+     * @param Email  $object The Email object recipients is added to
+     * @param string $type   The recipient type. Can be to, cc or bcc
+     * @param string $email  The email address, for example: john@example.com or "John Smith" <john@example.com>
+     */
+    private function addRecipient(Email $object, $type, $email)
+    {
+        try {
+            $object->addRecipient($this->recipient($type, $email));
+        } catch (EmailAddressParseException $e) {
+            /**
+             * An invalid email address should be ignored as well as mailing groups,
+             * such as "<undisclosed-recipients:;>" or "<nobody:;>"
+             */
+            $this->logger->warning(
+                'An invalid recipient address has been ignored',
+                ['exception' => $e->getMessage()]
+            );
+        }
     }
 }

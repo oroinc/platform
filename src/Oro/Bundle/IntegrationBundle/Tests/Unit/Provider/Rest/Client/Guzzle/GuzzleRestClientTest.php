@@ -2,95 +2,88 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Stream;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
+use Oro\Component\Testing\ReflectionUtil;
+use Psr\Http\Message\StreamInterface;
 
 class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $sourceClient;
+    private const BASE_URL = 'https://example.com/api/';
+    private const DEFAULT_OPTIONS = ['default' => 'value'];
 
-    /**
-     * @var GuzzleRestClient
-     */
-    protected $client;
+    /** @var Client|\PHPUnit\Framework\MockObject\MockObject */
+    private $sourceClient;
 
-    /**
-     * @var string
-     */
-    protected $baseUrl = 'https://example.com/api';
+    /** @var GuzzleRestClient */
+    private $client;
 
-    /**
-     * @var array
-     */
-    protected $defaultOptions = array('default' => 'value');
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->sourceClient = $this->getMockBuilder('Guzzle\Http\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->sourceClient = $this->createMock(Client::class);
 
-        $this->client = new GuzzleRestClient($this->baseUrl, $this->defaultOptions);
+        $this->client = new GuzzleRestClient(self::BASE_URL, self::DEFAULT_OPTIONS);
         $this->client->setGuzzleClient($this->sourceClient);
     }
 
     public function testConstructor()
     {
-        $this->assertAttributeEquals($this->baseUrl, 'baseUrl', $this->client);
-        $this->assertAttributeEquals($this->defaultOptions, 'defaultOptions', $this->client);
+        self::assertEquals(self::BASE_URL, ReflectionUtil::getPropertyValue($this->client, 'baseUrl'));
+        self::assertEquals(self::DEFAULT_OPTIONS, ReflectionUtil::getPropertyValue($this->client, 'defaultOptions'));
     }
 
     public function testGetLastResponseWorks()
     {
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($request));
-
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue($response));
-
         $response = $this->client->get('users');
-        $this->assertEquals($response, $this->client->getLastResponse());
+
+        self::assertEquals($response, $this->client->getLastResponse());
     }
 
     /**
      * @dataProvider performRequestDataProvider
      */
-    public function testPerformRequestWorks($method, $args, $expected)
+    public function testPerformRequestWorks(string $method, array $args, array $expected)
     {
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->with($expected['method'], $expected['url'], $expected['headers'], $expected['data'], $expected['options'])
-            ->will($this->returnValue($request));
+        $response = $this->createMock(Response::class);
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
+        $this->sourceClient->expects(self::once())
             ->method('send')
-            ->will($this->returnValue($response));
+            ->with(
+                $this->callback(
+                    function (Request $request) use ($expected) {
+                        $this->assertEquals($expected['method'], strtolower($request->getMethod()));
+                        $this->assertEquals($expected['url'], $request->getUri());
+                        $this->assertEquals(
+                            $expected['headers'],
+                            array_diff_key($request->getHeaders(), ['Host' => null])
+                        );
+                        $this->assertEquals($expected['data'], (string) $request->getBody());
 
-        $actual = call_user_func_array(array($this->client, $method), $args);
-        $this->assertInstanceOf(
-            'Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse',
-            $actual
-        );
-        $this->assertEquals($response, $actual->getSourceResponse());
+                        return true;
+                    }
+                ),
+                $expected['options']
+            )
+            ->willReturn($response);
+
+        $actual = call_user_func_array([$this->client, $method], $args);
+
+        self::assertInstanceOf(GuzzleRestResponse::class, $actual);
+        self::assertEquals($response, $actual->getSourceResponse());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function performRequestDataProvider()
+    public function performRequestDataProvider(): array
     {
+        $date = new \DateTime('2021-01-10T12:26:04+05:00');
+
         return [
             'get simple' => [
                 'method' => 'get',
@@ -99,7 +92,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                     'method' => 'get',
                     'url' => 'https://google.com/api',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -110,18 +103,21 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                     'method' => 'get',
                     'url' => 'https://example.com/api/users',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
             'get with params' => [
                 'method' => 'get',
-                'args' => ['resource' => 'https://google.com/api?v=2', 'params' => ['foo' => 'bar']],
+                'args' => [
+                    'resource' => 'https://google.com/api?v=2',
+                    'params' => ['foo' => 'bar', 'date' => $date->format(\DateTime::ATOM)]
+                ],
                 'expected' => [
                     'method' => 'get',
-                    'url' => 'https://google.com/api?v=2&foo=bar',
+                    'url' => 'https://google.com/api?v=2&foo=bar&date=2021-01-10T12%3A26%3A04%2B05%3A00',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -133,7 +129,8 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'method' => 'get',
                     'url' => 'https://google.com/api',
-                    'headers' => ['Accept' => '*/*'], 'data' => null,
+                    'headers' => ['Accept' => ['*/*']],
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -147,7 +144,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                     'method' => 'get',
                     'url' => 'https://google.com/api',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value', 'auth' => ['username', 'password']]
                 ]
             ],
@@ -172,7 +169,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'method' => 'post',
                     'url' => 'https://example.com/api/user',
-                    'headers' => ['Content-Type' => 'application/json'],
+                    'headers' => ['Content-Type' => ['application/json']],
                     'data' => '{"foo":"data"}',
                     'options' => ['default' => 'value']
                 ]
@@ -180,15 +177,17 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
             'put force content type' => [
                 'method' => 'put',
                 'args' => [
-                    'resource' => 'user/1', 'data' => ['foo' => 'data'],
-                    'headers' => ['Content-Type' => 'text/html'], 'options' => [],
+                    'resource' => 'user/1',
+                    'data' => '{"foo":"data"}',
+                    'headers' => ['Content-Type' => 'text/html'],
+                    'options' => [],
                 ],
                 'expected' => [
                     'method' => 'put',
                     'url' => 'https://example.com/api/user/1',
-                    'headers' => ['Content-Type' => 'text/html'],
-                    'data' => ['foo' => 'data'],
-                    'options' => ['default' => 'value']
+                    'headers' => ['Content-Type' => ['text/html']],
+                    'data' => '{"foo":"data"}',
+                    'options' => ['default' => 'value'],
                 ]
             ],
             'delete' => [
@@ -198,138 +197,94 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
                     'method' => 'delete',
                     'url' => 'https://example.com/api/user/1',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value']
                 ]
             ],
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
-     * @expectedExceptionMessage Exception message
-     */
     public function testPerformRequestThrowException()
     {
+        $this->expectException(GuzzleRestException::class);
+        $this->expectExceptionMessage('Exception message');
+
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($request));
-
-        $request->expects($this->once())
+        $this->sourceClient->expects(self::once())
             ->method('send')
-            ->will($this->throwException(new \Exception('Exception message')));
+            ->willThrowException(new \Exception('Exception message'));
 
         $this->client->performRequest($method, $url);
     }
 
-    /**
-     * @dataProvider getFormattedResultDataProvider
-     */
-    public function testGetFormattedResult($format)
+    public function testGetFormattedResult()
     {
-        $url = 'https://example.com/api/v2/users.' . $format;
+        $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];
         $headers = ['foo' => 'header'];
         $options = ['foo' => 'option'];
         $expectedResult = ['foo' => 'data'];
-        $expectedUrl = $url . '?foo=param';
-        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $response = $this->createMock(Response::class);
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->will($this->returnValue($request));
-
-        $request->expects($this->once())
+        $this->sourceClient->expects(self::once())
             ->method('send')
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
-        $response->expects($this->once())
-            ->method('isSuccessful')
-            ->will($this->returnValue(true));
+        $response->expects(self::any())
+            ->method('getStatusCode')
+            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method($format)
-            ->will($this->returnValue($expectedResult));
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, '{"foo":"data"}');
+        rewind($stream);
 
-        $getter = 'get' . strtoupper($format);
-        $this->assertEquals($expectedResult, $this->client->$getter($url, $params, $headers, $options));
+        $response->expects(self::once())
+            ->method('getBody')
+            ->willReturn(new Stream($stream));
+
+        self::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
     }
 
-    /**
-     * @dataProvider getFormattedResultDataProvider
-     */
-    public function testGetFormattedResultThrowException($format)
+    public function testGetFormattedResultThrowException()
     {
-        $url = 'https://example.com/api/v2/users.' . $format;
+        $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];
         $headers = ['foo' => 'header'];
         $options = ['foo' => 'option'];
-        $expectedUrl = $url . '?foo=param';
-        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
         $statusCode = 403;
         $reasonPhrase = 'Forbidden';
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $response = $this->createMock(Response::class);
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->will($this->returnValue($request));
-
-        $request->expects($this->once())
+        $this->sourceClient->expects(self::once())
             ->method('send')
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
-        $request->expects($this->atLeastOnce())
-            ->method('getUrl')
-            ->will($this->returnValue($url));
-
-        $response->expects($this->once())
-            ->method('isSuccessful')
-            ->will($this->returnValue(false));
-
-        $response->expects($this->atLeastOnce())
+        $response->expects(self::atLeastOnce())
             ->method('getStatusCode')
-            ->will($this->returnValue($statusCode));
-
-        $response->expects($this->atLeastOnce())
+            ->willReturn($statusCode);
+        $response->expects(self::atLeastOnce())
             ->method('getReasonPhrase')
-            ->will($this->returnValue($reasonPhrase));
+            ->willReturn($reasonPhrase);
+        $body = $this->createMock(StreamInterface::class);
+        $body->expects($this->atLeastOnce())
+            ->method('isSeekable')
+            ->willReturn(false);
+        $response->expects(self::atLeastOnce())
+            ->method('getBody')
+            ->willReturn($body);
 
-        $this->expectException('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException');
+        $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage(
-            "Unsuccessful response" . PHP_EOL .
-            "[status code] $statusCode" . PHP_EOL .
-            "[reason phrase] $reasonPhrase" . PHP_EOL .
+            "Client error response".PHP_EOL.
+            "[status code] $statusCode".PHP_EOL.
+            "[reason phrase] $reasonPhrase".PHP_EOL.
             "[url] $url"
         );
 
-        $getter = 'get' . strtoupper($format);
-        $this->client->$getter($url, $params, $headers, $options);
-    }
-
-    public function getFormattedResultDataProvider()
-    {
-        return [
-            'json' => [
-                'format' => 'json',
-            ]
-        ];
+        $this->client->getJSON($url, $params, $headers, $options);
     }
 }

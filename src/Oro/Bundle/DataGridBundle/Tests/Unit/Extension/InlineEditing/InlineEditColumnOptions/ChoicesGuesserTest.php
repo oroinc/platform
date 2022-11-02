@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -11,22 +11,19 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $choiceHelper;
+    /** @var ChoiceFieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $choiceHelper;
 
     /** @var ChoicesGuesser */
-    protected $guesser;
+    private $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
-
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
 
         $this->guesser = new ChoicesGuesser($this->doctrineHelper, $this->choiceHelper);
     }
@@ -49,7 +46,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')
@@ -106,7 +103,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')

@@ -10,49 +10,36 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * The inverse associations entity data accessor.
+ */
 class InverseAssociationAccessor implements AccessorInterface
 {
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    private DoctrineHelper $doctrineHelper;
+    private ?PropertyAccessor $propertyAccessor = null;
 
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
-     * Checks if this class supports accessing entity
-     *
-     * @param string        $entity
-     * @param FieldMetadata $metadata
-     * @return string
+     * {@inheritdoc}
      */
-    public function supports($entity, FieldMetadata $metadata)
+    public function getName()
     {
-        return !$metadata->isDefinedBySourceEntity() &&
-            $metadata->hasDoctrineMetadata() &&
-            $this->isAssociationTypeToOne($metadata->getDoctrineMetadata());
+        return 'inverse_association';
     }
 
     /**
-     * Checks if association is inverse and related to one entity
-     *
-     * @param DoctrineMetadata $metadata
-     * @return bool
+     * {@inheritdoc}
      */
-    protected function isAssociationTypeToOne(DoctrineMetadata $metadata)
+    public function supports($entity, FieldMetadata $metadata)
     {
-        return $metadata->isManyToOne() || $metadata->isOneToOne();
+        return
+            !$metadata->isDefinedBySourceEntity()
+            && $metadata->hasDoctrineMetadata()
+            && $this->isToOneAssociation($metadata->getDoctrineMetadata());
     }
 
     /**
@@ -72,7 +59,7 @@ class InverseAssociationAccessor implements AccessorInterface
      */
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
-        $oldRelatedEntities = array();
+        $oldRelatedEntities = [];
 
         foreach ($this->getValue($entity, $metadata) as $oldRelatedEntity) {
             $oldRelatedEntities[$this->doctrineHelper->getEntityIdentifierValue($oldRelatedEntity)] = $oldRelatedEntity;
@@ -88,12 +75,12 @@ class InverseAssociationAccessor implements AccessorInterface
         }
     }
 
-    /**
-     * @param object $relatedEntity
-     * @param FieldMetadata $metadata
-     * @param object $value
-     */
-    protected function setRelatedEntityValue($relatedEntity, FieldMetadata $metadata, $value)
+    private function isToOneAssociation(DoctrineMetadata $metadata): bool
+    {
+        return $metadata->isManyToOne() || $metadata->isOneToOne();
+    }
+
+    private function setRelatedEntityValue(object $relatedEntity, FieldMetadata $metadata, ?object $value): void
     {
         if ($metadata->has('setter')) {
             $setter = $metadata->get('setter');
@@ -101,11 +88,7 @@ class InverseAssociationAccessor implements AccessorInterface
         } else {
             try {
                 $this->getPropertyAccessor()
-                    ->setValue(
-                        $relatedEntity,
-                        $metadata->getDoctrineMetadata()->getFieldName(),
-                        $value
-                    );
+                    ->setValue($relatedEntity, $metadata->getDoctrineMetadata()->getFieldName(), $value);
             } catch (NoSuchPropertyException $e) {
                 // If setter is not exist
                 $reflection = new \ReflectionProperty(
@@ -118,22 +101,12 @@ class InverseAssociationAccessor implements AccessorInterface
         }
     }
 
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessor
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
-        return $this->propertyAccessor;
-    }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'inverse_association';
+        return $this->propertyAccessor;
     }
 }

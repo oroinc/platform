@@ -3,14 +3,15 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\DataContextConfigurator;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutContext;
 
 class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DataContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new DataContextConfigurator();
     }
@@ -18,9 +19,9 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     public function testMoveDataToDataCollection()
     {
         $dataKey1 = 'test1';
-        $data1    = new \stdClass();
+        $data1 = new \stdClass();
         $dataKey2 = 'test2';
-        $data2    = null;
+        $data2 = null;
 
         $context = new LayoutContext();
 
@@ -45,7 +46,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyData()
     {
-        $context         = new LayoutContext();
+        $context = new LayoutContext();
         $context['data'] = [];
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
@@ -55,41 +56,40 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     public function testNoData()
     {
-        $context         = new LayoutContext();
+        $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "data" does not exist.
-     */
     public function testShouldThrowExceptionIfDataNotArray()
     {
-        $context         = new LayoutContext();
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Failed to resolve the context variables. Reason: The option "data" does not exist.'
+        );
+
+        $context = new LayoutContext();
         $context['data'] = 123;
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data key "0" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidDataArray()
     {
-        $context         = new LayoutContext();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data key "0" must be a string, but "integer" given.');
+
+        $context = new LayoutContext();
         $context['data'] = [123];
         $this->contextConfigurator->configureContext($context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data item "test" must have "data" key.
-     */
     public function testShouldThrowExceptionIfNoDataValue()
     {
-        $context         = new LayoutContext();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data item "test" must have "data" key.');
+
+        $context = new LayoutContext();
         $context['data'] = ['test' => ['identifier' => 'dataId']];
         $this->contextConfigurator->configureContext($context);
     }

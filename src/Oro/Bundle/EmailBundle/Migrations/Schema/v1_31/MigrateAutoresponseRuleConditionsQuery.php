@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_31;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -47,9 +47,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
         return 'Migrates data from table "oro_email_response_rule_cond" into "oro_email_auto_response_rule"';
     }
 
-    /**
-     * @param Connection $connection
-     */
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;
@@ -70,7 +67,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
                 'id' => $ruleId,
             ],
             [
-                Type::TEXT,
+                Types::TEXT,
             ]
         );
     }

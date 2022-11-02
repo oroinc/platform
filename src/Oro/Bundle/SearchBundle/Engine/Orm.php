@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\LazyResult;
@@ -26,11 +26,6 @@ class Orm extends AbstractEngine
     /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @param ManagerRegistry          $registry
-     * @param ObjectMapper             $mapper
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $registry,
         ObjectMapper $mapper,
@@ -59,7 +54,6 @@ class Orm extends AbstractEngine
                     $results[] = new ResultItem(
                         $item['entity'],
                         $item['recordId'],
-                        $item['title'],
                         null,
                         $this->mapper->mapSelectedData($query, $originalItem),
                         $this->mapper->getEntityConfig($item['entity'])
@@ -83,6 +77,19 @@ class Orm extends AbstractEngine
             'records_count' => $recordsCountCallback,
             'aggregated_data' => $aggregatedDataCallback,
         ];
+    }
+
+    /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <Entity ClassName> => <Documents Count>
+     * ]
+     */
+    protected function doGetDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        return $this->getIndexRepository()->getDocumentsCountGroupByEntityFQCN($query);
     }
 
     /**

@@ -10,16 +10,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridCallbackActionProvider */
-    protected $provider;
+    private $provider;
 
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $config;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new DatagridCallbackActionProvider();
-
-        $this->config = $this->createMock(DatagridConfiguration::class);
     }
 
     public function testHasActions()
@@ -29,26 +24,32 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyActionsNothingToDo()
     {
-        $this->config->expects($this->once())->method('offsetGetOr')->with('action_configuration')->willReturn(null);
+        $config = $this->createMock(DatagridConfiguration::class);
+        $config->expects($this->once())
+            ->method('offsetGetOr')
+            ->with('action_configuration')
+            ->willReturn(null);
 
-        $this->provider->applyActions($this->config);
+        $this->provider->applyActions($config);
     }
 
     public function testApplyActionsGotNonCallable()
     {
-        $this->config->expects($this->once())
+        $config = $this->createMock(DatagridConfiguration::class);
+        $config->expects($this->once())
             ->method('offsetGetOr')
             ->with('action_configuration')
             ->willReturn(['come data']);
 
-        $this->provider->applyActions($this->config);
+        $this->provider->applyActions($config);
     }
 
     public function testApplyActionsGotCallable()
     {
         $callable = $this->createMock(CallableStub::class);
 
-        $this->config->expects($this->exactly(3))
+        $config = $this->createMock(DatagridConfiguration::class);
+        $config->expects($this->exactly(3))
             ->method('offsetGetOr')
             ->withConsecutive(
                 ['action_configuration'],
@@ -71,30 +72,21 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(['an array'], 'not an array');
 
-        $propertyConfigExpected = [
-            'type' => 'callback',
-            'callable' => $callable,
-            'frontend_type' => 'row_array'
-        ];
+        $config->expects($this->once())
+            ->method('offsetAddToArrayByPath')
+            ->with(
+                '[properties][action_configuration]',
+                $this->callback(function ($argument) use ($resultRecord) {
+                    $this->assertSame('callback', $argument['type']);
+                    $this->assertSame('row_array', $argument['frontend_type']);
+                    $this->assertArrayHasKey('callable', $argument);
+                    $this->assertEquals(['an array'], $argument['callable']($resultRecord));
+                    $this->assertEquals([], $argument['callable']($resultRecord));
 
-        $this->config->expects($this->once())->method('offsetAddToArrayByPath')->with(
-            '[properties][action_configuration]',
-            $this->callback(function ($argument) use ($propertyConfigExpected, $resultRecord) {
-                $this->assertArraySubset(
-                    [
-                        'type' => 'callback',
-                        'frontend_type' => 'row_array'
-                    ],
-                    $argument
-                );
-                $this->assertArrayHasKey('callable', $argument);
+                    return true;
+                })
+            );
 
-                $this->assertEquals(['an array'], $argument['callable']($resultRecord));
-                $this->assertEquals([], $argument['callable']($resultRecord));
-                return true;
-            })
-        );
-
-        $this->provider->applyActions($this->config);
+        $this->provider->applyActions($config);
     }
 }

@@ -12,7 +12,7 @@ class EntityStructureOptionsEventTest extends \PHPUnit\Framework\TestCase
 
     public function testAccessors()
     {
-        static::assertPropertyAccessors(new EntityStructureOptionsEvent(), [
+        self::assertPropertyAccessors(new EntityStructureOptionsEvent(), [
             ['data', [new EntityStructure()], []],
         ]);
     }

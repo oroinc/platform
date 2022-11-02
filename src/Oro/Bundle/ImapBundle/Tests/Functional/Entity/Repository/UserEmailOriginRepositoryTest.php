@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadEmailUserData;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadImapEmailData;
+use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadTypedUserEmailOriginData;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadUserEmailOriginData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -17,13 +16,21 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class UserEmailOriginRepositoryTest extends WebTestCase
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHeler;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->doctrineHeler = $this->getContainer()->get('oro_entity.doctrine_helper');
+    }
+
+    private function getRepository(): UserEmailOriginRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(UserEmailOrigin::class);
+    }
+
+    private function getEntitiesCount(string $entityClass): int
+    {
+        $repository = $this->getContainer()->get('doctrine')->getRepository($entityClass);
+
+        return count($repository->findAll());
     }
 
     public function testDeleteRelatedEmails()
@@ -35,9 +42,7 @@ class UserEmailOriginRepositoryTest extends WebTestCase
 
         $this->assertEquals(10, $this->getEntitiesCount(Email::class));
 
-        /** @var UserEmailOriginRepository $repo */
-        $repo = $this->doctrineHeler->getEntityRepositoryForClass(UserEmailOrigin::class);
-        $repo->deleteRelatedEmails($origin);
+        $this->getRepository()->deleteRelatedEmails($origin);
 
         $this->assertEquals(7, $this->getEntitiesCount(Email::class));
     }
@@ -51,9 +56,7 @@ class UserEmailOriginRepositoryTest extends WebTestCase
 
         $this->assertEquals(10, $this->getEntitiesCount(Email::class));
 
-        /** @var UserEmailOriginRepository $repo */
-        $repo = $this->doctrineHeler->getEntityRepositoryForClass(UserEmailOrigin::class);
-        $repo->deleteRelatedEmails($origin, false);
+        $this->getRepository()->deleteRelatedEmails($origin, false);
 
         $this->assertEquals(8, $this->getEntitiesCount(Email::class));
     }
@@ -67,23 +70,70 @@ class UserEmailOriginRepositoryTest extends WebTestCase
 
         $this->assertEquals(10, $this->getEntitiesCount(Email::class));
 
-        /** @var UserEmailOriginRepository $repo */
-        $repo = $this->doctrineHeler->getEntityRepositoryForClass(UserEmailOrigin::class);
-        $repo->deleteRelatedEmails($origin, true);
+        $this->getRepository()->deleteRelatedEmails($origin, true);
 
         $this->assertEquals(7, $this->getEntitiesCount(Email::class));
     }
 
     /**
-     * @param string $class
-     *
-     * @return int
+     * @dataProvider getOriginsData
      */
-    private function getEntitiesCount($class)
+    public function testGetOrigins(callable $qbCallback, callable $getTokenCallback, $expectedCount): void
     {
-        /** @var ObjectRepository $repository */
-        $repository = $this->getContainer()->get('doctrine')->getRepository($class);
+        $this->loadFixtures([LoadTypedUserEmailOriginData::class]);
 
-        return count($repository->findAll());
+        $tokens = $qbCallback($this->getRepository())->getQuery()->execute();
+        $this->assertCount($expectedCount, $tokens);
+        foreach ($tokens as $token) {
+            $this->assertEquals(8192, strlen($getTokenCallback($token)));
+        }
+    }
+
+    public function getOriginsData(): array
+    {
+        return [
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens('gmail'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens('microsoft'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens(),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
+                2
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens('gmail'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens('microsoft'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens(),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
+                2
+            ]
+        ];
+    }
+
+    public function testGetEmailIdsFromDisabledFoldersIterator()
+    {
+        $this->loadFixtures([LoadImapEmailData::class]);
+
+        $iterator = $this->getRepository()
+            ->getEmailIdsFromDisabledFoldersIterator(
+                $this->getReference(LoadUserEmailOriginData::USER_EMAIL_ORIGIN_3)
+            );
+
+        self::assertEquals(2, $iterator->count());
     }
 }

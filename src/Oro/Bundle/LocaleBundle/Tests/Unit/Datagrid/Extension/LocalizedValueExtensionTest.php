@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Datagrid\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -23,52 +24,36 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datasource;
+    private $datasource;
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryBuilder;
+    private $queryBuilder;
 
     /** @var LocalizedValueExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
+        $this->datasource = $this->createMock(OrmDatasource::class);
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
 
         $this->extension = new LocalizedValueExtension(
             $this->doctrineHelper,
             $this->entityClassResolver,
-            $this->localizationHelper
+            $this->localizationHelper,
+            (new InflectorFactory())->build()
         );
         $this->extension->setParameters(new ParameterBag());
     }
@@ -111,7 +96,9 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $config = DatagridConfiguration::create([]);
         $clonedConfig = clone $config;
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
         $this->extension->processConfigs($clonedConfig);
 
@@ -157,7 +144,8 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentLocalization')
             ->willReturn(new Localization());
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -166,9 +154,12 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([]);
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -202,24 +193,30 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('columnNames.string as columnName')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('innerJoin')
             ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(2))
+        $this->queryBuilder->expects($this->once())
             ->method('getDQLPart')
             ->with('groupBy')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('addGroupBy')
-            ->with('columnName');
+            ->with('columnName')
+            ->willReturnSelf();
+
+        $expr = new Expr();
+        $this->queryBuilder->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -254,28 +251,34 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('columnNames.string as columnName')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(2))
+        $this->queryBuilder->expects($this->once())
             ->method('andWhere')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('getDQLPart')
             ->with('groupBy')
-            ->willReturn(true);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(4))
+        $this->queryBuilder->expects($this->once())
             ->method('addGroupBy')
-            ->with('columnName');
+            ->with('columnName')
+            ->willReturnSelf();
+
+        $expr = new Expr();
+        $this->queryBuilder->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -284,7 +287,9 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([]);
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
         $result = ResultsObject::create([]);
 

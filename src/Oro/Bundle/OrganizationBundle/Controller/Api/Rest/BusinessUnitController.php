@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -15,10 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("businessunit")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for BusinessUnit entity.
  */
-class BusinessUnitController extends RestController implements ClassResourceInterface
+class BusinessUnitController extends RestController
 {
     /**
      * REST GET list
@@ -37,11 +33,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * )
      * @ApiDoc(
      *      description="Get all business units items",
-     *      resource=true,
-     *      filters={
-     *          {"name"="page", "dataType"="integer"},
-     *          {"name"="limit", "dataType"="integer"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_business_unit_view")
      * @param Request $request
@@ -81,7 +73,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * @AclAncestor("oro_business_unit_update")
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -89,7 +81,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     /**
      * REST GET item
      *
-     * @param string $id
+     * @param int $id
      *
      * @ApiDoc(
      *      description="Get business unit item",
@@ -98,7 +90,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * @AclAncestor("oro_business_unit_view")
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -160,13 +152,13 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -174,7 +166,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -182,18 +174,10 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {
         return $this->get('oro_organization.form.handler.business_unit.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
-    {
-        return $this->get('oro_organization.business_unit.handler.delete');
     }
 }

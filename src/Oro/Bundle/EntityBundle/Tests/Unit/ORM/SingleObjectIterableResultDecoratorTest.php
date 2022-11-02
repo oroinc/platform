@@ -8,24 +8,21 @@ use Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator;
 class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IterableResult|\PHPUnit\Framework\MockObject\MockObject */
-    protected $iterableResult;
+    private $iterableResult;
 
     /** @var SingleObjectIterableResultDecorator */
-    protected $iterableResultDecorator;
+    private $iterableResultDecorator;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->iterableResult = $this->getMockBuilder('Doctrine\ORM\Internal\Hydration\IterableResult')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->iterableResult = $this->createMock(IterableResult::class);
 
         $this->iterableResultDecorator = new SingleObjectIterableResultDecorator($this->iterableResult);
     }
 
     public function testRewind()
     {
-        $this->iterableResult
-            ->expects($this->once())
+        $this->iterableResult->expects($this->once())
             ->method('rewind');
 
         $this->iterableResultDecorator->rewind();
@@ -35,30 +32,31 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
     {
         $sampleObject = new \stdClass();
 
-        $this->iterableResult
-            ->expects($this->once())
-            ->method('next')
+        $this->iterableResult->expects($this->once())
+            ->method('next');
+        $this->iterableResult->expects($this->once())
+            ->method('current')
             ->willReturn([$sampleObject]);
-
-        $this->assertEquals($sampleObject, $this->iterableResultDecorator->next());
+        $this->iterableResultDecorator->next();
+        $this->assertEquals($sampleObject, $this->iterableResultDecorator->current());
     }
 
     public function testNextWhenNotArrayIsReturned()
     {
-        $this->iterableResult
-            ->expects($this->once())
-            ->method('next')
+        $this->iterableResult->expects($this->once())
+            ->method('next');
+        $this->iterableResult->expects($this->once())
+            ->method('current')
             ->willReturn(false);
-
-        $this->assertEquals(false, $this->iterableResultDecorator->next());
+        $this->iterableResultDecorator->next();
+        $this->assertEquals(false, $this->iterableResultDecorator->current());
     }
 
     public function testCurrent()
     {
         $sampleObject = new \stdClass();
 
-        $this->iterableResult
-            ->expects($this->once())
+        $this->iterableResult->expects($this->once())
             ->method('current')
             ->willReturn([$sampleObject]);
 
@@ -67,8 +65,7 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testKey()
     {
-        $this->iterableResult
-            ->expects($this->once())
+        $this->iterableResult->expects($this->once())
             ->method('key')
             ->willReturn('sample_key');
 
@@ -77,8 +74,7 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testValid()
     {
-        $this->iterableResult
-            ->expects($this->once())
+        $this->iterableResult->expects($this->once())
             ->method('valid')
             ->willReturn(true);
 

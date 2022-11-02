@@ -3,12 +3,12 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\SerializedName;
-use JMS\Serializer\Annotation\Type;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * Audit model
+ *
  * @ORM\Entity()
  * @Config(
  *      defaultValues={
@@ -37,7 +37,7 @@ class Audit extends AbstractAudit
     /**
      * @var string $objectId
      *
-     * @ORM\Column(name="object_id", type="integer", nullable=true)
+     * @ORM\Column(name="object_id", type="string", length=255, nullable=true)
      */
     protected $objectId;
 
@@ -72,8 +72,6 @@ class Audit extends AbstractAudit
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", cascade={"persist"})
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
-     * @Type("string")
-     * @SerializedName("username")
      */
     protected $user;
 

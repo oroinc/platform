@@ -1,13 +1,26 @@
 {% if isDesktopVersion() %}
-{% set togglerId = 'dropdown-'|uniqid %}
+{% set pinHelpTogglerId = 'pin-help-dropdown-'|uniqid %}
+{% set showMoreTogglerId = 'show-more-dropdown-'|uniqid %}
 <div class="list-bar-wrapper" id="pinbar">
+    <div class="pin-bar-empty dropdown">
+        <a href="#" id="{{ pinHelpTogglerId }}" role="button"
+           title="{{ 'oro.navigation.menu.how_to_use_pinbar'|trans }}"
+           data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false"
+        >{{ 'oro.navigation.menu.how_to_use_pinbar'|trans }}</a>
+        <div class="dropdown-menu" aria-labelledby="{{ pinHelpTogglerId }}">
+            <button class="btn-link btn-close fa-close" type="button" data-role="close" aria-hidden="true"></button>
+            <div class="dropdown-content">{{ 'oro.navigation.pins.help_message'|trans({'%pinIcon%': '<span class="fa-thumb-tack"></span>'})|raw }}</div>
+            <button class="btn btn-success no-hash" type="button" title="{{ 'Ok, got it'|trans }}" ><span class="fa-check"></span>{{ 'Ok, got it'|trans }}
+            </button>
+        </div>
+    </div>
     <div class="list-bar">
         <ul></ul>
-        <div class="pin-bar-empty" ><a href="{{ path('oro_pinbar_help') }}">{{ 'Learn how to use this space'|trans }}</a></div>
     </div>
-    <div class="show-more dropdown"><span role="button" id="{{ togglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
+    <div class="show-more dropdown"><span role="button" id="{{ showMoreTogglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
                                           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.navigation.pins.more_tabs.label'|trans }}"
-        ><span class="fa-ellipsis-v" aria-hidden="true"></span></span><ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}"></ul></div>
-    {{ oro_menu_render('pinbar') }}
+        ><span class="fa-ellipsis-v" aria-hidden="true"></span></span><div class="dropdown-menu" role="menu" aria-labelledby="{{ showMoreTogglerId }}"
+        ><ul class="dropdown-menu-items" data-role="pin-bar-dropdown-items"></ul></div></div>
 </div>
 {% endif %}

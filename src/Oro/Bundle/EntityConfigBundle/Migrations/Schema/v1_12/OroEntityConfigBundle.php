@@ -42,8 +42,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Create oro_attribute_family table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeFamilyTable(Schema $schema)
     {
@@ -64,8 +62,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Create oro_attribute_family_label table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeFamilyLabelTable(Schema $schema)
     {
@@ -79,8 +75,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Create oro_attribute_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupTable(Schema $schema)
     {
@@ -95,8 +89,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Create oro_attribute_group_label table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupLabelTable(Schema $schema)
     {
@@ -110,8 +102,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Create oro_attribute_group_rel table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupRelTable(Schema $schema)
     {
@@ -126,8 +116,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Add oro_attribute_family foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeFamilyForeignKeys(Schema $schema)
     {
@@ -142,8 +130,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Add oro_attribute_family_label foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeFamilyLabelForeignKeys(Schema $schema)
     {
@@ -164,8 +150,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Add oro_attribute_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupForeignKeys(Schema $schema)
     {
@@ -180,8 +164,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Add oro_attribute_group_label foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupLabelForeignKeys(Schema $schema)
     {
@@ -202,8 +184,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 
     /**
      * Add oro_attribute_group_rel foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupRelForeignKeys(Schema $schema)
     {
@@ -216,9 +196,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function addAttributeFamilyImageAssociation(Schema $schema)
     {
         $this->attachmentExtension->addImageRelation(
@@ -232,9 +209,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function addOrganizationForeignKey(Schema $schema)
     {
         $table = $schema->getTable('oro_attribute_family');

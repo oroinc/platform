@@ -3,45 +3,37 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data;
 
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 class DataGridDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datagrid;
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagrid;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $resultObject;
+    /** @var DataGridData */
+    private $data;
 
-    /**
-     * @var DataGridData
-     */
-    protected $data;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $this->resultObject = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->datagrid = $this->createMock(DatagridInterface::class);
+
         $this->data = new DataGridData($this->datagrid);
     }
 
     public function testToArray()
     {
-        $rawData = array(array('foo' => 'bar'));
+        $rawData = [['foo' => 'bar']];
+
+        $resultObject = $this->createMock(ResultsObject::class);
+        $resultObject->expects($this->once())
+            ->method('offsetGet')
+            ->with('data')
+            ->willReturn($rawData);
 
         $this->datagrid->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($this->resultObject));
-
-        $this->resultObject->expects($this->once())
-            ->method('offsetGet')
-            ->with('data')
-            ->will($this->returnValue($rawData));
+            ->willReturn($resultObject);
 
         $this->assertEquals($rawData, $this->data->toArray());
         $this->assertEquals($rawData, $this->data->toArray());

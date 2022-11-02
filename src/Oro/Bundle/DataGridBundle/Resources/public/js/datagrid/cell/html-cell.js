@@ -1,10 +1,8 @@
-define([
-    './string-cell',
-    'backgrid'
-], function(StringCell, Backgrid) {
+define(function(require) {
     'use strict';
 
-    var HtmlCell;
+    const StringCell = require('./string-cell');
+    const Backgrid = require('backgrid');
 
     /**
      * Html column cell. Added missing behaviour.
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.cell.HtmlCell
      * @extends oro.datagrid.cell.StringCell
      */
-    HtmlCell = StringCell.extend({
+    const HtmlCell = StringCell.extend({
         /**
          * use a default implementation to do not affect html content
          * @property {(Backgrid.CellFormatter)}
@@ -21,10 +19,10 @@ define([
         formatter: new Backgrid.CellFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function HtmlCell() {
-            HtmlCell.__super__.constructor.apply(this, arguments);
+        constructor: function HtmlCell(options) {
+            HtmlCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -32,8 +30,8 @@ define([
          * model's raw value for this cell's column.
          */
         render: function() {
-            var value = this.model.get(this.column.get('name'));
-            var formattedValue = this.formatter.fromRaw(value);
+            const value = this.model.get(this.column.get('name'));
+            const formattedValue = this.formatter.fromRaw(value);
             this.$el.html(formattedValue);
             return this;
         }

@@ -1,3 +1,2 @@
 bundles:
-    - Akeneo\Bundle\BatchBundle\AkeneoBatchBundle
     - Oro\Bundle\BatchBundle\OroBatchBundle

@@ -1,65 +1,86 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
-use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
+use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Updates application to actual state that the corresponding to local code base
+ * Updates the application state.
  */
 class PlatformUpdateCommand extends AbstractCommand
 {
-    const NAME = 'oro:platform:update';
+    /** @var string */
+    protected static $defaultName = 'oro:platform:update';
 
-    /**
-     * {@inheritdoc}
-     */
+    private PlatformUpdateCheckerInterface $platformUpdateChecker;
+
+    public function __construct(ContainerInterface $container, PlatformUpdateCheckerInterface $platformUpdateChecker)
+    {
+        parent::__construct($container);
+
+        $this->platformUpdateChecker = $platformUpdateChecker;
+    }
+
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Execute platform application update commands and init platform assets.')
-            ->addOption(
-                'force',
-                null,
-                InputOption::VALUE_NONE,
-                'Forces operation to be executed.'
+        $this
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
+            ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
+            ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
+            ->setDescription('Updates the application state.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command executes the application update commands
+to update the application state and to (re-)build the application assets.
+
+  <info>php %command.full_name%</info>
+
+The <info>--force</info> option is just a safety switch. The command will exit after checking
+the system requirements if this option is not used.
+
+  <info>php %command.full_name% --force</info>
+
+The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
+to skip the step of downloading translations (already downloaded translations
+will be applied if present), or skip applying the translations completely:
+
+  <info>php %command.full_name% --force --skip-download-translations</info>
+  <info>php %command.full_name% --force --skip-translations</info>
+
+HELP
             )
-            ->addOption(
-                'skip-assets',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip UI related commands during update'
-            )
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
-            ->addOption(
-                'skip-translations',
-                null,
-                InputOption::VALUE_NONE,
-                'Determines whether translation data need to be loaded or not'
-            )
-            ->addOption(
-                'skip-download-translations',
-                null,
-                InputOption::VALUE_NONE,
-                'Determines whether translation data need to be downloaded or not'
-            );
+            ->addUsage('--force')
+            ->addUsage('--force --skip-download-translations')
+            ->addUsage('--force --skip-translations')
+        ;
 
         parent::configure();
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
      */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
+            $this->presetTestEnvironmentOptions($input, $output);
+        }
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commandExecutor = $this->getCommandExecutor($input, $output);
@@ -72,21 +93,20 @@ class PlatformUpdateCommand extends AbstractCommand
         }
 
         $force = $input->getOption('force');
-
         if ($force) {
+            if (!$this->checkReadyToUpdate($output)) {
+                return 1;
+            }
+
             $eventDispatcher = $this->getEventDispatcher();
             $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
             try {
-                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+                $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
                 $this->loadDataStep($commandExecutor, $output);
-                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+                $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
-                $skipAssets = $input->getOption('skip-assets');
-
-                $this->finalStep($commandExecutor, $output, $input, $skipAssets);
-
-                return 0;
+                $this->finalStep($commandExecutor, $output, $input);
             } catch (\Exception $exception) {
                 return $commandExecutor->getLastCommandExitCode();
             }
@@ -99,17 +119,16 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
 
-            return 0;
+            if (!$this->checkReadyToUpdate($output)) {
+                return 1;
+            }
         }
+
+        return 0;
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param OutputInterface $output
-     *
-     * @return $this
-     */
-    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output)
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output): self
     {
         $commandExecutor
             ->runCommand(
@@ -120,18 +139,9 @@ class PlatformUpdateCommand extends AbstractCommand
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
-            ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
-            ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
-            ->runCommand(
-                'oro:cron:definitions:load',
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:workflow:definitions:load',
-                ['--process-isolation' => true]
-            )
+            ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
+            ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
+            ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
             ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
             ->runCommand('router:cache:clear', ['--process-isolation' => true])
@@ -141,93 +151,94 @@ class PlatformUpdateCommand extends AbstractCommand
         return $this;
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param OutputInterface $output
-     * @param InputInterface $input
-     * @param boolean $skipAssets
-     *
-     * @return $this
-     */
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
     protected function finalStep(
         CommandExecutor $commandExecutor,
         OutputInterface $output,
         InputInterface $input,
-        $skipAssets
-    ) {
+    ): self {
         $this->processTranslations($input, $commandExecutor);
 
-        if (!$skipAssets) {
-            $assetsOptions = [
-                '--exclude' => ['OroInstallerBundle']
-            ];
-            if ($input->hasOption('symlink') && $input->getOption('symlink')) {
-                $assetsOptions['--symlink'] = true;
-            }
-
-            $commandExecutor
-                ->runCommand('oro:assets:install', $assetsOptions)
-                ->runCommand('assetic:dump')
-                ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
-                ->runCommand('oro:localization:dump', ['--process-isolation' => true])
-                ->runCommand('oro:translation:dump', ['--process-isolation' => true])
-                ->runCommand(
-                    'oro:requirejs:build',
-                    ['--ignore-errors' => true, '--process-isolation' => true]
-                );
-        }
+        $commandExecutor->runCommand('fos:js-routing:dump', ['--process-isolation' => true]);
+        $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
 
         return $this;
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     *
-     * @return int
-     */
-    protected function checkRequirements(CommandExecutor $commandExecutor)
+    protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand(
-            'oro:check-requirements',
-            ['--ignore-errors' => true, '--verbose' => 1]
-        );
+        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 1]);
 
         return $commandExecutor->getLastCommandExitCode();
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    protected function checkSuggestedMemory(OutputInterface $output)
+    private function checkReadyToUpdate(OutputInterface $output): bool
+    {
+        $messages = $this->platformUpdateChecker->checkReadyToUpdate();
+        if (!$messages) {
+            return true;
+        }
+
+        $output->writeln('');
+        $output->writeln('<error>The application update is not possible:</error>');
+        foreach ($messages as $message) {
+            $output->writeln(sprintf('<error>  - %s</error>', $message));
+        }
+        $output->writeln('');
+
+        return false;
+    }
+
+    protected function checkSuggestedMemory(OutputInterface $output): void
     {
         $minimalSuggestedMemory = 1 * pow(1024, 3);
         $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
-        if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
+        if ($memoryLimit !== -1.0 && $memoryLimit < $minimalSuggestedMemory) {
             $output->writeln('<comment>It\'s recommended at least 1Gb to be available for PHP CLI</comment>');
         }
     }
 
-    /**
-     * @param InputInterface $input
-     * @param CommandExecutor $commandExecutor
-     */
-    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor)
+    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor): void
     {
         if (!$input->getOption('skip-translations')) {
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
-                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+                    ->runCommand(
+                        OroTranslationUpdateCommand::getDefaultName(),
+                        ['--process-isolation' => true, '--all' => true]
+                    );
             }
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->getContainer()->get('event_dispatcher');
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function presetTestEnvironmentOptions(InputInterface $input, OutputInterface $output): void
+    {
+        $testEnvDefaultOptionValuesMap = [
+            'force'             => true,
+            'skip-translations' => true,
+            'timeout'           => 600
+        ];
+
+        foreach ($testEnvDefaultOptionValuesMap as $optionName => $optionValue) {
+            if ($input->hasParameterOption('--' . $optionName)) {
+                continue;
+            }
+
+            $input->setOption($optionName, $optionValue);
+        }
+
+        $input->setInteractive(false);
+        $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
     }
 }

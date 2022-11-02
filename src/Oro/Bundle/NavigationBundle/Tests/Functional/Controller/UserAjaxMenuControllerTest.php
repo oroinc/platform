@@ -9,18 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserAjaxMenuControllerTest extends WebTestCase
 {
-    const MENU_NAME = 'application_menu';
+    private const MENU_NAME = 'application_menu';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            MenuUpdateData::class
-        ]);
+        $this->loadFixtures([MenuUpdateData::class]);
     }
 
     public function testCreate()
@@ -33,7 +27,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'POST',
             $this->getUrl('oro_navigation_user_menu_ajax_create', $parameters),
             [
@@ -56,7 +50,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_user_menu_ajax_delete', $parameters),
             ['ownerId' => 0]
@@ -77,7 +71,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_show', $parameters),
             ['ownerId' => 0]
@@ -98,7 +92,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_hide', $parameters),
             ['ownerId' => 0]
@@ -118,7 +112,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'PUT',
             $this->getUrl('oro_navigation_user_menu_ajax_move', $parameters),
             [
@@ -143,7 +137,7 @@ class UserAjaxMenuControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_navigation_user_menu_ajax_reset', $parameters),
             ['ownerId' => 0]

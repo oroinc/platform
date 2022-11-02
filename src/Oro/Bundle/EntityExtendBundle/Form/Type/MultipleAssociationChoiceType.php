@@ -27,8 +27,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
 
     /**
      * SUBMIT event handler
-     *
-     * @param FormEvent $event
      */
     public function submit(FormEvent $event)
     {

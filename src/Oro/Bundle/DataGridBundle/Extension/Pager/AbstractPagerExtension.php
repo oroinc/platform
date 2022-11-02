@@ -9,14 +9,21 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
+/**
+ * Abstract pager extension
+ */
 abstract class AbstractPagerExtension extends AbstractExtension
 {
-    /** @var PagerInterface */
-    protected $pager;
+    /**
+     * Soft limit to prevent unlimited results from index
+     */
+    protected const SOFT_LIMIT = 1000;
 
     /**
-     * @param PagerInterface $pager
+     * @var PagerInterface
      */
+    protected $pager;
+
     public function __construct(PagerInterface $pager)
     {
         $this->pager = $pager;
@@ -31,11 +38,53 @@ abstract class AbstractPagerExtension extends AbstractExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function processConfigs(DatagridConfiguration $config)
+    {
+        if ($this->getParameters()->has(PagerInterface::PAGER_ROOT_PARAM)) {
+            $page = $this->getOr(PagerInterface::PAGE_PARAM, 0);
+            if (!is_numeric($page) || $page <= 0) {
+                $this->getParameters()
+                    ->mergeKey(PagerInterface::PAGER_ROOT_PARAM, [PagerInterface::PAGE_PARAM => 1]);
+            }
+
+            $currentPageSize = $this->getOr(PagerInterface::PER_PAGE_PARAM, 0);
+            $defaultPageSize = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
+            $pageSizeItems = $config->offsetGetByPath(ToolbarExtension::PAGER_ITEMS_OPTION_PATH, []);
+
+            $exist = array_filter(
+                $pageSizeItems,
+                static function ($item) use ($currentPageSize) {
+                    if (isset($item['size'])) {
+                        return $currentPageSize == $item['size'];
+                    }
+
+                    return is_numeric($item) ? $currentPageSize == $item : false;
+                }
+            );
+
+            if (!$exist) {
+                $this->getParameters()
+                    ->mergeKey(PagerInterface::PAGER_ROOT_PARAM, [PagerInterface::PER_PAGE_PARAM => $defaultPageSize]);
+            }
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->setTotalRecords($this->pager->getNbResults());
+        $onePage = $config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false);
+        $totalRecords = $this->pager->getNbResults();
+
+        // if there is more records than soft limit we should show only soft limit records count
+        if ($onePage && $totalRecords > self::SOFT_LIMIT) {
+            $totalRecords = self::SOFT_LIMIT;
+        }
+
+        $result->setTotalRecords($totalRecords);
     }
 
     /**
@@ -69,7 +118,7 @@ abstract class AbstractPagerExtension extends AbstractExtension
     }
 
     /**
-     * @param ParameterBag $parameters
+     * {@inheritdoc}
      */
     public function setParameters(ParameterBag $parameters)
     {
@@ -102,6 +151,10 @@ abstract class AbstractPagerExtension extends AbstractExtension
     {
         $pagerParameters = $this->getParameters()->get(PagerInterface::PAGER_ROOT_PARAM, []);
 
-        return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
+        if (isset($pagerParameters[$paramName]) && '' !== $pagerParameters[$paramName]) {
+            return $pagerParameters[$paramName];
+        }
+
+        return $default;
     }
 }

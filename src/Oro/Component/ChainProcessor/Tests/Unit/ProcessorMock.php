@@ -7,11 +7,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class ProcessorMock implements ProcessorInterface
 {
-    /** @var string */
-    protected $processorId;
+    /** @var string|null */
+    private $processorId;
 
     /** @var callable|null */
-    protected $callback;
+    private $callback;
 
     /**
      * @param string|null   $processorId
@@ -20,11 +20,11 @@ class ProcessorMock implements ProcessorInterface
     public function __construct($processorId = null, $callback = null)
     {
         $this->processorId = $processorId;
-        $this->callback    = $callback;
+        $this->callback = $callback;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getProcessorId()
     {

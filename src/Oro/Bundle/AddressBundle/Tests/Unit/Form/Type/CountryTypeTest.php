@@ -7,26 +7,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CountryType
-     */
-    protected $type;
+    /** @var CountryType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->type = new CountryType(
-            'Oro\Bundle\AddressBundle\Entity\Address',
-            'Oro\Bundle\AddressBundle\Entity\Value\AddressValue'
-        );
+        $this->type = new CountryType();
     }
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver $resolver */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));

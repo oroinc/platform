@@ -1,0 +1,11 @@
+<div data-text-filter-template>
+    <input class="input input--size-m input--full" type="text" name="value" value="" aria-label="<%- inputFieldAriaLabel %>">
+    <% if (renderMode !== 'toggle-mode') { %>
+        <div class="filter-action-row">
+            <button type="button"
+                class="btn btn--action filter-update"
+                aria-label="<%- updateButtonAriaLabel %>"
+            ><%- _.__("oro.filter.updateButton.text") %></button>
+        </div>
+    <% } %>
+</div>

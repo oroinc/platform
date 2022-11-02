@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 
 abstract class ConfigProviderAwareType extends AbstractType
 {
@@ -16,9 +12,6 @@ abstract class ConfigProviderAwareType extends AbstractType
      */
     protected $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;

@@ -2,26 +2,29 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Connection;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $connection;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var MigrationQueryExecutor */
-    protected $executor;
+    private $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->logger     = $this->createMock('Psr\Log\LoggerInterface');
-        $this->executor   = new MigrationQueryExecutor($this->connection);
+        $this->connection = $this->createMock(Connection::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->executor = new MigrationQueryExecutor($this->connection);
         $this->executor->setLogger($this->logger);
     }
 
@@ -59,20 +62,8 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteMigrationQuery()
     {
-        $query = $this
-            ->getMockForAbstractClass(
-                'Oro\Bundle\MigrationBundle\Migration\MigrationQuery',
-                [],
-                '',
-                true,
-                true,
-                true,
-                ['setConnection', 'execute']
-            )
-        ;
+        $query = $this->createMock(MigrationQuery::class);
 
-        $query->expects($this->never())
-            ->method('setConnection');
         $query->expects($this->once())
             ->method('execute')
             ->with($this->identicalTo($this->logger));
@@ -82,9 +73,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteConnectionAwareMigrationQuery()
     {
-        $query = $this->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $query = $this->createMock(ParametrizedMigrationQuery::class);
 
         $query->expects($this->once())
             ->method('setConnection')
@@ -100,11 +89,11 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
     {
         $queryDescription = 'test query';
 
-        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock(MigrationQuery::class);
 
         $query->expects($this->once())
             ->method('getDescription')
-            ->will($this->returnValue($queryDescription));
+            ->willReturn($queryDescription);
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -120,18 +109,18 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
     {
         $queryDescription = ['test query 1', 'test query 2'];
 
-        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock(MigrationQuery::class);
 
         $query->expects($this->once())
             ->method('getDescription')
-            ->will($this->returnValue($queryDescription));
+            ->willReturn($queryDescription);
 
-        $this->logger->expects($this->at(0))
+        $this->logger->expects($this->exactly(2))
             ->method('info')
-            ->with($queryDescription[0]);
-        $this->logger->expects($this->at(1))
-            ->method('info')
-            ->with($queryDescription[1]);
+            ->withConsecutive(
+                [$queryDescription[0]],
+                [$queryDescription[1]]
+            );
 
         $query->expects($this->never())
             ->method('execute');
@@ -143,11 +132,11 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
     {
         $queryDescription = null;
 
-        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock(MigrationQuery::class);
 
         $query->expects($this->once())
             ->method('getDescription')
-            ->will($this->returnValue($queryDescription));
+            ->willReturn($queryDescription);
 
         $this->logger->expects($this->never())
             ->method('info');

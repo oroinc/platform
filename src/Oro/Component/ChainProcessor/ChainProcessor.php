@@ -12,9 +12,6 @@ class ChainProcessor implements ProcessorInterface
     /** @var ProcessorBagInterface */
     protected $processorBag;
 
-    /**
-     * @param ProcessorBagInterface $processorBag
-     */
     public function __construct(ProcessorBagInterface $processorBag)
     {
         $this->processorBag = $processorBag;
@@ -29,8 +26,6 @@ class ChainProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ContextInterface $context
-     *
      * @throws ExecutionFailedException if some processor fired an exception
      */
     protected function executeProcessors(ContextInterface $context)

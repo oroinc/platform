@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\EntitySerializer\ConfigUtil as BaseConfigUtil;
 
 /**
- * Provides a set of Data API configuration related reusable constants and static methods.
+ * Provides a set of API configuration related reusable constants and static methods.
  */
 class ConfigUtil extends BaseConfigUtil
 {
@@ -27,6 +28,15 @@ class ConfigUtil extends BaseConfigUtil
 
     /** the name of subresources configuration section */
     public const SUBRESOURCES = 'subresources';
+
+    /**
+     * exclude all custom fields belong to system extend entities that are not configured explicitly;
+     * the custom fields are fields with "is_extend" = true and "owner" = "Custom"
+     * in "extend" scope in entity configuration;
+     * the system extend entities are entities with "is_extend" = true and "owner" != "Custom"
+     * in "extend" scope in entity configuration
+     */
+    public const EXCLUSION_POLICY_CUSTOM_FIELDS = 'custom_fields';
 
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     public const INHERIT = 'inherit';
@@ -80,9 +90,6 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether a requesting of additional meta properties is disabled */
     public const DISABLE_META_PROPERTIES = 'disable_meta_properties';
 
-    /** a handler that should be used to delete the entity */
-    public const DELETE_HANDLER = 'delete_handler';
-
     /** the form type that should be used for the entity */
     public const FORM_TYPE = 'form_type';
 
@@ -122,6 +129,12 @@ class ConfigUtil extends BaseConfigUtil
      */
     public const TARGET_TYPE = 'target_type';
 
+    /** the type that represents a single valued association */
+    public const TO_ONE = 'to-one';
+
+    /** the type that represents a collection valued association */
+    public const TO_MANY = 'to-many';
+
     /** a list of fields on which this field depends on */
     public const DEPENDS_ON = 'depends_on';
 
@@ -144,10 +157,23 @@ class ConfigUtil extends BaseConfigUtil
     public const COLLECTION = 'collection';
 
     /**
+     * a key inside a record contains an additional information about a collection of primary objects
+     * that is used to specify the current page number
+     * @see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY
+     */
+    public const PAGE_NUMBER = 'page_number';
+
+    /** the type of a post processor to be applies to the field value */
+    public const POST_PROCESSOR = 'post_processor';
+
+    /** the option for a post processor to be applies to the field value */
+    public const POST_PROCESSOR_OPTIONS = 'post_processor_options';
+
+    /**
      * Gets a native PHP array representation of each object in a given array.
      *
-     * @param object[] $objects
-     * @param bool     $treatEmptyAsNull
+     * @param ToArrayInterface[] $objects
+     * @param bool               $treatEmptyAsNull
      *
      * @return array
      */
@@ -161,6 +187,25 @@ class ConfigUtil extends BaseConfigUtil
             } elseif ($treatEmptyAsNull) {
                 $result[$key] = null;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets a native PHP array representation of each property object in a given array.
+     *
+     * @param ToArrayInterface[] $properties
+     *
+     * @return array
+     */
+    public static function convertPropertiesToArray(array $properties)
+    {
+        $result = [];
+        foreach ($properties as $name => $property) {
+            $data = $property->toArray();
+            unset($data['name']);
+            $result[$name] = $data;
         }
 
         return $result;
@@ -221,5 +266,15 @@ class ConfigUtil extends BaseConfigUtil
         }
 
         return $field->getPropertyPath($fieldName);
+    }
+
+    /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    public static function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? self::TO_MANY : self::TO_ONE;
     }
 }

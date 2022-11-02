@@ -2,30 +2,29 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GridViewControllerTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures([
-            'Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData',
-        ]);
+        $this->loadFixtures([LoadGridViewData::class]);
     }
 
     public function testPostActionShouldReturn400IfSentDataAreInvalid()
     {
-        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'));
+        $this->client->jsonRequest('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'));
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
     public function testPostActionShouldReturn201IfSentDataAreValid()
     {
-        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
+        $this->client->jsonRequest('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
             'label' => 'view',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid',
@@ -34,7 +33,7 @@ class GridViewControllerTest extends WebTestCase
         ]);
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 201);
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('id', $response);
         $createdGridView = $this->findGridView($response['id']);
         $this->assertEquals('admin', $createdGridView->getOwner()->getUsername());
@@ -50,7 +49,7 @@ class GridViewControllerTest extends WebTestCase
         $gridView = $this->findFirstGridView();
 
         $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
-        $this->client->request('PUT', $url, [
+        $this->client->jsonRequest('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',
@@ -86,48 +85,33 @@ class GridViewControllerTest extends WebTestCase
     {
         $id = $this->findLastGridView()->getId();
 
-        $this->client->request('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
+        $this->client->jsonRequest('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         $this->assertNull($this->findGridView($id));
     }
 
-    /**
-     * @return GridView
-     */
-    private function findFirstGridView()
+    private function findFirstGridView(): GridView
     {
         return $this->getGridViewRepository()->findOneBy([], ['id' => 'ASC']);
     }
 
-    /**
-     * @return GridView
-     */
-    private function findLastGridView()
+    private function findLastGridView(): GridView
     {
         return $this->getGridViewRepository()->findOneBy([], ['id' => 'DESC']);
     }
 
-    /**
-     * @return GridView
-     */
-    private function findGridView($id)
+    private function findGridView(int $id): ?GridView
     {
         return $this->getGridViewRepository()->find($id);
     }
 
-    /**
-     * @return GridViewRepository
-     */
-    private function getGridViewRepository()
+    private function getGridViewRepository(): GridViewRepository
     {
-        return $this->getEntityManager()->getRepository('OroDataGridBundle:GridView');
+        return $this->getEntityManager()->getRepository(GridView::class);
     }
 
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
     }

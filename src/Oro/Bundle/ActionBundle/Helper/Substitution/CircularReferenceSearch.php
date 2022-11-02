@@ -27,7 +27,6 @@ class CircularReferenceSearch
 
     /**
      * Looks for circular reference in values -> keys in pairs, throws an exception if found.
-     * @param array $pairs
      * @throws CircularReferenceException
      */
     public static function assert(array $pairs)

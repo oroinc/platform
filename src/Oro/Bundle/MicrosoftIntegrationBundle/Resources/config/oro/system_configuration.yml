@@ -1,0 +1,69 @@
+system_configuration:
+    groups:
+        microsoft_settings:
+            icon: fa-windows
+            title: oro.microsoft_integration.system_configuration.groups.microsoft_settings.title
+        microsoft_integration_settings:
+            title: oro.microsoft_integration.system_configuration.groups.microsoft_integration_settings.title
+            priority: 50
+            tooltip: oro.microsoft_integration.system_configuration.groups.microsoft_integration_settings.tooltip
+        microsoft_integrations:
+            title: oro.microsoft_integration.system_configuration.groups.microsoft_integrations.title
+            priority: 40
+
+    fields:
+        oro_microsoft_integration.client_id:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            search_type: text
+            options:
+                label: oro.microsoft_integration.system_configuration.fields.client_id.label
+                resettable: false
+                required: false
+            priority: 30
+        oro_microsoft_integration.client_secret:
+            data_type: string
+            type: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
+            search_type: text
+            options:
+                label: oro.microsoft_integration.system_configuration.fields.client_secret.label
+                resettable: true
+                required: false
+            priority: 20
+        oro_microsoft_integration.tenant:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            search_type: text
+            options:
+                label: oro.microsoft_integration.system_configuration.fields.tenant.label
+                resettable: false
+                required: false
+            priority: 10
+        oro_microsoft_integration.redirect_url:
+            data_type: string
+            ui_only: true
+            type: Oro\Bundle\ConfigBundle\Form\Type\UrlInfoType
+            options:
+                required: false
+                label: oro.microsoft_integration.system_configuration.fields.redirect_uri.label
+                tooltip: oro.microsoft_integration.system_configuration.fields.redirect_uri.tooltip
+                resettable: false
+                attr:
+                    readonly: true
+                route: 'oro_imap_microsoft_access_token'
+            priority: 1
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    integrations:
+                        children:
+                            microsoft_settings:
+                                children:
+                                    microsoft_integration_settings:
+                                        children:
+                                            - oro_microsoft_integration.client_id
+                                            - oro_microsoft_integration.client_secret
+                                            - oro_microsoft_integration.tenant
+                                            - oro_microsoft_integration.redirect_url

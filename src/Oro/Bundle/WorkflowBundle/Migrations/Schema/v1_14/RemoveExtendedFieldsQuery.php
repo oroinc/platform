@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -58,7 +58,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
         foreach ($queries as $val) {
             $this->logQuery($logger, $val[0], $val[1], $val[2]);
             if (!$dryRun) {
-                $this->connection->executeUpdate($val[0], $val[1], $val[2]);
+                $this->connection->executeStatement($val[0], $val[1], $val[2]);
             }
         }
     }
@@ -75,7 +75,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
             'INNER JOIN oro_entity_config_field cfs ON cfs.entity_id = c.id ' .
             'WHERE cfi.field_name = :wi and cfs.field_name = :ws';
         $params = ['wi' => self::PROPERTY_WORKFLOW_ITEM, 'ws' => self::PROPERTY_WORKFLOW_STEP];
-        $types  = ['field' => Type::STRING];
+        $types  = ['field' => Types::STRING];
 
         $this->logQuery($logger, $query, $params, $types);
 
@@ -85,7 +85,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
         return array_filter(
             $rows,
             function ($row) {
-                return strpos($row['class_name'], 'Extend\\Entity\\') !== 0;
+                return !str_starts_with($row['class_name'], 'Extend\\Entity\\');
             }
         );
     }
@@ -108,11 +108,11 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
     protected function getUpdateQuery(array $data, $id)
     {
         $data['extend']['state'] = ExtendScope::STATE_DELETE;
-        
+
         return [
             'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
             ['data' => $data, 'id' => $id],
-            ['data' => Type::TARRAY, 'id' => Type::INTEGER]
+            ['data' => Types::ARRAY, 'id' => Types::INTEGER]
         ];
     }
 }

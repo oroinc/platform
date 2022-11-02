@@ -4,13 +4,10 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry returns the documentation parser for a specific request type.
- * The implementation of this registry assumes that all parsers
- * are declared in DIC as public services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
  */
 class ResourceDocParserRegistry
 {
@@ -37,11 +34,7 @@ class ResourceDocParserRegistry
 
     /**
      * Gets an instance of ResourceDocParserInterface
-     * responsible to parse documentation for Data API resources for the specific request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return ResourceDocParserInterface
+     * responsible to parse documentation for API resources for the specific request type.
      *
      * @throws \LogicException if a parser cannot be created for the given request type
      */

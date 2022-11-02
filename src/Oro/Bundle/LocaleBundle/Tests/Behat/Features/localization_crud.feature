@@ -1,6 +1,7 @@
 @regression
 @ticket-BAP-14021
 @ticket-BAP-15576
+@waf-skip
 @automatically-ticket-tagged
 @fixture-OroLocaleBundle:japanese-language.yml
 Feature: Localization Crud
@@ -11,9 +12,9 @@ Feature: Localization Crud
   Scenario: Check default localization
     Given I login as administrator
     When I go to System/Localization/Localizations
-    Then I should see "English" in grid with following data:
-      | Title               | English |
-      | Parent localization | N/A     |
+    Then I should see "English (United States)" in grid with following data:
+      | Title               | English (United States) |
+      | Parent localization |                         |
 
   Scenario: Verify HTML tags
     Given I click "Create Localization"
@@ -58,8 +59,8 @@ Feature: Localization Crud
     And I save and close form
     And go to System/Localization/Localizations
     Then I should see "Japanese" in grid with following data:
-      | Title               | Jap    |
-      | Parent localization | N/A    |
+      | Title               | Jap                      |
+      | Parent localization |                          |
       | Language            | Japanese (Japan) - ja_JP |
       | Formatting          | Japanese (Japan) - ja_JP |
 
@@ -76,8 +77,8 @@ Feature: Localization Crud
     And I save and close form
     And go to System/Localization/Localizations
     Then I should see "Dutch" in grid with following data:
-      | Title               | Netherlands    |
-      | Parent localization | N/A    |
+      | Title               | Netherlands                 |
+      | Parent localization |                             |
       | Language            | Dutch (Netherlands) - nl_NL |
       | Formatting          | Dutch (Netherlands) - nl_NL |
     And there are 3 records in grid
@@ -94,16 +95,16 @@ Feature: Localization Crud
       | Default Localization  | Dutch |
     And save form
     And go to System/Localization/Localizations
-    Then I should see following actions for English in grid:
+    Then I should see following actions for English (United States) in grid:
       | View   |
       | Edit   |
       | Delete |
 
   Scenario: Delete new localization but default can't be removed
-    Given I click Delete English in grid
+    Given I click Delete English (United States) in grid
     When I confirm deletion
     Then there is two record in grid
-    And there is no "English" in grid
+    And there is no "English (United States)" in grid
     And I should see Dutch in grid
     But I should not see following actions for Dutch in grid:
       | Delete |

@@ -2,68 +2,57 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
+use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
+use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\TempDirExtension;
 
 class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CsvFileWriter */
-    protected $writer;
+    use TempDirExtension;
 
     /** @var string */
-    protected $filePath;
+    private $filePath;
 
     /** @var string */
     private $tmpDir;
 
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextRegistry;
+    private $contextRegistry;
 
-    protected function setUp()
+    /** @var CsvFileWriter */
+    private $writer;
+
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getByStepExecution'])
+            ->onlyMethods(['getByStepExecution'])
             ->getMock();
-
-        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'CsvFileWriterTest';
-
-        @\mkdir($this->tmpDir);
+        $this->tmpDir = $this->getTempDir('CsvFileWriterTest');
         $this->filePath = $this->tmpDir . DIRECTORY_SEPARATOR . 'new_file.csv';
 
         $this->writer = new CsvFileWriter($this->contextRegistry);
     }
 
-    protected function tearDown()
-    {
-        $this->writer->close();
-        if (is_file($this->filePath)) {
-            unlink($this->filePath);
-        }
-        @\rmdir($this->tmpDir);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of CSV writer must contain "filePath".
-     */
     public function testSetStepExecutionNoFileException()
     {
-        $this->writer->setStepExecution($this->getMockStepExecution([]));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of CSV writer must contain "filePath".');
+
+        $this->writer->setStepExecution($this->getStepExecution([]));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     */
     public function testUnknownFileException()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->writer->setStepExecution(
-            $this->getMockStepExecution(
-                [
-                    'filePath' => $this->tmpDir . '/unknown/new_file.csv'
-                ]
-            )
+            $this->getStepExecution(['filePath' => $this->tmpDir . '/unknown/new_file.csv'])
         );
     }
 
@@ -77,29 +66,37 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
             'header'            => ['one', 'two']
         ];
 
-        self::assertAttributeEquals(',', 'delimiter', $this->writer);
-        self::assertAttributeEquals('"', 'enclosure', $this->writer);
-        self::assertAttributeEquals(true, 'firstLineIsHeader', $this->writer);
-        self::assertAttributeEmpty('header', $this->writer);
+        self::assertEquals(',', ReflectionUtil::getPropertyValue($this->writer, 'delimiter'));
+        self::assertEquals('"', ReflectionUtil::getPropertyValue($this->writer, 'enclosure'));
+        self::assertTrue(ReflectionUtil::getPropertyValue($this->writer, 'firstLineIsHeader'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($this->writer, 'header'));
 
-        $this->writer->setStepExecution($this->getMockStepExecution($options));
+        $this->writer->setStepExecution($this->getStepExecution($options));
 
-        self::assertAttributeEquals($options['delimiter'], 'delimiter', $this->writer);
-        self::assertAttributeEquals($options['enclosure'], 'enclosure', $this->writer);
-        self::assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->writer);
-        self::assertAttributeEquals($options['header'], 'header', $this->writer);
+        self::assertEquals(
+            $options['delimiter'],
+            ReflectionUtil::getPropertyValue($this->writer, 'delimiter')
+        );
+        self::assertEquals(
+            $options['enclosure'],
+            ReflectionUtil::getPropertyValue($this->writer, 'enclosure')
+        );
+        self::assertEquals(
+            $options['firstLineIsHeader'],
+            ReflectionUtil::getPropertyValue($this->writer, 'firstLineIsHeader')
+        );
+        self::assertEquals(
+            $options['header'],
+            ReflectionUtil::getPropertyValue($this->writer, 'header')
+        );
     }
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array  $options
-     * @param array  $data
-     * @param string $expected
      */
-    public function testWrite($options, $data, $expected)
+    public function testWrite(array $options, array $data, string $expected)
     {
-        $stepExecution = $this->getMockStepExecution($options);
+        $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write($data);
         self::assertFileExists($expected);
@@ -112,9 +109,9 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedContent, $actualContent);
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        $filePath = sys_get_temp_dir() . '/CsvFileWriterTest/new_file.csv';
+        $filePath = $this->getTempDir('CsvFileWriterTest', null) . DIRECTORY_SEPARATOR . 'new_file.csv';
 
         return [
             'first_item_header' => [
@@ -167,7 +164,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
             'filePath'          => $this->tmpDir . '/new_file.csv',
             'firstLineIsHeader' => false
         ];
-        $stepExecution = $this->getMockStepExecution($options);
+        $stepExecution = $this->getStepExecution($options);
 
         $data = [['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']];
         $expected = __DIR__ . '/fixtures/backslashes.csv';
@@ -185,18 +182,12 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array  $options
-     * @param array  $data
-     * @param string $expected
      */
-    public function testWriteWithClearWriter($options, $data, $expected)
+    public function testWriteWithClearWriter(array $options, array $data, string $expected)
     {
-        $stepExecution = $this->getMockStepExecution($options);
+        $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
-        $clearWriter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $clearWriter = $this->createMock(DoctrineClearWriter::class);
         $clearWriter->expects($this->once())
             ->method('write')
             ->with($data);
@@ -213,29 +204,22 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedContent, $actualContent);
     }
 
-    /**
-     * @param array $jobInstanceRawConfiguration
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
-     */
-    protected function getMockStepExecution(array $jobInstanceRawConfiguration)
+    private function getStepExecution(array $jobInstanceRawConfiguration): StepExecution
     {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext')
+        $context = $this->getMockBuilder(StepExecutionProxyContext::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getConfiguration'])
+            ->onlyMethods(['getConfiguration'])
             ->getMock();
-        $context->expects($this->any())
+        $context->expects(self::any())
             ->method('getConfiguration')
-            ->will($this->returnValue($jobInstanceRawConfiguration));
+            ->willReturn($jobInstanceRawConfiguration);
 
-        $this->contextRegistry->expects($this->any())
+        $this->contextRegistry->expects(self::any())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         return $stepExecution;
     }

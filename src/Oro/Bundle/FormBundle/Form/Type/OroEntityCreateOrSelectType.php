@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
-use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -32,9 +31,6 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -115,10 +111,6 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param array $options
-     */
     protected function disableNewEntityValidation(FormInterface $form, array $options)
     {
         // disable all validation for new entity field

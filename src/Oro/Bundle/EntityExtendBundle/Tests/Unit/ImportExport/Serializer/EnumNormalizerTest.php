@@ -9,40 +9,28 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    /**
-     * @var EnumNormalizer
-     */
-    protected $normalizer;
+    /** @var EnumNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
 
         $this->normalizer = new EnumNormalizer($this->fieldHelper);
     }
 
     /**
-     * @param mixed $value
-     * @param bool $expected
-     *
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($value, $expected)
+    public function testSupportsNormalization(mixed $value, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($value));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
         return [
             [null, false],
@@ -55,22 +43,16 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $value
-     * @param bool $expected
-     *
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($value, $expected)
+    public function testSupportsDenormalization(mixed $value, bool $expected)
     {
         $type = is_object($value) ? get_class($value) : gettype($value);
 
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization($value, $type));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
         return [
             [null, false],
@@ -83,14 +65,9 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $value
-     * @param bool $expected
-     * @param array $context
-     * @param string $identityField
-     *
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize($value, $expected, array $context = [], $identityField = 'name')
+    public function testNormalize(mixed $value, ?array $expected, array $context = [], string $identityField = 'name')
     {
         $type = is_object($value) ? get_class($value) : gettype($value);
 
@@ -102,10 +79,7 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($value, $type, $context));
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
         $id = uniqid();
 
@@ -126,6 +100,11 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
                 ['mode' => 'full']
             ],
             [
+                new TestEnumValue('0', '0', 100, true),
+                ['id' => '0', 'name' => '0', 'priority' => 100, 'is_default' => true],
+                ['mode' => 'full']
+            ],
+            [
                 new TestEnumValue($id, 'name', 100, true),
                 ['name' => 'name'],
                 ['mode' => 'short']
@@ -135,27 +114,27 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
                 ['id' => $id],
                 ['mode' => 'short'],
                 'id'
-            ]
+            ],
+            [
+                new TestEnumValue('0', '0', 100, true),
+                ['id' => '0'],
+                ['mode' => 'short'],
+                'id'
+            ],
         ];
     }
 
     /**
-     * @param array $data
-     * @param AbstractEnumValue $expected
-     *
      * @dataProvider denormalizeDataProvider
      */
-    public function testDenormalize($data, $expected)
+    public function testDenormalize(array $data, AbstractEnumValue $expected)
     {
         $class = get_class($expected);
 
         $this->assertEquals($expected, $this->normalizer->denormalize($data, $class));
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeDataProvider()
+    public function denormalizeDataProvider(): array
     {
         $id = uniqid();
 
@@ -170,8 +149,8 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
                 new TestEnumValue($id, 'name', 100, true)
             ],
             'Check that id with "0" value is handled correctly' => [
-                ['id' => "0", 'name' => 'name', 'priority' => 100, 'default' => true],
-                new TestEnumValue("0", 'name', 100, true)
+                ['id' => '0', 'name' => 'name', 'priority' => 100, 'default' => true],
+                new TestEnumValue('0', 'name', 100, true)
             ],
         ];
     }

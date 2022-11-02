@@ -7,7 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TextTypeStub extends TextType
 {
-    const NAME = 'text_stub';
+    private const NAME = 'text_stub';
 
     /**
      * {@inheritdoc}

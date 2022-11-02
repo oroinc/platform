@@ -14,9 +14,6 @@ class PostUpMigrationListener
      */
     protected $commandExecutor;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     */
     public function __construct(CommandExecutor $commandExecutor)
     {
         $this->commandExecutor = $commandExecutor;
@@ -24,8 +21,6 @@ class PostUpMigrationListener
 
     /**
      * Registers a migration to update entity configs
-     *
-     * @param PostMigrationEvent $event
      */
     public function updateConfigs(PostMigrationEvent $event)
     {
@@ -36,8 +31,6 @@ class PostUpMigrationListener
 
     /**
      * Registers a migration to warm up entity configs cache
-     *
-     * @param PostMigrationEvent $event
      */
     public function warmUpCache(PostMigrationEvent $event)
     {

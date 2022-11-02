@@ -5,43 +5,39 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\FormBuilder;
 
 class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetDateType */
-    protected $formType;
+    private $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetDateType();
     }
 
     public function testBuildFormWithDate()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with('useDate', CheckboxType::class);
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('date', OroDateType::class);
+            ->withConsecutive(
+                ['useDate', CheckboxType::class],
+                ['date', OroDateType::class]
+            );
+
         $this->formType->buildForm($builder, ['enable_date' => true]);
     }
 
     public function testBuildFormWithoutDate()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())
             ->method('add')
             ->with('useDate', CheckboxType::class)
-            ->will($this->returnSelf());
+            ->willReturnSelf();
+
         $this->formType->buildForm($builder, ['enable_date' => false]);
     }
 }

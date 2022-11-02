@@ -7,13 +7,20 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider generateIndexNameProvider
      */
-    public function testGenerateIndexName($tableName, $columnNames, $uniqueIndex, $expectedName)
-    {
+    public function testGenerateIndexName(
+        string $tableName,
+        array $columnNames,
+        bool $uniqueIndex,
+        string $expectedName
+    ) {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIndexName($tableName, $columnNames, $uniqueIndex);
         $this->assertEquals($expectedName, $result);
@@ -21,7 +28,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 
     public function testEncodedIndexNameIsTheSameAsDoctrineDefault()
     {
-        $tableName  = 'tbl123456789012345';
+        $tableName = 'tbl123456789012345';
         $columnName = 'clmn1234567890';
 
         $table = new Table($tableName, [new Column($columnName, Type::getType('string'))]);
@@ -55,9 +62,9 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider generateForeignKeyConstraintNameProvider
      */
     public function testGenerateForeignKeyConstraintName(
-        $tableName,
-        $columnNames,
-        $expectedName
+        string $tableName,
+        array $columnNames,
+        string $expectedName
     ) {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateForeignKeyConstraintName($tableName, $columnNames);
@@ -66,10 +73,10 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 
     public function testEncodedForeignKeyConstraintNameIsTheSameAsDoctrineDefault()
     {
-        $tableName1  = 'tbl123456789012345';
+        $tableName1 = 'tbl123456789012345';
         $columnName1 = 'clmn1234567890';
 
-        $tableName2  = 'tbl1234567890';
+        $tableName2 = 'tbl1234567890';
         $columnName2 = 'clmn12345';
 
         $table1 = new Table($tableName1, [new Column($columnName1, Type::getType('integer'))]);
@@ -90,8 +97,13 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateIdentifierNameProvider
      */
-    public function testGenerateIdentifierName($tableNames, $columnNames, $prefix, $expectedName, $upperCase)
-    {
+    public function testGenerateIdentifierName(
+        array $tableNames,
+        array $columnNames,
+        string $prefix,
+        string $expectedName,
+        ?bool $upperCase
+    ) {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIdentifierName($tableNames, $columnNames, $prefix, $upperCase);
         $this->assertEquals($expectedName, $result);
@@ -99,16 +111,17 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyTableNameProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A table name must not be empty.
      */
-    public function testGenerateIdentifierNameWithEmptyTableName($tableNames)
+    public function testGenerateIdentifierNameWithEmptyTableName(array|string|null $tableNames)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A table name must not be empty.');
+
         $generator = new DbIdentifierNameGenerator();
         $generator->generateIdentifierName($tableNames, ['test'], 'test');
     }
 
-    public function generateIndexNameProvider()
+    public function generateIndexNameProvider(): array
     {
         return [
             ['table1', ['column1'], false, 'idx_table1_column1'],
@@ -120,7 +133,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function generateForeignKeyConstraintNameProvider()
+    public function generateForeignKeyConstraintNameProvider(): array
     {
         return [
             ['table1', ['clmn1'], 'fk_table1_clmn1'],
@@ -130,7 +143,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function generateIdentifierNameProvider()
+    public function generateIdentifierNameProvider(): array
     {
         return [
             [
@@ -185,7 +198,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function emptyTableNameProvider()
+    public function emptyTableNameProvider(): array
     {
         return [
             [null],

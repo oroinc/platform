@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var StickyNoteContentView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    StickyNoteContentView = BaseView.extend({
+    const StickyNoteContentView = BaseView.extend({
         listen: {
             'change model': 'render'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function StickyNoteContentView() {
-            StickyNoteContentView.__super__.constructor.apply(this, arguments);
+        constructor: function StickyNoteContentView(options) {
+            StickyNoteContentView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var settings = this.model.get('settings') || {};
-            var content = _.escape(String(settings.content)).replace(/\r?\n/g, '<br/>');
+            const settings = this.model.get('settings') || {};
+            const content = _.escape(String(settings.content)).replace(/\r?\n/g, '<br/>');
             this.$el.html(content);
             return this;
         }

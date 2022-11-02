@@ -10,22 +10,13 @@ use Oro\Bundle\EmailBundle\Model\From;
  */
 class NotificationSettings
 {
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
+    private ConfigManager $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * @return From
-     */
     public function getSender(): From
     {
         return From::emailAddress(
@@ -46,17 +37,11 @@ class NotificationSettings
         );
     }
 
-    /**
-     * @return string
-     */
     public function getMassNotificationEmailTemplateName(): string
     {
         return $this->configManager->get('oro_notification.mass_notification_template');
     }
 
-    /**
-     * @return array
-     */
     public function getMassNotificationRecipientEmails(): array
     {
         $recipientEmails = $this->configManager->get('oro_notification.mass_notification_recipients');

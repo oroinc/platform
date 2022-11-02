@@ -11,28 +11,24 @@ class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var InternalEmailFlagManager */
     private $flagManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->flagManager = new InternalEmailFlagManager();
     }
 
     public function testSetSeen()
     {
-        /** @var EmailFolder|\PHPUnit_Framework_MockObject_MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var Email|\PHPUnit_Framework_MockObject_MockObject $email */
         $email = $this->createMock(Email::class);
 
-        $this->assertNull($this->flagManager->setSeen($emailFolder, $email));
+        $this->flagManager->setSeen($emailFolder, $email);
     }
 
     public function testSetUnseen()
     {
-        /** @var EmailFolder|\PHPUnit_Framework_MockObject_MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var Email|\PHPUnit_Framework_MockObject_MockObject $email */
         $email = $this->createMock(Email::class);
 
-        $this->assertNull($this->flagManager->setUnseen($emailFolder, $email));
+        $this->flagManager->setUnseen($emailFolder, $email);
     }
 }

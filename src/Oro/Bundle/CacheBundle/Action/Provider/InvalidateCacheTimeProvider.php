@@ -9,6 +9,9 @@ use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
+/**
+ * Provides datetime or Schedule for cache invalidation.
+ */
 class InvalidateCacheTimeProvider
 {
     /**
@@ -26,11 +29,6 @@ class InvalidateCacheTimeProvider
      */
     private $cronFormatTransformer;
 
-    /**
-     * @param InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgsBuilder
-     * @param ScheduleManager                                  $scheduleManager
-     * @param DateTimeToStringTransformerInterface             $cronFormatTransformer
-     */
     public function __construct(
         InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgsBuilder,
         ScheduleManager $scheduleManager,
@@ -65,7 +63,7 @@ class InvalidateCacheTimeProvider
     {
         $args = $this->scheduleArgsBuilder->build($dataStorage);
         $schedules = $this->scheduleManager->getSchedulesByCommandAndArguments(
-            InvalidateCacheScheduleCommand::NAME,
+            InvalidateCacheScheduleCommand::getDefaultName(),
             $args
         );
 

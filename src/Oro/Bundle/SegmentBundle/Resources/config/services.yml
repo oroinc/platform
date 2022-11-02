@@ -1,74 +1,83 @@
-parameters:
-    oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
-    oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
-    oro_segment.static_segment_manager.class:                Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
-    oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_segment.datagrid.configuration.provider.class:       Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
-    oro_segment.filter.segment.class:                        Oro\Bundle\SegmentBundle\Filter\SegmentFilter
-    oro_segment.query.dynamic_segment.query_builder.class:   Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
-    oro_segment.query.static_segment.query_builder.class:    Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
-    oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
-    oro_segment.entity_name_provider.class:                  Oro\Bundle\SegmentBundle\Provider\EntityNameProvider
-    oro_segment.grid.datagrid_configuration_builder.class:   Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
-    oro_segment.validator.sorting_validator.class:           Oro\Bundle\SegmentBundle\Validator\SortingValidator
-
 services:
     oro_segment.entity_provider:
         alias: oro_entity.entity_provider
+        public: true
 
     oro_segment.static_segment_manager:
-        class: '%oro_segment.static_segment_manager.class%'
+        class: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
+        public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_segment.query.dynamic_segment.query_builder'
             - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity.orm.native_query_executor_helper'
+            - '@oro_organization.organization_restriction_provider'
 
     oro_segment.segment_manager:
-        class: '%oro_segment.segment_manager.class%'
+        class: Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
+        public: true
+        lazy: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_segment.query_builder_registry'
             - '@oro_query_designer.query_designer.subquery_limit_helper'
-            - '@oro_segment.segment_manager.cache'
-        calls:
-            - ['setLogger', ['@?logger']]
-
-    oro_segment.segment_manager.cache:
-        parent: doctrine_cache.abstract.array
-        calls:
-            - [ setNamespace, [ 'oro_segment_manager' ] ]
+            - '@oro_security.acl_helper'
+            - '@logger'
 
     oro_segment.segment_manager.api:
-        class: '%oro_segment.segment_manager.api.class%'
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_segment.segment.entity.class%'
+            - 'Oro\Bundle\SegmentBundle\Entity\Segment'
             - '@doctrine.orm.entity_manager'
 
     oro_segment.datagrid.configuration.provider:
-        class: '%oro_segment.datagrid.configuration.provider.class%'
+        class: Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
         arguments:
             - '@oro_segment.grid.datagrid_configuration_builder'
             - '@doctrine'
         tags:
             - { name: oro_datagrid.configuration.provider, priority: 10 }
 
+    Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider:
+        alias: oro_segment.datagrid.configuration.provider
+
+    oro_segment.query.segment_query_cache:
+        parent: oro.cache.adapter.array
+        public: true
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_segment_query_cache' }
+
+    oro_segment.query.segment_query_converter_state:
+        class: Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState
+        arguments:
+            - '@oro_segment.query.segment_query_cache'
+
     oro_segment.query.segment_query_converter_factory:
-        class: 'Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory'
+        class: Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory
+        lazy: true
         arguments:
             - '@oro_query_designer.query_designer.manager'
-            - '@oro_entity.virtual_field_provider.chain'
-            - '@doctrine'
+            - '@oro_entity.virtual_field_provider'
+            - '@oro_entity.virtual_relation_provider'
+            - '@oro_entity.doctrine_helper'
             - '@oro_query_designer.query_designer.restriction_builder'
-            - '@oro_entity.virtual_relation_provider.chain'
-        public: false
+            - '@oro_segment.query.segment_query_converter_state'
 
-    oro_segment.query.segment_query_converter_factory.link:
+    oro_segment.query.filter_processor:
+        class: Oro\Bundle\SegmentBundle\Query\FilterProcessor
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_entity.virtual_field_provider'
+            - '@oro_entity.virtual_relation_provider'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_query_designer.query_designer.restriction_builder'
         tags:
-            - { name: oro_service_link,  service: oro_segment.query.segment_query_converter_factory }
+            - { name: oro_dashboard.widget_provider.filter }
 
     oro_segment.filter.segment:
-        class: '%oro_segment.filter.segment.class%'
+        class: Oro\Bundle\SegmentBundle\Filter\SegmentFilter
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
@@ -87,45 +96,40 @@ services:
             - [ addQueryBuilder, ['static', '@oro_segment.query.static_segment.query_builder'] ]
 
     oro_segment.query.dynamic_segment.query_builder:
-        class: '%oro_segment.query.dynamic_segment.query_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
         arguments:
-            - '@oro_segment.query.segment_query_converter_factory.link'
+            - '@oro_segment.query.segment_query_converter_factory'
             - '@doctrine'
 
     oro_segment.query.static_segment.query_builder:
-        class: '%oro_segment.query.static_segment.query_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
 
     oro_segment.event_listener.doctrine_pre_remove:
-        class: '%oro_segment.event_listener.doctrine_pre_remove.class%'
+        class: Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
-            - { name: doctrine.event_listener, event: preRemove, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
+            - { name: doctrine.event_listener, event: preRemove }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_segment.entity_name_provider:
-        class: '%oro_segment.entity_name_provider.class%'
+        class: Oro\Bundle\SegmentBundle\Provider\EntityNameProvider
+
+    Oro\Bundle\SegmentBundle\Provider\EntityNameProvider:
+        alias: oro_segment.entity_name_provider
 
     oro_segment.grid.datagrid_configuration_builder:
-        class: '%oro_segment.grid.datagrid_configuration_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
         parent: oro_report.grid.base_configuration_builder
 
     oro_segment.twig.extension.segment:
         class: Oro\Bundle\SegmentBundle\Twig\SegmentExtension
-        public: false
         arguments:
-            - '@event_dispatcher'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-
-    oro_segment.validator.sorting_validator:
-        class: '%oro_segment.validator.sorting_validator.class%'
-        arguments:
-            - '@translator'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_segment.sorting_validator }
 
     oro_segment.layout.data_provider.segment:
         class: Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider
@@ -136,7 +140,6 @@ services:
 
     oro_segment.provider.segment_snapshot_delta_provider:
         class: Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_segment.query.dynamic_segment.query_builder'

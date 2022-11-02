@@ -8,7 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FixRestAnnotationsTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -40,21 +40,23 @@ class FixRestAnnotationsTest extends WebTestCase
      *
      * @return bool
      */
-    protected function checkRoute($routeName, $routePath)
+    private function checkRoute($routeName, $routePath)
     {
         $oroDefaultPrefix = $this->getUrl('oro_default');
+
         /**
          * CRM only mode
          */
         if ($oroDefaultPrefix === '/') {
-            return (false !== strpos($routeName, '_api_') && 0 !== strpos($routePath, '/api/'));
+            return str_contains($routeName, '_api_') && !str_starts_with($routePath, '/api/');
         }
 
         /**
          * Integration mode (CRM + COMMERCE)
          */
         return
-            false !== strpos($routeName, '_api_') &&
-            0 !== strpos($routePath, '/api/') && 0 !== strpos($routePath, $oroDefaultPrefix . 'api/');
+            str_contains($routeName, '_api_')
+            && !str_starts_with($routePath, '/api/')
+            && !str_starts_with($routePath, $oroDefaultPrefix . 'api/');
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains all query modifiers and delegates a query modification

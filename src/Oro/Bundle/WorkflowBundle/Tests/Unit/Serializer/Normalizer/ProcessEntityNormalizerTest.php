@@ -2,212 +2,204 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessEntityNormalizer;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer\Stub\Entity;
+use Symfony\Component\Serializer\Serializer;
 
 class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    /**
-     * @var ProcessEntityNormalizer
-     */
-    protected $normalizer;
+    /** @var ProcessEntityNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new ProcessEntityNormalizer($this->registry, $this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    public function testNormalizeExistingEntity()
+    public function testNormalizeExistingEntity(): void
     {
         $entity = new Entity();
         $entityId = 1;
         $format = 'json';
-        $context = array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE));
+        $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE)];
 
-        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity)
-            ->will($this->returnValue($entityId));
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->willReturn($entityId);
 
-        $this->assertEquals(
-            array('className' => get_class($entity), 'entityId' => $entityId),
+        self::assertEquals(
+            ['className' => get_class($entity), 'entityId' => $entityId],
             $this->normalizer->normalize($entity, $format, $context)
         );
     }
 
-    public function testNormalizeDeletedEntity()
+    public function testNormalizeDeletedEntity(): void
     {
         $entity = new Entity();
         $entity->first = 1;
         $entity->second = 2;
         $format = 'json';
-        $context = array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE));
+        $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)];
 
-        $this->prepareMetadata(get_class($entity), array('first', 'second'));
-        $this->serializer->expects($this->any())->method('normalize')->with($this->isType('int'), $format, $context)
-            ->will($this->returnArgument(0));
+        $this->prepareMetadata(get_class($entity), ['first', 'second']);
+        $this->serializer->expects(self::any())
+            ->method('normalize')
+            ->with(self::isType('int'), $format, $context)
+            ->willReturnArgument(0);
 
-        $this->assertEquals(
-            array('className' => get_class($entity), 'entityData' => array('first' => 1, 'second' => 2)),
+        self::assertEquals(
+            ['className' => get_class($entity), 'entityData' => ['first' => 1, 'second' => 2]],
             $this->normalizer->normalize($entity, $format, $context)
         );
     }
 
-    public function testDenormalizeExistingEntity()
+    public function testDenormalizeExistingEntity(): void
     {
         $entity = new Entity();
         $entityId = 1;
         $className = get_class($entity);
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->once())->method('find')->with($className, $entityId)
-            ->will($this->returnValue($entity));
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::once())
+            ->method('find')
+            ->with($className, $entityId)
+            ->willReturn($entity);
 
-        $this->registry->expects($this->any())->method('getManagerForClass')->with($className)
-            ->will($this->returnValue($entityManager));
+        $this->registry->expects(self::any())
+            ->method('getManagerForClass')
+            ->with($className)
+            ->willReturn($entityManager);
 
-        $this->assertEquals(
+        self::assertEquals(
             $entity,
-            $this->normalizer->denormalize(array('className' => $className, 'entityId' => $entityId), null)
+            $this->normalizer->denormalize(['className' => $className, 'entityId' => $entityId], '')
         );
     }
 
-    public function testDenormalizeDeletedEntity()
+    public function testDenormalizeDeletedEntity(): void
     {
         $entity = new Entity();
         $entity->first = 1;
         $entity->second = 2;
         $className = get_class($entity);
         $format = 'json';
-        $context = array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE));
+        $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)];
 
-        $this->prepareMetadata(get_class($entity), array('first', 'second'));
-        $this->serializer->expects($this->any())->method('denormalize')
-            ->with($this->isType('int'), null, $format, $context)
-            ->will($this->returnArgument(0));
+        $this->prepareMetadata(get_class($entity), ['first', 'second']);
+        $this->serializer->expects(self::any())
+            ->method('denormalize')
+            ->with(self::isType('int'), '', $format, $context)
+            ->willReturnArgument(0);
 
-        $normalizedData = array('className' => $className, 'entityData' => array('first' => 1, 'second' => 2));
-        $this->assertEquals($entity, $this->normalizer->denormalize($normalizedData, null, $format, $context));
+        $normalizedData = ['className' => $className, 'entityData' => ['first' => 1, 'second' => 2]];
+        self::assertEquals(
+            $entity,
+            $this->normalizer->denormalize($normalizedData, '', $format, $context)
+        );
     }
 
-    /**
-     * @param string $className
-     * @param array $fieldNames
-     */
-    protected function prepareMetadata($className, array $fieldNames)
+    private function prepareMetadata(string $className, array $fieldNames): void
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getFieldNames', 'getFieldValue', 'getReflectionClass', 'getReflectionProperty'))
-            ->getMock();
-        $metadata->expects($this->any())->method('getFieldNames')
-            ->will($this->returnValue($fieldNames));
-        $metadata->expects($this->any())->method('getFieldValue')
-            ->will(
-                $this->returnCallback(
-                    function ($entity, $field) {
-                        return $entity->$field;
-                    }
-                )
-            );
-        $metadata->expects($this->any())->method('getReflectionClass')
-            ->will($this->returnValue(new \ReflectionClass($className)));
-        $metadata->expects($this->any())->method('getReflectionProperty')->with($this->isType('string'))
-            ->will(
-                $this->returnCallback(
-                    function ($name) use ($className) {
-                        return new \ReflectionProperty($className, $name);
-                    }
-                )
-            );
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects(self::any())
+            ->method('getFieldNames')
+            ->willReturn($fieldNames);
+        $metadata->expects(self::any())
+            ->method('getFieldValue')
+            ->willReturnCallback(function ($entity, $field) {
+                return $entity->{$field};
+            });
+        $metadata->expects(self::any())
+            ->method('getReflectionClass')
+            ->willReturn(new \ReflectionClass($className));
+        $metadata->expects(self::any())
+            ->method('getReflectionProperty')
+            ->with(self::isType('string'))
+            ->willReturnCallback(function ($name) use ($className) {
+                return new \ReflectionProperty($className, $name);
+            });
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())->method('getClassMetadata')->with($className)
-            ->will($this->returnValue($metadata));
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::any())
+            ->method('getClassMetadata')
+            ->with($className)
+            ->willReturn($metadata);
 
-        $this->registry->expects($this->any())->method('getManagerForClass')->with($className)
-            ->will($this->returnValue($entityManager));
+        $this->registry->expects(self::any())
+            ->method('getManagerForClass')
+            ->with($className)
+            ->willReturn($entityManager);
     }
 
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         if (is_object($data)) {
-            $this->doctrineHelper->expects($this->once())->method('isManageableEntity')->with($data)
-                ->will($this->returnValue($data instanceof \stdClass));
+            $this->doctrineHelper->expects(self::once())
+                ->method('isManageableEntity')
+                ->with($data)
+                ->willReturn($data instanceof \stdClass);
         } else {
-            $this->doctrineHelper->expects($this->never())->method('isManageableEntity');
+            $this->doctrineHelper->expects(self::never())
+                ->method('isManageableEntity');
         }
 
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'object' => array(new \DateTime(), false),
-            'entity' => array(new \stdClass(), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'object' => [new \DateTime(), false],
+            'entity' => [new \stdClass(), true],
+        ];
     }
 
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, $expected)
+    public function testSupportsDenormalization(mixed $data, bool $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        self::assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'object' => array(array('serialized_data'), false),
-            'entity' => array(array('className' => 'stdClass', 'entityData' => array()), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'object' => [['serialized_data'], false],
+            'entity' => [['className' => 'stdClass', 'entityData' => []], true],
+        ];
     }
 
-    /**
-     * @param string $event
-     * @return ProcessJob
-     */
-    protected function createProcessJob($event)
+    private function createProcessJob(string $event): ProcessJob
     {
         $definition = new ProcessDefinition();
         $definition->setRelatedEntity('Test\Entity');

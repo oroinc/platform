@@ -7,10 +7,7 @@ use Symfony\Component\Routing\Route;
 
 class OroExposeLoaderTest extends AbstractLoaderTest
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getLoader()
+    public function getLoader(): OroExposeLoader
     {
         $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
         $loader->setResolver($this->loaderResolver);
@@ -19,10 +16,7 @@ class OroExposeLoaderTest extends AbstractLoaderTest
         return $loader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLoaderWithoutEventDispatcher()
+    public function getLoaderWithoutEventDispatcher(): OroExposeLoader
     {
         $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
         $loader->setResolver($this->loaderResolver);
@@ -30,19 +24,16 @@ class OroExposeLoaderTest extends AbstractLoaderTest
         return $loader;
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
-        $this->assertTrue($this->getLoader()->supports(null, 'oro_expose'));
+        self::assertTrue($this->getLoader()->supports(null, 'oro_expose'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadDataProvider()
+    public function loadDataProvider(): array
     {
         return [
             [
-                ['route2' => (new Route('/root2'))->setOption('expose', true)]
+                ['route2' => (new Route('/root2'))->setOptions(['expose' => true, 'priority' => 10])]
             ]
         ];
     }

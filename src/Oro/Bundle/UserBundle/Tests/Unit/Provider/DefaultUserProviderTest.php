@@ -2,116 +2,148 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var DefaultUserProvider */
     private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->provider = new DefaultUserProvider($this->configManager, $this->doctrineHelper);
+        $this->provider = new DefaultUserProvider($this->configManager, $this->doctrine);
     }
 
-    public function testGetDefaultUser()
+    private function getUser(int $id): User
     {
-        $user = $this->getEntity(User::class, ['first_name' => 'first name']);
+        $user = new User();
+        $user->setId($id);
 
-        $this->configManager
-            ->expects($this->once())
+        return $user;
+    }
+
+    public function testGetDefaultUserWhenItIsNotSetInConfig(): void
+    {
+        $user = $this->getUser(1);
+
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(null);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with([], ['id' => 'ASC'])
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityRepositoryForClass')
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
             ->with(User::class)
             ->willReturn($repository);
 
-        $this->assertSame($user, $this->provider->getDefaultUser('alias', 'key'));
+        self::assertSame($user, $this->provider->getDefaultUser('alias.key'));
     }
 
-    public function testGetDefaultUserById()
+    public function testGetDefaultUserWhenItIsSetInConfigAndExistsInDatabase(): void
     {
-        $user = $this->getEntity(User::class, ['id' => 1, 'first_name' => 'first name']);
+        $user = $this->getUser(1);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
-        $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
             ->method('find')
-            ->with(1)
+            ->with(User::class, 1)
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityRepositoryForClass')
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
             ->with(User::class)
-            ->willReturn($repository);
+            ->willReturn($em);
 
-        $this->assertSame($user, $this->provider->getDefaultUser('alias', 'key'));
+        self::assertSame($user, $this->provider->getDefaultUser('alias.key'));
     }
 
-    public function testGetDefaultUserByNotExistId()
+    public function testGetDefaultUserWhenItIsSetInConfigAndDoesNotExistInDatabase(): void
     {
-        $user = $this->getEntity(User::class, ['id' => 2, 'first_name' => 'first name']);
+        $user = $this->getUser(2);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
-        $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
             ->method('find')
-            ->with(1)
+            ->with(User::class, 1)
             ->willReturn(null);
-        $repository->expects($this->once())
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with([], ['id' => 'ASC'])
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityRepositoryForClass')
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
             ->with(User::class)
             ->willReturn($repository);
 
-        $this->assertSame($user, $this->provider->getDefaultUser('alias', 'key'));
+        self::assertSame($user, $this->provider->getDefaultUser('alias.key'));
+    }
+
+
+    public function testGetDefaultUserWhenItIsSetInConfigAndDoesNotExistInDatabaseAndAnotherDefaultUserNotFound(): void
+    {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('alias.key')
+            ->willReturn(1);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
+            ->method('find')
+            ->with(User::class, 1)
+            ->willReturn(null);
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('findOneBy')
+            ->with([], ['id' => 'ASC'])
+            ->willReturn(null);
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(User::class)
+            ->willReturn($repository);
+
+        self::assertNull($this->provider->getDefaultUser('alias.key'));
     }
 }

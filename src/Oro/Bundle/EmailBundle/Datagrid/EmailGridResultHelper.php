@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -34,12 +34,6 @@ class EmailGridResultHelper
     /** @var EmailAddressManager */
     private $emailAddressManager;
 
-    /**
-     * @param ManagerRegistry           $doctrine
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param MailboxNameHelper         $mailboxNameHelper
-     * @param EmailAddressManager       $emailAddressManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
@@ -54,6 +48,7 @@ class EmailGridResultHelper
 
     /**
      * @param ResultRecord[] $records
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addEmailDirections(array $records)
     {

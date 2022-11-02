@@ -2,18 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder\DatagridConfigurationBuilderTestCase;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
 {
     /**
-     * @param array $columns
-     * @param array $virtualRelationQuery
-     * @param array $virtualFieldProviderConfig
-     * @param array $expected
-     *
      * @dataProvider virtualRelationsDataProvider
      */
     public function testVirtualColumns(
@@ -32,74 +26,23 @@ class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
                 'Acme\Entity\TestEntity5' => [],
             ]
         );
-        $virtualColumnProvider = $this->getVirtualFieldProvider($virtualFieldProviderConfig);
-        $model = new QueryDesignerModel();
-        $model->setEntity($entity);
-        $model->setDefinition(json_encode(['columns' => $columns]));
-        $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
+        $model = new QueryDesigner($entity, QueryDefinitionUtil::encodeDefinition(['columns' => $columns]));
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualRelationProviderInterface $virtualRelationProvider */
-        $virtualRelationProvider = $this
-            ->createMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
-
-        $virtualRelationProvider->expects($this->any())
-            ->method('isVirtualRelation')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($virtualRelationQuery) {
-                        return !empty($virtualRelationQuery[$className][$fieldName]);
-                    }
-                )
-            );
-        $virtualRelationProvider->expects($this->any())
-            ->method('getVirtualRelationQuery')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($virtualRelationQuery) {
-                        if (empty($virtualRelationQuery[$className][$fieldName])) {
-                            return [];
-                        }
-
-                        return $virtualRelationQuery[$className][$fieldName];
-                    }
-                )
-            );
-        $virtualRelationProvider->expects($this->any())
-            ->method('getTargetJoinAlias')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($virtualRelationQuery) {
-                        if (!empty($virtualRelationQuery[$className][$fieldName]['target_join_alias'])) {
-                            return $virtualRelationQuery[$className][$fieldName]['target_join_alias'];
-                        }
-
-                        $joins = [];
-                        foreach ($virtualRelationQuery[$className][$fieldName]['join'] as $typeJoins) {
-                            $joins = array_merge($joins, $typeJoins);
-                        }
-
-                        if (1 === count($joins)) {
-                            $join = reset($joins);
-
-                            return $join['alias'];
-                        }
-
-                        return null;
-                    }
-                )
-            );
-
-        $builder->setVirtualRelationProvider($virtualRelationProvider);
+        $builder = $this->createDatagridConfigurationBuilder(
+            $model,
+            $doctrine,
+            null,
+            $this->getVirtualFieldProvider($virtualFieldProviderConfig),
+            $this->getVirtualRelationProvider($virtualRelationQuery)
+        );
 
         $this->assertEquals($expected, $builder->getConfiguration()->toArray()['source']['query']);
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function virtualRelationsDataProvider()
+    public function virtualRelationsDataProvider(): array
     {
         return [
             'on root entity' => [

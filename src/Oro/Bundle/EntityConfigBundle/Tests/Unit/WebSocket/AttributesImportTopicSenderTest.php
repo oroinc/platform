@@ -13,30 +13,22 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const CONFIG_MODEL_ID = 33;
-    const USER_ID = 44;
+    private const CONFIG_MODEL_ID = 33;
+    private const USER_ID = 44;
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $websocketClient;
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $websocketClient;
 
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $connectionChecker;
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $connectionChecker;
 
-    /**
-     * @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /**
-     * @var AttributesImportTopicSender
-     */
-    protected $attributesImportTopicSender;
+    /** @var AttributesImportTopicSender */
+    private $attributesImportTopicSender;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
@@ -51,8 +43,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTopicWhenNoUser()
     {
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn(null);
 
@@ -64,8 +55,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTopicWhenNotIntegerConfigModelId()
     {
-        $this->tokenAccessor
-            ->expects($this->never())
+        $this->tokenAccessor->expects($this->never())
             ->method('getUser');
 
         $this->expectException(\InvalidArgumentException::class);
@@ -77,8 +67,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
     public function testGetTopic()
     {
         $user = $this->getEntity(User::class, ['id' => self::USER_ID]);
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
@@ -92,18 +81,15 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->getEntity(User::class, ['id' => self::USER_ID]);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->connectionChecker
-            ->expects($this->once())
+        $this->connectionChecker->expects($this->once())
             ->method('checkConnection')
             ->willReturn(true);
 
-        $this->websocketClient
-            ->expects($this->once())
+        $this->websocketClient->expects($this->once())
             ->method('publish')
             ->with(
                 sprintf(AttributesImportTopicSender::TOPIC, self::USER_ID, self::CONFIG_MODEL_ID),
@@ -115,17 +101,14 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSendNoConnection()
     {
-        $this->tokenAccessor
-            ->expects($this->never())
+        $this->tokenAccessor->expects($this->never())
             ->method($this->anything());
 
-        $this->connectionChecker
-            ->expects($this->once())
+        $this->connectionChecker->expects($this->once())
             ->method('checkConnection')
             ->willReturn(false);
 
-        $this->websocketClient
-            ->expects($this->never())
+        $this->websocketClient->expects($this->never())
             ->method($this->anything());
 
         $this->attributesImportTopicSender->send(self::CONFIG_MODEL_ID);

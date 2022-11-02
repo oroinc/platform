@@ -4,9 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,14 +21,14 @@ class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new DataTransformerCompilerPass();
 
         $this->registry = $this->container->setDefinition(
             'oro_api.data_transformer_registry',
-            new Definition(DataTransformerRegistry::class, [[]])
+            new Definition(DataTransformerRegistry::class, [[], null])
         );
     }
 
@@ -35,6 +37,12 @@ class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
 
         self::assertEquals([], $this->registry->getArgument(0));
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
     public function testProcess()
@@ -67,16 +75,28 @@ class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'type1' => [
-                    [new Reference('transformer1'), 'rest'],
-                    [new Reference('transformer2'), null]
+                    ['transformer1', 'rest'],
+                    ['transformer2', null]
                 ],
                 'type2' => [
-                    [new Reference('transformer2'), 'rest'],
-                    [new Reference('transformer2'), 'json_api'],
-                    [new Reference('transformer2'), null]
+                    ['transformer2', 'rest'],
+                    ['transformer2', 'json_api'],
+                    ['transformer2', null]
                 ]
             ],
             $this->registry->getArgument(0)
+        );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'transformer1' => new ServiceClosureArgument(new Reference('transformer1')),
+                'transformer2' => new ServiceClosureArgument(new Reference('transformer2'))
+            ],
+            $serviceLocatorDef->getArgument(0)
         );
     }
 }

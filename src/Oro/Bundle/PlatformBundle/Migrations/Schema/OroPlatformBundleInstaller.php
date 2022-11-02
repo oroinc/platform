@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -22,7 +22,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -40,13 +40,11 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     {
         /** Tables generation **/
         $this->oroSessionTable($schema, $queries);
+        $this->createMaterializedViewTable($schema, $queries);
     }
 
     /**
      * Makes sure oro_session table is up-to-date
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
      */
     public function oroSessionTable(Schema $schema, QueryBag $queries)
     {
@@ -72,21 +70,30 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
 
     /**
      * Create oro_session table
-     *
-     * @param Schema $schema
      */
     public function createOroSessionTable(Schema $schema)
     {
         $table = $schema->createTable('oro_session');
         if ($this->platform instanceof MySqlPlatform) {
-            $table->addColumn('id', Type::BINARY, ['length' => 128]);
-            $table->addColumn('sess_data', Type::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
+            $table->addColumn('id', Types::BINARY, ['length' => 128]);
+            $table->addColumn('sess_data', Types::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
         } else {
-            $table->addColumn('id', Type::STRING, ['length' => 128]);
-            $table->addColumn('sess_data', Type::BLOB, []);
+            $table->addColumn('id', Types::STRING, ['length' => 128]);
+            $table->addColumn('sess_data', Types::BLOB, []);
         }
-        $table->addColumn('sess_time', Type::INTEGER, []);
-        $table->addColumn('sess_lifetime', Type::INTEGER, []);
+        $table->addColumn('sess_time', Types::INTEGER, []);
+        $table->addColumn('sess_lifetime', Types::INTEGER, []);
         $table->setPrimaryKey(['id']);
+    }
+
+    private function createMaterializedViewTable(Schema $schema, QueryBag $queries): void
+    {
+        $table = $schema->createTable('oro_materialized_view');
+        $table->addColumn('name', Types::STRING, ['length' => 63]);
+        $table->setPrimaryKey(['name']);
+
+        $table->addColumn('with_data', Types::BOOLEAN, ['default' => false]);
+        $table->addColumn('created_at', Types::DATETIME_MUTABLE, []);
+        $table->addColumn('updated_at', Types::DATETIME_MUTABLE, []);
     }
 }

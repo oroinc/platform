@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 
@@ -14,7 +14,7 @@ class InitializeConfigExtrasTest extends GetProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

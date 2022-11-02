@@ -5,22 +5,16 @@ namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
 /**
  * Normalizer for enum entities.
  */
-class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
+class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
 {
-    /**
-     * @var FieldHelper
-     */
-    protected $fieldHelper;
+    protected FieldHelper $fieldHelper;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(FieldHelper $fieldHelper)
     {
         $this->fieldHelper = $fieldHelper;
@@ -31,7 +25,7 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof AbstractEnumValue) {
             return null;
@@ -45,23 +39,23 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
             'id' => $object->getId(),
             'name' => $object->getName(),
             'priority' => (int)$object->getPriority(),
-            'is_default' => (bool)$object->isDefault()
+            'is_default' => (bool)$object->isDefault(),
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $reflection  = new \ReflectionClass($class);
+        $reflection = new \ReflectionClass($type);
 
         $args = [
             // isset is used instead of empty as $data['id'] could be "0"
-            'id' => !isset($data['id']) ? null : $data['id'],
-            'name' => empty($data['name']) ? '' : $data['name'],
+            'id' => $data['id'] ?? null,
+            'name' => $data['name'] ?? '',
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
-            'default' => !empty($data['default'])
+            'default' => !empty($data['default']),
         ];
 
         return $reflection->newInstanceArgs($args);
@@ -70,29 +64,25 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
-        return is_a($type, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true);
+        return is_a($type, AbstractEnumValue::class, true);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractEnumValue;
     }
 
-    /**
-     * @param AbstractEnumValue $object
-     * @return array
-     */
-    protected function getShortData(AbstractEnumValue $object)
+    protected function getShortData(AbstractEnumValue $object): array
     {
         if ($this->fieldHelper->getConfigValue(ClassUtils::getClass($object), 'name', 'identity')) {
             return ['name' => $object->getName()];
-        } else {
-            return ['id' => $object->getId()];
         }
+
+        return ['id' => $object->getId()];
     }
 }

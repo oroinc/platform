@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
- * TODO: Should be removed after https://magecore.atlassian.net/browse/BB-12955
+ * Clears text value from html tags.
  */
 class TextFilteredObjectMapper extends ObjectMapper
 {

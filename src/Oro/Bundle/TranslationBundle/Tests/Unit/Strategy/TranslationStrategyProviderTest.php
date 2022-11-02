@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 
-use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
-use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -11,25 +9,33 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $defaultStrategy;
+    private $defaultStrategy;
 
     /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $customStrategy;
+    private $customStrategy;
 
     /** @var TranslationStrategyProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->defaultStrategy = $this->getStrategy('default');
-        $this->customStrategy = $this->getStrategy('custom');
+        $this->defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
+        $this->defaultStrategy->expects($this->any())
+            ->method('isApplicable')
+            ->willReturn(true);
+        $this->defaultStrategy->expects($this->any())
+            ->method('getName')
+            ->willReturn('default');
 
-        $this->provider = new TranslationStrategyProvider();
-        $this->provider->addStrategy($this->defaultStrategy);
-        $this->provider->addStrategy($this->customStrategy);
+        $this->customStrategy = $this->createMock(TranslationStrategyInterface::class);
+        $this->customStrategy->expects($this->any())
+            ->method('isApplicable')
+            ->willReturn(true);
+        $this->customStrategy->expects($this->any())
+            ->method('getName')
+            ->willReturn('custom');
+
+        $this->provider = new TranslationStrategyProvider([$this->defaultStrategy, $this->customStrategy]);
     }
 
     public function testGetStrategy()
@@ -58,46 +64,26 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $fallbackTree
-     * @param string $locale
-     * @param array $expectedFallbackLocales
-     *
-     * @param $fallbackStrategyName
-     *
      * @dataProvider getFallbackLocalesDataProvider
      */
     public function testGetFallbackLocales(
         array $fallbackTree,
-        $locale,
-        array $expectedFallbackLocales,
-        $fallbackStrategyName
+        string $locale,
+        array $expectedFallbackLocales
     ) {
-        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
-        $defaultStrategy = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider = new TranslationStrategyProvider([$defaultStrategy]);
 
-        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
-        $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $testedStrategy = $this->createMock(TranslationStrategyInterface::class);
         $testedStrategy->expects($this->any())
             ->method('getLocaleFallbacks')
             ->willReturn($fallbackTree);
 
-        if ($fallbackStrategyName) {
-            $testedStrategy->expects($this->atLeastOnce())->method('getName')->willReturn($fallbackStrategyName);
-        } else {
-            $testedStrategy->expects($this->never())->method('getName');
-        }
-
         $this->assertEquals($expectedFallbackLocales, $provider->getFallbackLocales($testedStrategy, $locale));
     }
 
-    /**
-     * @return array
-     */
-    public function getFallbackLocalesDataProvider()
+    public function getFallbackLocalesDataProvider(): array
     {
         return [
             'one node tree defined locale' => [
@@ -106,7 +92,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'en',
                 'expectedFallbackLocales' => [],
-                'fallbackStrategyName' => DefaultTranslationStrategy::NAME,
             ],
             'one node tree undefined locale' => [
                 'fallbackTree' => [
@@ -114,7 +99,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'ru',
                 'expectedFallbackLocales' => [Translator::DEFAULT_LOCALE],
-                'fallbackStrategyName' => null,
             ],
             'complex tree defined locale first level' => [
                 'fallbackTree' => [
@@ -132,7 +116,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'ru',
                 'expectedFallbackLocales' => [],
-                'fallbackStrategyName' => DefaultTranslationStrategy::NAME,
             ],
             'complex tree defined locale second level' => [
                 'fallbackTree' => [
@@ -150,7 +133,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'ru_RU',
                 'expectedFallbackLocales' => ['ru'],
-                'fallbackStrategyName' => DefaultTranslationStrategy::NAME,
             ],
             'complex tree defined locale third level' => [
                 'fallbackTree' => [
@@ -168,7 +150,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'en_MX',
                 'expectedFallbackLocales' => ['en_US', 'en'],
-                'fallbackStrategyName' => DefaultTranslationStrategy::NAME,
             ],
             'localization based fallback tree' => [
                 'fallbackTree' => [
@@ -190,26 +171,20 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'locale' => 'ab',
                 'expectedFallbackLocales' => ['ru', 'pl', 'en'],
-                'fallbackStrategyName' => LocalizationFallbackStrategy::NAME,
             ],
         ];
     }
 
     /**
-     * @param array $fallbackTree
-     * @param array $expectedFallbackLocales
-     *
      * @dataProvider getAllFallbackLocalesDataProvider
      */
     public function testGetAllFallbackLocales(array $fallbackTree, array $expectedFallbackLocales)
     {
-        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
-        $defaultStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider = new TranslationStrategyProvider([$defaultStrategy]);
 
-        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
-        $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $testedStrategy = $this->createMock(TranslationStrategyInterface::class);
         $testedStrategy->expects($this->any())
             ->method('getLocaleFallbacks')
             ->willReturn($fallbackTree);
@@ -217,10 +192,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFallbackLocales, $provider->getAllFallbackLocales($testedStrategy));
     }
 
-    /**
-     * @return array
-     */
-    public function getAllFallbackLocalesDataProvider()
+    public function getAllFallbackLocalesDataProvider(): array
     {
         return [
             'simple tree' => [
@@ -254,19 +226,5 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
                 'expectedFallbackLocales' => ['en'],
             ],
         ];
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getStrategy($name)
-    {
-        $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategy->expects($this->any())->method('isApplicable')->willReturn(true);
-        $strategy->expects($this->any())->method('getName')->willReturn($name);
-
-        return $strategy;
     }
 }

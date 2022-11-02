@@ -3,54 +3,59 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides a set of methods to build a query based on the query designer configuration.
+ */
 class Manager implements FunctionProviderInterface
 {
-    /** @var ConfigurationObject */
-    protected $config;
+    /** @var ConfigurationProvider */
+    private $configProvider;
 
-    /** @var FilterInterface[] */
-    protected $filters = [];
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    /** @var ConfigurationResolver */
+    private $configResolver;
 
     /** @var EntityHierarchyProviderInterface */
-    protected $entityHierarchyProvider;
+    private $entityHierarchyProvider;
 
-    /**
-     * Constructor
-     *
-     * @param array                            $config
-     * @param ConfigurationResolver            $resolver
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param TranslatorInterface              $translator
-     */
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var FilterBagInterface */
+    private $filterBag;
+
+    /** @var ConfigurationObject|null */
+    private $config;
+
     public function __construct(
-        array $config,
-        ConfigurationResolver $resolver,
+        ConfigurationProvider $configProvider,
+        ConfigurationResolver $configResolver,
         EntityHierarchyProviderInterface $entityHierarchyProvider,
+        FilterBagInterface $filterBag,
         TranslatorInterface $translator
     ) {
-        $resolver->resolve($config);
-        $this->config                  = ConfigurationObject::create($config);
+        $this->configProvider = $configProvider;
+        $this->configResolver = $configResolver;
         $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->translator              = $translator;
+        $this->filterBag = $filterBag;
+        $this->translator = $translator;
     }
 
     /**
      * Returns metadata for the given query type
      *
      * @param string $queryType The query type
+     *
      * @return array
      */
     public function getMetadata($queryType)
     {
         $filtersMetadata = [];
-        $filters         = $this->getFilters($queryType);
+        $filters = $this->getFilters($queryType);
         foreach ($filters as $filter) {
             $filtersMetadata[] = $filter->getMetadata();
         }
@@ -65,28 +70,19 @@ class Manager implements FunctionProviderInterface
     }
 
     /**
-     * Add filter to array of available filters
-     *
-     * @param string          $type
-     * @param FilterInterface $filter
-     */
-    public function addFilter($type, FilterInterface $filter)
-    {
-        $this->filters[$type] = $filter;
-    }
-
-    /**
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name   A filter name
-     * @param array  $params An additional parameters of a new filter
-     * @throws \RuntimeException if a filter with the given name does not exist
+     * @param string     $name   A filter name
+     * @param array|null $params An additional parameters of a new filter
+     *
      * @return FilterInterface
+     *
+     * @throws \RuntimeException if a filter with the given name does not exist
      */
     public function createFilter($name, array $params = null)
     {
-        $filtersConfig = $this->config->offsetGet('filters');
+        $filtersConfig = $this->getConfig()->offsetGet('filters');
         if (!isset($filtersConfig[$name])) {
             throw new \RuntimeException(sprintf('Unknown filter "%s".', $name));
         }
@@ -104,8 +100,8 @@ class Manager implements FunctionProviderInterface
      */
     public function getFunction($name, $groupName, $groupType)
     {
-        $result    = null;
-        $functions = $this->config->offsetGetByPath(sprintf('[%s][%s][functions]', $groupType, $groupName));
+        $result = null;
+        $functions = $this->getConfig()->offsetGetByPath(sprintf('[%s][%s][functions]', $groupType, $groupName));
         if ($functions !== null) {
             foreach ($functions as $function) {
                 if ($function['name'] === $name) {
@@ -126,13 +122,14 @@ class Manager implements FunctionProviderInterface
     /**
      * Returns filters types
      *
-     * @param array $filterNames
+     * @param string[] $filterNames
+     *
      * @return array
      */
     public function getExcludedProperties(array $filterNames)
     {
-        $types   = [];
-        $filters = $this->config->offsetGet('filters');
+        $types = [];
+        $filters = $this->getConfig()->offsetGet('filters');
         foreach ($filterNames as $filterName) {
             unset($filters[$filterName]);
         }
@@ -152,12 +149,13 @@ class Manager implements FunctionProviderInterface
      * Returns all available filters for the given query type
      *
      * @param string $queryType The query type
+     *
      * @return FilterInterface[]
      */
-    protected function getFilters($queryType)
+    private function getFilters($queryType)
     {
-        $filters       = [];
-        $filtersConfig = $this->config->offsetGet('filters');
+        $filters = [];
+        $filtersConfig = $this->getConfig()->offsetGet('filters');
         foreach ($filtersConfig as $name => $attr) {
             if ($this->isItemAllowedForQueryType($attr, $queryType)) {
                 unset($attr['query_type']);
@@ -176,9 +174,9 @@ class Manager implements FunctionProviderInterface
      *
      * @return FilterInterface
      */
-    protected function getFilterObject($name, array $config)
+    private function getFilterObject($name, array $config)
     {
-        $filter = clone $this->filters[$config['type']];
+        $filter = clone $this->filterBag->getFilter($config['type']);
         $filter->init($name, $config);
 
         return $filter;
@@ -191,7 +189,7 @@ class Manager implements FunctionProviderInterface
      */
     public function getMetadataForGrouping()
     {
-        return $this->config->offsetGet('grouping');
+        return $this->getConfig()->offsetGet('grouping');
     }
 
     /**
@@ -199,12 +197,13 @@ class Manager implements FunctionProviderInterface
      *
      * @param string $groupType The type of functions' group
      * @param string $queryType The query type
+     *
      * @return array
      */
     public function getMetadataForFunctions($groupType, $queryType)
     {
-        $result       = [];
-        $groupsConfig = $this->config->offsetGet($groupType);
+        $result = [];
+        $groupsConfig = $this->getConfig()->offsetGet($groupType);
         foreach ($groupsConfig as $name => $attr) {
             if ($this->isItemAllowedForQueryType($attr, $queryType)) {
                 unset($attr['query_type']);
@@ -240,9 +239,10 @@ class Manager implements FunctionProviderInterface
      *
      * @param array  $item      An item to check
      * @param string $queryType The query type
+     *
      * @return bool true if the item can be used for the given query type; otherwise, false.
      */
-    protected function isItemAllowedForQueryType(&$item, $queryType)
+    private function isItemAllowedForQueryType($item, $queryType)
     {
         foreach ($item['query_type'] as $itemQueryType) {
             if ($itemQueryType === 'all' || $itemQueryType === $queryType) {
@@ -251,5 +251,16 @@ class Manager implements FunctionProviderInterface
         }
 
         return false;
+    }
+
+    private function getConfig(): ConfigurationObject
+    {
+        if (null === $this->config) {
+            $config = $this->configProvider->getConfiguration();
+            $this->configResolver->resolve($config);
+            $this->config = ConfigurationObject::create($config);
+        }
+
+        return $this->config;
     }
 }

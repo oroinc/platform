@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Util;
 
+/**
+ * Tool to parse date from different formats.
+ */
 class DateTimeParser
 {
     /**
@@ -19,6 +22,10 @@ class DateTimeParser
     public static function parse($value)
     {
         $originalVal = $value;
+        // removed zero timezone, which may broke date parsing
+        $value = preg_replace('# 0+$#', '', $value);
+        // move 'H:'-like(no minutes pointed) time shift expression into 'H'-like one
+        $value = preg_replace("# (\+|\-)(\d+)\:(?!\d)#", ' $1$2', $value);
 
         // remove "quoted-printable" encoded spaces if any
         $pos = strpos($value, '=20');
@@ -64,11 +71,11 @@ class DateTimeParser
             $value = preg_replace('#: (\d)#', ':0$1', $value);
             $date = self::parseDateTime($value, 'D, d m Y H:i:s O');
 
-            if (!$date && false !== strpos($value, ',')) {
+            if (!$date && str_contains($value, ',')) {
                 // handle case when invalid short day name given
                 $value = substr($value, strpos($value, ',') + 1);
                 $alphabeticalCharsLeft = trim(preg_replace('#[\W0-9]+#', '', $value));
-                if (strlen($alphabeticalCharsLeft) > 0) {
+                if ($alphabeticalCharsLeft) {
                     $date = self::parseDateTime(ltrim($value), 'd M Y H:i:s O');
                 }
             }
@@ -82,6 +89,13 @@ class DateTimeParser
                     );
                 }
             }
+        }
+
+        // Validate date. Will not pass dates with incorrect year, month or day.
+        if (!checkdate($date->format('n'), $date->format('d'), $date->format('Y'))) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid date. Original value: "%s".', $originalVal)
+            );
         }
 
         return $date;

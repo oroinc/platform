@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ActionBundle\Resolver;
 
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Resolves the URL redirection activity by a route name from the entity configuration
+ * using the `routeName` or `routeView` parameters.
+ */
 class DestinationPageResolver
 {
-    /** @var RequestStack */
-    protected $requestStack;
-
     /** @var EntityConfigHelper */
     protected $entityConfigHelper;
 
@@ -21,27 +21,12 @@ class DestinationPageResolver
     const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
     const PARAM_ORIGINAL_URL = 'originalUrl';
 
-    /**
-     * @param RequestStack $requestStack
-     * @param EntityConfigHelper $entityConfigHelper
-     * @param RouterInterface $router
-     */
     public function __construct(
-        RequestStack $requestStack,
         EntityConfigHelper $entityConfigHelper,
         RouterInterface $router
     ) {
-        $this->requestStack = $requestStack;
         $this->entityConfigHelper = $entityConfigHelper;
         $this->router = $router;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOriginalUrl()
-    {
-        return $this->requestStack->getMasterRequest()->getRequestUri();
     }
 
     /**

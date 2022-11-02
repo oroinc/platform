@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponsesTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\SendEmailTemplateTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\SyncEmailSeenFlagTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailAssociationsTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesForOrganizationTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailVisibilitiesForOrganizationTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailVisibilitiesForOrganizationChunkTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailBodyTopic: ~
+

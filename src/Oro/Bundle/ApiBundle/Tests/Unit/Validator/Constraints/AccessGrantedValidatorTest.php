@@ -4,15 +4,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
+class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 

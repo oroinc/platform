@@ -1,10 +1,3 @@
-parameters:
-    oro_comment.migration.extension.comment.class:    Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
-    oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
-    oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
-    oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
-    oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
-
 services:
     oro_comment.association_helper:
         class: Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper
@@ -13,17 +6,17 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_comment.migration.extension.comment:
-        class: '%oro_comment.migration.extension.comment.class%'
+        class: Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
         tags:
             - { name: oro_migration.extension, extension_name: comment }
 
     oro_comment.entity_generator.extension:
-        class: '%oro_comment.entity_generator.extension.class%'
+        class: Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
     oro_comment.entity_config_dumper.extension:
-        class: '%oro_comment.entity_config_dumper.extension.class%'
+        class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
@@ -35,18 +28,19 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_comment.comment.api_manager:
-        class: '%oro_comment.comment.api_manager.class%'
+        class: Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
+        public: true
         arguments:
             - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_datagrid.extension.pager.orm.pager'
+            - '@oro_batch.orm.query_builder.count_query_optimizer'
             - '@event_dispatcher'
             - '@oro_attachment.provider.attachment'
             - '@oro_security.acl_helper'
             - '@oro_entity_config.config_manager'
         calls:
-            - [setAttachmentManager, ['@oro_attachment.manager']]
+            - [setPictureSourcesProvider, ['@oro_attachment.provider.picture_sources']]
             - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
 
     oro_comment.comment_lifecycle_listener:
@@ -57,8 +51,13 @@ services:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\CommentBundle\Entity\Comment, event: preUpdate }
     
     oro_comment.placeholder.filter:
-        class: '%oro_comment.placeholder.filter.class%'
+        class: Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
+        public: true
         arguments:
             - '@oro_comment.association_helper'
             - '@oro_entity.doctrine_helper'
             - '@security.authorization_checker'
+
+    Oro\Bundle\CommentBundle\EntityConfig\CommentEntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config

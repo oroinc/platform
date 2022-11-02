@@ -12,17 +12,13 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The ACL extension that works with workflow transitions.
+ */
 class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
-    const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
+    private const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManager                            $workflowManager
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,
@@ -51,6 +47,8 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
                 MaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
             ],
         ];
+
+        $this->maskBuilder = new MaskBuilder();
     }
 
     /**
@@ -116,30 +114,6 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getMaskBuilder($permission)
-    {
-        return new MaskBuilder();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllMaskBuilders()
-    {
-        return [new MaskBuilder()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMaskBuilderConst($constName)
-    {
-        return MaskBuilder::getConst($constName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceBits($mask)
     {
         return $mask & MaskBuilder::SERVICE_BITS;
@@ -167,15 +141,26 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      * Process start transition. For the start transitions with init options return null class cause this transition
      * will start from the entity from the init options.
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjectClassName($object)
     {
-        if (is_string($object)) {
+        if (\is_string($object)) {
             $workflowName = $id = $group = null;
             $this->parseDescriptor($object, $workflowName, $id, $group);
-            $fieldName = ObjectIdentityHelper::decodeEntityFieldInfo($object)[1];
-            list($transitionName, $fromStep, $toStep) = explode('|', $fieldName);
+
+            $fieldInfo = ObjectIdentityHelper::decodeEntityFieldInfo($object);
+            if (!isset($fieldInfo[1])) {
+                return null;
+            }
+
+            $data = explode('|', $fieldInfo[1]);
+            $transitionName = $data[0] ?? '';
+            if (!$transitionName) {
+                return null;
+            }
+
+            $fromStep = $data[1] ?? '';
             // detect that given transition is start
             if ('' === $fromStep) {
                 $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);

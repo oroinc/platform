@@ -15,9 +15,6 @@ class NormalizeEntity implements ProcessorInterface
     /** @var ObjectNormalizer */
     protected $objectNormalizer;
 
-    /**
-     * @param ObjectNormalizer $objectNormalizer
-     */
     public function __construct(ObjectNormalizer $objectNormalizer)
     {
         $this->objectNormalizer = $objectNormalizer;
@@ -41,18 +38,11 @@ class NormalizeEntity implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-
-        $context->setResult(
-            $this->objectNormalizer->normalizeObject(
-                $data,
-                $config,
-                [
-                    Context::ACTION       => $context->getAction(),
-                    Context::VERSION      => $context->getVersion(),
-                    Context::REQUEST_TYPE => $context->getRequestType()
-                ]
-            )
+        $data = $this->objectNormalizer->normalizeObjects(
+            [$data],
+            $context->getConfig(),
+            $context->getNormalizationContext()
         );
+        $context->setResult(reset($data));
     }
 }

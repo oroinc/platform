@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
@@ -20,7 +21,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     /** @var NormalizeRequestData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,12 +35,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor = new NormalizeRequestData($entityIdTransformerRegistry);
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    private function createFieldMetadata($fieldName)
+    private function createFieldMetadata(string $fieldName): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -47,21 +43,16 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    private function createAssociationMetadata($associationName, $targetClass, $isCollection)
-    {
+    private function createAssociationMetadata(
+        string $associationName,
+        string $targetClass,
+        bool $isCollection
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsCollection($isCollection);
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName($targetClass);
+        $associationTargetMetadata = new EntityMetadata($targetClass);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
@@ -78,7 +69,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'emptyToManyRelation' => []
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('firstName'));
         $metadata->addField($this->createFieldMetadata('lastName'));
         $metadata->addAssociation(
@@ -96,11 +87,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -132,6 +121,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidIdentifiers()
@@ -141,7 +131,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'toManyRelation' => ['val1', 'val2']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
         );
@@ -188,6 +178,64 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                     ->setSource(ErrorSource::createByPropertyPath('toManyRelation.1'))
             ],
             $this->context->getErrors()
+        );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessWithNotResolvedIdentifiers()
+    {
+        $inputData = [
+            'toOneRelation'  => 'val1',
+            'toManyRelation' => ['val1', 'val2']
+        ];
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toManyRelation', 'Test\Group', true)
+        );
+
+        $this->entityIdTransformer->expects(self::any())
+            ->method('reverseTransform')
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                if ('val1' === $value) {
+                    return null;
+                }
+
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'toOneRelation'  => [
+                'id'    => null,
+                'class' => 'Test\User'
+            ],
+            'toManyRelation' => [
+                [
+                    'id'    => null,
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => 'normalized::Test\Group::val2',
+                    'class' => 'Test\Group'
+                ]
+            ]
+        ];
+
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertFalse($this->context->hasErrors());
+        self::assertEquals(
+            [
+                'requestData.toOneRelation'    => new NotResolvedIdentifier('val1', 'Test\User'),
+                'requestData.toManyRelation.0' => new NotResolvedIdentifier('val1', 'Test\Group')
+            ],
+            $this->context->getNotResolvedIdentifiers()
         );
     }
 }

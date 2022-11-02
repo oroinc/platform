@@ -1,94 +1,108 @@
 /* @theme: admin.oro; */
 
-.container-fluid.page-title {
-    padding-#{$end}: 0;
-    padding-#{$start}: $content-padding;
-
-    .navbar-extra > .row {
-        > .pull-right {
-            max-width: calc(100% - 180px);
-
-            > .title-buttons-container {
-                text-align: #{$end};
-
-                > .pull-left,
-                > .btn-group {
-                    text-align: #{$start};
-                    display: inline-block;
-                    margin-bottom: 4px;
-                    vertical-align: top;
-                }
-
-                > .pinned-dropdown > .btn-group {
-                    text-align: #{$start};
-                }
-            }
-
-            .separator-btn {
-                margin-top: 2px;
-            }
-        }
-
-        > .pull-left + .pull-right {
-            max-width: none;
-        }
-    }
-
-    .page-title-center.under-left-block {
-        clear: #{$start};
-        position: relative;
-        top: 8px;
-    }
-
-    .navigation {
-        .row {
-            display: flex;
-            align-items: center;
-
-            > .pull-left-extra {
-                width: 100%;
-                margin-#{$start}: 0;
-            }
-
-            > .pull-right {
-                max-width: 100%;
-                flex-shrink: 0;
-            }
-        }
-    }
-
-    .customer-content {
+.page-title {
+    &__path {
         .top-row {
             .pull-left {
                 float: none;
-                display: inline;
+                display: inline-block;
+                vertical-align: middle;
             }
         }
     }
 }
 
-.customer-info {
-    h1 {
-        margin: 0 0 3px;
+.container-fluid.page-title {
+    padding-right: 0;
+    padding-left: $content-padding;
 
-        &.user-name {
-            margin-#{$end}: 5px;
+    .navbar-extra {
+        margin-bottom: 10px;
+    }
+
+    .navbar-extra > .row {
+        .title-buttons-container {
+            max-width: 100%;
+
+            // All children should have a own font-size
+            font-size: 0;
+            text-align: right;
+
+            /* stylelint-disable selector-max-compound-selectors */
+            > .pull-left,
+            > .btn-group {
+                text-align: left;
+                display: inline-block;
+                vertical-align: top;
+
+                .btn {
+                    margin-bottom: 4px;
+                }
+            }
+
+            > .pinned-dropdown > .btn-group {
+                text-align: left;
+            }
+
+            .separator-btn {
+                margin: 0 0 0 $content-padding-small;
+            }
+            /* stylelint-enable selector-max-compound-selectors */
         }
     }
 
-    .sub-title {
-        a {
-            color: $link-color;
+    .page-title-center {
+        position: relative;
+        min-width: 150px;
+        flex-grow: 100;
 
-            &:hover {
-                color: $link-color-hover;
+        &:empty {
+            display: none;
+        }
+    }
+
+    .center-under-both {
+        .page-title-center {
+            flex-basis: 100%;
+            order: 3;
+            height: 31px;
+        }
+    }
+
+    .center-under-left {
+        .pull-left-extra {
+            flex-basis: 100%;
+        }
+    }
+
+    .navigation {
+        .row {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+
+            > div {
+                margin-bottom: 6px;
+            }
+
+            &.inline-info {
+                flex-wrap: wrap-reverse;
+
+                > div {
+                    margin-bottom: 0;
+                }
+            }
+
+            > .pull-left-extra {
+                flex-grow: 1;
+                margin-left: 0;
+                text-align: left;
+            }
+
+            > .pull-right {
+                flex-shrink: 0;
+                order: 2;
             }
         }
-    }
-
-    .sub-title,
-    .separator,
-    .user-name {
-        display: inline;
     }
 }

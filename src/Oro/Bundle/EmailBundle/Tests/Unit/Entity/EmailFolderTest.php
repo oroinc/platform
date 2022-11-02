@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailFolderTest extends \PHPUnit\Framework\TestCase
@@ -31,8 +33,8 @@ class EmailFolderTest extends \PHPUnit\Framework\TestCase
 
     public function testFolderGetterAndSetter()
     {
-        $subFolder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
-        $subFolder2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $subFolder = $this->createMock(EmailFolder::class);
+        $subFolder2 = $this->createMock(EmailFolder::class);
 
         $entity = new EmailFolder();
         $entity->addSubFolder($subFolder);
@@ -40,18 +42,16 @@ class EmailFolderTest extends \PHPUnit\Framework\TestCase
 
         $subFolders = $entity->getSubFolders();
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $subFolders);
+        $this->assertInstanceOf(ArrayCollection::class, $subFolders);
         $this->assertCount(2, $subFolders);
-        $this->assertTrue($subFolder === $subFolders[0]);
-        $this->assertTrue($subFolder2 === $subFolders[1]);
+        $this->assertSame($subFolder, $subFolders[0]);
+        $this->assertSame($subFolder2, $subFolders[1]);
     }
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new EmailFolder();
 
@@ -60,13 +60,10 @@ class EmailFolderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        $origin = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailOrigin');
-        $parentFolder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $origin = $this->createMock(EmailOrigin::class);
+        $parentFolder = $this->createMock(EmailFolder::class);
         $synchronizedAt = new \DateTime();
 
         return [

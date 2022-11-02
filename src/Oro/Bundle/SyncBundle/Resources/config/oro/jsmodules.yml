@@ -1,0 +1,19 @@
+aliases:
+    autobahn$: '@oroinc/autobahnjs/autobahn/autobahn'
+    vertx$: orosync/js/extend/vertx
+    when$: when/when
+app-modules:
+    - orosync/js/app/modules/content-manager-module
+dynamic-imports:
+    commons:
+        - orosync/js/app/components/ping-handler
+        - orosync/js/app/components/tag-content
+        - orosync/js/content-manager
+        - orosync/js/content/grid-builder
+        - orosync/js/sync
+        - orosync/js/sync/wamp
+map:
+    '*':
+        autobahn: orosync/js/extend/autobahn
+    orosync/js/extend/autobahn:
+        autobahn: autobahn

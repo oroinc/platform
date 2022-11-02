@@ -4,72 +4,89 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\ConsumptionExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
+use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testOnBeforeReceive()
+    private MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject $messageProcessorClassProvider;
+
+    protected function setUp(): void
     {
-        $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $this->messageProcessorClassProvider = $this->createMock(MessageProcessorClassProvider::class);
+
+        $this->messageProcessorClassProvider
+            ->expects(self::any())
+            ->method('getMessageProcessorClassByName')
+            ->willReturnCallback(static fn (string $name) => str_replace('_', '', ucwords($name, '_')) . 'Class');
+    }
+
+    public function testOnBeforeReceive(): void
+    {
+        $messageProcessorName = 'sample_processor';
+        $message = new Message();
         $job = new Job();
 
-        $context = new Context(self::createMock(SessionInterface::class));
-        $context->setMessageProcessor($messageProcessor);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessageProcessorName($messageProcessorName);
         $context->setMessage($message);
 
         $consumerState = new ConsumerState();
-        $consumerState->setMessageProcessor($messageProcessor);
+        $consumerState->setMessageProcessorName($messageProcessorName);
+        $consumerState->setMessageProcessorClass(\stdClass::class);
         $consumerState->setMessage($message);
         $consumerState->setJob($job);
 
-        $extension = new ConsumptionExtension($consumerState);
+        $extension = new ConsumptionExtension($consumerState, $this->messageProcessorClassProvider);
         $extension->onBeforeReceive($context);
 
-        $this->assertNull($consumerState->getMessageProcessor());
-        $this->assertNull($consumerState->getMessage());
-        $this->assertNull($consumerState->getJob());
+        self::assertSame('', $consumerState->getMessageProcessorName());
+        self::assertSame('', $consumerState->getMessageProcessorClass());
+        self::assertNull($consumerState->getMessage());
+        self::assertNull($consumerState->getJob());
     }
 
-    public function testOnPreReceived()
+    public function testOnPreReceived(): void
     {
-        $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $messageProcessorName = 'sample_processor';
+        $message = new Message();
 
-        $context = new Context(self::createMock(SessionInterface::class));
-        $context->setMessageProcessor($messageProcessor);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessageProcessorName($messageProcessorName);
         $context->setMessage($message);
 
         $consumerState = new ConsumerState();
 
-        $extension = new ConsumptionExtension($consumerState);
+        $extension = new ConsumptionExtension($consumerState, $this->messageProcessorClassProvider);
         $extension->onPreReceived($context);
 
-        $this->assertSame($messageProcessor, $consumerState->getMessageProcessor());
-        $this->assertSame($message, $consumerState->getMessage());
+        self::assertSame($messageProcessorName, $consumerState->getMessageProcessorName());
+        self::assertSame('SampleProcessorClass', $consumerState->getMessageProcessorClass());
+        self::assertSame($message, $consumerState->getMessage());
     }
 
-    public function testOnPostReceived()
+    public function testOnPostReceived(): void
     {
-        $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $messageProcessorName = 'sample_processor';
+        $message = new Message();
 
-        $context = new Context(self::createMock(SessionInterface::class));
-        $context->setMessageProcessor($messageProcessor);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessageProcessorName($messageProcessorName);
         $context->setMessage($message);
 
         $consumerState = new ConsumerState();
-        $consumerState->setMessageProcessor($messageProcessor);
+        $consumerState->setMessageProcessorName($messageProcessorName);
+        $consumerState->setMessageProcessorClass(\stdClass::class);
         $consumerState->setMessage($message);
 
-        $extension = new ConsumptionExtension($consumerState);
+        $extension = new ConsumptionExtension($consumerState, $this->messageProcessorClassProvider);
         $extension->onPostReceived($context);
 
-        $this->assertNull($consumerState->getMessageProcessor());
-        $this->assertNull($consumerState->getMessage());
+        self::assertSame('', $consumerState->getMessageProcessorName());
+        self::assertSame('', $consumerState->getMessageProcessorClass());
+        self::assertNull($consumerState->getMessage());
     }
 }

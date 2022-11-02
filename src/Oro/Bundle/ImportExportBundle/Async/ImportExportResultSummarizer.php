@@ -1,14 +1,19 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Prepared import and export data by forming a single structure for future use
+ */
 class ImportExportResultSummarizer
 {
     const TEMPLATE_IMPORT_RESULT = 'import_result';
@@ -17,9 +22,9 @@ class ImportExportResultSummarizer
     const TEMPLATE_IMPORT_ERROR = 'import_error';
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
-    protected $router;
+    protected $urlGenerator;
 
     /**
      * @var ConfigManager
@@ -32,14 +37,20 @@ class ImportExportResultSummarizer
     protected $fileManager;
 
     /**
-     * @param Router $router
-     * @param ConfigManager $configManager
+     * @var ManagerRegistry
      */
-    public function __construct(Router $router, ConfigManager $configManager, FileManager $fileManager)
-    {
-        $this->router = $router;
+    protected $registry;
+
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        ConfigManager $configManager,
+        FileManager $fileManager,
+        ManagerRegistry $registry
+    ) {
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
         $this->fileManager = $fileManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -71,12 +82,9 @@ class ImportExportResultSummarizer
         $data = $this->getExportResultAsArray($job);
         $data['fileName'] = $fileName;
 
-        $url = $this->configManager->get('oro_ui.application_url') .
-            $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
-
-        $data['url'] = $url;
+        $data['url'] = $this->getDownloadUrl($job->getId());
         $data['downloadLogUrl'] = $this->getDownloadErrorLogUrl($job->getId());
-        if (! $data['success']) {
+        if (!$data['success']) {
             $data['url'] = $data['downloadLogUrl'];
         }
 
@@ -86,30 +94,27 @@ class ImportExportResultSummarizer
     /**
      * @param Job $job
      *
-     * @throws FileNotFound
-     *
      * @return null|string
+     * @throws FileNotFound
      */
     public function getErrorLog(Job $job)
     {
         $errorLog = null;
         $job = $job->isRoot() ? $job : $job->getRootJob();
-        foreach ($job->getChildJobs() as $childrenJob) {
-            $childrenJobData = $childrenJob->getData();
-            if (empty($childrenJobData) || !array_key_exists('errorLogFile', $childrenJobData)) {
-                continue;
-            }
-            $fileName = $childrenJobData['errorLogFile'];
 
-            if (! $this->fileManager->isFileExist($fileName)) {
-                $errorLog .=  sprintf('Log file of job id: "%s" was not found.', $childrenJob->getId()) . PHP_EOL;
+        $repo = $this->registry->getRepository(Job::class);
+        foreach ($repo->getChildJobErrorLogFiles($job) as $childrenJobData) {
+            $fileName = $childrenJobData['error_log_file'];
+
+            if (!$this->fileManager->isFileExist($fileName)) {
+                $errorLog .= sprintf('Log file of job id: "%s" was not found.', $childrenJobData['id']) . PHP_EOL;
                 continue;
             }
 
             $errorLog .= implode(
                 PHP_EOL,
                 json_decode($this->fileManager->getContent($fileName), true)
-            ). PHP_EOL;
+            ) . PHP_EOL;
         }
 
         return $errorLog;
@@ -122,10 +127,23 @@ class ImportExportResultSummarizer
      */
     protected function getDownloadErrorLogUrl($jobId)
     {
-        $url = $this->configManager->get('oro_ui.application_url') .
-            $this->router->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
+        return
+            $this->configManager->get('oro_ui.application_url')
+            . $this->urlGenerator->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
+    }
 
-        return $url;
+    /**
+     * @param integer $jobId
+     *
+     * @return string
+     */
+    protected function getDownloadUrl($jobId)
+    {
+        return sprintf(
+            '%s%s',
+            $this->configManager->get('oro_ui.application_url'),
+            $this->urlGenerator->generate('oro_importexport_export_download', ['jobId' => $jobId])
+        );
     }
 
     /**
@@ -195,7 +213,7 @@ class ImportExportResultSummarizer
 
             $data['readsCount'] += $childrenJobData['readsCount'];
             $data['errorsCount'] += $childrenJobData['errorsCount'];
-            $data['success']  += $childrenJobData['success'];
+            $data['success'] += $childrenJobData['success'];
             $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : $data['entities'];
         }
 
@@ -224,7 +242,7 @@ class ImportExportResultSummarizer
                 );
                 break;
             case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
-                $message =  sprintf(
+                $message = sprintf(
                     'Import validation of the %s from %s is completed.
                     Success: %s.
                     Info: %s.

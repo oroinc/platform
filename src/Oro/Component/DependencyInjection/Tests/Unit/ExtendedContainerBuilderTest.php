@@ -10,66 +10,72 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const EXTENSION = 'ext';
+    private const EXTENSION = 'ext';
 
-    /** @var ExtendedContainerBuilder */
-    private $builder;
+    private ExtendedContainerBuilder $builder;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);
-        $extension
-            ->expects($this->any())
+        $extension->expects(self::any())
             ->method('getAlias')
-            ->will($this->returnValue(static::EXTENSION));
+            ->willReturn(self::EXTENSION);
 
         $this->builder = new ExtendedContainerBuilder();
         $this->builder->registerExtension($extension);
     }
 
-    public function testSetExtensionConfigShouldOverwriteCurrentConfig()
+    public function testSetExtensionConfigShouldOverwriteCurrentConfig(): void
     {
-        $originalConfig    = ['prop' => 'val'];
+        $originalConfig = ['prop' => 'val'];
         $overwrittenConfig = [['p' => 'v']];
 
-        $this->builder->prependExtensionConfig(static::EXTENSION, $originalConfig);
-        $this->assertEquals([$originalConfig], $this->builder->getExtensionConfig(static::EXTENSION));
+        $this->builder->prependExtensionConfig(self::EXTENSION, $originalConfig);
+        self::assertEquals([$originalConfig], $this->builder->getExtensionConfig(self::EXTENSION));
 
-        $this->builder->setExtensionConfig(static::EXTENSION, $overwrittenConfig);
-        $this->assertEquals($overwrittenConfig, $this->builder->getExtensionConfig(static::EXTENSION));
+        $this->builder->setExtensionConfig(self::EXTENSION, $overwrittenConfig);
+        self::assertEquals($overwrittenConfig, $this->builder->getExtensionConfig(self::EXTENSION));
     }
 
-    public function testMoveCompilerPassBefore()
+    public function testMoveCompilerPassBefore(): void
     {
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
         $this->builder->addCompilerPass($targetPass);
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeForNonDefaultPassType()
+    public function testMoveCompilerPassBeforeForNonDefaultPassType(): void
     {
         $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
-
-        [$resolvePrivatesPass] = $this->builder->getCompilerPassConfig()->getBeforeRemovingPasses();
 
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_REMOVING);
@@ -78,193 +84,247 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             get_class($targetPass),
             PassConfig::TYPE_BEFORE_REMOVING
         );
-        $this->assertSame(
-            [$srcPass, $targetPass, $resolvePrivatesPass],
+        self::assertSame(
+            [$srcPass, $targetPass],
             $this->builder->getCompilerPassConfig()->getBeforeRemovingPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsBeforeTargetPass()
+    public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsBeforeTargetPass(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
-        $srcPass     = new CompilerPass1();
-        $targetPass  = new CompilerPass2();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        $srcPass = new CompilerPass1();
+        $targetPass = new CompilerPass2();
         $anotherPass = new CompilerPass3();
         $this->builder->addCompilerPass($anotherPass);
         $this->builder->addCompilerPass($targetPass);
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $anotherPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsAfterSrcPass()
+    public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsAfterSrcPass(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass     = new CompilerPass1();
-        $targetPass  = new CompilerPass2();
+        $srcPass = new CompilerPass1();
+        $targetPass = new CompilerPass2();
         $anotherPass = new CompilerPass3();
         $this->builder->addCompilerPass($targetPass);
         $this->builder->addCompilerPass($srcPass);
         $this->builder->addCompilerPass($anotherPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
                 $anotherPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeWhenSrcPassIsAlreadyBeforeTargetPass()
+    public function testMoveCompilerPassBeforeWhenSrcPassIsAlreadyBeforeTargetPass(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass);
         $this->builder->addCompilerPass($targetPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeWhenDoubleTargetPasses()
+    public function testMoveCompilerPassBeforeWhenDoubleTargetPasses(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass     = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $target1Pass = new CompilerPass2();
         $target2Pass = new CompilerPass2();
         $this->builder->addCompilerPass($target1Pass);
         $this->builder->addCompilerPass($target2Pass);
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($target1Pass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $target1Pass,
                 $target2Pass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeForEmptyPasses()
+    public function testMoveCompilerPassBeforeForEmptyPasses(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass1::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
     }
 
-    public function testMoveCompilerPassBeforeWhenSrcPassDoesNotExist()
+    public function testMoveCompilerPassBeforeWhenSrcPassDoesNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass1::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($targetPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
     }
 
-    public function testMoveCompilerPassBeforeWhenTargetPassDoesNotExist()
+    public function testMoveCompilerPassBeforeWhenTargetPassDoesNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass2::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
     }
 
-    public function testMoveCompilerPassBeforeWhenTargetPassHasLowerPriority()
+    public function testMoveCompilerPassBeforeWhenTargetPassHasLowerPriority(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testMoveCompilerPassBeforeWhenTargetPassHasHigherPriority()
+    public function testMoveCompilerPassBeforeWhenTargetPassHasHigherPriority(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testAddCompilerPassAfterTargetPass()
+    public function testAddCompilerPassAfterTargetPass(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
@@ -273,26 +333,34 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         $beforeTargetPass = new CompilerPass3();
         $this->builder->addCompilerPass($beforeTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 17);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $beforeTargetPass,
                 $srcPass,
                 $targetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
-    public function testAddCompilerPassBeforeTargetPass()
+    public function testAddCompilerPassBeforeTargetPass(): void
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
-            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        [
+            $resolveClassPass,
+            $registerAutoconfigureAttributesPass,
+            $attributeAutoconfigurationPass,
+            $resolveInstanceOfConditionalsPass,
+            $registerEnvVarsProcessorsPass,
+            $extensionCompilerPass
+        ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
@@ -301,15 +369,17 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         $afterTargetPass = new CompilerPass3();
         $this->builder->addCompilerPass($afterTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 7);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 $resolveClassPass,
+                $registerAutoconfigureAttributesPass,
+                $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
                 $srcPass,
                 $targetPass,
                 $afterTargetPass,
-                $xtensionCompilerPass,
+                $extensionCompilerPass,
             ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );

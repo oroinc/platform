@@ -6,25 +6,21 @@ use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
+/**
+ * The base class for processors that switch to form extensions.
+ */
 abstract class SwitchFormExtension
 {
-    const API_FORM_EXTENSION_ACTIVATED = 'apiFormExtensionActivated';
+    private const API_FORM_EXTENSION_ACTIVATED = 'apiFormExtensionActivated';
 
-    const PREVIOUS_METADATA_ACCESSOR  = 'previousMetadataAccessor';
-    const PREVIOUS_CONFIG_ACCESSOR    = 'previousConfigAccessor';
-    const PREVIOUS_ENTITY_MAPPER      = 'previousEntityMapper';
-    const PREVIOUS_INCLUDED_ENTITIES  = 'previousIncludedEntities';
+    private const PREVIOUS_METADATA_ACCESSOR = 'previousMetadataAccessor';
+    private const PREVIOUS_CONFIG_ACCESSOR = 'previousConfigAccessor';
+    private const PREVIOUS_ENTITY_MAPPER = 'previousEntityMapper';
+    private const PREVIOUS_INCLUDED_ENTITIES = 'previousIncludedEntities';
 
-    /** @var FormExtensionSwitcherInterface */
-    protected $formExtensionSwitcher;
+    protected FormExtensionSwitcherInterface $formExtensionSwitcher;
+    protected MetadataTypeGuesser $metadataTypeGuesser;
 
-    /** @var MetadataTypeGuesser */
-    protected $metadataTypeGuesser;
-
-    /**
-     * @param FormExtensionSwitcherInterface $formExtensionSwitcher
-     * @param MetadataTypeGuesser            $metadataTypeGuesser
-     */
     public function __construct(
         FormExtensionSwitcherInterface $formExtensionSwitcher,
         MetadataTypeGuesser $metadataTypeGuesser
@@ -43,27 +39,18 @@ abstract class SwitchFormExtension
         return (bool)$context->get(self::API_FORM_EXTENSION_ACTIVATED);
     }
 
-    /**
-     * @param FormContext $context
-     */
     protected function switchToApiFormExtension(FormContext $context)
     {
         $this->formExtensionSwitcher->switchToApiFormExtension();
         $context->set(self::API_FORM_EXTENSION_ACTIVATED, true);
     }
 
-    /**
-     * @param FormContext $context
-     */
     protected function switchToDefaultFormExtension(FormContext $context)
     {
         $this->formExtensionSwitcher->switchToDefaultFormExtension();
         $context->remove(self::API_FORM_EXTENSION_ACTIVATED);
     }
 
-    /**
-     * @param FormContext $context
-     */
     protected function rememberContext(FormContext $context)
     {
         // remember current metadata type guesser context as an action can be nested
@@ -90,9 +77,6 @@ abstract class SwitchFormExtension
         );
     }
 
-    /**
-     * @param FormContext $context
-     */
     protected function restoreContext(FormContext $context)
     {
         $this->metadataTypeGuesser->setEntityMapper($context->get(self::PREVIOUS_ENTITY_MAPPER));

@@ -1,6 +1,0 @@
-config:
-    paths:
-        'orosegment/js/app/components/refresh-button': 'bundles/orosegment/js/app/components/refresh-button.js'
-        'orosegment/js/app/components/segment-component': 'bundles/orosegment/js/app/components/segment-component.js'
-        'orosegment/js/app/components/aggregated-field-condition-extension': 'bundles/orosegment/js/app/components/aggregated-field-condition-extension.js'
-        'orosegment/js/app/views/segment-condition-view': 'bundles/orosegment/js/app/views/segment-condition-view.js'

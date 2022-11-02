@@ -1,5 +1,0 @@
-config:
-    paths:
-        'orosearch/js/app/views/search-suggestion-view': 'bundles/orosearch/js/app/views/search-suggestion-view.js'
-        'orosearch/js/app/views/search-suggestion-item-view': 'bundles/orosearch/js/app/views/search-suggestion-item-view.js'
-        'orosearch/js/app/models/search-suggestion-collection': 'bundles/orosearch/js/app/models/search-suggestion-collection.js'

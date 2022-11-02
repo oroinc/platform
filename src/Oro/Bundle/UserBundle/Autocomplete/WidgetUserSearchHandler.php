@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Autocomplete search handler for users.
+ */
 class WidgetUserSearchHandler extends UserSearchHandler
 {
     /** @var TranslatorInterface */
@@ -24,32 +27,26 @@ class WidgetUserSearchHandler extends UserSearchHandler
 
     /**
      * @param TranslatorInterface $translator
-     * @param AttachmentManager   $attachmentManager
-     * @param string              $userEntityName
-     * @param array               $properties
+     * @param PictureSourcesProviderInterface $pictureSourcesProvider
+     * @param string $userEntityName
+     * @param array $properties
      */
     public function __construct(
         TranslatorInterface $translator,
-        AttachmentManager $attachmentManager,
+        PictureSourcesProviderInterface $pictureSourcesProvider,
         $userEntityName,
         array $properties
     ) {
-        parent::__construct($attachmentManager, $userEntityName, $properties);
+        parent::__construct($pictureSourcesProvider, $userEntityName, $properties);
 
         $this->translator = $translator;
     }
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param SearchCriteria $searchCriteria
-     */
     public function setSearchUserCriteria(SearchCriteria $searchCriteria)
     {
         $this->searchUserCriteria = $searchCriteria;

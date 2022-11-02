@@ -4,7 +4,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
+use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 
 class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,16 +27,14 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $expected
-     * @param array $parameters
      * @dataProvider provideParameters
      */
-    public function testAddParameters($expected, array $parameters)
+    public function testAddParameters(ActionData $expected, array $parameters)
     {
         $instance = new ActionGroupExecutionArgs('someName');
 
         foreach ($parameters as $v) {
-            list($name, $value) = $v;
+            [$name, $value] = $v;
             $instance->addParameter($name, $value);
         }
 
@@ -44,14 +44,8 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
     public function testExecute()
     {
         $instance = new ActionGroupExecutionArgs('test_action_group', ['arg1' => 'val1']);
-
-        $mockRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockActionGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockRegistry = $this->createMock(ActionGroupRegistry::class);
+        $mockActionGroup = $this->createMock(ActionGroup::class);
 
         $mockRegistry->expects($this->once())
             ->method('get')
@@ -60,17 +54,15 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
 
         $errorsCollection = new ArrayCollection();
 
-        $mockActionGroup->expects($this->once())->method('execute')
+        $mockActionGroup->expects($this->once())
+            ->method('execute')
             ->with(new ActionData(['arg1' => 'val1']), $errorsCollection)
             ->willReturn('ok');
 
         $this->assertEquals('ok', $instance->execute($mockRegistry, $errorsCollection));
     }
 
-    /**
-     * @return array
-     */
-    public function provideParameters()
+    public function provideParameters(): array
     {
         return [
             'no args' => [

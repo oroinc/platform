@@ -1,25 +1,33 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block list %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
             {% set togglerId = 'dropdown-'|uniqid %}
             <div class="dropdown header-dropdown-shortcut" data-layout="separate"
                 {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
-                <button class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown" id="{{ togglerId }}"
+                <button class="dropdown-toggle dropdown-toggle--no-caret" type="button" data-toggle="dropdown" id="{{ togglerId }}"
                     aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.navigation.shortcuts.title'|trans }}"
-                    title="{{ 'oro.navigation.shortcuts.title'|trans }}">
+                    title="{{ 'oro.navigation.shortcuts.title'|trans }}"
+                    data-prevent-close-on-menu-click="true">
                     <span class="fa-share-square" aria-hidden="true"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="{{ togglerId }}">
-                    <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
+                    <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}
+                    {% if isMobileVersion() %}
+                        <button class="btn-link btn-close fa-close hide-text" data-role="close">{{ 'Close'|trans }}</button>
+                    {% endif %}
+                    </li>
                     <li class="nav-content">
-                        <form>
+                        <div class="shortcut-container">
                             <input type="text"
                                    class="header-dropdown-shortcut__search"
                                    placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
+                                   aria-label="{{ 'oro.navigation.shortcuts.aria_label'|trans }}"
                                    data-source-url={{ options.source|json_encode|raw }}
                                    data-role="shortcut-search"
+                                   data-clearable
+                                   data-placeholder-icon="fa-search"
                                    data-entity-class="{{ oro_class_name(app.user, true) }}"
                                    data-entity-id="{{ app.user.id }}"
                             >
@@ -28,7 +36,7 @@
                                     <a href="{{ options.details }}">{{ 'oro.navigation.shortcuts.see_all'|trans }}</a>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </li>
                     <li class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</li>
                     {{ block('children') }}

@@ -7,12 +7,13 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * The filter by a numeric value or a range of numeric values for a datasource based on a search index.
+ */
 class SearchNumberRangeFilter extends SearchNumberFilter
 {
     /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param array $data
-     * @return bool
+     * {@inheritdoc}
      */
     protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
     {
@@ -24,7 +25,10 @@ class SearchNumberRangeFilter extends SearchNumberFilter
         switch ($data['type']) {
             case NumberRangeFilterType::TYPE_BETWEEN:
                 $ds->addRestriction($builder->gte($fieldName, $value), FilterUtility::CONDITION_AND);
-                $ds->addRestriction($builder->lte($fieldName, $valueEnd), FilterUtility::CONDITION_AND);
+
+                if (null !== $valueEnd) {
+                    $ds->addRestriction($builder->lte($fieldName, $valueEnd), FilterUtility::CONDITION_AND);
+                }
 
                 return true;
 

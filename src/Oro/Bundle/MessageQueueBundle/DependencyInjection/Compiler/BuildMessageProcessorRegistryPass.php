@@ -2,81 +2,36 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Collects message processors for {@see \Oro\Component\MessageQueue\Client\MessageProcessorRegistry}
+ */
 class BuildMessageProcessorRegistryPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $processorTagName = 'oro_message_queue.client.message_processor';
         $processorRegistryId = 'oro_message_queue.client.message_processor_registry';
-
         if (!$container->hasDefinition($processorRegistryId)) {
             return;
         }
 
-        $processorIds = [];
-        foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {
-            $class = $container->getDefinition($serviceId)->getClass();
-            if (is_subclass_of($class, TopicSubscriberInterface::class)) {
-                $this->addConfigsFromTopicSubscriber($processorIds, $class, $serviceId);
-            } else {
-                $this->addConfigsFromTags($processorIds, $tagAttributes, $serviceId, $processorTagName);
-            }
+        $messageProcessors = [];
+        $taggedServiceIds = $container->findTaggedServiceIds('oro_message_queue.client.message_processor');
+        foreach ($taggedServiceIds as $serviceId => $tagAttributes) {
+            $messageProcessors[] = new Reference($serviceId);
         }
 
-        $processorRegistryDef = $container->getDefinition($processorRegistryId);
-        $processorRegistryDef->replaceArgument(0, $processorIds);
-    }
+        // Adds a last-call message processor for the messages which are not claimed by any processor.
+        // Added manually as it cannot be registered with a tag because of empty topic name.
+        $messageProcessors[] = new Reference('oro_message_queue.client.noop_message_processor');
 
-    /**
-     * @param array  $processorIds
-     * @param string $class
-     * @param string $serviceId
-     */
-    protected function addConfigsFromTopicSubscriber(&$processorIds, $class, $serviceId)
-    {
-        foreach ($class::getSubscribedTopics() as $topicName => $params) {
-            if (is_string($params)) {
-                $processorIds[$serviceId] = $serviceId;
-            } elseif (is_array($params)) {
-                $processorName = empty($params['processorName']) ? $serviceId : $params['processorName'];
-
-                $processorIds[$processorName] = $serviceId;
-            } else {
-                throw new \LogicException(sprintf(
-                    'Topic subscriber configuration is invalid. "%s"',
-                    json_encode($class::getSubscribedTopics())
-                ));
-            }
-        }
-    }
-
-    /**
-     * @param array  $processorIds
-     * @param array  $tagAttributes
-     * @param string $serviceId
-     * @param string $processorTagName
-     */
-    protected function addConfigsFromTags(&$processorIds, $tagAttributes, $serviceId, $processorTagName)
-    {
-        foreach ($tagAttributes as $tagAttribute) {
-            if (!isset($tagAttribute['topicName']) || !$tagAttribute['topicName']) {
-                throw new \LogicException(sprintf(
-                    'Topic name is not set but it is required. service: "%s", tag: "%s"',
-                    $serviceId,
-                    $processorTagName
-                ));
-            }
-
-            $processorName = empty($tagAttribute['processorName']) ? $serviceId : $tagAttribute['processorName'];
-
-            $processorIds[$processorName] = $serviceId;
-        }
+        $messageProcessorRegistryDef = $container->getDefinition($processorRegistryId);
+        $messageProcessorRegistryDef->replaceArgument(0, $messageProcessors);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use JMS\Serializer\Annotation\Type;
-
 /**
  * Represents item of search results
  */
@@ -11,26 +9,18 @@ class Item
 {
     /**
      * @var string
-     * @Type("string")
      */
     protected $entityName;
 
     /**
      * @var string
-     * @Type("string")
      */
     protected $entityLabel;
 
     /**
      * @var int
-     * @Type("integer")
      */
     protected $recordId;
-
-    /**
-     * @var string
-     */
-    protected $recordTitle;
 
     /**
      * @var string
@@ -50,7 +40,6 @@ class Item
     /**
      * @param string|null   $entityName
      * @param string|null   $recordId
-     * @param string|null   $recordTitle
      * @param string|null   $recordUrl
      * @param array         $selectedData
      * @param array         $entityConfig
@@ -58,7 +47,6 @@ class Item
     public function __construct(
         $entityName = null,
         $recordId = null,
-        $recordTitle = null,
         $recordUrl = null,
         array $selectedData = [],
         array $entityConfig = []
@@ -66,7 +54,6 @@ class Item
         $this->entityName   = $entityName;
         $this->entityLabel  = '';
         $this->recordId     = empty($recordId) ? 0 : $recordId;
-        $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
         $this->selectedData = $selectedData;
         $this->entityConfig = $entityConfig;
@@ -152,30 +139,6 @@ class Item
     }
 
     /**
-     * Set record title
-     *
-     * @param string $recordTitle
-     *
-     * @return Item
-     */
-    public function setRecordTitle($recordTitle)
-    {
-        $this->recordTitle = $recordTitle;
-
-        return $this;
-    }
-
-    /**
-     * Get record string
-     *
-     * @return string
-     */
-    public function getRecordTitle()
-    {
-        return $this->recordTitle;
-    }
-
-    /**
      * Set record string
      *
      * @param string $recordUrl
@@ -237,7 +200,6 @@ class Item
             'entity_name'   => $this->entityName,
             'entity_label'   => $this->entityLabel,
             'record_id'     => $this->recordId,
-            'record_string' => $this->recordTitle,
             'record_url'    => $this->recordUrl,
         ];
 

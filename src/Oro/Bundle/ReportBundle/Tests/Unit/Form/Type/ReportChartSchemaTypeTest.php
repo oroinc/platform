@@ -3,23 +3,20 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportChartSchemaTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ReportChartSchemaType
-     */
-    protected $type;
+    /** @var ReportChartSchemaType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $manager = $this
-            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $manager = $this->createMock(Manager::class);
 
         $this->type = new ReportChartSchemaType($manager);
 
@@ -27,8 +24,6 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $dataSchema
-     *
      * @dataProvider dataSchemaProvider
      */
     public function testBuildForm(array $dataSchema)
@@ -36,10 +31,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
         $this->factory->create(ReportChartSchemaType::class, null, ['data_schema' => $dataSchema]);
     }
 
-    /**
-     * @return array
-     */
-    public function dataSchemaProvider()
+    public function dataSchemaProvider(): array
     {
         return [
             'full' => [
@@ -56,14 +48,11 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
-        $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $fieldChoiceType = new FieldChoiceType($translator);
 

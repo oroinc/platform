@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var EntityFieldModel;
-    var _ = require('underscore');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const _ = require('underscore');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    EntityFieldModel = BaseModel.extend({
+    const EntityFieldModel = BaseModel.extend({
         fieldAttribute: 'name',
 
         /**
@@ -15,14 +14,14 @@ define(function(require) {
         dataProvider: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EntityFieldModel() {
-            EntityFieldModel.__super__.constructor.apply(this, arguments);
+        constructor: function EntityFieldModel(...args) {
+            EntityFieldModel.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attributes, options) {
             if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
@@ -33,10 +32,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         validate: function(attrs, options) {
-            var error;
+            let error;
             try {
                 this.dataProvider.pathToEntityChain(attrs[this.fieldAttribute]);
             } catch (e) {

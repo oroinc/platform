@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsHeaders;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsSettings;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -11,15 +13,12 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsAllowOrigin implements ProcessorInterface
 {
-    /** @var string[] */
-    private $allowedOrigins;
+    /** @var CorsSettings */
+    private $corsSettings;
 
-    /**
-     * @param string[] $allowedOrigins
-     */
-    public function __construct(array $allowedOrigins)
+    public function __construct(CorsSettings $corsSettings)
     {
-        $this->allowedOrigins = $allowedOrigins;
+        $this->corsSettings = $corsSettings;
     }
 
     /**
@@ -35,8 +34,21 @@ class SetCorsAllowOrigin implements ProcessorInterface
         }
 
         $origin = $context->getRequestHeaders()->get(CorsHeaders::ORIGIN);
-        if ($origin && \in_array($origin, $this->allowedOrigins, true)) {
+        if ($origin && $this->isAllowedOrigin($origin)) {
             $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_ALLOW_ORIGIN, $origin);
         }
+    }
+
+    private function isAllowedOrigin(string $origin): bool
+    {
+        $allowedOrigins = $this->corsSettings->getAllowedOrigins();
+
+        foreach ($allowedOrigins as $allowedOrigin) {
+            if ('*' === $allowedOrigin || $origin === $allowedOrigin) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

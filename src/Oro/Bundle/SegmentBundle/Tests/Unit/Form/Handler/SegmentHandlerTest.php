@@ -2,82 +2,55 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $staticSegmentManager;
+    /** @var StaticSegmentManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $staticSegmentManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var Segment|\PHPUnit\Framework\MockObject\MockObject */
+    private $entity;
 
-    /**
-     * @var Segment| \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entity;
+    /** @var SegmentHandler */
+    private $handler;
 
-    /**
-     * @var SegmentHandler
-     */
-    protected $handler;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(Form::class);
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->staticSegmentManager = $this->getMockBuilder(
-            'Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->staticSegmentManager = $this->createMock(StaticSegmentManager::class);
 
-        $this->entity = $this->getMockBuilder('Oro\Bundle\SegmentBundle\Entity\Segment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entity = $this->createMock(Segment::class);
         $this->handler = new SegmentHandler(
-            $this->form,
             $requestStack,
             $this->managerRegistry,
             $this->staticSegmentManager
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->form, $this->request, $this->manager, $this->handler, $this->entity);
-    }
-
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -86,10 +59,10 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form->expects($this->never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->entity));
+        self::assertFalse($this->handler->process($this->form, $this->entity));
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -104,9 +77,9 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->once())
             ->method('persist')
             ->with($this->entity);
@@ -124,32 +97,29 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('run')
             ->with($this->entity);
 
-        $this->assertTrue($this->handler->process($this->entity));
+        self::assertTrue($this->handler->process($this->form, $this->entity));
     }
 
     /**
      * @dataProvider supportedMethods
-     *
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
 
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
 
-        $this->form->expects($this->once())->method('submit')
+        $this->form->expects($this->once())
+            ->method('submit')
             ->with(self::FORM_DATA);
 
-        $this->assertFalse($this->handler->process($this->entity));
+        self::assertFalse($this->handler->process($this->form, $this->entity));
     }
 
-    /**
-     * @return array
-     */
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
         return [
             ['POST'],

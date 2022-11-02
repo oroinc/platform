@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\LayoutBundle\Loader;
 
-use Imagine\Image\ImageInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 /**
- * Load dimensions from theme config to LiipImagine filters
+ * Load dimensions from theme config to LiipImagine filters.
+ * For the options reference {@see https://symfony.com/doc/2.x/bundles/LiipImagineBundle/filters/sizing.html}.
  */
 class ImageFilterLoader
 {
     const IMAGE_QUALITY = 85;
     const BACKGROUND_COLOR = '#fff';
-    const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
+    const RESIZE_MODE = 'inset';
     const INTERLACE_MODE = 'line';
 
     /** @var ImageTypeProvider */
@@ -32,11 +32,9 @@ class ImageFilterLoader
     /** @var CustomImageFilterProviderInterface[]  */
     protected $customFilterProviders = [];
 
-    /**
-     * @param ImageTypeProvider $imageTypeProvider
-     * @param FilterConfiguration $filterConfiguration
-     * @param DoctrineHelper $doctrineHelper
-     */
+    /** @var bool */
+    private $shouldBeLoaded = true;
+
     public function __construct(
         ImageTypeProvider $imageTypeProvider,
         FilterConfiguration $filterConfiguration,
@@ -47,8 +45,18 @@ class ImageFilterLoader
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    public function forceLoad()
+    {
+        $this->shouldBeLoaded = true;
+        $this->load();
+    }
+
     public function load()
     {
+        if (!$this->shouldBeLoaded) {
+            return;
+        }
+
         foreach ($this->imageTypeProvider->getImageDimensions() as $dimension) {
             $filterName = $dimension->getName();
             $this->filterConfiguration->set(
@@ -56,14 +64,14 @@ class ImageFilterLoader
                 $this->buildFilterFromDimension($dimension)
             );
         }
+
+        $this->shouldBeLoaded = false;
     }
 
-    /**
-     * @param CustomImageFilterProviderInterface $provider
-     */
     public function addCustomImageFilterProvider(CustomImageFilterProviderInterface $provider)
     {
         $this->customFilterProviders[] = $provider;
+        $this->shouldBeLoaded = true;
     }
 
     /**
@@ -84,6 +92,10 @@ class ImageFilterLoader
                 ]
             ]
         ];
+
+        if ($dimension->hasOption('format')) {
+            $filterSettings['format'] = $dimension->getOption('format');
+        }
 
         foreach ($this->customFilterProviders as $provider) {
             if ($provider->isApplicable($dimension)) {
@@ -108,12 +120,12 @@ class ImageFilterLoader
      */
     private function prepareResizeFilterSettings($width, $height)
     {
-        if (Configuration::AUTO === $width || Configuration::AUTO === $height) {
+        if (ThemeConfiguration::AUTO === $width || ThemeConfiguration::AUTO === $height) {
             return [
                 'scale' => [
                     'dim' => [
-                        Configuration::AUTO === $width ? null : $width,
-                        Configuration::AUTO === $height ? null : $height,
+                        ThemeConfiguration::AUTO === $width ? null : $width,
+                        ThemeConfiguration::AUTO === $height ? null : $height,
                     ]
                 ]
             ];

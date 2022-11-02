@@ -6,12 +6,11 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Show flash message
+ * Shows a flash message.
  * Usage:
  * @flash_message:
  *      message: 'Message %parameter_one%, %parameter_two%'
@@ -24,42 +23,27 @@ class FlashMessage extends AbstractAction
 {
     const DEFAULT_MESSAGE_TYPE = 'info';
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var HtmlTagHelper
-     */
+    /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @var RequestStack
-     */
+    /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @var string|PropertyPath
-     */
+    /** @var string|PropertyPathInterface */
     protected $message;
 
-    /**
-     * @var string|PropertyPath
-     */
+    /** @var bool|PropertyPathInterface|null */
+    protected $translate;
+
+    /** @var string|PropertyPathInterface|null */
     protected $type;
 
-    /**
-     * @var array|PropertyPath
-     */
+    /** @var array|PropertyPathInterface|null */
     protected $messageParameters;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param TranslatorInterface $translator
-     * @param HtmlTagHelper $htmlTagHelper
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         TranslatorInterface $translator,
@@ -67,7 +51,6 @@ class FlashMessage extends AbstractAction
         RequestStack $requestStack
     ) {
         parent::__construct($contextAccessor);
-
         $this->translator = $translator;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->requestStack = $requestStack;
@@ -79,25 +62,21 @@ class FlashMessage extends AbstractAction
     protected function executeAction($context)
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (!$request) {
+        if (null === $request) {
             return;
         }
 
         $message = $this->contextAccessor->getValue($context, $this->message);
-
         $messageParameters = $this->getMessageParameters($context);
-        $translatedMessage = $this->translator->trans($message, $messageParameters);
-
-        $type = $this->contextAccessor->getValue($context, $this->type);
-        if (!$type) {
-            $type = self::DEFAULT_MESSAGE_TYPE;
+        if ($this->contextAccessor->getValue($context, $this->translate) ?? true) {
+            $message = $this->translator->trans($message, $messageParameters);
+        } elseif ($messageParameters) {
+            $message = strtr($message, $messageParameters);
         }
 
-        /** @var Session $session */
-        $session = $request->getSession();
-        $session->getFlashBag()->add(
-            $type,
-            $this->htmlTagHelper->sanitize($translatedMessage)
+        $request->getSession()->getFlashBag()->add(
+            $this->contextAccessor->getValue($context, $this->type) ?? self::DEFAULT_MESSAGE_TYPE,
+            $this->htmlTagHelper->sanitize($message)
         );
     }
 
@@ -106,29 +85,34 @@ class FlashMessage extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (empty($options['message'])) {
-            throw new InvalidParameterException('Message parameter is required');
+        $message = $options['message'] ?? null;
+        if (!$message) {
+            throw new InvalidParameterException('Parameter "message" is required.');
         }
-        if (array_key_exists('type', $options)) {
+        if (!empty($options['type'])) {
             $this->type = $options['type'];
         }
-        if (array_key_exists('message_parameters', $options)) {
+        if (!empty($options['message_parameters'])) {
             $this->messageParameters = $options['message_parameters'];
         }
+        if (isset($options['translate'])) {
+            $this->translate = $options['translate'];
+        }
 
-        $this->message = $options['message'];
+        $this->message = $message;
 
         return $this;
     }
 
     /**
      * @param mixed $context
+     *
      * @return array
      */
     protected function getMessageParameters($context)
     {
-        $parameters = (array)$this->contextAccessor->getValue($context, $this->messageParameters);
         $result = [];
+        $parameters = (array)$this->contextAccessor->getValue($context, $this->messageParameters);
         foreach ($parameters as $key => $parameter) {
             $result['%' . $key . '%'] = $this->contextAccessor->getValue($context, $parameter);
         }

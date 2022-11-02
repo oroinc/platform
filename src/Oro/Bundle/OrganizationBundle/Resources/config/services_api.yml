@@ -1,9 +1,26 @@
 services:
+    oro_organization.api.validate_business_unit_new_included_entity_existence:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNewIncludedEntityExistence
+        arguments:
+            - '@oro_api.form_property_accessor'
+            - '@translator'
+            - { owner: false }
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, class: Oro\Bundle\OrganizationBundle\Entity\BusinessUnit }
+
     oro_organization.api.config.add_owner_validator:
-        class: Oro\Bundle\OrganizationBundle\Api\Processor\Config\AddOwnerValidator
+        class: Oro\Bundle\OrganizationBundle\Api\Processor\GetConfig\AddOwnerValidator
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_api.validation_helper'
+            - 'Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -50 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -50 }
+
+    oro_organization.api.set_ownership_associations:
+        class: Oro\Bundle\OrganizationBundle\Api\Processor\SetOwnershipAssociations
+        arguments:
+            - '@oro_organization.entity_ownership_associations_setter'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_validate, parentAction: create, priority: 10 }

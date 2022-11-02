@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 
 class PreMigrationEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PreMigrationEvent
-     */
-    protected $preMigrationEvent;
+    /** @var PreMigrationEvent */
+    private $preMigrationEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
+
         $this->preMigrationEvent = new PreMigrationEvent($connection);
     }
 

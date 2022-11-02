@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\AbstractType;
@@ -34,9 +34,6 @@ class LocalizationCollectionType extends AbstractType
      */
     protected $dataClass;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -81,7 +78,8 @@ class LocalizationCollectionType extends AbstractType
             'enabled_fallbacks'     => [],
             'value_type'            => FallbackValueType::class,
             'group_fallback_fields' => null,
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false,
         ]);
     }
 
@@ -112,7 +110,8 @@ class LocalizationCollectionType extends AbstractType
                     'fallback_type_parent_localization' => $parent,
                     'enabled_fallbacks' => $enabledFallbacks,
                     'group_fallback_fields' => $options['group_fallback_fields'],
-                    'exclude_parent_localization' => $excludeParentLocalization
+                    'exclude_parent_localization' => $excludeParentLocalization,
+                    'use_tabs' => $options['use_tabs'],
                 ]
             );
         }

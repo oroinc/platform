@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Marks all services definer in "Resources/config/oro/lazy_services.yml" as lazy.
+ * Marks all services defined in "Resources/config/oro/lazy_services.yml" as lazy.
  */
 class LazyServicesCompilerPass implements CompilerPassInterface
 {
@@ -21,17 +22,20 @@ class LazyServicesCompilerPass implements CompilerPassInterface
             'oro_lazy_services',
             new YamlCumulativeFileLoader('Resources/config/oro/lazy_services.yml')
         );
-
-        $lazyServices = array();
-        foreach ($configLoader->load($container) as $resource) {
-            if (!empty($resource->data['lazy_services']) && is_array($resource->data['lazy_services'])) {
-                $lazyServices = array_merge($lazyServices, $resource->data['lazy_services']);
+        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
+        foreach ($resources as $resource) {
+            if (empty($resource->data['lazy_services']) || !is_array($resource->data['lazy_services'])) {
+                continue;
             }
-        }
-
-        foreach ($lazyServices as $serviceId) {
-            if ($container->hasDefinition($serviceId)) {
-                $container->getDefinition($serviceId)->setLazy(true);
+            foreach ($resource->data['lazy_services'] as $serviceId) {
+                if ($container->hasDefinition($serviceId)) {
+                    $container->getDefinition($serviceId)->setLazy(true);
+                } else {
+                    $container->log(
+                        $this,
+                        sprintf('The service "%s" cannot be marked as lazy due to it does not exist.', $serviceId)
+                    );
+                }
             }
         }
     }

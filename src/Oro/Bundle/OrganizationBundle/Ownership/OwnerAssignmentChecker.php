@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\OrganizationBundle\Ownership;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Default implementation of check owner assignment algorithm
+ * The default implementation of the owner assignment checker.
  */
 class OwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function hasAssignments($ownerId, $entityClassName, $ownerFieldName, EntityManager $em)
-    {
+    public function hasAssignments(
+        $ownerId,
+        string $entityClassName,
+        string $ownerFieldName,
+        EntityManagerInterface $em
+    ): bool {
         $findResult = $this->getHasAssignmentsQueryBuilder($ownerId, $entityClassName, $ownerFieldName, $em)
             ->getQuery()
             ->getArrayResult();
@@ -24,20 +27,25 @@ class OwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
     }
 
     /**
-     * Returns a query builder is used to check if assignments exist
+     * Gets a query builder is used to check if assignments exist.
      *
-     * @param mixed         $ownerId
-     * @param string        $entityClassName
-     * @param string        $ownerFieldName
-     * @param EntityManager $em
+     * @param mixed                  $ownerId
+     * @param string                 $entityClassName
+     * @param string                 $ownerFieldName
+     * @param EntityManagerInterface $em
+     *
      * @return QueryBuilder
      */
-    protected function getHasAssignmentsQueryBuilder($ownerId, $entityClassName, $ownerFieldName, EntityManager $em)
-    {
-        return $em->getRepository($entityClassName)
-            ->createQueryBuilder('entity')
+    protected function getHasAssignmentsQueryBuilder(
+        $ownerId,
+        string $entityClassName,
+        string $ownerFieldName,
+        EntityManagerInterface $em
+    ): QueryBuilder {
+        return $em->createQueryBuilder()
+            ->from($entityClassName, 'entity')
             ->select('owner.id')
-            ->innerJoin(QueryBuilderUtil::getField('entity', $ownerFieldName), 'owner')
+            ->innerJoin('entity.' . $ownerFieldName, 'owner')
             ->where('owner.id = :ownerId')
             ->setParameter('ownerId', $ownerId)
             ->setMaxResults(1);

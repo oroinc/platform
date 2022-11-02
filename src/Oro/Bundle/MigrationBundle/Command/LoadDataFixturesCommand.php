@@ -1,71 +1,114 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
 use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * This command load fixtures
- *
- * @package Oro\Bundle\MigrationBundle\Command
+ * Loads data fixtures.
  */
-class LoadDataFixturesCommand extends ContainerAwareCommand
+class LoadDataFixturesCommand extends Command
 {
-    const COMMAND_NAME = 'oro:migration:data:load';
+    public const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
+    public const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
 
-    const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
-    const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
+    /** @var string */
+    protected static $defaultName = 'oro:migration:data:load';
 
-    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
-    const MAIN_FIXTURES_PATH = 'Migrations/Data/ORM';
+    protected KernelInterface $kernel;
+    protected DataFixturesLoader $dataFixturesLoader;
+    protected DataFixturesExecutorInterface $dataFixturesExecutor;
+    protected FixturePathLocatorInterface $fixturePathLocator;
 
-    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
-    const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
+    public function __construct(
+        KernelInterface $kernel,
+        DataFixturesLoader $dataFixturesLoader,
+        DataFixturesExecutorInterface $dataFixturesExecutor,
+        FixturePathLocatorInterface $fixturePathLocator
+    ) {
+        parent::__construct();
 
-    /**
-     * {@inheritdoc}
-     */
+        $this->kernel = $kernel;
+        $this->dataFixturesLoader = $dataFixturesLoader;
+        $this->dataFixturesExecutor = $dataFixturesExecutor;
+        $this->fixturePathLocator = $fixturePathLocator;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(static::COMMAND_NAME)
-            ->setDescription('Load data fixtures.')
+        $this
             ->addOption(
                 'fixtures-type',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 sprintf(
-                    'Select fixtures type to be loaded (%s or %s). By default - %s',
+                    'Fixtures type to be loaded (%s or %s). By default - %s',
                     self::MAIN_FIXTURES_TYPE,
                     self::DEMO_FIXTURES_TYPE,
                     self::MAIN_FIXTURES_TYPE
                 ),
                 self::MAIN_FIXTURES_TYPE
             )
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of fixtures without apply them')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the list of fixtures without applying them')
             ->addOption(
                 'bundles',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundle names to load data from'
+                'Bundles to load the data from'
             )
             ->addOption(
                 'exclude',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundle names which fixtures should be skipped'
-            );
+                'Bundles with the fixtures that should be skipped'
+            )
+            ->setDescription('Loads data fixtures.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command loads data fixtures.
+The fixtures type ("main", or "demo") can be specified with the <info>--fixtures-type</info> option:
+
+  <info>php %command.full_name% --fixtures-type=<type></info>
+
+The <info>--dry-run</info> option can be used to print the list of fixtures without applying them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+The <info>--bundles</info> option can be used to load the fixtures only from the specified bundles:
+
+  <info>php %command.full_name% --bundles=<BundleOne> --bundles=<BundleTwo> --bundles=<BundleThree></info>
+
+The <info>--exclude</info> option will skip loading fixtures from the specified bundles:
+
+  <info>php %command.full_name% --exclude=<BundleOne> --exclude=<BundleTwo> --exclude=<BundleThree></info>
+
+HELP
+            )
+            ->addUsage('--fixtures-type=main')
+            ->addUsage('--fixtures-type=demo')
+            ->addUsage('--dry-run')
+            ->addUsage('--bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--dry-run --fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--exclude=<BundleOne> --exclude=<BundleTwo>')
+            ->addUsage('--fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
+            ->addUsage('--dry-run --fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fixtures = null;
@@ -90,21 +133,18 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @throws \RuntimeException if loading of data fixtures should be terminated
      */
-    protected function getFixtures(InputInterface $input, OutputInterface $output)
+    protected function getFixtures(InputInterface $input, OutputInterface $output): array
     {
-        /** @var DataFixturesLoader $loader */
-        $loader = $this->getContainer()->get('oro_migration.data_fixtures.loader');
         $includeBundles = $input->getOption('bundles');
         $excludeBundles = $input->getOption('exclude');
         $fixtureRelativePath = $this->getFixtureRelativePath($input);
 
         /** @var BundleInterface[] $bundles */
-        $bundles = $this->getApplication()->getKernel()->getBundles();
+        $bundles = $this->kernel->getBundles();
+
         foreach ($bundles as $bundle) {
             if (!empty($includeBundles) && !in_array($bundle->getName(), $includeBundles, true)) {
                 continue;
@@ -114,21 +154,31 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
             }
             $path = $bundle->getPath() . $fixtureRelativePath;
             if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
+                $this->dataFixturesLoader->loadFromDirectory($path);
             }
         }
+        $this->loadAppFixtures($fixtureRelativePath);
 
-        return $loader->getFixtures();
+        return $this->dataFixturesLoader->getFixtures();
     }
 
-    /**
-     * Output list of fixtures
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     */
-    protected function outputFixtures(InputInterface $input, OutputInterface $output, $fixtures)
+    protected function loadAppFixtures(string $relativeFixturePath): void
+    {
+        $appFixturesDirectory = $this->kernel->getProjectDir() . '/migrations';
+        if (!is_dir($appFixturesDirectory)) {
+            return;
+        }
+        $finder = (new Finder())->directories()->in($appFixturesDirectory);
+        $relativeFixturePath = str_replace('/Migrations', '', $relativeFixturePath);
+        foreach ($finder as $directory) {
+            $fixtureItemDirectory = $directory . $relativeFixturePath;
+            if (is_dir($fixtureItemDirectory)) {
+                $this->dataFixturesLoader->loadFromDirectory($fixtureItemDirectory);
+            }
+        }
+    }
+
+    protected function outputFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void
     {
         $output->writeln(
             sprintf(
@@ -141,14 +191,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * Process fixtures
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     */
-    protected function processFixtures(InputInterface $input, OutputInterface $output, $fixtures)
+    protected function processFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void
     {
         $output->writeln(
             sprintf(
@@ -160,50 +203,44 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         $this->executeFixtures($output, $fixtures, $this->getTypeOfFixtures($input));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     * @param string          $fixturesType
-     */
-    protected function executeFixtures(OutputInterface $output, $fixtures, $fixturesType)
+    protected function executeFixtures(OutputInterface $output, array $fixtures, string $fixturesType): void
     {
-        /** @var DataFixturesExecutorInterface $loader */
-        $executor = $this->getContainer()->get('oro_migration.data_fixtures.executor');
-        $executor->setLogger(
-            function ($message) use ($output) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+        $cursor = new Cursor($output);
+        $this->dataFixturesExecutor->setLogger(
+            function ($message) use ($output, $cursor) {
+                $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                // Saves the cursor position to make it possible to return to the end of previous line in the progress
+                // callback to append the progress info.
+                $cursor->savePosition();
+                $output->writeln('');
             }
         );
-        $executor->execute($fixtures, $fixturesType);
+
+        $progressCallback = static function (int $memoryBytes, float $durationMilli) use ($output, $cursor) {
+            // Returns cursor to the end of the previous line so the progress info will be appended after it.
+            $cursor->restorePosition();
+            $cursor->moveUp();
+
+            $output->writeln(\sprintf(
+                ' <comment>%.2F MiB - %d ms</comment>',
+                $memoryBytes / 1024 / 1024,
+                $durationMilli
+            ));
+        };
+
+        $this->dataFixturesExecutor->execute($fixtures, $fixturesType, $progressCallback);
     }
 
-    /**
-     * @param InputInterface $input
-     * @return string
-     */
-    protected function getTypeOfFixtures(InputInterface $input)
+    protected function getTypeOfFixtures(InputInterface $input): string
     {
         return $input->getOption('fixtures-type');
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return string
-     */
-    protected function getFixtureRelativePath(InputInterface $input)
+    protected function getFixtureRelativePath(InputInterface $input): string
     {
         $fixtureType         = (string)$this->getTypeOfFixtures($input);
-        $fixtureRelativePath = $this->getFixturePathLocator()->getPath($fixtureType);
+        $fixtureRelativePath = $this->fixturePathLocator->getPath($fixtureType);
 
         return str_replace('/', DIRECTORY_SEPARATOR, sprintf('/%s', $fixtureRelativePath));
-    }
-
-    /**
-     * @return FixturePathLocatorInterface
-     */
-    protected function getFixturePathLocator(): FixturePathLocatorInterface
-    {
-        return $this->getContainer()->get('oro_migration.locator.fixture_path_locator');
     }
 }

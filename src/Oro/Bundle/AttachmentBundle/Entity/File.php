@@ -6,22 +6,23 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * File entity.
+ * Contains information about uploaded file. Can be attached to any entity which requires file or image functionality.
+ *
  * @ORM\Table(name="oro_attachment_file", indexes = {
- *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
+ *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"}),
+ *      @ORM\Index("att_file_uuid_idx", columns = {"uuid"})
  * })
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-file"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "comment"={
  *              "immutable"=true
@@ -34,8 +35,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
-class File extends ExtendFile implements FileExtensionInterface, \Serializable
+class File extends ExtendFile implements FileExtensionInterface
 {
     /**
      * @var integer
@@ -45,6 +47,20 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="uuid", type="guid", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $uuid;
 
     /**
      * @var UserInterface
@@ -57,37 +73,71 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="filename", type="string", length=255, nullable=true)
+     * @ORM\Column(name="filename", type="string", length=255, nullable=false)
      */
     protected $filename;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="extension", type="string", length=10, nullable=true)
      */
     protected $extension;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="mime_type", type="string", length=100, nullable=true)
      */
     protected $mimeType;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="original_filename", type="string", length=255, nullable=true)
      */
     protected $originalFilename;
 
     /**
-     * @var integer
+     * @var integer|null
      *
      * @ORM\Column(name="file_size", type="integer", nullable=true)
      */
     protected $fileSize;
+
+    /**
+     * Class name of the parent entity to which this file belongs. Needed in sake of ACL checks.
+     *
+     * @var string|null
+     *
+     * @ORM\Column(name="parent_entity_class", type="string", length=512, nullable=true)
+     */
+    protected $parentEntityClass;
+
+    /**
+     * Id of the parent entity to which this file belongs. Needed in sake of ACL checks.
+     *
+     * @var int|null
+     *
+     * @ORM\Column(name="parent_entity_id", type="integer", nullable=true)
+     */
+    protected $parentEntityId;
+
+    /**
+     * Field name where the file is stored in the parent entity to which it belongs. Needed in sake of ACL checks.
+     *
+     * @var string|null
+     *
+     * @ORM\Column(name="parent_entity_field_name", type="string", length=50, nullable=true)
+     */
+    protected $parentEntityFieldName;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="external_url", type="string", length=1024, nullable=true)
+     */
+    protected $externalUrl;
 
     /**
      * @var \DateTime
@@ -117,15 +167,17 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      */
     protected $updatedAt;
 
-    /**
-     * @var ComponentFile $file
-     */
-    protected $file;
+    protected ?\SplFileInfo $file = null;
 
     /**
      * @var bool
      */
     protected $emptyFile;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     /**
      * Get id
@@ -135,6 +187,18 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setUuid(?string $uuid): File
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     /**
@@ -163,7 +227,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * Set originalFilename
      *
-     * @param string $originalFilename
+     * @param string|null $originalFilename
      * @return File
      */
     public function setOriginalFilename($originalFilename)
@@ -176,7 +240,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * Get originalFilename
      *
-     * @return string
+     * @return string|null
      */
     public function getOriginalFilename()
     {
@@ -229,16 +293,16 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this->updatedAt;
     }
 
-    /**
-     * @param ComponentFile|null $file
-     */
-    public function setFile(ComponentFile $file = null)
+    public function setFile(\SplFileInfo $file = null)
     {
         $this->file = $file;
+
+        // Makes sure doctrine listeners react on change because the property `file` is not stored.
+        $this->preUpdate();
     }
 
     /**
-     * @return ComponentFile|null
+     * @return \SplFileInfo|null
      */
     public function getFile()
     {
@@ -271,6 +335,9 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     public function setEmptyFile($emptyFile)
     {
         $this->emptyFile = $emptyFile;
+
+        // Makes sure doctrine listeners react on change because the property `emptyFile` is not stored.
+        $this->preUpdate();
 
         return $this;
     }
@@ -330,6 +397,10 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = clone $this->createdAt;
+
+        if (!$this->uuid) {
+            $this->uuid = UUIDGenerator::v4();
+        }
     }
 
     /**
@@ -342,17 +413,18 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
-        $fileName = (string)$this->getFilename();
-        if (!$fileName) {
-            return '';
+        if ($this->getExternalUrl() !== null) {
+            $result = $this->getExternalUrl();
+        } else {
+            $result = (string)$this->getFilename();
+            if ($this->getOriginalFilename()) {
+                $result .= ' (' . $this->getOriginalFilename() . ')';
+            }
         }
 
-        return $fileName . ' (' . $this->getOriginalFilename() . ')';
+        return (string) $result;
     }
 
     /**
@@ -380,27 +452,95 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         if ($this->id) {
             $this->id = null;
         }
+
+        // Resets uuid for cloned object, will be created on prePersist
+        $this->uuid = null;
+
+        // Resets parent entity info for cloned object, must be set by corresponding listeners.
+        $this->parentEntityClass = null;
+        $this->parentEntityFieldName = null;
+        $this->parentEntityId = null;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->id,
+            $this->filename,
+            $this->uuid,
+            $this->externalUrl,
+            $this->originalFilename,
+            $this->mimeType,
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->id,
+            $this->filename,
+            $this->uuid,
+            $this->externalUrl,
+            $this->originalFilename,
+            $this->mimeType,
+        ] = $serialized;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $parentEntityClass
+     *
+     * @return File
      */
-    public function serialize()
+    public function setParentEntityClass(?string $parentEntityClass): File
     {
-        return serialize([
-            $this->id,
-            $this->filename,
-        ]);
+        $this->parentEntityClass = $parentEntityClass;
+
+        return $this;
+    }
+
+    public function getParentEntityClass(): ?string
+    {
+        return $this->parentEntityClass;
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $parentEntityId
+     *
+     * @return File
      */
-    public function unserialize($serialized)
+    public function setParentEntityId(?int $parentEntityId): File
     {
-        list(
-            $this->id,
-            $this->filename,
-            ) = unserialize($serialized);
+        $this->parentEntityId = $parentEntityId;
+
+        return $this;
+    }
+
+    public function getParentEntityId(): ?int
+    {
+        return $this->parentEntityId;
+    }
+
+    public function setParentEntityFieldName(?string $parentEntityFieldName): File
+    {
+        $this->parentEntityFieldName = $parentEntityFieldName;
+
+        return $this;
+    }
+
+    public function getParentEntityFieldName(): ?string
+    {
+        return $this->parentEntityFieldName;
+    }
+
+    public function setExternalUrl(?string $externalUrl): File
+    {
+        $this->externalUrl = $externalUrl;
+
+        return $this;
+    }
+
+    public function getExternalUrl(): ?string
+    {
+        return $this->externalUrl;
     }
 }

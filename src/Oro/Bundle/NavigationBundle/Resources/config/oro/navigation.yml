@@ -2,33 +2,31 @@ navigation:
     menu_config:
         templates:
             application_menu:
-                template: 'OroNavigationBundle:Menu:application_menu.html.twig'
+                template: '@OroNavigation/Menu/application_menu.html.twig'
                 current_class: 'active'
                 ancestor_class: 'active'
                 allow_safe_labels: true
                 root_class: 'nav-multilevel main-menu'
                 compressed: true
             dots_menu:
-                template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
+                template: '@OroNavigation/Menu/dots_menu.html.twig'
             shortcuts:
-                template: 'OroNavigationBundle:Menu:shortcuts.html.twig'
+                template: '@OroNavigation/Menu/shortcuts.html.twig'
             navbar:
-                template: 'OroNavigationBundle:Menu:navbar.html.twig'
+                template: '@OroNavigation/Menu/navbar.html.twig'
             dropdown:
-                template: 'OroNavigationBundle:Menu:dropdown.html.twig'
+                template: '@OroNavigation/Menu/dropdown.html.twig'
             user_menu:
-                template: 'OroNavigationBundle:Menu:user_menu.html.twig'
+                template: '@OroNavigation/Menu/user_menu.html.twig'
             horizontal_tabs:
-                template: 'OroNavigationBundle:Menu:horizontal_tabs.html.twig'
-            pinbar:
-                template: 'OroNavigationBundle:Menu:pinbar.html.twig'
+                template: '@OroNavigation/Menu/horizontal_tabs.html.twig'
             favorite:
-                template: 'OroNavigationBundle:Menu:favorites.html.twig'
+                template: '@OroNavigation/Menu/favorites.html.twig'
             mostviewed:
-                template: 'OroNavigationBundle:Menu:mostviewed.html.twig'
+                template: '@OroNavigation/Menu/mostviewed.html.twig'
                 root_class: 'extra-list'
             history:
-                template: 'OroNavigationBundle:Menu:history.html.twig'
+                template: '@OroNavigation/Menu/history.html.twig'
                 root_class: 'extra-list'
                 current_as_link: false
 

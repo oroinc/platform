@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -17,46 +15,31 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * as a process that sent the message.
  * Also the "security_agnostic_processors" option can be used to disable changing the security context
  * for some processors.
- * For details see "Resources/doc/secutity_context.md".
+ * For details see {@link https://doc.oroinc.com/master/backend/mq/security-context/}.
  */
 class SecurityAwareConsumptionExtension extends AbstractExtension
 {
     /** @var array [processor name => TRUE, ...] */
-    private $securityAgnosticProcessors;
+    private array $securityAgnosticProcessors;
+    private TokenStorageInterface $tokenStorage;
+    private TokenSerializerInterface  $tokenSerializer;
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var TokenSerializerInterface */
-    private $tokenSerializer;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /**
-     * @param string[]                 $securityAgnosticProcessors
-     * @param TokenStorageInterface    $tokenStorage
-     * @param TokenSerializerInterface $tokenSerializer
-     * @param LoggerInterface          $logger
-     */
     public function __construct(
         array $securityAgnosticProcessors,
         TokenStorageInterface $tokenStorage,
-        TokenSerializerInterface $tokenSerializer,
-        LoggerInterface $logger
+        TokenSerializerInterface $tokenSerializer
     ) {
         $this->securityAgnosticProcessors = array_fill_keys($securityAgnosticProcessors, true);
         $this->tokenStorage = $tokenStorage;
         $this->tokenSerializer = $tokenSerializer;
-        $this->logger = $logger;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function onPreReceived(Context $context)
+    public function onPreReceived(Context $context): void
     {
-        if (isset($this->securityAgnosticProcessors[$this->getProcessorName($context)])) {
+        if (isset($this->securityAgnosticProcessors[$context->getMessageProcessorName()])) {
             return;
         }
 
@@ -66,31 +49,21 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
         if ($serializedToken) {
             $token = $this->tokenSerializer->deserialize($serializedToken);
             if (null === $token) {
-                $this->logger->error('Cannot deserialize security token');
-                $context->setStatus(MessageProcessorInterface::REJECT);
-            } else {
-                $this->logger->debug('Set security token');
-                $this->tokenStorage->setToken($token);
+                $exception = new InvalidSecurityTokenException();
+                $context->getLogger()->error($exception->getMessage());
+                throw $exception;
             }
+            $context->getLogger()->debug('Set security token');
+            $this->tokenStorage->setToken($token);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function onPostReceived(Context $context)
+    public function onPostReceived(Context $context): void
     {
         // reset the security context after processing of each message
         $this->tokenStorage->setToken(null);
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return string
-     */
-    private function getProcessorName(Context $context)
-    {
-        return $context->getMessage()->getProperty(Config::PARAMETER_PROCESSOR_NAME);
     }
 }

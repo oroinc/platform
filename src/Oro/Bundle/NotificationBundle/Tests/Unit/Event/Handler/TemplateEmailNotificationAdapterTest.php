@@ -12,51 +12,55 @@ use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var EmailHolderStub */
+    private $entity;
+
+    /** @var EmailNotification|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailNotification;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
     /** @var TemplateEmailNotificationAdapter */
     private $adapter;
 
-    /** @var EmailHolderStub */
-    private $entity;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotification */
-    private $emailNotification;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    private $em;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EmailHolderStub();
         $this->emailNotification = $this->createMock(EmailNotification::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->em = $this->createMock(EntityManager::class);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        $additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
+        $additionalEmailAssociationProvider->expects($this->any())
+            ->method('getAssociationValue')
+            ->willReturnCallback(function ($associationEntity, $associationComponent) use ($propertyAccessor) {
+                return $propertyAccessor->getValue($associationEntity, $associationComponent);
+            });
 
         $this->adapter = new TemplateEmailNotificationAdapter(
             $this->entity,
             $this->emailNotification,
             $this->em,
-            $this->getPropertyAccessor(),
-            $this->eventDispatcher
+            $propertyAccessor,
+            $this->eventDispatcher,
+            $additionalEmailAssociationProvider
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->adapter, $this->entity, $this->emailNotification, $this->em);
-    }
-
-    public function testGetTemplateCriteria()
+    public function testGetTemplateCriteria(): void
     {
         $emailTemplate = (new EmailTemplate('template_name'))->setEntityName('Entity/User');
 
@@ -70,7 +74,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRecipients()
+    public function testGetRecipients(): void
     {
         $recipients = [new EmailAddressWithContext('email1@mail.com')];
         $this->mockRecipients(new RecipientList(), $recipients);
@@ -78,21 +82,19 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
         $transformedRecipients = [new EmailHolderStub('email1@mail.com')];
 
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(NotificationProcessRecipientsEvent::NAME, $event)
-            ->willReturnCallback(function (
-                $eventName,
-                NotificationProcessRecipientsEvent $event
-            ) use ($transformedRecipients) {
+            ->with($event, NotificationProcessRecipientsEvent::NAME)
+            ->willReturnCallback(function (NotificationProcessRecipientsEvent $event) use ($transformedRecipients) {
                 $event->setRecipients($transformedRecipients);
+
+                return $event;
             });
 
         $this->assertEquals($transformedRecipients, $this->adapter->getRecipients());
     }
 
-    public function testGetRecipientsFromAdditionalAssociations()
+    public function testGetRecipientsFromAdditionalAssociations(): void
     {
         $subHolder1 = new EmailHolderStub('test1@example.com');
         $subHolder2 = new EmailHolderStub('test2@example.com');
@@ -124,7 +126,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRecipients, $this->adapter->getRecipients());
     }
 
-    public function testGetRecipientsFromAdditionalAssociationsAndUsers()
+    public function testGetRecipientsFromAdditionalAssociationsAndUsers(): void
     {
         $subHolder1 = new EmailHolderStub('test1@example.com');
         $subHolder2 = new EmailHolderStub('test2@example.com');
@@ -155,12 +157,9 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $email
-     * @param array $expected
-     *
      * @dataProvider emailValuesDataProvider
      */
-    public function testGetRecipientsFromEntityEmails($email, $expected)
+    public function testGetRecipientsFromEntityEmails(mixed $email, array $expected): void
     {
         $recipientList = new RecipientList();
         $recipientList->setEntityEmails(['getEmail']);
@@ -172,10 +171,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actualResult);
     }
 
-    /**
-     * @return array
-     */
-    public function emailValuesDataProvider()
+    public function emailValuesDataProvider(): array
     {
         $testEmail = 'test1@example.com';
         $emailHolderStub = new EmailHolderStub($testEmail);
@@ -193,7 +189,14 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'email as object with EmailHolderInterface' => [
-                'actual'   => $emailHolderStub,
+                'actual'   => [
+                    $emailHolderStub,
+                    (new User())->setEmail('some@example.com')->setEnabled(false),
+                    new EmailAddressWithContext(
+                        'some2@example.com',
+                        (new User())->setEnabled(false)
+                    ),
+                ],
                 'expected' => [$emailHolderStub]
             ],
             'email as multidimensional array' => [
@@ -224,10 +227,10 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param RecipientList $recipientList
-     * @param array|EmailHolderInterface[] $recipients
+     * @param RecipientList          $recipientList
+     * @param EmailHolderInterface[] $recipients
      */
-    private function mockRecipients(RecipientList $recipientList, $recipients)
+    private function mockRecipients(RecipientList $recipientList, array $recipients): void
     {
         $repository = $this->createMock(RecipientListRepository::class);
         $repository->expects($this->once())

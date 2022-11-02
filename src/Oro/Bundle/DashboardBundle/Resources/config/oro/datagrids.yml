@@ -1,5 +1,6 @@
 datagrids:
     dashboards-grid:
+        extended_entity_name: 'Oro\Bundle\DashboardBundle\Entity\Dashboard'
         acl_resource: oro_dashboard_view
         source:
             type: orm
@@ -12,7 +13,7 @@ datagrids:
                     - dashboard.createdAt
                     - dashboard.updatedAt
                 from:
-                    - { table: '%oro_dashboard.dashboard_entity.class%', alias: dashboard }
+                    - { table: Oro\Bundle\DashboardBundle\Entity\Dashboard, alias: dashboard }
                 join:
                     left:
                         - { join: dashboard.owner, alias: owner }
@@ -23,7 +24,7 @@ datagrids:
                 type:          twig
                 label:         oro.dashboard.owner.label
                 frontend_type: html
-                template:      OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+                template:      '@OroDashboard/Dashboard/Datagrid/Property/owner.html.twig'
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime

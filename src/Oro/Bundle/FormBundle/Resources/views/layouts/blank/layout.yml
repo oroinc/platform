@@ -1,6 +1,0 @@
-layout:
-    actions:
-        - '@setBlockTheme':
-            themes: 'OroFormBundle:layouts:blank/layout.html.twig'
-        - '@setFormTheme':
-            themes: 'OroFormBundle:layouts:blank/form_theme.html.twig'

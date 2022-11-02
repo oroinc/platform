@@ -11,9 +11,6 @@ class ReportManager
      */
     protected $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;

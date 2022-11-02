@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
+use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,14 +17,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 
-class ImpersonationAuthenticator implements GuardAuthenticatorInterface
+/**
+ * Authenticator guard for impersonated authentication.
+ */
+class ImpersonationAuthenticator implements AuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
 
@@ -32,28 +36,35 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     /** @var UsernamePasswordOrganizationTokenFactoryInterface */
     protected $tokenFactory;
 
+    /** @var OrganizationGuesserInterface */
+    protected $organizationGuesser;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var UrlGeneratorInterface */
     protected $router;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param UrlGeneratorInterface $router
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
+        OrganizationGuesserInterface $organizationGuesser,
         EventDispatcherInterface $eventDispatcher,
         UrlGeneratorInterface $router
     ) {
         $this->doctrine = $doctrine;
         $this->tokenFactory = $tokenFactory;
+        $this->organizationGuesser = $organizationGuesser;
         $this->eventDispatcher = $eventDispatcher;
         $this->router = $router;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): bool
+    {
+        return $request->query->has(static::TOKEN_PARAMETER);
     }
 
     /**
@@ -93,7 +104,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         $token->setAttribute('IMPERSONATION', $impersonation->getId());
 
         $event = new ImpersonationSuccessEvent($impersonation);
-        $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ImpersonationSuccessEvent::EVENT_NAME);
 
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $impersonation->setIpAddress($request->getClientIp());
@@ -135,15 +146,14 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function createAuthenticatedToken(UserInterface $user, $providerKey)
     {
-        $guesser = new UserOrganizationGuesser();
         /** @var User $user */
-        $organization = $guesser->guessByUser($user);
+        $organization = $this->organizationGuesser->guess($user);
 
         if (!$organization) {
-            throw new BadCredentialsException("You don't have active organization assigned.");
+            throw new BadUserOrganizationException("You don't have active organization assigned.");
         }
 
-        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getRoles());
+        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getUserRoles());
     }
 
     /**
@@ -172,12 +182,16 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
         }
 
         if ($impersonation->getLoginAt()) {
-            throw new CustomUserMessageAuthenticationException('Impersonation token is already used.');
+            $exception = new ImpersonationAuthenticationException('Impersonation token has already been used.');
+            $exception->setUser($impersonation->getUser());
+            throw $exception;
         }
 
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         if ($impersonation->getExpireAt() <= $now) {
-            throw new CustomUserMessageAuthenticationException('Impersonation token has expired.');
+            $exception = new ImpersonationAuthenticationException('Impersonation token has expired.');
+            $exception->setUser($impersonation->getUser());
+            throw $exception;
         }
     }
 }

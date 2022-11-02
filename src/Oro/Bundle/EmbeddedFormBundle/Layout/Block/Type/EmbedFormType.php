@@ -8,6 +8,9 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+/**
+ * Embed form block type.
+ */
 class EmbedFormType extends AbstractType
 {
     const NAME = 'embed_form';
@@ -70,6 +73,7 @@ class EmbedFormType extends AbstractType
             [
                 'form',
                 'form_name',
+                'render_rest',
                 'groups',
                 'form_prefix',
                 'form_field_prefix',
@@ -89,7 +93,6 @@ class EmbedFormType extends AbstractType
             [
                 'form',
                 'form_name',
-                'render_rest',
                 'additional_block_prefixes',
                 'instance_name',
             ]

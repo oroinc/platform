@@ -4,10 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
+use Oro\Bundle\ScopeBundle\Tests\Functional\DataFixtures\LoadScopeData;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
@@ -136,6 +136,36 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
+        'test_menu_item1_global' => [
+            'key' => 'test_menu_item1',
+            'parent_key' => null,
+            'default_title' => 'test_menu_item1',
+            'titles' => [],
+            'default_description' => 'test_menu_item1.description',
+            'descriptions' => [],
+            'uri' => '#test_menu_item1_upd',
+            'menu' => 'test_menu',
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
+            'active' => false,
+            'priority' => 10,
+            'divider' => false,
+            'custom' => true,
+        ],
+        'test_menu_item1_user' => [
+            'key' => 'test_menu_item1',
+            'parent_key' => null,
+            'default_title' => 'test_menu_item1',
+            'titles' => [],
+            'default_description' => 'test_menu_item1.description',
+            'descriptions' => [],
+            'uri' => '#test_menu_item1',
+            'menu' => 'test_menu',
+            'scope' => LoadScopeUserData::SIMPLE_USER_SCOPE,
+            'active' => false,
+            'priority' => 10,
+            'divider' => false,
+            'custom' => true,
+        ]
     ];
 
     /**

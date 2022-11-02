@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 class UpdateAuditDataWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
@@ -18,8 +18,6 @@ class UpdateAuditDataWithOrganization extends UpdateWithOrganization implements 
 
     /**
      * Update data audit with organization
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

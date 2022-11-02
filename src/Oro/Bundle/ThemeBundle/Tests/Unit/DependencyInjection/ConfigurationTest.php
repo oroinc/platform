@@ -1,9 +1,9 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
@@ -13,13 +13,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $configuration = new Configuration();
         $builder = $configuration->getConfigTreeBuilder();
 
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
+        $this->assertInstanceOf(TreeBuilder::class, $builder);
     }
 
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($configs, $expected)
+    public function testProcessConfiguration(array $configs, array $expected)
     {
         $configuration = new Configuration();
         $processor = new Processor();
@@ -35,7 +35,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'themes' => [
                     'foo-bar' => [
                         'label' => 'Foo Theme',
-                        'styles' => 'style.css',
                         'logo' => 'logo.png',
                         'icon' => 'favicon.ico',
                         'screenshot' => 'screenshot.png'
@@ -51,7 +50,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'empty' => [
@@ -65,7 +64,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'foo' => [
                                 'label' => 'Foo Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -78,7 +76,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'themes' => [
                         'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
@@ -93,7 +90,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'foo' => [
                                 'label' => 'Foo Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -105,7 +101,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'bar' => [
                                 'label' => 'Bar Theme',
-                                'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
@@ -116,14 +111,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'themes' => [
                             'bar' => [
                                 'label' => 'Bar Extended Theme',
-                                'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
                             ],
                             'foo-bar_bar' => [
                                 'label' => 'Bar Extended Theme',
-                                'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
@@ -136,21 +129,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'themes' => [
                         'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
                         ],
                         'bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => ['style.css', 'style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
                         ],
                         'foo-bar_bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => ['style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'

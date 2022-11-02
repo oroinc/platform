@@ -2,25 +2,33 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
-use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\UIBundle\Route\Router;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Controller for Integrations config page
+ *
  * @Route("/integration")
  */
-class IntegrationController extends Controller
+class IntegrationController extends AbstractController
 {
+    use RequestHandlerTrait;
+
     /**
      * @Route("/", name="oro_integration_index")
      * @Acl(
@@ -34,7 +42,7 @@ class IntegrationController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_integration.entity.class')
+            'entity_class' => Integration::class
         ];
     }
 
@@ -46,11 +54,11 @@ class IntegrationController extends Controller
      *      permission="CREATE",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template("OroIntegrationBundle:Integration:update.html.twig")
+     * @Template("@OroIntegration/Integration/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Integration());
+        return $this->update(new Integration(), $request);
     }
 
     /**
@@ -63,20 +71,21 @@ class IntegrationController extends Controller
      * )
      * @Template()
      */
-    public function updateAction(Integration $integration)
+    public function updateAction(Request $request, Integration $integration)
     {
-        return $this->update($integration);
+        return $this->update($integration, $request);
     }
 
     /**
-     * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
+     * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule", methods={"POST"})
      * @AclAncestor("oro_integration_update")
+     * @CsrfProtection()
      */
     public function scheduleAction(Integration $integration, Request $request)
     {
         if ($integration->isEnabled()) {
             try {
-                $this->get('oro_integration.genuine_sync_scheduler')->schedule(
+                $this->get(GenuineSyncScheduler::class)->schedule(
                     $integration->getId(),
                     null,
                     ['force' => (bool)$request->get('force', false)]
@@ -87,16 +96,16 @@ class IntegrationController extends Controller
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
 
-                $status = Codes::HTTP_OK;
+                $status = Response::HTTP_OK;
                 $response = [
                     'successful' => true,
-                    'message'    => $this->get('translator')->trans(
+                    'message'    => $this->get(TranslatorInterface::class)->trans(
                         'oro.integration.scheduled',
                         ['%url%' => $checkJobProgressUrl]
                     )
                 ];
             } catch (\Exception $e) {
-                $this->get('logger')->error(
+                $this->get(LoggerInterface::class)->error(
                     sprintf(
                         'Failed to schedule integration synchronization. Integration Id: %s.',
                         $integration->getId()
@@ -104,17 +113,17 @@ class IntegrationController extends Controller
                     ['e' => $e]
                 );
 
-                $status = Codes::HTTP_BAD_REQUEST;
+                $status = Response::HTTP_BAD_REQUEST;
                 $response = [
                     'successful' => false,
-                    'message'    => $this->get('translator')->trans('oro.integration.sync_error')
+                    'message'    => $this->getTranslator()->trans('oro.integration.sync_error')
                 ];
             }
         } else {
-            $status = Codes::HTTP_OK;
+            $status = Response::HTTP_OK;
             $response = [
                 'successful' => false,
-                'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated')
+                'message'    => $this->getTranslator()->trans('oro.integration.sync_error_integration_deactivated')
             ];
         }
 
@@ -126,40 +135,46 @@ class IntegrationController extends Controller
      *
      * @return array
      */
-    protected function update(Integration $integration)
+    protected function update(Integration $integration, Request $request)
     {
-        if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
-            $this->get('session')->getFlashBag()->add(
+        $formHandler = $this->get(ChannelHandler::class);
+
+        if ($formHandler->process($integration)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
+                $this->getTranslator()->trans('oro.integration.controller.integration.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($integration);
+            return $this->get(Router::class)->redirect($integration);
         }
-        $form = $this->getForm();
-        
+
+        $form = $formHandler->getForm();
+
         return [
             'entity' => $integration,
             'form'   => $form->createView()
         ];
     }
 
-    /**
-     * Returns form instance
-     *
-     * @return FormInterface
-     */
-    protected function getForm()
+    private function getTranslator(): TranslatorInterface
     {
-        $isUpdateOnly = $this->get('request_stack')->getCurrentRequest()->get(ChannelHandler::UPDATE_MARKER, false);
+        return $this->get(TranslatorInterface::class);
+    }
 
-        $form = $this->get('oro_integration.form.channel');
-        // take different form due to JS validation should be shown even in case when it was not validated on backend
-        if ($isUpdateOnly) {
-            $form = $this->get('form.factory')
-                ->createNamed('oro_integration_channel_form', ChannelType::class, $form->getData());
-        }
-
-        return $form;
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                GenuineSyncScheduler::class,
+                LoggerInterface::class,
+                ChannelHandler::class,
+                Router::class,
+            ]
+        );
     }
 }

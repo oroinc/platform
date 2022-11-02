@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * The migration query that refreshes the extend entity configs.
+ */
 class RefreshExtendConfigMigrationQuery implements MigrationQuery
 {
     /** @var CommandExecutor */
@@ -48,7 +51,7 @@ class RefreshExtendConfigMigrationQuery implements MigrationQuery
         if (empty($this->initialEntityConfigState)) {
             $this->commandExecutor->runCommand(
                 'oro:entity-extend:update-config',
-                [],
+                ['--force' => true],
                 $logger
             );
         } else {
@@ -56,7 +59,7 @@ class RefreshExtendConfigMigrationQuery implements MigrationQuery
             try {
                 $this->commandExecutor->runCommand(
                     'oro:entity-extend:update-config',
-                    ['--initial-state-path' => $this->initialEntityConfigStatePath],
+                    ['--initial-state-path' => $this->initialEntityConfigStatePath, '--force' => true],
                     $logger
                 );
                 $this->removeInitialEntityConfigStateFile();

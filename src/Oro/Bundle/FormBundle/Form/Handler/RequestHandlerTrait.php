@@ -15,12 +15,8 @@ trait RequestHandlerTrait
 {
     /**
      * Submits data from post or put Request to a given form.
-     *
-     * @param FormInterface $form
-     * @param Request $request
-     * @param bool $clearMissing
      */
-    private function submitPostPutRequest(FormInterface $form, Request $request, bool $clearMissing = true)
+    protected function submitPostPutRequest(FormInterface $form, Request $request, bool $clearMissing = true)
     {
         $requestData = $form->getName()
             ? $request->request->get($form->getName(), [])

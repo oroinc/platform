@@ -2,47 +2,55 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Doctrine\Inflector\Inflector;
+use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
-class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
+/**
+ * Provides Twig functions to work with layout blocks:
+ *   - block_widget
+ *   - block_label
+ *   - block_row
+ *   - parent_block_widget
+ *   - layout_attr_defaults
+ *   - set_class_prefix_to_form
+ *   - convert_value_to_string
+ *   - highlight_string
+ *   - clone_form_view_with_unique_id
+ *
+ * Provides Twig filters for string manipulations:
+ *   - block_text - normalizes and translates (if needed) labels in the given value.
+ *   - merge_context - merges additional context to BlockView.
+ *   - pluralize
+ *
+ * Provides Twig tests for string content identification:
+ *   - expression
+ *   - string
+ *
+ * Provides a Twig tag for setting block theme:
+ *   - block_theme
+ */
+class LayoutExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
+    private ContainerInterface $container;
+    private Inflector $inflector;
+    private ?TextHelper $textHelper = null;
 
-    /**
-     * This property is public so that it can be accessed directly from compiled
-     * templates without having to call a getter, which slightly decreases performance.
-     *
-     * @var TwigRendererInterface
-     */
-    public $renderer;
-
-    /** @var TextHelper */
-    private $textHelper;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Inflector $inflector)
     {
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        $this->renderer = $this->container->get('oro_layout.twig.renderer');
-        $this->renderer->setEnvironment($environment);
+        $this->inflector = $inflector;
     }
 
     /**
@@ -51,7 +59,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getTokenParsers()
     {
         return [
-            new BlockThemeTokenParser()
+            new BlockThemeTokenParser(),
         ];
     }
 
@@ -61,38 +69,47 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_widget',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_label',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'block_row',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'parent_block_widget',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'layout_attr_defaults',
                 [$this, 'defaultAttributes']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'set_class_prefix_to_form',
                 [$this, 'setClassPrefixToForm']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'convert_value_to_string',
                 [$this, 'convertValueToString']
-            )
+            ),
+            new TwigFunction(
+                'highlight_string',
+                [$this, 'highlightString'],
+                ['is_safe' => ['html']]
+            ),
+            new TwigFunction(
+                'clone_form_view_with_unique_id',
+                [$this, 'cloneFormViewWithUniqueId']
+            ),
         ];
     }
 
@@ -103,9 +120,21 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     {
         return [
             // Normalizes and translates (if needed) labels in the given value.
-            new \Twig_SimpleFilter('block_text', [$this, 'processText']),
+            new TwigFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
-            new \Twig_SimpleFilter('merge_context', [$this, 'mergeContext']),
+            new TwigFilter('merge_context', [$this, 'mergeContext']),
+            new TwigFilter('pluralize', [$this->inflector, 'pluralize']),
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTests()
+    {
+        return [
+            new TwigTest('expression', [$this, 'isExpression']),
+            new TwigTest('string', [$this, 'isString']),
         ];
     }
 
@@ -126,7 +155,7 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
 
     /**
      * @param BlockView $view
-     * @param array $context
+     * @param array     $context
      * @return BlockView
      */
     public function mergeContext(BlockView $view, array $context)
@@ -148,17 +177,17 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function defaultAttributes(array $attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
-            if (strpos($key, '~') === 0) {
+            if (str_starts_with($key, '~')) {
                 $key = substr($key, 1);
-                if (array_key_exists($key, $attr)) {
-                    if (is_array($value)) {
+                if (\array_key_exists($key, $attr)) {
+                    if (\is_array($value)) {
                         $attr[$key] = ArrayUtil::arrayMergeRecursiveDistinct($value, (array)$attr[$key]);
                     } else {
                         $attr[$key] .= $value;
                     }
                 }
             }
-            if (!array_key_exists($key, $attr)) {
+            if (!\array_key_exists($key, $attr)) {
                 $attr[$key] = $value;
             }
         }
@@ -166,10 +195,6 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
         return $attr;
     }
 
-    /**
-     * @param FormView $formView
-     * @param $classPrefix
-     */
     public function setClassPrefixToForm(FormView $formView, $classPrefix)
     {
         $formView->vars['class_prefix'] = $classPrefix;
@@ -186,27 +211,73 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'layout';
-    }
-
-    /**
      * @param mixed $value
      * @return string
      */
     public function convertValueToString($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $value = stripslashes(json_encode($value));
-        } elseif (is_object($value)) {
-            $value = get_class($value);
-        } elseif (!is_string($value)) {
+        } elseif (\is_object($value)) {
+            $value = \get_class($value);
+        } elseif (!\is_string($value)) {
             $value = var_export($value, true);
         }
 
         return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function highlightString($value)
+    {
+        $highlightString = @highlight_string('<?php '.$value, true);
+        $highlightString = str_replace('&lt;?php&nbsp;', '', $highlightString);
+
+        return $highlightString;
+    }
+
+    public function cloneFormViewWithUniqueId(FormView $form, string $uniqueId, FormView $parent = null): FormView
+    {
+        $newForm = new FormView($parent);
+        $newForm->vars = $form->vars;
+        $newForm->vars['id'] = sprintf('%s-%s', $form->vars['id'], $uniqueId);
+        $newForm->vars['form'] = $newForm;
+
+        foreach ($form->children as $name => $child) {
+            $newForm->children[$name] = $this->cloneFormViewWithUniqueId($child, $uniqueId, $newForm);
+        }
+
+        return $newForm;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isExpression($value)
+    {
+        return $value instanceof Expression;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isString($value)
+    {
+        return \is_string($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_layout.text.helper' => TextHelper::class,
+        ];
     }
 }

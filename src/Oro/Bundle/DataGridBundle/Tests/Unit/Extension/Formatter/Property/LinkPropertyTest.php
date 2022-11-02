@@ -5,37 +5,29 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
+use Oro\Bundle\UIBundle\Twig\Environment;
+use Symfony\Component\Routing\RouterInterface;
 
 class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LinkProperty
-     */
-    protected $property;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $router;
+    /** @var LinkProperty */
+    private $property;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
-        $this->twig = $this->createMock('Oro\Bundle\UIBundle\Twig\Environment');
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->twig = $this->createMock(Environment::class);
 
         $this->property = new LinkProperty($this->router, $this->twig);
     }
 
     /**
-     * @param array $params
-     * @param array $data
-     * @param array $expected
-     *
      * @dataProvider valueDataProvider
      */
     public function testGetRawValue(array $params, array $data, array $expected)
@@ -44,33 +36,20 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 
         $record = new ResultRecord($data);
 
-        $template = $this->createMock('Twig_TemplateInterface');
-
-        $this->twig
-            ->expects($this->once())
-            ->method('loadTemplate')
-            ->with($this->equalTo(LinkProperty::TEMPLATE))
-            ->will($this->returnValue($template));
-
         if (!empty($data[LinkProperty::ROUTE_KEY])) {
-            $this->router
-                ->expects($this->once())
+            $this->router->expects($this->once())
                 ->method('generate')
-                ->will($this->returnValue($data[LinkProperty::ROUTE_KEY]));
+                ->willReturn($data[LinkProperty::ROUTE_KEY]);
         }
 
-        $template
-            ->expects($this->once())
+        $this->twig->expects($this->once())
             ->method('render')
-            ->with($this->equalTo($expected));
+            ->with(LinkProperty::TEMPLATE, $expected);
 
         $this->property->getRawValue($record);
     }
 
-    /**
-     * @return array
-     */
-    public function valueDataProvider()
+    public function valueDataProvider(): array
     {
         return [
             [

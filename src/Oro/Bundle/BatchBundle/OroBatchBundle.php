@@ -2,29 +2,21 @@
 
 namespace Oro\Bundle\BatchBundle;
 
-use Oro\Bundle\BatchBundle\DependencyInjection\Compiler\DebugBatchPass;
+use Oro\Bundle\BatchBundle\DependencyInjection\Compiler\PushBatchLogHandlerPass;
+use Oro\Bundle\BatchBundle\DependencyInjection\Compiler\RegisterJobsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Batch Bundle
- *
- */
 class OroBatchBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function build(ContainerBuilder $container): void
     {
-        return 'AkeneoBatchBundle';
-    }
+        parent::build($container);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        $container->addCompilerPass(new DebugBatchPass());
+        $container->addCompilerPass(new PushBatchLogHandlerPass());
+        $container->addCompilerPass(new RegisterJobsPass());
     }
 }

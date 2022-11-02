@@ -80,7 +80,7 @@
         <span>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</span>
     </div>
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
@@ -254,7 +254,7 @@
             }
         </style>
 
-        <script type="text/javascript">//<![CDATA[
+        <script>//<![CDATA[
 
         function sortTable(header, column, targetId) {
             "use strict";

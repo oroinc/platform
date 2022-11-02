@@ -8,30 +8,36 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
-class AclPrivilegeEntityFilterTest extends AbstractAclPrivilegeFilterTestCase
+class AclPrivilegeEntityFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return \Generator
-     */
-    public function isSupportedAclPrivilegeProvider()
-    {
-        yield 'supported' => [
-            'aclPrivilege' => (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('entity:test')),
-            'isSupported' => true
-        ];
+    /** @var AclPrivilegeEntityFilter */
+    private $filter;
 
-        yield 'not supported' => [
-            'aclPrivilege' => (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('config:test')),
-            'isSupported' => false
-        ];
+    protected function setUp(): void
+    {
+        $this->filter = new AclPrivilegeEntityFilter();
     }
 
     /**
-     * {@inheritdoc}
+     * @dataProvider isSupportedAclPrivilegeProvider
      */
-    protected function createFilter()
+    public function testIsSupported(AclPrivilege $aclPrivilege, bool $isSupported)
     {
-        return new AclPrivilegeEntityFilter();
+        $this->assertSame($isSupported, $this->filter->isSupported($aclPrivilege));
+    }
+
+    public function isSupportedAclPrivilegeProvider(): array
+    {
+        return [
+            'supported' => [
+                'aclPrivilege' => (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('entity:test')),
+                'isSupported' => true
+            ],
+            'not supported' => [
+                'aclPrivilege' => (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('config:test')),
+                'isSupported' => false
+            ]
+        ];
     }
 
     public function testFilter()
@@ -43,17 +49,14 @@ class AclPrivilegeEntityFilterTest extends AbstractAclPrivilegeFilterTestCase
         $aclPrivilege1->addPermission(new AclPermission('perm2'));
         $aclPrivilege2->addPermission(new AclPermission('perm2'));
 
-        /** @var ConfigurablePermission|\PHPUnit\Framework\MockObject\MockObject $configurablePermission */
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
         $configurablePermission->expects($this->any())
             ->method('isEntityPermissionConfigurable')
-            ->willReturnMap(
-                [
-                    ['test1','perm1', false],
-                    ['test1','perm2', true],
-                    ['test2','perm2', false]
-                ]
-            );
+            ->willReturnMap([
+                ['test1','perm1', false],
+                ['test1','perm2', true],
+                ['test2','perm2', false]
+            ]);
 
         $this->assertTrue($this->filter->filter($aclPrivilege1, $configurablePermission));
         $this->assertCount(1, $aclPrivilege1->getPermissions());

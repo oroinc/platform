@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
@@ -14,31 +15,26 @@ use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupTypeTest extends BlockTypeTestCase
 {
+    use EntityTrait;
+
     /** @var AttributeRenderRegistry */
-    protected $attributeRenderRegistry;
+    private $attributeRenderRegistry;
 
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject $attributeManager */
-    protected $attributeManager;
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeManager;
 
-    /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject $blockTypeMapper */
-    protected $blockTypeMapper;
+    /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $blockTypeMapper;
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeRenderRegistry = new AttributeRenderRegistry();
-
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->setMethods(['getAttributesByGroup'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->blockTypeMapper = $this->createMock(AttributeBlockTypeMapperInterface::class);
 
         $attributeGroupType = new AttributeGroupType(
@@ -66,20 +62,48 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
 
     public function testGetBlockView()
     {
-        $firstAttribute = new FieldConfigModel('first_attribute', 'string');
-        $firstAttribute->setEntity(new EntityConfigModel('firstAttributeClassName'));
-        $secondAttribute = new FieldConfigModel('second_attribute', 'integer');
-        $secondAttribute->setEntity(new EntityConfigModel('secondAttributeClassName'));
-        $thirdAttribute = new FieldConfigModel('third_attribute', 'integer');
-        $thirdAttribute->setEntity(new EntityConfigModel('thirdAttributeClassName'));
+        $firstAttribute = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 1,
+                'fieldName' => 'first_attribute',
+                'type' => 'string',
+                'entity' => new EntityConfigModel('firstAttributeClassName'),
+            ]
+        );
+        $secondAttribute = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 2,
+                'fieldName' => 'second_attribute',
+                'type' => 'string',
+                'entity' => new EntityConfigModel('secondAttributeClassName'),
+            ]
+        );
+        $thirdAttribute = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 3,
+                'fieldName' => 'third_attribute',
+                'type' => 'string',
+                'entity' => new EntityConfigModel('thirdAttributeClassName'),
+            ]
+        );
 
-        $attributeGroup = new AttributeGroup();
-        $attributeGroup->setCode('group_code');
+        $attributeGroup = (new AttributeGroup())
+            ->setCode('group_code')
+            ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId($firstAttribute->getId()))
+            ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId($secondAttribute->getId()))
+            ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId($thirdAttribute->getId()));
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByGroup')
             ->with($attributeGroup)
-            ->willReturn([$firstAttribute, $secondAttribute, $thirdAttribute]);
+            // Attributes will be indexed by id
+            ->willReturn([
+                $thirdAttribute->getId() => $thirdAttribute,
+                $secondAttribute->getId() => $secondAttribute,
+                $firstAttribute->getId() => $firstAttribute]);
 
         $this->blockTypeMapper->expects($this->any())
             ->method('getBlockType')
@@ -107,6 +131,12 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
             ]
         );
         $this->assertCount(2, $view->children);
+
+        $this->assertSame(
+            ['attribute_group_id_attribute_type_first_attribute', 'attribute_group_id_attribute_type_second_attribute'],
+            array_keys($view->children),
+            'Attributes order is not the same as order in attribute group'
+        );
 
         $firstAttributeView = $view->children['attribute_group_id_attribute_type_first_attribute'];
         $this->assertEquals('attribute_type', $firstAttributeView->vars['block_type']);
@@ -155,15 +185,26 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewNotExcludeFromRest()
     {
-        $attribute = new FieldConfigModel('attribute', 'string');
-        $attribute->setEntity(new EntityConfigModel('attributeClassName'));
+        $attribute = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 1,
+                'fieldName' => 'attribute',
+                'type' => 'string',
+                'entity' => new EntityConfigModel('attributeClassName'),
+            ]
+        );
+
         $attributeGroup = new AttributeGroup();
         $attributeGroup->setCode('group_code');
+        $attributeGroup->addAttributeRelation(
+            (new AttributeGroupRelation())->setEntityConfigFieldId($attribute->getId())
+        );
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByGroup')
             ->with($attributeGroup)
-            ->willReturn([$attribute]);
+            ->willReturn([$attribute->getId() => $attribute]);
 
         $this->blockTypeMapper->expects($this->any())
             ->method('getBlockType')

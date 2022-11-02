@@ -1,0 +1,9 @@
+oro_behat_extension:
+  suites:
+    OroLoggerBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+      paths:
+        - '@OroLoggerBundle/Tests/Behat/Features'

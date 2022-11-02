@@ -1,6 +1,7 @@
 services:
     oro_workflow.datagrid.action_permission_provider:
         class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+        public: true
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_workflow.configuration.checker'
@@ -15,11 +16,13 @@ services:
 
     oro_workflow.datagrid.process_definition_entity_name_provider:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
+        public: true
         calls:
             - [setEntityName, ["OroWorkflowBundle:ProcessDefinition"]]
 
     oro_workflow.datagrid.workflow_definition_entity_name_provider:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
+        public: true
         calls:
             - [setEntityName, ["OroWorkflowBundle:WorkflowDefinition"]]
 
@@ -30,6 +33,7 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_entity_config.provider.workflow'
             - '@oro_workflow.registry.workflow_manager'
+            - '@oro_filter.provider.state.filters'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore, priority: 255 }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
@@ -73,7 +77,7 @@ services:
         arguments:
             - '@translator'
             - '@oro_security.acl.permission_manager'
-            - '@oro_user.form.handler.abstract.acl_role='
+            - '@oro_user.form.handler.abstract.acl_role'
             - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_entity_config.config_manager'
         tags:

@@ -3,65 +3,57 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileNormalizer */
-    protected $normalizer;
+    use EntityTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $attachmentManager;
+    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $validator;
+    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $attachmentEntityConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private FileNormalizer $normalizer;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->normalizer = new FileNormalizer();
-
-        $router = $this->createMock(Router::class);
-        $associationManager = $this->createMock(AssociationManager::class);
-        $this->attachmentManager = $this->getMockBuilder(AttachmentManager::class)
-            ->setConstructorArgs([$router, [], $associationManager, true, true])
-            ->setMethods(['getAttachment'])
-            ->getMock();
+        $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->fileManager = $this->createMock(FileManager::class);
-        $this->validator = $this->createMock(ConfigFileValidator::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
 
-        $this->normalizer->setAttachmentManager($this->attachmentManager);
-        $this->normalizer->setFileManager($this->fileManager);
-        $this->normalizer->setValidator($this->validator);
-        $this->normalizer->setLogger($this->logger);
+        $this->normalizer = new FileNormalizer(
+            $this->attachmentManager,
+            $this->fileManager,
+            $this->attachmentEntityConfigProvider
+        );
     }
 
     /**
      * @dataProvider supportsDenormalizationData
      */
-    public function testSupportsDenormalization($type, $isSupport)
+    public function testSupportsDenormalization($type, $isSupport): void
     {
-        $this->assertEquals($isSupport, $this->normalizer->supportsDenormalization([], $type));
+        self::assertEquals($isSupport, $this->normalizer->supportsDenormalization([], $type));
     }
 
-    public function supportsDenormalizationData()
+    public function supportsDenormalizationData(): array
     {
         return [
             'supports' => [File::class, true],
@@ -72,124 +64,190 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationData
      */
-    public function testSupportsNormalization($data, $isSupport)
+    public function testSupportsNormalization($data, $isSupport): void
     {
-        $this->assertEquals($isSupport, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($isSupport, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationData()
+    public function supportsNormalizationData(): array
     {
         return [
             'supports' => [new File(), true],
             'wrongObject' => [new \stdClass(), false],
-            'notObject' => ['test', false]
+            'notObject' => ['test', false],
         ];
     }
 
-    public function testDenormalizeValidFile()
+    public function testNormalize(): void
     {
-        $data = 'http://example.com/test.txt';
-        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
-        $violations = new ConstraintViolationList();
+        $sampleUrl = '/sample/url';
+        $sampleUuid = 'sample-uuid';
 
-        $entity = new File();
-        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
-        $entity->setFile($file);
+        $file = $this->getEntity(File::class, ['id' => 1, 'uuid' => $sampleUuid]);
+        $this->attachmentManager->expects(self::once())
+            ->method('getFileUrl')
+            ->with($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD, UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn($sampleUrl);
 
-        $this->fileManager->expects($this->any())
-            ->method('createFileEntity')
-            ->with($data)
-            ->willReturn($entity);
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
-            ->will($this->returnValue($violations));
-        $this->logger->expects($this->never())
-            ->method('error');
-
-        $result = $this->normalizer->denormalize($data, '', '', $context);
-        $this->assertSame($entity, $result);
-    }
-
-    public function testDenormalizeNotSupportedFileProtocol()
-    {
-        $data = 'http://example.com/test.txt';
-        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
-
-        $this->fileManager->expects($this->once())
-            ->method('createFileEntity')
-            ->with($data)
-            ->willThrowException(new ProtocolNotSupportedException($data));
-        $this->validator->expects($this->never())
-            ->method('validate');
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with('The protocol for the file "http://example.com/test.txt" is not supported.');
-
-        $result = $this->normalizer->denormalize($data, '', '', $context);
-        $this->assertNull($result);
-    }
-
-    public function testDenormalizeNotExistingFile()
-    {
-        $data = 'http://example.com/test.txt';
-        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
-
-        $this->fileManager->expects($this->once())
-            ->method('createFileEntity')
-            ->with($data)
-            ->willThrowException(new FileNotFoundException('File does not exist.', 0, null, $data));
-        $this->validator->expects($this->never())
-            ->method('validate');
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with('File does not exist.');
-
-        $result = $this->normalizer->denormalize($data, '', '', $context);
-        $this->assertNull($result);
-    }
-
-    public function testDenormalizeNotValidFile()
-    {
-        $data = 'http://example.com/test.txt';
-        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
-        $violations = new ConstraintViolationList([
-            new ConstraintViolation('Some constraint violation', '', [], '', '', '')
-        ]);
-
-        $entity = new File();
-        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
-        $entity->setFile($file);
-
-        $this->fileManager->expects($this->any())
-            ->method('createFileEntity')
-            ->with($data)
-            ->willReturn($entity);
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
-            ->will($this->returnValue($violations));
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with($this->stringStartsWith('Some constraint violation.'));
-
-        $result = $this->normalizer->denormalize($data, '', '', $context);
-        $this->assertNull($result);
-    }
-
-    public function testNormalize()
-    {
-        $object = new File();
-        $this->attachmentManager->expects($this->once())->method('getAttachment')
-            ->with('testEntity', 1, 'testField', $object, 'download', true);
-        $this->normalizer->normalize(
-            $object,
-            null,
+        self::assertEquals(
             [
-                'entityName' => 'testEntity',
-                'entityId' => 1,
-                'fieldName' => 'testField'
+                'uuid' => $sampleUuid,
+                'uri' => $sampleUrl,
+            ],
+            $this->normalizer->normalize($file)
+        );
+    }
+
+    public function testNormalizeWhenNoFileId(): void
+    {
+        $sampleUuid = 'sample-uuid';
+
+        $file = $this->getEntity(File::class, ['uuid' => $sampleUuid]);
+        $this->attachmentManager->expects(self::never())
+            ->method(self::anything());
+
+        self::assertEquals(
+            [
+                'uuid' => $sampleUuid,
+                'uri' => '',
+            ],
+            $this->normalizer->normalize($file)
+        );
+    }
+
+    public function testDenormalizeWhenNoUri(): void
+    {
+        $sampleUuid = 'sample-uuid';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+
+        self::assertEquals(
+            $expectedFile,
+            $this->normalizer->denormalize(['uuid' => $sampleUuid], File::class)
+        );
+    }
+
+    public function testDenormalizeWhenNoUuid(): void
+    {
+        $sampleUri = __DIR__ . '/FileNormalizerTest.php';
+        $expectedFile = new File();
+        $expectedFile->setFile(new SymfonyFile($sampleUri, false));
+
+        $this->fileManager->expects(self::never())
+            ->method('getReadonlyFilePath');
+
+        $file = $this->normalizer->denormalize(['uri' => $sampleUri], File::class);
+        self::assertEquals($expectedFile->getFile(), $expectedFile->getFile());
+        self::assertNotEmpty($file->getUuid());
+    }
+
+    public function testDenormalizeWithFullUrl(): void
+    {
+        $sampleUuid = 'sample-uuid';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new SymfonyFile('http://example.org/sample/url', false));
+
+        $this->fileManager->expects(self::never())
+            ->method('getReadonlyFilePath');
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => 'http://example.org/sample/url', 'uuid' => $sampleUuid],
+            File::class
+        );
+
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+    }
+
+    public function testDenormalizeWithFullLocalPath(): void
+    {
+        $sampleUuid = 'sample-uuid';
+        $path = __FILE__;
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new SymfonyFile($path, false));
+
+        $this->fileManager->expects(self::never())
+            ->method('getReadonlyFilePath');
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $path, 'uuid' => $sampleUuid],
+            File::class
+        );
+
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+    }
+
+    public function testDenormalizeWithRelativePath(): void
+    {
+        $sampleUuid = 'sample-uuid';
+        $path = 'some_file.php';
+        $expectedFilePath = 'gaufrette-readonly://import_files/some_file.php';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new SymfonyFile($expectedFilePath, false));
+
+        $this->fileManager->expects(self::once())
+            ->method('getReadonlyFilePath')
+            ->with($path)
+            ->willReturn($expectedFilePath);
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $path, 'uuid' => $sampleUuid],
+            File::class
+        );
+
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+    }
+
+    public function testDenormalizeWithExternalUrl(): void
+    {
+        $sampleUuid = 'sample-uuid';
+        $url = 'http://example.org/sample/url/filename.pdf';
+        $entityClassName = \stdClass::class;
+        $fieldName = 'field_name';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new ExternalFile($url));
+
+        $entityFieldConfig = new Config(
+            new FieldConfigId('extend', $entityClassName, $fieldName),
+            [
+                'is_stored_externally' => true,
             ]
         );
+
+        $this->attachmentEntityConfigProvider->expects(self::once())
+            ->method('getFieldConfig')
+            ->with($entityClassName, $fieldName)
+            ->willReturn($entityFieldConfig);
+
+        $this->fileManager->expects(self::never())
+            ->method('getReadonlyFilePath');
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $url, 'uuid' => $sampleUuid],
+            File::class,
+            null,
+            [
+                'entityName' => $entityClassName,
+                'originalFieldName' => $fieldName,
+            ]
+        );
+
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }
 }

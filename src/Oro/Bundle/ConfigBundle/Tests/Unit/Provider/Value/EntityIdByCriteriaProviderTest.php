@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider\Value\Entity;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider\Value;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Entity\Config;
@@ -9,27 +9,19 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityIdByCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $entityClass;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $defaultEntityCriteria;
 
-    /**
-     * @var EntityIdByCriteriaProvider
-     */
+    /** @var EntityIdByCriteriaProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityClass = 'OroBundle:Entity';
@@ -51,39 +43,39 @@ class EntityIdByCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 
         $repository = $this->createMock(EntityRepository::class);
 
-        $this->doctrineHelper->expects(static::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with($this->entityClass)
             ->willReturn($repository);
 
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with($this->defaultEntityCriteria)
             ->willReturn($entity);
 
         $id = 2;
 
-        $entity->expects(static::once())
+        $entity->expects(self::once())
             ->method('getId')
             ->willReturn($id);
 
-        static::assertEquals($id, $this->provider->getValue());
+        self::assertEquals($id, $this->provider->getValue());
     }
 
     public function testGetValueNoEntity()
     {
         $repository = $this->createMock(EntityRepository::class);
 
-        $this->doctrineHelper->expects(static::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with($this->entityClass)
             ->willReturn($repository);
 
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with($this->defaultEntityCriteria)
             ->willReturn(null);
 
-        static::assertNull($this->provider->getValue());
+        self::assertNull($this->provider->getValue());
     }
 }

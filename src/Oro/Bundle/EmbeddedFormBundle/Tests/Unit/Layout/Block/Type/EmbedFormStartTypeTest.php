@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormView;
 
 /**
@@ -22,28 +24,28 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockView()
     {
-        $formName       = 'test_form';
+        $formName = 'test_form';
         $formActionPath = 'test_form_action_path';
-        $formMethod     = 'GET';
-        $formEnctype    = 'test_enctype';
-        $formView       = new FormView();
+        $formMethod = 'GET';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue(FormAction::createByPath($formActionPath)));
+            ->willReturn(FormAction::createByPath($formActionPath));
         $formAccessor->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
         $formAccessor->expects($this->once())
             ->method('getEnctype')
-            ->will($this->returnValue($formEnctype));
+            ->willReturn($formEnctype);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -59,29 +61,29 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewWithRoute()
     {
-        $formName              = 'test_form';
-        $formActionRoute       = 'test_form_action_route';
+        $formName = 'test_form';
+        $formActionRoute = 'test_form_action_route';
         $formActionRouteParams = ['foo' => 'bar'];
-        $formMethod            = 'POST';
-        $formEnctype           = 'test_enctype';
-        $formView              = new FormView();
+        $formMethod = 'POST';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue(FormAction::createByRoute($formActionRoute, $formActionRouteParams)));
+            ->willReturn(FormAction::createByRoute($formActionRoute, $formActionRouteParams));
         $formAccessor->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
         $formAccessor->expects($this->once())
             ->method('getEnctype')
-            ->will($this->returnValue($formEnctype));
+            ->willReturn($formEnctype);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -97,28 +99,28 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewWithRouteWithoutParams()
     {
-        $formName        = 'test_form';
+        $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
-        $formMethod      = 'POST';
-        $formEnctype     = 'test_enctype';
-        $formView        = new FormView();
+        $formMethod = 'POST';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue(FormAction::createByRoute($formActionRoute)));
+            ->willReturn(FormAction::createByRoute($formActionRoute));
         $formAccessor->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
         $formAccessor->expects($this->once())
             ->method('getEnctype')
-            ->will($this->returnValue($formEnctype));
+            ->willReturn($formEnctype);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -137,22 +139,22 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formName = 'test_form';
         $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue(FormAction::createEmpty()));
+            ->willReturn(FormAction::createEmpty());
         $formAccessor->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $formAccessor->expects($this->once())
             ->method('getEnctype')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -168,19 +170,19 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewWithOverrideOptions()
     {
-        $formName       = 'test_form';
+        $formName = 'test_form';
         $formActionPath = 'test_form_action_path';
-        $formMethod     = 'get';
-        $formEnctype    = 'test_enctype';
-        $formView       = new FormView();
+        $formMethod = 'get';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->never())
             ->method('getAction');
         $formAccessor->expects($this->never())
@@ -210,20 +212,20 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewWithOverrideOptionsRoute()
     {
-        $formName              = 'test_form';
-        $formActionRoute       = 'test_form_action_route';
+        $formName = 'test_form';
+        $formActionRoute = 'test_form_action_route';
         $formActionRouteParams = ['foo' => 'bar'];
-        $formMethod            = 'get';
-        $formEnctype           = 'test_enctype';
-        $formView              = new FormView();
+        $formMethod = 'get';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->never())
             ->method('getAction');
         $formAccessor->expects($this->never())
@@ -254,19 +256,19 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewWithOverrideOptionsRouteWithoutParams()
     {
-        $formName        = 'test_form';
+        $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
-        $formMethod      = 'get';
-        $formEnctype     = 'test_enctype';
-        $formView        = new FormView();
+        $formMethod = 'get';
+        $formEnctype = 'test_enctype';
+        $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $formAccessor->expects($this->never())
             ->method('getAction');
         $formAccessor->expects($this->never())
@@ -294,26 +296,25 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: test_form.
-     */
     public function testGetBlockViewWithoutForm()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: test_form.');
+
         $this->getBlockView(
             EmbedFormStartType::NAME,
             ['form_name' => 'test_form']
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetBlockViewWithInvalidForm()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
+            FormAccessorInterface::class
+        ));
+
         $formName = 'test_form';
 
         $this->context->getResolver()->setDefined([$formName]);

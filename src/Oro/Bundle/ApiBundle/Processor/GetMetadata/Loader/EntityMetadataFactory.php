@@ -15,16 +15,9 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
  */
 class EntityMetadataFactory
 {
-    /** @var MetadataHelper */
-    protected $metadataHelper;
+    private MetadataHelper $metadataHelper;
+    private MetadataFactory $metadataFactory;
 
-    /** @var MetadataFactory */
-    protected $metadataFactory;
-
-    /**
-     * @param MetadataHelper  $metadataHelper
-     * @param MetadataFactory $metadataFactory
-     */
     public function __construct(
         MetadataHelper $metadataHelper,
         MetadataFactory $metadataFactory
@@ -33,22 +26,13 @@ class EntityMetadataFactory
         $this->metadataFactory = $metadataFactory;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return MetaPropertyMetadata
-     */
     public function createAndAddMetaPropertyMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): MetaPropertyMetadata {
         $propertyPath = $field->getPropertyPath($fieldName);
         $metaPropertyMetadata = $this->metadataFactory->createMetaPropertyMetadata(
             $classMetadata,
@@ -68,22 +52,13 @@ class EntityMetadataFactory
         return $metaPropertyMetadata;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return FieldMetadata
-     */
     public function createAndAddFieldMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): FieldMetadata {
         $propertyPath = $field->getPropertyPath($fieldName);
         $fieldMetadata = $this->metadataFactory->createFieldMetadata(
             $classMetadata,
@@ -99,22 +74,13 @@ class EntityMetadataFactory
         return $fieldMetadata;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param string                      $associationName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return AssociationMetadata
-     */
     public function createAndAddAssociationMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
-        $associationName,
+        string $associationName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): AssociationMetadata {
         $propertyPath = $field->getPropertyPath($associationName);
         $associationMetadata = $this->metadataFactory->createAssociationMetadata(
             $classMetadata,

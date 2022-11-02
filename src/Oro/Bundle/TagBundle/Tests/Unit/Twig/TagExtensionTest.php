@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Twig\TagExtension;
@@ -11,26 +12,19 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TagExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|TagManager */
-    protected $manager;
+    private $manager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var TagExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(TagManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->helper = $this->getMockBuilder(TaggableHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(TagManager::class);
+        $this->helper = $this->createMock(TaggableHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_tag.tag.manager', $this->manager)
@@ -40,20 +34,9 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TagExtension($container);
     }
 
-    protected function tearDown()
-    {
-        unset($this->manager);
-        unset($this->extension);
-    }
-
-    public function testName()
-    {
-        $this->assertEquals('oro_tag', $this->extension->getName());
-    }
-
     public function testGetList()
     {
-        $entity = $this->createMock('Oro\Bundle\TagBundle\Entity\Taggable');
+        $entity = $this->createMock(Taggable::class);
         $expected = ['test tag'];
 
         $this->manager->expects($this->once())

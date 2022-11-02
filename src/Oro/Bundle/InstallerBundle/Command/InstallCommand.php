@@ -1,124 +1,211 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Composer\Question\StrictConfirmationQuestion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
-use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
+use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
+use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Intl\Locales;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Validator\Constraints\Url;
 
 /**
- * Command installs application with all schema and data migrations, prepares assets and application cache
+ * Application installer.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
-    const NAME = 'oro:install';
+    /** @var string */
+    protected static $defaultName = 'oro:install';
 
-    /** @var InputOptionProvider */
-    protected $inputOptionProvider;
+    private Process $assetsCommandProcess;
+    private InputOptionProvider $inputOptionProvider;
+    private ApplicationState $applicationState;
+    private ScriptManager $scriptManager;
+    private ManagerRegistry $doctrine;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(
+        ContainerInterface $container,
+        ManagerRegistry $doctrine,
+        EventDispatcherInterface $eventDispatcher,
+        ApplicationState $applicationState,
+        ScriptManager $scriptManager
+    ) {
+        parent::__construct($container);
+
+        $this->doctrine = $doctrine;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->applicationState = $applicationState;
+        $this->scriptManager = $scriptManager;
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
-            ->setDescription('Oro Application Installer.')
             ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
-            ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
-            ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
-            ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
-            ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
-            ->addOption(
-                'skip-assets',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip UI related commands during installation'
+            ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'Admin username')
+            ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'Admin user email')
+            ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'Admin user first name')
+            ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'Admin user last name')
+            ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'Admin user password')
+            ->addOption('sample-data', null, InputOption::VALUE_OPTIONAL, 'Load sample data')
+            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Localization language code')
+            ->addOption('formatting-code', null, InputOption::VALUE_OPTIONAL, 'Localization formatting code')
+            ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
+            ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
+            ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
+            ->setDescription('Application installer.')
+            // @codingStandardsIgnoreStart
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command is the application installer. It installs the application
+with all schema and data migrations, prepares assets and application caches.
+
+  <info>php %command.full_name%</info>
+
+The <info>--application-url</info> option can be used to specify the URL at which
+the management console (back-office) of the application will be available.
+Please make sure that you web-server is configured properly (see more at
+<comment>https://doc.oroinc.com/backend/setup/dev-environment/web-server-config/</comment>).
+
+  <info>php %command.full_name% --application-url=<url></info>
+  <info>php %command.full_name% --application-url='http://example.com/'</info>
+
+It is also possible to modify the application URL after the installation:
+
+  <info>php oro:config:update oro_ui.application_url 'http://example.com/'</info>
+
+The <info>--organization-name</info> option can be used to specify your company name:
+
+  <info>php %command.full_name% --organization-name=<company></info>
+  <info>php %command.full_name% --organization-name="Acme Inc."</info>
+
+The <info>--user-name</info>, <info>--user-email</info>, <info>--user-firstname</info>, <info>--user-lastname</info> and
+<info>--user-password</info> options allow to configure the admin user account details:
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> --user-password=<password></info>
+
+The <info>--sample-data</info> option can be used specify whether the demo sample data
+should be loaded after the installation:
+
+  <info>php %command.full_name% --sample-data=y</info>
+  <info>php %command.full_name% --sample-data=n</info>
+
+The <info>--language</info> and <info>--formatting</info> code options should be used to specify
+the localization language and the localization formatting setting that are used
+by the application:
+
+  <info>php %command.full_name% --language=<language-code> --formatting-code=<formatting-code></info>
+  <info>php %command.full_name% --language=en --formatting-code=en_US</info>
+
+The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
+to skip the step of downloading translations (already downloaded translations
+will be applied if present), or skip applying the translations completely:
+
+  <info>php %command.full_name% --skip-download-translations</info>
+  <info>php %command.full_name% --skip-translations</info>
+
+The <info>--drop-database</info> option should be provided when reinstalling the application
+from scratch on top of the existing database that needs to be wiped out first,
+or otherwise the installation will fail:
+
+  <info>php %command.full_name% --drop-database</info>
+
+Please see below an example with the most commonly used options:
+
+  <info>php %command.full_name% \
+    -vvv \
+    --env=prod \
+    --timeout=600 \
+    --language=en \
+    --formatting-code=en_US \
+    --organization-name='Acme Inc.' \
+    --user-name=admin \
+    --user-email=admin@example.com \
+    --user-firstname=John \
+    --user-lastname=Doe \
+    --user-password='PleaseReplaceWithSomeStrongPassword' \
+    --application-url='http://example.com/' \
+    --sample-data=y</info>
+
+Or, as a one-liner:
+
+  <info>php %command.full_name% -vvv --env=prod --timeout=600 --language=en --formatting-code=en_US --organization-name='Acme Inc.' --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password='PleaseReplaceWithSomeStrongPassword' --application-url='http://example.com/' --sample-data=y</info>
+
+HELP
             )
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
-            ->addOption(
-                'sample-data',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Determines whether sample data need to be loaded or not'
-            )
-            ->addOption(
-                'drop-database',
-                null,
-                InputOption::VALUE_NONE,
-                'Database will be dropped and all data will be deleted.'
-            )
-            ->addOption(
-                'skip-translations',
-                null,
-                InputOption::VALUE_NONE,
-                'Determines whether translation data need to be loaded or not'
-            )
-            ->addOption(
-                'skip-download-translations',
-                null,
-                InputOption::VALUE_NONE,
-                'Determines whether translation data need to be downloaded or not'
-            );
+            ->addUsage('--application-url=<url>')
+            ->addUsage('--organization-name=<company>')
+            ->addUsage('--user-name=<username> --user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> --user-password=<password>')
+            ->addUsage('--sample-data=y')
+            ->addUsage('--sample-data=n')
+            ->addUsage('--language=en --formatting-code=en_US')
+            ->addUsage('--skip-download-translations')
+            ->addUsage('--skip-translations')
+            ->addUsage('--drop-database')
+            ->addUsage("-vvv --env=prod --timeout=600 --language=en --formatting-code=en_US --organization-name=<company> --user-name=<username> --user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> --user-password=<password> --application-url=<url> --sample-data=y")
+            ->addUsage("-vvv --env=prod --timeout=600 --language=en --formatting-code=en_US --organization-name='Acme Inc.' --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password='PleaseReplaceWithSomeStrongPassword' --application-url='http://example.com/' --sample-data=y")
+            // @codingStandardsIgnoreEnd
+        ;
 
         parent::configure();
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @param InputInterface $input
+     * @param OutputInterface $output
      */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
+            $this->presetTestEnvironmentOptions($input, $output);
+        }
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
 
+        $this->validateApplicationUrl($input->getOption('application-url'));
         if (false === $input->isInteractive()) {
             $this->validate($input);
         }
 
-        $skipAssets = $input->getOption('skip-assets');
-        $commandExecutor = $this->getCommandExecutor($input, $output);
+        if ($this->isInstalled() && !$input->getOption('drop-database')) {
+            $this->alreadyInstalledMessageShow($input, $output);
 
-        if ($this->isInstalled()) {
-            $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
-            $output->writeln(
-                'To proceed with install: '
-            );
-            $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
-            $output->writeln(' - remove caches in var/cache folder manually');
-            $output->writeln(' - drop database manually or reinstall over existing database.');
-            $output->writeln(
-                'To reinstall over existing database - run command with <info>--drop-database</info> option:'
-            );
-            $output->writeln(sprintf('    <info>%s --drop-database</info>', $this->getName()));
-            $output->writeln(
-                '<comment>ATTENTION</comment>: All data will be lost. ' .
-                'Database backup is highly recommended before executing this command.'
-            );
-            $output->writeln('');
-
-            return 0;
+            // Using non-reserved exit code for already installed case.
+            // See https://tldp.org/LDP/abs/html/exitcodes.html
+            return 3;
         }
+
+        $commandExecutor = $this->getCommandExecutor($input, $output);
 
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
@@ -128,23 +215,47 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             return $exitCode;
         }
 
-        $eventDispatcher = $this->getEventDispatcher();
         $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
         try {
             $this->prepareStep($input, $output);
 
-            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
-            $this->loadDataStep($commandExecutor, $output);
-            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+            $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
 
-            $this->finalStep($commandExecutor, $output, $input, $skipAssets);
+            $this->loadDataStep($commandExecutor, $output);
+            $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
+
+            $this->finalStep($commandExecutor, $output, $input);
+            // cache clear must be done after assets build process finished,
+            // otherwise, it could lead to unpredictable errors
+            $this->clearCache($commandExecutor, $input);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
             return $commandExecutor->getLastCommandExitCode();
         }
 
+        $this->successfullyInstalledMessageShow($input, $output);
+
+        return $buildAssetsProcessExitCode ?? 0;
+    }
+
+    private function alreadyInstalledMessageShow(InputInterface $input, OutputInterface $output): void
+    {
+        $io = new SymfonyStyle($input, $output);
+        $io->error('An Oro application is already installed.');
+        $io->text('To proceed with the installation:');
+        $io->listing([
+            'remove caches in <info>var/cache</info> folder manually,',
+            'drop the database manually or reinstall with the <info>--drop-database</info> option.',
+        ]);
+        $io->warning([
+            'All data will be lost. Database backup is highly recommended!'
+        ]);
+    }
+
+    private function successfullyInstalledMessageShow(InputInterface $input, OutputInterface $output): void
+    {
         $output->writeln('');
         $output->writeln(
             sprintf(
@@ -169,17 +280,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'Use the <comment>oro:message-queue:consume</comment> ' .
             'command to launch a consumer service instance. See ' .
             '<comment>' .
-            'https://oroinc.com/orocrm/doc/current/install-upgrade/post-install-steps#activate-background-tasks' .
+            'https://doc.oroinc.com/backend/setup/dev-environment/manual-installation/crm-ce/' .
+            '#configure-and-run-required-background-processes' .
             '</comment> ' .
             'for more information.</info>'
         );
-
-        return 0;
     }
 
     /**
-     * @param InputInterface $input
-     *
      * @throws \InvalidArgumentException
      */
     protected function validate(InputInterface $input)
@@ -201,35 +309,25 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 )
             );
         }
+
+        $this->validateLocalizationOptions($input);
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     *
-     * @return int
-     */
-    protected function checkRequirements(CommandExecutor $commandExecutor)
+    protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand(
-            'oro:check-requirements',
-            ['--ignore-errors' => true, '--verbose' => 2]
-        );
+        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 2]);
 
         return $commandExecutor->getLastCommandExitCode();
     }
 
     /**
      * Drop schema, clear entity config and extend caches
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return InstallCommand
      */
-    protected function prepareStep(InputInterface $input, OutputInterface $output)
+    protected function prepareStep(InputInterface $input, OutputInterface $output): self
     {
         if ($input->getOption('drop-database')) {
             $output->writeln('<info>Drop schema.</info>');
-            $managers = $this->getContainer()->get('doctrine')->getManagers();
+            $managers = $this->doctrine->getManagers();
             foreach ($managers as $name => $manager) {
                 if ($manager instanceof EntityManager) {
                     $tool = new SchemaTool($manager);
@@ -241,12 +339,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         return $this;
     }
 
-    /**
-     * @param string $message
-     *
-     * @return callable
-     */
-    protected function getNotBlankValidator($message)
+    protected function getNotBlankValidator(string $message): callable
     {
         return function ($value) use ($message) {
             if (strlen(trim($value)) === 0) {
@@ -259,10 +352,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
     /**
      * Update the administrator user
-     *
-     * @param CommandExecutor $commandExecutor
      */
-    protected function updateUser(CommandExecutor $commandExecutor)
+    protected function updateUser(CommandExecutor $commandExecutor): void
     {
         $emailValidator     = $this->getNotBlankValidator('The email must be specified');
         $firstNameValidator = $this->getNotBlankValidator('The first name must be specified');
@@ -305,16 +396,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ],
         ];
 
-        $commandParameters = [];
-        foreach ($options as $optionName => $optionData) {
-            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
-                $optionName,
-                $optionData['label'],
-                $optionData['defaultValue'],
-                $optionData['options']
-            );
-        }
-
         $commandExecutor->runCommand(
             'oro:user:update',
             array_merge(
@@ -322,17 +403,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                     '--process-isolation' => true
                 ],
-                $commandParameters
+                $this->getCommandParametersFromOptions($options)
             )
         );
     }
 
-    /**
-     * Update the organization
-     *
-     * @param CommandExecutor $commandExecutor
-     */
-    protected function updateOrganization(CommandExecutor $commandExecutor)
+    protected function updateOrganization(CommandExecutor $commandExecutor): void
     {
         /** @var ConfigManager $configManager */
         $configManager             = $this->getContainer()->get('oro_config.global');
@@ -359,16 +435,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ]
         ];
 
-        $commandParameters = [];
-        foreach ($options as $optionName => $optionData) {
-            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
-                $optionName,
-                $optionData['label'],
-                $optionData['defaultValue'],
-                $optionData['options']
-            );
-        }
-
         $commandExecutor->runCommand(
             'oro:organization:update',
             array_merge(
@@ -376,7 +442,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     'organization-name' => 'default',
                     '--process-isolation' => true,
                 ],
-                $commandParameters
+                $this->getCommandParametersFromOptions($options)
             )
         );
     }
@@ -384,14 +450,31 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     /**
      * Update system settings such as app url, company name and short name
      */
-    protected function updateSystemSettings()
+    protected function updateSystemSettings(): void
     {
         /** @var ConfigManager $configManager */
         $configManager = $this->getContainer()->get('oro_config.global');
         $options       = [
             'application-url' => [
-                'label'                  => 'Application URL',
-                'config_key'             => 'oro_ui.application_url',
+                'label' => 'Application URL',
+                'config_key' => 'oro_ui.application_url',
+                'options' => [
+                    'settings' => [
+                        'validator' => [
+                            function (?string $applicationUrl) {
+                                if (!$applicationUrl) {
+                                    throw new \InvalidArgumentException(
+                                        'The value of the "application-url" parameter should not be blank.'
+                                    );
+                                }
+
+                                $this->validateApplicationUrl($applicationUrl);
+
+                                return $applicationUrl;
+                            }
+                        ]
+                    ]
+                ]
             ]
         ];
 
@@ -403,7 +486,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $defaultValue,
-                ['constructorArgs' => [$defaultValue]]
+                array_merge(['constructorArgs' => [$defaultValue]], $optionData['options'])
             );
 
             // update setting if it's not empty and not equal to default value
@@ -415,13 +498,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $configManager->flush();
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param OutputInterface $output
-     *
-     * @return InstallCommand
-     */
-    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output)
+    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output): self
     {
         $output->writeln('<info>Setting up database.</info>');
 
@@ -434,43 +511,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
                 ]
             )
-            ->runCommand(
-                LoadPermissionConfigurationCommand::NAME,
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                LoadConfigurablePermissionCommand::NAME,
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:cron:definitions:load',
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:workflow:definitions:load',
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:process:configuration:load',
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:migration:data:load',
-                [
-                    '--process-isolation' => true,
-                    '--no-interaction'    => true,
-                ]
-            );
+            ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
+            ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
+            ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
+            ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+            ->runCommand('oro:migration:data:load', ['--process-isolation' => true, '--no-interaction' => true]);
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
@@ -478,13 +523,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $this->updateSystemSettings();
         $this->updateOrganization($commandExecutor);
         $this->updateUser($commandExecutor);
+        $this->updateLocalization($commandExecutor);
 
         $isDemo = $this->inputOptionProvider->get(
             'sample-data',
             'Load sample data (y/n)',
-            false,
+            null,
             [
-                'class' => StrictConfirmationQuestion::class,
+                'class' => ConfirmationQuestion::class,
                 'constructorArgs' => [false]
             ]
         );
@@ -492,10 +538,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             // load demo fixtures
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
-                [
-                    '--process-isolation'  => true,
-                    '--fixtures-type'      => 'demo',
-                ]
+                ['--process-isolation'  => true, '--fixtures-type' => 'demo']
             );
         }
 
@@ -504,62 +547,28 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         return $this;
     }
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param OutputInterface $output
-     * @param InputInterface $input
-     * @param boolean $skipAssets
-     * @return InstallCommand
-     */
     protected function finalStep(
         CommandExecutor $commandExecutor,
         OutputInterface $output,
-        InputInterface $input,
-        $skipAssets
-    ) {
+        InputInterface $input
+    ): self {
         $output->writeln('<info>Preparing application.</info>');
-
-        $assetsOptions = [
-            '--exclude' => ['OroInstallerBundle']
-        ];
-        if ($input->hasOption('symlink') && $input->getOption('symlink')) {
-            $assetsOptions['--symlink'] = true;
-        }
 
         $this->processTranslations($input, $commandExecutor);
 
-        if (!$skipAssets) {
-            $commandExecutor->runCommand(
-                'fos:js-routing:dump',
-                [
-                    '--process-isolation' => true,
-                ]
-            )
-                ->runCommand('oro:localization:dump')
-                ->runCommand(
-                    'oro:assets:install',
-                    $assetsOptions
-                )
-                ->runCommand(
-                    'assetic:dump',
-                    [
-                        '--process-isolation' => true,
-                    ]
-                )
-                ->runCommand(
-                    'oro:requirejs:build',
-                    [
-                        '--ignore-errors' => true,
-                        '--process-isolation' => true,
-                    ]
-                );
-        }
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
-        $this->updateInstalledFlag(date('c'));
+        $this->applicationState->setInstalled();
+        $commandExecutor->runCommand('fos:js-routing:dump', ['--process-isolation' => true]);
+        $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
+        $output->writeln('');
 
-        // clear the cache and set installed flag in DI container
+        return $this;
+    }
+
+    protected function clearCache(CommandExecutor $commandExecutor, InputInterface $input): void
+    {
         $cacheClearOptions = ['--process-isolation' => true];
         if ($commandExecutor->getDefaultOption('no-debug')) {
             $cacheClearOptions['--no-debug'] = true;
@@ -568,57 +577,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
-
-        if (!$skipAssets) {
-            /**
-             * @todo Place this launch of command after the launch of 'assetic-dump' in BAP-16333
-             */
-            $commandExecutor->runCommand(
-                'oro:translation:dump',
-                [
-                    '--process-isolation' => true,
-                ]
-            );
-        }
-
-        $output->writeln('');
-
-        return $this;
     }
 
-    /**
-     * Update installed flag in parameters.yml
-     *
-     * @param bool|string $installed
-     */
-    protected function updateInstalledFlag($installed)
-    {
-        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params                        = $dumper->parse();
-        $params['system']['installed'] = $installed;
-        $dumper->dump($params);
-    }
-
-    /**
-     * Clears the state of all database checkers to make sure they will recheck the database state
-     */
-    protected function clearCheckDatabaseState()
-    {
-        $this->getContainer()->get('oro_entity.database_checker.state_manager')->clearState();
-    }
-
-    /**
-     * Process installer scripts
-     *
-     * @param OutputInterface $output
-     * @param CommandExecutor $commandExecutor
-     */
-    protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor)
+    protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor): void
     {
         $scriptExecutor = new ScriptExecutor($output, $this->getContainer(), $commandExecutor);
-        /** @var ScriptManager $scriptManager */
-        $scriptManager = $this->getContainer()->get('oro_installer.script_manager');
-        $scriptFiles   = $scriptManager->getScriptFiles();
+
+        $scriptFiles   = $this->scriptManager->getScriptFiles();
         if (!empty($scriptFiles)) {
             foreach ($scriptFiles as $scriptFile) {
                 $scriptExecutor->runScript($scriptFile);
@@ -626,38 +591,196 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    protected function isInstalled()
+    protected function isInstalled(): bool
     {
-        $isInstalled = $this->getContainer()->hasParameter('installed')
-            && $this->getContainer()->getParameter('installed');
-
-        return $isInstalled;
+        return $this->applicationState->isInstalled();
     }
 
-    /**
-     * @param InputInterface $input
-     * @param CommandExecutor $commandExecutor
-     */
-    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor)
+    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor): void
     {
         if (!$input->getOption('skip-translations')) {
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
-                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+                    ->runCommand(
+                        OroTranslationUpdateCommand::getDefaultName(),
+                        ['--process-isolation' => true, '--all' => true]
+                    );
             }
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    private function getEventDispatcher()
+    protected function updateLocalization(CommandExecutor $commandExecutor): void
     {
-        return $this->getContainer()->get('event_dispatcher');
+        $formattingCode = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
+        $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
+
+        $options = [
+            'formatting-code' => [
+                'label' => 'Formatting Code',
+                'options' => [
+                    'constructorArgs' => [$formattingCode],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                                $this->validateFormattingCode($value);
+                                return $value;
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => $formattingCode
+            ],
+            'language' => [
+                'label' => 'Language',
+                'options' => [
+                    'constructorArgs' => [$language],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                                $this->validateLanguage($value);
+                                return $value;
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => $language
+            ]
+        ];
+
+        $commandExecutor->runCommand(
+            UpdateLocalizationCommand::getDefaultName(),
+            array_merge(
+                ['--process-isolation' => true],
+                $this->getCommandParametersFromOptions($options)
+            )
+        );
+    }
+
+    private function validateLocalizationOptions(InputInterface $input): void
+    {
+        $formattingCode = $input->getOption('formatting-code');
+        if ($formattingCode) {
+            $this->validateFormattingCode($formattingCode);
+        }
+
+        $language = (string)$input->getOption('language');
+        if ($language) {
+            $this->validateLanguage($language);
+        }
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
+    private function validateFormattingCode(string $locale): void
+    {
+        $locales = array_keys(Locales::getNames());
+        if (!in_array($locale, $locales, true)) {
+            throw new \InvalidArgumentException($this->getExceptionMessage('formatting', $locale, $locales));
+        }
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
+    private function validateLanguage(string $language): void
+    {
+        $locales = Locales::getLocales();
+        if (!in_array($language, $locales, true)) {
+            throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $locales));
+        }
+    }
+
+    private function getExceptionMessage(string $optionName, string $localeCode, array $availableLocaleCodes):string
+    {
+        $exceptionMessage = sprintf('"%s" is not a valid %s code!', $localeCode, $optionName);
+        $alternatives = $this->getAlternatives($localeCode, $availableLocaleCodes);
+        if ($alternatives) {
+            $exceptionMessage .= sprintf("\nDid you mean %s?\n", $alternatives);
+        }
+
+        return $exceptionMessage;
+    }
+
+    private function validateApplicationUrl(?string $applicationUrl): void
+    {
+        if (!$applicationUrl) {
+            return;
+        }
+
+        $violations = $this->getContainer()
+            ->get('validator')
+            ->validate($applicationUrl, new Url());
+
+        if (!$violations->count()) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(
+            'The value of the "application-url" parameter is invalid. ' . $violations->get(0)->getMessage()
+        );
+    }
+
+    private function getCommandParametersFromOptions(array $options): array
+    {
+        $commandParameters = [];
+        foreach ($options as $optionName => $optionData) {
+            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
+                $optionName,
+                $optionData['label'],
+                $optionData['defaultValue'],
+                $optionData['options']
+            );
+        }
+
+        return $commandParameters;
+    }
+
+    private function getAlternatives(string $name, array $items): string
+    {
+        $alternatives = [];
+        foreach ($items as $item) {
+            $lev = levenshtein($name, $item);
+            if ($lev <= \strlen($name) / 2 || str_contains($item, $name)) {
+                $alternatives[$item] = $lev;
+            }
+        }
+        asort($alternatives);
+
+        return implode(', ', array_keys($alternatives));
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function presetTestEnvironmentOptions(InputInterface $input, OutputInterface $output): void
+    {
+        $testEnvDefaultOptionValuesMap = [
+            'user-name'         => 'admin',
+            'user-email'        => 'admin@example.com',
+            'user-firstname'    => 'John',
+            'user-lastname'     => 'Doe',
+            'user-password'     => 'admin',
+            'sample-data'       => 'n',
+            'organization-name' => 'OroInc',
+            'application-url'   => 'http://localhost/',
+            'skip-translations' => true,
+            'timeout'           => '600',
+            'language'          => 'en',
+            'formatting-code'   => 'en_US'
+        ];
+
+        foreach ($testEnvDefaultOptionValuesMap as $optionName => $optionValue) {
+            if ($input->hasParameterOption('--' . $optionName)) {
+                continue;
+            }
+
+            $input->setOption($optionName, $optionValue);
+        }
+
+        $input->setInteractive(false);
     }
 }

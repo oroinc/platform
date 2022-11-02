@@ -2,44 +2,82 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Sets attributes of the specified {@see AttributeFamily} to either NULL or default value specific
+ * to the field or its column's DBAL type.
+ */
 class AttributeValueProvider implements AttributeValueProviderInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
+    private ManagerRegistry $managerRegistry;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    private DbalTypeDefaultValueProvider $dbalTypeDefaultValueProvider;
+
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        DbalTypeDefaultValueProvider $dbalTypeDefaultValueProvider
+    ) {
+        $this->managerRegistry = $managerRegistry;
+        $this->dbalTypeDefaultValueProvider = $dbalTypeDefaultValueProvider;
     }
 
     /**
      * @param AttributeFamily $attributeFamily
-     * @param array $names
+     * @param string[] $names
      */
-    public function removeAttributeValues(AttributeFamily $attributeFamily, array $names)
+    public function removeAttributeValues(AttributeFamily $attributeFamily, array $names): void
     {
-        $manager = $this->doctrineHelper->getEntityManagerForClass($attributeFamily->getEntityClass());
+        $entityClass = $attributeFamily->getEntityClass();
+        $entityManager = $this->managerRegistry->getManagerForClass($entityClass);
 
-        $queryBuilder = $manager->createQueryBuilder();
+        $queryBuilder = $entityManager->createQueryBuilder();
         $queryBuilder
-            ->update($attributeFamily->getEntityClass(), 'entity')
+            ->update($entityClass, 'entity')
             ->where($queryBuilder->expr()->eq('entity.attributeFamily', ':attributeFamily'))
-            ->setParameter('attributeFamily', $attributeFamily)
-            ->setParameter('null', null);
+            ->setParameter('attributeFamily', $attributeFamily);
 
+        $classMetadata = $entityManager->getClassMetadata($entityClass);
+        $doExecute = false;
         foreach ($names as $name) {
-            $queryBuilder->set(QueryBuilderUtil::getField('entity', $name), ':null');
+            if ($classMetadata->hasField($name)) {
+                $mapping = $classMetadata->getFieldMapping($name);
+                $default = $mapping['default'] ?? null;
+
+                if (!isset($default) && !$classMetadata->isNullable($name)) {
+                    if (!$this->dbalTypeDefaultValueProvider->hasDefaultValueForDbalType($mapping['type'])) {
+                        // Skips because default value cannot be found.
+                        continue;
+                    }
+
+                    $default = $this->dbalTypeDefaultValueProvider->getDefaultValueForDbalType($mapping['type']);
+                }
+            } elseif ($classMetadata->hasAssociation($name)) {
+                $mapping = $classMetadata->getAssociationMapping($name);
+                if (!($mapping['type'] & ClassMetadataInfo::TO_ONE)) {
+                    // Skips because to-many association type is not supported yet.
+                    continue;
+                }
+
+                $default = null;
+            } else {
+                // Skips because field or association is missing.
+                continue;
+            }
+
+            $parameterName = QueryBuilderUtil::sprintf(':%s', $name);
+            $queryBuilder
+                ->set(QueryBuilderUtil::getField('entity', $name), $parameterName)
+                ->setParameter($parameterName, $default);
+            $doExecute = true;
         }
 
-        $queryBuilder->getQuery()->execute();
+        if ($doExecute) {
+            $queryBuilder->getQuery()->execute();
+        }
     }
 }

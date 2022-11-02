@@ -2,17 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use BadMethodCallException;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("autoresponserule")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for AutoResponseRule entity.
  */
 class AutoResponseRuleController extends RestController
 {
@@ -31,7 +27,7 @@ class AutoResponseRuleController extends RestController
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -41,7 +37,7 @@ class AutoResponseRuleController extends RestController
      */
     public function getFormHandler()
     {
-        throw new BadMethodCallException('This method is unsupported.');
+        throw new \BadMethodCallException('This method is unsupported.');
     }
 
     /**

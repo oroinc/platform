@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
+/**
+ * Provides an access to properties of a different object types.
+ */
 class ObjectAccessor implements ObjectAccessorInterface
 {
     /** @var ObjectAccessorInterface[] */
-    protected $accessors = [];
+    private $accessors = [];
 
     /**
      * {@inheritdoc}
      */
-    public function getClassName($object)
+    public function getClassName($object): ?string
     {
         return $this->getObjectAccessor($object)->getClassName($object);
     }
@@ -18,7 +21,7 @@ class ObjectAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($object, $propertyName)
+    public function getValue($object, string $propertyName)
     {
         return $this->getObjectAccessor($object)->getValue($object, $propertyName);
     }
@@ -26,7 +29,7 @@ class ObjectAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasProperty($object, $propertyName)
+    public function hasProperty($object, string $propertyName): bool
     {
         return $this->getObjectAccessor($object)->hasProperty($object, $propertyName);
     }
@@ -34,7 +37,7 @@ class ObjectAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray($object)
+    public function toArray($object): array
     {
         return $this->getObjectAccessor($object)->toArray($object);
     }
@@ -44,11 +47,11 @@ class ObjectAccessor implements ObjectAccessorInterface
      *
      * @return ObjectAccessorInterface
      */
-    protected function getObjectAccessor($object)
+    private function getObjectAccessor($object): ObjectAccessorInterface
     {
-        $objectType = is_object($object)
-            ? get_class($object)
-            : gettype($object);
+        $objectType = \is_object($object)
+            ? \get_class($object)
+            : \gettype($object);
 
         if (isset($this->accessors[$objectType])) {
             return $this->accessors[$objectType];
@@ -56,15 +59,13 @@ class ObjectAccessor implements ObjectAccessorInterface
 
         // currently only ArrayAccessor was implemented. It is enough for now.
         // in the future may be ArrayAccessAccessor will be implemented.
-        if (is_array($object)) {
+        if (\is_array($object)) {
             $this->accessors[$objectType] = new ArrayAccessor();
         } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The object accessor for "%s" type does not exist.',
-                    is_object($object) ? get_class($object) : gettype($object)
-                )
-            );
+            throw new \InvalidArgumentException(\sprintf(
+                'The object accessor for "%s" type does not exist.',
+                $objectType
+            ));
         }
 
         return $this->accessors[$objectType];

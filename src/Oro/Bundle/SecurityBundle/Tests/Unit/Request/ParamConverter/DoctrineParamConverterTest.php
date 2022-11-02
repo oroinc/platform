@@ -2,32 +2,38 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request\ParamConverter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
+
+    /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestAuthorizationChecker;
 
     /** @var DoctrineParamConverter */
-    protected $converter;
+    private $converter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestAuthorizationChecker;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);
 
         $this->converter = new DoctrineParamConverter(
             $this->registry,
+            $this->createMock(ExpressionLanguage::class),
             $this->requestAuthorizationChecker
         );
     }
@@ -35,19 +41,19 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider idsProvider
      */
-    public function testApply($object, $isGranted, $class, $isCorrectClass)
+    public function testApply(CmsAddress $object, int $isGranted, string $class, bool $isCorrectClass)
     {
-        $manager          = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $objectRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $manager = $this->createMock(ObjectManager::class);
+        $objectRepository = $this->createMock(ObjectRepository::class);
         $manager->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($objectRepository));
+            ->willReturn($objectRepository);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->will($this->returnValue($manager));
+            ->willReturn($manager);
         $objectRepository->expects($this->any())
             ->method('find')
-            ->will($this->returnValue($object));
+            ->willReturn($object);
 
         $request = new Request();
         $request->attributes->set('_oro_access_checked', false);
@@ -69,14 +75,14 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         );
         $this->requestAuthorizationChecker->expects($this->any())
             ->method('isRequestObjectIsGranted')
-            ->will($this->returnValue($isGranted));
+            ->willReturn($isGranted);
 
         if ($isGranted === -1) {
-            $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+            $this->expectException(AccessDeniedException::class);
             $this->expectExceptionMessage('You do not get EDIT permission for this object');
             $this->requestAuthorizationChecker->expects($this->any())
                 ->method('getRequestAcl')
-                ->will($this->returnValue($annotation));
+                ->willReturn($annotation);
         }
 
         $this->converter->apply($request, $config);
@@ -91,11 +97,11 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function idsProvider()
+    public function idsProvider(): array
     {
         return [
-            [new CmsAddress(), 1, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress', true],
-            [new CmsAddress(), -1, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress', true],
+            [new CmsAddress(), 1, CmsAddress::class, true],
+            [new CmsAddress(), -1, CmsAddress::class, true],
             [new CmsAddress(), -1, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\wrongClass', false],
             [new CmsAddress(), -1, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\wrongClass', false],
         ];
@@ -117,9 +123,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
     {
         $config = new ParamConverter(['class' => 'stdClass']);
 
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $objectManager = $this->createMock(ObjectManager::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -146,17 +150,13 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $config = new ParamConverter(['class' => 'stdClass']);
         $config->setOptions(['entity_manager' => 'foo']);
 
-        $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->once())
             ->method('isTransient')
             ->with('stdClass')
             ->willReturn(false);
 
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $objectManager = $this->createMock(ObjectManager::class);
         $objectManager->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
@@ -174,17 +174,13 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $config = new ParamConverter(['class' => 'stdClass']);
         $config->setOptions(['entity_manager' => 'foo']);
 
-        $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->once())
             ->method('isTransient')
             ->with('stdClass')
             ->willReturn(true);
 
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $objectManager = $this->createMock(ObjectManager::class);
         $objectManager->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);

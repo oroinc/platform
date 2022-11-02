@@ -11,11 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ClientValidationExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /**
      * Add the client_validation option
-     *
-     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -24,10 +22,6 @@ class ClientValidationExtension extends AbstractTypeExtension
 
     /**
      * Pass the client validation flag to the view
-     *
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {

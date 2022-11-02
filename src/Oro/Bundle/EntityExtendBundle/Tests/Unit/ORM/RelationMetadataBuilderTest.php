@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ORM;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -11,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -22,30 +25,40 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     /** @var RelationMetadataBuilder */
-    protected $builder;
+    private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
         $this->builder = new RelationMetadataBuilder(
             $this->configManager,
-            $this->nameGenerator
+            $this->nameGenerator,
+            (new InflectorFactory())->build()
         );
+    }
+
+    private function getEntityConfig(string $className, array $values = []): Config
+    {
+        $configId = new EntityConfigId('extend', $className);
+        $config = new Config($configId);
+        $config->setValues($values);
+
+        return $config;
     }
 
     /**
      * @dataProvider supportsDataProvider
      *
      * @param Config $extendConfig
-     * @param bool $expected
+     * @param bool   $expected
      */
     public function testSupports(Config $extendConfig, $expected)
     {
@@ -79,25 +92,25 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldSkipBuildForSpecifiedStateOfTargetEntity($state)
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_ONE;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_ONE;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+        $targetEntityClass = TestClass2::class;
 
         $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->willReturn($this->getEntityConfig($entityClass, ['state' => $state]));
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -134,12 +147,12 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildManyToOne()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_ONE;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_ONE;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+        $targetEntityClass = TestClass2::class;
 
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
@@ -148,16 +161,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -188,7 +203,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -213,7 +228,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -222,12 +237,12 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildManyToOneWithAdditionalOptions()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_ONE;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_ONE;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+        $targetEntityClass = TestClass2::class;
 
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
@@ -236,16 +251,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -280,7 +297,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['persist', 'detach'],
+                'cascade'                  => ['persist'],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -305,7 +322,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => true,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -314,15 +331,15 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildManyToOneBidirectional()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_ONE;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_ONE;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::ONE_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::ONE_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
@@ -330,16 +347,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -370,7 +389,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => $targetFieldName,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $fieldName . '_id',
@@ -395,7 +414,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -407,24 +426,21 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToOneWithCustomizedColumnName()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_ONE;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
-        $columnName  = 'src_column_id';
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_ONE;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $columnName = 'src_column_id';
         $fieldConfig = new Config($fieldId, ['column_name' => $columnName]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+        $targetEntityClass = TestClass2::class;
 
-        $this->configManager
-            ->expects($this->at(1))
+        $this->configManager->expects($this->exactly(2))
             ->method('hasConfig')
-            ->with($targetEntityClass)
-            ->willReturn(false);
-        $this->configManager->expects($this->at(2))
-            ->method('hasConfig')
-            ->with($entityClass, $fieldName)
-            ->willReturn(true);
+            ->willReturnMap([
+                [$targetEntityClass, null, false],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
@@ -437,16 +453,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -477,7 +495,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
-                'cascade'                  => ['detach'],
+                'cascade'                  => [],
                 'joinColumns'              => [
                     [
                         'name'                 => $columnName,
@@ -502,7 +520,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isCascadePersist'         => false,
                 'isCascadeRefresh'         => false,
                 'isCascadeMerge'           => false,
-                'isCascadeDetach'          => true,
+                'isCascadeDetach'          => false,
                 'orphanRemoval'            => false
             ],
             $result
@@ -511,16 +529,16 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOneToMany()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::ONE_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_ONE;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -534,16 +552,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::ONE_TO_MANY,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -574,13 +594,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result
@@ -594,16 +614,16 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOneToManyWithAdditionalCascadeOption()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::ONE_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_ONE;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -617,16 +637,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::ONE_TO_MANY,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -635,7 +657,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                         'owner'           => false,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => $targetFieldId,
-                        'cascade'         => ['persist'],
+                        'cascade'         => ['persist', 'detach'],
                         'fetch'           => 'extra_lazy',
                     ]
                 ],
@@ -677,21 +699,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testBuildOneToManyWithDefaultRelation()
+    public function testBuildOneToManyWithAdditionalOrphanRemovalOption()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::ONE_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
-        $fieldConfig = new Config($fieldId, []);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_ONE;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -705,16 +724,107 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::ONE_TO_MANY,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'relation' => [
+                    $relationKey => [
+                        'field_id'        => $fieldId,
+                        'owner'           => false,
+                        'target_entity'   => $targetEntityClass,
+                        'target_field_id' => $targetFieldId,
+                        'orphanRemoval'   => true,
+                    ]
+                ],
+                'schema'   => [
+                    'relation' => [
+                        $fieldName => []
+                    ]
+                ]
+            ]
+        );
+
+        $this->builder->build($metadataBuilder, $extendConfig);
+
+        $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
+        $this->assertEquals(
+            [
+                'sourceEntity'     => $entityClass,
+                'targetEntity'     => $targetEntityClass,
+                'fieldName'        => $fieldName,
+                'type'             => ClassMetadataInfo::ONE_TO_MANY,
+                'isOwningSide'     => false,
+                'mappedBy'         => $targetFieldName,
+                'inversedBy'       => null,
+                'cascade'          => [],
+                'fetch'            => ClassMetadataInfo::FETCH_LAZY,
+                'isCascadeRemove'  => true,
+                'isCascadePersist' => false,
+                'isCascadeRefresh' => false,
+                'isCascadeMerge'   => false,
+                'isCascadeDetach'  => false,
+                'orphanRemoval'    => true
+            ],
+            $result
+        );
+
+        $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+        $this->assertFalse(
+            $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testBuildOneToManyWithDefaultRelation()
+    {
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldConfig = new Config($fieldId, []);
+
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', $entityClass, $fieldName)
+            ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => ExtendScope::STATE_ACTIVE
+            ]
+        );
+
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
+
+        $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
+        $relationKey = ExtendHelper::buildRelationKey(
+            $entityClass,
+            $fieldName,
+            RelationType::ONE_TO_MANY,
+            $targetEntityClass
+        );
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -745,13 +855,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result
@@ -801,15 +911,15 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOneToManyForInheritedRelation()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::ONE_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_ONE;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->never())
             ->method('getFieldConfig');
@@ -821,16 +931,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             'typeInheritedFromManyToOne',
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -861,13 +973,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
                 'isOwningSide'     => false,
                 'mappedBy'         => $targetFieldName,
                 'inversedBy'       => null,
-                'cascade'          => ['detach'],
+                'cascade'          => [],
                 'fetch'            => ClassMetadataInfo::FETCH_LAZY,
                 'isCascadeRemove'  => false,
                 'isCascadePersist' => false,
                 'isCascadeRefresh' => false,
                 'isCascadeMerge'   => false,
-                'isCascadeDetach'  => true,
+                'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
             ],
             $result
@@ -884,17 +996,17 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToMany()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -908,16 +1020,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1006,17 +1120,17 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToManyWithAdditionalCascadeOption()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -1030,16 +1144,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1130,17 +1246,17 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToManyWithDefaultRelation()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, []);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -1154,16 +1270,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1288,16 +1406,16 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToManyTargetSide()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
         $fieldName = 'srcField';
         $fieldType = RelationType::MANY_TO_MANY;
-        $fieldId   = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
@@ -1306,17 +1424,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
-
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1371,16 +1490,16 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToManyTargetSideWithAdditionalCascadeOption()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
         $fieldName = 'srcField';
         $fieldType = RelationType::MANY_TO_MANY;
-        $fieldId   = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
-        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
@@ -1389,17 +1508,18 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
-
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $targetEntityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1456,16 +1576,16 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildManyToManyWhenOwningSiteAndInverseSideEntitiesAreEqual()
     {
-        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $entityClass = TestClass::class;
 
-        $fieldName   = 'srcField';
-        $fieldType   = RelationType::MANY_TO_MANY;
-        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
         $fieldConfig = new Config($fieldId, ['without_default' => true]);
 
-        $targetFieldName   = 'targetField';
-        $targetFieldType   = RelationType::MANY_TO_MANY;
-        $targetFieldId     = new FieldConfigId('extend', $entityClass, $targetFieldName, $targetFieldType);
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_MANY;
+        $targetFieldId = new FieldConfigId('extend', $entityClass, $targetFieldName, $targetFieldType);
 
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
@@ -1474,7 +1594,9 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
@@ -1482,13 +1604,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fieldConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
-        $relationKey     = ExtendHelper::buildRelationKey(
+        $relationKey = ExtendHelper::buildRelationKey(
             $entityClass,
             $fieldName,
             RelationType::MANY_TO_ONE,
             $entityClass
         );
-        $extendConfig    = $this->getEntityConfig(
+        $extendConfig = $this->getEntityConfig(
             $entityClass,
             [
                 'relation' => [
@@ -1570,20 +1692,5 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
-    }
-
-    /**
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className, array $values = [])
-    {
-        $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
     }
 }

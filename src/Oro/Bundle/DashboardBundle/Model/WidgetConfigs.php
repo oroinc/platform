@@ -5,15 +5,18 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Dashboard widget configuration model
+ */
 class WidgetConfigs
 {
     /** @var ConfigProvider */
@@ -43,16 +46,6 @@ class WidgetConfigs
     /** @var array */
     protected $widgetOptionsById = [];
 
-    /**
-     * @param ConfigProvider               $configProvider
-     * @param ResolverInterface            $resolver
-     * @param EntityManagerInterface       $entityManager
-     * @param ConfigValueProvider          $valueProvider
-     * @param TranslatorInterface          $translator
-     * @param EventDispatcherInterface     $eventDispatcher
-     * @param WidgetConfigVisibilityFilter $visibilityFilter
-     * @param RequestStack                 $requestStack
-     */
     public function __construct(
         ConfigProvider $configProvider,
         ResolverInterface $resolver,
@@ -161,17 +154,17 @@ class WidgetConfigs
     }
 
     /**
-     * Returns widget configuration or null based on applicable flags and acl
+     * Returns widget configuration or null based on applicable flags and ACL.
      *
-     * @param string $widgetName
-     *
-     * @return array|null
+     * @throws InvalidConfigurationException if the widget config was not found and $throwExceptionIfMissing = true
      */
-    public function getWidgetConfig($widgetName)
+    public function getWidgetConfig(string $widgetName): ?array
     {
-        $configs = $this->visibilityFilter->filterConfigs([
-            $widgetName => $this->configProvider->getWidgetConfig($widgetName)
-        ]);
+        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName, false);
+        if (null === $widgetConfig) {
+            return null;
+        }
+        $configs = $this->visibilityFilter->filterConfigs([$widgetName => $widgetConfig]);
         $config = reset($configs);
 
         return $config ?: null;
@@ -183,13 +176,14 @@ class WidgetConfigs
      * @param string $widgetName The name of widget
      *
      * @return array
+     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
      */
     public function getWidgetItems($widgetName)
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
-        return $items = $this->visibilityFilter->filterConfigs(
-            isset($widgetConfig['items']) ? $widgetConfig['items'] : [],
+        return $this->visibilityFilter->filterConfigs(
+            $widgetConfig['items'] ?? [],
             $widgetName
         );
     }
@@ -211,7 +205,7 @@ class WidgetConfigs
 
         if ($this->eventDispatcher->hasListeners(WidgetItemsLoadDataEvent::EVENT_NAME)) {
             $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, $widgetOptions);
-            $this->eventDispatcher->dispatch(WidgetItemsLoadDataEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, WidgetItemsLoadDataEvent::EVENT_NAME);
             $items = $event->getItems();
         }
 
@@ -228,14 +222,12 @@ class WidgetConfigs
     /**
      * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
      *
-     * @param int|null $widgetId
-     *
-     * @return WidgetOptionBag
+     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
      */
-    public function getWidgetOptions($widgetId = null)
+    public function getWidgetOptions(?int $widgetId = null): WidgetOptionBag
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && is_null($widgetId)) {
+        if ($request && null === $widgetId) {
             $widgetId = $request->query->get('_widgetId', null);
         }
 
@@ -247,19 +239,18 @@ class WidgetConfigs
             return new WidgetOptionBag($this->widgetOptionsById[$widgetId]);
         }
 
-        $widget       = $this->findWidget($widgetId);
+        $widget = $this->findWidget($widgetId);
         if (!$widget) {
             return new WidgetOptionBag();
         }
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
-        $options      = $widget->getOptions();
+        $options = $widget->getOptions();
 
         foreach ($widgetConfig['configuration'] as $name => $config) {
-            $value          = isset($options[$name]) ? $options[$name] : null;
             $options[$name] = $this->valueProvider->getConvertedValue(
                 $widgetConfig,
                 $config['type'],
-                $value,
+                $options[$name] ?? null,
                 $config,
                 $options
             );
@@ -297,8 +288,10 @@ class WidgetConfigs
      */
     protected function loadDefaultValue($options, $widgetConfig)
     {
-        if (!$options['title']['title'] || $options['title']['useDefault']) {
-            $options['title']['title'] = $this->translator->trans($widgetConfig['label']);
+        if (!isset($options['title']) || !$options['title']['title'] || $options['title']['useDefault']) {
+            $options['title']['title'] = isset($widgetConfig['label'])
+                ? $this->translator->trans((string) $widgetConfig['label'])
+                : '';
             $options['title']['useDefault'] = true;
         }
 

@@ -3,12 +3,11 @@ define([
 ], function(Backbone) {
     'use strict';
 
-    var DashboardItemsModel;
     /**
      * @class   orodashboard.items.Model
      * @extends Backbone.Model
      */
-    DashboardItemsModel = Backbone.Model.extend({
+    const DashboardItemsModel = Backbone.Model.extend({
         defaults: {
             id: null,
             label: null,
@@ -18,10 +17,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DashboardItemsModel() {
-            DashboardItemsModel.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardItemsModel(attrs, options) {
+            DashboardItemsModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

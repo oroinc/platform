@@ -1,18 +1,18 @@
 /* @theme: default; */
 
 .catalog-switcher {
-    .btn {
-        color: $catalog-switcher-btn-color;
+    &__tooltip-trigger {
+        position: absolute;
+        inset: 0;
+    }
 
-        @include element-state('hover') {
-            color: $catalog-switcher-btn-color;
-        }
+    .dropdown-toggle {
+        position: relative;
+    }
 
-        &.active,
-        &:not(:disabled):not(.disabled):active,
-        &:not(:disabled):not(.disabled).active {
-            background-color: $catalog-switcher-btn-background-active;
-            color: $catalog-switcher-btn-color-active;
+    .dropdown-menu[x-placement] {
+        .dropdown-item {
+            white-space: $catalog-switcher-dropdown-item-white-space;
         }
     }
 }

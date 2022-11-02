@@ -2,81 +2,56 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
-use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
-    protected $entityRepository;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $entityManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var StepManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $stepManager;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
     /** @var WorkflowDefinitionHandler */
-    protected $handler;
+    private $handler;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->stepManager = $this->getMockBuilder(StepManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->entityRepository);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $managerRegistry */
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+        $this->entityManager = $this->createMock(EntityManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $managerRegistry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
-        $this->handler = new WorkflowDefinitionHandler($this->eventDispatcher, $managerRegistry);
+        $this->handler = new WorkflowDefinitionHandler($this->eventDispatcher, $doctrine);
     }
 
     public function testCreateWorkflowDefinition()
     {
         $newDefinition = new WorkflowDefinition();
 
-        $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($newDefinition);
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
         $changes = new WorkflowChangesEvent($newDefinition);
 
-        $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_CREATE;
-        $afterEvent = WorkflowEvents::WORKFLOW_AFTER_CREATE;
-
-        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
-        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
+        $this->eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$changes, WorkflowEvents::WORKFLOW_BEFORE_CREATE],
+                [$changes, WorkflowEvents::WORKFLOW_AFTER_CREATE]
+            );
 
         $this->handler->createWorkflowDefinition($newDefinition);
     }
@@ -86,48 +61,41 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
         $existingDefinition = (new WorkflowDefinition())->setName('existing');
         $newDefinition = (new WorkflowDefinition())->setName('updated');
 
-        $this->entityManager->expects($this->once())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('persist');
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
         $changes = new WorkflowChangesEvent($existingDefinition, (new WorkflowDefinition())->setName('existing'));
 
-        $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_UPDATE;
-        $afterEvent = WorkflowEvents::WORKFLOW_AFTER_UPDATE;
-
-        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
-        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
+        $this->eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$changes, WorkflowEvents::WORKFLOW_BEFORE_UPDATE],
+                [$changes, WorkflowEvents::WORKFLOW_AFTER_UPDATE]
+            );
 
         $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
     }
 
     /**
      * @dataProvider deleteWorkflowDefinitionDataProvider
-     *
-     * @param WorkflowDefinition $definition
-     * @param bool $expected
      */
-    public function testDeleteWorkflowDefinition(WorkflowDefinition $definition, $expected)
+    public function testDeleteWorkflowDefinition(WorkflowDefinition $definition, bool $expected)
     {
-        $this->entityManager
-            ->expects($this->exactly((int)$expected))
+        $this->entityManager->expects($this->exactly((int)$expected))
             ->method('remove');
-
-        $this->entityManager
-            ->expects($this->exactly((int)$expected))
+        $this->entityManager->expects($this->exactly((int)$expected))
             ->method('flush');
 
-        $this->eventDispatcher
-            ->expects($this->exactly((int)$expected))
+        $this->eventDispatcher->expects($this->exactly((int)$expected))
             ->method('dispatch')
-            ->with(WorkflowEvents::WORKFLOW_AFTER_DELETE, $this->equalTo(new WorkflowChangesEvent($definition)));
+            ->with(new WorkflowChangesEvent($definition), WorkflowEvents::WORKFLOW_AFTER_DELETE);
 
         $this->assertEquals($expected, $this->handler->deleteWorkflowDefinition($definition));
     }
 
-    /**
-     * @return array
-     */
-    public function deleteWorkflowDefinitionDataProvider()
+    public function deleteWorkflowDefinitionDataProvider(): array
     {
         $definition1 = new WorkflowDefinition();
         $definition1

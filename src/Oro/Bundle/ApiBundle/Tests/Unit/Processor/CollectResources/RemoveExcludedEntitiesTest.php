@@ -17,7 +17,7 @@ class RemoveExcludedEntitiesTest extends \PHPUnit\Framework\TestCase
     /** @var RemoveExcludedEntities */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
 
@@ -39,12 +39,10 @@ class RemoveExcludedEntitiesTest extends \PHPUnit\Framework\TestCase
             ->willReturn($exclusionProvider);
         $exclusionProvider->expects(self::exactly(2))
             ->method('isIgnoredEntity')
-            ->willReturnMap(
-                [
-                    ['Test\Entity1', true],
-                    ['Test\Entity1', false]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Entity1', true],
+                ['Test\Entity1', false]
+            ]);
 
         $this->processor->process($context);
 

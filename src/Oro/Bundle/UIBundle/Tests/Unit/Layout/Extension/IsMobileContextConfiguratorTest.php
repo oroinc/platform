@@ -10,36 +10,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var IsMobileContextConfigurator
-     */
-    protected $isMobileContextConfigurator;
+    /** @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $userAgentProvider;
 
-    /**
-     * @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $userAgentProvider;
+    /** @var UserAgent|\PHPUnit\Framework\MockObject\MockObject */
+    private $userAgent;
 
-    /**
-     * @var UserAgent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $userAgent;
+    /** @var IsMobileContextConfigurator */
+    private $isMobileContextConfigurator;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->userAgentProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgentProvider')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
-            ->disableOriginalConstructor()->getMock();
+        $this->userAgentProvider = $this->createMock(UserAgentProvider::class);
+        $this->userAgent = $this->createMock(UserAgent::class);
 
         $this->isMobileContextConfigurator = new IsMobileContextConfigurator($this->userAgentProvider);
     }
 
     public function testConfigureContext()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionResolver */
-        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $optionResolver = $this->createMock(OptionsResolver::class);
         $optionResolver->expects($this->once())
             ->method('setRequired')
             ->with(['is_mobile'])
@@ -50,8 +40,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->with('is_mobile', ['boolean'])
             ->willReturn($optionResolver);
 
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->createMock('Oro\Component\Layout\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getResolver')
             ->willReturn($optionResolver);

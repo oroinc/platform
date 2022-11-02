@@ -2,42 +2,47 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
 use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
+    /** @var EntityAliasLoader|\PHPUnit\Framework\MockObject\MockObject */
     private $loader;
 
-    /** @var MutableEntityOverrideProvider */
-    private $entityOverrideProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemInterface */
+    private $cacheItem;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var EntityAliasResolver */
     private $entityAliasResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
-        $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->entityAliasResolver = new EntityAliasResolver(
             $this->loader,
-            $this->entityOverrideProvider,
+            new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']),
             $this->cache,
             $this->logger,
             ['api.yml']
@@ -46,21 +51,22 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     protected function setLoadExpectations()
     {
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('entity_aliases')
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cache->expects(self::atLeastOnce())
+            ->method('getItem')
+            ->with('entity_aliases')
+            ->willReturn($this->cacheItem);
 
         $this->loader->expects(self::once())
             ->method('load')
-            ->willReturnCallback(
-                function (EntityAliasStorage $storage) {
-                    $storage->addEntityAlias(
-                        'Test\Entity1',
-                        new EntityAlias('entity1_alias', 'entity1_plural_alias')
-                    );
-                }
-            );
+            ->willReturnCallback(function (EntityAliasStorage $storage) {
+                $storage->addEntityAlias(
+                    'Test\Entity1',
+                    new EntityAlias('entity1_alias', 'entity1_plural_alias')
+                );
+            });
     }
 
     public function testHasAliasForUnknownEntity()
@@ -72,45 +78,41 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage An alias for "Test\UnknownEntity" entity not found.
-     */
     public function testGetAliasForUnknownEntity()
     {
+        $this->expectException(EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('An alias for "Test\UnknownEntity" entity not found.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getAlias('Test\UnknownEntity');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage A plural alias for "Test\UnknownEntity" entity not found.
-     */
     public function testGetPluralAliasForUnknownEntity()
     {
+        $this->expectException(EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('A plural alias for "Test\UnknownEntity" entity not found.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getPluralAlias('Test\UnknownEntity');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage The alias "unknown" is not associated with any entity class.
-     */
     public function testGetClassByAliasForUnknownAlias()
     {
+        $this->expectException(EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('The alias "unknown" is not associated with any entity class.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getClassByAlias('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage The plural alias "unknown" is not associated with any entity class.
-     */
     public function testGetClassByPluralAliasForUnknownAlias()
     {
+        $this->expectException(EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('The plural alias "unknown" is not associated with any entity class.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getClassByPluralAlias('unknown');
@@ -178,7 +180,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     public function testWarmUpCache()
     {
         $this->cache->expects(self::once())
-            ->method('delete')
+            ->method('deleteItem')
             ->with('entity_aliases');
 
         $this->setLoadExpectations();
@@ -189,7 +191,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     public function testClearCache()
     {
         $this->cache->expects(self::once())
-            ->method('delete')
+            ->method('deleteItem')
             ->with('entity_aliases');
 
         $this->entityAliasResolver->clearCache();
@@ -200,10 +202,16 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $storage = new EntityAliasStorage();
         $storage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cache->expects($this->once())
+            ->method('getItem')
             ->with('entity_aliases')
-            ->willReturn($storage);
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
+            ->willReturn([null, $storage]);
 
         $this->loader->expects(self::never())
             ->method('load');
@@ -255,18 +263,19 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('entity_aliases')
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cache->expects(self::atLeastOnce())
+            ->method('getItem')
+            ->with('entity_aliases')
+            ->willReturn($this->cacheItem);
         $this->loader->expects(self::once())
             ->method('load')
-            ->willReturnCallback(
-                function (EntityAliasStorage $storage) {
-                    $storage->addEntityAlias('Test\Entity1', new EntityAlias('alias', 'plural_alias'));
-                    $storage->addEntityAlias('Test\Entity2', new EntityAlias('alias', 'plural_alias'));
-                }
-            );
+            ->willReturnCallback(function (EntityAliasStorage $storage) {
+                $storage->addEntityAlias('Test\Entity1', new EntityAlias('alias', 'plural_alias'));
+                $storage->addEntityAlias('Test\Entity2', new EntityAlias('alias', 'plural_alias'));
+            });
 
         $this->entityAliasResolver->getAll();
     }

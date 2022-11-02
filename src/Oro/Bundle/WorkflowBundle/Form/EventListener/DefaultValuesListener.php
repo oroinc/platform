@@ -26,9 +26,6 @@ class DefaultValuesListener implements EventSubscriberInterface
      */
     protected $defaultValues;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(ContextAccessor $contextAccessor)
     {
         $this->contextAccessor = $contextAccessor;
@@ -36,9 +33,6 @@ class DefaultValuesListener implements EventSubscriberInterface
 
     /**
      * Initialize listener with required data
-     *
-     * @param WorkflowItem $workflowItem
-     * @param array $defaultValues
      */
     public function initialize(
         WorkflowItem $workflowItem,
@@ -50,8 +44,6 @@ class DefaultValuesListener implements EventSubscriberInterface
 
     /**
      * Updates default values
-     *
-     * @param FormEvent $event
      */
     public function setDefaultValues(FormEvent $event)
     {

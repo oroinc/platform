@@ -15,6 +15,7 @@
 
         .title {
             @include text-line-truncate();
+
             display: block;
         }
 
@@ -38,15 +39,15 @@
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &:before {
+                &::before {
                     content: '';
 
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
-                    margin-#{$end}: 8px;
+                    margin-right: 8px;
 
-                    font-weight: normal;
+                    font-weight: font-weight('light');
                     line-height: 1;
                     text-align: center;
 
@@ -57,16 +58,16 @@
             }
 
             .accordion-toggle {
-                font-weight: bold;
+                font-weight: font-weight('bold');
 
-                @include fa-icon(if-ltr($menu-icon-right, $menu-icon-left), before, true) {
-                    transform: if-ltr(rotate(90deg), rotate(-90deg));
+                @include fa-icon($menu-icon, before, true, true) {
+                    transform: rotate(90deg);
                 }
 
                 &.collapsed {
-                    font-weight: normal;
+                    font-weight: font-weight('light');
 
-                    &:before {
+                    &::before {
                         transform: rotate(0);
                     }
                 }
@@ -81,11 +82,12 @@
                 }
 
                 $menu-title-offset: 0;
+
                 @for $i from 1 through 5 {
                     $selector: '&-level-' + $i;
 
                     #{$selector} {
-                        padding-#{$start}: $menu-title-offset *1px;
+                        padding-left: $menu-title-offset * 1px;
                     }
 
                     $menu-title-offset: $menu-title-offset + 24;
@@ -101,7 +103,7 @@
     .accordion-body {
         background-color: $menu-dropdown-background-color;
 
-        & > a {
+        > a {
             display: none;
         }
 
@@ -117,14 +119,14 @@
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-        padding: side-values(12px 22px 12px 24px);
+        padding: 12px 22px 12px 24px;
 
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
             min-width: 16px;
-            margin-#{$end}: 8px;
+            margin-right: 8px;
             margin-left: 0;
 
             text-align: center;
@@ -158,6 +160,25 @@
             position: static;
         }
 
+        .title-level-1 {
+            display: block;
+            padding: 13px 6px;
+
+            font-size: 11px;
+            line-height: 1.2;
+
+            color: $menu-item-first-level-text-color;
+
+            word-break: break-word;
+
+            .menu-icon {
+                display: block;
+                width: 100%;
+                margin: 0 0 5px;
+                font-size: 24px;
+            }
+        }
+
         // First level
         .dropdown-level-1 {
             text-align: center;
@@ -165,7 +186,6 @@
             width: $menu-side-width-minimized;
 
             .dropdown-menu {
-
                 display: none;
             }
 
@@ -180,81 +200,10 @@
             &.active {
                 background-color: $menu-dropdown-background-color;
 
-                > .unclickable .title {
+                .title-level-1 {
                     color: $menu-minimized-item-first-level-text-color-active;
                 }
             }
-        }
-
-        .title-level-1 {
-            display: block;
-            padding: 13px 8px;
-
-            font-size: 11px;
-            line-height: 1.2;
-
-            color: $menu-item-first-level-text-color;
-
-            word-break: break-word;
-
-            .menu-icon {
-                display: block;
-                width: 100%;
-                margin: 0 0 5px;
-
-                font-size: 24px;
-            }
-        }
-    }
-
-    .main-menu {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-
-        width: 100%;
-        padding-#{$end}: 25px;
-
-        box-sizing: content-box;
-
-        overflow-y: auto;
-    }
-
-    .menu-icon {
-        display: none;
-    }
-
-    &__scroll {
-        position: absolute;
-        #{$start}: 0;
-        z-index: 1;
-
-        width: 100%;
-        height: $menu-placeholder-size;
-
-        background-color: $menu-dropdown-background-color-active;
-
-        opacity: .85;
-
-        @extend %main-menu-trigger;
-
-        &:first-child {
-            top: 0;
-
-            @include fa-icon($menu-icon-up);
-        }
-
-        &:last-child {
-            bottom: 0;
-
-            @include fa-icon($menu-icon-down);
-        }
-
-        &:hover,
-        &:focus {
-            background-color: $menu-dropdown-background-color-light-active;
-
-            opacity: 1;
         }
     }
 }

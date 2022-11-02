@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -38,9 +36,5 @@ class InitializeConfigExtras implements ProcessorInterface
             )
         );
         $context->addConfigExtra(new FilterIdentifierFieldsConfigExtra());
-        if ($context->isCollection()) {
-            $context->addConfigExtra(new FiltersConfigExtra());
-            $context->addConfigExtra(new SortersConfigExtra());
-        }
     }
 }

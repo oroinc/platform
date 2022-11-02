@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Stores all configuration values which may be configured in `theme.yml`.
+ */
 class Theme
 {
     /** @var string */
@@ -17,6 +20,12 @@ class Theme
 
     /** @var string */
     protected $icon;
+
+    /** @var array */
+    protected $imagePlaceholders = [];
+
+    /** @var bool */
+    protected $rtlSupport = false;
 
     /** @var string */
     protected $logo;
@@ -109,6 +118,26 @@ class Theme
         $this->icon = $icon;
     }
 
+    public function getImagePlaceholders(): array
+    {
+        return $this->imagePlaceholders;
+    }
+
+    public function setImagePlaceholders(array $imagePlaceholders): void
+    {
+        $this->imagePlaceholders = $imagePlaceholders;
+    }
+
+    public function isRtlSupport(): bool
+    {
+        return $this->rtlSupport;
+    }
+
+    public function setRtlSupport(bool $rtlSupport): void
+    {
+        $this->rtlSupport = $rtlSupport;
+    }
+
     /**
      * @return string
      */
@@ -173,9 +202,6 @@ class Theme
         $this->directory = $directory;
     }
 
-    /**
-     * @param array $groups
-     */
     public function setGroups(array $groups)
     {
         $this->groups = $groups;
@@ -190,8 +216,14 @@ class Theme
     }
 
     /**
-     * @param array $config
+     * @param string $value
+     * @return bool
      */
+    public function hasGroup($value)
+    {
+        return in_array($value, $this->groups, true);
+    }
+
     public function setConfig(array $config)
     {
         $this->config = $config;

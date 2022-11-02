@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var PageStateView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var base64 = require('base64');
-    var routing = require('routing');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
-    var PageStateModel = require('oronavigation/js/app/models/page-state-model');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const base64 = require('base64');
+    const routing = require('routing');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
+    const PageStateModel = require('oronavigation/js/app/models/page-state-model');
+    const pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    PageStateView = BaseView.extend({
+    const PageStateView = BaseView.extend({
         listen: {
             'change:data model': '_saveModel',
             'change model': '_updateCache',
@@ -22,52 +22,53 @@ define(function(require) {
             'page:afterChange mediator': 'afterPageChange',
             'page:afterPagePartChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
-            'openLink:before mediator': 'beforePageChange',
-
-            'add collection': 'toggleStateTrace',
-            'remove collection': 'toggleStateTrace'
+            'openLink:before mediator': 'beforePageChange'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PageStateView() {
-            PageStateView.__super__.constructor.apply(this, arguments);
+        constructor: function PageStateView(options) {
+            PageStateView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            var confirmModal;
             this.model = new PageStateModel();
 
             this._initialState = null;
             this._resetChanges = false;
 
-            confirmModal = new Modal({
+            const confirmModal = new Modal({
                 title: __('Refresh Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
-                okText: __('OK, got it.'),
+                okText: __('Ok, got it'),
                 className: 'modal modal-primary',
-                cancelText: __('Cancel')
+                cancelText: __('Cancel'),
+                disposeOnHidden: false
             });
             this.subview('confirmModal', confirmModal);
 
-            $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
+            $(window).on('beforeunload' + this.eventNamespace(), this.onWindowUnload.bind(this));
+
+            this.isChangesLossConfirmationNeeded = this.isChangesLossConfirmationNeeded.bind(this);
+            pageStateChecker.registerChecker(this.isChangesLossConfirmationNeeded);
 
             PageStateView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
                 return;
             }
+            pageStateChecker.removeChecker(this.isChangesLossConfirmationNeeded);
             $(window).off(this.eventNamespace());
-            PageStateView.__super__.dispose.apply(this, arguments);
+            PageStateView.__super__.dispose.call(this);
         },
 
         /**
@@ -79,14 +80,14 @@ define(function(require) {
          * @param {Array} queue
          */
         beforePageRefresh: function(queue) {
-            var deferred;
-            var confirmModal;
-            var self;
+            let deferred;
+            let confirmModal;
+            let self;
             if (!this.model.get('data')) {
                 // data is not set, nothing to compare with
                 return;
             }
-            var preservedState = JSON.parse(this.model.get('data'));
+            const preservedState = JSON.parse(this.model.get('data'));
             if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
@@ -98,7 +99,7 @@ define(function(require) {
                 this.listenTo(confirmModal, 'ok', function() {
                     deferred.resolve({resetChanges: true});
                 });
-                this.listenTo(confirmModal, 'cancel', function() {
+                this.listenTo(confirmModal, 'cancel close', function() {
                     deferred.reject();
                 });
 
@@ -117,13 +118,22 @@ define(function(require) {
         },
 
         /**
+         * Checks if there are changes and the page is not pinned (changes are temporary preserved)
+         * @return {boolean}
+         */
+        isChangesLossConfirmationNeeded: function() {
+            return this._isStateChanged() && !this._isStateTraceRequired();
+        },
+
+        /**
          * Handles navigation action and shows confirm dialog
          * if page changes is not preserved and the state is changed from initial
          * (excludes cancel action)
          */
         beforePageChange: function(e) {
-            var action = $(e.target).data('action');
-            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            const action = $(e.target).data('action');
+            const blank = $(e.target).attr('target') === '_blank';
+            if (!e.prevented && action !== 'cancel' && !blank && this.isChangesLossConfirmationNeeded()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -143,8 +153,7 @@ define(function(require) {
          * @param {Object} args
          */
         onPageUpdate: function(attributes, args) {
-            var options;
-            options = (args || {}).options;
+            const options = (args || {}).options;
             this._resetChanges = Boolean(options && options.resetChanges);
         },
 
@@ -153,7 +162,7 @@ define(function(require) {
          * if page changes is not preserved and the state is changed from initial
          */
         onWindowUnload: function() {
-            if (!this._isStateTraceRequired() && this._isStateChanged()) {
+            if (this.isChangesLossConfirmationNeeded() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },
@@ -162,7 +171,7 @@ define(function(require) {
          * Fetches model's attributes from cache on page changes is done
          */
         afterPageChange: function() {
-            var options;
+            let options;
 
             if (this._hasForm()) {
                 this._initialState = this._collectFormsData();
@@ -184,7 +193,7 @@ define(function(require) {
          * Switch on/off form state trace
          */
         toggleStateTrace: function() {
-            var switchOn = this._isStateTraceRequired();
+            const switchOn = this._isStateTraceRequired();
             if (switchOn) {
                 this._switchOnTrace({initial: true});
             } else {
@@ -198,8 +207,7 @@ define(function(require) {
          * @protected
          */
         _switchOnTrace: function(options) {
-            var attributes;
-            attributes = mediator.execute('pageCache:state:fetch', 'form');
+            const attributes = mediator.execute('pageCache:state:fetch', 'form');
             if (attributes && attributes.id) {
                 this._initStateTracer(attributes, options);
             } else {
@@ -223,19 +231,18 @@ define(function(require) {
          * @protected
          */
         _loadState: function(options) {
-            var self = this;
-            var checkIdRoute = 'oro_api_get_pagestate_checkid';
-            var pageStateRoutes = this.$el.find('#pagestate-routes');
+            const self = this;
+            let checkIdRoute = 'oro_api_get_pagestate_checkid';
+            const pageStateRoutes = this.$el.find('#pagestate-routes');
             if (pageStateRoutes.data()) {
                 this.model.postRoute = pageStateRoutes.data('pagestate-put-route');
                 this.model.putRoute = pageStateRoutes.data('pagestate-put-route');
                 checkIdRoute = pageStateRoutes.data('pagestate-checkid-route');
             }
 
-            var url = routing.generate(checkIdRoute, {pageId: this._combinePageId()});
+            const url = routing.generate(checkIdRoute, {pageId: this._combinePageId()});
             $.get(url).done(function(data) {
-                var attributes;
-                attributes = {
+                const attributes = {
                     pageId: data.pagestate.pageId || self._combinePageId(),
                     data: self._resetChanges ? '' : data.pagestate.data,
                     pagestate: data.pagestate
@@ -254,9 +261,8 @@ define(function(require) {
          * @protected
          */
         _initStateTracer: function(attributes, options) {
-            var currentData;
             options = options || {};
-            currentData = JSON.stringify(this._collectFormsData());
+            const currentData = JSON.stringify(this._collectFormsData());
             if (!attributes.data || options.initial) {
                 attributes.data = currentData;
             }
@@ -264,7 +270,7 @@ define(function(require) {
             if (attributes.data !== currentData) {
                 this._restoreState();
             }
-            this.$el.on('change.page-state', _.bind(this._collectState, this));
+            this.$el.on('change.page-state', this._collectState.bind(this));
         },
 
         /**
@@ -272,8 +278,7 @@ define(function(require) {
          * @protected
          */
         _updateCache: function() {
-            var attributes;
-            attributes = {};
+            const attributes = {};
             _.extend(attributes, this.model.getAttributes());
             mediator.execute('pageCache:state:save', 'form', attributes);
         },
@@ -312,12 +317,12 @@ define(function(require) {
          * @protected
          */
         _collectState: function() {
-            var pageId = this._combinePageId();
+            const pageId = this._combinePageId();
             if (!pageId) {
                 return;
             }
 
-            var data = JSON.stringify(this._collectFormsData());
+            const data = JSON.stringify(this._collectFormsData());
 
             if (data === this.model.get('data')) {
                 return;
@@ -335,10 +340,9 @@ define(function(require) {
          * @protected
          */
         _collectFormsData: function() {
-            var data;
-            data = [];
+            const data = [];
             $('form[data-collect=true]').each(function(index, el) {
-                var items = $(el)
+                let items = $(el)
                     .find('input, textarea, select')
                     .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
                          ':input[type=password], :input[type=file],   :input[name$="[_token]"], ' +
@@ -349,9 +353,9 @@ define(function(require) {
                 // collect select2 selected data
                 items = $(el).find('.select2[type=hidden], .select2[type=select]');
                 _.each(items, function(item) {
-                    var $item = $(item);
-                    var selectedData = $item.inputWidget('data');
-                    var itemData = {name: item.name, value: $item.val()};
+                    const $item = $(item);
+                    const selectedData = $item.inputWidget('data');
+                    const itemData = {name: item.name, value: $item.val()};
 
                     if (!_.isEmpty(selectedData)) {
                         itemData.selectedData = selectedData;
@@ -368,8 +372,7 @@ define(function(require) {
          * @protected
          */
         _restoreState: function() {
-            var data;
-            data = this.model.get('data');
+            const data = this.model.get('data');
 
             if (data) {
                 this._restoreForms(JSON.parse(data));
@@ -384,10 +387,10 @@ define(function(require) {
          */
         _restoreForms: function(data) {
             $.each(data, function(index, el) {
-                var form = $('form[data-collect=true]').eq(index);
+                const form = $('form[data-collect=true]').eq(index);
 
                 $.each(el, function(i, input) {
-                    var element = form.find('[name="' + input.name + '"]');
+                    const element = form.find('[name="' + input.name + '"]');
                     switch (element.prop('type')) {
                         case 'checkbox':
                             element.filter('[value="' + input.value + '"]').prop('checked', true);
@@ -415,9 +418,7 @@ define(function(require) {
          * @protected
          */
         _combinePageId: function() {
-            var route;
-            route = this._parseCurrentURL();
-            return base64.encode(route.path);
+            return base64.encode(this._getCurrentURL());
         },
 
         /**
@@ -425,22 +426,29 @@ define(function(require) {
          * @returns {Object}
          * @protected
          */
-        _parseCurrentURL: function() {
-            var route = mediator.execute('currentUrl');
-            var _ref = route.split('?');
-            route = {
-                path: _ref[0],
-                query: _ref[1] || ''
-            };
-            return route;
+        _getCurrentURL: function() {
+            let url = mediator.execute('currentUrl');
+            url = mediator.execute('normalizeUrl', url);
+
+            return url;
+        },
+
+        /**
+         * Allows to overload _isStateTraceRequired stub-method
+         *
+         * @param {Function} callback
+         */
+        setStateTraceRequiredChecker: function(callback) {
+            this._isStateTraceRequired = callback;
         },
 
         /**
          * Defines if page is in cache and state trace is required
+         * (it is stub-method and can be overloaded)
          * @protected
          */
         _isStateTraceRequired: function() {
-            return Boolean(this.collection.getCurrentModel());
+            return false;
         },
 
         /**
@@ -465,7 +473,7 @@ define(function(require) {
          * @protected
          */
         _isDifferentFromInitialState: function(state) {
-            var initialState = this._initialState;
+            const initialState = this._initialState;
 
             if (_.isArray(state)) {
                 $.each(state, function(index, item) {
@@ -478,7 +486,7 @@ define(function(require) {
                 });
             }
 
-            var isSame = initialState && _.every(initialState, function(form, i) {
+            const isSame = initialState && _.every(initialState, function(form, i) {
                 return _.isArray(state[i]) && _.every(form, function(field, j) {
                     return _.isObject(state[i][j]) &&
                         state[i][j].name === field.name && state[i][j].value === field.value;

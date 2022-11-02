@@ -2,84 +2,65 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
+use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
+use Oro\Bundle\SearchBundle\Entity\IndexInteger;
+use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var SkipTagTrackingPass */
-    protected $skipTagTrackingPass;
+    private $compiler;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerBuilder::class);
-
-        $this->skipTagTrackingPass = new SkipTagTrackingPass();
+        $this->compiler = new SkipTagTrackingPass();
     }
 
     public function testProcessWithoutService()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue(false));
+        $container = new ContainerBuilder();
 
-        $this->container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $this->skipTagTrackingPass->process($this->container);
+        $this->compiler->process($container);
     }
-    
+
     public function testProcess()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue(true));
+        $container = new ContainerBuilder();
+        $listenerDef = $container->register('oro_sync.event_listener.doctrine_tag');
+
+        $this->compiler->process($container);
 
         $skippedEntityClasses = [];
-
-        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
-        $definition = $this->createMock(Definition::class);
-        $definition->expects($this->any())
-            ->method('addMethodCall')
-            ->with('markSkipped')
-            ->willReturnCallback(function ($method, array $arguments) use (&$skippedEntityClasses) {
-                $skippedEntityClasses[] = $arguments[0];
-            });
-
-        $this->container
-            ->expects($this->once())
-            ->method('getDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue($definition));
-
-        $this->skipTagTrackingPass->process($this->container);
-
+        foreach ($listenerDef->getMethodCalls() as [$methodName, $methodArguments]) {
+            if ('markSkipped' === $methodName) {
+                $skippedEntityClasses[] = $methodArguments[0];
+            }
+        }
         self::assertEquals(
             [
-                'Oro\Bundle\DataAuditBundle\Entity\Audit',
-                'Oro\Bundle\DataAuditBundle\Entity\AuditField',
-                'Oro\Bundle\NavigationBundle\Entity\PageState',
-                'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem',
-                'Oro\Bundle\SearchBundle\Entity\Item',
-                'Oro\Bundle\SearchBundle\Entity\IndexText',
-                'Oro\Bundle\SearchBundle\Entity\IndexInteger',
-                'Oro\Bundle\SearchBundle\Entity\IndexDecimal',
-                'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
-                'Akeneo\Bundle\BatchBundle\Entity\JobExecution',
-                'Akeneo\Bundle\BatchBundle\Entity\StepExecution',
-                'Oro\Bundle\MessageQueueBundle\Entity\Job',
+                Audit::class,
+                AuditField::class,
+                PageState::class,
+                NavigationHistoryItem::class,
+                Item::class,
+                IndexText::class,
+                IndexInteger::class,
+                IndexDecimal::class,
+                IndexDatetime::class,
+                JobExecution::class,
+                StepExecution::class,
+                Job::class,
             ],
             $skippedEntityClasses
         );

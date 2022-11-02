@@ -15,8 +15,6 @@ class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
 
     /**
      * CurrencyConfigManager constructor.
-     *
-     * @param ConfigManager $configManager
      */
     public function __construct(ConfigManager $configManager)
     {

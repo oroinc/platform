@@ -1,15 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var LayoutSubtreeView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    LayoutSubtreeView = BaseView.extend({
+    const LayoutSubtreeView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'keepAttrs', 'useHiddenElement', 'onLoadingCssClass',
+            'loadingMask', 'disableControls'
+        ]),
+
         options: {
             blockId: '',
             reloadEvents: [],
@@ -19,32 +23,68 @@ define(function(require) {
 
         formState: null,
 
+        /** @property */
+        hiddenElement: null,
+
+        /** @property */
+        useHiddenElement: false,
+
+        keepAttrs: [],
+
+        onLoadingCssClass: '',
+
+        disableControls: false,
+
+        /** @property */
+        events: {
+            'content:initialized': 'contentInitialized'
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function LayoutSubtreeView() {
-            LayoutSubtreeView.__super__.constructor.apply(this, arguments);
+        constructor: function LayoutSubtreeView(options) {
+            LayoutSubtreeView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
-            LayoutSubtreeView.__super__.initialize.apply(this, arguments);
+            LayoutSubtreeView.__super__.initialize.call(this, options);
             LayoutSubtreeManager.addView(this);
         },
 
         dispose: function() {
             LayoutSubtreeManager.removeView(this);
-            return LayoutSubtreeView.__super__.dispose.apply(this, arguments);
+            return LayoutSubtreeView.__super__.dispose.call(this);
         },
 
         setContent: function(content) {
+            if (content === void 0) {
+                return;
+            }
+            const $content = $(content);
             this._hideLoading();
             this.disposePageComponents();
 
-            this.$el
-                .trigger('content:remove')
-                .html($(content).children())
-                .trigger('content:changed');
+            if (this.useHiddenElement) {
+                // Create a hidden element in which initialization will be performed
+                this.hiddenElement = this.$el.clone(true).hide();
+                this.hiddenElement.insertAfter(this.$el);
+                this.hiddenElement.trigger('content:remove')
+                    .html($content.children())
+                    .trigger('content:changed');
+            } else {
+                this.$el
+                    .trigger('content:remove')
+                    .html($content.children())
+                    .trigger('content:changed');
+            }
+
+            if (this.keepAttrs.length) {
+                for (const attr of this.keepAttrs) {
+                    this.$el.attr(attr, $content.attr(attr));
+                }
+            }
         },
 
         beforeContentLoading: function() {
@@ -58,7 +98,7 @@ define(function(require) {
         afterContentLoading: function() {
             this._restoreFormState();
             // Initialize tooltips and other elements
-            mediator.execute('layout:init', this.$el);
+            mediator.execute('layout:init', this.useHiddenElement ? this.hiddenElement : this.$el);
         },
 
         contentLoadingFail: function() {
@@ -66,10 +106,18 @@ define(function(require) {
         },
 
         _showLoading: function() {
+            if (this.onLoadingCssClass) {
+                this.$el.addClass(this.onLoadingCssClass);
+            }
+
+            if (this.disableControls) {
+                this.setDisableControls();
+            }
+
             if (!this.options.showLoading) {
                 return;
             }
-            var $container = this.$el.closest('[data-role="layout-subtree-loading-container"]');
+            let $container = this.$el.closest('[data-role="layout-subtree-loading-container"]');
             if (!$container.length) {
                 $container = this.$el;
             }
@@ -80,6 +128,9 @@ define(function(require) {
         },
 
         _hideLoading: function() {
+            if (this.onLoadingCssClass) {
+                this.$el.removeClass(this.onLoadingCssClass);
+            }
             if (!this.options.showLoading) {
                 return;
             }
@@ -89,16 +140,16 @@ define(function(require) {
         _saveFormState: function() {
             this.formState = {};
 
-            _.each(this._getInputs(), _.bind(function(input) {
-                var name = input.name;
-                var value = input.value;
+            _.each(this._getInputs(), input => {
+                let name = input.name;
+                let value = input.value;
 
                 if ($(input).is(':checkbox, :radio')) {
                     name += ':' + value;
                     value = input.checked;
                 }
                 this.formState[name] = value;
-            }, this));
+            });
         },
 
         _restoreFormState: function() {
@@ -106,29 +157,52 @@ define(function(require) {
                 return;
             }
 
-            _.each(this._getInputs(), _.bind(function(input) {
-                var name = input.name;
-                var isRadio = $(input).is(':checkbox, :radio');
+            _.each(this._getInputs(), input => {
+                let name = input.name;
+                const isRadio = $(input).is(':checkbox, :radio');
                 if (isRadio) {
                     name += ':' + input.value;
                 }
 
-                var savedInput = this.formState[name];
+                const savedInput = this.formState[name];
                 if (savedInput === undefined || (isRadio && !savedInput)) {
                     return;
                 }
 
-                var $input = $(input);
+                const $input = $(input);
                 if (isRadio) {
                     $input.click();
                 } else {
                     $input.val(savedInput).change();
                 }
-            }, this));
+            });
         },
 
         _getInputs: function() {
             return this.$el.find('input, textarea, select').filter('[name!=""]');
+        },
+
+        setDisableControls() {
+            this.$el.find(':tabbable').each((i, element) => {
+                if (!_.isUndefined(element.value)) {
+                    $(element).attr('disabled', 'disabled');
+                } else {
+                    $(element)
+                        .attr('aria-disabled', 'true')
+                        .addClass('disabled');
+                }
+            });
+        },
+
+        contentInitialized: function() {
+            if (this.useHiddenElement) {
+                // Replace a target element with an initialized hidden element
+                this.$el.html(this.hiddenElement.html());
+                // Remove a hidden element
+                this.hiddenElement.remove();
+                this.hiddenElement = null;
+                this.useHiddenElement = false;
+            }
         }
     });
 

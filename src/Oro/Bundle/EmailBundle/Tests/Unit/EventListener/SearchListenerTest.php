@@ -14,15 +14,15 @@ use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listener = new SearchListener();
     }
 
     /**
-     * @dataProvider getTestData
+     * @dataProvider prepareEntityMapEventDataProvider
      */
     public function testPrepareEntityMapEvent($entity, $expected)
     {
@@ -36,7 +36,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $event->getData());
     }
 
-    public function getTestData()
+    public function prepareEntityMapEventDataProvider(): array
     {
         $badEmail = new Email();
         $badEmailAddress = new EmailAddress();
@@ -56,7 +56,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         $email->addRecipient($recipient);
 
         return [
-            'wrong class' => [
+            'not email class' => [
                 new \stdClass(),
                 [
                     'integer' => [
@@ -64,7 +64,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'email without correct user organization' => [
+            'email without user organization' => [
                 $badEmail,
                 [
                     'integer' => [
@@ -72,7 +72,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'correct email' => [
+            'email with user organization' => [
                 $email,
                 [
                     'integer' => [

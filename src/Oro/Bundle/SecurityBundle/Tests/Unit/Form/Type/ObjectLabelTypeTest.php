@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -9,12 +10,11 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectLabelType */
-    protected $formType;
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()->getMock();
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $this->formType = new ObjectLabelType(new EntityClassNameHelper($entityAliasResolver));
     }
 

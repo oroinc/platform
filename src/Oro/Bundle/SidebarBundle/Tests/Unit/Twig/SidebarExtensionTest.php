@@ -3,58 +3,46 @@
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
+use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionRegistry */
-    protected $widgetDefinitionsRegistry;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionProvider */
+    private $widgetDefinitionProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AssetHelper */
-    protected $assetHelper;
-
-    /** @var SidebarExtension */
-    protected $extension;
+    private $assetHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
-    protected function setUp()
+    /** @var SidebarExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->widgetDefinitionsRegistry = $this->getMockBuilder(WidgetDefinitionRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->widgetDefinitionProvider = $this->createMock(WidgetDefinitionProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->assetHelper = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assetHelper = $this->createMock(AssetHelper::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_sidebar.widget_definition.registry', $this->widgetDefinitionsRegistry)
-            ->add('translator', $this->translator)
-            ->add('assets.packages', $this->assetHelper)
+            ->add('oro_sidebar.widget_definition_provider', $this->widgetDefinitionProvider)
+            ->add(TranslatorInterface::class, $this->translator)
+            ->add(AssetHelper::class, $this->assetHelper)
             ->getContainer($this);
 
         $this->extension = new SidebarExtension($container);
         $this->extension->setFeatureChecker($this->featureChecker);
-    }
-
-    public function testGetName()
-    {
-        self::assertEquals(SidebarExtension::NAME, $this->extension->getName());
     }
 
     public function testGetWidgetDefinitions()
@@ -73,7 +61,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->widgetDefinitionsRegistry->expects(self::once())
+        $this->widgetDefinitionProvider->expects(self::once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
             ->willReturn($definitions);
@@ -100,7 +88,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
                     'module' => 'widget/foo',
                     'placement' => 'left',
                     'description' => 'Simple',
-                    'dialogIcon' => "/test-icon.png"
+                    'dialogIcon' => '/test-icon.png'
                 ]
             ],
             self::callTwigFunction($this->extension, 'oro_sidebar_get_available_widgets', [$placement])
@@ -123,7 +111,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->widgetDefinitionsRegistry->expects(self::once())
+        $this->widgetDefinitionProvider->expects(self::once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
             ->willReturn($definitions);

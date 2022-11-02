@@ -33,12 +33,6 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var ButtonContext */
     private $baseButtonContext;
 
-    /**
-     * @param OperationRegistry $operationRegistry
-     * @param ContextHelper $contextHelper
-     * @param RouteProviderInterface $routeProvider
-     * @param OptionsResolver $optionsResolver
-     */
     public function __construct(
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,

@@ -9,21 +9,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroSyncExtension extends Extension
 {
-    const CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  = 'websocket_host';
-    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  = 'websocket_port';
-    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  = 'websocket_path';
-    const CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  = 'websocket_bind_address';
-    const CONFIG_PARAM_WEBSOCKET_BIND_PORT     = 'websocket_bind_port';
-    const CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  = 'websocket_backend_host';
-    const CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  = 'websocket_backend_port';
-    const CONFIG_PARAM_WEBSOCKET_BACKEND_PATH  = 'websocket_backend_path';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST = 'websocket_host';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT = 'websocket_port';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH = 'websocket_path';
+    const CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS = 'websocket_bind_address';
+    const CONFIG_PARAM_WEBSOCKET_BIND_PORT = 'websocket_bind_port';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_HOST = 'websocket_backend_host';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_PORT = 'websocket_backend_port';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_PATH = 'websocket_backend_path';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST = 'websocket_frontend_host';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT = 'websocket_frontend_port';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH = 'websocket_frontend_path';
@@ -61,12 +56,13 @@ class OroSyncExtension extends Extension
         $this->setDefaultParameterValue($container, self::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS, []);
         $this->validateWebSocketContextOptions($container);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $loader->load('services.yml');
         $loader->load('security.yml');
         $loader->load('client.yml');
         $loader->load('data_update.yml');
+        $loader->load('controllers.yml');
 
         $this->cloneParameters(
             $container,
@@ -74,7 +70,7 @@ class OroSyncExtension extends Extension
             [
                 self::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS,
                 self::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST,
-                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST,
             ]
         );
         $this->cloneParameters(
@@ -83,7 +79,7 @@ class OroSyncExtension extends Extension
             [
                 self::CONFIG_PARAM_WEBSOCKET_BIND_PORT,
                 self::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT,
-                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT,
             ]
         );
 
@@ -92,12 +88,14 @@ class OroSyncExtension extends Extension
             self::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH,
             [
                 self::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH,
-                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH,
             ]
         );
 
-        if (isset($bundles['MonologBundle'])) {
-            $this->configureLogger($container);
+        $this->configureLogger($container);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
         }
     }
 
@@ -118,18 +116,19 @@ class OroSyncExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureLogger(ContainerBuilder $container): void
     {
         if (true === $container->getParameter('kernel.debug')) {
             $verbosityLevels = [
+                'VERBOSITY_QUIET' => Logger::ERROR,
                 'VERBOSITY_NORMAL' => Logger::INFO,
                 'VERBOSITY_VERBOSE' => Logger::DEBUG,
+                'VERBOSITY_VERY_VERBOSE' => Logger::DEBUG,
+                'VERBOSITY_DEBUG' => Logger::DEBUG,
             ];
         } else {
             $verbosityLevels = [
+                'VERBOSITY_QUIET' => Logger::ERROR,
                 'VERBOSITY_NORMAL' => Logger::WARNING,
                 'VERBOSITY_VERBOSE' => Logger::NOTICE,
                 'VERBOSITY_VERY_VERBOSE' => Logger::INFO,
@@ -145,13 +144,21 @@ class OroSyncExtension extends Extension
                     'verbosity_levels' => $verbosityLevels,
                     'channels' => [
                         'type' => 'inclusive',
-                        'elements' => ['oro_websocket'],
+                        'elements' => ['oro_websocket', 'websocket'],
                     ],
+                    // Should be one of the first handlers to avoid cancelling of this handler by another
+                    // handler with higher priority.
+                    'priority' => 512,
                 ],
             ],
         ];
 
         $container->prependExtensionConfig('monolog', $monologConfig);
+
+        $container
+            ->getDefinition('oro_sync.log.handler.websocket_server_console')
+            // see Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension::getHandlerId
+            ->setDecoratedService('monolog.handler.websocket');
     }
 
     /**
@@ -166,9 +173,6 @@ class OroSyncExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function validateWebSocketBackendTransport(ContainerBuilder $container): void
     {
         if (!\in_array(
@@ -176,37 +180,40 @@ class OroSyncExtension extends Extension
             stream_get_transports(),
             true
         )) {
-            throw new InvalidConfigurationException(sprintf(
-                'Transport "%s" is not available, please run stream_get_transports() to verify'
-                . ' the list of registered transports.',
-                $container->getParameter(self::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT)
-            ));
+            throw new InvalidConfigurationException(
+                sprintf(
+                    'Transport "%s" is not available, please run stream_get_transports() to verify'
+                    . ' the list of registered transports.',
+                    $container->getParameter(self::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT)
+                )
+            );
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function validateWebSocketContextOptions(ContainerBuilder $container): void
     {
         $options = $container->getParameter(self::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS);
 
         foreach ($options as $optionName => $optionValue) {
             if (!array_key_exists($optionName, self::KNOWN_CONTEXT_OPTIONS)) {
-                throw new InvalidConfigurationException(sprintf(
-                    'Unknown socket context option "%s". Only SSL context options '
-                    . '(http://php.net/manual/en/context.ssl.php) are allowed.',
-                    $optionName
-                ));
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'Unknown socket context option "%s". Only SSL context options '
+                        . '(http://php.net/manual/en/context.ssl.php) are allowed.',
+                        $optionName
+                    )
+                );
             }
 
             if (gettype($optionValue) !== self::KNOWN_CONTEXT_OPTIONS[$optionName]) {
-                throw new InvalidConfigurationException(sprintf(
-                    'Invalid type "%s" of socket context option "%s", expected "%s" type.',
-                    gettype($optionValue),
-                    $optionName,
-                    self::KNOWN_CONTEXT_OPTIONS[$optionName]
-                ));
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'Invalid type "%s" of socket context option "%s", expected "%s" type.',
+                        gettype($optionValue),
+                        $optionName,
+                        self::KNOWN_CONTEXT_OPTIONS[$optionName]
+                    )
+                );
             }
         }
     }

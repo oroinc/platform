@@ -3,51 +3,49 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowPermissionDatasource;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowPermissionDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $permissionManager;
+    /** @var PermissionManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $permissionManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclRoleHandler;
+    /** @var AclRoleHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclRoleHandler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $categoryProvider;
+    /** @var RolePrivilegeCategoryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $categoryProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configEntityManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configEntityManager;
 
     /** @var WorkflowPermissionDatasource */
-    protected $datasource;
+    private $datasource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclRoleHandler = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->categoryProvider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configEntityManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->permissionManager = $this->createMock(PermissionManager::class);
+        $this->aclRoleHandler = $this->createMock(AclRoleHandler::class);
+        $this->categoryProvider = $this->createMock(RolePrivilegeCategoryProvider::class);
+        $this->configEntityManager = $this->createMock(ConfigManager::class);
 
         $this->datasource = new WorkflowPermissionDatasource(
             $this->translator,
@@ -63,9 +61,7 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit\Framework\TestCase
         $role = new Role();
         $parameters = new ParameterBag();
         $parameters->add(['role' => $role]);
-        $datagridConfig = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datagridConfig = $this->createMock(DatagridConfiguration::class);
         $grid = new Datagrid('test', $datagridConfig, $parameters);
 
         $this->datasource->process($grid, []);
@@ -102,7 +98,9 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit\Framework\TestCase
         $privilege2->setFields(new ArrayCollection([$privilege2Transition1, $privilege2Transition2]));
 
         $privileges = new ArrayCollection(['workflow' => new ArrayCollection([$privilege1, $privilege2])]);
-        $this->aclRoleHandler->expects($this->any())->method('getAllPrivileges')->willReturn($privileges);
+        $this->aclRoleHandler->expects($this->any())
+            ->method('getAllPrivileges')
+            ->willReturn($privileges);
 
         $this->translator->expects($this->any())
             ->method('trans')
@@ -110,22 +108,22 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit\Framework\TestCase
                 return 'translated: ' . $value;
             });
 
-        $this->permissionManager->expects($this->any())->method('getPermissionByName')
-            ->willReturnCallback(
-                function ($permissionName) {
-                    $permission = new Permission();
-                    $permission->setName($permissionName);
-                    $permission->setLabel($permissionName);
-                    return $permission;
-                }
-            );
+        $this->permissionManager->expects($this->any())
+            ->method('getPermissionByName')
+            ->willReturnCallback(function ($permissionName) {
+                $permission = new Permission();
+                $permission->setName($permissionName);
+                $permission->setLabel($permissionName);
+
+                return $permission;
+            });
 
         $result = $this->datasource->getResults();
 
         $this->validateResult($result);
     }
 
-    protected function validateResult($result)
+    private function validateResult(array $result): void
     {
         $this->assertCount(2, $result);
 

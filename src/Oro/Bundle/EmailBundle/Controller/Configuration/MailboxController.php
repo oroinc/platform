@@ -2,31 +2,36 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
+use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler;
+use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class MailboxController
+ * The controller for the mailboxes functionality.
  *
  * Actions in this controller are protected by MailboxAuthorizationListener because access to them is determined
  * by access to Organization entity which is not even always available.
  * @see \Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
- *
- * @package Oro\Bundle\EmailBundle\Controller\Configuration
  */
-class MailboxController extends Controller
+class MailboxController extends AbstractController
 {
-    const ACTIVE_GROUP    = 'platform';
-    const ACTIVE_SUBGROUP = 'email_configuration';
+    private const ACTIVE_GROUP = 'platform';
+    private const ACTIVE_SUBGROUP = 'email_configuration';
 
     /**
      * @Route(
@@ -37,53 +42,36 @@ class MailboxController extends Controller
      *      "mailbox",
      *      class="OroEmailBundle:Mailbox"
      * )
-     * @Template
-     *
-     * @param Mailbox $mailbox
-     * @param Request $request
-     *
-     * @return array
+     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
      */
-    public function updateAction(Mailbox $mailbox, Request $request)
+    public function updateAction(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
         return $this->update($mailbox, $request);
     }
 
     /**
      * Prepares and handles data of Mailbox update/create form.
-     *
-     * @param Mailbox $mailbox
-     * @param Request $request
-     *
-     * @return array
      */
-    private function update(Mailbox $mailbox, Request $request)
+    private function update(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
-        $provider = $this->get('oro_config.provider.system_configuration.form_provider');
-
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
-
+        $provider = $this->get(SystemConfigurationFormProvider::class);
+        [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
         $jsTree = $provider->getJsTree();
-
-        $handler = $this->get('oro_email.form.handler.mailbox');
+        $handler = $this->get(MailboxHandler::class);
 
         if ($handler->process($mailbox)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans(
+                $this->get(TranslatorInterface::class)->trans(
                     'oro.email.mailbox.action.saved',
                     ['%mailbox%' => $mailbox->getLabel()]
                 )
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                [
-                    'route' => 'oro_email_mailbox_update',
-                    'parameters' => ['id' => $mailbox->getId()]
-                ],
-                $this->getRedirectData($request),
-                $mailbox
-            );
+            return $this->get(Router::class)->redirect([
+                'route' => 'oro_email_mailbox_update',
+                'id'    => $mailbox->getId()
+            ]);
         }
 
         return [
@@ -97,32 +85,21 @@ class MailboxController extends Controller
 
     /**
      * @Route("/mailbox/create", name="oro_email_mailbox_create")
-     * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
-     *
-     * @param Request      $request
-     *
-     * @return array
+     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): array|RedirectResponse
     {
         return $this->update(new Mailbox(), $request);
     }
 
     /**
-     * @Delete(
-     *      "/mailbox/delete/{id}",
-     *      name="oro_email_mailbox_delete"
-     * )
+     * @Route("/mailbox/delete/{id}", name="oro_email_mailbox_delete", methods={"DELETE"})
      * @ParamConverter(
      *      "mailbox",
      *      class="OroEmailBundle:Mailbox"
      * )
-     *
-     * @param Mailbox $mailbox
-     *
-     * @return Response
      */
-    public function deleteAction(Mailbox $mailbox)
+    public function deleteAction(Mailbox $mailbox): Response
     {
         $mailboxManager = $this->getDoctrine()->getManagerForClass('OroEmailBundle:Mailbox');
         $mailboxManager->remove($mailbox);
@@ -138,43 +115,34 @@ class MailboxController extends Controller
      *      "/mailbox/users/search/{organizationId}",
      *      name="oro_email_mailbox_users_search"
      * )
-     *
-     * @param Request $request
-     * @param int     $organizationId
-     *
-     * @return JsonResponse
      */
-    public function searchUsersAction(Request $request, $organizationId)
+    public function searchUsersAction(Request $request, int $organizationId): JsonResponse
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get('validator');
-        $isXmlHttpRequest    = $request->isXmlHttpRequest();
-        $code                = 200;
-        $result              = [
+        $result = [
             'results' => [],
             'hasMore' => false,
             'errors'  => []
         ];
 
-        if ($violations = $validator->validate($autocompleteRequest)) {
-            foreach ($violations as $violation) {
-                $result['errors'][] = $violation->getMessage();
-            }
+        $violations = $this->get(ValidatorInterface::class)->validate($autocompleteRequest);
+        foreach ($violations as $violation) {
+            $result['errors'][] = $violation->getMessage();
         }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
         if (!empty($result['errors'])) {
-            if ($isXmlHttpRequest) {
-                return new JsonResponse($result, $code);
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse($result);
             }
 
-            throw new HttpException($code, implode(', ', $result['errors']));
+            throw new HttpException(Response::HTTP_OK, implode(', ', $result['errors']));
         }
 
-        $searchHandler = $this->get('oro_email.autocomplete.mailbox_user_search_handler');
+        $searchHandler = $this->get(MailboxUserSearchHandler::class);
         $searchHandler->setOrganizationId($organizationId);
 
         return new JsonResponse(
@@ -187,12 +155,7 @@ class MailboxController extends Controller
         );
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return array
-     */
-    protected function getRedirectData(Request $request)
+    protected function getRedirectData(Request $request): array
     {
         return $request->query->get(
             'redirectData',
@@ -202,6 +165,25 @@ class MailboxController extends Controller
                     'activeGroup' => self::ACTIVE_GROUP,
                     'activeSubGroup' => self::ACTIVE_SUBGROUP,
                 ]
+            ]
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                ValidatorInterface::class,
+                Security::class,
+                MailboxUserSearchHandler::class,
+                MailboxHandler::class,
+                SystemConfigurationFormProvider::class,
             ]
         );
     }

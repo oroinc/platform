@@ -1,6 +1,7 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {"%role%": entity.label }}) %}
 
@@ -17,6 +18,8 @@
 {% endblock pageHeader %}
 
 {% block navButtonContainer %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% block navButtons %}
         {% placeholder view_navButtons with {entity: entity} %}
         {% if entity.id is defined and is_granted('DELETE', entity) %}
@@ -35,6 +38,8 @@
 {% endblock navButtonContainer %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set dataBlocks = [
         {
             'title': 'General'|trans,
@@ -51,6 +56,8 @@
             {{ UI.renderProperty('oro.user.role.organization.label'|trans, entity.organization) }}
         {% endif %}
         {{ UI.renderSwitchableHtmlProperty('oro.user.role.extend_description.label'|trans, entity.extendDescription) }}
+        {% set ignoredFields = ['organization', 'extend_description'] %}
+        {{ entityConfig.renderDynamicFields(entity, entity_class, ignoredFields) }}
     {% endset %}
 
     {% set rolePermissionsGrid %}
@@ -63,7 +70,7 @@
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        <div id="{{ entityTabPanelId }}" role="tabpanel">
+        <div id="{{ entityTabPanelId }}" class="tab-content" role="tabpanel">
             {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: true} }) }}
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orouser/js/components/role/capability-set-component',

@@ -14,12 +14,15 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityTypeTest extends OrmRelatedTestCase
 {
     /** @var FormFactoryInterface */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->factory = Forms::createFormFactoryBuilder()
@@ -35,7 +38,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     /**
      * @dataProvider validSingleEmptyValuesDataProvider
      */
-    public function testSingleWithValidEmptyValue($value, $expected)
+    public function testSingleWithValidEmptyValue(array|string|null $value)
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
@@ -48,10 +51,10 @@ class EntityTypeTest extends OrmRelatedTestCase
         );
         $form->submit($value);
         self::assertTrue($form->isSynchronized());
-        self::assertEquals($expected, $form->getData());
+        self::assertNull($form->getData());
     }
 
-    public function validSingleEmptyValuesDataProvider()
+    public function validSingleEmptyValuesDataProvider(): array
     {
         return [
             [null, null],
@@ -63,7 +66,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     /**
      * @dataProvider validMultipleEmptyValuesDataProvider
      */
-    public function testMultipleWithValidEmptyValue($value, $expected)
+    public function testMultipleWithValidEmptyValue(array|string|null $value, ArrayCollection $expected)
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
@@ -79,7 +82,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertEquals($expected, $form->getData());
     }
 
-    public function validMultipleEmptyValuesDataProvider()
+    public function validMultipleEmptyValuesDataProvider(): array
     {
         return [
             [null, new ArrayCollection()],

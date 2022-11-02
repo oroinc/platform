@@ -2,73 +2,67 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\TagBundle\Entity\Taggable as TaggableInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\EventListener\TagListener;
-use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class TagListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ID = 1;
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $taggableHelper;
 
-    /**
-     * @var TagListener
-     */
+    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $tagManager;
+
+    /** @var TagListener */
     private $listener;
 
-    /**
-     * @var TaggableInterface
-     */
-    private $resource;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->resource = new Taggable(['id' => self::TEST_ID]);
+        $this->taggableHelper = $this->createMock(TaggableHelper::class);
+        $this->tagManager = $this->createMock(TagManager::class);
+
+        $container = TestContainerBuilder::create()
+            ->add('oro_tag.helper.taggable_helper', $this->taggableHelper)
+            ->add('oro_tag.tag.manager', $this->tagManager)
+            ->getContainer($this);
+
+        $this->listener = new TagListener($container);
     }
 
-    protected function tearDown()
+    public function testPreRemoveForTaggableEntity()
     {
-        unset($this->listener);
-        unset($this->resource);
-    }
+        $entity = new \stdClass();
 
-    /**
-     * Test pre-remove doctrine listener
-     */
-    public function testPreRemove()
-    {
-        $helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $helper->expects($this->once())
+        $this->taggableHelper->expects(self::once())
             ->method('isTaggable')
-            ->with($this->resource)
+            ->with(self::identicalTo($entity))
             ->willReturn(true);
-
-        $manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $manager->expects($this->once())
+        $this->tagManager->expects(self::once())
             ->method('deleteTagging')
-            ->with($this->resource, []);
+            ->with(self::identicalTo($entity), []);
 
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('oro_tag.tag.manager'))
-            ->will($this->returnValue($manager));
+        $this->listener->preRemove(
+            new LifecycleEventArgs($entity, $this->createMock(EntityManagerInterface::class))
+        );
+    }
 
-        $this->listener = new TagListener($helper);
-        $this->listener->setContainer($container);
+    public function testPreRemoveForNotTaggableEntity()
+    {
+        $entity = new \stdClass();
 
-        $args = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $args->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($this->resource));
+        $this->taggableHelper->expects(self::once())
+            ->method('isTaggable')
+            ->with(self::identicalTo($entity))
+            ->willReturn(false);
+        $this->tagManager->expects(self::never())
+            ->method('deleteTagging');
 
-        $this->listener->preRemove($args);
+        $this->listener->preRemove(
+            new LifecycleEventArgs($entity, $this->createMock(EntityManagerInterface::class))
+        );
     }
 }

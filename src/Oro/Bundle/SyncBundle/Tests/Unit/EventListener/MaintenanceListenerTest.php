@@ -9,27 +9,19 @@ use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
 
 class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $websocketClient;
 
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $connectionChecker;
 
-    /**
-     * @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /**
-     * @var MaintenanceListener
-     */
+    /** @var MaintenanceListener */
     private $publisher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
@@ -46,17 +38,14 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
     {
         $expectedUserId = 0;
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(true);
 
-        $this->websocketClient
-            ->expects(self::once())
+        $this->websocketClient->expects(self::once())
             ->method('publish')
             ->with('oro/maintenance', ['isOn' => true, 'userId' => $expectedUserId]);
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUserId')
             ->willReturn($expectedUserId);
 
@@ -65,17 +54,14 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnModeOnNoConnection()
     {
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(false);
 
-        $this->websocketClient
-            ->expects(self::never())
+        $this->websocketClient->expects(self::never())
             ->method(self::anything());
 
-        $this->tokenAccessor
-            ->expects(self::never())
+        $this->tokenAccessor->expects(self::never())
             ->method(self::anything());
 
         $this->publisher->onModeOn();
@@ -85,17 +71,14 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
     {
         $expectedUserId = 42;
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(true);
 
-        $this->websocketClient
-            ->expects(self::once())
+        $this->websocketClient->expects(self::once())
             ->method('publish')
             ->with('oro/maintenance', ['isOn' => false, 'userId' => $expectedUserId]);
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUserId')
             ->willReturn($expectedUserId);
 
@@ -104,17 +87,14 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnModeOffNoConnection()
     {
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(false);
 
-        $this->websocketClient
-            ->expects(self::never())
+        $this->websocketClient->expects(self::never())
             ->method(self::anything());
 
-        $this->tokenAccessor
-            ->expects(self::never())
+        $this->tokenAccessor->expects(self::never())
             ->method(self::anything());
 
         $this->publisher->onModeOff();

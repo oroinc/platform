@@ -6,8 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SetHttpAllowHeaderForSubresource;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 
 class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCase
@@ -21,7 +21,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
     /** @var SetHttpAllowHeaderForSubresource */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,11 +36,13 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenResponseStatusCodeIsNot405()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
             ->method('getResourceExcludeActions');
+        $this->subresourcesProvider->expects(self::never())
+            ->method('getSubresource');
 
         $this->context->setResponseStatusCode(404);
         $this->context->setParentClassName('Test\Class');
@@ -52,11 +54,13 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllowResponseHeaderAlreadySet()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
             ->method('getResourceExcludeActions');
+        $this->subresourcesProvider->expects(self::never())
+            ->method('getSubresource');
 
         $this->context->setResponseStatusCode(405);
         $this->context->getResponseHeaders()->set('Allow', 'GET');
@@ -69,22 +73,27 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllActionsDisabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -94,20 +103,19 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllActionsEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $entitySubresources = new ApiResourceSubresources('Test\Class');
-        $entitySubresources->addSubresource('testAssociation');
+        $subresource = new ApiSubresource();
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([]);
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($subresource);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
@@ -121,21 +129,26 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenOnlyGetSubresourceEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -144,21 +157,26 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenOnlyUpdateSubresourceEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::GET_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -167,20 +185,25 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::UPDATE_SUBRESOURCE,
-                ApiActions::ADD_SUBRESOURCE,
-                ApiActions::DELETE_SUBRESOURCE
+                ApiAction::UPDATE_SUBRESOURCE,
+                ApiAction::ADD_SUBRESOURCE,
+                ApiAction::DELETE_SUBRESOURCE
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -189,21 +212,20 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenActionDisabledForParticularAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $entitySubresources = new ApiResourceSubresources('Test\Class');
-        $entitySubresources->addSubresource('testAssociation')
-            ->setExcludedActions([ApiActions::UPDATE_SUBRESOURCE]);
+        $subresource = new ApiSubresource();
+        $subresource->setExcludedActions([ApiAction::UPDATE_SUBRESOURCE]);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::ADD_SUBRESOURCE, ApiActions::DELETE_SUBRESOURCE]);
+            ->willReturn([ApiAction::ADD_SUBRESOURCE, ApiAction::DELETE_SUBRESOURCE]);
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($subresource);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');

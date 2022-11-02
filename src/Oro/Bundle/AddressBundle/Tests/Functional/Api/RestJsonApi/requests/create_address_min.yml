@@ -1,0 +1,15 @@
+data:
+    type: addresses
+    attributes:
+        street: 'Street 1'
+        city: 'Los Angeles'
+        postalCode: '90001'
+    relationships:
+        country:
+            data:
+                type: countries
+                id: '<toString(@country_usa->iso2Code)>'
+        region:
+            data:
+                type: regions
+                id: '<toString(@region_usa_california->combinedCode)>'

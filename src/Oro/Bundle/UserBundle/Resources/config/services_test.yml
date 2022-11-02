@@ -1,0 +1,4 @@
+services:
+    oro_user.tests.security.provider:
+        alias: oro_user.security.provider
+        public: true

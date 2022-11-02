@@ -1,22 +1,22 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var FiltersTogglePlugin;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var ToggleFiltersAction = require('orofilter/js/actions/toggle-filters-action');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const ToggleFiltersAction = require('orofilter/js/actions/toggle-filters-action');
 
-    var config = require('module').config();
-    var launcherOptions = _.extend({
+    const config = require('module-config').default(module.id);
+    const launcherOptions = _.extend({
         className: 'btn',
         icon: 'filter',
-        label: __('oro.filter.datagrid-toolbar.filters')
+        label: __('oro.filter.datagrid-toolbar.filters'),
+        ariaLabel: __('oro.filter.datagrid-toolbar.aria_label')
     }, config.launcherOptions || {});
 
-    FiltersTogglePlugin = BasePlugin.extend({
+    const FiltersTogglePlugin = BasePlugin.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
             this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
@@ -24,10 +24,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onBeforeToolbarInit: function(toolbarOptions) {
-            var options = {
+            const options = {
                 datagrid: this.main,
                 launcherOptions: launcherOptions,
                 order: config.order || 50

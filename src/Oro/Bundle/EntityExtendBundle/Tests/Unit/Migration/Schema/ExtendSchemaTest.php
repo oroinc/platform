@@ -8,56 +8,61 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadataHelper;
+    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
-    protected $extendOptionsManager;
+    private $extendOptionsManager;
 
     /** @var ExtendOptionsParser */
-    protected $extendOptionsParser;
+    private $extendOptionsParser;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityMetadataHelper =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
-                    ]
-                )
-            );
-        $this->extendOptionsManager = new ExtendOptionsManager();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturnMap([
+                ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
+            ]);
+        $this->extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
+
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
+
         $this->extendOptionsParser  = new ExtendOptionsParser(
             $this->entityMetadataHelper,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
         );
-        $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
+
+        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
 
     public function testEmptySchema()
@@ -102,6 +107,14 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
      */
     public function testSchema()
     {
+        $this->entityMetadataHelper->expects($this->exactly(3))
+            ->method('isEntityClassContainsColumn')
+            ->willReturnMap([
+                ['Acme\AcmeBundle\Entity\Entity1', 'ref_column1', true],
+                ['Acme\AcmeBundle\Entity\Entity1', 'ref_column2', true],
+                ['Acme\AcmeBundle\Entity\Entity1', 'configurable_column1', true],
+            ]);
+
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
             $this->nameGenerator
@@ -213,6 +226,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                         'configurable_column1' => [
                             'type'    => 'string',
                             'configs' => [
+                                'extend'   => ['length' => 100],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_TRUE, 'other' => 'val'],
                                 'form'     => ['is_enabled' => false],
                             ]
@@ -220,7 +234,12 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                         'extend_column1'       => [
                             'type'    => 'string',
                             'configs' => [
-                                'extend'   => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                                'extend'   => [
+                                    'is_extend' => true,
+                                    'owner' => ExtendScope::OWNER_CUSTOM,
+                                    'length' => 100,
+                                    'nullable' => true
+                                ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ]
                         ],
@@ -236,28 +255,28 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function assertSchemaTypes(Schema $schema)
+    private function assertSchemaTypes(Schema $schema)
     {
         foreach ($schema->getTables() as $table) {
             $this->assertInstanceOf(
-                'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable',
+                ExtendTable::class,
                 $table
             );
             foreach ($table->getColumns() as $column) {
                 $this->assertInstanceOf(
-                    'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn',
+                    ExtendColumn::class,
                     $column
                 );
             }
         }
     }
 
-    protected function assertSchemaSql(Schema $schema, array $expectedSql)
+    private function assertSchemaSql(Schema $schema, array $expectedSql)
     {
         $sql = $schema->toSql(new MySqlPlatform());
         foreach ($sql as &$el) {
             $el = str_replace(
-                ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB',
+                ' DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
                 '',
                 $el
             );
@@ -265,7 +284,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSql, $sql);
     }
 
-    protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
+    private function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
         $extendOptions = $schema->getExtendOptions();
         $extendOptions = $this->extendOptionsParser->parseOptions($extendOptions);

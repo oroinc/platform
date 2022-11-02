@@ -8,36 +8,30 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 class TranslationKeyGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationKeyGenerator */
-    protected $generator;
+    private $generator;
 
-    /** @var TranslationKeySourceInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $keySource;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new TranslationKeyGenerator();
-
-        $this->keySource = $this->createMock(TranslationKeySourceInterface::class);
     }
 
     /**
      * @dataProvider generateDataProvider
-     *
-     * @param array $data
-     * @param string $expected
      */
-    public function testGenerate(array $data, $expected)
+    public function testGenerate(array $data, string $expected)
     {
-        $this->keySource->expects($this->once())->method('getTemplate')->willReturn('test.{{ data }}.test');
-        $this->keySource->expects($this->once())->method('getData')->willReturn($data);
+        $keySource = $this->createMock(TranslationKeySourceInterface::class);
+        $keySource->expects($this->once())
+            ->method('getTemplate')
+            ->willReturn('test.{{ data }}.test');
+        $keySource->expects($this->once())
+            ->method('getData')
+            ->willReturn($data);
 
-        $this->assertEquals($expected, $this->generator->generate($this->keySource));
+        $this->assertEquals($expected, $this->generator->generate($keySource));
     }
 
-    /**
-     * @return array
-     */
-    public function generateDataProvider()
+    public function generateDataProvider(): array
     {
         return [
             'trim string' => [

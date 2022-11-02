@@ -1,0 +1,6 @@
+app-modules:
+    - ororeminder/js/app/modules/template-macros-module
+dynamic-imports:
+    commons:
+        - ororeminder/js/app/components/reminder-handler-component
+        - ororeminder/js/app/components/reminder-messages-publisher

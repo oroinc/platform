@@ -1,0 +1,52 @@
+/* @theme: admin.oro; */
+
+.form-layout {
+    &__row {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    &__part {
+        width: 100%;
+
+        &.is-label {
+            padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
+            padding-right: $content-padding;
+
+            line-height: $form-horizontal-control-label-inner-line-height;
+        }
+
+        &.is-group {
+            width: 100%;
+
+            .fields-row-error {
+                padding-bottom: $content-padding-medium;
+
+                &:last-child {
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .is-group__col-start,
+    .is-group__col-end {
+        width: 100%;
+    }
+
+    /* stylelint-disable selector-type-no-unknown */
+    // Update static widths in form fields
+    #{map_get($oro-form-selectors, 'select2-append'),
+    map_get($oro-form-selectors, 'select2-prepend')} {
+        width: calc(100% - #{$btn-icon-mobile-width + $add-on-append-offset-left});
+    }
+
+    #{map_get($oro-form-selectors, 'select2-add-entity-enabled')} {
+        width:
+            calc(
+                100% - #{$btn-icon-mobile-width * 2} -
+                #{$add-on-append-outer-offset-left + $add-on-append-offset-left}
+            );
+    }
+    /* stylelint-enable selector-type-no-unknown */
+}

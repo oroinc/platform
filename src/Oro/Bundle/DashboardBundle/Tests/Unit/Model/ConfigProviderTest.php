@@ -1,155 +1,173 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private $eventDispatcher;
+    use TempDirExtension;
 
-    public function setUp()
+    private ConfigProvider $configurationProvider;
+    private array $expectedDashboardConfigs;
+    private array $expectedWidgetConfigs;
+
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-    }
+        $cacheFile = $this->getTempFile('DashboardConfigurationProvider');
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-    public function testHasConfig()
-    {
-        $existConfigKey = 'exist key';
-        $configProvider = new ConfigProvider(array($existConfigKey => array()), $this->eventDispatcher);
+        $this->configurationProvider = new ConfigProvider($cacheFile, false, $eventDispatcher);
 
-        $this->assertFalse($configProvider->hasConfig('not found config'));
-        $this->assertTrue($configProvider->hasConfig($existConfigKey));
-    }
+        $bundle1 = new FirstTestBundle();
+        $bundle2 = new SecondTestBundle();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2)
+            ]);
 
-    public function testGetConfig()
-    {
-        $existConfigKey = 'exist key';
-        $expected = array('label' => 'test label');
-        $configProvider = new ConfigProvider(array($existConfigKey => $expected), $this->eventDispatcher);
+        $this->expectedDashboardConfigs = [
+            'main'                  => ['twig' => '@OroDashboard/Index/default.html.twig'],
+            'alternative_dashboard' => ['twig' => '@OroDashboard/Index/default.html.twig'],
+            'empty_board'           => ['twig' => '@OroDashboard/Index/default.html.twig']
+        ];
 
-        $this->assertEquals($expected, $configProvider->getConfig($existConfigKey));
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Can't find configuration for: not found config
-     */
-    public function testGetConfigHasNoKeyException()
-    {
-        $configProvider = new ConfigProvider(array(), $this->eventDispatcher);
-        $configProvider->getConfig('not found config');
-    }
-
-    public function testGetConfigs()
-    {
-        $expected = array('exist key' => array('label' => 'test label'));
-        $configProvider = new ConfigProvider($expected, $this->eventDispatcher);
-
-        $this->assertEquals($expected, $configProvider->getConfigs());
+        $this->expectedWidgetConfigs = [
+            'quick_launchpad'        => [
+                'route'                        => 'alternative_quick_lanchpad_route',
+                'route_parameters'             => [
+                    'bundle' => 'TestBundle',
+                    'name'   => 'quickLaunchpad',
+                    'widget' => 'quick_launchpad'
+                ],
+                'items'                        => [
+                    'test1'  => [
+                        'label'            => 'Test1',
+                        'route'            => 'test1',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'index'  => [
+                        'label'            => 'List',
+                        'route'            => 'oro_sales_opportunity_index',
+                        'acl'              => 'oro_sales_opportunity_view',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'create' => [
+                        'label'            => 'Create opportunity',
+                        'route'            => 'oro_sales_opportunity_create',
+                        'acl'              => 'oro_sales_opportunity_create',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'test2'  => [
+                        'label'            => 'Test2',
+                        'route'            => 'test2',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ]
+                ],
+                'enabled'                      => true,
+                'isNew'                        => false,
+                'configuration_dialog_options' => ['resizable' => false],
+                'configuration'                => [],
+                'data_items'                   => [],
+            ],
+            'second_quick_launchpad' => [
+                'route'                        => 'second_quick_launchpad_test_route',
+                'route_parameters'             => [
+                    'bundle' => 'SecondTestBundle',
+                    'name'   => 'secondQuickLaunchpad',
+                    'widget' => 'second_quick_launchpad'
+                ],
+                'isNew'                        => true,
+                'enabled'                      => true,
+                'configuration_dialog_options' => ['resizable' => false],
+                'configuration'                => [],
+                'data_items'                   => [],
+            ]
+        ];
     }
 
     public function testGetDashboardConfigs()
     {
-        $expected = array('label' => 'test label');
-        $configProvider = new ConfigProvider(array(
-            ConfigProvider::NODE_DASHBOARD => $expected
-        ), $this->eventDispatcher);
+        self::assertEquals($this->expectedDashboardConfigs, $this->configurationProvider->getDashboardConfigs());
+    }
 
-        $this->assertEquals($expected, $configProvider->getDashboardConfigs());
+    public function testHasDashboardConfig()
+    {
+        foreach (\array_keys($this->expectedDashboardConfigs) as $name) {
+            self::assertTrue($this->configurationProvider->hasDashboardConfig($name), $name);
+        }
+    }
+
+    public function testGetDashboardConfig()
+    {
+        foreach ($this->expectedDashboardConfigs as $name => $config) {
+            self::assertEquals($config, $this->configurationProvider->getDashboardConfig($name), $name);
+        }
     }
 
     public function testGetWidgetConfigs()
     {
-        $expected = array('label' => 'test label');
-        $configProvider = new ConfigProvider(array(ConfigProvider::NODE_WIDGET => $expected), $this->eventDispatcher);
-
-        $this->assertEquals($expected, $configProvider->getWidgetConfigs());
-    }
-
-    public function testGetDashboardsConfig()
-    {
-        $dashboardName = 'test dashboard';
-        $expected = array('label' => 'test label');
-        $config = array(ConfigProvider::NODE_DASHBOARD => array($dashboardName => $expected));
-        $configProvider = new ConfigProvider($config, $this->eventDispatcher);
-
-        $this->assertEquals($expected, $configProvider->getDashboardConfig($dashboardName));
-    }
-
-    public function testHasDashboardsConfig()
-    {
-        $dashboardName = 'test dashboard';
-        $config = array(ConfigProvider::NODE_DASHBOARD => array($dashboardName => array('label' => 'test label')));
-        $configProvider = new ConfigProvider($config, $this->eventDispatcher);
-
-        $this->assertTrue($configProvider->hasDashboardConfig($dashboardName));
-        $this->assertFalse($configProvider->hasDashboardConfig('incorrect dashboard'));
-    }
-
-    public function testGetWidgetConfig()
-    {
-        $widgetName = 'test dashboard';
-        $expected = array('label' => 'test label');
-        $config = array(ConfigProvider::NODE_WIDGET => array($widgetName => $expected));
-        $configProvider = new ConfigProvider($config, $this->eventDispatcher);
-
-        $this->assertEquals($expected, $configProvider->getWidgetConfig($widgetName));
+        self::assertEquals($this->expectedWidgetConfigs, $this->configurationProvider->getWidgetConfigs());
     }
 
     public function testHasWidgetConfig()
     {
-        $widgetName = 'test dashboard';
-        $config = array(ConfigProvider::NODE_WIDGET => array($widgetName => array('label' => 'test label')));
-        $configProvider = new ConfigProvider($config, $this->eventDispatcher);
-
-        $this->assertTrue($configProvider->hasWidgetConfig($widgetName));
-        $this->assertFalse($configProvider->hasWidgetConfig('incorrect widget'));
+        foreach (\array_keys($this->expectedWidgetConfigs) as $name) {
+            self::assertTrue($this->configurationProvider->hasWidgetConfig($name), $name);
+        }
     }
 
-    public function testGetWidgetConfigShouldReturnConfigurationOfWidgetFromEvent()
+    public function testGetWidgetConfig()
     {
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->with(WidgetConfigurationLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(true));
-
-        $eventConfiguration = ['k12' => 'opt'];
-        $this->eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->will(
-                $this->returnCallback(function ($name, WidgetConfigurationLoadEvent $event) use ($eventConfiguration) {
-                    $event->setConfiguration($eventConfiguration);
-
-                    return $event;
-                })
-            );
-
-        $config = [ConfigProvider::NODE_WIDGET => ['widget' => []]];
-        $configProvider = new ConfigProvider($config, $this->eventDispatcher);
-
-        $this->assertTrue($configProvider->hasWidgetConfig('widget'));
-        $this->assertEquals($eventConfiguration, $configProvider->getWidgetConfig('widget'));
+        foreach ($this->expectedWidgetConfigs as $name => $config) {
+            self::assertEquals($config, $this->configurationProvider->getWidgetConfig($name), $name);
+        }
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     */
-    public function testGetWidgetConfigHasNoKeyException()
+    public function testHasWidgetConfigForUnknownWidget()
     {
-        $configProvider = new ConfigProvider(array(), $this->eventDispatcher);
-        $configProvider->getWidgetConfig('not found config');
+        self::assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     */
-    public function testGetDashboardConfigHasNoKeyException()
+    public function testGetWidgetConfigForUnknownWidget()
     {
-        $configProvider = new ConfigProvider(array(), $this->eventDispatcher);
-        $configProvider->getDashboardConfig('not found config');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for: unknown");
+
+        $this->configurationProvider->getWidgetConfig('unknown');
+    }
+
+    public function testGetWidgetConfigForUnknownWidgetIfExceptioNotAllowed()
+    {
+        self::assertNull($this->configurationProvider->getWidgetConfig('unknown', false));
+    }
+
+    public function testHasDashboardConfigForUnknownDashboard()
+    {
+        self::assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
+    }
+
+    public function testGetDashboardConfigForUnknownDashboard()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for: unknown");
+
+        $this->configurationProvider->getDashboardConfig('unknown');
     }
 }

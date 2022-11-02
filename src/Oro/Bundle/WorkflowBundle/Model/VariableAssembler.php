@@ -9,8 +9,11 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Assembles variables collection for the specified workflow configuration.
+ */
 class VariableAssembler extends BaseAbstractAssembler
 {
     /**
@@ -28,11 +31,6 @@ class VariableAssembler extends BaseAbstractAssembler
      */
     protected $translator;
 
-    /**
-     * @param WorkflowVariableNormalizer $dataNormalizer
-     * @param VariableGuesser            $variableGuesser
-     * @param TranslatorInterface        $translator
-     */
     public function __construct(
         WorkflowVariableNormalizer $dataNormalizer,
         VariableGuesser $variableGuesser,
@@ -181,7 +179,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param Variable $variable
      * @throws AssemblerException
      */
     protected function validateVariable(Variable $variable)
@@ -197,7 +194,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertVariableEntityAcl(array $options)
@@ -214,7 +210,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param Variable $variable
      * @throws AssemblerException
      */
     protected function assertVariableHasValidType(Variable $variable)
@@ -238,12 +233,13 @@ class VariableAssembler extends BaseAbstractAssembler
      * @param array $parameters
      * @return string
      */
-    private function guessOptionLabel(array $options, array $parameters)
+    private function guessOptionLabel(array $options, array $parameters): string
     {
         $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
 
-        if ($this->translator->trans($options['label'], [], $domain) === $options['label']) {
-            $options['label'] = $parameters['label'];
+        $label = (string) $options['label'];
+        if ($this->translator->trans($label, [], $domain) === $label) {
+            $options['label'] = (string) $parameters['label'];
         }
 
         return $options['label'];

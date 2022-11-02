@@ -2,48 +2,38 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowEmailTemplates;
 use Oro\Component\Testing\ResponseExtension;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
 
 class EmailNotificationControllerTest extends WebTestCase
 {
     use ResponseExtension;
 
-    const ENTITY_NAME = WorkflowAwareEntity::class;
-    const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
-    const TRANSITION_NAME = 'starting_point_transition';
+    private const ENTITY_NAME = WorkflowAwareEntity::class;
+    private const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
+    private const TRANSITION_NAME = 'starting_point_transition';
 
-    /** @var  Registry */
-    protected $doctrine;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient([], array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1]));
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
-        $this->doctrine = $this->getContainer()->get('doctrine');
         $this->loadFixtures([LoadWorkflowDefinitions::class, LoadWorkflowEmailTemplates::class]);
     }
 
-    /**
-     * @return string
-     */
-    public function testCreate()
+    public function testCreate(): string
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_create'));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent(self::EVENT_NAME);
+        $eventName = self::EVENT_NAME;
 
-        $this->assertFormSubmission($event, $crawler);
+        $this->assertFormSubmission($eventName, $crawler);
         $response = $this->client->requestGrid(
             'email-notification-grid',
             [
@@ -59,10 +49,8 @@ class EmailNotificationControllerTest extends WebTestCase
 
     /**
      * @depends testCreate
-     *
-     * @param string $id
      */
-    public function testUpdate($id)
+    public function testUpdate(string $id)
     {
         $crawler = $this->client->request(
             'GET',
@@ -71,19 +59,17 @@ class EmailNotificationControllerTest extends WebTestCase
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent(self::EVENT_NAME);
+        $eventName = self::EVENT_NAME;
 
-        $this->assertFormSubmission($event, $crawler);
+        $this->assertFormSubmission($eventName, $crawler);
     }
 
     /**
      * @depends testCreate
-     *
-     * @param $id
      */
-    public function testDelete($id)
+    public function testDelete(string $id)
     {
-        $this->client->request(
+        $this->ajaxRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_emailnotication', ['id' => $id])
         );
@@ -92,37 +78,17 @@ class EmailNotificationControllerTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
     }
 
-    /**
-     * @param $eventName
-     *
-     * @return null|object|Event
-     */
-    protected function getEvent($eventName)
-    {
-        return $this->doctrine->getRepository(Event::class)
-            ->findOneBy(['name' => $eventName]);
-    }
-
-    /**
-     * @return null|object|EmailTemplate
-     */
-    protected function getTemplate()
+    private function getTemplate(): EmailTemplate
     {
         return $this->getReference(LoadWorkflowEmailTemplates::WFA_EMAIL_TEMPLATE_NAME);
     }
 
-    /**
-     * @param Event $event
-     * @param Crawler $crawler
-     */
-    protected function assertFormSubmission(Event $event, Crawler $crawler)
+    private function assertFormSubmission(string $eventName, Crawler $crawler): void
     {
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $formValues = $form->getPhpValues();
-        $formValues['formSubmitMarker'] = true;
         $formValues['emailnotification']['entityName'] = self::ENTITY_NAME;
-        $formValues['emailnotification']['event'] = $event->getId();
+        $formValues['emailnotification']['eventName'] = $eventName;
         $formValues['emailnotification']['template'] = $this->getTemplate()->getId();
         $formValues['emailnotification']['recipientList']['users'] = 1;
         $formValues['emailnotification']['recipientList']['groups'][0] = 1;
@@ -136,6 +102,6 @@ class EmailNotificationControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        $this->assertContains("Email notification rule saved", $html);
+        self::assertStringContainsString('Email notification rule saved', $html);
     }
 }

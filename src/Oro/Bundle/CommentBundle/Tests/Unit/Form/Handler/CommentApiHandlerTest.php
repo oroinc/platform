@@ -2,53 +2,36 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    private Request $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $om;
+    private ObjectManager|\PHPUnit\Framework\MockObject\MockObject $om;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /**
-     * @var Comment
-     */
-    protected $comment;
+    private Comment $comment;
 
-    /**
-     * @var CommentApiHandler
-     */
-    protected $handler;
+    private CommentApiHandler $handler;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->om = $this->createMock(ObjectManager::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->comment = new Comment();
 
         $this->handler = new CommentApiHandler($this->form, $requestStack, $this->om, $this->configManager);
@@ -56,16 +39,11 @@ class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTestData
-     *
-     * @param string $type
-     * @param int $callsCount
-     * @param bool $valid
-     * @param bool $expects
      */
-    public function testRequest($type, $callsCount, $valid, $expects)
+    public function testRequest(string $type, int $callsCount, bool $isValid, bool $isExpects): void
     {
         $persistCallsCount = 0;
-        if ($valid && $callsCount) {
+        if ($isValid && $callsCount) {
             $persistCallsCount = 1;
         }
         $this->request->setMethod($type);
@@ -75,7 +53,7 @@ class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->exactly($callsCount))
             ->method('isValid')
-            ->will($this->returnValue($valid));
+            ->willReturn($isValid);
 
         $this->om->expects($this->exactly($persistCallsCount))
             ->method('persist')
@@ -83,10 +61,10 @@ class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->exactly($persistCallsCount))
             ->method('flush');
 
-        $this->assertEquals($expects, $this->handler->process($this->comment));
+        $this->assertEquals($isExpects, $this->handler->process($this->comment));
     }
 
-    public function getTestData()
+    public function getTestData(): array
     {
         return [
             'correct request type GET' => ['GET', 0, true, false],

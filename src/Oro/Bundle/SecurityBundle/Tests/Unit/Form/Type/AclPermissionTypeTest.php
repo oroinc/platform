@@ -3,45 +3,48 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPermissionType */
-    protected $formType;
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new AclPermissionType();
     }
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $options = array(
-            'privileges_config' => array(
+        $builder = $this->createMock(FormBuilder::class);
+        $options = [
+            'privileges_config' => [
                 'field_type' => 'grid'
-            )
-        );
-        $builder->expects($this->at(0))->method('add')->with('accessLevel', 'grid', array('required' => false));
-        $builder->expects($this->at(1))->method('add')->with('name', HiddenType::class, array('required' => false));
+            ]
+        ];
+        $builder->expects($this->exactly(2))
+            ->method('add')
+            ->withConsecutive(
+                ['accessLevel', 'grid', ['required' => false]],
+                ['name', HiddenType::class, ['required' => false]]
+            );
         $this->formType->buildForm($builder, $options);
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolver->expects($this->once())->method('setDefaults')
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
+            ->method('setDefaults')
             ->with(
-                array(
-                    'data_class' => 'Oro\Bundle\SecurityBundle\Model\AclPermission',
-                    'privileges_config' => array()
-                )
+                [
+                    'data_class'        => AclPermission::class,
+                    'privileges_config' => []
+                ]
             );
         $this->formType->configureOptions($resolver);
     }

@@ -1,0 +1,92 @@
+services:
+    oro_platform.tests.merge_service_locators.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: true
+        arguments:
+            - [] # services
+        tags:
+            - { name: container.service_locator }
+
+    oro_platform.tests.merge_service_locators.another_service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: true
+        arguments:
+            - [] # services
+        tags:
+            - { name: container.service_locator }
+
+    oro_platform.tests.merge_service_locators.service_locator_injected_via_constructor:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectedViaConstructor
+        public: true
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: oro_platform.tests.merge_service_locators }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: router }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.service_locator_injected_via_setter:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectedViaSetter
+        public: true
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: oro_platform.tests.merge_service_locators }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.service_locator_injected_via_setter_another_via_constructor:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectedViaSetter
+        public: true
+        arguments:
+            - '@oro_platform.tests.merge_service_locators.another_service_locator'
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: oro_platform.tests.merge_service_locators }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.decorated:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjection
+        public: true
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.decorator:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectionDecorator
+        public: true
+        decorates: oro_platform.tests.merge_service_locators.decorated
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+            - '@.inner'
+        tags:
+            - { name: oro_platform.tests.merge_service_locators }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: router }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.base:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjection
+        public: true
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: translator }
+
+    oro_platform.tests.merge_service_locators.with_parent:
+        class: Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectionDecorator
+        public: true
+        parent: oro_platform.tests.merge_service_locators.base
+        arguments:
+            - '@oro_platform.tests.merge_service_locators.service_locator_injected_via_constructor'
+        tags:
+            - { name: oro_platform.tests.merge_service_locators }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: router }
+            - { name: container.service_subscriber, id: translator }

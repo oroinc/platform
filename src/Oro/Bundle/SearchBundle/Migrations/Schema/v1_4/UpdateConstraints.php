@@ -19,8 +19,6 @@ class UpdateConstraints implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function changeConstraintDecimalFk(Schema $schema)
@@ -39,8 +37,6 @@ class UpdateConstraints implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function changeConstraintIntegerFk(Schema $schema)
@@ -58,8 +54,6 @@ class UpdateConstraints implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function changeConstraintDatetimeFk(Schema $schema)

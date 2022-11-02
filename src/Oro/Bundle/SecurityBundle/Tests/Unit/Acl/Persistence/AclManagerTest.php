@@ -2,68 +2,70 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
+use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\Batch\BatchItem;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AclManagerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectIdentityFactory;
+
+    /** @var MutableAclProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclProvider;
+
+    /** @var AceManipulationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aceProvider;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $extension;
+
+    /** @var FieldAclExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldExtension;
+
+    /** @var AclExtensionSelector|\PHPUnit\Framework\MockObject\MockObject */
+    private $extensionSelector;
+
     /** @var AclManager */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $objectIdentityFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $aclProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $aceProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $extension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $fieldExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $extensionSelector;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->objectIdentityFactory =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);
+        $this->aclProvider = $this->createMock(MutableAclProvider::class);
+        $this->aceProvider = $this->createMock(AceManipulationHelper::class);
+        $this->extension = $this->createMock(AclExtensionInterface::class);
+        $this->fieldExtension = $this->createMock(FieldAclExtension::class);
+        $this->extensionSelector = $this->createMock(AclExtensionSelector::class);
 
-        $this->extension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
-        $this->fieldExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extension->expects($this->any())->method('getExtensionKey')->will($this->returnValue('entity'));
-        $this->extension->expects($this->any())->method('getFieldExtension')
-            ->will($this->returnValue($this->fieldExtension));
-        $this->extension->expects($this->any())->method('getServiceBits')->will($this->returnValue(0));
-        $this->extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extension->expects($this->any())
+            ->method('getExtensionKey')
+            ->willReturn('entity');
+        $this->extension->expects($this->any())
+            ->method('getFieldExtension')
+            ->willReturn($this->fieldExtension);
+        $this->extension->expects($this->any())
+            ->method('getServiceBits')
+            ->willReturn(0);
+
         $this->extensionSelector->expects($this->any())
             ->method('select')
-            ->will($this->returnValue($this->extension));
-
-        $this->aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->aceProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn($this->extension);
 
         $this->manager = new AclManager(
             $this->objectIdentityFactory,
@@ -75,19 +77,13 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsAclEnabled()
     {
-        $factory = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $factory = $this->createMock(ObjectIdentityFactory::class);
+        $extensionSelector = $this->createMock(AclExtensionSelector::class);
         $manager = new AclManager($factory, $extensionSelector);
 
         $this->assertFalse($manager->isAclEnabled());
 
-        $aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclProvider = $this->createMock(MutableAclProvider::class);
         $manager = new AclManager($factory, $extensionSelector, $aclProvider);
 
         $this->assertTrue($manager->isAclEnabled());
@@ -99,9 +95,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->objectIdentityFactory->expects($this->once())
             ->method('get')
             ->with($this->equalTo('test'))
-            ->will($this->returnValue($oid));
+            ->willReturn($oid);
 
-        $this->assertTrue($oid === $this->manager->getOid('test'));
+        $this->assertSame($oid, $this->manager->getOid('test'));
     }
 
     public function testGetRootOid()
@@ -110,9 +106,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->objectIdentityFactory->expects($this->once())
             ->method('root')
             ->with($this->equalTo('test'))
-            ->will($this->returnValue($oid));
+            ->willReturn($oid);
 
-        $this->assertTrue($oid === $this->manager->getRootOid('test'));
+        $this->assertSame($oid, $this->manager->getRootOid('test'));
     }
 
     public function testDeleteAclShouldNotFailIfNoItems()
@@ -129,14 +125,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->manager->deleteAcl($oid);
 
-        $items = $this->getItems();
+        /** @var BatchItem[] $items */
+        $items = ReflectionUtil::getPropertyValue($this->manager, 'items');
         $this->assertCount(1, $items);
         $this->assertEquals(BatchItem::STATE_DELETE, current($items)->getState());
     }
 
     public function testSetPermissionForNewAclIfGetAcesCalledBefore()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -145,7 +142,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -160,17 +157,17 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissionForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -193,17 +190,17 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissionForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -226,17 +223,17 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissionForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -253,17 +250,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo($mask),
                 $this->equalTo($strategy)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->setPermission($sid, $oid, $mask, $granting, $strategy);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetFieldPermissionForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $this->expectException(\InvalidArgumentException::class);
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
@@ -275,18 +270,18 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFieldPermissionForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -309,18 +304,18 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFieldPermissionForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -337,24 +332,24 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo($mask),
                 $this->equalTo($strategy)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->setFieldPermission($sid, $oid, $field, $mask, $granting, $strategy);
     }
 
     public function testDeletePermissionForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deletePermission')
             ->with(
@@ -372,17 +367,17 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeletePermissionForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deletePermission')
             ->with(
@@ -400,17 +395,17 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeletePermissionForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deletePermission')
             ->with(
@@ -422,17 +417,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo($mask),
                 $this->equalTo($strategy)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->deletePermission($sid, $oid, $mask, $granting, $strategy);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDeleteFieldPermissionForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $this->expectException(\InvalidArgumentException::class);
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
@@ -444,18 +437,18 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteFieldPermissionForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deletePermission')
             ->with(
@@ -473,18 +466,18 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteFieldPermissionForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
         $strategy = 'any';
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deletePermission')
             ->with(
@@ -496,21 +489,21 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo($mask),
                 $this->equalTo($strategy)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->deleteFieldPermission($sid, $oid, $field, $mask, $granting, $strategy);
     }
 
     public function testDeleteAllPermissionsForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deleteAllPermissions')
             ->with(
@@ -525,14 +518,14 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllPermissionsForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deleteAllPermissions')
             ->with(
@@ -547,14 +540,14 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllPermissionsForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deleteAllPermissions')
             ->with(
@@ -563,17 +556,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo(null),
                 $this->identicalTo($sid)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->deleteAllPermissions($sid, $oid);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDeleteAllFieldPermissionsForRootOid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $this->expectException(\InvalidArgumentException::class);
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $field = 'TestField';
 
@@ -582,15 +573,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFieldPermissionsForDomainObject()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deleteAllPermissions')
             ->with(
@@ -605,15 +596,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFieldPermissionsForEntityClass()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $field = 'TestField';
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->aceProvider->expects($this->once())
             ->method('deleteAllPermissions')
             ->with(
@@ -622,14 +613,14 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo($field),
                 $this->identicalTo($sid)
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->deleteAllFieldPermissions($sid, $oid, $field);
     }
 
     public function testSetPermissionForRootOidNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
@@ -638,7 +629,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -650,7 +641,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissionForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -659,7 +650,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -671,7 +662,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPermissionForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -680,7 +671,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->extension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -692,7 +683,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFieldPermissionForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -702,7 +693,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -714,7 +705,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFieldPermissionForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -724,7 +715,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclProvider->expects($this->once())
             ->method('findAcl')
             ->with($this->identicalTo($oid))
-            ->will($this->throwException(new AclNotFoundException()));
+            ->willThrowException(new AclNotFoundException());
         $this->fieldExtension->expects($this->once())
             ->method('validateMask')
             ->with($this->equalTo($mask), $this->identicalTo($oid));
@@ -736,7 +727,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeletePermissionForRootOidNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
         $mask = 123;
@@ -754,7 +745,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeletePermissionForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -772,7 +763,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeletePermissionForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -790,7 +781,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteFieldPermissionForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -809,7 +800,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteFieldPermissionForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $granting = true;
         $mask = 123;
@@ -828,7 +819,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllPermissionsForRootOidNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
 
         $this->setItem($oid, BatchItem::STATE_CREATE);
@@ -843,7 +834,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllPermissionsForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
 
         $this->setItem($oid, BatchItem::STATE_CREATE);
@@ -858,7 +849,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllPermissionsForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
 
         $this->setItem($oid, BatchItem::STATE_CREATE);
@@ -873,7 +864,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFieldPermissionsForDomainObjectNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity(123, 'Acme\Test');
         $field = 'TestField';
 
@@ -889,7 +880,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFieldPermissionsForEntityClassNoAcl()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $oid = new ObjectIdentity('entity', 'Acme\Test');
         $field = 'TestField';
 
@@ -910,32 +901,30 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $oid3 = new ObjectIdentity('Acme\Test3', 'entity');
         $oid4 = new ObjectIdentity('Acme\Test4', 'entity');
 
-        $newItemSid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $newItemSid = $this->createMock(SecurityIdentityInterface::class);
         $newItem = new BatchItem($oid2, BatchItem::STATE_CREATE);
         $newItem->addAce(AclManager::OBJECT_ACE, 'TestField', $newItemSid, true, 123, 'all', true);
 
-        $updateItemAcl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
-        $deleteItemAcl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $updateItemAcl = $this->createMock(MutableAclInterface::class);
+        $deleteItemAcl = $this->createMock(MutableAclInterface::class);
 
-        $this->setItems(
-            array(
-                new BatchItem($oid1, BatchItem::STATE_NONE),
-                $newItem,
-                new BatchItem($oid3, BatchItem::STATE_UPDATE, $updateItemAcl),
-                new BatchItem($oid4, BatchItem::STATE_DELETE, $deleteItemAcl),
-            )
-        );
+        $this->setItems([
+            new BatchItem($oid1, BatchItem::STATE_NONE),
+            $newItem,
+            new BatchItem($oid3, BatchItem::STATE_UPDATE, $updateItemAcl),
+            new BatchItem($oid4, BatchItem::STATE_DELETE, $deleteItemAcl),
+        ]);
 
         $this->aclProvider->expects($this->once())
             ->method('beginTransaction');
         $this->aclProvider->expects($this->once())
             ->method('commit');
 
-        $acl = $this->createMock('Symfony\Component\Security\Acl\Model\MutableAclInterface');
+        $acl = $this->createMock(MutableAclInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('createAcl')
             ->with($this->identicalTo($oid2))
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
 
         $this->aceProvider->expects($this->once())
             ->method('setPermission')
@@ -950,7 +939,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo(123),
                 $this->equalTo('all')
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->aclProvider->expects($this->exactly(2))
             ->method('updateAcl');
@@ -962,48 +951,26 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->flush();
     }
 
-    /**
-     * @return BatchItem[]
-     */
-    private function getItems()
-    {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        return $prop->getValue($this->manager);
-    }
-
     private function setItem(ObjectIdentity $oid, $state, MutableAclInterface $acl = null)
     {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        $getKeyMtd = $class->getMethod('getKey');
-        $getKeyMtd->setAccessible(true);
-        $key = $getKeyMtd->invoke($this->manager, $oid);
-
-        $prop->setValue($this->manager, array($key => new BatchItem($oid, $state, $acl)));
+        $key = ReflectionUtil::callMethod($this->manager, 'getKey', [$oid]);
+        ReflectionUtil::setPropertyValue(
+            $this->manager,
+            'items',
+            [$key => new BatchItem($oid, $state, $acl)]
+        );
     }
 
     /**
      * @param BatchItem[] $items
      */
-    private function setItems($items)
+    private function setItems(array $items)
     {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        $getKeyMtd = $class->getMethod('getKey');
-        $getKeyMtd->setAccessible(true);
-
-        $val = array();
+        $val = [];
         foreach ($items as $item) {
-            $val[$getKeyMtd->invoke($this->manager, $item->getOid())] = $item;
+            $key = ReflectionUtil::callMethod($this->manager, 'getKey', [$item->getOid()]);
+            $val[$key] = $item;
         }
-
-        $prop->setValue($this->manager, $val);
+        ReflectionUtil::setPropertyValue($this->manager, 'items', $val);
     }
 }

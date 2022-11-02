@@ -7,45 +7,50 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Represents the configuration of Data API resource action.
+ * Represents the configuration of API resource action.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ActionConfig implements ConfigBagInterface
+class ActionConfig
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
-
+    private ?bool $exclude = null;
+    private array $items = [];
     /** @var ActionFieldConfig[] */
-    protected $fields = [];
+    private array $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
      *
-     * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (null !== $this->exclude) {
             $result[ConfigUtil::EXCLUDE] = $this->exclude;
+        }
+        if (isset($result[ConfigUtil::DISABLE_INCLUSION])
+            && false === $result[ConfigUtil::DISABLE_INCLUSION]
+        ) {
+            unset($result[ConfigUtil::DISABLE_INCLUSION]);
+        }
+        if (isset($result[ConfigUtil::DISABLE_FIELDSET])
+            && false === $result[ConfigUtil::DISABLE_FIELDSET]
+        ) {
+            unset($result[ConfigUtil::DISABLE_FIELDSET]);
         }
         if (isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
             && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
-        if (isset($result[ConfigUtil::DISABLE_INCLUSION]) && false === $result[ConfigUtil::DISABLE_INCLUSION]) {
-            unset($result[ConfigUtil::DISABLE_INCLUSION]);
-        }
-        if (isset($result[ConfigUtil::DISABLE_FIELDSET]) && false === $result[ConfigUtil::DISABLE_FIELDSET]) {
-            unset($result[ConfigUtil::DISABLE_FIELDSET]);
+        if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
+            && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
+        ) {
+            unset($result[ConfigUtil::DISABLE_PARTIAL_LOAD]);
         }
         if (isset($result[ConfigUtil::DISABLE_SORTING]) && false === $result[ConfigUtil::DISABLE_SORTING]) {
             unset($result[ConfigUtil::DISABLE_SORTING]);
@@ -61,10 +66,8 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Indicates whether the action does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclude
@@ -83,10 +86,8 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Indicates whether the configuration of at least one action exists.
-     *
-     * @return bool
      */
-    public function hasFields()
+    public function hasFields(): bool
     {
         return !empty($this->fields);
     }
@@ -96,47 +97,31 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return ActionFieldConfig[] [field name => config, ...]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
      * Indicates whether the configuration of the action exists.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
-    public function hasField($fieldName)
+    public function hasField(string $fieldName): bool
     {
         return isset($this->fields[$fieldName]);
     }
 
     /**
      * Gets the configuration of the action.
-     *
-     * @param string $fieldName
-     *
-     * @return ActionFieldConfig|null
      */
-    public function getField($fieldName)
+    public function getField(string $fieldName): ?ActionFieldConfig
     {
-        if (!isset($this->fields[$fieldName])) {
-            return null;
-        }
-
-        return $this->fields[$fieldName];
+        return $this->fields[$fieldName] ?? null;
     }
 
     /**
      * Gets the configuration of existing action or adds new action.
-     *
-     * @param string $fieldName
-     *
-     * @return ActionFieldConfig
      */
-    public function getOrAddField($fieldName)
+    public function getOrAddField(string $fieldName): ActionFieldConfig
     {
         $field = $this->getField($fieldName);
         if (null === $field) {
@@ -148,13 +133,8 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Adds the configuration of the action.
-     *
-     * @param string                 $fieldName
-     * @param ActionFieldConfig|null $field
-     *
-     * @return ActionFieldConfig
      */
-    public function addField($fieldName, $field = null)
+    public function addField(string $fieldName, ActionFieldConfig $field = null): ActionFieldConfig
     {
         if (null === $field) {
             $field = new ActionFieldConfig();
@@ -167,26 +147,24 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Removes the configuration of the action.
-     *
-     * @param string $fieldName
      */
-    public function removeField($fieldName)
+    public function removeField(string $fieldName): void
     {
         unset($this->fields[$fieldName]);
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -196,9 +174,9 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -208,43 +186,37 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded()
+    public function hasExcluded(): bool
     {
         return null !== $this->exclude;
     }
 
     /**
      * Indicates whether the exclusion flag.
-     *
-     * @return bool
      */
-    public function isExcluded()
+    public function isExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
-
-        return $this->exclude;
+        return $this->exclude ?? false;
     }
 
     /**
@@ -252,37 +224,31 @@ class ActionConfig implements ConfigBagInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
 
     /**
      * Indicates whether the description attribute exists.
-     *
-     * @return bool
      */
-    public function hasDescription()
+    public function hasDescription(): bool
     {
         return $this->has(ConfigUtil::DESCRIPTION);
     }
 
     /**
      * Gets the value of the description attribute.
-     *
-     * @return string|Label|null
      */
-    public function getDescription()
+    public function getDescription(): string|Label|null
     {
         return $this->get(ConfigUtil::DESCRIPTION);
     }
 
     /**
      * Sets the value of the description attribute.
-     *
-     * @param string|Label|null $description
      */
-    public function setDescription($description)
+    public function setDescription(string|Label|null $description): void
     {
         if ($description) {
             $this->items[ConfigUtil::DESCRIPTION] = $description;
@@ -293,30 +259,24 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Indicates whether the documentation attribute exists.
-     *
-     * @return bool
      */
-    public function hasDocumentation()
+    public function hasDocumentation(): bool
     {
         return $this->has(ConfigUtil::DOCUMENTATION);
     }
 
     /**
      * Gets a detailed documentation of API resource.
-     *
-     * @return string|null
      */
-    public function getDocumentation()
+    public function getDocumentation(): ?string
     {
         return $this->get(ConfigUtil::DOCUMENTATION);
     }
 
     /**
      * Sets a detailed documentation of API resource.
-     *
-     * @param string|null $documentation
      */
-    public function setDocumentation($documentation)
+    public function setDocumentation(?string $documentation): void
     {
         if ($documentation) {
             $this->items[ConfigUtil::DOCUMENTATION] = $documentation;
@@ -327,30 +287,24 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Indicates whether the name of ACL resource is set explicitly.
-     *
-     * @return bool
      */
-    public function hasAclResource()
+    public function hasAclResource(): bool
     {
         return $this->has(ConfigUtil::ACL_RESOURCE);
     }
 
     /**
      * Gets the name of ACL resource that should be used to protect the entity.
-     *
-     * @return string|null
      */
-    public function getAclResource()
+    public function getAclResource(): ?string
     {
         return $this->get(ConfigUtil::ACL_RESOURCE);
     }
 
     /**
      * Sets the name of ACL resource that should be used to protect the entity.
-     *
-     * @param string|null $aclResource
      */
-    public function setAclResource($aclResource = null)
+    public function setAclResource(?string $aclResource): void
     {
         $this->items[ConfigUtil::ACL_RESOURCE] = $aclResource;
     }
@@ -363,7 +317,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return array [field name => direction, ...]
      */
-    public function getOrderBy()
+    public function getOrderBy(): array
     {
         return $this->get(ConfigUtil::ORDER_BY, []);
     }
@@ -376,7 +330,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @param array $orderBy [field name => direction, ...]
      */
-    public function setOrderBy(array $orderBy = [])
+    public function setOrderBy(array $orderBy): void
     {
         if ($orderBy) {
             $this->items[ConfigUtil::ORDER_BY] = $orderBy;
@@ -387,20 +341,16 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Gets the form type.
-     *
-     * @return string|null
      */
-    public function getFormType()
+    public function getFormType(): ?string
     {
         return $this->get(ConfigUtil::FORM_TYPE);
     }
 
     /**
      * Sets the form type.
-     *
-     * @param string|null $formType
      */
-    public function setFormType($formType)
+    public function setFormType(?string $formType): void
     {
         if ($formType) {
             $this->items[ConfigUtil::FORM_TYPE] = $formType;
@@ -411,20 +361,16 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Gets the form options.
-     *
-     * @return array|null
      */
-    public function getFormOptions()
+    public function getFormOptions(): ?array
     {
         return $this->get(ConfigUtil::FORM_OPTIONS);
     }
 
     /**
      * Sets the form options.
-     *
-     * @param array|null $formOptions
      */
-    public function setFormOptions($formOptions)
+    public function setFormOptions(?array $formOptions): void
     {
         if ($formOptions) {
             $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
@@ -435,11 +381,8 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Sets a form option. If an option is already exist its value will be replaced with new value.
-     *
-     * @param string $name  The name of an option
-     * @param mixed  $value The value of an option
      */
-    public function setFormOption($name, $value)
+    public function setFormOption(string $name, mixed $value): void
     {
         $formOptions = $this->getFormOptions();
         $formOptions[$name] = $value;
@@ -449,28 +392,27 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Gets existing validation constraints from the form options.
      *
-     * @return Constraint[]|null
+     * @return array|null [Constraint object or [constraint name or class => constraint options, ...], ...]
      */
-    public function getFormConstraints()
+    public function getFormConstraints(): ?array
     {
-        $formOptions = $this->getFormOptions();
-        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
-            return null;
-        }
-
-        return $formOptions['constraints'];
+        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
     }
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
-    public function addFormConstraint(Constraint $constraint)
+    public function addFormConstraint(Constraint $constraint): void
     {
-        $formOptions = $this->getFormOptions();
-        $formOptions['constraints'][] = $constraint;
-        $this->setFormOptions($formOptions);
+        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+    }
+
+    /**
+     * Removes a validation constraint from the form options by its class.
+     */
+    public function removeFormConstraint(string $constraintClass): void
+    {
+        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
     }
 
     /**
@@ -478,7 +420,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return string[]|null Each element in the array is the name of a service implements EventSubscriberInterface
      */
-    public function getFormEventSubscribers()
+    public function getFormEventSubscribers(): ?array
     {
         return $this->get(ConfigUtil::FORM_EVENT_SUBSCRIBER);
     }
@@ -489,7 +431,7 @@ class ActionConfig implements ConfigBagInterface
      * @param string[]|null $eventSubscribers Each element in the array should be
      *                                        the name of a service implements EventSubscriberInterface
      */
-    public function setFormEventSubscribers(array $eventSubscribers = null)
+    public function setFormEventSubscribers(?array $eventSubscribers): void
     {
         if ($eventSubscribers) {
             $this->items[ConfigUtil::FORM_EVENT_SUBSCRIBER] = $eventSubscribers;
@@ -503,7 +445,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @param string $eventSubscriber The name of a service implements EventSubscriberInterface
      */
-    public function addFormEventSubscriber($eventSubscriber)
+    public function addFormEventSubscriber(string $eventSubscriber): void
     {
         $eventSubscribers = $this->getFormEventSubscribers();
         $eventSubscribers[] = $eventSubscriber;
@@ -511,57 +453,17 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Indicates whether the "disable_meta_properties" option is set explicitly.
-     *
-     * @return bool
-     */
-    public function hasDisableMetaProperties()
-    {
-        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
-    }
-
-    /**
-     * Indicates whether a requesting of additional meta properties is enabled.
-     *
-     * @return bool
-     */
-    public function isMetaPropertiesEnabled()
-    {
-        return !$this->get(ConfigUtil::DISABLE_META_PROPERTIES, false);
-    }
-
-    /**
-     * Enables a requesting of additional meta properties.
-     */
-    public function enableMetaProperties()
-    {
-        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = false;
-    }
-
-    /**
-     * Disables a requesting of additional meta properties.
-     */
-    public function disableMetaProperties()
-    {
-        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
-    }
-
-    /**
      * Indicates whether the "disable_fieldset" option is set explicitly.
-     *
-     * @return bool
      */
-    public function hasDisableFieldset()
+    public function hasDisableFieldset(): bool
     {
         return $this->has(ConfigUtil::DISABLE_FIELDSET);
     }
 
     /**
      * Indicates whether indicates whether a requesting of a restricted set of fields is enabled.
-     *
-     * @return bool
      */
-    public function isFieldsetEnabled()
+    public function isFieldsetEnabled(): bool
     {
         return !$this->get(ConfigUtil::DISABLE_FIELDSET, false);
     }
@@ -569,7 +471,7 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Enables a requesting of a restricted set of fields.
      */
-    public function enableFieldset()
+    public function enableFieldset(): void
     {
         $this->items[ConfigUtil::DISABLE_FIELDSET] = false;
     }
@@ -577,27 +479,23 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Disables a requesting of a restricted set of fields.
      */
-    public function disableFieldset()
+    public function disableFieldset(): void
     {
         $this->items[ConfigUtil::DISABLE_FIELDSET] = true;
     }
 
     /**
      * Indicates whether the "disable_inclusion" option is set explicitly.
-     *
-     * @return bool
      */
-    public function hasDisableInclusion()
+    public function hasDisableInclusion(): bool
     {
         return $this->has(ConfigUtil::DISABLE_INCLUSION);
     }
 
     /**
      * Indicates whether an inclusion of related entities is enabled.
-     *
-     * @return bool
      */
-    public function isInclusionEnabled()
+    public function isInclusionEnabled(): bool
     {
         return !$this->get(ConfigUtil::DISABLE_INCLUSION, false);
     }
@@ -605,7 +503,7 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Enables an inclusion of related entities.
      */
-    public function enableInclusion()
+    public function enableInclusion(): void
     {
         $this->items[ConfigUtil::DISABLE_INCLUSION] = false;
     }
@@ -613,27 +511,55 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Disables an inclusion of related entities.
      */
-    public function disableInclusion()
+    public function disableInclusion(): void
     {
         $this->items[ConfigUtil::DISABLE_INCLUSION] = true;
     }
 
     /**
-     * Indicates whether the "disable_sorting" option is set explicitly.
-     *
-     * @return bool
+     * Indicates whether the "disable_meta_properties" option is set explicitly.
      */
-    public function hasDisableSorting()
+    public function hasDisableMetaProperties(): bool
+    {
+        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
+    }
+
+    /**
+     * Indicates whether a requesting of additional meta properties is enabled.
+     */
+    public function isMetaPropertiesEnabled(): bool
+    {
+        return !$this->get(ConfigUtil::DISABLE_META_PROPERTIES, false);
+    }
+
+    /**
+     * Enables a requesting of additional meta properties.
+     */
+    public function enableMetaProperties(): void
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = false;
+    }
+
+    /**
+     * Disables a requesting of additional meta properties.
+     */
+    public function disableMetaProperties(): void
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
+    }
+
+    /**
+     * Indicates whether the "disable_sorting" option is set explicitly.
+     */
+    public function hasDisableSorting(): bool
     {
         return $this->has(ConfigUtil::DISABLE_SORTING);
     }
 
     /**
      * Indicates whether a sorting is enabled.
-     *
-     * @return bool
      */
-    public function isSortingEnabled()
+    public function isSortingEnabled(): bool
     {
         return !$this->get(ConfigUtil::DISABLE_SORTING, false);
     }
@@ -641,7 +567,7 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Enables a sorting.
      */
-    public function enableSorting()
+    public function enableSorting(): void
     {
         $this->items[ConfigUtil::DISABLE_SORTING] = false;
     }
@@ -649,17 +575,15 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Disables a sorting.
      */
-    public function disableSorting()
+    public function disableSorting(): void
     {
         $this->items[ConfigUtil::DISABLE_SORTING] = true;
     }
 
     /**
      * Indicates whether the default page size is set.
-     *
-     * @return bool
      */
-    public function hasPageSize()
+    public function hasPageSize(): bool
     {
         return $this->has(ConfigUtil::PAGE_SIZE);
     }
@@ -671,7 +595,7 @@ class ActionConfig implements ConfigBagInterface
      *                  NULL if the default page size should be set be a processor
      *                  -1 if the pagination should be disabled
      */
-    public function getPageSize()
+    public function getPageSize(): ?int
     {
         return $this->get(ConfigUtil::PAGE_SIZE);
     }
@@ -684,22 +608,19 @@ class ActionConfig implements ConfigBagInterface
      *
      * @param int|null $pageSize A positive number, NULL or -1
      */
-    public function setPageSize($pageSize = null)
+    public function setPageSize(?int $pageSize): void
     {
         if (null === $pageSize) {
             unset($this->items[ConfigUtil::PAGE_SIZE]);
         } else {
-            $pageSize = (int)$pageSize;
             $this->items[ConfigUtil::PAGE_SIZE] = $pageSize >= 0 ? $pageSize : -1;
         }
     }
 
     /**
      * Indicates whether the maximum number of items is set.
-     *
-     * @return bool
      */
-    public function hasMaxResults()
+    public function hasMaxResults(): bool
     {
         return $this->has(ConfigUtil::MAX_RESULTS);
     }
@@ -709,7 +630,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return int|null The requested maximum number of items, NULL or -1 if not limited
      */
-    public function getMaxResults()
+    public function getMaxResults(): ?int
     {
         return $this->get(ConfigUtil::MAX_RESULTS);
     }
@@ -721,32 +642,27 @@ class ActionConfig implements ConfigBagInterface
      *
      * @param int|null $maxResults The maximum number of items, NULL or -1 to set unlimited
      */
-    public function setMaxResults($maxResults = null)
+    public function setMaxResults(?int $maxResults): void
     {
         if (null === $maxResults) {
             unset($this->items[ConfigUtil::MAX_RESULTS]);
         } else {
-            $maxResults = (int)$maxResults;
             $this->items[ConfigUtil::MAX_RESULTS] = $maxResults >= 0 ? $maxResults : -1;
         }
     }
 
     /**
      * Gets response status codes.
-     *
-     * @return StatusCodesConfig|null
      */
-    public function getStatusCodes()
+    public function getStatusCodes(): ?StatusCodesConfig
     {
         return $this->get(ConfigUtil::STATUS_CODES);
     }
 
     /**
      * Sets response status codes.
-     *
-     * @param StatusCodesConfig|null $statusCodes
      */
-    public function setStatusCodes(StatusCodesConfig $statusCodes = null)
+    public function setStatusCodes(?StatusCodesConfig $statusCodes): void
     {
         $this->set(ConfigUtil::STATUS_CODES, $statusCodes);
     }

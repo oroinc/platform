@@ -2,15 +2,11 @@
 
 namespace Oro\Bundle\SSOBundle\Security\Core\Exception;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class EmailDomainNotAllowedException extends AuthenticationException
+/**
+ * This exception is thrown when a user email is not allowed for OAuth single sign-on authentication.
+ */
+class EmailDomainNotAllowedException extends BadCredentialsException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
-    {
-        return 'Invalid credentials.';
-    }
 }

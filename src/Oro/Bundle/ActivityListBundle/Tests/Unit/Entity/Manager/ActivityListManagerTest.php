@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityList;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestFeatureAwareActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestOrganization;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestUser;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -23,42 +24,39 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListManager */
-    protected $activityListManager;
+    private $activityListManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $config;
+    private $config;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $activityListIdProvider;
+    private $activityListIdProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $commentManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commentManager;
+    private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var WorkflowDataHelper */
-    protected $workflowHelper;
+    private $workflowHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    private $htmlTagHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
@@ -66,20 +64,13 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->provider = $this->createMock(ActivityListChainProvider::class);
         $this->activityListIdProvider = $this->createMock(ActivityListIdProvider::class);
-        $this->em = $this->createMock(EntityManager::class);
         $this->commentManager = $this->createMock(CommentApiManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())
             ->method('purify')
-            ->will(
-                $this->returnCallback(
-                    function ($value) {
-                        return $value;
-                    }
-                )
-            );
+            ->willReturnArgument(0);
 
         $this->activityListManager = new ActivityListManager(
             $this->authorizationChecker,
@@ -97,20 +88,47 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRepository()
     {
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('OroActivityListBundle:ActivityList');
+            ->with(ActivityList::class);
         $this->activityListManager->getRepository();
     }
 
     public function testGetNonExistItem()
     {
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('find')->with(12)->willReturn(null);
+        $repo = $this->createMock(ActivityListRepository::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('find')
+            ->with(12)
+            ->willReturn(null);
         $this->assertNull($this->activityListManager->getItem(12));
+    }
+
+    public function testGetEntityViewModelWhenActivityIsAbsent()
+    {
+        $activityList = $this->createMock(ActivityList::class);
+        $activityList->expects(self::any())
+            ->method('getRelatedActivityClass');
+        $activityList->expects(self::once())
+            ->method('getRelatedActivityId');
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn(null);
+        $entityProvider = $this->createMock(TestFeatureAwareActivityProvider::class);
+        $entityProvider->expects(self::once())
+            ->method('isFeaturesEnabled')
+            ->willReturn(true);
+
+        $this->provider->expects(self::once())
+            ->method('getProviderForEntity')
+            ->willReturn($entityProvider);
+
+        $result = $this->activityListManager->getEntityViewModel($activityList);
+
+        self::assertNull($result);
     }
 
     public function testGetItem()
@@ -119,12 +137,12 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $testItem->setId(105);
         $owner = new TestUser();
         $owner->setId(15);
-        $editor = new TestUser();
-        $editor->setId(142);
+        $updatedBy = new TestUser();
+        $updatedBy->setId(142);
         $organization = new TestOrganization();
         $organization->setId(584);
         $testItem->setOwner($owner);
-        $testItem->setEditor($editor);
+        $testItem->setUpdatedBy($updatedBy);
         $testItem->setOrganization($organization);
         $testItem->setCreatedAt(new \DateTime('2012-01-01', new \DateTimeZone('UTC')));
         $testItem->setUpdatedAt(new \DateTime('2014-01-01', new \DateTimeZone('UTC')));
@@ -134,26 +152,36 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $testItem->setRelatedActivityClass('Acme\TestBundle\Entity\TestEntity');
         $testItem->setRelatedActivityId(127);
 
-        $this->entityNameResolver->expects($this->any())->method('getName')
-            ->willReturnCallback(
-                function ($user) {
-                    if ($user->getId() === 15) {
-                        return 'Owner_String';
-                    }
-
-                    return 'Editor_String';
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
+            ->willReturnCallback(function ($user) {
+                if ($user->getId() === 15) {
+                    return 'Owner_String';
                 }
-            );
 
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('find')->with(105)->willReturn($testItem);
+                return 'Editor_String';
+            });
 
-        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
+        $repo = $this->createMock(ActivityListRepository::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->willReturn($repo);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn($testItem);
+        $repo->expects($this->once())
+            ->method('find')
+            ->with(105)
+            ->willReturn($testItem);
+
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
 
         $provider = new TestActivityProvider();
-        $this->provider->expects($this->once())->method('getProviderForEntity')->willReturn($provider);
+        $this->provider->expects($this->once())
+            ->method('getProviderForEntity')
+            ->willReturn($provider);
 
         $this->assertEquals(
             [
@@ -183,16 +211,5 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
             ],
             $this->activityListManager->getItem(105)
         );
-    }
-
-    protected function mockEmailActivityListProvider()
-    {
-        $emailActivityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-        ->disableOriginalConstructor()->getMock();
-
-        $emailActivityListProvider->expects($this->once())->method('getActivityClass')->willReturn('ActivityClass');
-        $emailActivityListProvider->expects($this->once())->method('getAclClass')->willReturn('AclClass');
-
-        return $emailActivityListProvider;
     }
 }

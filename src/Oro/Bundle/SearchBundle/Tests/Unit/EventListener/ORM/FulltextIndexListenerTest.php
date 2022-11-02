@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener\ORM;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
@@ -11,58 +13,35 @@ use Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener;
 
 class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadataInfo
-     */
-    protected $metadata;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadataInfo */
+    private $metadata;
 
-    /**
-     * @var FulltextIndexListener
-     */
-    protected $listener;
+    /** @var FulltextIndexListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->event = $this
-            ->getMockBuilder('Doctrine\ORM\Event\LoadClassMetadataEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->setMethods(['getTable', 'getTableName'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $this->metadata = $this->createMock(ClassMetadataInfo::class);
     }
 
-    /**
-     * @param string $databaseDriver
-     * @param string $textIndexTableName
-     * @param string $returnMysqlVersion
-     */
-    protected function initListener($databaseDriver, $textIndexTableName, $returnMysqlVersion = '5.5')
-    {
-        $connection = $this
-            ->getMockBuilder('Doctrine\DBAL\Connection')
-            ->setMethods(['getDriver', 'getName', 'fetchColumn'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection
-            ->expects($this->any())
-            ->method('getDriver')
-            ->willReturn($connection);
-        $connection
-            ->expects($this->any())
+    private function initListener(
+        string $databaseDriver,
+        string $textIndexTableName,
+        string $returnMysqlVersion = '5.5'
+    ): void {
+        $driver = $this->createMock(Driver::class);
+        $driver->expects($this->any())
             ->method('getName')
             ->willReturn($databaseDriver);
-
-        $connection
-            ->expects($this->any())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
+            ->method('getDriver')
+            ->willReturn($driver);
+        $connection->expects($this->any())
             ->method('fetchColumn')
             ->with('select version()')
             ->willReturn($returnMysqlVersion);
@@ -74,13 +53,8 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->initListener('not_mysql', 'expectedTextIndexTableName');
 
-        $this->event
-            ->expects($this->never())
+        $this->event->expects($this->never())
             ->method('getClassMetadata');
-
-        $this->metadata
-            ->expects($this->never())
-            ->method('getTable');
 
         $this->listener->loadClassMetadata($this->event);
         $this->assertNull($this->metadata->table);
@@ -90,15 +64,13 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, 'expectedTextIndexTableName');
 
-        $this->metadata
-            ->expects($this->once())
+        $this->metadata->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('notExpectedTextIndexTableName'));
+            ->willReturn('notExpectedTextIndexTableName');
 
-        $this->event
-            ->expects($this->once())
+        $this->event->expects($this->once())
             ->method('getClassMetadata')
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
         $this->listener->loadClassMetadata($this->event);
         $this->assertNull($this->metadata->table);
@@ -106,22 +78,18 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMysqlVersionsProvider
-     *
-     * @param string $mysqlVersion
      */
-    public function testTableEngineDependsOnMysqlVersionOptions($mysqlVersion, $tableEngine)
+    public function testTableEngineDependsOnMysqlVersionOptions(string $mysqlVersion, string $tableEngine)
     {
         $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME, $mysqlVersion);
 
-        $this->metadata
-            ->expects($this->once())
+        $this->metadata->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue(IndexText::TABLE_NAME));
+            ->willReturn(IndexText::TABLE_NAME);
 
-        $this->event
-            ->expects($this->once())
+        $this->event->expects($this->once())
             ->method('getClassMetadata')
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
         $this->listener->loadClassMetadata($this->event);
 
@@ -134,10 +102,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getMysqlVersionsProvider()
+    public function getMysqlVersionsProvider(): array
     {
         return [
             ['5.5.5', PdoMysql::ENGINE_MYISAM],

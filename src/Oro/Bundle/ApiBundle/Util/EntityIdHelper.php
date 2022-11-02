@@ -5,33 +5,35 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Provides a set of methods to simplify working with entity identifier.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityIdHelper
 {
     /**
      * Sets the identifier value to a given entity.
      *
-     * @param object         $entity
-     * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param object                    $entity
+     * @param mixed                     $entityId
+     * @param EntityIdMetadataInterface $metadata
      *
      * @throws \InvalidArgumentException
      */
-    public function setEntityIdentifier($entity, $entityId, EntityMetadata $entityMetadata): void
+    public function setEntityIdentifier($entity, $entityId, EntityIdMetadataInterface $metadata): void
     {
         if (!\is_array($entityId)) {
-            $idFieldNames = $entityMetadata->getIdentifierFieldNames();
+            $idFieldNames = $metadata->getIdentifierFieldNames();
             if (\count($idFieldNames) > 1) {
                 throw new \InvalidArgumentException(\sprintf(
                     'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
                     $entityId,
-                    $entityMetadata->getClassName()
+                    $metadata->getClassName()
                 ));
             }
             $entityId = [\reset($idFieldNames) => $entityId];
@@ -39,25 +41,24 @@ class EntityIdHelper
 
         $reflClass = new \ReflectionClass($entity);
         foreach ($entityId as $fieldName => $value) {
-            $propertyMetadata = $entityMetadata->getProperty($fieldName);
-            if (null === $propertyMetadata) {
+            $propertyName = $metadata->getPropertyPath($fieldName);
+            if (null === $propertyName) {
                 throw new \InvalidArgumentException(\sprintf(
                     'The entity "%s" does not have metadata for the "%s" property.',
                     \get_class($entity),
                     $fieldName
                 ));
             }
-            $propertyPath = $propertyMetadata->getPropertyPath();
-            $setter = $this->getSetter($reflClass, $propertyPath);
+            $setter = $this->getSetter($reflClass, $propertyName);
             if (null !== $setter) {
                 $setter->invoke($entity, $value);
             } else {
-                $property = ReflectionUtil::getProperty($reflClass, $propertyPath);
+                $property = ReflectionUtil::getProperty($reflClass, $propertyName);
                 if (null === $property) {
                     throw new \InvalidArgumentException(\sprintf(
                         'The entity "%s" does not have the "%s" property.',
                         \get_class($entity),
-                        $propertyPath
+                        $propertyName
                     ));
                 }
 
@@ -72,32 +73,44 @@ class EntityIdHelper
     /**
      * Adds a restriction by the entity identifier to the given query builder.
      *
-     * @param QueryBuilder   $qb
-     * @param mixed          $entityId
-     * @param EntityMetadata $entityMetadata
+     * @param QueryBuilder              $qb
+     * @param mixed                     $entityId
+     * @param EntityIdMetadataInterface $metadata
+     * @param string|null               $entityAlias
+     * @param string|null               $idParamName
      */
-    public function applyEntityIdentifierRestriction(QueryBuilder $qb, $entityId, EntityMetadata $entityMetadata): void
-    {
-        $rootAlias = QueryBuilderUtil::getSingleRootAlias($qb);
-        $idFieldNames = $entityMetadata->getIdentifierFieldNames();
+    public function applyEntityIdentifierRestriction(
+        QueryBuilder $qb,
+        $entityId,
+        EntityIdMetadataInterface $metadata,
+        string $entityAlias = null,
+        string $idParamName = null
+    ): void {
+        if (!$entityAlias) {
+            $entityAlias = QueryBuilderUtil::getSingleRootAlias($qb);
+        }
+        if (!$idParamName) {
+            $idParamName = 'id';
+        }
+        $idFieldNames = $metadata->getIdentifierFieldNames();
         if (\count($idFieldNames) === 1) {
             // single identifier
             if (\is_array($entityId)) {
                 throw new RuntimeException(\sprintf(
                     'The entity identifier cannot be an array because the entity "%s" has single identifier.',
-                    $entityMetadata->getClassName()
+                    $metadata->getClassName()
                 ));
             }
-            $propertyName = $entityMetadata->getProperty(\reset($idFieldNames))->getPropertyPath();
+            $propertyName = $metadata->getPropertyPath(\reset($idFieldNames));
             $qb
-                ->andWhere(\sprintf('%s.%s = :id', $rootAlias, $propertyName))
-                ->setParameter('id', $entityId);
+                ->andWhere(\sprintf('%s.%s = :%s', $entityAlias, $propertyName, $idParamName))
+                ->setParameter($idParamName, $entityId);
         } else {
             // composite identifier
             if (!\is_array($entityId)) {
                 throw new RuntimeException(\sprintf(
                     'The entity identifier must be an array because the entity "%s" has composite identifier.',
-                    $entityMetadata->getClassName()
+                    $metadata->getClassName()
                 ));
             }
             $counter = 1;
@@ -107,13 +120,13 @@ class EntityIdHelper
                         'The entity identifier array must have the key "%s" because '
                         . 'the entity "%s" has composite identifier.',
                         $fieldName,
-                        $entityMetadata->getClassName()
+                        $metadata->getClassName()
                     ));
                 }
-                $propertyName = $entityMetadata->getProperty($fieldName)->getPropertyPath();
+                $propertyName = $metadata->getPropertyPath($fieldName);
                 $qb
-                    ->andWhere(\sprintf('%s.%s = :id%d', $rootAlias, $propertyName, $counter))
-                    ->setParameter(\sprintf('id%d', $counter), $entityId[$fieldName]);
+                    ->andWhere(\sprintf('%s.%s = :%s%d', $entityAlias, $propertyName, $idParamName, $counter))
+                    ->setParameter(\sprintf('%s%d', $idParamName, $counter), $entityId[$fieldName]);
                 $counter++;
             }
         }
@@ -187,21 +200,21 @@ class EntityIdHelper
     /**
      * Gets an identifier of the given entity.
      *
-     * @param object         $entity
-     * @param EntityMetadata $entityMetadata
+     * @param object                    $entity
+     * @param EntityIdMetadataInterface $metadata
      *
      * @return mixed A scalar value if the entity has a single identifier,
      *               or an array [field name => value, ...] if the entity has a composite identifier
      */
-    public function getEntityIdentifier($entity, EntityMetadata $entityMetadata)
+    public function getEntityIdentifier($entity, EntityIdMetadataInterface $metadata)
     {
         $idFieldNames = [];
-        foreach ($entityMetadata->getIdentifierFieldNames() as $fieldName) {
-            $property = $entityMetadata->getProperty($fieldName);
-            if (null !== $property) {
-                $fieldName = $property->getPropertyPath();
+        foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
+            $propertyName = $metadata->getPropertyPath($fieldName);
+            if (null === $propertyName) {
+                $propertyName = $fieldName;
             }
-            $idFieldNames[] = $fieldName;
+            $idFieldNames[] = $propertyName;
         }
 
         $identifier = [];
@@ -234,12 +247,36 @@ class EntityIdHelper
     }
 
     /**
+     * Checks whether the given entity identifier is empty.
+     * A single valued identifier is empty if its value equals to NULL.
+     * A composite identifier is empty if values of all its fields equal to NULL.
+     *
+     * @param mixed $identifier
+     *
+     * @return bool
+     */
+    public function isEntityIdentifierEmpty($identifier): bool
+    {
+        if (null === $identifier) {
+            return true;
+        }
+        if (!\is_array($identifier)) {
+            return false;
+        }
+
+        $isEmpty = true;
+        foreach ($identifier as $value) {
+            if (null !== $value) {
+                $isEmpty = false;
+                break;
+            }
+        }
+
+        return $isEmpty;
+    }
+
+    /**
      * Gets a public getter for the given property.
-     *
-     * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
-     *
-     * @return \ReflectionMethod|null
      */
     private function getGetter(\ReflectionClass $reflClass, string $propertyName): ?\ReflectionMethod
     {
@@ -256,11 +293,6 @@ class EntityIdHelper
 
     /**
      * Gets a public setter for the given property.
-     *
-     * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
-     *
-     * @return \ReflectionMethod|null
      */
     private function getSetter(\ReflectionClass $reflClass, string $propertyName): ?\ReflectionMethod
     {
@@ -280,10 +312,6 @@ class EntityIdHelper
 
     /**
      * Camelizes a given string.
-     *
-     * @param string $value
-     *
-     * @return string
      */
     private function camelize(string $value): string
     {

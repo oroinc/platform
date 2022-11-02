@@ -5,19 +5,20 @@ namespace Oro\Bundle\PlatformBundle\Provider\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * Delegates adding and resolving global options for CLI commands to child providers.
+ */
 class GlobalOptionsProviderRegistry implements GlobalOptionsProviderInterface
 {
-    /**
-     * @var array|GlobalOptionsProviderInterface[]
-     */
-    private $globalOptionsProviders = [];
+    /** @var iterable|GlobalOptionsProviderInterface[] */
+    private $providers;
 
     /**
-     * @param GlobalOptionsProviderInterface $globalOptionsProvider
+     * @param iterable|GlobalOptionsProviderInterface[] $providers
      */
-    public function registerProvider(GlobalOptionsProviderInterface $globalOptionsProvider)
+    public function __construct(iterable $providers)
     {
-        $this->globalOptionsProviders[] = $globalOptionsProvider;
+        $this->providers = $providers;
     }
 
     /**
@@ -25,8 +26,8 @@ class GlobalOptionsProviderRegistry implements GlobalOptionsProviderInterface
      */
     public function addGlobalOptions(Command $command)
     {
-        foreach ($this->globalOptionsProviders as $globalOptionsProvider) {
-            $globalOptionsProvider->addGlobalOptions($command);
+        foreach ($this->providers as $provider) {
+            $provider->addGlobalOptions($command);
         }
     }
 
@@ -35,8 +36,8 @@ class GlobalOptionsProviderRegistry implements GlobalOptionsProviderInterface
      */
     public function resolveGlobalOptions(InputInterface $input)
     {
-        foreach ($this->globalOptionsProviders as $globalOptionsProvider) {
-            $globalOptionsProvider->resolveGlobalOptions($input);
+        foreach ($this->providers as $provider) {
+            $provider->resolveGlobalOptions($input);
         }
     }
 }

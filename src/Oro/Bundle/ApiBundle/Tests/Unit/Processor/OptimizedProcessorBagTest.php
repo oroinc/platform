@@ -7,14 +7,14 @@ use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface */
-    private $processorFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
+    private $processorRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
     private $applicableCheckerFactory;
@@ -22,46 +22,34 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     private $processorIteratorFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
-    private $ungroupedApplicableCheckerFactory;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     private $ungroupedProcessorIteratorFactory;
 
     /** @var ChainApplicableChecker */
     private $applicableChecker;
 
-    /** @var ChainApplicableChecker */
-    private $ungroupedApplicableChecker;
-
     /** @var OptimizedProcessorBag */
     private $processorBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processorFactory = $this->createMock(ProcessorFactoryInterface::class);
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->applicableCheckerFactory = $this->createMock(ProcessorApplicableCheckerFactoryInterface::class);
         $this->processorIteratorFactory = $this->createMock(ProcessorIteratorFactoryInterface::class);
-        $this->ungroupedApplicableCheckerFactory = $this->createMock(ProcessorApplicableCheckerFactoryInterface::class);
         $this->ungroupedProcessorIteratorFactory = $this->createMock(ProcessorIteratorFactoryInterface::class);
         $this->applicableChecker = new ChainApplicableChecker();
-        $this->ungroupedApplicableChecker = new ChainApplicableChecker();
 
         $this->applicableCheckerFactory->expects(self::any())
             ->method('createApplicableChecker')
             ->willReturn($this->applicableChecker);
-        $this->ungroupedApplicableCheckerFactory->expects(self::any())
-            ->method('createApplicableChecker')
-            ->willReturn($this->ungroupedApplicableChecker);
 
         $processorBagConfigBuilder = new ProcessorBagConfigBuilder();
         $this->processorBag = new OptimizedProcessorBag(
             $processorBagConfigBuilder,
-            $this->processorFactory,
+            $this->processorRegistry,
             false,
             $this->applicableCheckerFactory,
             $this->processorIteratorFactory,
-            $this->ungroupedApplicableCheckerFactory,
             $this->ungroupedProcessorIteratorFactory
         );
 
@@ -83,7 +71,7 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
                 [['processor1', ['group' => 'group1']]],
                 self::identicalTo($context),
                 self::identicalTo($this->applicableChecker),
-                self::identicalTo($this->processorFactory)
+                self::identicalTo($this->processorRegistry)
             )
             ->willReturn($iterator);
 
@@ -105,8 +93,8 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
             ->with(
                 [['processor2', []]],
                 self::identicalTo($context),
-                self::identicalTo($this->ungroupedApplicableChecker),
-                self::identicalTo($this->processorFactory)
+                self::identicalTo($this->applicableChecker),
+                self::identicalTo($this->processorRegistry)
             )
             ->willReturn($iterator);
 

@@ -16,10 +16,12 @@
 "copy": "copy"
 "remove": "remove"
 "Status": "Status"
-"oro.datagrid.headerCell.selectAll.label": "Select rows"
+"oro.datagrid.headerCell.selectAll.label": "Rows selection options"
 "oro.datagrid.headerCell.selectAll.all": "All"
 "oro.datagrid.headerCell.selectAll.allVisible": "All visible"
 "oro.datagrid.headerCell.selectAll.none": "None"
+"oro.datagrid.headerCell.selectAll.input.aria_label": "Select all rows"
+"oro.datagrid.headerCell.selectAllVisible.input.aria_label": "Select all visible rows"
 "only short": "only short"
 "this is long text for test": "this is long text for test"
 "View per page": "View per page"
@@ -35,31 +37,36 @@
 "Please, select item to perform action.": "Please, select item to perform action."
 "Please select view": "Please select view"
 "oro.datagrid.entityHint": "Entities"
-"oro.datagrid.no.entities": "No records found"
-"oro.datagrid.no.resultsTitle": "No Results Found"
-"oro.datagrid.no.results": "No {{ entityHint }} were found to match your search.<br/>Try modifying your search criteria"
+"oro.datagrid.no.entities": "There are no {{ entityHint }}"
+"oro.datagrid.no.results_title": "No Results Found"
+"oro.datagrid.no.results": "No {{ entityHint }} were found to match your search.<br>Try modifying your search criteria"
 "oro.datagrid.no.columns": "No columns configured for this grid"
 "oro.datagrid.pagination.input-aria": "data grid pagination input"
+"oro.datagrid.pagination.input.aria_label": "Current page number"
 "oro.datagrid.pagination.label": "Page"
 "oro.datagrid.pagination.prev": "Prev"
+"oro.datagrid.pagination.prev.aria_label": "Previous Page"
 "oro.datagrid.pagination.next": "Next"
+"oro.datagrid.pagination.next.aria_label": "Next Page"
 "oro.datagrid.pagination.totalPages": "of {{ totalPages }}"
 "oro.datagrid.pagination.visibleItems": "Showing {{ count }} of {{ total }} records"
-"oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"
-"oro.datagrid.pagination.totalRecordsShort": "{{ totalRecords }} total records"
+"oro.datagrid.pagination.totalRecords": "{1}Total of {{ totalRecords }} record|]1,Inf[Total of {{ totalRecords }} records"
+"oro.datagrid.pagination.totalRecordsShort": "{1}{{ totalRecords }} total record|]1,Inf[{{ totalRecords }} total records"
 oro.datagrid.extension.export.label: "Export Grid"
 oro.datagrid.extension.export.tooltip: "With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported."
 oro_datagrid.label_add_filter: "Manage filters"
 oro_datagrid.label_reset_button: "Reset Filter"
 oro_datagrid.action.reset: "Reset"
+oro_datagrid.action.reset.aria_label: "Reset grid action"
 oro_datagrid.action.refresh: "Refresh"
+oro_datagrid.action.refresh.aria_label: "Refresh grid action"
 oro_datagrid.action.appearance: "Data appearance"
 "oro.datagrid.action.save_grid_view": "Save"
 "oro.datagrid.action.rename_grid_view": "Rename"
 "oro.datagrid.name_modal.title": "Grid view"
 "oro.datagrid.row_actions.label": "Row actions"
 "oro.datagrid.card_actions.label": "Card actions"
-"oro.datagrid.action.discard_grid_view_changes": "Discard changes"
+"oro.datagrid.action.discard_grid_view_changes": "Discard Changes"
 "oro.datagrid.action.save_grid_view_as": "Save As"
 "oro.datagrid.action.share_grid_view": "Share With Others"
 "oro.datagrid.action.unshare_grid_view": "Unshare"
@@ -83,8 +90,12 @@ oro:
         toolbar_sorting:
             label: "Sorted By"
         settings:
+            tab:
+                grid: "Grid"
+                filters: "Filters"
             header.title: "Settings"
             title: "Grid Settings"
+            title_aria_label: "Expand or Collapse Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
             unselect_all: "Unselect All"
@@ -104,6 +115,19 @@ oro:
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
             close.label: "Close"
+        btn:
+            show_all:
+                aria_label: 'Show all added items on one page'
+                label: 'Show All'
+            show_less:
+                aria_label: 'Show all added items with pagination'
+                label: 'Show Less'
+            group_similar:
+                aria_label: 'Group similar items'
+                label: 'Group Similar'
+            ungroup_similar:
+                aria_label: 'Show similar items separately'
+                label: 'Ungroup Similar'
         not_number: Not a number
         inline_editing:
             message:
@@ -112,23 +136,26 @@ oro:
             refresh_confirm_modal:
                 title: Confirmation
             help: |
-                <ul style="margin-bottom: 0px;">
-                    <li><span style="font-family: monospace">Enter</span>, <span style="font-family: monospace">Shift + Enter</span> - Save and edit next/previous cell in column</li>
-                	<li><span style="font-family: monospace">Tab</span>, <span style="font-family: monospace">Shift + Tab</span> - Save and edit next/previous cell in row</li>
-                	<li><span style="font-family: monospace">Alt + ←/↑/→/↓  </span> - Navigate between cells</li>
-                	<li><span style="font-family: monospace">Ctrl + Enter</span> - Save and close</li>
-                	<li><span style="font-family: monospace">Escape</span> - Quit</li>
+                <ul style="margin-bottom:0px;">
+                    <li><span style="font-family:monospace;">Enter</span>, <span style="font-family:monospace;">Shift + Enter</span> - Save and edit next/previous cell in column</li>
+                    <li><span style="font-family:monospace;">Tab</span>, <span style="font-family:monospace;">Shift + Tab</span> - Save and edit next/previous cell in row</li>
+                    <li><span style="font-family:monospace;">Alt + ←/↑/→/↓  </span> - Navigate between cells</li>
+                    <li><span style="font-family:monospace;">Ctrl + Enter</span> - Save and close</li>
+                    <li><span style="font-family:monospace;">Escape</span> - Quit</li>
                 </ul>
+        action:
+            select_row: 'Select a row'
+            default_postfix: "row action"
         mass_action:
             title: Mass Actions
             button_title: "..."
             delete:
-                selected_message: You have selected {{ selected }} record.<br/> Are you sure you want to delete it?|You have selected {{ selected }} records.<br/> Are you sure you want to delete them?
+                selected_message: You have selected {{ selected }} record.<br> Are you sure you want to delete it?|You have selected {{ selected }} records.<br> Are you sure you want to delete them?
                 max_limit_message: >
-                    The maximum number of records that can be deleted at once is {{ max_limit }}.<br/>
+                    The maximum number of records that can be deleted at once is {{ max_limit }}.<br>
                     Are you sure you want to delete first {{ max_limit }} records in the selection?
                 restricted_access_message: >
-                    You have permissions to delete  {{ deletable }} records out of {{ selected }} selected.<br/>
+                    You have permissions to delete  {{ deletable }} records out of {{ selected }} selected.<br>
                     Are you sure you want to delete them?
                 restricted_access_empty_message: >
                     You don't have permissions to delete any of the selected records.
@@ -158,5 +185,11 @@ oro:
             success.message: Export started successfully. You will receive email notification upon completion.
             fail.message: Could not start export, please try again.
             max_limit_message: >
-                The maximum number of records that can be exported at once is {{ max_limit }}.<br/>
+                The maximum number of records that can be exported at once is {{ max_limit }}.<br>
                 Are you sure you want to export {{ total }} records?
+        cell:
+            blank:
+                aria_label: 'Blank'
+                placeholder: 'N/A'
+            action_header:
+                aria_label: 'Row actions'

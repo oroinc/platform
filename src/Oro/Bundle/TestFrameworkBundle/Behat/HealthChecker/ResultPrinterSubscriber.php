@@ -15,9 +15,6 @@ class ResultPrinterSubscriber implements EventSubscriberInterface, HealthChecker
      */
     protected $output;
 
-    /**
-     * @param OutputInterface $output
-     */
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;

@@ -20,8 +20,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Add additional fields
-     *
-     * @param Schema $schema
      */
     public static function addTable(Schema $schema)
     {
@@ -34,8 +32,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Add additional fields
-     *
-     * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {
@@ -50,8 +46,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email
-     *
-     * @param Schema $schema
      */
     public static function addForeignKeys(Schema $schema)
     {

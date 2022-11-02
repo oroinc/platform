@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
-use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\ClearableErrorsInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -13,10 +15,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * for elements of a emails collection based on a primary email property of an entity
  * contains this collection.
  * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class MapPrimaryField extends AbstractProcessor
+class MapPrimaryField implements ProcessorInterface
 {
-    const PRIMARY_ITEM_KEY = 'primary_item_key';
+    protected const PRIMARY_ITEM_KEY   = 'primary_item_key';
+    protected const PRIMARY_ITEM_VALUE = 'primary_item_value';
 
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
@@ -62,134 +66,179 @@ class MapPrimaryField extends AbstractProcessor
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function processPreSubmit(CustomizeFormDataContext $context)
+    public function process(ContextInterface $context)
     {
-        $config = $context->getConfig();
-        if (null === $config) {
-            return;
-        }
+        /** @var CustomizeFormDataContext $context */
 
+        switch ($context->getEvent()) {
+            case CustomizeFormDataContext::EVENT_PRE_SUBMIT:
+                $this->processPreSubmit($context);
+                break;
+            case CustomizeFormDataContext::EVENT_POST_SUBMIT:
+                $this->processPostSubmit($context);
+                break;
+            case CustomizeFormDataContext::EVENT_POST_VALIDATE:
+                $this->processPostValidate($context);
+                break;
+        }
+    }
+
+    protected function processPreSubmit(CustomizeFormDataContext $context)
+    {
         $submittedData = $context->getData();
         if (!is_array($submittedData) && !$submittedData instanceof \ArrayAccess) {
             return;
         }
-        $form = $context->getForm();
-        if (array_key_exists($this->associationName, $submittedData) || !$form->has($this->associationName)) {
-            return;
-        }
-        if (empty($submittedData[$this->primaryFieldName]) || !$form->has($this->primaryFieldName)) {
-            return;
-        }
-        $associationField = $config->getField($this->associationName);
+
+        $associationField = $this->getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist($context);
         if (null === $associationField) {
             return;
         }
 
-        list($collectionSubmitData, $primaryItemKey) = $this->getAssociationSubmitData(
-            $form->get($this->associationName)->getData(),
-            $submittedData[$this->primaryFieldName],
+        if (!array_key_exists($this->associationName, $submittedData)
+            && array_key_exists($this->primaryFieldName, $submittedData)
+        ) {
+            list($collectionSubmitData, $primaryItemKey) = $this->getAssociationSubmitData(
+                $context->getForm()->get($this->associationName)->getData(),
+                $submittedData[$this->primaryFieldName],
+                $associationField
+            );
+            $submittedData[$this->associationName] = $collectionSubmitData;
+            $context->setData($submittedData);
+            if (null !== $primaryItemKey) {
+                $context->set(self::PRIMARY_ITEM_KEY, $primaryItemKey);
+            }
+        } elseif (array_key_exists($this->associationName, $submittedData)
+            && !array_key_exists($this->primaryFieldName, $submittedData)
+        ) {
+            $context->set(
+                self::PRIMARY_ITEM_VALUE,
+                $this->getPrimaryValue(
+                    $context->getForm()->get($this->associationName)->getData(),
+                    $associationField
+                )
+            );
+        }
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function processPostSubmit(CustomizeFormDataContext $context)
+    {
+        $associationField = $this->getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist($context);
+        if (null === $associationField) {
+            return;
+        }
+
+        $form = $context->getForm();
+        $primaryFieldForm = $form->get($this->primaryFieldName);
+        $associationForm = $form->get($this->associationName);
+        if (!$primaryFieldForm->isSubmitted() && !$associationForm->isSubmitted()) {
+            return;
+        }
+
+        $primaryValue = null;
+        if ($primaryFieldForm->isSubmitted()) {
+            $primaryValue = $primaryFieldForm->getViewData();
+        } elseif ($associationForm->isSubmitted() && $context->has(self::PRIMARY_ITEM_VALUE)) {
+            $primaryValue = $context->get(self::PRIMARY_ITEM_VALUE);
+        }
+
+        $isKnownPrimaryValue = $this->updateAssociationData(
+            $associationForm->getData(),
+            $primaryValue,
             $associationField
         );
-        $submittedData[$this->associationName] = $collectionSubmitData;
-        $context->setData($submittedData);
-        if (null !== $primaryItemKey) {
-            $context->set(self::PRIMARY_ITEM_KEY, $primaryItemKey);
+        if ($primaryValue && !$isKnownPrimaryValue && $primaryFieldForm->isSubmitted()) {
+            FormUtil::addNamedFormError(
+                $primaryFieldForm,
+                'primary item',
+                $this->unknownPrimaryValueValidationMessage
+            );
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function processPostSubmit(CustomizeFormDataContext $context)
-    {
-        $config = $context->getConfig();
-        if (null === $config) {
-            return;
-        }
-
-        $primaryFieldForm = $context->getForm()->get($this->primaryFieldName);
-        if (!$primaryFieldForm->isSubmitted()) {
-            // the primary field does not exist in the submitted data
-            return;
-        }
-
-        $primaryField = $config->getField($this->primaryFieldName);
-        if (null === $primaryField) {
-            return;
-        }
-        $associationField = $config->getField($this->associationName);
-        if (null === $associationField) {
-            return;
-        }
-
-        $data = $context->getData();
-        $primaryValue = $primaryFieldForm->getViewData();
-        $collection = $this->propertyAccessor->getValue(
-            $data,
-            $associationField->getPropertyPath($this->associationName)
-        );
-        $isKnownPrimaryValue = $this->updateAssociationData(
-            $collection,
-            $this->getAssociationFieldPropertyPath($associationField, $this->associationDataFieldName),
-            $this->getAssociationFieldPropertyPath($associationField, $this->associationPrimaryFlagFieldName),
-            $primaryValue
-        );
-
-        if ($primaryValue && !$isKnownPrimaryValue) {
-            FormUtil::addFormError($primaryFieldForm, $this->unknownPrimaryValueValidationMessage);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function processFinishSubmit(CustomizeFormDataContext $context)
+    protected function processPostValidate(CustomizeFormDataContext $context)
     {
         $form = $context->getForm();
         $primaryItemKey = $context->get(self::PRIMARY_ITEM_KEY);
         if (null !== $primaryItemKey && $form->has($this->associationName)) {
             $associationForm = $form->get($this->associationName);
             if ($associationForm->has($primaryItemKey)) {
-                ReflectionUtil::clearFormErrors($associationForm->get($primaryItemKey), true);
+                $primaryItemForm = $associationForm->get($primaryItemKey);
+                if ($primaryItemForm instanceof ClearableErrorsInterface) {
+                    $primaryItemForm->clearErrors(true);
+                }
             }
         }
     }
 
     /**
      * @param mixed                       $collection
-     * @param string                      $primaryValue
+     * @param EntityDefinitionFieldConfig $association
+     *
+     * @return mixed
+     */
+    protected function getPrimaryValue($collection, EntityDefinitionFieldConfig $association)
+    {
+        $this->assertAssociationData($collection);
+
+        $dataPropertyPath = $this->getAssociationDataPropertyPath($association);
+        $primaryFlagPropertyPath = $this->getAssociationPrimaryFlagPropertyPath($association);
+
+        $result = null;
+        foreach ($collection as $item) {
+            if ($this->propertyAccessor->getValue($item, $primaryFlagPropertyPath)) {
+                $result = $this->propertyAccessor->getValue($item, $dataPropertyPath);
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed                       $collection
+     * @param mixed                       $submittedPrimaryValue
      * @param EntityDefinitionFieldConfig $association
      *
      * @return array [collection submit data, the primary item key]
      */
     protected function getAssociationSubmitData(
         $collection,
-        $primaryValue,
+        $submittedPrimaryValue,
         EntityDefinitionFieldConfig $association
     ) {
         $this->assertAssociationData($collection);
 
         $isCollapsed = $association->isCollapsed();
-        $dataPropertyPath = $this->getAssociationFieldPropertyPath(
-            $association,
-            $this->associationDataFieldName
-        );
+        $dataPropertyPath = $this->getAssociationDataPropertyPath($association);
+        $primaryFlagPropertyPath = $this->getAssociationPrimaryFlagPropertyPath($association);
 
         $result = [];
-        $hasPrimaryItem = false;
+        $oldPrimaryItemIndex = false;
+        $newPrimaryItemIndex = false;
         foreach ($collection as $item) {
             $value = $this->propertyAccessor->getValue($item, $dataPropertyPath);
-            if (trim($value) === trim($primaryValue)) {
-                $hasPrimaryItem = true;
+            if ($this->propertyAccessor->getValue($item, $primaryFlagPropertyPath)) {
+                $oldPrimaryItemIndex = count($result);
+            }
+            if (trim($value) === trim($submittedPrimaryValue)) {
+                $newPrimaryItemIndex = count($result);
             }
             $result[] = $this->getAssociationSubmittedDataItem($value, $isCollapsed);
         }
+
         $primaryItemKey = null;
-        if (!$hasPrimaryItem) {
+        if (false === $newPrimaryItemIndex) {
+            if (false !== $oldPrimaryItemIndex) {
+                unset($result[$oldPrimaryItemIndex]);
+                $result = array_values($result);
+            }
             $primaryItemKey = (string)count($result);
-            $result[] = $this->getAssociationSubmittedDataItem($primaryValue, $isCollapsed);
+            $result[] = $this->getAssociationSubmittedDataItem($submittedPrimaryValue, $isCollapsed);
         }
 
         return [$result, $primaryItemKey];
@@ -209,36 +258,59 @@ class MapPrimaryField extends AbstractProcessor
     }
 
     /**
-     * @param mixed  $collection
-     * @param string $dataPropertyPath
-     * @param string $primaryFlagPropertyPath
-     * @param mixed  $primaryValue
+     * @param mixed                       $collection
+     * @param mixed                       $primaryValue
+     * @param EntityDefinitionFieldConfig $association
      *
      * @return bool
      */
     protected function updateAssociationData(
         $collection,
-        $dataPropertyPath,
-        $primaryFlagPropertyPath,
-        $primaryValue
+        $primaryValue,
+        EntityDefinitionFieldConfig $association
     ) {
         $this->assertAssociationData($collection);
 
+        $dataPropertyPath = $this->getAssociationDataPropertyPath($association);
+        $primaryFlagPropertyPath = $this->getAssociationPrimaryFlagPropertyPath($association);
+
+        $isEmptyCollection = true;
         $isKnownPrimaryValue = false;
         foreach ($collection as $item) {
+            $isEmptyCollection = false;
             $value = $this->propertyAccessor->getValue($item, $dataPropertyPath);
-            $primaryFlag = $this->propertyAccessor->getValue($item, $primaryFlagPropertyPath);
+            $isPrimary = $this->propertyAccessor->getValue($item, $primaryFlagPropertyPath);
             if ($primaryValue && $primaryValue == $value) {
                 $isKnownPrimaryValue = true;
-                if (!$primaryFlag) {
+                if (!$isPrimary) {
                     $this->propertyAccessor->setValue($item, $primaryFlagPropertyPath, true);
                 }
-            } elseif ($primaryFlag) {
+            } elseif ($isPrimary) {
                 $this->propertyAccessor->setValue($item, $primaryFlagPropertyPath, false);
             }
         }
 
-        return $isKnownPrimaryValue;
+        return $isKnownPrimaryValue || $isEmptyCollection;
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $association
+     *
+     * @return string
+     */
+    protected function getAssociationDataPropertyPath(EntityDefinitionFieldConfig $association)
+    {
+        return $this->getAssociationFieldPropertyPath($association, $this->associationDataFieldName);
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $association
+     *
+     * @return string
+     */
+    protected function getAssociationPrimaryFlagPropertyPath(EntityDefinitionFieldConfig $association)
+    {
+        return $this->getAssociationFieldPropertyPath($association, $this->associationPrimaryFlagFieldName);
     }
 
     /**
@@ -278,5 +350,28 @@ class MapPrimaryField extends AbstractProcessor
                 )
             );
         }
+    }
+
+    /**
+     * @param CustomizeFormDataContext $context
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    protected function getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist(CustomizeFormDataContext $context)
+    {
+        $config = $context->getConfig();
+        if (null === $config) {
+            return null;
+        }
+
+        $associationField = $config->getField($this->associationName);
+        if (null !== $associationField) {
+            $form = $context->getForm();
+            if (!$form->has($this->associationName) || !$form->has($this->primaryFieldName)) {
+                return null;
+            }
+        }
+
+        return $associationField;
     }
 }

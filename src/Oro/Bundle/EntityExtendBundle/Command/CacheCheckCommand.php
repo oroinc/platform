@@ -1,54 +1,80 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheCheckCommand extends ContainerAwareCommand
+/**
+ * Prepares extended entity configs for processing by other commands.
+ */
+class CacheCheckCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected static $defaultName = 'oro:entity-extend:cache:check';
+
+    private ExtendConfigDumper $extendConfigDumper;
+
+    public function __construct(ExtendConfigDumper $extendConfigDumper)
+    {
+        $this->extendConfigDumper = $extendConfigDumper;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:cache:check')
-            ->setDescription(
-                'Makes sure that extended entity configs are ready to be processed by other commands.'
-                . ' This is an internal command. Please do not run it manually.'
+            ->addOption('cache-dir', null, InputOption::VALUE_REQUIRED, 'Cache directory')
+            ->setHidden(true)
+            ->setDescription('Prepares extended entity configs for processing by other commands.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command makes sure that extended entity configs
+are ready to be processed by other commands.
+
+  <info>php %command.full_name%</info>
+
+<error>This is an internal command. Please do not run it manually.</error>
+
+The <info>--cache-dir</info> option can be used to dump the extended entity config cache
+to a different location and check it there.
+
+  <info>php %command.full_name% --cache-dir=<path></info>
+
+HELP
             )
-            ->addOption(
-                'cache-dir',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The cache directory'
-            );
+            ->addUsage('--cache-dir=<path>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @noinspection PhpMissingParentCallCommonInspection
+     * @throws \Exception
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Check extended entity configs');
 
         $cacheDir = $input->getOption('cache-dir');
-        $dumper   = $this->getContainer()->get('oro_entity_extend.tools.dumper');
+        $originalCacheDir = $this->extendConfigDumper->getCacheDir();
 
-        $originalCacheDir = $dumper->getCacheDir();
         if (empty($cacheDir) || $cacheDir === $originalCacheDir) {
-            $dumper->checkConfig();
+            $this->extendConfigDumper->checkConfig();
         } else {
-            $dumper->setCacheDir($cacheDir);
+            $this->extendConfigDumper->setCacheDir($cacheDir);
             try {
-                $dumper->checkConfig();
+                $this->extendConfigDumper->checkConfig();
             } catch (\Exception $e) {
-                $dumper->setCacheDir($originalCacheDir);
+                $this->extendConfigDumper->setCacheDir($originalCacheDir);
                 throw $e;
             }
         }
+
+        return 0;
     }
 }

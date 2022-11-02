@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -19,8 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("commentlist")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Comment entity.
  */
 class CommentController extends RestController
 {
@@ -67,7 +63,7 @@ class CommentController extends RestController
      *
      * @return JsonResponse
      */
-    public function cgetAction(Request $request, $relationClass, $relationId)
+    public function cgetAction(Request $request, $relationClass, int $relationId)
     {
         $page             = $request->get('page', 1);
         $limit            = $request->get('limit', self::ITEMS_PER_PAGE);
@@ -83,7 +79,7 @@ class CommentController extends RestController
     /**
      * Get comment
      *
-     * @param string $id Comment id
+     * @param int $id Comment id
      *
      * @ApiDoc(
      *      description="Get comment item",
@@ -93,7 +89,7 @@ class CommentController extends RestController
      *
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -102,7 +98,9 @@ class CommentController extends RestController
      * Create new comment
      *
      * @param string $relationClass
-     * @param string $relationId
+     * @param int    $relationId
+     *
+     * @return Response
      *
      * @ApiDoc(
      *      description="Create new comment",
@@ -110,10 +108,8 @@ class CommentController extends RestController
      * )
      *
      * @AclAncestor("oro_comment_create")
-     *
-     * @return Response
      */
-    public function postAction($relationClass, $relationId)
+    public function postAction($relationClass, int $relationId)
     {
         $isProcessed = false;
 
@@ -127,11 +123,11 @@ class CommentController extends RestController
         if ($entity) {
             $view = $this->view(
                 $this->getManager()->getEntityViewModel($entity, $relationClass, $relationId),
-                Codes::HTTP_CREATED
+                Response::HTTP_CREATED
             );
             $isProcessed = true;
         } else {
-            $view = $this->view($exception, Codes::HTTP_BAD_REQUEST);
+            $view = $this->view($exception, Response::HTTP_BAD_REQUEST);
         }
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
@@ -150,19 +146,19 @@ class CommentController extends RestController
      *
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         $entity = $this->getManager()->find($id);
 
         if ($entity) {
             $entity = $this->processForm($entity);
             if ($entity) {
-                $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
+                $view = $this->view($this->getManager()->getEntityViewModel($entity), Response::HTTP_OK);
             } else {
-                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                $view = $this->view($this->getForm(), Response::HTTP_BAD_REQUEST);
             }
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
         }
 
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
@@ -181,7 +177,7 @@ class CommentController extends RestController
      *
      * @return Response
      */
-    public function removeAttachmentAction($id)
+    public function removeAttachmentAction(int $id)
     {
         $entity = $this->getManager()->find($id);
 
@@ -189,12 +185,12 @@ class CommentController extends RestController
             $entity->setAttachment(null);
             $entity = $this->processForm($entity);
             if ($entity) {
-                $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
+                $view = $this->view($this->getManager()->getEntityViewModel($entity), Response::HTTP_OK);
             } else {
-                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                $view = $this->view($this->getForm(), Response::HTTP_BAD_REQUEST);
             }
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
         }
 
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
@@ -217,7 +213,7 @@ class CommentController extends RestController
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -266,7 +262,7 @@ class CommentController extends RestController
         unset($data['updatedAt']);
         unset($data['editable']);
         unset($data['removable']);
-        unset($data['avatarUrl']);
+        unset($data['avatarPicture']);
 
         return true;
     }

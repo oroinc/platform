@@ -5,51 +5,41 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroups;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AttributeFamilyGroupsValidatorTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyGroupsValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var AttributeFamilyGroupsValidator
-     */
-    protected $validator;
-
-    /**
-     * @var AttributeFamilyGroups
-     */
-    protected $constraint;
-
-    protected function setUp()
+    protected function createValidator(): AttributeFamilyGroupsValidator
     {
-        $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->getMock();
-        $this->validator = new AttributeFamilyGroupsValidator();
-        $this->validator->initialize($this->context);
-        $this->constraint = new AttributeFamilyGroups();
+        return new AttributeFamilyGroupsValidator();
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new AttributeFamilyGroups();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidateWrongEntity()
     {
         $entity = new \stdClass();
-        $this->context->expects($this->never())
-            ->method('addViolation');
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new AttributeFamilyGroups();
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateEmptyGroups()
     {
         $entity = new AttributeFamily();
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->emptyGroupsMessage);
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new AttributeFamilyGroups();
+        $this->validator->validate($entity, $constraint);
+
+        $this->buildViolation($constraint->emptyGroupsMessage)
+            ->assertRaised();
     }
 
     public function testValidateSameLabelsConstraint()
@@ -61,11 +51,11 @@ class AttributeFamilyGroupsValidatorTest extends \PHPUnit\Framework\TestCase
         $group2 = new AttributeGroupStub(2, 'default label 1');
         $entity->addAttributeGroup($group2);
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->sameLabelsMessage);
+        $constraint = new AttributeFamilyGroups();
+        $this->validator->validate($entity, $constraint);
 
-        $this->validator->validate($entity, $this->constraint);
+        $this->buildViolation($constraint->sameLabelsMessage)
+            ->assertRaised();
     }
 
     public function testValidateValid()
@@ -77,9 +67,9 @@ class AttributeFamilyGroupsValidatorTest extends \PHPUnit\Framework\TestCase
         $group2 = new AttributeGroupStub(2, 'default label 2');
         $entity->addAttributeGroup($group2);
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new AttributeFamilyGroups();
+        $this->validator->validate($entity, $constraint);
 
-        $this->validator->validate($entity, $this->constraint);
+        $this->assertNoViolation();
     }
 }

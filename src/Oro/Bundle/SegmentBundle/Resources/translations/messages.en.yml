@@ -2,6 +2,11 @@ oro:
     segment:
         action:
             refresh: Refresh segment
+            clone:
+                button:
+                    label: Clone
+                    title: Clone Segment
+                name_format: Copy of {name}
 
         menu:
             reports_tab.label: Reports & Segments
@@ -11,6 +16,7 @@ oro:
         description.label:   Description
         entity_label:        Segment
         entity_plural_label: Segments
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         last_run.label:      Last run
         name.label:          Name
@@ -31,6 +37,10 @@ oro:
 
         records_limit:
             label: Records limit
+
+        feature:
+            label: Segments
+            description: Enables creating and managing filtered subsets of data (segments) that are used in reports, web catalog nodes, and marketing lists.
 
         form:
             choose_segment_type:    Choose segment type

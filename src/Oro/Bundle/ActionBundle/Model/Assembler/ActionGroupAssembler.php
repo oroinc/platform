@@ -21,12 +21,6 @@ class ActionGroupAssembler extends AbstractAssembler
     /**@var ActionGroup\ParametersResolver */
     private $parametersResolver;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     * @param ConditionFactory $conditionFactory
-     * @param ParameterAssembler $parameterAssembler
-     * @param ActionGroup\ParametersResolver $parametersResolver
-     */
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
@@ -80,10 +74,6 @@ class ActionGroupAssembler extends AbstractAssembler
         return $definition;
     }
 
-    /**
-     * @param ActionGroupDefinition $definition
-     * @param array $options
-     */
     protected function addConditions(ActionGroupDefinition $definition, array $options)
     {
         $conditions = $this->getAclConditions($this->getOption($options, 'acl_resource'));

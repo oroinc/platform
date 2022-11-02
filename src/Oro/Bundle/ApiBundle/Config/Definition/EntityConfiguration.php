@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * The builder for "entities" and "relations" configuration sections.
+ * The builder for "entities" configuration section.
  */
 class EntityConfiguration
 {
@@ -23,12 +23,6 @@ class EntityConfiguration
     /** @var int */
     protected $maxNestingLevel;
 
-    /**
-     * @param string                              $sectionName
-     * @param TargetEntityDefinitionConfiguration $definitionSection
-     * @param ConfigurationSettingsInterface      $settings
-     * @param int                                 $maxNestingLevel
-     */
     public function __construct(
         string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection,
@@ -64,8 +58,6 @@ class EntityConfiguration
 
     /**
      * Gets the name of the section.
-     *
-     * @return string
      */
     public function getSectionName(): string
     {
@@ -74,9 +66,6 @@ class EntityConfiguration
 
     /**
      * Builds the definition of an entity configuration.
-     *
-     * @param NodeBuilder $node
-     * @param string      $currentSectionName
      */
     public function configure(NodeBuilder $node, string $currentSectionName = ''): void
     {
@@ -86,9 +75,6 @@ class EntityConfiguration
 
     /**
      * Builds the definition of an entity configuration.
-     *
-     * @param NodeBuilder $node
-     * @param string      $currentSectionName
      */
     protected function configureEntity(NodeBuilder $node, string $currentSectionName): void
     {
@@ -114,11 +100,6 @@ class EntityConfiguration
             );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessConfig(array $config): array
     {
         $extraSections = $this->settings->getExtraSections();

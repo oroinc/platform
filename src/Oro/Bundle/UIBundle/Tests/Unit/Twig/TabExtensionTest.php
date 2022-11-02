@@ -2,51 +2,51 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
+use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class TabExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $menuExtension;
+    /** @var MenuExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $menuExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var TabExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->environment = $this->createMock(\Twig_Environment::class);
-        $this->menuExtension = $this->getMockBuilder(MenuExtension::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getMenu'])
-            ->getMock();
+        $this->environment = $this->createMock(Environment::class);
+        $this->menuExtension = $this->createMock(MenuExtension::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_menu.twig.extension', $this->menuExtension)
-            ->add('router', $this->router)
-            ->add('security.authorization_checker', $this->authorizationChecker)
-            ->add('translator', $this->translator)
+            ->add(RouterInterface::class, $this->router)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
+            ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
         $this->extension = new TabExtension($container);
@@ -62,34 +62,31 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $expected,
-            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, $tabs = []])
+            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, []])
         );
         self::assertEquals(
             $expected,
-            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, $tabs = [], $options = []])
+            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, [], []])
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Extra parameter "widgetRoute" should be defined for
-     */
     public function testMenuTabPanelWithoutAnyParameters()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Extra parameter "widgetRoute" should be defined for');
+
         $child = $this->createMenuItem();
         $child->expects($this->once())
             ->method('isDisplayed')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension
-            ->expects($this->once())
+        $this->menuExtension->expects($this->once())
             ->method('getMenu')
-            ->will($this->returnValue($parent));
+            ->willReturn($parent);
 
-        $this->environment
-            ->expects($this->never())
+        $this->environment->expects($this->never())
             ->method('render');
 
         self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []]);
@@ -101,14 +98,14 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         $child = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
         $child->expects($this->once())
             ->method('isDisplayed')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $acl = [['testAcl', null, true]];
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension->expects($this->once())
             ->method('getMenu')
-            ->will($this->returnValue($parent));
+            ->willReturn($parent);
 
         $this->environment->expects($this->once())
             ->method('render')
@@ -116,9 +113,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will(
-                $this->returnValueMap($acl)
-            );
+            ->willReturnMap($acl);
 
         self::assertEquals(
             $expected,
@@ -129,38 +124,30 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuProvider
      */
-    public function testGetTabs($options, $tab, $tabOptions, $acl, $isDisplayed = true)
+    public function testGetTabs(array $options, ?array $tab, array $tabOptions, array $acl, $isDisplayed = true)
     {
         $child = $this->createMenuItem(null, $options);
         $child->expects($this->once())
             ->method('isDisplayed')
-            ->will($this->returnValue($isDisplayed));
+            ->willReturn($isDisplayed);
 
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension->expects($this->once())
             ->method('getMenu')
-            ->will($this->returnValue($parent));
+            ->willReturn($parent);
 
         $this->router->expects($this->any())
             ->method('generate')
-            ->will(
-                $this->returnCallback(
-                    function ($route, $options) {
-                        return $route . '?' . http_build_query($options);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($route, $options) {
+                return $route . '?' . http_build_query($options);
+            });
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will(
-                $this->returnCallback(
-                    function ($aclResource) use ($acl) {
-                        return $acl[$aclResource];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($aclResource) use ($acl) {
+                return $acl[$aclResource];
+            });
 
         if (empty($options['label'])) {
             $this->translator->expects($this->never())
@@ -168,7 +155,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         } else {
             $this->translator->expects($this->once())
                 ->method('trans')
-                ->will($this->returnArgument(0));
+                ->willReturnArgument(0);
         }
 
         $result = $this->extension->getTabs('menu', $tabOptions);
@@ -176,7 +163,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($tab ? [$tab] : [], $result);
     }
 
-    public function menuProvider()
+    public function menuProvider(): array
     {
         return [
             'uri and label'             => [
@@ -189,7 +176,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => 'testLabel',
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'test'
                 ],
                 'tabOptions' => [],
@@ -207,7 +194,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => null,
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'route?' . http_build_query(['type' => 'code'])
                 ],
                 'tabOptions' => [],
@@ -226,7 +213,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => null,
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'route?' . http_build_query(['type' => 'test']),
                 ],
                 'tabOptions' => ['type2' => 'test'],
@@ -234,7 +221,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                     'testAcl' => true
                 ]
             ],
-            'accessDenide'              => [
+            'accessDenied'              => [
                 'options'    => [
                     'name'      => 'item',
                     'uri'       => 'test',
@@ -264,57 +251,37 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testName()
+    /**
+     * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function createMenuItem(MenuItem $child = null, array $options = []): MenuItem
     {
-        $this->assertEquals('oro_ui.tab_panel', $this->extension->getName());
-    }
-
-    protected function createMenuItem($child = null, $options = [])
-    {
-        $menuItem = $this
-            ->getMockBuilder('Knp\Menu\MenuItem')
-            ->disableOriginalConstructor()
-            ->setMethods(['getChildren', 'getUri', 'getName', 'getLabel', 'getExtra', 'isDisplayed'])
-            ->getMock();
-
+        $menuItem = $this->createMock(MenuItem::class);
         if ($child) {
-            $menuItem
-                ->expects($this->once())
+            $menuItem->expects($this->once())
                 ->method('getChildren')
-                ->will($this->returnValue([$child]));
+                ->willReturn([$child]);
         }
-
         if (isset($options['uri'])) {
-            $menuItem
-                ->expects($this->atLeastOnce())
+            $menuItem->expects($this->atLeastOnce())
                 ->method('getUri')
-                ->will($this->returnValue($options['uri']));
+                ->willReturn($options['uri']);
         }
-
         if (isset($options['name'])) {
-            $menuItem
-                ->expects($this->any())
+            $menuItem->expects($this->any())
                 ->method('getName')
-                ->will($this->returnValue($options['name']));
+                ->willReturn($options['name']);
         }
-
         if (isset($options['label'])) {
-            $menuItem
-                ->expects($this->any())
+            $menuItem->expects($this->any())
                 ->method('getLabel')
-                ->will($this->returnValue($options['label']));
+                ->willReturn($options['label']);
         }
-
-        $menuItem
-            ->expects($this->any())
+        $menuItem->expects($this->any())
             ->method('getExtra')
-            ->will(
-                $this->returnCallback(
-                    function ($key, $default) use ($options) {
-                        return isset($options[$key]) ? $options[$key] : $default;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($key, $default) use ($options) {
+                return $options[$key] ?? $default;
+            });
 
         return $menuItem;
     }

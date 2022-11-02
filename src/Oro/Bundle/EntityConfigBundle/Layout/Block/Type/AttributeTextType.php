@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider;
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
@@ -19,15 +19,20 @@ class AttributeTextType extends AbstractType
 {
     const NAME = 'attribute_text';
 
-    /** @var AttributeConfigurationProvider */
+    /** @var AttributeConfigurationProviderInterface */
     protected $attributeConfigurationProvider;
 
-    /**
-     * @param AttributeConfigurationProvider $attributeConfigurationProvider
-     */
-    public function __construct(AttributeConfigurationProvider $attributeConfigurationProvider)
+    /** @var string */
+    protected $defaultVisible = '=value !== null';
+
+    public function __construct(AttributeConfigurationProviderInterface $attributeConfigurationProvider)
     {
         $this->attributeConfigurationProvider = $attributeConfigurationProvider;
+    }
+
+    public function setDefaultVisible(string $defaultVisible): void
+    {
+        $this->defaultVisible = $defaultVisible;
     }
 
     /**
@@ -56,7 +61,7 @@ class AttributeTextType extends AbstractType
         $resolver->setDefaults(
             [
                 'value' => '=data["property_accessor"].getValue(entity, fieldName)',
-                'visible' => '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value !== null'
+                'visible' => $this->defaultVisible
             ]
         );
     }

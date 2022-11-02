@@ -60,9 +60,6 @@ class Company
         return $this->groups;
     }
 
-    /**
-     * @param Group $group
-     */
     public function addGroup(Group $group)
     {
         if (!$this->groups->contains($group)) {
@@ -70,9 +67,6 @@ class Company
         }
     }
 
-    /**
-     * @param Group $group
-     */
     public function removeGroup(Group $group)
     {
         if ($this->groups->contains($group)) {

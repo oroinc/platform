@@ -4,181 +4,148 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationGmailTypeTest extends FormIntegrationTestCase
 {
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $tokenAccessor;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $userConfigManager;
+    private $userConfigManager;
 
-    protected function setUp()
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $oauthManagerRegistry;
+
+    protected function setUp(): void
     {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getOrganization'])
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->userConfigManager = $this->createMock(ConfigManager::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
 
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-
-        $user->expects($this->any())
+        $user = $this->createMock(User::class);
+        $organization = $this->createMock(Organization::class);
+        $user->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->setMethods(['hasConfig', 'getConfig', 'get'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->createMock(Request::class);
+        $request->expects(self::any())
+            ->method('isXmlHttpRequest')
+            ->willReturn(false);
+        $request->expects(self::any())
+            ->method('get')
+            ->willReturn('sample');
+        $this->requestStack->expects(self::any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
 
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $type = new ConfigurationGmailType($this->translator, $this->userConfigManager, $this->tokenAccessor);
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        CheckButtonType::class => new CheckButtonType(),
-                        EmailFolderTreeType::class => new EmailFolderTreeType(),
-                        ConfigurationGmailType::class => $type
+                        new CheckButtonType(),
+                        new EmailFolderTreeType(),
+                        new ConfigurationGmailType(
+                            $this->createMock(TranslatorInterface::class),
+                            $this->userConfigManager,
+                            $this->tokenAccessor,
+                            $this->requestStack,
+                            $this->oauthManagerRegistry
+                        )
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
             ]
         );
     }
 
-    /**
-     * Test default values for form ConfigurationGmailType
-     */
     public function testDefaultData()
     {
         $form = $this->factory->create(ConfigurationGmailType::class);
 
-        $expectedViewData = [
-            'imapHost' => GmailImap::DEFAULT_GMAIL_HOST,
-            'imapPort' => GmailImap::DEFAULT_GMAIL_PORT,
-            'imapEncryption' => GmailImap::DEFAULT_GMAIL_SSL,
-            'smtpHost' => GmailImap::DEFAULT_GMAIL_SMTP_HOST,
-            'smtpPort' => GmailImap::DEFAULT_GMAIL_SMTP_PORT,
-            'smtpEncryption' => GmailImap::DEFAULT_GMAIL_SMTP_SSL
-        ];
-
-        foreach ($expectedViewData as $name => $value) {
-            $this->assertEquals($value, $form->get($name)->getData());
-        }
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_HOST, $form->get('imapHost')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_PORT, $form->get('imapPort')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SSL, $form->get('imapEncryption')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_HOST, $form->get('smtpHost')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_PORT, $form->get('smtpPort')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_SSL, $form->get('smtpEncryption')->getData());
     }
 
-    /**
-     * @param array      $formData
-     * @param array|bool $expectedViewData
-     * @param array      $expectedModelData
-     *
-     * @dataProvider setDataProvider
-     */
-    public function testBindValidData($formData, $expectedViewData, $expectedModelData)
-    {
-        $form = $this->factory->create(ConfigurationGmailType::class);
-        if ($expectedViewData) {
-            $form->submit($formData);
-            foreach ($expectedViewData as $name => $value) {
-                $this->assertEquals($value, $form->get($name)->getData());
-            }
-
-            $entity = $form->getData();
-            foreach ($expectedModelData as $name => $value) {
-                $this->assertAttributeEquals($value, $name, $entity);
-            }
-        } else {
-            $form->submit($formData);
-            $this->assertNull($form->getData());
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function setDataProvider()
+    public function testShouldBindValidData()
     {
         $accessTokenExpiresAt = new \DateTime();
 
-        return [
-            'should bind correct data' => [
-                [
-                    'user' => 'test',
-                    'imapHost' => 'imap.gmail.com',
-                    'imapPort' => '993',
-                    'imapEncryption' => 'ssl',
-                    'smtpHost' => 'smtp.gmail.com',
-                    'smtpPort' => '993',
-                    'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                    'accessToken' => '1',
-                    'refreshToken' => '111'
-                ],
-                [
-                    'user' => 'test',
-                    'imapHost' => 'imap.gmail.com',
-                    'imapPort' => '993',
-                    'imapEncryption' => 'ssl',
-                    'smtpHost' => 'smtp.gmail.com',
-                    'smtpPort' => '993',
-                    'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                    'accessToken' => '1',
-                    'refreshToken' => '111'
-                ],
-                [
-                    'user' => 'test',
-                    'imapHost' => 'imap.gmail.com',
-                    'imapPort' => '993',
-                    'imapEncryption' => 'ssl',
-                    'smtpHost' => 'smtp.gmail.com',
-                    'smtpPort' => '993',
-                    'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                    'accessToken' => '1',
-                    'refreshToken' => '111'
-                ],
-            ],
-        ];
+        $form = $this->factory->create(ConfigurationGmailType::class);
+        $form->submit([
+            'user' => 'test',
+            'imapHost' => 'imap.gmail.com',
+            'imapPort' => '993',
+            'imapEncryption' => 'ssl',
+            'smtpHost' => 'smtp.gmail.com',
+            'smtpPort' => '993',
+            'smtpEncryption' => 'ssl',
+            'accessTokenExpiresAt' => $accessTokenExpiresAt,
+            'accessToken' => '1',
+            'refreshToken' => '111'
+        ]);
+
+        self::assertEquals('test', $form->get('user')->getData());
+        self::assertEquals('imap.gmail.com', $form->get('imapHost')->getData());
+        self::assertEquals('993', $form->get('imapPort')->getData());
+        self::assertEquals('ssl', $form->get('imapEncryption')->getData());
+        self::assertEquals('smtp.gmail.com', $form->get('smtpHost')->getData());
+        self::assertEquals('993', $form->get('smtpPort')->getData());
+        self::assertEquals('ssl', $form->get('smtpEncryption')->getData());
+        self::assertEquals($accessTokenExpiresAt, $form->get('accessTokenExpiresAt')->getData());
+        self::assertEquals('1', $form->get('accessToken')->getData());
+        self::assertEquals('111', $form->get('refreshToken')->getData());
+
+        $entity = $form->getData();
+
+        self::assertEquals('test', $entity->getUser());
+        self::assertEquals('imap.gmail.com', $entity->getImapHost());
+        self::assertEquals('993', $entity->getImapPort());
+        self::assertEquals('ssl', $entity->getImapEncryption());
+        self::assertEquals('smtp.gmail.com', $entity->getSmtpHost());
+        self::assertEquals('993', $entity->getSmtpPort());
+        self::assertEquals('ssl', $entity->getSmtpEncryption());
+        self::assertEquals($accessTokenExpiresAt, $entity->getAccessTokenExpiresAt());
+        self::assertEquals('1', $entity->getAccessToken());
+        self::assertEquals('111', $entity->getRefreshToken());
     }
 }

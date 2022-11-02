@@ -7,7 +7,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -19,6 +21,9 @@ use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+/**
+ * Base datagrid extension which adds to datagrids columns, filters and sorters for the extended entities fields.
+ */
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
     /** @var ConfigManager */
@@ -33,21 +38,15 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     /** @var FieldsHelper */
     protected $fieldsHelper;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param DatagridGuesser     $datagridGuesser
-     * @param FieldsHelper        $fieldsHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         EntityClassResolver $entityClassResolver,
         DatagridGuesser $datagridGuesser,
         FieldsHelper $fieldsHelper
     ) {
-        $this->configManager       = $configManager;
+        $this->configManager = $configManager;
         $this->entityClassResolver = $entityClassResolver;
-        $this->datagridGuesser     = $datagridGuesser;
+        $this->datagridGuesser = $datagridGuesser;
         $this->fieldsHelper = $fieldsHelper;
     }
 
@@ -100,9 +99,39 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         }
 
         $this->buildExpression($fields, $config, $alias);
+
+        foreach ($fields as $field) {
+            $extendFieldConfig = $this->getFieldConfig('extend', $field);
+            if (is_a($extendFieldConfig->get('target_entity'), EntityFieldFallbackValue::class, true)) {
+                // Render EntityFieldFallbackValue with a html template
+                $path = sprintf('[%s][%s]', FormatterConfiguration::COLUMNS_KEY, $field->getFieldName());
+                $columnConfig = ArrayUtil::arrayMergeRecursiveDistinct(
+                    $config->offsetGetByPath($path, []),
+                    [
+                        'type' => 'twig',
+                        'frontend_type' => Property::TYPE_HTML,
+                        'template' => '@OroEntity/Datagrid/Property/entityFallbackValue.html.twig',
+                        'context' => [
+                            'fieldName' => $field->getFieldName(),
+                            'entityClassName' => $entityClassName
+                        ]
+                    ]
+                );
+                $config->offsetSetByPath($path, $columnConfig);
+
+                // Disable filter and sorter for EntityFieldFallbackValue
+                $config->offsetUnsetByPath(
+                    sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $field->getFieldName())
+                );
+                $config->offsetUnsetByPath(
+                    sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $field->getFieldName())
+                );
+            }
+        }
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @param FieldConfigId[] $fields
      * @param DatagridConfiguration $config
      * @param string $alias
@@ -138,6 +167,11 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                 case RelationType::MANY_TO_ONE:
                 case RelationType::ONE_TO_ONE:
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
+                    // Skip EntityFieldFallbackValue relations as their values are fetched and rendered by a template.
+                    if (is_a($extendFieldConfig->get('target_entity'), EntityFieldFallbackValue::class, true)) {
+                        continue 2;
+                    }
+
                     $join = sprintf('%s.%s', $alias, $fieldName);
                     $joinAlias = $query->getJoinAlias($join);
                     $query->addLeftJoin($join, $joinAlias);
@@ -217,10 +251,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         return $this->fieldsHelper->getFields($this->getEntityName($config));
     }
 
-    /**
-     * @param FieldConfigId $field
-     * @param array         $columnOptions
-     */
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
         $fieldName = $field->getFieldName();
@@ -230,27 +260,30 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         // otherwise - not required and hidden by default.
         $gridVisibilityValue = (int)$this->getFieldConfig('datagrid', $field)->get('is_visible');
 
-        $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
-        $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
+        $isRequired = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
+        $isRenderable = $isRequired ?: $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
 
-        $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct(
-            [
-                DatagridGuesser::FORMATTER => [
-                    'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
-                    'renderable' => $isRenderable,
-                    'required' => $isRequired,
-                    'order' => $this->getFieldConfig('datagrid', $field)->get('order', false, 0),
-                ],
-                DatagridGuesser::SORTER => [
-                    'data_name' => $fieldName,
-                ],
-                DatagridGuesser::FILTER => [
-                    'data_name' => $fieldName,
-                    'enabled' => false,
-                ],
+        $defaultColumnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
+                'renderable' => $isRenderable,
+                'required' => $isRequired,
             ],
-            $columnOptions
-        );
+            DatagridGuesser::SORTER => [
+                'data_name' => $fieldName,
+            ],
+            DatagridGuesser::FILTER => [
+                'data_name' => $fieldName,
+                'renderable' => false,
+            ],
+        ];
+
+        $columnOrder = $this->getFieldConfig('datagrid', $field)->get('order');
+        if ($columnOrder !== null) {
+            $defaultColumnOptions[DatagridGuesser::FORMATTER]['order'] = $columnOrder;
+        }
+
+        $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct($defaultColumnOptions, $columnOptions);
 
         switch ($field->getFieldType()) {
             case RelationType::MANY_TO_ONE:
@@ -288,7 +321,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     }
 
     /**
-     * @param string        $scope
+     * @param string $scope
      * @param FieldConfigId $fieldId
      *
      * @return ConfigInterface

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SoapBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FindAfter extends Event
 {
@@ -13,9 +13,6 @@ class FindAfter extends Event
      */
     protected $entity;
 
-    /**
-     * @param $entity
-     */
     public function __construct($entity)
     {
         $this->entity = $entity;

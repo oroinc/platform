@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
+use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy;
@@ -50,20 +51,23 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
     /**
      * {@inheritdoc}
      */
-    protected function getStrategyObject()
+    protected function getStrategyObject(): AbstractImportStrategy
     {
         $container = $this->getContainer();
 
-        return new TranslationImportStrategy(
+        $strategy = new TranslationImportStrategy(
             $container->get('event_dispatcher'),
-            $container->get('oro_importexport.strategy.import.helper'),
+            $container->get('oro_importexport.strategy.configurable_import_strategy_helper'),
             $container->get('oro_entity.helper.field_helper'),
             $container->get('oro_importexport.field.database_helper'),
             $container->get('oro_entity.entity_class_name_provider'),
             $container->get('translator'),
             $container->get('oro_importexport.strategy.new_entities_helper'),
             $container->get('oro_entity.doctrine_helper'),
-            $container->get('oro_security.owner.checker')
+            $container->get('oro_importexport.field.related_entity_state_helper')
         );
+        $strategy->setOwnershipSetter($container->get('oro_organization.entity_ownership_associations_setter'));
+
+        return $strategy;
     }
 }

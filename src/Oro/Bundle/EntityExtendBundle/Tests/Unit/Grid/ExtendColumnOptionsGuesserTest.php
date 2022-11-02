@@ -2,25 +2,28 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser;
+use Symfony\Component\Form\Guess\Guess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ExtendColumnOptionsGuesser */
-    protected $guesser;
+    private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->guesser = new ExtendColumnOptionsGuesser($this->configManager);
     }
@@ -39,20 +42,18 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFormatterForEnumNoConfig()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $guess = $this->guesser->guessFormatter($class, $property, 'enum');
         $this->assertNull($guess);
@@ -60,20 +61,18 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFilterForEnumNoConfig()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $guess = $this->guesser->guessFilter($class, $property, 'enum');
         $this->assertNull($guess);
@@ -81,20 +80,18 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFormatterForMultiEnumNoConfig()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $guess = $this->guesser->guessFormatter($class, $property, 'multiEnum');
         $this->assertNull($guess);
@@ -102,20 +99,18 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFilterForMultiEnumNoConfig()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $guess = $this->guesser->guessFilter($class, $property, 'multiEnum');
         $this->assertNull($guess);
@@ -123,46 +118,44 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFormatterForEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
         $config->set('target_entity', 'Test\EnumValue');
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $guess = $this->guesser->guessFormatter($class, $property, 'enum');
         $this->assertEquals(
             [
                 'frontend_type' => Property::TYPE_HTML,
                 'type'          => 'twig',
-                'template'      => 'OroEntityExtendBundle:Datagrid:Property/enum.html.twig',
+                'template'      => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
                 'context'       => [
                     'entity_class' => $config->get('target_entity')
                 ]
             ],
             $guess->getOptions()
         );
-        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
     public function testGuessSorterForEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $guess = $this->guesser->guessSorter($class, $property, 'enum');
@@ -171,27 +164,25 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     public function testGuessFilterForEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
         $config->set('target_entity', 'Test\EnumValue');
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $guess = $this->guesser->guessFilter($class, $property, 'enum');
         $this->assertEquals(
@@ -202,32 +193,30 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ],
             $guess->getOptions()
         );
-        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
     public function testGuessFormatterForMultiEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
         $config->set('target_entity', 'Test\EnumValue');
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $guess = $this->guesser->guessFormatter($class, $property, 'multiEnum');
         $this->assertEquals(
@@ -235,19 +224,19 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
                 'frontend_type' => Property::TYPE_HTML,
                 'export_type'   => 'list',
                 'type'          => 'twig',
-                'template'      => 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig',
+                'template'      => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
                 'context'       => [
                     'entity_class' => 'Test\EnumValue'
                 ]
             ],
             $guess->getOptions()
         );
-        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
     public function testGuessSorterForMultiEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $guess = $this->guesser->guessSorter($class, $property, 'multiEnum');
@@ -257,32 +246,30 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ],
             $guess->getOptions()
         );
-        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
     public function testGuessFilterForMultiEnum()
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
         $config->set('target_entity', 'Test\EnumValue');
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $guess = $this->guesser->guessFilter($class, $property, 'multiEnum');
         $this->assertEquals(
@@ -293,6 +280,6 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ],
             $guess->getOptions()
         );
-        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 }

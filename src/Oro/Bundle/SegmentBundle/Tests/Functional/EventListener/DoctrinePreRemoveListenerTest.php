@@ -2,81 +2,62 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\EventListener;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DoctrinePreRemoveListenerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
-        $this->loadFixtures([
-            LoadSegmentSnapshotData::class,
-        ]);
+        $this->loadFixtures([LoadSegmentSnapshotData::class]);
     }
 
-    public function testSegmentSnapshotActualizationOnEntityRemoveWhenExecutedWithinJob()
+    private function getSegment(string $reference): Segment
     {
-        /** @var Segment $segment */
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        return $this->getReference($reference);
+    }
 
-        $registry = $this->getContainer()->get('doctrine');
+    private function getWorkflowAwareEntity(string $reference): WorkflowAwareEntity
+    {
+        return $this->getReference($reference);
+    }
 
-        $job = $this->createJob();
-        $jobEm = $registry->getManagerForClass(Job::class);
-        $jobEm->persist($job);
-        $jobEm->flush($job);
+    private function getEntityManager(string $entityClass): EntityManagerInterface
+    {
+        return self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
+    }
 
-        $entity = $this->getReference('workflow_aware_entity_1');
+    public function testSegmentSnapshotActualizationOnEntityRemoveWhenExecutedWithinJob(): void
+    {
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
+        $entity = $this->getWorkflowAwareEntity('workflow_aware_entity_1');
         $entityId = $entity->getId();
 
-        $segmentSnapshotRepository = $registry->getManagerForClass(SegmentSnapshot::class)
+        $segmentSnapshotRepository = $this->getEntityManager(SegmentSnapshot::class)
             ->getRepository(SegmentSnapshot::class);
 
+        $qb = $segmentSnapshotRepository->getIdentifiersSelectQueryBuilder($segment);
         $snapshotIds = array_column(
-            $segmentSnapshotRepository->getIdentifiersSelectQueryBuilder($segment)
-                ->getQuery()
-                ->getArrayResult(),
+            $qb->getQuery()->getArrayResult(),
             SegmentSnapshot::ENTITY_REF_INTEGER_FIELD
         );
-        $this->assertContains($entityId, $snapshotIds);
+        self::assertContains($entityId, $snapshotIds);
 
-        $em = $registry->getManagerForClass(ClassUtils::getClass($entity));
+        $em = $this->getEntityManager(get_class($entity));
         $em->remove($entity);
-
-        $jobEm->remove($job);
-        $jobEm->flush();
-
         $em->flush();
 
+        $qb = $segmentSnapshotRepository->getIdentifiersSelectQueryBuilder($segment);
         $snapshotIds = array_column(
-            $segmentSnapshotRepository->getIdentifiersSelectQueryBuilder($segment)
-                ->getQuery()
-                ->getArrayResult(),
+            $qb->getQuery()->getArrayResult(),
             SegmentSnapshot::ENTITY_REF_INTEGER_FIELD
         );
-        $this->assertNotContains($entityId, $snapshotIds);
-    }
-
-    /**
-     * @return Job
-     */
-    protected function createJob()
-    {
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $job = new Job();
-        $job->setName('test');
-        $job->setStatus(Job::STATUS_CANCELLED);
-        $job->setCreatedAt($date);
-        $job->setStartedAt($date);
-        $job->setLastActiveAt($date);
-
-        return $job;
+        self::assertNotContains($entityId, $snapshotIds);
     }
 }

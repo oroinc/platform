@@ -4,17 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityMetadata */
     private $entityMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityMetadata = new EntityMetadata();
-        $this->entityMetadata->setClassName('entityClassName');
+        $this->entityMetadata = new EntityMetadata('entityClassName');
         $this->entityMetadata->setInheritedType(true);
     }
 
@@ -25,13 +30,17 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setBaseTargetClassName('baseTargetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1']);
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed(true);
-        $targetEntityMetadata = new EntityMetadata();
-        $targetEntityMetadata->setClassName('TargetEntityClassName');
+        $targetEntityMetadata = new EntityMetadata('TargetEntityClassName');
         $associationMetadata->setTargetMetadata($targetEntityMetadata);
+        $associationMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
+        $associationMetadata->addRelationshipMetaProperty(new MetaAttributeMetadata('metaProperty2', 'string'));
+        $associationMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
+        $associationMetadata->addRelationshipLink('link2', new ExternalLinkMetadata('url2'));
 
         $associationMetadataClone = clone $associationMetadata;
 
@@ -57,27 +66,53 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setBaseTargetClassName('baseTargetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
         $associationMetadata->setAssociationType('manyToMany');
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed(true);
         $associationMetadata->setTargetMetadata($this->entityMetadata);
+        $associationMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
+        $associationMetadata->addRelationshipMetaProperty(new MetaAttributeMetadata('metaProperty2', 'string'));
+        $associationMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
+        $associationMetadata->addRelationshipLink('link2', new ExternalLinkMetadata('url2'));
 
         self::assertEquals(
             [
-                'name'                      => 'testName',
-                'property_path'             => 'testPropertyPath',
-                'data_type'                 => 'testDataType',
-                'nullable'                  => true,
-                'collapsed'                 => true,
-                'association_type'          => 'manyToMany',
-                'collection'                => true,
-                'target_class'              => 'targetClassName',
-                'acceptable_target_classes' => ['targetClassName1', 'targetClassName2'],
-                'target_metadata'           => [
+                'name'                         => 'testName',
+                'property_path'                => 'testPropertyPath',
+                'data_type'                    => 'testDataType',
+                'nullable'                     => true,
+                'collapsed'                    => true,
+                'association_type'             => 'manyToMany',
+                'collection'                   => true,
+                'target_class'                 => 'targetClassName',
+                'base_target_class'            => 'baseTargetClassName',
+                'acceptable_target_classes'    => ['targetClassName1', 'targetClassName2'],
+                'target_metadata'              => [
                     'class'     => 'entityClassName',
                     'inherited' => true
+                ],
+                'meta_properties'              => [
+                    'metaProperty1' => [
+                        'data_type' => 'string'
+                    ]
+                ],
+                'relationship_meta_properties' => [
+                    'metaProperty2' => [
+                        'data_type' => 'string'
+                    ]
+                ],
+                'links'                        => [
+                    'link1' => [
+                        'url_template' => 'url1'
+                    ]
+                ],
+                'relationship_links'           => [
+                    'link2' => [
+                        'url_template' => 'url2'
+                    ]
                 ]
             ],
             $associationMetadata->toArray()
@@ -130,6 +165,25 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
             [
                 'name'             => 'testName',
                 'direction'        => 'output-only',
+                'nullable'         => false,
+                'collapsed'        => false,
+                'association_type' => null,
+                'collection'       => false
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayHiddenField()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setHidden();
+
+        self::assertEquals(
+            [
+                'name'             => 'testName',
+                'hidden'           => true,
                 'nullable'         => false,
                 'collapsed'        => false,
                 'association_type' => null,
@@ -259,6 +313,19 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
+    public function testHidden()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        self::assertFalse($associationMetadata->isHidden());
+        self::assertTrue($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+        $associationMetadata->setHidden();
+        self::assertTrue($associationMetadata->isHidden());
+        self::assertFalse($associationMetadata->isInput());
+        self::assertFalse($associationMetadata->isOutput());
+    }
+
     public function testTargetClassName()
     {
         $associationMetadata = new AssociationMetadata();
@@ -266,6 +333,15 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($associationMetadata->getTargetClassName());
         $associationMetadata->setTargetClassName('targetClassName');
         self::assertEquals('targetClassName', $associationMetadata->getTargetClassName());
+    }
+
+    public function testBaseTargetClassName()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        self::assertNull($associationMetadata->getBaseTargetClassName());
+        $associationMetadata->setBaseTargetClassName('targetClassName');
+        self::assertEquals('targetClassName', $associationMetadata->getBaseTargetClassName());
     }
 
     public function testAcceptableTargetClassName()
@@ -338,5 +414,109 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($associationMetadata->getTargetMetadata());
         $associationMetadata->setTargetMetadata($this->entityMetadata);
         self::assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
+    }
+
+    public function testLinks()
+    {
+        $associationMetadata = new AssociationMetadata();
+        self::assertCount(0, $associationMetadata->getLinks());
+        self::assertFalse($associationMetadata->hasLink('unknown'));
+        self::assertNull($associationMetadata->getLink('unknown'));
+
+        $link1 = new ExternalLinkMetadata('url1');
+        self::assertSame($link1, $associationMetadata->addLink('link1', $link1));
+        $link2 = new ExternalLinkMetadata('url2');
+        self::assertSame($link2, $associationMetadata->addLink('link2', $link2));
+        self::assertCount(2, $associationMetadata->getLinks());
+
+        self::assertTrue($associationMetadata->hasLink('link1'));
+        self::assertSame($link1, $associationMetadata->getLink('link1'));
+
+        $associationMetadata->removeLink('link1');
+        self::assertCount(1, $associationMetadata->getLinks());
+        self::assertFalse($associationMetadata->hasLink('link1'));
+        self::assertTrue($associationMetadata->hasLink('link2'));
+
+        $associationMetadata->removeLink('link2');
+        self::assertCount(0, $associationMetadata->getLinks());
+        self::assertFalse($associationMetadata->hasLink('link2'));
+    }
+
+    public function testRelationshipLinks()
+    {
+        $associationMetadata = new AssociationMetadata();
+        self::assertCount(0, $associationMetadata->getRelationshipLinks());
+        self::assertFalse($associationMetadata->hasRelationshipLink('unknown'));
+        self::assertNull($associationMetadata->getRelationshipLink('unknown'));
+
+        $link1 = new ExternalLinkMetadata('url1');
+        self::assertSame($link1, $associationMetadata->addRelationshipLink('link1', $link1));
+        $link2 = new ExternalLinkMetadata('url2');
+        self::assertSame($link2, $associationMetadata->addRelationshipLink('link2', $link2));
+        self::assertCount(2, $associationMetadata->getRelationshipLinks());
+
+        self::assertTrue($associationMetadata->hasRelationshipLink('link1'));
+        self::assertSame($link1, $associationMetadata->getRelationshipLink('link1'));
+
+        $associationMetadata->removeRelationshipLink('link1');
+        self::assertCount(1, $associationMetadata->getRelationshipLinks());
+        self::assertFalse($associationMetadata->hasRelationshipLink('link1'));
+        self::assertTrue($associationMetadata->hasRelationshipLink('link2'));
+
+        $associationMetadata->removeRelationshipLink('link2');
+        self::assertCount(0, $associationMetadata->getRelationshipLinks());
+        self::assertFalse($associationMetadata->hasRelationshipLink('link2'));
+    }
+
+    public function testMetaProperties()
+    {
+        $associationMetadata = new AssociationMetadata();
+        self::assertCount(0, $associationMetadata->getMetaProperties());
+        self::assertFalse($associationMetadata->hasMetaProperty('unknown'));
+        self::assertNull($associationMetadata->getMetaProperty('unknown'));
+
+        $metaProperty1 = new MetaAttributeMetadata('metaProperty1', 'string');
+        self::assertSame($metaProperty1, $associationMetadata->addMetaProperty($metaProperty1));
+        $metaProperty2 = new MetaAttributeMetadata('metaProperty2', 'string');
+        self::assertSame($metaProperty2, $associationMetadata->addMetaProperty($metaProperty2));
+        self::assertCount(2, $associationMetadata->getMetaProperties());
+
+        self::assertTrue($associationMetadata->hasMetaProperty('metaProperty1'));
+        self::assertSame($metaProperty1, $associationMetadata->getMetaProperty('metaProperty1'));
+
+        $associationMetadata->removeMetaProperty('metaProperty1');
+        self::assertCount(1, $associationMetadata->getMetaProperties());
+        self::assertFalse($associationMetadata->hasMetaProperty('metaProperty1'));
+        self::assertTrue($associationMetadata->hasMetaProperty('metaProperty2'));
+
+        $associationMetadata->removeMetaProperty('metaProperty2');
+        self::assertCount(0, $associationMetadata->getMetaProperties());
+        self::assertFalse($associationMetadata->hasMetaProperty('metaProperty2'));
+    }
+
+    public function testRelationshipMetaProperties()
+    {
+        $associationMetadata = new AssociationMetadata();
+        self::assertCount(0, $associationMetadata->getRelationshipMetaProperties());
+        self::assertFalse($associationMetadata->hasRelationshipMetaProperty('unknown'));
+        self::assertNull($associationMetadata->getRelationshipMetaProperty('unknown'));
+
+        $metaProperty1 = new MetaAttributeMetadata('metaProperty1', 'string');
+        self::assertSame($metaProperty1, $associationMetadata->addRelationshipMetaProperty($metaProperty1));
+        $metaProperty2 = new MetaAttributeMetadata('metaProperty2', 'string');
+        self::assertSame($metaProperty2, $associationMetadata->addRelationshipMetaProperty($metaProperty2));
+        self::assertCount(2, $associationMetadata->getRelationshipMetaProperties());
+
+        self::assertTrue($associationMetadata->hasRelationshipMetaProperty('metaProperty1'));
+        self::assertSame($metaProperty1, $associationMetadata->getRelationshipMetaProperty('metaProperty1'));
+
+        $associationMetadata->removeRelationshipMetaProperty('metaProperty1');
+        self::assertCount(1, $associationMetadata->getRelationshipMetaProperties());
+        self::assertFalse($associationMetadata->hasRelationshipMetaProperty('metaProperty1'));
+        self::assertTrue($associationMetadata->hasRelationshipMetaProperty('metaProperty2'));
+
+        $associationMetadata->removeRelationshipMetaProperty('metaProperty2');
+        self::assertCount(0, $associationMetadata->getRelationshipMetaProperties());
+        self::assertFalse($associationMetadata->hasRelationshipMetaProperty('metaProperty2'));
     }
 }

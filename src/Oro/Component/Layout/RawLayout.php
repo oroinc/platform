@@ -139,6 +139,7 @@ class RawLayout
      * @throws Exception\LogicException if the layout item cannot be added by other reasons
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function add(
         $id,
@@ -275,7 +276,7 @@ class RawLayout
                 throw new Exception\LogicException('The sibling item cannot be the same as the parent item.');
             }
             $parentPath = $this->items[$parentId][self::PATH];
-            if (strpos(implode('/', $parentPath) . '/', implode('/', $path) . '/') === 0) {
+            if (str_starts_with(implode('/', $parentPath) . '/', implode('/', $path) . '/')) {
                 throw new Exception\LogicException(
                     sprintf(
                         'The parent item (path: %s) cannot be a child of the moving item (path: %s).',
@@ -417,7 +418,7 @@ class RawLayout
         if ($alias === $id) {
             throw new Exception\LogicException(
                 sprintf(
-                    'The "%s" sting cannot be used as an alias for "%s" item'
+                    'The "%s" string cannot be used as an alias for "%s" item'
                     . ' because an alias cannot be equal to the item id.',
                     $alias,
                     $id
@@ -427,7 +428,7 @@ class RawLayout
         if (isset($this->items[$alias])) {
             throw new Exception\LogicException(
                 sprintf(
-                    'The "%s" sting cannot be used as an alias for "%s" item'
+                    'The "%s" string cannot be used as an alias for "%s" item'
                     . ' because another item with the same id exists.',
                     $alias,
                     $id
@@ -477,11 +478,11 @@ class RawLayout
      * Example of returned data:
      *  [
      *      'root_item_id' => [
-     *          'MyBundle:Layout:my_theme.html.twig',
-     *          'AcmeBundle:Layout:some_theme.html.twig'
+     *          '@My/Layout/my_theme.html.twig',
+     *          '@Acme/Layout/some_theme.html.twig'
      *      ],
      *      'item_id1' => [
-     *          'MyBundle:Layout:custom_item.html.twig'
+     *          '@My/Layout/custom_item.html.twig'
      *      ]
      *  ]
      *
@@ -496,7 +497,7 @@ class RawLayout
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
      * @param string          $id     The id of the layout item to assign the theme(s) to
-     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes The theme(s). For example '@My/Layout/my_theme.html.twig'
      *
      * @return self
      */
@@ -521,8 +522,8 @@ class RawLayout
      *
      * Example of returned data:
      *  [
-     *      'MyBundle:Layout:div_form_layout.html.twig',
-     *      'AcmeBundle:Layout:div_form_layout.html.twig'
+     *      '@My/Layout/div_form_layout.html.twig',
+     *      '@Acme/Layout/div_form_layout.html.twig'
      *  ]
      *
      * @return array
@@ -535,7 +536,7 @@ class RawLayout
     /**
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
-     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes The theme(s). For example '@My/Layout/my_theme.html.twig'
      *
      * @return self
      */
@@ -621,7 +622,7 @@ class RawLayout
      */
     protected function isValidId($id)
     {
-        return preg_match('/^[a-z][a-z0-9_\-:]*$/iD', $id);
+        return preg_match('/^[a-z][a-z0-9\_\-\:]*$/iD', $id);
     }
 
     /**

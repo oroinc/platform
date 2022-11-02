@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
+use Doctrine\DBAL\Exception\RetryableException;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -35,25 +35,14 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var array */
     private $config;
 
-    /** @var DatabaseExceptionHelper */
-    private $databaseExceptionHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityDetachFixer $detachFixer
-     * @param ContextRegistry $contextRegistry
-     * @param DatabaseExceptionHelper $databaseExceptionHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityDetachFixer $detachFixer,
-        ContextRegistry $contextRegistry,
-        DatabaseExceptionHelper $databaseExceptionHelper
+        ContextRegistry $contextRegistry
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->detachFixer = $detachFixer;
         $this->contextRegistry = $contextRegistry;
-        $this->databaseExceptionHelper = $databaseExceptionHelper;
     }
 
     /**
@@ -74,21 +63,12 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
             if (empty($configuration[self::SKIP_CLEAR])) {
                 $entityManager->clear();
             }
-        } catch (\Exception $e) {
-            $driverException = $this->databaseExceptionHelper->getDriverException($e);
-
-            if ($driverException && $this->databaseExceptionHelper->isDeadlock($driverException)) {
-                $context = $this->contextRegistry->getByStepExecution($this->stepExecution);
-                $context->setValue('deadlockDetected', true);
-            } else {
-                throw $e;
-            }
+        } catch (RetryableException $e) {
+            $context = $this->contextRegistry->getByStepExecution($this->stepExecution);
+            $context->setValue('deadlockDetected', true);
         }
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

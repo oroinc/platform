@@ -6,37 +6,29 @@ use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class DateTimeRangeTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var DateRangeType
-     */
+    /** @var DateRangeType */
     private $type;
 
-    /**
-     * @var string
-     */
-    protected $defaultLocale = 'en';
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultTimezone = 'Pacific/Honolulu';
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+        $localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getTimezone'))
+            ->onlyMethods(['getTimezone'])
             ->getMock();
-        $localeSettings->expects($this->any())
+        $localeSettings->expects(self::any())
             ->method('getTimezone')
-            ->will($this->returnValue($this->defaultTimezone));
+            ->willReturn($this->defaultTimezone);
 
-        $this->type = new DateTimeRangeType($localeSettings);
+        $this->type = new DateTimeRangeType();
         $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
         $this->formExtensions[] = new PreloadedExtension(
             [$this->type],
@@ -61,18 +53,17 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => DateTimeType::class,
-                    'field_options' => array(
+                    'field_options' => [
                         'format' => 'yyyy-MM-dd HH:mm',
-                        'view_timezone' => $this->defaultTimezone,
-                        'model_timezone' => $this->defaultTimezone
-                    )
-                )
-            )
-        );
+                        'html5' => false
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -80,61 +71,57 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array('start' => '', 'end' => ''),
-                'formData' => array('start' => null, 'end' => null),
-                'viewData' => array(
-                    'value' => array('start' => '', 'end' => ''),
-                ),
-            ),
-            'default timezone' => array(
-                'bindData' => array('start' => '2012-01-01 13:00', 'end' => '2013-01-01 18:00'),
-                'formData' => array(
+        return [
+            'empty' => [
+                'bindData' => ['start' => '', 'end' => ''],
+                'formData' => ['start' => null, 'end' => null],
+                'viewData' => [
+                    'value' => ['start' => '', 'end' => ''],
+                ],
+            ],
+            'default timezone' => [
+                'bindData' => ['start' => '2012-01-01 13:00', 'end' => '2013-01-01 18:00'],
+                'formData' => [
                     'start' => $this->createDateTime('2012-01-01 23:00', 'UTC'),
                     'end' => $this->createDateTime('2013-01-02 04:00', 'UTC')
-                ),
-                'viewData' => array(
-                    'value' => array('start' => '2012-01-01 13:00', 'end' => '2013-01-01 18:00'),
-                ),
-            ),
-            'custom timezone' => array(
-                'bindData' => array('start' => '2010-06-02T03:04:00-10:00', 'end' => '2013-06-02T03:04:00-10:00'),
-                'formData' => array(
+                ],
+                'viewData' => [
+                    'value' => ['start' => '2012-01-01 13:00', 'end' => '2013-01-01 18:00'],
+                ],
+            ],
+            'custom timezone' => [
+                'bindData' => ['start' => '2010-06-02T03:04:00-10:00', 'end' => '2013-06-02T03:04:00-10:00'],
+                'formData' => [
                     'start' => $this->createDateTime('2010-06-02 03:04', 'America/New_York')
                         ->setTimezone(new \DateTimeZone('America/Los_Angeles')),
                     'end' => $this->createDateTime('2013-06-02 03:04:00', 'America/New_York')
                         ->setTimezone(new \DateTimeZone('America/Los_Angeles')),
-                ),
-                'viewData' => array(
-                    'value' => array('start' => '2010-06-02T03:04:00', 'end' => '2013-06-02T03:04:00'),
-                ),
-                'customOptions' => array(
-                    'field_options' => array(
+                ],
+                'viewData' => [
+                    'value' => ['start' => '2010-06-02T03:04:00', 'end' => '2013-06-02T03:04:00'],
+                ],
+                'customOptions' => [
+                    'field_options' => [
                         'model_timezone' => 'America/Los_Angeles',
                         'view_timezone' => 'America/New_York',
                         'format' => "yyyy-MM-dd'T'HH:mm:ss"
-                    )
-                )
-            ),
-        );
+                    ]
+                ]
+            ],
+        ];
     }
 
     /**
      * Creates date time object from date string
      *
-     * @param string $dateString
-     * @param string|null $timeZone
-     * @param string $format
-     * @return \DateTime
      * @throws \Exception
      */
     private function createDateTime(
-        $dateString,
-        $timeZone = null,
-        $format = 'yyyy-MM-dd HH:mm'
-    ) {
-        $pattern = $format ? $format : null;
+        string $dateString,
+        string $timeZone = null,
+        ?string $format = 'yyyy-MM-dd HH:mm'
+    ): \DateTime {
+        $pattern = $format ?: null;
 
         if (!$timeZone) {
             $timeZone = date_default_timezone_get();

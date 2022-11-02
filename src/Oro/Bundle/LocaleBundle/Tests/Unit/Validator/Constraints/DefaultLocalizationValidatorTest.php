@@ -8,92 +8,72 @@ use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class DefaultLocalizationValidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var Constraints\DefaultLocalization */
-    protected $constraint;
-
-    /** @var ConstraintViolationBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $violationBuilder;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationManager;
+    private $localizationManager;
 
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    private $form;
 
-    /** @var DefaultLocalizationValidator */
-    protected $validator;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->constraint = new Constraints\DefaultLocalization();
-        $this->violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->form = $this->createMock(FormInterface::class);
-
-        $this->validator = new DefaultLocalizationValidator($this->localizationManager);
-        $this->validator->initialize($this->context);
+        parent::setUp();
+        $this->setRoot($this->form);
     }
 
-    public function testConfiguration()
+    protected function createValidator(): DefaultLocalizationValidator
     {
-        $this->assertEquals(
-            'oro_locale.default_localization_validator',
-            $this->constraint->validatedBy()
-        );
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        return new DefaultLocalizationValidator($this->localizationManager);
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new Constraints\DefaultLocalization();
+        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidateAndNoLocalizationForm()
     {
-        $this->context->expects($this->once())->method('getRoot')->willReturn($this->form);
-
         $this->form->expects($this->once())
             ->method('getName')
             ->willReturn('unknown_name');
 
-        $this->validator->validate(1, $this->constraint);
+        $constraint = new Constraints\DefaultLocalization();
+        $this->validator->validate(1, $constraint);
 
-        $this->context->expects($this->never())->method('buildViolation');
+        $this->assertNoViolation();
     }
 
     public function testValidateAndNoEnabledLocalizationsField()
     {
-        $this->context->expects($this->once())->method('getRoot')->willReturn($this->form);
-        $this->form->expects($this->once())->method('getName')->willReturn('localization');
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->willReturn('localization');
 
         $this->form->expects($this->once())
             ->method('has')
             ->with(DefaultLocalizationValidator::ENABLED_LOCALIZATIONS_NAME)
             ->willReturn(false);
 
-        $this->validator->validate(1, $this->constraint);
+        $constraint = new Constraints\DefaultLocalization();
+        $this->validator->validate(1, $constraint);
 
-        $this->context->expects($this->never())->method('buildViolation');
+        $this->assertNoViolation();
     }
 
     public function testValidateAndValueInEnabledLocalizations()
     {
-        $this->context->expects($this->once())->method('getRoot')->willReturn($this->form);
-        $this->form->expects($this->once())->method('getName')->willReturn('localization');
-        $this->form->expects($this->once())->method('has')->willReturn(true);
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->willReturn('localization');
+        $this->form->expects($this->once())
+            ->method('has')
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
@@ -103,16 +83,20 @@ class DefaultLocalizationValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->context->expects($this->never())->method('buildViolation');
+        $constraint = new Constraints\DefaultLocalization();
+        $this->validator->validate(1, $constraint);
 
-        $this->validator->validate(1, $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidateAndNotEnabledLocalization()
     {
-        $this->context->expects($this->once())->method('getRoot')->willReturn($this->form);
-        $this->form->expects($this->once())->method('getName')->willReturn('localization');
-        $this->form->expects($this->once())->method('has')->willReturn(true);
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->willReturn('localization');
+        $this->form->expects($this->once())
+            ->method('has')
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
@@ -126,21 +110,22 @@ class DefaultLocalizationValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getLocalization')
             ->willReturn((new Localization)->setName('L1'));
 
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with('oro.locale.validators.is_not_enabled', ['%localization%' => 'L1'])
-            ->willReturn($this->violationBuilder);
+        $constraint = new Constraints\DefaultLocalization();
+        $this->validator->validate(1, $constraint);
 
-        $this->violationBuilder->expects($this->once())->method('addViolation');
-
-        $this->validator->validate(1, $this->constraint);
+        $this->buildViolation('oro.locale.validators.is_not_enabled')
+            ->setParameter('%localization%', 'L1')
+            ->assertRaised();
     }
 
     public function testValidateAndUnknownLocalization()
     {
-        $this->context->expects($this->once())->method('getRoot')->willReturn($this->form);
-        $this->form->expects($this->once())->method('getName')->willReturn('localization');
-        $this->form->expects($this->once())->method('has')->willReturn(true);
+        $this->form->expects($this->once())
+            ->method('getName')
+            ->willReturn('localization');
+        $this->form->expects($this->once())
+            ->method('has')
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
@@ -154,13 +139,11 @@ class DefaultLocalizationValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getLocalization')
             ->willReturn(null);
 
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with('oro.locale.validators.unknown_localization', ['%localization_id%' => 1])
-            ->willReturn($this->violationBuilder);
+        $constraint = new Constraints\DefaultLocalization();
+        $this->validator->validate(1, $constraint);
 
-        $this->violationBuilder->expects($this->once())->method('addViolation');
-
-        $this->validator->validate(1, $this->constraint);
+        $this->buildViolation('oro.locale.validators.unknown_localization')
+            ->setParameter('%localization_id%', 1)
+            ->assertRaised();
     }
 }

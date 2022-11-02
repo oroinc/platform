@@ -1,11 +1,9 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid'
-], function(_, Backbone, Backgrid) {
+define(function(require) {
     'use strict';
 
-    var FooterCell;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
 
     /**
      * Datagrid footer cell
@@ -14,23 +12,27 @@ define([
      * @class orodatagrid.datagrid.footer.FooterCell
      * @extends Backbone.View
      */
-    FooterCell = Backbone.View.extend({
+    const FooterCell = Backbone.View.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         /** @property */
         tagName: 'th',
 
         /** @property */
         template: _.template(
             // wrap label into span otherwise underscore will not render it
-            '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>'
+            '<span><%- label  %><%- total ? (label? ": " : "") + total : "" %></span>'
         ),
 
         keepElement: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FooterCell() {
-            FooterCell.__super__.constructor.apply(this, arguments);
+        constructor: function FooterCell(options) {
+            FooterCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -39,7 +41,6 @@ define([
         initialize: function(options) {
             this.options = options || {};
 
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -47,8 +48,8 @@ define([
             this.listenTo(options.collection, 'reset', this.render);
             this.listenTo(this.column, 'change:editable change:sortable change:renderable',
                 function(column) {
-                    var changed = column.changedAttributes();
-                    for (var key in changed) {
+                    const changed = column.changedAttributes();
+                    for (const key in changed) {
                         if (changed.hasOwnProperty(key)) {
                             this.$el.toggleClass(key, changed[key]);
                         }
@@ -63,9 +64,9 @@ define([
          */
         render: function() {
             this.$el.empty();
-            var columnName = this.column.get('name');
-            var state = this.collection.state || {};
-            var totals = state.totals || {};
+            const columnName = this.column.get('name');
+            const state = this.collection.state || {};
+            const totals = state.totals || {};
 
             if (_.isUndefined(totals[this.options.rowName])) {
                 this.$el.removeClass('renderable');
@@ -73,7 +74,7 @@ define([
             }
             if (!_.isUndefined(totals[this.options.rowName]) &&
                 _.has(totals[this.options.rowName].columns, columnName)) {
-                var columnTotals = totals[this.options.rowName].columns[columnName];
+                const columnTotals = totals[this.options.rowName].columns[columnName];
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }
@@ -84,7 +85,7 @@ define([
             }
 
             if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
-                var className = this.column.attributes.cell.prototype.className;
+                const className = this.column.attributes.cell.prototype.className;
                 this.$el.addClass(_.isFunction(className) ? className.call(this) : className);
             }
 
@@ -92,7 +93,6 @@ define([
                 this.$el.removeClass('align-left align-center align-right');
                 this.$el.addClass('align-' + this.column.get('align'));
             }
-
             return this;
         }
     });

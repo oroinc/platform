@@ -2,12 +2,17 @@ namespace Test;
 
 class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    protected $rel_2;
-    protected $rel1;
+    protected $rel1 = null;
+    protected $rel_2 = null;
 
-    public function setRel2($value)
+    public function __construct()
     {
-        $this->rel_2 = $value; return $this;
+        $this->rel1 = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function getRel1()
+    {
+        return $this->rel1;
     }
 
     public function setRel1($value)
@@ -26,22 +31,14 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
         return $this;
     }
 
-    public function removeRel1($value)
-    {
-        if ($this->rel1 && $this->rel1->contains($value)) {
-            $this->rel1->removeElement($value);
-            $value->setTarget1(null);
-        }
-    }
-
     public function getRel2()
     {
         return $this->rel_2;
     }
 
-    public function getRel1()
+    public function setRel2($value)
     {
-        return $this->rel1;
+        $this->rel_2 = $value; return $this;
     }
 
     public function addRel1($value)
@@ -52,8 +49,11 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
         }
     }
 
-    public function __construct()
+    public function removeRel1($value)
     {
-        $this->rel1 = new \Doctrine\Common\Collections\ArrayCollection();
+        if ($this->rel1 && $this->rel1->contains($value)) {
+            $this->rel1->removeElement($value);
+            $value->setTarget1(null);
+        }
     }
 }

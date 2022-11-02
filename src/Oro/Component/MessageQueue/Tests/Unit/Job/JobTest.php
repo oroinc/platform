@@ -4,6 +4,10 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\Job;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JobTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldConstructWithNullId()
@@ -235,6 +239,6 @@ class JobTest extends \PHPUnit\Framework\TestCase
         $job->setData($data);
 
         self::assertSame($properties, $job->getProperties());
-        self::assertSame($data, $job->getData());
+        self::assertSame(array_merge($data, ['_properties' => $properties]), $job->getData());
     }
 }

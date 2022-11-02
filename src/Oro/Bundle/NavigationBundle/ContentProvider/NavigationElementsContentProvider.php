@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
-use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class NavigationElementsContentProvider extends AbstractContentProvider
+/**
+ * Returns navigation elements.
+ */
+class NavigationElementsContentProvider implements ContentProviderInterface
 {
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     * @param RequestStack $requestStack
-     */
     public function __construct(ConfigurationProvider $configurationProvider, RequestStack $requestStack)
     {
         $this->configurationProvider = $configurationProvider;
@@ -29,8 +28,7 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        $navigationElements = $this->configurationProvider
-            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+        $navigationElements = $this->configurationProvider->getNavigationElements();
 
         $elements = array_keys($navigationElements);
         $defaultValues = $values = array_map(
@@ -65,38 +63,30 @@ class NavigationElementsContentProvider extends AbstractContentProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'navigationElements';
-    }
-
-    /**
      * @param string $element
      * @param string $route
      *
      * @return bool
      */
-    protected function hasConfigValue($element, $route)
+    private function hasConfigValue($element, $route)
     {
-        $navigationElements = $this->configurationProvider
-            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+        $navigationElements = $this->configurationProvider->getNavigationElements();
 
-        return isset($navigationElements[$element], $navigationElements[$element]['routes'][$route]);
+        return isset($navigationElements[$element]['routes'][$route]);
     }
 
     /**
      * @param string $element
      * @param string $route
      *
-     * @return null|bool
+     * @return bool|null
      */
-    protected function getConfigValue($element, $route)
+    private function getConfigValue($element, $route)
     {
-        $navigationElements = $this->configurationProvider
-            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+        $navigationElements = $this->configurationProvider->getNavigationElements();
 
-        return $this->hasConfigValue($element, $route) ? (bool)$navigationElements[$element]['routes'][$route] : null;
+        return isset($navigationElements[$element]['routes'][$route])
+            ? (bool)$navigationElements[$element]['routes'][$route]
+            : null;
     }
 }

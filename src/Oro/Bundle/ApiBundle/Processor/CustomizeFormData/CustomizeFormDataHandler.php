@@ -21,20 +21,11 @@ class CustomizeFormDataHandler
     /** @var ActionProcessorInterface */
     private $customizationProcessor;
 
-    /**
-     * @param ActionProcessorInterface $customizationProcessor
-     */
     public function __construct(ActionProcessorInterface $customizationProcessor)
     {
         $this->customizationProcessor = $customizationProcessor;
     }
 
-    /**
-     * @param string    $eventName
-     * @param FormEvent $event
-     *
-     * @return CustomizeFormDataContext|null
-     */
     public function handleFormEvent(string $eventName, FormEvent $event): ?CustomizeFormDataContext
     {
         $context = $this->getInitializedContext($event->getForm());
@@ -47,16 +38,11 @@ class CustomizeFormDataHandler
         return $context;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return CustomizeFormDataContext|null
-     */
     private function getInitializedContext(FormInterface $form): ?CustomizeFormDataContext
     {
         /** @var CustomizeFormDataContext $context */
         $context = $form->getConfig()->getAttribute(self::API_EVENT_CONTEXT);
-        if ($context->has(CustomizeFormDataContext::CLASS_NAME)) {
+        if ($context->isInitialized()) {
             // already initialized
             return $context;
         }
@@ -69,12 +55,13 @@ class CustomizeFormDataHandler
 
         /** @var FormContext $formContext */
         $formContext = $rootFormConfig->getAttribute(self::API_CONTEXT);
-        $config = $formContext->getConfig();
         $context->setVersion($formContext->getVersion());
         $context->getRequestType()->set($formContext->getRequestType());
+        $context->setSharedData($formContext->getSharedData());
         $context->setClassName($form->getConfig()->getDataClass());
         $context->setParentAction($formContext->getAction());
         $context->setForm($form);
+        $config = $formContext->getConfig();
         if (null === $form->getParent()) {
             $context->setConfig($config);
         } else {
@@ -86,15 +73,15 @@ class CustomizeFormDataHandler
                 $context->setConfig($this->getAssociationConfig($config, $propertyPath));
             }
         }
+        $includedEntities = $formContext->getIncludedEntities();
+        if (null !== $includedEntities) {
+            $context->setIncludedEntities($includedEntities);
+        }
+        $context->setEntityMapper($formContext->getEntityMapper());
 
         return $context;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private function getPropertyPath(FormInterface $form): string
     {
         $path = [];
@@ -112,12 +99,6 @@ class CustomizeFormDataHandler
         return \implode('.', \array_reverse($path));
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig|null
-     */
     private function getAssociationConfig(
         EntityDefinitionConfig $config,
         string $propertyPath

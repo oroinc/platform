@@ -1,15 +1,14 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var SelectChoiceLauncher;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var module = require('module');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Backbone = require('backbone');
+    let config = require('module-config').default(module.id);
 
-    var config = module.config();
     config = _.extend({
-        iconHideText: true
+        launcherMode: 'icon-only'
     }, config);
 
     /**
@@ -22,7 +21,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.ActionLauncher
      * @extends Backbone.View
      */
-    SelectChoiceLauncher = Backbone.View.extend({
+    const SelectChoiceLauncher = Backbone.View.extend({
         /** @property */
         enabled: true,
 
@@ -39,17 +38,14 @@ define(function(require) {
         label: undefined,
 
         /** @property {String} */
-        title: undefined,
+        ariaLabel: undefined,
 
-        /** @property {String} */
-        icon: undefined,
-
-        /** @property {String} */
-        iconClassName: undefined,
-
-        /** @property {Boolean} */
-        /** @deprecated use launcherMode */
-        iconHideText: config.iconHideText,
+        /**
+         * Allow to use / set default aria-label attribute if it not defined
+         *
+         * @property {boolean}
+         */
+        allowDefaultAriaLabel: false,
 
         /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
@@ -67,24 +63,24 @@ define(function(require) {
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
-        template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/action-launcher.html'),
 
         /**
          * Defines map of events => handlers
          * @return {Object}
          */
         events: function() {
-            var events = {};
+            const events = {};
             events['shown.bs.dropdown'] = 'onDropdownShown';
             events['click .dropdown-menu a'] = 'onClick';
             return events;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SelectChoiceLauncher() {
-            SelectChoiceLauncher.__super__.constructor.apply(this, arguments);
+        constructor: function SelectChoiceLauncher(options) {
+            SelectChoiceLauncher.__super__.constructor.call(this, options);
         },
 
         /**
@@ -94,9 +90,7 @@ define(function(require) {
          * @param {oro.datagrid.action.AbstractAction} options.action
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
-         * @param {String} [options.icon]
          * @param {Boolean} [options.launcherMode]
-         * @param {Boolean} [options.iconHideText]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
@@ -104,66 +98,18 @@ define(function(require) {
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
-
-            if (!opts.action) {
+            if (!options.action) {
                 throw new TypeError('"action" is required');
             }
 
-            if (opts.template) {
-                this.template = opts.template;
-            }
+            this.setOptions(options);
+            this.selectedItem = options.selectedItem || options.items[0];
 
-            if (opts.label) {
-                this.label = opts.label;
-            }
-
-            if (opts.attributes) {
-                this.attributes = opts.attributes;
-            }
-
-            if (opts.iconHideText !== undefined) {
-                this.iconHideText = opts.iconHideText;
-            }
-
-            if (opts.launcherMode) {
-                this.launcherMode = opts.launcherMode;
-            }
-
-            if (opts.className) {
-                this.className = opts.className;
-            }
-
-            if (_.has(opts, 'runAction')) {
-                this.runAction = opts.runAction;
-            }
-
-            this.selectedItem = opts.selectedItem || opts.items[0];
-
-            this.items = opts.items;
-
-            this.action = opts.action;
-
-            SelectChoiceLauncher.__super__.initialize.apply(this, arguments);
+            SelectChoiceLauncher.__super__.initialize.call(this, options);
         },
 
         /**
-         * @return {String}
-         */
-        _convertToLauncherMode: function() {
-            var str = '';
-
-            if (this.icon) {
-                str = this.iconHideText ? 'icon-only' : 'icon-text';
-            } else {
-                str = 'text-only';
-            }
-
-            return str;
-        },
-
-        /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -172,17 +118,52 @@ define(function(require) {
             delete this.action;
             delete this.runAction;
 
-            SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
+            SelectChoiceLauncher.__super__.dispose.call(this);
+        },
+
+        /**
+         * @param {Object} options
+         * @param {oro.datagrid.action.AbstractAction} options.action
+         * @param {function(Object, ?Object=): string} [options.template]
+         * @param {String} [options.label]
+         * @param {Boolean} [options.launcherMode]
+         * @param {String} [options.link]
+         * @param {Boolean} [options.runAction]
+         * @param {Boolean} [options.onClickReturnValue]
+         * @param {Array} [options.links]
+         */
+        setOptions: function(options) {
+            const truthy = _.pick(options, 'template', 'label', 'ariaLabel', 'allowDefaultAriaLabel',
+                'link', 'launcherMode', 'className', 'attributes', 'runAction');
+
+            _.extend(
+                this,
+                _.pick(options, 'action', 'items'),
+                _.pick(truthy, Boolean)
+            );
         },
 
         getTemplateData: function() {
-            var label = this.label || this.action.label;
+            const label = this.label || this.action.label;
+            let ariaLabel = this.ariaLabel;
 
-            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
+            if (!ariaLabel && this.action.ariaLabel) {
+                ariaLabel = this.action.ariaLabel;
+            }
+
+            if (!ariaLabel && this.allowDefaultAriaLabel) {
+                ariaLabel = this.getDefaultAriaLabel(label);
+            }
+
+            if (!this.launcherMode) {
+                this.launcherMode = this.icon ? config.launcherMode : 'text-only';
+            }
+
             return {
                 label: label,
                 icon: this.selectedItem.icon,
                 title: this.selectedItem.title,
+                ariaLabel: ariaLabel,
                 className: this.className,
                 iconClassName: this.selectedItem.iconClassName,
                 launcherMode: this.launcherMode,
@@ -196,13 +177,20 @@ define(function(require) {
         },
 
         /**
+         * @return {string}
+         */
+        getDefaultAriaLabel: function(label) {
+            return `${label} ${__('oro.datagrid.action.default_postfix')}`;
+        },
+
+        /**
          * Render actions
          *
          * @return {*}
          */
         render: function() {
             this.$el.empty();
-            var $el = $(this.template(this.getTemplateData()));
+            const $el = $(this.template(this.getTemplateData()));
             $el.insertAfter(this.$el);
             this.$el.remove();
             this.setElement($el);
@@ -216,13 +204,12 @@ define(function(require) {
          * @return {Boolean}
          */
         onClick: function(e) {
-            var $link;
-            var actionOptions = {};
+            const actionOptions = {};
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
             this.trigger('click', this, e.currentTarget);
-            $link = $(e.currentTarget);
+            const $link = $(e.currentTarget);
             actionOptions.key = $link.data('key');
             actionOptions.index = parseInt($link.data('index'));
             actionOptions.item = this.items[actionOptions.index];

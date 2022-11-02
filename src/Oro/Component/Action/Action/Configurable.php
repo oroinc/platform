@@ -23,9 +23,6 @@ class Configurable implements ActionInterface
      */
     protected $configuration = [];
 
-    /**
-     * @param ActionAssembler $assembler
-     */
     public function __construct(ActionAssembler $assembler)
     {
         $this->assembler = $assembler;

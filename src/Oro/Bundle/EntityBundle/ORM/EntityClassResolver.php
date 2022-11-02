@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * This class allows to get the real class name of an entity by its name
@@ -13,9 +13,6 @@ class EntityClassResolver
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

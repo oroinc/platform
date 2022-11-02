@@ -6,6 +6,9 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsRes
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Context for rendering layout blocks
+ */
 class LayoutContext implements ContextInterface
 {
     /** @var array */
@@ -24,8 +27,8 @@ class LayoutContext implements ContextInterface
     protected $hash;
 
     /**
-     * @param array         $parameters Context items
-     * @param null|string[] $vars Array of allowed layout context variables
+     * @param array          $parameters Context items
+     * @param array|string[] $vars       Array of allowed layout context variables
      */
     public function __construct(array $parameters = [], array $vars = [])
     {
@@ -66,15 +69,13 @@ class LayoutContext implements ContextInterface
 
             // validate that all added objects implement ContextItemInterface
             foreach ($this->items as $name => $value) {
-                if (is_object($value) && !$value instanceof ContextItemInterface) {
-                    throw new InvalidOptionsException(
-                        sprintf(
-                            'The option "%s" has invalid type. Expected "%s", but "%s" given.',
-                            $name,
-                            'Oro\Component\Layout\ContextItemInterface',
-                            get_class($value)
-                        )
-                    );
+                if (\is_object($value) && !$value instanceof ContextItemInterface) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The option "%s" has invalid type. Expected "%s", but "%s" given.',
+                        $name,
+                        ContextItemInterface::class,
+                        \get_class($value)
+                    ));
                 }
             }
 
@@ -102,7 +103,7 @@ class LayoutContext implements ContextInterface
      */
     public function has($name)
     {
-        return isset($this->items[$name]) || array_key_exists($name, $this->items);
+        return \array_key_exists($name, $this->items);
     }
 
     /**
@@ -110,9 +111,9 @@ class LayoutContext implements ContextInterface
      */
     public function get($name)
     {
-        if (!isset($this->items[$name]) && !array_key_exists($name, $this->items)) {
+        if (!\array_key_exists($name, $this->items)) {
             throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
-        };
+        }
 
         return $this->items[$name];
     }
@@ -122,7 +123,7 @@ class LayoutContext implements ContextInterface
      */
     public function getOr($name, $default = null)
     {
-        return isset($this->items[$name]) || array_key_exists($name, $this->items)
+        return \array_key_exists($name, $this->items)
             ? $this->items[$name]
             : $default;
     }
@@ -166,19 +167,19 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
-        return isset($this->items[$name]) || array_key_exists($name, $this->items);
+        return \array_key_exists($name, $this->items);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
-        if (!isset($this->items[$name]) && !array_key_exists($name, $this->items)) {
+        if (!\array_key_exists($name, $this->items)) {
             throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
-        };
+        }
 
         return $this->items[$name];
     }
@@ -186,7 +187,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
@@ -194,7 +195,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->remove($name);
     }
@@ -224,13 +225,32 @@ class LayoutContext implements ContextInterface
      */
     protected function generateHash()
     {
-        $items = $this->items;
-        foreach ($items as &$item) {
-            if ($item instanceof ContextItemInterface) {
-                $item = $item->getHash();
+        $items = [];
+        foreach ($this->items as $key => $item) {
+            $items[$key] = $item instanceof ContextItemInterface
+                ? $item->getHash()
+                : $item;
+        }
+
+        $dataItems = [];
+        $knownValues = $this->dataCollection->getKnownValues();
+        foreach ($knownValues as $key) {
+            if (!$this->dataCollection->has($key)) {
+                continue;
+            }
+
+            $dataItem = $this->dataCollection->get($key);
+            if ($dataItem instanceof ContextItemInterface) {
+                $dataItems[$key] = $dataItem->getHash();
+            } elseif (\is_scalar($dataItem) || \is_array($dataItem)) {
+                try {
+                    $dataItems[$key] = serialize($dataItem);
+                } catch (\Exception $e) {
+                    // Serialization of current data is not allowed
+                }
             }
         }
 
-        return md5(serialize($items));
+        return md5(serialize($items) . serialize($dataItems));
     }
 }

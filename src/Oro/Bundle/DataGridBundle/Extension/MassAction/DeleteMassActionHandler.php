@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -11,8 +11,11 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * DataGrid mass action handler for mass delete action.
+ */
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
@@ -35,13 +38,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param TranslatorInterface           $translator
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param MassDeleteLimiter             $limiter
-     * @param RequestStack                  $requestStack
-     */
     public function __construct(
         ManagerRegistry $registry,
         TranslatorInterface $translator,
@@ -62,7 +58,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         $limitResult = $this->limiter->getLimitResult($args);
-        $method      = $this->requestStack->getMasterRequest()->getMethod();
+        $method      = $this->requestStack->getMainRequest()->getMethod();
         if ($method === 'POST') {
             $result = $this->getPostResponse($limitResult);
         } elseif ($method === 'DELETE') {
@@ -77,8 +73,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
     /**
      * Finish processed batch
-     *
-     * @param EntityManager $manager
      */
     protected function finishBatch(EntityManager $manager)
     {
@@ -102,9 +96,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
         return new MassActionResponse(
             $successful,
-            $this->translator->transChoice(
+            $this->translator->trans(
                 $responseMessage,
-                $entitiesCount,
                 ['%count%' => $entitiesCount]
             ),
             $options
@@ -175,8 +168,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
         // if we ask identifier that's means that we have plain data in array
         // so we will just use column name without entity alias
-        if (strpos('.', $identifier) !== -1) {
-            $parts      = explode('.', $identifier);
+        if (str_contains($identifier, '.')) {
+            $parts = explode('.', $identifier);
             $identifier = end($parts);
         }
 

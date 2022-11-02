@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var NotesComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var routing = require('routing');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
-    var NoteView = require('../views/note-view');
-    var NotesView = require('../views/notes-view');
-    var NoteModel = require('../models/note-model');
-    var NotesCollection = require('../models/notes-collection');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mediator = require('oroui/js/mediator');
+    const NoteView = require('../views/note-view');
+    const NotesView = require('../views/notes-view');
+    const NoteModel = require('../models/note-model');
+    const NotesCollection = require('../models/notes-collection');
     require('jquery');
 
-    NotesComponent = BaseComponent.extend({
+    const NotesComponent = BaseComponent.extend({
         defaults: {
             notesOptions: {
                 urls: {},
@@ -28,14 +27,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NotesComponent() {
-            NotesComponent.__super__.constructor.apply(this, arguments);
+        constructor: function NotesComponent(options) {
+            NotesComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};
@@ -43,7 +42,7 @@ define(function(require) {
 
             if (!_.isEmpty(options.modules)) {
                 this._deferredInit();
-                tools.loadModules(options.modules, function(modules) {
+                loadModules(options.modules, function(modules) {
                     _.extend(options.notesOptions, modules);
                     this.initView(options);
                     this._resolveDeferredInit();
@@ -54,8 +53,7 @@ define(function(require) {
         },
 
         processOptions: function(options) {
-            var defaults;
-            defaults = $.extend(true, {}, this.defaults);
+            const defaults = $.extend(true, {}, this.defaults);
             _.defaults(options, defaults);
             _.defaults(options.notesOptions, defaults.notesOptions);
 
@@ -79,10 +77,10 @@ define(function(require) {
         },
 
         initView: function(options) {
-            var notesOptions = options.notesOptions;
+            const notesOptions = options.notesOptions;
 
             // setup notes collection
-            var collection = new NotesCollection(options.notesData, {
+            const collection = new NotesCollection(options.notesData, {
                 model: notesOptions.itemModel
             });
             collection.baseUrl = notesOptions.urls.list;
@@ -98,19 +96,19 @@ define(function(require) {
         },
 
         registerWidget: function(options) {
-            var list = this.list;
+            const list = this.list;
             mediator.execute('widgets:getByIdAsync', options.widgetId, function(widget) {
                 widget.getAction('expand_all', 'adopted', function(action) {
-                    action.on('click', _.bind(list.expandAll, list));
+                    action.on('click', list.expandAll.bind(list));
                 });
                 widget.getAction('collapse_all', 'adopted', function(action) {
-                    action.on('click', _.bind(list.collapseAll, list));
+                    action.on('click', list.collapseAll.bind(list));
                 });
                 widget.getAction('refresh', 'adopted', function(action) {
-                    action.on('click', _.bind(list.refresh, list));
+                    action.on('click', list.refresh.bind(list));
                 });
                 widget.getAction('toggle_sorting', 'adopted', function(action) {
-                    action.on('click', _.bind(list.toggleSorting, list));
+                    action.on('click', list.toggleSorting.bind(list));
                 });
             });
         }

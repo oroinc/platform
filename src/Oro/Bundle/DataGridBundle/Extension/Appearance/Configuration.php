@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $builder->root('appearances')
+        $builder = new TreeBuilder('appearances');
+        $builder->getRootNode()
             ->children()
                 ->arrayNode(static::GRID_APPEARANCE_TYPE)
                     ->addDefaultsIfNotSet()

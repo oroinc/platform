@@ -8,7 +8,7 @@
 {% block oro_reminder_widget %}
     <div {{ block('widget_container_attributes') }}>
         <div class="float-holder">
-            <div>
+            <div class="fields-row">
                 <div class="method inline-field{% if form.method.vars.errors|length > 0 %} validation-error{% endif %}">
                     {{ form_widget(form.method) }}
                 </div>
@@ -23,6 +23,7 @@
         {{ form_errors(form.interval.number) }}
         {{ form_errors(form.interval.unit) }}
         {{ form_errors(form) }}
+            <input type="hidden" name="{{ form.vars.full_name }}" disabled data-validate-element>
         </div>
     </div>
 {% endblock %}

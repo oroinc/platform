@@ -1,0 +1,19 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository:
+            getOrganizationsPartialData:
+                fields: true
+            updateWithOrganization:
+                tableName: true
+        Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository:
+            getGridFilterChoices:
+                entity: true
+        Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker:
+            getHasAssignmentsQueryBuilder:
+                entityClassName: true
+                ownerFieldName: true
+        Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager:
+            hasAssignmentsForOrganization:
+                entityClass: true
+                organizationFieldName: true

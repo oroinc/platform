@@ -6,49 +6,49 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Builds menu from navigation history items.
+ */
 class NavigationHistoryBuilder extends NavigationItemBuilder
 {
     /** @var Matcher */
     private $matcher;
 
+    /** @var MenuManipulator */
+    private $menuManipulator;
+
     /** @var ConfigManager */
     private $configManager;
 
-    /** @var MenuManipulator */
-    private $manipulator;
+    public function __construct(
+        TokenAccessorInterface $tokenAccessor,
+        NavigationItemsProviderInterface $navigationItemsProvider,
+        Matcher $matcher,
+        MenuManipulator $menuManipulator,
+        ConfigManager $configManager
+    ) {
+        parent::__construct($tokenAccessor, $navigationItemsProvider);
 
-    /**
-     * @return MenuManipulator
-     */
-    protected function getMenuManipulator()
-    {
-        if (!$this->manipulator) {
-            $this->manipulator = new MenuManipulator();
-        }
-        return $this->manipulator;
-    }
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
         $this->configManager = $configManager;
+        $this->matcher = $matcher;
+        $this->menuManipulator = $menuManipulator;
     }
 
     /**
      * Modify menu by adding, removing or editing items.
      *
      * @param \Knp\Menu\ItemInterface $menu
-     * @param array                   $options
-     * @param string|null             $alias
+     * @param array $options
+     * @param string|null $alias
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $maxItems = $this->configManager->get('oro_navigation.max_items');
 
-        if (!is_null($maxItems)) {
+        if ($maxItems !== null) {
             // we'll hide current item, so always select +1 item
             $options['max_items'] = $maxItems + 1;
         }
@@ -64,27 +64,6 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
             }
         }
 
-        $this->getMenuManipulator()->slice($menu, 0, $maxItems);
-    }
-
-    /**
-     * Setter for matcher service
-     *
-     * @param \Knp\Menu\Matcher\Matcher $matcher
-     * @return $this
-     */
-    public function setMatcher(Matcher $matcher)
-    {
-        $this->matcher = $matcher;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getMatchedRoute($item)
-    {
-        return isset($item['route']) ? $item['route'] : null;
+        $this->menuManipulator->slice($menu, 0, $maxItems);
     }
 }

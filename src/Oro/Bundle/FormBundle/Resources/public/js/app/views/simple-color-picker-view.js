@@ -2,12 +2,12 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
 ], function(_, BaseSimpleColorPickerView) {
     'use strict';
 
-    var SimpleColorPickerView = BaseSimpleColorPickerView.extend({
+    const SimpleColorPickerView = BaseSimpleColorPickerView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SimpleColorPickerView() {
-            SimpleColorPickerView.__super__.constructor.apply(this, arguments);
+        constructor: function SimpleColorPickerView(options) {
+            SimpleColorPickerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -19,32 +19,36 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _processOptions: function(options) {
-            var selectedVal = this.$el.val();
-            var selectedIndex = null;
-            var customIndex = null;
-
             SimpleColorPickerView.__super__._processOptions.call(this, options);
 
-            // set custom color
-            _.each(options.data, function(value, index) {
-                if (value.class) {
-                    if (value.class === 'custom-color') {
-                        customIndex = index;
-                    }
-                } else if (selectedVal && value.id === selectedVal) {
-                    selectedIndex = index;
-                }
+            const selectedVal = this.$el.val();
+            const customIndex = _.findIndex(options.data, function(item) {
+                return item.class === 'custom-color';
             });
-            if (customIndex !== null) {
-                options.data[customIndex].id = selectedVal && selectedIndex === null ? selectedVal : '#FFFFFF';
+
+            if (customIndex !== -1) {
+                if (_.isMobile()) {
+                    if (customIndex > 0 && _.isEmpty(options.data[customIndex - 1])) {
+                        options.data.splice(customIndex - 1, 2);
+                    } else {
+                        options.data.splice(customIndex, 1);
+                    }
+                } else {
+                    // set custom color
+                    const selectedIndex = _.findIndex(options.data, function(item) {
+                        return item.id === selectedVal;
+                    });
+
+                    options.data[customIndex].id = selectedVal && selectedIndex === -1 ? selectedVal : '#FFFFFF';
+                }
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getSimpleColorPickerOptions: function(options) {
             options = SimpleColorPickerView.__super__._getSimpleColorPickerOptions.call(this, options);
@@ -54,14 +58,14 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPickerOptions: function(options) {
             return SimpleColorPickerView.__super__._getPickerOptions.call(this, options.custom_color);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPicker: function() {
             return this.$parent.find('span.custom-color');

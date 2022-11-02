@@ -9,12 +9,6 @@ use Oro\Bundle\InstallerBundle\InstallerEvent;
  */
 trait ReindexationCommandTrait
 {
-    /**
-     * @param InstallerEvent $event
-     * @param string $commandName
-     * @param bool $isScheduled
-     * @param bool $processIsolation
-     */
     protected function executeReindexation(
         InstallerEvent $event,
         string $commandName,
@@ -27,6 +21,9 @@ trait ReindexationCommandTrait
         }
         if ($processIsolation) {
             $params['--process-isolation'] = true;
+        }
+        if ($event->getInput()->hasOption('timeout')) {
+            $params['--process-timeout'] = $event->getInput()->getOption('timeout');
         }
 
         $commandExecutor = $event->getCommandExecutor();

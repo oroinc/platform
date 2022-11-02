@@ -3,36 +3,47 @@
 namespace Oro\Bundle\PlatformBundle\Twig;
 
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Twig\SerializerExtension as BaseSerializerExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class SerializerExtension extends BaseSerializerExtension
+/**
+ * This version of JMS serializer Twig extension that does not initializes JMS serializer service on each web request.
+ */
+class SerializerExtension extends BaseSerializerExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    protected function getSerializer()
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize($object, $type = 'json', SerializationContext $context = null): string
     {
-        return $this->container->get('jms_serializer');
+        if (null === $this->serializer) {
+            $this->serializer = $this->getSerializer();
+        }
+
+        return parent::serialize($object, $type, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function serialize($object, $type = 'json', SerializationContext $context = null)
+    public static function getSubscribedServices()
     {
-        if (!$this->serializer) {
-            $this->serializer = $this->getSerializer();
-        }
+        return [
+            'jms_serializer' => SerializerInterface::class,
+        ];
+    }
 
-        return parent::serialize($object, $type, $context);
+    private function getSerializer(): SerializerInterface
+    {
+        return $this->container->get('jms_serializer');
     }
 }

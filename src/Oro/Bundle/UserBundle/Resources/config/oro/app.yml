@@ -18,13 +18,11 @@ security:
             provider:                       chain_provider
             anonymous:                      true
             context:                        main
-            logout_on_user_change: true
 
         reset_password:
             pattern:                        ^/user/reset/*
             provider:                       chain_provider
             anonymous:                      true
-            logout_on_user_change: true
 
         main:
             pattern:                        ^/
@@ -37,7 +35,10 @@ security:
             logout:
                 path:                       oro_user_security_logout
             organization-remember-me:
+                token_provider:             oro_security.token.provider.rememberme
                 secret:                     '%secret%'
+                # More info about remember me cookie configuration can be found at
+                # https://doc.oroinc.com/backend/setup/post-install/cookies-configuration/#back-office-remember-me-cookie
                 name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
@@ -45,7 +46,6 @@ security:
             guard:
                 authenticators:
                     - oro_user.impersonation_authenticator
-            logout_on_user_change: true
 
 oro_user:
     privileges:
@@ -67,6 +67,16 @@ oro_user:
             fix_values: false
             default_value: 1
             show_default: false
+    login_sources:
+        default:
+            label: oro.user.login_source.default
+            code: 1
+        impersonation:
+            label: oro.user.login_source.impersonation
+            code: 10
 
-escape_wsse_authentication:
-    authentication_listener_class: Oro\Bundle\UserBundle\Security\Http\Firewall\Listener
+oro_entity:
+    entity_name_representation:
+        Oro\Bundle\UserBundle\Entity\Role:
+            full: [ label ]
+            short: [ label ]

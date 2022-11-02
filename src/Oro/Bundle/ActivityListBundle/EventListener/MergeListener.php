@@ -8,8 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds fields metadata for Activity types.
+ */
 class MergeListener
 {
     const TRANSLATE_KEY = 'label';
@@ -23,11 +26,6 @@ class MergeListener
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider $configProvider
-     * @param ActivityManager $activityManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigProvider $configProvider,
@@ -38,9 +36,6 @@ class MergeListener
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onBuildMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
@@ -52,7 +47,7 @@ class MergeListener
                 'activity'      => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
-                'template'      => 'OroActivityListBundle:Merge:value.html.twig',
+                'template'      => '@OroActivityList/Merge/value.html.twig',
                 'is_collection' => true,
                 'label'         => $this->translator->trans(
                     'oro.activity.merge.label',
@@ -94,10 +89,10 @@ class MergeListener
      *
      * @return string
      */
-    protected function getAliasByActivityClass($className)
+    protected function getAliasByActivityClass($className): string
     {
         $config = $this->configProvider->getConfig($className);
 
-        return $config->get(self::TRANSLATE_KEY);
+        return (string) $config->get(self::TRANSLATE_KEY);
     }
 }

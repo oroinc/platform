@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
@@ -22,10 +21,6 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     /** @var callable|null */
     private $logger;
 
-    /**
-     * @param EntityManager            $em
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EntityManager $em, EventDispatcherInterface $eventDispatcher)
     {
         $this->em = $em;
@@ -35,18 +30,19 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     /**
      * {@inheritdoc}
      */
-    public function execute(array $fixtures, $fixturesType)
+    public function execute(array $fixtures, string $fixturesType, ?callable $progressCallback = null): void
     {
         $event = new MigrationDataFixturesEvent($this->em, $fixturesType, $this->logger);
-        $this->eventDispatcher->dispatch(MigrationEvents::DATA_FIXTURES_PRE_LOAD, $event);
+        $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_PRE_LOAD);
 
-        $executor = new ORMExecutor($this->em);
+        $executor = new DataFixturesORMExecutor($this->em);
+        $executor->setProgressCallback($progressCallback);
         if (null !== $this->logger) {
             $executor->setLogger($this->logger);
         }
         $executor->execute($fixtures, true);
 
-        $this->eventDispatcher->dispatch(MigrationEvents::DATA_FIXTURES_POST_LOAD, $event);
+        $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_POST_LOAD);
     }
 
     /**

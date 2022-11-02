@@ -3,65 +3,49 @@
 namespace Oro\Bundle\EntityConfigBundle\Metadata\Driver;
 
 use Doctrine\Common\Annotations\Reader;
-use Metadata\Driver\DriverInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 
-class AnnotationDriver implements DriverInterface
+/**
+ * The driver to read entity and field config annotations.
+ */
+class AnnotationDriver
 {
-    /**
-     * Annotation reader uses a full class pass for parsing
-     */
-    const ENTITY_CONFIG = 'Oro\\Bundle\\EntityConfigBundle\\Metadata\\Annotation\\Config';
-    const FIELD_CONFIG  = 'Oro\\Bundle\\EntityConfigBundle\\Metadata\\Annotation\\ConfigField';
+    private Reader $reader;
 
-    /**
-     * @var Reader
-     */
-    protected $reader;
-
-    /**
-     * @param Reader $reader
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadMetadataForClass(\ReflectionClass $class)
+    public function loadMetadataForClass(\ReflectionClass $class): ?EntityMetadata
     {
-        /** @var Config $annotation */
-        if ($annotation = $this->reader->getClassAnnotation($class, self::ENTITY_CONFIG)) {
-            $metadata = new EntityMetadata($class->getName());
-
-            $metadata->configurable  = true;
-            $metadata->defaultValues = $annotation->defaultValues;
-            $metadata->routeName     = $annotation->routeName;
-            $metadata->routeView     = $annotation->routeView;
-            $metadata->routeCreate   = $annotation->routeCreate;
-            $metadata->routes        = $annotation->routes;
-            $metadata->mode          = $annotation->mode;
-
-            foreach ($class->getProperties() as $property) {
-                $propertyMetadata = new FieldMetadata($class->getName(), $property->getName());
-
-                /** @var ConfigField $annotation */
-                if ($annotation = $this->reader->getPropertyAnnotation($property, self::FIELD_CONFIG)) {
-                    $propertyMetadata->defaultValues = $annotation->defaultValues;
-                    $propertyMetadata->mode          = $annotation->mode;
-                }
-
-                $metadata->addPropertyMetadata($propertyMetadata);
-            }
-
-            return $metadata;
+        $entity = $this->reader->getClassAnnotation($class, Config::class);
+        if (null === $entity) {
+            return null;
         }
 
-        return null;
+        $metadata = new EntityMetadata($class->getName());
+        $metadata->mode = $entity->mode;
+        $metadata->defaultValues = $entity->defaultValues;
+        $metadata->routeName = $entity->routeName;
+        $metadata->routeView = $entity->routeView;
+        $metadata->routeCreate = $entity->routeCreate;
+        $metadata->routes = $entity->routes;
+
+        $properties = $class->getProperties();
+        foreach ($properties as $property) {
+            $fieldMetadata = new FieldMetadata($class->getName(), $property->getName());
+            $field = $this->reader->getPropertyAnnotation($property, ConfigField::class);
+            if (null !== $field) {
+                $fieldMetadata->mode = $field->mode;
+                $fieldMetadata->defaultValues = $field->defaultValues;
+            }
+            $metadata->addFieldMetadata($fieldMetadata);
+        }
+
+        return $metadata;
     }
 }

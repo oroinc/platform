@@ -14,9 +14,6 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
     /** @var string[] [class name => substitute class name, ...] */
     private $substitutions;
 
-    /**
-     * @param ConfigCache $configCache
-     */
     public function __construct(ConfigCache $configCache)
     {
         $this->configCache = $configCache;
@@ -36,5 +33,22 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
         }
 
         return $this->substitutions[$entityClass];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityClass(string $substituteClass): ?string
+    {
+        if (null === $this->substitutions) {
+            $this->substitutions = $this->configCache->getSubstitutions();
+        }
+
+        $entityClass = \array_search($substituteClass, $this->substitutions, true);
+        if (false === $entityClass) {
+            return null;
+        }
+
+        return $entityClass;
     }
 }

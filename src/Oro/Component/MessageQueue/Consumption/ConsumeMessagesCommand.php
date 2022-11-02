@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Consumption;
 
@@ -8,51 +9,63 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
+/**
+ * Processes a message-queue with a specific processor.
+ */
+class ConsumeMessagesCommand extends Command
 {
-    use ContainerAwareTrait;
     use LimitsExtensionsCommandTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:transport:consume';
+
+    protected QueueConsumer $queueConsumer;
+
+    public function __construct(QueueConsumer $queueConsumer)
+    {
+        parent::__construct();
+
+        $this->queueConsumer = $queueConsumer;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this->configureLimitsExtensions();
 
         $this
-            ->setName('oro:message-queue:transport:consume')
-            ->setDescription('A worker that consumes message from a broker. '.
-                'To use this broker you have to explicitly set a queue to consume from '.
-                'and a message processor service')
-            ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
-            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service');
+            ->addArgument('queue', InputArgument::REQUIRED, 'Queue to consume from')
+            ->addArgument('processor-service', InputArgument::OPTIONAL, 'The message processor service id')
+            ->setDescription('Processes messages from the specified queue with the specified processor.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command consumes message from a specified message queue.
+The message processor service id can be specified as the second argument.
+
+  <info>php %command.full_name% <queue-name> <message-processor-service-id></info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $queueName = $input->getArgument('queue');
-        $messageProcessor = $this->getMessageProcessor($input->getArgument('processor-service'));
-        $consumer = $this->getConsumer();
+        $messageProcessorName = (string) $input->getArgument('processor-service');
 
         $extensions = $this->getLimitsExtensions($input, $output);
         array_unshift($extensions, $this->getLoggerExtension($input, $output));
 
-        $consumer->bind($queueName, $messageProcessor);
-        $this->consume($consumer, $this->getConsumerExtension($extensions));
+        $this->queueConsumer->bind($queueName, $messageProcessorName);
+        $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
+
+        return self::SUCCESS;
     }
 
-    /**
-     * @param QueueConsumer      $consumer
-     * @param ExtensionInterface $extension
-     */
-    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
+    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         try {
             $consumer->consume($extension);
@@ -61,51 +74,17 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         }
     }
 
-    /**
-     * @param array $extensions
-     *
-     * @return ExtensionInterface
-     */
-    protected function getConsumerExtension(array $extensions)
+    protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions);
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return ExtensionInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpUnusedParameterInspection
      */
-    protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
+    protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension(new ConsoleLogger($output));
-    }
-
-    /**
-     * @param string $processorServiceId
-     *
-     * @return MessageProcessorInterface
-     */
-    private function getMessageProcessor($processorServiceId)
-    {
-        $processor = $this->container->get($processorServiceId);
-        if (!$processor instanceof MessageProcessorInterface) {
-            throw new \LogicException(sprintf(
-                'Invalid message processor service given. It must be an instance of %s but %s',
-                MessageProcessorInterface::class,
-                get_class($processor)
-            ));
-        }
-
-        return $processor;
-    }
-
-    /**
-     * @return QueueConsumer
-     */
-    private function getConsumer()
-    {
-        return $this->container->get('oro_message_queue.consumption.queue_consumer');
     }
 }

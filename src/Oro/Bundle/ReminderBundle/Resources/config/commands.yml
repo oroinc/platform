@@ -1,6 +1,10 @@
 services:
-    Oro\Bundle\ReminderBundle\Command\SendRemindersCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\ReminderBundle\Command\SendRemindersCommand
+
+    Oro\Bundle\ReminderBundle\Command\SendRemindersCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_reminder.sender'
         tags:
             - { name: console.command }

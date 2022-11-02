@@ -3,95 +3,83 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
-use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1\TestBundle1;
-use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBundle2;
-use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\TestBundleIncorrect;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\ItemValue;
+use Oro\Bundle\TestFrameworkBundle\Entity\Product;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Config\CumulativeResourceManager;
-use Symfony\Component\Console\Tester\CommandTester;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Config\Definition\Processor;
 
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
-    /**
-     * @var PermissionConfigurationProvider
-     */
-    protected $provider;
+    private PermissionConfigurationProvider $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
-        $bundle1 = new TestBundle1();
-        $bundle2 = new TestBundle2();
-        $bundleIncorrect = new TestBundleIncorrect();
-
-        $bundles = [
-            $bundle1->getName() => get_class($bundle1),
-            $bundle2->getName() => get_class($bundle2),
-        ];
-
-        CumulativeResourceManager::getInstance()->clear()->setBundles(
-            array_merge($bundles, [$bundleIncorrect->getName() => get_class($bundleIncorrect)])
-        );
-
-        $this->provider = $this->getContainer()->get('oro_security.configuration.provider.permission_configuration');
-
-        $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
+        $this->provider = $this->getContainer()
+            ->get('oro_security.configuration.provider.permission_configuration');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
+        $this->provider->warmUpCache();
+        $this->getContainer()->get('oro_security.cache.provider.permission')->clear();
 
         parent::tearDown();
     }
 
     public function testExecuteWithInvalidConfiguration()
     {
-        $bundle = new TestBundleIncorrect();
-        $bundles = [$bundle->getName() => get_class($bundle)];
+        $newPermissions = $this->processPermissionConfig([
+            'PERMISSION.BAD.NAME' => [
+                'label' => 'Label for Permission with a Bad Name'
+            ]
+        ]);
 
-        $this->setObjectProperty($this->provider, 'kernelBundles', $bundles);
-        $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
+        $this->appendPermissionConfig($this->provider, $newPermissions);
 
-        $this->assertContains('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
+        $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
+
+        self::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $expectedMessages
-     * @param array $expectedPermissions
      */
     public function testExecute(array $expectedMessages, array $expectedPermissions)
     {
-        $permissionsBefore = $this->getRepository('OroSecurityBundle:Permission')->findAll();
+        $expectedPermissions = $this->processPermissionConfig($expectedPermissions);
+        $this->appendPermissionConfig($this->provider, $expectedPermissions);
 
-        $result = $this->runCommand(LoadPermissionConfigurationCommand::NAME);
+        $permissionsBefore = $this->getRepository(Permission::class)->findAll();
+
+        $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {
-            $this->assertContains($message, $result);
+            self::assertStringContainsString($message, $result);
         }
 
-        $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();
-        $this->assertCount(count($permissionsBefore) + 3, $permissions);
+        $permissions = $this->getRepository(Permission::class)->findAll();
+        $this->assertCount(count($permissionsBefore) + count($expectedPermissions), $permissions);
 
         foreach ($expectedPermissions as $name => $permissionData) {
             $this->assertPermissionLoaded($permissions, $permissionData, $name);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [
@@ -109,14 +97,14 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                         'group_names' => ['default', 'frontend', 'new_group'],
                         'apply_to_all' => false,
                         'apply_to_entities' => [
-                            'OroTestFrameworkBundle:TestActivity',
-                            'OroTestFrameworkBundle:Product',
-                            'OroTestFrameworkBundle:TestActivityTarget',
+                            TestActivity::class,
+                            Product::class,
+                            TestActivityTarget::class,
                         ],
                         'exclude_entities' => [
-                            'OroTestFrameworkBundle:Item',
-                            'OroTestFrameworkBundle:ItemValue',
-                            'OroTestFrameworkBundle:WorkflowAwareEntity',
+                            Item::class,
+                            ItemValue::class,
+                            WorkflowAwareEntity::class,
                         ],
                         'description' => 'Permission 2 description',
                     ],
@@ -130,36 +118,31 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
+    private function getRepository(string $className): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
+        return self::getContainer()->get('doctrine')->getRepository($className);
     }
 
-    /**
-     * @param object $object
-     * @param string $property
-     * @param mixed $value
-     */
-    protected function setObjectProperty($object, $property, $value)
+    private function processPermissionConfig(array $config): array
     {
-        $reflection = ClassUtils::newReflectionObject($object);
-        $reflectionProperty = $reflection->getProperty($property);
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($object, $value);
+        return (new Processor())->processConfiguration(new PermissionConfiguration(), [$config]);
     }
 
-    /**
-     * @param array|Permission[] $permissions
-     * @param array $expected
-     * @param string $name
-     */
-    protected function assertPermissionLoaded(array $permissions, array $expected, $name)
+    private function appendPermissionConfig(PermissionConfigurationProvider $provider, array $newPermissions)
+    {
+        $provider->ensureCacheWarmedUp();
+
+        ReflectionUtil::setPropertyValue(
+            $provider,
+            'config',
+            array_merge(ReflectionUtil::getPropertyValue($provider, 'config'), $newPermissions)
+        );
+    }
+
+    private function assertPermissionLoaded(array $permissions, array $expected, string $name): void
     {
         $found = false;
+        /** @var Permission $permission */
         foreach ($permissions as $permission) {
             if ($permission->getName() === $name) {
                 $this->assertSame($expected['label'], $permission->getLabel());
@@ -192,9 +175,10 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
     /**
      * @param Collection|PermissionEntity[] $permissionEntities
-     * @return array
+     *
+     * @return string[]
      */
-    protected function getPermissionEntityNames(Collection $permissionEntities)
+    private function getPermissionEntityNames(Collection $permissionEntities): array
     {
         $entities = [];
         foreach ($permissionEntities as $permissionEntity) {
@@ -204,13 +188,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         return $entities;
     }
 
-    /**
-     * @param array $options
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getConfigurationOption(array $options, $key, $default = null)
+    private function getConfigurationOption(array $options, string $key, mixed $default = null): mixed
     {
         if (array_key_exists($key, $options)) {
             return $options[$key];

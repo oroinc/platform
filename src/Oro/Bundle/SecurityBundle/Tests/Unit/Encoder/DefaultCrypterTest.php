@@ -10,16 +10,15 @@ class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
      * Test two way encoding/decoding
      *
      * @dataProvider keyDataProvider
-     * @param string $key
      */
-    public function testEncodeDecode($key)
+    public function testEncodeDecode(string $key)
     {
         $someData = 'someValue';
 
         $encryptor = new DefaultCrypter($key);
 
         $encrypted = $encryptor->encryptData($someData);
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
         $this->assertNotEquals($someData, $encrypted);
 
         $this->assertEquals($someData, $encryptor->decryptData($encrypted));
@@ -27,9 +26,8 @@ class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider keyDataProvider
-     * @param string $key
      */
-    public function testEncodeDecodeDifferentInstances($key)
+    public function testEncodeDecodeDifferentInstances(string $key)
     {
         $someData = 'someValue';
 
@@ -42,17 +40,14 @@ class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($encrypted, $newInstance->encryptData($someData));
     }
 
-    /**
-     * @return array
-     */
-    public function keyDataProvider()
+    public function keyDataProvider(): array
     {
-        return array(
-            '0 length' => array(''),
-            '1 length' => array('a'),
-            'test key' => array('someKey'),
-            '32 length' => array('1234567890123456789012'),
-            '33 length' => array('12345678901234567890123')
-        );
+        return [
+            '0 length' => [''],
+            '1 length' => ['a'],
+            'test key' => ['someKey'],
+            '32 length' => ['1234567890123456789012'],
+            '33 length' => ['12345678901234567890123']
+        ];
     }
 }

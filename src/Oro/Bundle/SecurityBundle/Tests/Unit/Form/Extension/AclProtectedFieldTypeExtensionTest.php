@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -21,16 +22,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldAclHelper;
+    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldAclHelper;
 
     /** @var TestLogger */
-    protected $logger;
+    private $logger;
 
     /** @var AclProtectedFieldTypeExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,39 +44,32 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         );
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes(): void
     {
-        $expectedResult = method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-            : 'form';
-
-        $this->assertEquals(
-            $expectedResult,
-            $this->extension->getExtendedType()
-        );
+        self::assertEquals([FormType::class], AclProtectedFieldTypeExtension::getExtendedTypes());
     }
 
-    public function testBuildFormWithCorrectData()
+    public function testBuildFormWithCorrectData(): void
     {
         $options = $this->prepareCorrectOptions('Acme\Demo\TestEntity');
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
-        $this->assertCount(2, $listeners);
-        $this->assertTrue(array_key_exists(FormEvents::PRE_SUBMIT, $listeners));
-        $this->assertTrue(array_key_exists(FormEvents::POST_SUBMIT, $listeners));
+        self::assertCount(2, $listeners);
+        self::assertArrayHasKey(FormEvents::PRE_SUBMIT, $listeners);
+        self::assertArrayHasKey(FormEvents::POST_SUBMIT, $listeners);
     }
 
-    public function testBuildFormWithoutDataClassInOptions()
+    public function testBuildFormWithoutDataClassInOptions(): void
     {
         $options = [];
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
-        $this->assertCount(0, $listeners);
+        self::assertCount(0, $listeners);
     }
 
-    public function testBuildFormWithNonSecurityProtectedSupportedClass()
+    public function testBuildFormWithNonSecurityProtectedSupportedClass(): void
     {
         $className = 'Acme\Demo\TestEntity';
 
@@ -86,15 +80,18 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->fieldAclHelper->expects(self::never())
             ->method('isRestrictedFieldsVisible');
 
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, ['data_class' => $className]);
         $listeners = $dispatcher->getListeners();
-        $this->assertCount(0, $listeners);
+        self::assertCount(0, $listeners);
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
-        list($view, $form, $options) = $this->getTestFormAndFormView(true);
+        /** @var FormView $view */
+        [$view, $form, $options] = $this->getTestFormAndFormView();
+        $view->children['broken'] = new \stdClass();
+
         $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldViewGranted')
             ->willReturn(false);
@@ -106,26 +103,31 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
         /** @var FormErrorIterator $formErrors */
         $formErrors = $view->vars['errors'];
-        $this->assertEquals(1, $formErrors->count());
-        $this->assertEquals(
+        self::assertEquals(1, $formErrors->count());
+        self::assertEquals(
             'The form contains fields "city, country" that are required or not valid but you have no access to them. '
             . 'Please contact your administrator to solve this issue.',
             $formErrors->current()->getMessage()
         );
-        $this->assertEquals(2, $this->logger->countErrors());
-        $this->assertEquals(
-            "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
-            $this->logger->getLogs('error')[0]
+        self::assertEquals(2, $this->logger->countErrors());
+        self::assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
+                'error'
+            )
         );
-        $this->assertEquals(
-            "Non accessible field `country` detected in form `form`. Validation errors: ERROR: country error\n",
-            $this->logger->getLogs('error')[1]
+        self::assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `country` detected in form `form`. Validation errors: ERROR: country error\n",
+                'error'
+            )
         );
+        self::assertFalse(isset($view->children['broken']));
     }
 
-    public function testFinishViewWithShowRestricted()
+    public function testFinishViewWithShowRestricted(): void
     {
-        list($view, $form, $options) = $this->getTestFormAndFormView(true);
+        [$view, $form, $options] = $this->getTestFormAndFormView();
         $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldViewGranted')
             ->willReturnCallback(
@@ -141,34 +143,36 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
         /** @var FormErrorIterator $formErrors */
         $formErrors = $view->vars['errors'];
-        $this->assertEquals(1, $formErrors->count());
-        $this->assertEquals(
+        self::assertEquals(1, $formErrors->count());
+        self::assertEquals(
             'The form contains fields "city" that are required or not valid but you have no access to them. '
             . 'Please contact your administrator to solve this issue.',
             $formErrors->current()->getMessage()
         );
-        $this->assertEquals(1, $this->logger->countErrors());
-        $this->assertEquals(
-            "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
-            $this->logger->getLogs('error')[0]
+        self::assertEquals(1, $this->logger->countErrors());
+        self::assertTrue(
+            $this->logger->hasRecord(
+                "Non accessible field `city` detected in form `form`. Validation errors: ERROR: city error\n",
+                'error'
+            )
         );
-        $this->assertTrue($view->children['city']->isRendered());
-        $this->assertFalse($view->children['street']->isRendered());
-        $this->assertTrue($view->children['street']->vars['attr']['readonly']);
-        $this->assertFalse($view->children['country']->isRendered());
-        $this->assertTrue($view->children['country']->vars['attr']['readonly']);
+        self::assertArrayNotHasKey('city', $view->children);
+        self::assertFalse($view->children['street']->isRendered());
+        self::assertTrue($view->children['street']->vars['attr']['readonly']);
+        self::assertFalse($view->children['country']->isRendered());
+        self::assertTrue($view->children['country']->vars['attr']['readonly']);
     }
 
-    public function testPreSubmitOnEmptyData()
+    public function testPreSubmitOnEmptyData(): void
     {
         $data = [];
         $form = $this->factory->create(FormType::class, new CmsAddress(), []);
         $event = new FormEvent($form, $data);
         $this->extension->preSubmit($event);
-        $this->assertCount(0, $event->getData());
+        self::assertCount(0, $event->getData());
     }
 
-    public function testPreAndPostSubmit()
+    public function testPreAndPostSubmit(): void
     {
         $options = $this->prepareCorrectOptions(CmsAddress::class);
         $entity = new CmsAddress();
@@ -181,11 +185,12 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('city');
         $form->add('street');
         $form->add('country');
+        $form->add('zip');
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath('zip'));
-        $builder->setAttribute('error_mapping', array());
+        $builder->setAttribute('error_mapping', []);
         $builder->setErrorBubbling(false);
         $builder->setMapped(true);
         $form->add($builder->getForm());
@@ -197,7 +202,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             'postoffice' => 61000
         ];
 
-        $this->fieldAclHelper->expects(self::exactly(4))
+        $this->fieldAclHelper->expects(self::exactly(5))
             ->method('isFieldModificationGranted')
             ->willReturnCallback(
                 function ($entity, $fieldName) {
@@ -213,7 +218,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $event = new FormEvent($form, $data);
         $this->extension->preSubmit($event);
 
-        $this->assertEquals(
+        self::assertFalse($form->has('zip'));
+
+        self::assertEquals(
             [
                 'country' => 'USA',
                 'city' => 'some city',
@@ -227,19 +234,19 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->extension->postSubmit($postSubmitEvent);
 
         $countryErrors = $form->get('country')->getErrors();
-        $this->assertCount(1, $countryErrors);
-        $this->assertEquals(
+        self::assertCount(1, $countryErrors);
+        self::assertEquals(
             'You have no access to modify this field.',
             $countryErrors[0]->getMessage()
         );
         $postofficeErrors = $form->get('postoffice')->getErrors();
-        $this->assertCount(1, $postofficeErrors);
-        $this->assertEquals(
+        self::assertCount(1, $postofficeErrors);
+        self::assertEquals(
             'You have no access to modify this field.',
             $postofficeErrors[0]->getMessage()
         );
-        $this->assertCount(0, $form->get('city')->getErrors());
-        $this->assertCount(0, $form->get('street')->getErrors());
+        self::assertCount(0, $form->get('city')->getErrors());
+        self::assertCount(0, $form->get('street')->getErrors());
     }
 
     /**
@@ -247,7 +254,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
      *
      * @return array [view, form, options]
      */
-    protected function getTestFormAndFormView($showRestricted = true)
+    private function getTestFormAndFormView(bool $showRestricted = true): array
     {
         $options = $this->prepareCorrectOptions(CmsAddress::class, $showRestricted);
         $view = new FormView();
@@ -262,13 +269,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         return [$view, $form, $options];
     }
 
-    /**
-     * @param string $className
-     * @param bool   $showRestricted
-     *
-     * @return array
-     */
-    protected function prepareCorrectOptions($className, $showRestricted = true)
+    private function prepareCorrectOptions(string $className, bool $showRestricted = true): array
     {
         $this->fieldAclHelper->expects(self::any())
             ->method('isFieldAclEnabled')
@@ -287,20 +288,16 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     /**
      * @return array [dispatcher, builder]
      */
-    protected function getFormBuilderWithEventDispatcher($dataClass = null, $formName = null)
+    private function getFormBuilderWithEventDispatcher(string $dataClass = null, string $formName = null): array
     {
         $dispatcher = new EventDispatcher();
-        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')
-            ->disableOriginalConstructor()->getMock();
+        $formFactory = $this->createMock(FormFactoryInterface::class);
         $builder = new FormBuilder($formName, $dataClass, $dispatcher, $formFactory);
 
         return [$dispatcher, $builder];
     }
 
-    /**
-     * @param FormInterface $formField
-     */
-    protected function addFieldModificationDeniedFormError(FormInterface $formField)
+    private function addFieldModificationDeniedFormError(FormInterface $formField): void
     {
         $formField->addError(new FormError('You have no access to modify this field.'));
     }

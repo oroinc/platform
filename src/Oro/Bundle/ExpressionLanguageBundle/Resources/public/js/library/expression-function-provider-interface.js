@@ -1,11 +1,12 @@
-define(function(require) {
-    'use strict';
+import Interface from 'oroexpressionlanguage/js/library/interface';
 
-    var Interface = require('oroexpressionlanguage/js/library/interface');
+/**
+ * @interface ExpressionFunctionProviderInterface
+ */
+class ExpressionFunctionProviderInterface {
+    getFunctions() {}
+}
 
-    var ExpressionFunctionProviderInterface = new Interface({
-        getFunctions: function() {}
-    });
+const expressionFunctionProviderInterface = new Interface(ExpressionFunctionProviderInterface.prototype);
 
-    return ExpressionFunctionProviderInterface;
-});
+export default expressionFunctionProviderInterface;

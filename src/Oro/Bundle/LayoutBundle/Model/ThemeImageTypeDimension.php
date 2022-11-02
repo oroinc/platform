@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Model;
 
+/**
+ * A model holding image dimensions and options.
+ */
 class ThemeImageTypeDimension
 {
     /**
@@ -19,18 +22,15 @@ class ThemeImageTypeDimension
      */
     private $height;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     /**
      * @param string $name
      * @param int|null $width
      * @param int|null $height
-     * @param array|null $options
+     * @param array $options
      */
-    public function __construct($name, $width, $height, array $options = null)
+    public function __construct($name, $width, $height, array $options = [])
     {
         $this->name = $name;
         $this->width = $width;
@@ -68,7 +68,7 @@ class ThemeImageTypeDimension
      */
     public function getOption($name)
     {
-        return $this->hasOption($name) ? $this->options[$name] : null;
+        return $this->options[$name] ?? null;
     }
 
     /**
@@ -77,6 +77,11 @@ class ThemeImageTypeDimension
      */
     public function hasOption($name)
     {
-        return $this->options && array_key_exists($name, $this->options);
+        return array_key_exists($name, $this->options);
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

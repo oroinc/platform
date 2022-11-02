@@ -5,29 +5,24 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainExceptionTextExtractor */
     private $chainExtractor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
-    private $extractors = [];
+    /** @var ExceptionTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
+    private $extractors;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->chainExtractor = new ChainExceptionTextExtractor();
-
-        $firstExtractor = $this->getMockBuilder(ExceptionTextExtractorInterface::class)
-            ->setMockClassName('FirstExceptionTextExtractor')
-            ->getMock();
-        $secondExtractor = $this->getMockBuilder(ExceptionTextExtractorInterface::class)
-            ->setMockClassName('SecondExceptionTextExtractor')
-            ->getMock();
-
-        $this->chainExtractor->addExtractor($firstExtractor);
-        $this->chainExtractor->addExtractor($secondExtractor);
+        $firstExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
+        $secondExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
 
         $this->extractors = [$firstExtractor, $secondExtractor];
+        $this->chainExtractor = new ChainExceptionTextExtractor($this->extractors);
     }
 
     public function testGetExceptionStatusCodeByFirstExtractor()

@@ -2,28 +2,35 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use ErrorException;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
-use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
+use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
+use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
+use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * Common import strategy for configurable entities.
  */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 {
     const STRATEGY_CONTEXT = 'configurable_add_or_replace_strategy';
 
-    /** @var ChainEntityClassNameProvider */
-    protected $chainEntityClassNameProvider;
+    /** @var EntityClassNameProviderInterface */
+    protected $entityClassNameProvider;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -34,51 +41,44 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var OwnerChecker */
-    protected $ownerChecker;
+    /** @var RelatedEntityStateHelper */
+    protected $relatedEntityStateHelper;
+
+    /** @var EntityOwnershipAssociationsSetter */
+    protected $entityOwnershipAssociationsSetter;
 
     /** @var array */
     protected $cachedEntities = [];
 
-    /** @var array */
-    protected $cachedExistingEntities = [];
+    /** @var object */
+    protected $processingEntity;
 
     /** @var array */
-    protected $cachedInverseSingleRelations = [];
+    protected $isEntityFieldFallbackValue = [];
 
-    /** @var array */
-    protected $cachedInverseMultipleRelations = [];
-
-    /**
-     * @param EventDispatcherInterface     $eventDispatcher
-     * @param ImportStrategyHelper         $strategyHelper
-     * @param FieldHelper                  $fieldHelper
-     * @param DatabaseHelper               $databaseHelper
-     * @param ChainEntityClassNameProvider $chainEntityClassNameProvider
-     * @param TranslatorInterface          $translator
-     * @param NewEntitiesHelper            $newEntitiesHelper
-     * @param DoctrineHelper               $doctrineHelper
-     * @param OwnerChecker                 $ownerChecker
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ImportStrategyHelper $strategyHelper,
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper,
-        ChainEntityClassNameProvider $chainEntityClassNameProvider,
+        EntityClassNameProviderInterface $entityClassNameProvider,
         TranslatorInterface $translator,
         NewEntitiesHelper $newEntitiesHelper,
         DoctrineHelper $doctrineHelper,
-        OwnerChecker $ownerChecker
+        RelatedEntityStateHelper $relatedEntityStateHelper
     ) {
         parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
-        $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
-        $this->translator                   = $translator;
-        $this->newEntitiesHelper            = $newEntitiesHelper;
-        $this->doctrineHelper               = $doctrineHelper;
-        $this->ownerChecker = $ownerChecker;
+        $this->entityClassNameProvider = $entityClassNameProvider;
+        $this->translator = $translator;
+        $this->newEntitiesHelper = $newEntitiesHelper;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->relatedEntityStateHelper = $relatedEntityStateHelper;
     }
 
+    public function setOwnershipSetter(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter): void
+    {
+        $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
+    }
 
     /**
      * {@inheritdoc}
@@ -88,19 +88,34 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = [];
-        $this->cachedInverseSingleRelations = [];
-        $this->cachedExistingEntities = [];
-        $this->cachedInverseMultipleRelations = [];
+        $this->processingEntity = null;
+        $this->relatedEntityStateHelper->clear();
 
+        $source = $entity;
+        if (!$entity = $this->validateBeforeProcess($entity)) {
+            $this->invalidateEntity($source);
+
+            return null;
+        }
+
+        $source = $entity;
         if (!$entity = $this->beforeProcessEntity($entity)) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
+        $source = $entity;
         if (!$entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'))) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
+        $source = $entity;
         if (!$entity = $this->afterProcessEntity($entity)) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
@@ -108,14 +123,15 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * @param object           $entity
-     * @param bool             $isFullData
-     * @param bool             $isPersistNew
+     * @param object $entity
+     * @param bool $isFullData
+     * @param bool $isPersistNew
      * @param mixed|array|null $itemData
-     * @param array            $searchContext
-     * @param bool             $entityIsRelation
+     * @param array $searchContext
+     * @param bool $entityIsRelation
      *
      * @return null|object
+     * @throws ErrorException
      */
     protected function processEntity(
         $entity,
@@ -136,72 +152,31 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             if (!$this->isPermissionGrantedForEntity('EDIT', $existingEntity, $entityClass)) {
                 return null;
             }
-            $existingOid = spl_object_hash($existingEntity);
-            if (isset($this->cachedEntities[$existingOid])) {
-                return $existingEntity;
+
+            if ($cachedEntity = $this->checkCachedEntities($existingEntity)) {
+                return $cachedEntity;
             }
-            $this->cachedEntities[$existingOid] = $existingEntity;
-            $this->cachedExistingEntities[$existingOid] = $existingEntity;
         } else {
-            // if can't find entity and new entity can't be persisted
-            if (!$isPersistNew) {
-                if ($entityIsRelation) {
-                    $class         = $this->chainEntityClassNameProvider->getEntityClassName($entityClass);
-                    $errorMessages = [$this->translator->trans(
-                        'oro.importexport.import.errors.not_found_entity',
-                        ['%entity_name%' => $class]
-                    )];
-                    $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
-                }
-
+            if (!$this->isValidNewEntity($isPersistNew, $entityIsRelation, $entityClass, $itemData)) {
                 return null;
-            } else {
-                /**
-                 * Save new entity to newEntitiesHelper storage by key constructed from identityValues
-                 * and this strategy context for reuse if there will be entity with the same identity values
-                 * it has not be created again but has be fetch from this storage
-                 */
-                $identityValues = $this->combineIdentityValues($entity, $entityClass, $searchContext);
-                if ($identityValues) {
-                    $newEntityKey   = sprintf('%s:%s', $entityClass, serialize($identityValues));
-                    $existingEntity = $this->newEntitiesHelper->getEntity($newEntityKey);
-                    if (null === $existingEntity) {
-                        $this->newEntitiesHelper->setEntity($newEntityKey, $entity);
-                        $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($entity));
-                    } else {
-                        $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($existingEntity));
-                    }
-                }
             }
 
+            $identityValues = $this->combineIdentityValues($entity, $entityClass, $searchContext);
+            $existingEntity = $this->newEntitiesHelper
+                ->storeNewEntity($entity, $identityValues, self::STRATEGY_CONTEXT);
             $this->databaseHelper->resetIdentifier($entity);
-            if (!$this->strategyHelper->isGranted('CREATE', 'entity:' . ClassUtils::getClass($entity))) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_entity',
-                    ['%entity_name%' => $entityClass,]
-                );
-                $this->context->addError($error);
 
+            if (!$this->isPermissionGrantedForEntity('CREATE', 'entity:' . $entityClass, $entityClass)) {
                 return null;
             }
             $this->cachedEntities[$oid] = $entity;
         }
 
-        // update relations
-        if ($isFullData) {
-            $this->updateRelations($entity, $itemData);
-        }
+        $entity = $this->importEntityFields($entity, $existingEntity, $isFullData, $entityIsRelation, $itemData);
 
-        // import entity fields
-        if ($existingEntity) {
-            $this->checkEntityAcl($entity, $existingEntity, $itemData);
-            if ($isFullData) {
-                $this->importExistingEntity($entity, $existingEntity, $itemData);
-            }
-
-            $entity = $existingEntity;
-        } else {
-            $this->checkEntityAcl($entity, null, $itemData);
+        // try to set the owner data if it absent in import data
+        if (null !== $entity) {
+            $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($entity);
         }
 
         return $entity;
@@ -214,47 +189,49 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function checkEntityAcl($entity, $existingEntity = null, $itemData = null)
     {
-        $entityName       = ClassUtils::getClass($entity);
-        $identifierName   = $this->databaseHelper->getIdentifierFieldName($entityName);
-        $excludedFields[] = $identifierName;
-        $fields           = $this->fieldHelper->getFields($entityName, true);
-        $action = $existingEntity ? 'EDIT' : 'CREATE';
-        $checkEntity = $existingEntity ? $existingEntity : new ObjectIdentity('entity', $entityName);
-
-        foreach ($fields as $field) {
-            $fieldName = $field['name'];
-            $importedValue = $this->getObjectValue($entity, $fieldName);
-            if (!$this->strategyHelper->isGranted($action, $checkEntity, $fieldName) && $importedValue) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_property_entity',
-                    [
-                        '%property_name%' => $fieldName,
-                        '%entity_name%' => $entityName,
-                    ]
-                );
-                $this->context->addError($error);
-                if ($existingEntity) {
-                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
-                    $this->fieldHelper->setObjectValue($entity, $fieldName, $existingValue);
-                } else {
-                    $this->fieldHelper->setObjectValue($entity, $fieldName, null);
-                }
-            }
-        }
-
-        if (!$this->ownerChecker->isOwnerCanBeSet($entity)) {
-            $error = $this->translator->trans(
-                'oro.importexport.import.errors.wrong_owner'
-            );
-            $this->strategyHelper->addValidationErrors([$error], $this->context);
-        }
+        $this->strategyHelper->checkImportedEntityFieldsAcl($this->context, $entity, $existingEntity, $itemData);
+        $this->strategyHelper->checkEntityOwnerPermissions($this->context, $entity);
     }
 
     /**
-     * @param object           $entity
-     * @param object           $existingEntity
+     * @param object $entity
+     * @param object|null $existingEntity
+     * @param bool $isFullData
+     * @param bool $entityIsRelation
      * @param mixed|array|null $itemData
-     * @param array            $excludedFields
+     * @return object|null
+     * @throws ErrorException
+     */
+    protected function importEntityFields($entity, $existingEntity, $isFullData, $entityIsRelation, $itemData)
+    {
+        // update relations
+        if ($isFullData) {
+            if (!$entityIsRelation) {
+                $this->processingEntity = $existingEntity ?: $entity;
+            }
+            $this->updateRelations($entity, $itemData);
+        }
+
+        $this->checkEntityAcl($entity, $existingEntity, $itemData);
+        // import entity fields
+        if ($existingEntity) {
+            if ($isFullData) {
+                $this->importExistingEntity($entity, $existingEntity, $itemData);
+            }
+            if (!$entityIsRelation) {
+                $this->relatedEntityStateHelper->rememberAlteredCollectionsItems($existingEntity);
+            }
+            $entity = $existingEntity;
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param object $existingEntity
+     * @param mixed|array|null $itemData
+     * @param array $excludedFields
      */
     protected function importExistingEntity(
         $entity,
@@ -262,10 +239,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $itemData = null,
         array $excludedFields = []
     ) {
-        $entityName       = ClassUtils::getClass($entity);
-        $identifierName   = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $entityName = ClassUtils::getClass($entity);
+        $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
         $excludedFields[] = $identifierName;
-        $fields           = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
@@ -289,29 +266,29 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function isFieldExcluded($entityName, $fieldName, $itemData = null)
     {
-        $isExcluded = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false);
-        $isIdentity = $this->isIdentityField($entityName, $fieldName, $itemData);
-        $isSkipped  = $itemData !== null && !array_key_exists($fieldName, $itemData);
-
-        return $isExcluded || $isSkipped && !$isIdentity;
+        return $this->fieldHelper->isFieldExcluded($entityName, $fieldName, $itemData);
     }
 
     /**
-     * @param object     $entity
+     * @param object $entity
      * @param array|null $itemData
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @throws ErrorException
      */
     protected function updateRelations($entity, array $itemData = null)
     {
         $entityName = ClassUtils::getClass($entity);
-        $fields     = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
+        $ownerFieldName = $this->databaseHelper->getOwnerFieldName($entityName);
 
         foreach ($fields as $field) {
             if ($this->fieldHelper->isRelation($field)) {
-                $fieldName         = $field['name'];
-                $isFullRelation    = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
+                $fieldName = $field['name'];
+                $isFullRelation = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
-                
-                $searchContext     = $this->generateSearchContextForRelationsUpdate(
+
+                $searchContext = $this->generateSearchContextForRelationsUpdate(
                     $entity,
                     $entityName,
                     $fieldName,
@@ -321,9 +298,22 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 if ($this->fieldHelper->isSingleRelation($field)) {
                     // single relation
                     $relationEntity = $this->getObjectValue($entity, $fieldName);
-                    if ($relationEntity) {
+                    $ownerEntity = null;
+
+                    if ($relationEntity && $ownerFieldName === $fieldName) {
+                        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($relationEntity);
+                        if ($identifier) {
+                            $ownerEntity = $this->databaseHelper->find(
+                                $this->doctrineHelper->getEntityClass($relationEntity),
+                                $identifier,
+                                false
+                            );
+                        }
+                    }
+
+                    if ($relationEntity && !$ownerEntity) {
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
-                        $relationEntity   = $this->processEntity(
+                        $relationEntity = $this->processEntity(
                             $relationEntity,
                             $isFullRelation,
                             $isPersistRelation,
@@ -331,21 +321,17 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             $searchContext,
                             true
                         );
-
-                        $this->cacheInverseFieldRelation($entityName, $fieldName, $relationEntity);
                     }
-                    $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, $ownerEntity ?: $relationEntity);
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
                     // multiple relation
-                    $relationCollection = $this->getObjectValue($entity, $fieldName);
-                    if ($relationCollection instanceof Collection) {
+                    $importedCollection = $this->getObjectValue($entity, $fieldName);
+                    if ($importedCollection instanceof Collection) {
                         $collectionItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
-                        $collectionEntities = new ArrayCollection();
-
-                        foreach ($relationCollection as $collectionEntity) {
-                            $entityItemData   = $this->fieldHelper->getItemData(array_shift($collectionItemData));
-                            $collectionEntity = $this->processEntity(
-                                $collectionEntity,
+                        foreach ($importedCollection as $importedEntity) {
+                            $entityItemData = $this->fieldHelper->getItemData(array_shift($collectionItemData));
+                            $databaseEntity = $this->processEntity(
+                                $importedEntity,
                                 $isFullRelation,
                                 $isPersistRelation,
                                 $entityItemData,
@@ -353,18 +339,57 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                                 true
                             );
 
-                            if ($collectionEntity) {
-                                $collectionEntities->add($collectionEntity);
-                                $this->cacheInverseFieldRelation($entityName, $fieldName, $collectionEntity);
+                            $key = $importedCollection->indexOf($importedEntity);
+                            $importedCollection->removeElement($importedEntity);
+                            if ($databaseEntity) {
+                                $importedCollection->set($key, $databaseEntity);
+                                $this->cacheInverseFieldRelation($entityName, $fieldName, $databaseEntity);
                             }
                         }
-
-                        $relationCollection->clear();
-                        $this->fieldHelper->setObjectValue($entity, $fieldName, $collectionEntities);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Temporarily save related entity inversed fields in order to recover them if import iteration fails
+     *
+     * @param string $entityName
+     * @param string $fieldName
+     * @param mixed $relationEntity
+     */
+    protected function cacheInverseFieldRelation($entityName, $fieldName, $relationEntity)
+    {
+        if (ClassUtils::getClass($relationEntity) === $this->entityName) {
+            $inversedRelationFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
+            $this->relatedEntityStateHelper->rememberCollectionRelation(
+                $relationEntity,
+                $inversedRelationFieldName,
+                $this->processingEntity
+            );
+        }
+    }
+
+    /**
+     * @param object     $entity
+     * @return object|null
+     */
+    protected function validateBeforeProcess($entity)
+    {
+        // validate entity
+        $validationErrors = $this->strategyHelper->validateEntity($entity, null, [
+            TypeValidationLoader::IMPORT_FIELD_TYPE_VALIDATION_GROUP
+        ]);
+
+        if ($validationErrors) {
+            $this->context->incrementErrorEntriesCount();
+            $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+            return null;
+        }
+
+        return $entity;
     }
 
     /**
@@ -378,6 +403,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $validationErrors = $this->strategyHelper->validateEntity($entity);
         if ($validationErrors) {
             $this->processValidationErrors($entity, $validationErrors);
+
             return null;
         }
 
@@ -395,42 +421,31 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->context->incrementErrorEntriesCount();
         $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
 
-        foreach ($this->cachedExistingEntities as $oid => $object) {
-            if (array_key_exists($oid, $this->cachedInverseSingleRelations)) {
-                foreach ($this->cachedInverseSingleRelations[$oid] as $fieldName => $value) {
-                    // restore initial value of related entity's inverse field
-                    $this->fieldHelper->setObjectValue($object, $fieldName, $value);
-                }
-            }
+        $this->invalidateEntity($entity);
+    }
+
+    protected function invalidateEntity($entity)
+    {
+        $this->relatedEntityStateHelper->revertRelations();
+
+        if (!$entity) {
+            return;
         }
 
-        foreach ($this->cachedInverseMultipleRelations as $fieldEntityPair) {
-            foreach ($fieldEntityPair as $fieldName => $object) {
-                /** @var PersistentCollection $collection */
-                $collection = $this->fieldHelper->getObjectValue($object, $fieldName);
-                if ($collection->contains($entity)) {
-                    // remove entity from related entity's updated collections
-                    if ($collection instanceof PersistentCollection) {
-                        // fix `orphanRemoval` association
-                        $tmpAssociation = $association = $collection->getMapping();
-                        $tmpAssociation['orphanRemoval'] = false;
-                        $collection->setOwner($collection->getOwner(), $tmpAssociation);
-                        $collection->removeElement($entity);
-                        $collection->setOwner($collection->getOwner(), $association);
-                    } else {
-                        $collection->removeElement($entity);
-                    }
-                }
-            }
+        $em = $this->doctrineHelper->getEntityManager($entity, false);
+        if (!$em) {
+            return;
         }
 
-        $this->doctrineHelper->getEntityManager($entity)->detach($entity);
+        try {
+            $em->refresh($entity);
+        } catch (ORMInvalidArgumentException $e) {
+            $em->detach($entity);
+        }
     }
 
     /**
      * Increment context counters.
-     *
-     * @param $entity
      */
     protected function updateContextCounters($entity)
     {
@@ -449,9 +464,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function getEntityHashKey($entity)
     {
-        $hashKey = self::STRATEGY_CONTEXT . spl_object_hash($entity);
-
-        return $hashKey;
+        return $this->newEntitiesHelper->getEntityHashKey($entity, self::STRATEGY_CONTEXT);
     }
 
     /**
@@ -475,7 +488,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
-        $notEmptyValues     = [];
+        $notEmptyValues = [];
         $nullRequiredValues = [];
         foreach ($identityValues as $fieldName => $value) {
             if (null !== $value) {
@@ -538,7 +551,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             return [];
         }
 
-        if (!$this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
+        $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
+        // Association type should be one-to-one so context with inverse field name can lead to a single result.
+        // Otherwise - if allowing one-to-many and trying to call ::findExistingEntity() with such context it will
+        // always return the first item in the collection.
+        if ($association['type'] !== ClassMetadata::ONE_TO_ONE) {
             return [];
         }
 
@@ -552,64 +571,75 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * Temporarily save related entity inversed fields in order to recover them if import iteration fails
-     * @param string $entityName
-     * @param string $fieldName
-     * @param mixed $relationEntity
-     */
-    protected function cacheInverseFieldRelation($entityName, $fieldName, $relationEntity)
-    {
-        if (null === $relationEntity) {
-            return;
-        }
-
-        $oid = spl_object_hash($relationEntity);
-        $inverseFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
-
-        if (array_key_exists($oid, $this->cachedExistingEntities) && $inverseFieldName) {
-            $relatedFields = $this->fieldHelper->getFields(ClassUtils::getClass($relationEntity), true);
-            $index = array_search($inverseFieldName, array_column($relatedFields, 'name'));
-
-            if ($index && $this->fieldHelper->isMultipleRelation($relatedFields[$index])) {
-                $this->cachedInverseMultipleRelations[$oid][$inverseFieldName] = $relationEntity;
-            }
-
-            if ($index && $this->fieldHelper->isSingleRelation($relatedFields[$index])) {
-                $value = $this->fieldHelper->getObjectValue($relationEntity, $inverseFieldName);
-                $this->cachedInverseSingleRelations[$oid][$inverseFieldName] = $value;
-            }
-        }
-    }
-
-    /**
      * @param object $entity
      * @param string $fieldName
      * @return mixed
+     * @throws ErrorException
      */
     protected function getObjectValue($entity, $fieldName)
     {
-        return $this->fieldHelper->getObjectValue($entity, $fieldName);
+        $methodName = 'getObjectValue';
+
+        if (is_a($entity, UserInterface::class, true)) {
+            $methodName = 'getObjectValueWithReflection';
+        }
+
+        $importedEntity = $this->fieldHelper->$methodName($entity, $fieldName);
+        if ($this->isEntityFieldFallbackValue(ClassUtils::getClass($entity), $fieldName)) {
+            $existedEntity = $this->fieldHelper->$methodName($this->processingEntity, $fieldName);
+
+            if ($existedEntity && $importedEntity) {
+                $this->fieldHelper->setObjectValue(
+                    $importedEntity,
+                    'id',
+                    $this->fieldHelper->getObjectValue($existedEntity, 'id')
+                );
+            }
+        }
+
+        return $importedEntity;
+    }
+
+    /**
+     * EntityFieldFallbackValue generated automaticaly when column is empty in imported files.
+     * Allow initial generation only and get data from existing entity in other cases.
+     * There is no way to use identity fields for EntityFieldFallbackValue.
+     */
+    protected function isEntityFieldFallbackValue(string $className, string $fieldName): bool
+    {
+        $key = $className.'::'.$fieldName;
+        if (array_key_exists($key, $this->isEntityFieldFallbackValue)) {
+            return (bool)$this->isEntityFieldFallbackValue[$key];
+        }
+
+        $fields = array_filter(
+            $this->fieldHelper->getEntityFields($className, EntityFieldProvider::OPTION_WITH_RELATIONS),
+            function (array $field) use ($fieldName) {
+                return $field['name'] === $fieldName &&
+                    $this->fieldHelper->isRelation($field) &&
+                    is_a($field['related_entity_name'], EntityFieldFallbackValue::class, true);
+            }
+        );
+
+        $this->isEntityFieldFallbackValue[$key] = !empty($fields);
+
+        return $this->isEntityFieldFallbackValue[$key];
     }
 
     /**
      * @param string $permission
-     * @param object $entity
-     * @param string $entityClass
+     * @param object|string $entity
+     * @param string $entityName
      * @return null
      */
-    protected function isPermissionGrantedForEntity($permission, $entity, $entityClass)
+    protected function isPermissionGrantedForEntity($permission, $entity, $entityName)
     {
-        if (!$this->strategyHelper->isGranted($permission, $entity)) {
-            $error = $this->translator->trans(
-                'oro.importexport.import.errors.access_denied_entity',
-                ['%entity_name%' => $entityClass,]
-            );
-            $this->context->addError($error);
-
-            return false;
-        }
-
-        return true;
+        return $this->strategyHelper->checkPermissionGrantedForEntity(
+            $this->context,
+            $permission,
+            $entity,
+            $entityName
+        );
     }
 
     /**
@@ -641,21 +671,49 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @param mixed  $itemData
+     * @param object $existingEntity
+     * @return object|null
+     */
+    protected function checkCachedEntities($existingEntity)
+    {
+        $existingOid = spl_object_hash($existingEntity);
+        if (isset($this->cachedEntities[$existingOid])) {
+            return $existingEntity;
+        }
+        $this->cachedEntities[$existingOid] = $existingEntity;
+
+        return null;
+    }
+
+    /**
+     * If can't find entity and new entity can't be persisted
      *
+     * @param bool $isPersistNew
+     * @param bool $entityIsRelation
+     * @param string $entityClass
+     * @param mixed|array|null $itemData
      * @return bool
      */
-    private function isIdentityField($entityName, $fieldName, $itemData = null)
+    protected function isValidNewEntity($isPersistNew, $entityIsRelation, string $entityClass, $itemData): bool
     {
-        $isIdentity = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false);
-        if (false === $isIdentity) {
-            return $isIdentity;
+        if (!$isPersistNew) {
+            if ($entityIsRelation) {
+                $class = $this->entityClassNameProvider->getEntityClassName($entityClass);
+                $errorMessages = [
+                    $this->translator->trans(
+                        'oro.importexport.import.errors.not_found_entity',
+                        [
+                            '%entity_name%' => $class,
+                            '%item_data%' => json_encode($itemData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                        ]
+                    )
+                ];
+                $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
+            }
+
+            return false;
         }
 
-        $isInputDataContainsField = is_array($itemData) && array_key_exists($fieldName, $itemData);
-
-        return $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName) || $isInputDataContainsField;
+        return true;
     }
 }

@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "variables";
-@import "oroui/css/scss/mixins";
+@import 'comment';
 
-@import "comment";
+// mobile
+@import 'mobile/main';

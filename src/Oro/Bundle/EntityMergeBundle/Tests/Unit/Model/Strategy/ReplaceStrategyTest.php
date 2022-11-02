@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy;
@@ -9,85 +12,63 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReplaceStrategy $strategy
-     */
-    protected $strategy;
+    /** @var ReplaceStrategy */
+    private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = new ReplaceStrategy(new DefaultAccessor());
     }
 
     public function testNotSupports()
     {
-        $fieldData = $this->createFieldData();
-        $fieldData
-            ->expects($this->once())
+        $fieldData = $this->createMock(FieldData::class);
+        $fieldData->expects($this->once())
             ->method('getMode')
-            ->will($this->returnValue(MergeModes::UNITE));
+            ->willReturn(MergeModes::UNITE);
 
         $this->assertFalse($this->strategy->supports($fieldData));
     }
 
     public function testSupports()
     {
-        $fieldData = $this->createFieldData();
-        $fieldData
-            ->expects($this->once())
+        $fieldData = $this->createMock(FieldData::class);
+        $fieldData->expects($this->once())
             ->method('getMode')
-            ->will($this->returnValue(MergeModes::REPLACE));
+            ->willReturn(MergeModes::REPLACE);
 
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 
     public function testMerge()
     {
-        $fieldData         = $this->createFieldData();
-        $fieldMetadataData = $this->createFieldMetadata();
-        $entityData        = $this->createEntityData();
-        $masterEntity      = new EntityStub(1);
-        $sourceEntity      = new EntityStub(2);
+        $masterEntity = new EntityStub(1);
+        $sourceEntity = new EntityStub(2);
 
-        $fieldData
-            ->expects($this->once())
-            ->method('getEntityData')
-            ->will($this->returnValue($entityData));
+        $entityData = $this->createMock(EntityData::class);
+        $fieldData = $this->createMock(FieldData::class);
+        $fieldMetadataData = $this->createMock(FieldMetadata::class);
 
-        $fieldMetadataData
-            ->expects($this->any())
-            ->method('has')
-            ->will($this->returnValue(true));
-
-        $fieldMetadataData
-            ->expects($this->at(1))
-            ->method('get')
-            ->will($this->returnValue('getId'));
-
-        $fieldMetadataData
-            ->expects($this->at(3))
-            ->method('get')
-            ->will($this->returnValue('setId'));
-
-        $fieldMetadataData
-            ->expects($this->at(4))
-            ->method('get')
-            ->will($this->returnValue('setId'));
-
-        $fieldData
-            ->expects($this->once())
-            ->method('getMetadata')
-            ->will($this->returnValue($fieldMetadataData));
-
-        $fieldData
-            ->expects($this->once())
-            ->method('getSourceEntity')
-            ->will($this->returnValue($sourceEntity));
-
-        $entityData
-            ->expects($this->once())
+        $entityData->expects($this->once())
             ->method('getMasterEntity')
-            ->will($this->returnValue($masterEntity));
+            ->willReturn($masterEntity);
+
+        $fieldData->expects($this->once())
+            ->method('getEntityData')
+            ->willReturn($entityData);
+        $fieldData->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn($fieldMetadataData);
+        $fieldData->expects($this->once())
+            ->method('getSourceEntity')
+            ->willReturn($sourceEntity);
+
+        $fieldMetadataData->expects($this->atLeastOnce())
+            ->method('has')
+            ->willReturn(true);
+        $fieldMetadataData->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls('getId', 'setId');
 
         $this->strategy->merge($fieldData);
 
@@ -97,29 +78,5 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     public function testGetName()
     {
         $this->assertEquals('replace', $this->strategy->getName());
-    }
-
-    protected function createFieldData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')
-            ->setMethods(['getMode', 'getEntityData', 'getMetadata', 'getSourceEntity'])
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createEntityData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->setMethods(['getMasterEntity'])
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 
 use Oro\Bundle\ImapBundle\Connector\Search\GmailSearchStringManager;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExpr;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 
 class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
@@ -15,7 +14,7 @@ class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQuery */
     private $query;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchStringManager = new GmailSearchStringManager();
         $this->query = $this->createSearchQuery();
@@ -93,78 +92,78 @@ class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function valueProvider()
+    public function valueProvider(): array
     {
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');
 
-        return array(
+        return [
             'one word + DEFAULT_MATCH'
-                => array('product', SearchQueryMatch::DEFAULT_MATCH, '"product"'),
+                => ['product', SearchQueryMatch::DEFAULT_MATCH, '"product"'],
             'one word + SUBSTRING_MATCH'
-                => array('product', SearchQueryMatch::SUBSTRING_MATCH, '"product"'),
+                => ['product', SearchQueryMatch::SUBSTRING_MATCH, '"product"'],
             'one word + EXACT_MATCH'
-                => array('product', SearchQueryMatch::EXACT_MATCH, '"+product"'),
+                => ['product', SearchQueryMatch::EXACT_MATCH, '"+product"'],
             'two words + DEFAULT_MATCH'
-                => array('my product', SearchQueryMatch::DEFAULT_MATCH, '"\\"my product\\""'),
+                => ['my product', SearchQueryMatch::DEFAULT_MATCH, '"\\"my product\\""'],
             'two words + SUBSTRING_MATCH'
-                => array('my product', SearchQueryMatch::SUBSTRING_MATCH, '"\\"my product\\""'),
+                => ['my product', SearchQueryMatch::SUBSTRING_MATCH, '"\\"my product\\""'],
             'two words + EXACT_MATCH'
-                => array('my product', SearchQueryMatch::EXACT_MATCH, '"+\\"my product\\""'),
+                => ['my product', SearchQueryMatch::EXACT_MATCH, '"+\\"my product\\""'],
             'SearchQuery as value + DEFAULT_MATCH'
-                => array($sampleQuery, SearchQueryMatch::DEFAULT_MATCH, '"product"'),
-        );
+                => [$sampleQuery, SearchQueryMatch::DEFAULT_MATCH, '"product"'],
+        ];
     }
 
-    public function itemProvider()
+    public function itemProvider(): array
     {
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');
 
-        return array(
-            'one word + DEFAULT_MATCH' => array(
+        return [
+            'one word + DEFAULT_MATCH' => [
                 'subject',
                 'product',
                 SearchQueryMatch::DEFAULT_MATCH,
                 '"subject:product"'
-            ),
-            'one word + SUBSTRING_MATCH' => array(
+            ],
+            'one word + SUBSTRING_MATCH' => [
                 'subject',
                 'product',
                 SearchQueryMatch::SUBSTRING_MATCH,
                 '"subject:product"'
-            ),
-            'one word + EXACT_MATCH' => array(
+            ],
+            'one word + EXACT_MATCH' => [
                 'subject',
                 'product',
                 SearchQueryMatch::EXACT_MATCH,
                 '"subject:+product"'
-            ),
-            'two words + DEFAULT_MATCH' => array(
+            ],
+            'two words + DEFAULT_MATCH' => [
                 'subject',
                 'my product',
                 SearchQueryMatch::DEFAULT_MATCH,
                 '"subject:\\"my product\\""'
-            ),
-            'two words + SUBSTRING_MATCH' => array(
+            ],
+            'two words + SUBSTRING_MATCH' => [
                 'subject',
                 'my product',
                 SearchQueryMatch::SUBSTRING_MATCH,
                 '"subject:\\"my product\\""'
-            ),
-            'two words + EXACT_MATCH' => array(
+            ],
+            'two words + EXACT_MATCH' => [
                 'subject',
                 'my product',
                 SearchQueryMatch::EXACT_MATCH,
                 '"subject:+\\"my product\\""'
-            ),
-            'SearchQuery as value + DEFAULT_MATCH' => array(
+            ],
+            'SearchQuery as value + DEFAULT_MATCH' => [
                 'subject',
                 $sampleQuery,
                 SearchQueryMatch::DEFAULT_MATCH,
                 '"subject:product"'
-            ),
-        );
+            ],
+        ];
     }
 
     private function createSearchQuery()

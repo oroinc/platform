@@ -5,54 +5,50 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  IntegrationTypeSelectType */
-    protected $type;
-
     /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $assetHelper;
+    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
+    private $assetHelper;
 
-    protected function setUp()
+    /** @var IntegrationTypeSelectType */
+    private $type;
+
+    protected function setUp(): void
     {
-        $this->registry    = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-            ->disableOriginalConstructor()->getMock();
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
-            ->disableOriginalConstructor()->getMock();
-        $this->type        = new IntegrationTypeSelectType($this->registry, $this->assetHelper);
-    }
+        $this->registry = $this->createMock(TypesRegistry::class);
+        $this->assetHelper = $this->createMock(Packages::class);
 
-    public function tearDown()
-    {
-        unset($this->type, $this->registry, $this->assetHelper);
+        $this->type = new IntegrationTypeSelectType($this->registry, $this->assetHelper);
     }
 
     public function testConfigureOptions()
     {
         $resolver = new OptionsResolver();
-        $this->registry->expects($this->once())->method('getAvailableIntegrationTypesDetailedData')
-            ->will(
-                $this->returnValue(
-                    [
-                        'testType1' => ['label' => 'oro.type1.label', 'icon' => 'bundles/acmedemo/img/logo.png'],
-                        'testType2' => ['label' => 'oro.type2.label'],
-                    ]
-                )
+        $this->registry->expects($this->once())
+            ->method('getAvailableIntegrationTypesDetailedData')
+            ->willReturn(
+                [
+                    'testType1' => ['label' => 'oro.type1.label', 'icon' => 'bundles/acmedemo/img/logo.png'],
+                    'testType2' => ['label' => 'oro.type2.label'],
+                ]
             );
 
         $this->assetHelper->expects($this->once())
             ->method('getUrl')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->type->configureOptions($resolver);
         $result = $resolver->resolve([]);
         $choiceAttr = [];
-        foreach ($result['choices'] as $label => $choice) {
+        foreach ($result['choices'] as $choice) {
             $choiceAttr[$choice] = call_user_func($result['choice_attr'], $choice);
         }
         unset($result['choice_attr']);
@@ -80,11 +76,9 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildView()
     {
-        $view       = $this->getMockBuilder('Symfony\Component\Form\FormView')
-            ->disableOriginalConstructor()->getMock();
-        $form       = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
-        $options    = ['configs' => [], 'choices' => []];
+        $view = $this->createMock(FormView::class);
+        $form = $this->createMock(Form::class);
+        $options = ['configs' => [], 'choices' => []];
 
         $this->type->buildView($view, $form, $options);
 

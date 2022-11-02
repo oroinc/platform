@@ -1,0 +1,60 @@
+aliases:
+    oro/filter/abstract-filter$: orofilter/js/filter/abstract-filter
+    oro/filter/boolean-filter$: orofilter/js/filter/boolean-filter
+    oro/filter/choice-filter$: orofilter/js/filter/choice-filter
+    oro/filter/choice-tree-filter$: orofilter/js/filter/choice-tree-filter
+    oro/filter/date-filter$: orofilter/js/filter/date-filter
+    oro/filter/datetime-filter$: orofilter/js/filter/datetime-filter
+    oro/filter/dictionary-filter$: orofilter/js/filter/dictionary-filter
+    oro/filter/empty-filter$: orofilter/js/filter/empty-filter
+    oro/filter/multiselect-filter$: orofilter/js/filter/multiselect-filter
+    oro/filter/none-filter$: orofilter/js/filter/none-filter
+    oro/filter/number-filter$: orofilter/js/filter/number-filter
+    oro/filter/number-range-filter$: orofilter/js/filter/number-range-filter
+    oro/filter/select-filter$: orofilter/js/filter/select-filter
+    oro/filter/text-filter$: orofilter/js/filter/text-filter
+configs:
+    oro/filter/abstract-filter: {}
+    oro/filter/date-filter: {}
+    oro/filter/datetime-filter: {}
+    oro/filter/select-filter: {}
+    oro/filter/text-filter: {}
+    orofilter/js/datafilter-builder: {}
+    orofilter/js/filter-hint: {}
+    orofilter/js/filters-manager: {}
+    orofilter/js/plugins/filters-toggle-plugin: {}
+dynamic-imports:
+    orodatagrid:
+        - oro/filter/abstract-filter
+        - oro/filter/boolean-filter
+        - oro/filter/choice-filter
+        - oro/filter/choice-tree-filter
+        - oro/filter/date-filter
+        - oro/filter/datetime-filter
+        - oro/filter/dictionary-filter
+        - oro/filter/empty-filter
+        - oro/filter/multiselect-filter
+        - oro/filter/none-filter
+        - oro/filter/number-filter
+        - oro/filter/number-range-filter
+        - oro/filter/select-filter
+        - oro/filter/text-filter
+        - orofilter/js/datafilter-builder
+map:
+    '*':
+        orofilter/templates/filter/choice-filter.html: orofilter/default/templates/filters/choice-filter.html
+        orofilter/templates/filter/choice-tree.html: orofilter/default/templates/filters/choice-tree.html
+        orofilter/templates/filter/date-filter-dropdown.html: orofilter/default/templates/filters/date-filter-dropdown.html
+        orofilter/templates/filter/date-filter.html: orofilter/default/templates/filters/date-filter.html
+        orofilter/templates/filter/date-picker.html: orofilter/default/templates/filters/date-picker.html
+        orofilter/templates/filter/dictionary-filter.html: orofilter/default/templates/filters/dictionary-filter.html
+        orofilter/templates/filter/embedded/simple-choice-filter.html: orofilter/default/templates/filters/embedded/simple-choice-filter.html
+        orofilter/templates/filter/filter-hint.html: orofilter/default/templates/filters/filter-hint.html
+        orofilter/templates/filter/filter-wrapper.html: orofilter/default/templates/filters/filter-wrapper.html
+        orofilter/templates/filter/multiselect-filter.html: orofilter/default/templates/filters/multiselect-filter.html
+        orofilter/templates/filter/none-filter.html: orofilter/default/templates/filters/none-filter.html
+        orofilter/templates/filter/number-range-filter.html: orofilter/default/templates/filters/number-range-filter.html
+        orofilter/templates/filter/select-field.html: orofilter/default/templates/filters/select-field.html
+        orofilter/templates/filter/select-filter.html: orofilter/default/templates/filters/select-filter.html
+        orofilter/templates/filter/text-filter.html: orofilter/default/templates/filters/text-filter.html
+        orofilter/templates/filters-container.html: orofilter/default/templates/filters/filters-container.html

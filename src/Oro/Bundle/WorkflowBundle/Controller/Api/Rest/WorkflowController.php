@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-// Annotations import
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
@@ -17,7 +17,6 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-// Exceptions
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +24,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * @Rest\NamePrefix("oro_api_workflow_")
+ * REST API controller for workflows.
  */
-class WorkflowController extends FOSRestController
+class WorkflowController extends AbstractFOSRestController
 {
     /**
      * Returns:
@@ -37,11 +36,6 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/start/{workflowName}/{transitionName}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Start workflow for entity from transition", resource=true)
      *
      * @param string $workflowName
@@ -51,6 +45,8 @@ class WorkflowController extends FOSRestController
      */
     public function startAction($workflowName, $transitionName, Request $request)
     {
+        $errors = new ArrayCollection();
+
         try {
             /** @var WorkflowManager $workflowManager */
             $workflowManager = $this->get('oro_workflow.manager');
@@ -82,29 +78,48 @@ class WorkflowController extends FOSRestController
             }
 
             $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
-            $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
+            $workflowItem = $workflowManager->startWorkflow(
+                $workflowName,
+                $entity,
+                $transitionName,
+                $dataArray,
+                true,
+                $errors
+            );
         } catch (HttpException $e) {
-            return $this->handleError($e->getMessage(), $e->getStatusCode());
+            return $this->handleError($this->buildMessageString($errors, $e), $e->getStatusCode());
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_NOT_FOUND);
         } catch (UnknownAttributeException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Codes::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
+    }
+
+    private function buildMessageString(Collection $errors, \Exception $e): string
+    {
+        $translator = $this->get('translator');
+
+        $messages = $errors->map(
+            static function ($error) use ($translator) {
+                if (!isset($error['message'])) {
+                    return null;
+                }
+
+                return $translator->trans($error['message'], $error['parameters'] ?? []);
+            }
+        );
+
+        return implode(' ', array_filter($messages->toArray())) ?: $e->getMessage();
     }
 
     /**
@@ -140,11 +155,6 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
      *
@@ -154,38 +164,33 @@ class WorkflowController extends FOSRestController
      */
     public function transitAction(WorkflowItem $workflowItem, $transitionName)
     {
+        $errors = new ArrayCollection();
+
         try {
-            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
+            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName, $errors);
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_NOT_FOUND);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem,
-                    'redirectUrl' => $workflowItem->getResult()->redirectUrl,
-                ),
-                Codes::HTTP_OK
-            )
-        );
+        $data = ['workflowItem' => $this->serializeWorkflowItem($workflowItem)];
+        $redirectUrl = $workflowItem->getResult()->redirectUrl;
+        if ($redirectUrl) {
+            $data['redirectUrl'] = $redirectUrl;
+        }
+
+        return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
     /**
      * Returns
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/{workflowItemId}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
      *
@@ -195,12 +200,7 @@ class WorkflowController extends FOSRestController
     public function getAction(WorkflowItem $workflowItem)
     {
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Codes::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
     }
 
@@ -210,11 +210,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_NO_CONTENT (204)
      *
-     * @Rest\Delete(
-     *      "/api/rest/{version}/workflow/{workflowItemId}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
      *
@@ -224,7 +219,8 @@ class WorkflowController extends FOSRestController
     public function deleteAction(WorkflowItem $workflowItem)
     {
         $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+
+        return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -233,11 +229,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (200)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/activate/{workflowDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Activate workflow", resource=true)
      *
      * @param WorkflowDefinition $workflowDefinition
@@ -252,11 +243,11 @@ class WorkflowController extends FOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow activated')
-                ),
-                Codes::HTTP_OK
+                ],
+                Response::HTTP_OK
             )
         );
     }
@@ -267,11 +258,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (204)
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/deactivate/{workflowDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Deactivate workflow", resource=true)
      *
      * @param WorkflowDefinition $workflowDefinition
@@ -286,11 +272,11 @@ class WorkflowController extends FOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow deactivated')
-                ),
-                Codes::HTTP_OK
+                ],
+                Response::HTTP_OK
             )
         );
     }
@@ -302,20 +288,25 @@ class WorkflowController extends FOSRestController
      */
     protected function handleError($message, $code)
     {
-        return $this->handleView(
-            $this->view(
-                $this->formatErrorResponse($message),
-                $code
-            )
-        );
+        return $this->handleView($this->view(['message' => $message], $code));
     }
 
     /**
-     * @param string $message
-     * @return array
+     * {@inheritDoc}
      */
-    protected function formatErrorResponse($message)
+    protected function handleView(View $view)
     {
-        return array('message' => $message);
+        $view->getContext()->setSerializeNull(true);
+
+        return parent::handleView($view);
+    }
+
+    protected function serializeWorkflowItem(?WorkflowItem $workflowItem): ?array
+    {
+        if (null === $workflowItem) {
+            return null;
+        }
+
+        return $this->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
     }
 }

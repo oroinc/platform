@@ -1,24 +1,30 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
-    var tools = require('oroui/js/tools');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const tools = require('oroui/js/tools');
+    const pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
 
-    var console = window.console;
+    const console = window.console;
 
-    var OriginalBackboneView = Backbone.View;
-    Backbone.View = function(original) {
+    const OriginalBackboneView = Backbone.View;
+    Backbone.View = function(options) {
+        Object.assign(this, _.pick(options, this.optionNames));
         this.subviews = [];
         this.subviewsByName = {};
-        OriginalBackboneView.apply(this, arguments);
+        OriginalBackboneView.call(this, options);
     };
     _.extend(Backbone.View, OriginalBackboneView, {
         RENDERING_TIMEOUT: 30000 // 30s
     });
     Backbone.View.prototype = OriginalBackboneView.prototype;
+    Backbone.View.prototype.constructor = Backbone.View;
+
+    const original = _.pick(Backbone.View.prototype, 'remove');
 
     // Backbone.View
     Backbone.View.prototype.subviews = null;
@@ -26,8 +32,8 @@ define(function(require) {
     _.extend(Backbone.View.prototype, componentContainerMixin);
 
     Backbone.View.prototype.subview = function(name, view) {
-        var subviews = this.subviews;
-        var byName = this.subviewsByName;
+        const subviews = this.subviews;
+        const byName = this.subviewsByName;
         if (name && view) {
             this.removeSubview(name);
             subviews.push(view);
@@ -39,18 +45,15 @@ define(function(require) {
     };
 
     Backbone.View.prototype.removeSubview = function(nameOrView) {
-        var byName;
-        var index;
-        var name;
-        var otherName;
-        var otherView;
-        var subviews;
-        var view;
+        let name;
+        let otherName;
+        let otherView;
+        let view;
         if (!nameOrView) {
             return;
         }
-        subviews = this.subviews;
-        byName = this.subviewsByName;
+        const subviews = this.subviews;
+        const byName = this.subviewsByName;
         if (typeof nameOrView === 'string') {
             name = nameOrView;
             view = byName[name];
@@ -71,7 +74,7 @@ define(function(require) {
             return;
         }
         view.dispose();
-        index = _.indexOf(subviews, view);
+        const index = _.indexOf(subviews, view);
         if (index !== -1) {
             subviews.splice(index, 1);
         }
@@ -80,14 +83,12 @@ define(function(require) {
 
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var subview;
-        var _i;
-        var _j;
-        var _len;
-        var _len1;
-        var _ref;
+        let prop;
+        let subview;
+        let _i;
+        let _j;
+        let _len;
+        let _len1;
         if (this.disposed || !this.$el) {
             return;
         }
@@ -99,7 +100,7 @@ define(function(require) {
         this.disposePageComponents();
         this.trigger('dispose', this);
 
-        _ref = _.toArray(this.subviews);
+        const _ref = _.toArray(this.subviews);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             subview = _ref[_i];
             subview.dispose();
@@ -110,12 +111,12 @@ define(function(require) {
         this.stopListening();
 
         if (this.keepElement === false) {
-            this.$el.remove();
+            this.remove();
         } else {
             this.undelegateEvents();
         }
 
-        properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
+        const properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
         for (_j = 0, _len1 = properties.length; _j < _len1; _j++) {
             prop = properties[_j];
             delete this[prop];
@@ -124,13 +125,32 @@ define(function(require) {
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
-    Backbone.View.prototype._ensureElement = _.wrap(Backbone.View.prototype._ensureElement, function(_ensureElement) {
-        // if the element was passed with options -- preserve it in the DOM, if `keepElement` is not set to `false`
-        if (this.el && this.keepElement !== false) {
-            this.keepElement = true;
+
+    /**
+     * Copied original `_ensureElement` method and changed:
+     *  - added with support extra `_attributes` set, collected from prototype chain
+     *  - `keepElement` is true by default, is the element was passed within options
+     */
+    Backbone.View.prototype._ensureElement = function() {
+        if (!this.el) {
+            const attrs = this._collectAttributes();
+            if (this.id) attrs.id = _.result(this, 'id');
+            if (this.className) attrs['class'] = _.result(this, 'className');
+            this.setElement(this._createElement(_.result(this, 'tagName')));
+            this._setAttributes(attrs);
+        } else {
+            // if the element was passed within options -- preserve it in the DOM
+            if (this.keepElement !== false) {
+                this.keepElement = true;
+            }
+            this.setElement(_.result(this, 'el'));
         }
-        return _ensureElement.call(this);
-    });
+    };
+    Backbone.View.prototype._collectAttributes = function() {
+        const attrsSet = tools.getAllPropertyVersions(this, '_attributes')
+            .map(attrs => typeof attrs === 'function' ? attrs.call(this) : attrs);
+        return Object.assign({}, ...attrsSet, _.result(this, 'attributes'));
+    };
     Backbone.View.prototype.setElement = _.wrap(Backbone.View.prototype.setElement, function(setElement, element) {
         if (this.$el) {
             this.disposePageComponents();
@@ -153,10 +173,10 @@ define(function(require) {
         // initializes controls in layout
         this.initControls();
         // initializes page components
-        var initPromise = this.initPageComponents(options);
+        const initPromise = this.initPageComponents(options);
         if (!this.deferredRender) {
             this._deferredRender();
-            initPromise.always(_.bind(this._resolveDeferredRender, this));
+            initPromise.always(this._resolveDeferredRender.bind(this));
         }
         return initPromise.fail(function(e) {
             console.error(e);
@@ -174,9 +194,9 @@ define(function(require) {
         }
         this.deferredRender = $.Deferred();
         this.deferredRender.timeoutID =
-            setTimeout(function() {
-                var xpath = tools.getElementXPath(this.el);
-                var error = new Error('Rendering timeout for view of element: "' + xpath + '"');
+            pageVisibilityTracker.setTimeout(function() {
+                const xpath = tools.getElementXPath(this.el);
+                const error = new Error('Rendering timeout for view of element: "' + xpath + '"');
                 this._rejectDeferredRender(error);
             }.bind(this), Backbone.View.RENDERING_TIMEOUT);
     };
@@ -188,12 +208,12 @@ define(function(require) {
      */
     Backbone.View.prototype._resolveDeferredRender = function() {
         if (this.deferredRender) {
-            var promises = [];
-            var resolve = _.bind(function() {
-                clearTimeout(this.deferredRender.timeoutID);
+            const promises = [];
+            const resolve = () => {
+                pageVisibilityTracker.clearTimeout(this.deferredRender.timeoutID);
                 this.deferredRender.resolve(this);
                 delete this.deferredRender;
-            }, this);
+            };
 
             if (this.subviews.length) {
                 _.each(this.subviews, function(subview) {
@@ -205,7 +225,7 @@ define(function(require) {
 
             if (promises.length) {
                 // even with empty list of promises $.when takes about 1.4ms
-                $.when.apply($, promises).done(resolve);
+                $.when(...promises).done(resolve);
             } else {
                 resolve();
             }
@@ -242,10 +262,9 @@ define(function(require) {
     // Backbone.Model
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var _i;
-        var _len;
+        let prop;
+        let _i;
+        let _len;
         if (this.disposed) {
             return;
         }
@@ -253,7 +272,7 @@ define(function(require) {
         Backbone.mediator.unsubscribe(null, null, this);
         this.stopListening();
         this.off();
-        properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes',
+        const properties = ['collection', 'attributes', 'changed', '_escapedAttributes', '_previousAttributes',
             '_silent', '_pending', '_callbacks'];
         for (_i = 0, _len = properties.length; _i < _len; _i++) {
             prop = properties[_i];
@@ -266,10 +285,9 @@ define(function(require) {
     // Backbone.Collection
     Backbone.Collection.prototype.disposed = false;
     Backbone.Collection.prototype.dispose = function() {
-        var prop;
-        var properties;
-        var _i;
-        var _len;
+        let prop;
+        let _i;
+        let _len;
         if (this.disposed) {
             return;
         }
@@ -280,7 +298,7 @@ define(function(require) {
         Backbone.mediator.unsubscribe(null, null, this);
         this.stopListening();
         this.off();
-        properties = ['model', 'models', '_byId', '_byCid', '_callbacks'];
+        const properties = ['model', 'models', '_byId', '_byCid', '_callbacks'];
         for (_i = 0, _len = properties.length; _i < _len; _i++) {
             prop = properties[_i];
             delete this[prop];
@@ -288,6 +306,69 @@ define(function(require) {
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
+
+    Backbone.View.prototype.remove = function() {
+        // Since we often override original `delegateEvents` to bind events on elements placed outside view el
+        // it needs call `undelegateEvents` even view el is going to be removed
+        this.undelegateEvents();
+        // Before remove container should to destroy some plugins and widgets from child elements
+        this.disposeControls();
+
+        return original.remove.call(this);
+    };
+
+    // Backbone.Events
+    /**
+     * Wraps original `listenTo` method and makes the event handler first in order
+     *
+     * @param {Object} obj
+     * @param {string} name
+     * @param {Function} callback
+     * @return {Backbone.Events}
+     */
+    Backbone.Events.firstListenTo = function(obj, name, callback) {
+        this.listenTo(obj, name, callback);
+
+        if (!obj) {
+            return this;
+        }
+        const events = obj._events[name];
+        const last = events.splice(events.length - 1, 1);
+        events.unshift(last[0]);
+    };
+
+    /**
+     * Wraps original `on` method and makes the event handler first in order
+     *
+     * @param {string} name
+     * @param {Function} callback
+     * @param {Object} [context]
+     */
+    Backbone.Events.firstOn = function(name, callback, context) {
+        this.on(name, callback, context);
+
+        const events = this._events[name];
+        const last = events.splice(events.length - 1, 1);
+        events.unshift(last[0]);
+    };
+
+    const oldLoadUrl = Backbone.History.prototype.loadUrl;
+    _.extend(Backbone.History.prototype, {
+        loadUrl: function(...args) {
+            try {
+                return oldLoadUrl.apply(this, args);
+            } catch (e) {
+                if (e instanceof URIError) {
+                    loadModules(['oroui/js/messenger', 'orotranslation/js/translator'], function(messenger, __) {
+                        messenger.showErrorMessage(__('oro.ui.malformed_url_loading_error'));
+                    });
+                    return false;
+                }
+
+                throw e;
+            }
+        }
+    });
 
     return Backbone;
 });

@@ -3,7 +3,6 @@
 namespace Oro\Component\MessageQueue\Log;
 
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
@@ -19,8 +18,11 @@ class ConsumerState
     /** @var ExtensionInterface */
     private $extension;
 
-    /** @var MessageProcessorInterface */
-    private $messageProcessor;
+    /** @var string */
+    private string $messageProcessorName = '';
+
+    /** @var string */
+    private string $messageProcessorClass = '';
 
     /** @var MessageInterface */
     private $message;
@@ -75,8 +77,6 @@ class ConsumerState
 
     /**
      * Sets a consumption extension that is executed at the moment.
-     *
-     * @param ExtensionInterface|null $extension
      */
     public function setExtension(ExtensionInterface $extension = null)
     {
@@ -84,23 +84,39 @@ class ConsumerState
     }
 
     /**
-     * Returns a message processor that is executed at the moment.
+     * Returns a message processor name that is executed at the moment.
      *
-     * @return MessageProcessorInterface|null
+     * @return string
      */
-    public function getMessageProcessor()
+    public function getMessageProcessorName(): string
     {
-        return $this->messageProcessor;
+        return $this->messageProcessorName ?? '';
     }
 
     /**
-     * Sets a message processor that is executed at the moment.
-     *
-     * @param MessageProcessorInterface|null $messageProcessor
+     * Sets a message processor name that is executed at the moment.
      */
-    public function setMessageProcessor(MessageProcessorInterface $messageProcessor = null)
+    public function setMessageProcessorName(string $messageProcessorName = ''): void
     {
-        $this->messageProcessor = $messageProcessor;
+        $this->messageProcessorName = $messageProcessorName;
+    }
+
+    /**
+     * Returns a message processor class that is executed at the moment.
+     *
+     * @return string
+     */
+    public function getMessageProcessorClass(): string
+    {
+        return $this->messageProcessorClass ?? '';
+    }
+
+    /**
+     * Sets a message processor class that is executed at the moment.
+     */
+    public function setMessageProcessorClass(string $messageProcessorClass = ''): void
+    {
+        $this->messageProcessorClass = $messageProcessorClass;
     }
 
     /**
@@ -115,8 +131,6 @@ class ConsumerState
 
     /**
      * Sets a message that is processed at the moment.
-     *
-     * @param MessageInterface|null $message
      */
     public function setMessage(MessageInterface $message = null)
     {
@@ -186,7 +200,8 @@ class ConsumerState
     public function clear()
     {
         $this->extension = null;
-        $this->messageProcessor = null;
+        $this->messageProcessorName = '';
+        $this->messageProcessorClass = '';
         $this->message = null;
         $this->job = null;
         $this->startTime = null;

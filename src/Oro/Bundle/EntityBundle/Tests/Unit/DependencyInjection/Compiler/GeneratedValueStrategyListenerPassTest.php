@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -8,76 +8,68 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GeneratedValueStrategyListenerPass */
-    protected $compiler;
+    private $compiler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
-    protected $container;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new GeneratedValueStrategyListenerPass();
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()->getMock();
     }
 
-    /**
-     * @dataProvider processDataProvider
-     * @param array $parameterValue
-     */
-    public function testProcess($parameterValue)
+    public function testProcess()
     {
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $container = new ContainerBuilder();
+        $listenerDef = $container->register('oro_entity.listener.orm.generated_value_strategy_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata']);
+        $container->setParameter(
+            'doctrine.connections',
+            [
+                'default' => 'doctrine.dbal.default_connection',
+                'session' => 'doctrine.dbal.session_connection'
+            ]
+        );
 
-        $this->container->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $this->container->expects($this->once())->method('getDefinition')->willReturn($definition);
-        $this->container->expects($this->once())->method('hasParameter')->willReturn(true);
-        $this->container->expects($this->once())->method('getParameter')->willReturn($parameterValue);
+        $this->compiler->process($container);
 
-        $definition->expects($this->once())->method('clearTag')->with($this->isType('string'));
-        $definition
-            ->expects($this->exactly(count((array) $parameterValue)))
-            ->method('addTag')
-            ->with(
-                $this->isType('string'),
-                $this->logicalAnd(
-                    $this->isType('array'),
-                    $this->arrayHasKey('event'),
-                    $this->arrayHasKey('connection')
-                )
-            );
-
-        $this->compiler->process($this->container);
-    }
-
-    /**
-     * @return array
-     */
-    public function processDataProvider()
-    {
-        return [
-            'type' => ['session'],
-            'empty' => [[]],
-            'value' => [['session']],
-        ];
+        self::assertEquals(
+            [
+                'doctrine.event_listener' => [
+                    ['event' => 'loadClassMetadata', 'connection' => 'default'],
+                    ['event' => 'loadClassMetadata', 'connection' => 'session']
+                ]
+            ],
+            $listenerDef->getTags()
+        );
     }
 
     public function testProcessWithoutDefinition()
     {
-        $this->container->expects($this->once())->method('hasDefinition')->willReturn(false);
-        $this->container->expects($this->never())->method('getDefinition');
-        $this->container->expects($this->never())->method('hasParameter');
-        $this->container->expects($this->never())->method('getParameter');
+        $container = new ContainerBuilder();
+        $container->setParameter(
+            'doctrine.connections',
+            [
+                'default' => 'doctrine.dbal.default_connection',
+                'session' => 'doctrine.dbal.session_connection'
+            ]
+        );
 
-        $this->compiler->process($this->container);
+        $this->compiler->process($container);
     }
 
-    public function testProcessWithoutParameter()
+    public function testProcessWithoutDoctrineConnectionsParameter()
     {
-        $this->container->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $this->container->expects($this->never())->method('getDefinition');
-        $this->container->expects($this->once())->method('hasParameter')->willReturn(false);
-        $this->container->expects($this->never())->method('getParameter');
+        $container = new ContainerBuilder();
+        $listenerDef = $container->register('oro_entity.listener.orm.generated_value_strategy_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata']);
 
-        $this->compiler->process($this->container);
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                'doctrine.event_listener' => [
+                    ['event' => 'loadClassMetadata']
+                ]
+            ],
+            $listenerDef->getTags()
+        );
     }
 }

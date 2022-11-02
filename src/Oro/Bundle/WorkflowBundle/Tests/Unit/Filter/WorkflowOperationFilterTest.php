@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
@@ -20,11 +20,9 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowOperationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->repository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(WorkflowDefinitionRepository::class);
 
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
@@ -43,11 +41,6 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterDataProvider
-     *
-     * @param array $disabledOperationsConfigs
-     * @param array $operationsToFilter
-     * @param OperationFindCriteria $findCriteria
-     * @param array $expected
      */
     public function testFilter(
         array $disabledOperationsConfigs,
@@ -81,10 +74,7 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['operation2' => $this->createOperation('operation2')], $result);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function filterDataProvider()
+    public function filterDataProvider(): \Generator
     {
         $operation1 = $this->createOperation('first');
         $operation2 = $this->createOperation('second');
@@ -153,23 +143,20 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject|Operation
-     */
-    private function createOperation($name)
+    private function createOperation(string $name): Operation
     {
-        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
-        $operation->expects($this->any())->method('getName')->willReturn($name);
-        $operation->expects($this->any())->method('getDefinition')->willReturn(new OperationDefinition());
+        $operation = $this->createMock(Operation::class);
+        $operation->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $operation->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn(new OperationDefinition());
 
         return $operation;
     }
 
-    /**
-     * @param array $disabledOperationsConfigs
-     */
-    private function setUpWorkflowDefinitionRepository(array $disabledOperationsConfigs)
+    private function setUpWorkflowDefinitionRepository(array $disabledOperationsConfigs): void
     {
         $this->repository->expects($this->once())
             ->method('findActive')
@@ -178,9 +165,10 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param array $disabledOperationsConfigs
-     * @return array|WorkflowDefinition[]
+     *
+     * @return WorkflowDefinition[]
      */
-    private function createWorkflowDefinitionsWithConfig(array $disabledOperationsConfigs)
+    private function createWorkflowDefinitionsWithConfig(array $disabledOperationsConfigs): array
     {
         $definitions = [];
 

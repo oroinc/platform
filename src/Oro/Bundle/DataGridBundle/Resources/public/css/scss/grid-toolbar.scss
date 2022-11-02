@@ -1,36 +1,31 @@
 /* @theme: admin.oro; */
 
 .grid-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: $oro-datagrid-toolbar-offset;
-
     color: $oro-datagrid-toolbar-color;
+    text-align: center;
+
+    @include clearfix();
 
     &__part {
-        display: flex;
-        flex-wrap: wrap;
-        flex-grow: 1;
-        flex-shrink: 0;
+        margin-bottom: $oro-datagrid-toolbar-offset;
+
+        text-align: left;
 
         &:empty {
             display: none;
         }
 
         &--start {
-            flex-basis: $oro-datagrid-toolbar-part-width;
-            align-items: center;
+            display: inline-block;
+            padding: $oro-datagrid-toolbar-part-offset;
         }
 
         &--center {
-            flex-grow: 0;
+            float: left;
         }
 
         &--end {
-            flex-basis: $oro-datagrid-toolbar-part-width;
-            justify-content: flex-end;
+            float: right;
         }
     }
 
@@ -42,20 +37,11 @@
     }
 
     .pagination {
-        color: $primary-550;
-        margin: 0 auto;
-    }
-
-    @include if-rtl() {
-        .pagination-trigger {
-            position: relative;
-
-            transform: rotate(180deg);
-        }
+        color: $primary-200;
     }
 
     .totals-label {
-        padding-#{$start}: $oro-datagrid-toolbar-label-offset;
+        padding-left: $oro-datagrid-toolbar-label-offset;
     }
 
     .sorting {
@@ -73,5 +59,4 @@
 .grid-toolbar-tools {
     display: flex;
     flex-shrink: 0;
-    padding: $oro-datagrid-toolbar-tools-offset;
 }

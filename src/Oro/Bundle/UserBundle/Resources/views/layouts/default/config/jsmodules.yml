@@ -1,0 +1,18 @@
+aliases:
+    oro/datagrid/cell/action-permissions-cell$: orouser/js/datagrid/cell/action-permissions-cell
+app-modules:
+    - orouser/js/app/modules/validator-constraints-module
+configs:
+    orouser/js/components/role/entity-category-tabs-component: {}
+    orouser/js/views/role/capability-group-view: {}
+dynamic-imports:
+    commons:
+        - orouser/js/validator/password-complexity
+    orodatagrid:
+        - oro/datagrid/cell/action-permissions-cell
+    orouser:
+        - orouser/js/components/password-generate
+        - orouser/js/components/role/capability-set-component
+        - orouser/js/components/role/entity-category-tabs-component
+        - orouser/js/datagrid/roles-datagrid-builder
+        - orouser/js/views/role-view

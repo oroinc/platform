@@ -10,9 +10,6 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
  */
 interface TemplateEmailNotificationInterface
 {
-    /**
-     * @return EmailTemplateCriteria
-     */
     public function getTemplateCriteria(): EmailTemplateCriteria;
 
     /**

@@ -7,19 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
 class OroSoapExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var OroSoapExtension
-     */
-    private $extension;
-
-    protected function setUp()
+    public function testLoad(): void
     {
-        $this->extension = new OroSoapExtension();
-    }
-
-    public function testLoad()
-    {
-        $this->loadExtension($this->extension);
+        $this->loadExtension(new OroSoapExtension());
 
         $expectedDefinitions = [
             'oro_soap.client.factory',
@@ -28,11 +18,5 @@ class OroSoapExtensionTest extends ExtensionTestCase
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);
-
-        $expectedParameters = [
-
-        ];
-
-        $this->assertParametersLoaded($expectedParameters);
     }
 }

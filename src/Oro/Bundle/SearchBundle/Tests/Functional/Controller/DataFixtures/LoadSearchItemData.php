@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface
+class LoadSearchItemData extends LoadOrganization implements OrderedFixtureInterface
 {
     const COUNT = 9;
 
@@ -17,9 +17,10 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        for ($ind = 1; $ind <= self::COUNT; $ind++) {
+        parent::load($manager);
+
+        for ($ind = 1; $ind <= static::COUNT; $ind++) {
             //create item
-            /** @var $item Item */
             $item = new Item();
             //string value
             $item->stringValue  = 'item' . $ind . '@mail.com';
@@ -44,6 +45,8 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             $item->objectValue = new \stdClass();
             //phone
             $item->phone = sprintf($ind % 2 ? '0123-456%s00' : '%s00987654', $ind);
+            //organization
+            $item->organization = $this->getReference('organization');
 
             $manager->persist($item);
             $this->addReference(sprintf('item_%d', $ind), $item);

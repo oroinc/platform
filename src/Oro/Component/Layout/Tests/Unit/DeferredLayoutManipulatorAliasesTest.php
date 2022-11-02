@@ -9,6 +9,7 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 
 /**
  * This class contains unit tests related to ALIASES
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTestCase
 {
@@ -292,14 +293,15 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "test_alias" alias for "root" item. Reason: The "test_alias" sting cannot be used as an alias for "root" item because it is already used for "header" item.
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedefineAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "test_alias" alias for "root" item.'
+            . ' Reason: The "test_alias" string cannot be used as an alias for "root" item'
+            . ' because it is already used for "header" item.'
+        );
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
@@ -609,7 +611,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'test_logo')
+            ->setBlockTheme('@My/Layout/my_theme.html.twig', 'test_logo')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo')
             ->addAlias('test_logo', 'logo');
@@ -636,7 +638,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         $blockThemes = $this->rawLayoutBuilder->getRawLayout()->getBlockThemes();
         $this->assertSame(
             [
-                'logo' => ['MyBundle:Layout:my_theme.html.twig']
+                'logo' => ['@My/Layout/my_theme.html.twig']
             ],
             $blockThemes
         );

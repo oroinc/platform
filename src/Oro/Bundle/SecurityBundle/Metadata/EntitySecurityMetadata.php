@@ -2,44 +2,43 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
-
-class EntitySecurityMetadata implements AclClassInfo, \Serializable
+/**
+ * Represents security metadata for an entity.
+ */
+class EntitySecurityMetadata implements ClassSecurityMetadata
 {
     /** @var string */
-    protected $securityType;
+    private $securityType;
 
     /** @var string */
-    protected $className;
+    private $className;
 
     /** @var string */
-    protected $group;
+    private $group;
 
     /** @var string */
-    protected $label;
+    private $label;
 
     /** @var string[] */
-    protected $permissions;
+    private $permissions;
 
     /** @var string */
-    protected $description;
+    private $description;
 
     /** @var string */
-    protected $category;
+    private $category;
 
-    /** @var array|FieldSecurityMetadata[] */
-    protected $fields;
+    /** @var FieldSecurityMetadata[] */
+    private $fields;
 
     /**
-     * Constructor
-     *
-     * @param string $securityType
-     * @param string $className
-     * @param string $group
-     * @param string $label
-     * @param string[] $permissions
-     * @param string $description
-     * @param string $category
+     * @param string                  $securityType
+     * @param string                  $className
+     * @param string                  $group
+     * @param string                  $label
+     * @param string[]                $permissions
+     * @param string                  $description
+     * @param string                  $category
      * @param FieldSecurityMetadata[] $fields
      */
     public function __construct(
@@ -53,13 +52,13 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
         $fields = []
     ) {
         $this->securityType = $securityType;
-        $this->className    = $className;
-        $this->group        = $group;
-        $this->label        = $label;
-        $this->permissions  = $permissions;
-        $this->description  = $description;
-        $this->category     = $category;
-        $this->fields       = $fields;
+        $this->className = $className;
+        $this->group = $group;
+        $this->label = $label;
+        $this->permissions = $permissions;
+        $this->description = $description;
+        $this->category = $category;
+        $this->fields = $fields;
     }
 
     /**
@@ -73,9 +72,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * Gets an entity class name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getClassName()
     {
@@ -83,9 +80,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * Gets a security group name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup()
     {
@@ -93,9 +88,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * Gets an entity label
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLabel()
     {
@@ -113,9 +106,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * Gets an action description
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -123,7 +114,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getCategory()
     {
@@ -131,38 +122,16 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
-     * @return array|FieldSecurityMetadata[]
+     * {@inheritdoc}
      */
     public function getFields()
     {
         return $this->fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(
-            array(
-                $this->securityType,
-                $this->className,
-                $this->group,
-                $this->label,
-                $this->permissions,
-                $this->description,
-                $this->category,
-                $this->fields
-            )
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list(
+        return [
             $this->securityType,
             $this->className,
             $this->group,
@@ -171,29 +140,41 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             $this->description,
             $this->category,
             $this->fields
-            ) = unserialize($serialized);
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->securityType,
+            $this->className,
+            $this->group,
+            $this->label,
+            $this->permissions,
+            $this->description,
+            $this->category,
+            $this->fields
+        ] = $serialized;
     }
 
     /**
-     * The __set_state handler
+     * @param array $data
      *
-     * @param array $data Initialization array
-     * @return EntitySecurityMetadata A new instance of a EntitySecurityMetadata object
+     * @return EntitySecurityMetadata
      */
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result               = new EntitySecurityMetadata();
-        $result->securityType = $data['securityType'];
-        $result->className    = $data['className'];
-        $result->group        = $data['group'];
-        $result->label        = $data['label'];
-        $result->permissions  = $data['permissions'];
-        $result->description  = $data['description'];
-        $result->category     = $data['category'];
-        $result->fields       = $data['fields'];
-
-        return $result;
+        return new EntitySecurityMetadata(
+            $data['securityType'],
+            $data['className'],
+            $data['group'],
+            $data['label'],
+            $data['permissions'],
+            $data['description'],
+            $data['category'],
+            $data['fields']
+        );
     }
     // @codingStandardsIgnoreEnd
 }

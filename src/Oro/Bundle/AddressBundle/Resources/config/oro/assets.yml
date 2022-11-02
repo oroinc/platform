@@ -1,4 +1,7 @@
-assets:
-    css:
-      'oroaddress':
-          - 'bundles/oroaddress/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroaddress/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroaddress/css/scss/main.scss'

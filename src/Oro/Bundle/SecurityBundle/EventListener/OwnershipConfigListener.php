@@ -11,17 +11,11 @@ class OwnershipConfigListener
     /** @var OwnershipMetadataProviderInterface */
     protected $provider;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $provider
-     */
     public function __construct(OwnershipMetadataProviderInterface $provider)
     {
         $this->provider = $provider;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('extend');

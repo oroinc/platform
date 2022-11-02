@@ -34,7 +34,9 @@ class SearchHandler extends BaseSearchHandler
      */
     protected function searchIds($search, $firstResult, $maxResults)
     {
+        // Result returned can be either string or integer, because used different search engines(elasticsearch or orm).
         $ids = parent::searchIds($search, $firstResult, $maxResults);
+
         // Need to make additional query cause of Mysql Full-Text Search limitation and databases stop words.
         // http://dev.mysql.com/doc/refman/5.0/en/server-system-variables.html#sysvar_ft_min_word_len
         // http://dev.mysql.com/doc/refman/5.0/en/fulltext-stopwords.html
@@ -47,7 +49,7 @@ class SearchHandler extends BaseSearchHandler
         );
         if ($object !== null) {
             $id = $object->getId();
-            if (!in_array($id, $ids, true)) {
+            if (!in_array($id, $ids)) {
                 $ids[] = $id;
             }
         }

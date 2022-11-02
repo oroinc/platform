@@ -42,7 +42,7 @@ class AjaxMassAction extends AbstractMassAction
     {
         return [Request::METHOD_POST];
     }
-    
+
     /**
      * {@inheritdoc}
      */

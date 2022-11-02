@@ -11,6 +11,8 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * The embedded form configuration.
+ *
  * @ORM\Entity
  * @ORM\Table(name="oro_embedded_form")
  * @ORM\HasLifecycleCallbacks()
@@ -206,9 +208,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->allowedDomains;
     }
 
-    /**
-     * @param \DateTime $createdAt
-     */
     public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
@@ -222,9 +221,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTime $updatedAt
-     */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
@@ -251,7 +247,8 @@ class EmbeddedForm extends ExtendEmbeddedForm
      */
     public function prePersist()
     {
-        $this->createdAt = $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
         $this->id = UUIDGenerator::v4();
     }
 
@@ -263,9 +260,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->owner;
     }
 
-    /**
-     * @param Organization $organization
-     */
     public function setOwner(Organization $organization)
     {
         $this->owner = $organization;

@@ -19,9 +19,6 @@ class RoleMultiSelectType extends AbstractType
      */
     protected $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -47,7 +44,6 @@ class RoleMultiSelectType extends AbstractType
                 'autocomplete_alias' => 'roles',
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'placeholder' => 'oro.user.form.choose_role',
                     'allowClear'  => true,
                 ]

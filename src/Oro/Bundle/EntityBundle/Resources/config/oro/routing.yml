@@ -3,35 +3,77 @@ oro_entity:
     type:         annotation
     prefix:       /
 
-oro_entity_api:
-    resource:     "@OroEntityBundle/Resources/config/oro/routing_api.yml"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
 
-oro_entity_dictionary_api:
-    resource: "@OroEntityBundle/Controller/Api/Rest/DictionaryController.php"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+#
+# OLD REST API ROUTES
+#
+
+oro_api_fields_entity:
+    path: '/api/rest/{version}/entities/fields.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityController::fieldsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_entities:
+    path: '/api/rest/{version}/entities.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_entity_fields:
+    path: '/api/rest/{version}/entities/{entityName}/fields.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityFieldController::getFieldsAction'
+        _format: json
+        version: latest
+    requirements:
+        entityName: ((\w+)_)+(\w+)
+        _format: json
+        version: latest|v1
+
+oro_api_get_entity_aliases:
+    path: '/api/rest/{version}/entities/aliases.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityAliasController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_patch_entity_data:
+    path: '/api/rest/{version}/entity_data/{className}/{id}.{_format}'
+    methods: [PATCH]
+    defaults:
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityDataController::patchAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_dictionary_values:
+    path: '/api/rest/{version}/{dictionary}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\DictionaryController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
     options:
         group: dictionary_entity
         priority: -10
-
-oro_entity_data_api:
-    resource: "@OroEntityBundle/Controller/Api/Rest/EntityDataController.php"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest

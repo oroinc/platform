@@ -39,9 +39,9 @@
 
         font-size: $base-font-size;
 
-        background: get-color('additional', 'ultra');
-        border-radius: 4px;
-        box-shadow: 1px 2px 8px rgba(0,0,0,.4);
+        background: $base-ui-popup-background;
+        border-radius: $base-ui-popup-border-radius;
+        box-shadow: $base-ui-popup-box-shadow;
     }
 
     &__list {
@@ -50,7 +50,6 @@
         white-space: nowrap;
 
         @include list-normalize;
-
 
         &-item {
             margin-top: $oro-toolbar-list-item-offset;
@@ -63,17 +62,16 @@
 
     &__link {
         display: block;
-
         line-height: 2;
 
-        color: get-color('additional', 'dark');
+        color: $oro-toolbar-link-color;
 
         &:hover {
-            color: get-color('additional', 'dark');
+            color: $oro-toolbar-link-hover-color;
         }
 
         &--active {
-            font-weight: bold;
+            font-weight: font-weight('bold');
         }
     }
 
@@ -84,14 +82,14 @@
     }
 
     &__currency {
-        margin-right: $offset-y-m / 2;
+        margin-right: $offset-y-m * .5;
     }
 
     // toolbar open
     &.active,
     &.show {
         .oro-toolbar__content {
-            box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,.3);
+            box-shadow: $oro-toolbar-open-content-box-shadow;
         }
 
         .oro-toolbar__dropdown {
@@ -104,7 +102,7 @@
         display: block;
 
         .oro-toolbar__list-item {
-            margin-top: 0
+            margin-top: 0;
         }
 
         .oro-toolbar__link {
@@ -112,7 +110,7 @@
 
             text-transform: uppercase;
 
-            border-bottom: 1px solid get-color('additional', 'light');
+            border-bottom: $oro-toolbar-fullscreen-link-border;
         }
     }
 }

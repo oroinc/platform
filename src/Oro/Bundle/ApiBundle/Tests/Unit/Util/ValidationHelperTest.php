@@ -17,7 +17,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ValidationHelper */
     private $validationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataFactory = $this->createMock(MetadataFactoryInterface::class);
 

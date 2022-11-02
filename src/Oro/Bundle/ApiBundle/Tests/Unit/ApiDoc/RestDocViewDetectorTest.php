@@ -4,148 +4,191 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RequestTypeProviderInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
-
-        $this->docViewDetector = new RestDocViewDetector($this->requestStack);
     }
 
-    public function testGetViewWhenRequestStackIsEmpty()
+    public function testGetViewWhenRequestStackIsEmpty(): void
     {
         $this->requestStack->expects(self::exactly(2))
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn(null);
 
-        self::assertSame('', $this->docViewDetector->getView());
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+
+        self::assertSame('', $docViewDetector->getView());
         // test that the view is not cached
-        self::assertSame('', $this->docViewDetector->getView());
+        self::assertSame('', $docViewDetector->getView());
     }
 
-    public function testGetViewWhenRequestDoesNotContainViewAttribute()
+    public function testGetViewWhenRequestDoesNotContainViewAttribute(): void
     {
         $request = Request::create('url');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
-        self::assertSame('', $this->docViewDetector->getView());
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+
+        self::assertSame('', $docViewDetector->getView());
         // test that the view is cached
-        self::assertSame('', $this->docViewDetector->getView());
+        self::assertSame('', $docViewDetector->getView());
     }
 
-    public function testGetViewWhenRequestContainsViewAttribute()
+    public function testGetViewWhenRequestContainsViewAttribute(): void
     {
         $view = 'test';
         $request = Request::create('url');
         $request->attributes->set('view', $view);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
-        self::assertSame($view, $this->docViewDetector->getView());
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+
+        self::assertSame($view, $docViewDetector->getView());
         // test that the view is cached
-        self::assertSame($view, $this->docViewDetector->getView());
+        self::assertSame($view, $docViewDetector->getView());
     }
 
-    public function testSetView()
+    public function testSetView(): void
     {
         $view = 'test';
 
-        $this->docViewDetector->setView($view);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+        $docViewDetector->setView($view);
 
         $this->requestStack->expects(self::never())
-            ->method('getMasterRequest');
+            ->method('getMainRequest');
 
-        self::assertEquals($view, $this->docViewDetector->getView());
+        self::assertEquals($view, $docViewDetector->getView());
     }
 
-    public function testGetRequestTypeWhenNoProviderThatCanDetectRequestType()
+    public function testGetRequestTypeWhenNoProviderThatCanDetectRequestType(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
-        $this->docViewDetector->addRequestTypeProvider($requestTypeProvider);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
 
         $requestTypeProvider->expects(self::once())
             ->method('getRequestType')
             ->willReturn(null);
 
-        $requestType = $this->docViewDetector->getRequestType();
+        $requestType = $docViewDetector->getRequestType();
         self::assertInstanceOf(RequestType::class, $requestType);
         self::assertTrue($requestType->isEmpty());
 
         // test that the request type is cached
-        $requestType = $this->docViewDetector->getRequestType();
+        $requestType = $docViewDetector->getRequestType();
         self::assertInstanceOf(RequestType::class, $requestType);
         self::assertTrue($requestType->isEmpty());
     }
 
-    public function testGetRequestTypeWhenProviderDetectsRequestType()
+    public function testGetRequestTypeWhenProviderDetectsRequestType(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
-        $this->docViewDetector->addRequestTypeProvider($requestTypeProvider);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
 
         $requestTypeProvider->expects(self::once())
             ->method('getRequestType')
             ->willReturn(new RequestType(['test']));
 
-        $requestType = $this->docViewDetector->getRequestType();
+        $requestType = $docViewDetector->getRequestType();
         self::assertInstanceOf(RequestType::class, $requestType);
         self::assertTrue($requestType->contains('test'));
 
         // test that the request type is cached
-        $requestType = $this->docViewDetector->getRequestType();
+        $requestType = $docViewDetector->getRequestType();
         self::assertInstanceOf(RequestType::class, $requestType);
         self::assertTrue($requestType->contains('test'));
     }
 
-    public function testShouldClearRequestTypeWhenViewChanged()
+    public function testShouldClearRequestTypeWhenViewChanged(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
-        $this->docViewDetector->addRequestTypeProvider($requestTypeProvider);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
 
         $requestTypeProvider->expects(self::exactly(2))
             ->method('getRequestType')
             ->willReturn(null);
 
-        $this->docViewDetector->getRequestType();
+        $docViewDetector->getRequestType();
 
-        $this->docViewDetector->setView();
-        $this->docViewDetector->getRequestType();
+        $docViewDetector->setView();
+        $docViewDetector->getRequestType();
     }
 
-    public function testGetVersionIfItWasNotSetExplicitly()
+    public function testShouldInitializeRequestTypeProvider(): void
     {
-        self::assertEquals('latest', $this->docViewDetector->getVersion());
+        $requestTypeProvider = $this->createMock(RestRequestTypeProvider::class);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
+
+        $requestTypeProvider->expects(self::once())
+            ->method('setRestDocViewDetector')
+            ->with(self::identicalTo($docViewDetector));
+        $requestTypeProvider->expects(self::exactly(2))
+            ->method('getRequestType')
+            ->willReturn(null);
+
+        $docViewDetector->getRequestType();
+        $docViewDetector->setView();
+        $docViewDetector->getRequestType();
     }
 
-    public function testSetVersion()
+    public function testShouldReinitializeRequestTypeProviderAfterReset(): void
+    {
+        $requestTypeProvider = $this->createMock(RestRequestTypeProvider::class);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
+
+        $requestTypeProvider->expects(self::exactly(2))
+            ->method('setRestDocViewDetector')
+            ->with(self::identicalTo($docViewDetector));
+        $requestTypeProvider->expects(self::exactly(2))
+            ->method('getRequestType')
+            ->willReturn(null);
+
+        $docViewDetector->getRequestType();
+        $docViewDetector->reset();
+        $docViewDetector->getRequestType();
+    }
+
+    public function testGetVersionIfItWasNotSetExplicitly(): void
+    {
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+        self::assertEquals('latest', $docViewDetector->getVersion());
+    }
+
+    public function testSetVersion(): void
     {
         $version = '1.2';
 
-        $this->docViewDetector->setVersion($version);
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+        $docViewDetector->setVersion($version);
 
-        self::assertEquals($version, $this->docViewDetector->getVersion());
+        self::assertEquals($version, $docViewDetector->getVersion());
     }
 
-    public function testShouldClearVersionWhenViewChanged()
+    public function testShouldClearVersionWhenViewChanged(): void
     {
-        $this->docViewDetector->setVersion('1.2');
-        $this->docViewDetector->setView();
+        $docViewDetector = new RestDocViewDetector($this->requestStack, []);
+        $docViewDetector->setVersion('1.2');
+        $docViewDetector->setView();
 
-        self::assertEquals('latest', $this->docViewDetector->getVersion());
+        self::assertEquals('latest', $docViewDetector->getVersion());
     }
 }

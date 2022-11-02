@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * ConfigValue
+ * Config Value Entity class.
  *
  * @ORM\Table(
  *  name="oro_config_value",
@@ -245,7 +245,7 @@ class ConfigValue
     }
 
     /**
-     * @param \DateTime
+     * @param \DateTime $updatedAt
      *
      * @return Config
      */

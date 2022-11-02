@@ -1,20 +1,24 @@
 define(function(require) {
     'use strict';
 
-    var CapabilityGroupView;
-    var _ = require('underscore');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var CapabilityItemView = require('orouser/js/views/role/capability-item-view');
+    const _ = require('underscore');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const CapabilityItemView = require('orouser/js/views/role/capability-item-view');
+
+    let config = require('module-config').default(module.id);
+    config = _.extend({
+        selectAllClassName: 'btn btn-link btn-sm'
+    }, config);
 
     /**
      * @export orouser/js/views/role-view
      */
-    CapabilityGroupView = BaseCollectionView.extend({
+    const CapabilityGroupView = BaseCollectionView.extend({
         animationDuration: 0,
 
         className: 'role-capability',
 
-        template: require('tpl!orouser/templates/role/capability-group.html'),
+        template: require('tpl-loader!orouser/templates/role/capability-group.html'),
 
         listSelector: '[data-name="capability-items"]',
 
@@ -31,22 +35,23 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CapabilityGroupView() {
-            CapabilityGroupView.__super__.constructor.apply(this, arguments);
+        constructor: function CapabilityGroupView(options) {
+            CapabilityGroupView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             this.model = options.model;
             this.collection = options.model.get('items');
-            CapabilityGroupView.__super__.initialize.apply(this, arguments);
+            CapabilityGroupView.__super__.initialize.call(this, options);
         },
 
         getTemplateData: function() {
-            var templateData = CapabilityGroupView.__super__.getTemplateData.apply(this, arguments);
+            const templateData = CapabilityGroupView.__super__.getTemplateData.call(this);
             _.defaults(templateData, this.model.toJSON());
             templateData.allSelected = this.isAllSelected();
+            templateData.selectAllClassName = config.selectAllClassName;
             return templateData;
         },
 
@@ -58,8 +63,7 @@ define(function(require) {
         },
 
         onChange: function() {
-            this.$('[data-name="capabilities-select-all"]')
-                .toggleClass('disabled', this.isAllSelected());
+            this.$('[data-name="capabilities-select-all"]').attr('disabled', this.isAllSelected());
         },
 
         isAllSelected: function() {

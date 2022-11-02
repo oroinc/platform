@@ -8,13 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 
 class GetWithRenamedFieldsTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/renamed_fields.yml']);
 
         $this->appendEntityConfig(
@@ -87,12 +83,9 @@ class GetWithRenamedFieldsTest extends RestJsonApiTestCase
     }
 
     /**
-     * @param array $params
-     * @param array $expected
-     *
-     * @dataProvider getSortingByRenamedFieldData
+     * @dataProvider getSortingByRenamedFieldDataProvider
      */
-    public function testSortingByRenamedField($params, $expected)
+    public function testSortingByRenamedField(array $params, string $expected)
     {
         $response = $this->cget(
             ['entity' => 'testproducts'],
@@ -102,10 +95,7 @@ class GetWithRenamedFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains($expected, $response);
     }
 
-    /**
-     * @return array
-     */
-    public function getSortingByRenamedFieldData()
+    public function getSortingByRenamedFieldDataProvider(): array
     {
         return [
             'use default sorting'                   => [

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Format dates based on locale settings
  */
-class DateTimeFormatter
+class DateTimeFormatter implements DateTimeFormatterInterface
 {
     const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
     const DEFAULT_TIME_TYPE = \IntlDateFormatter::SHORT;
@@ -25,10 +25,6 @@ class DateTimeFormatter
     /** @var string[] */
     protected $cachedPatterns = [];
 
-    /**
-     * @param LocaleSettings      $localeSettings
-     * @param TranslatorInterface $translator
-     */
     public function __construct(LocaleSettings $localeSettings, TranslatorInterface $translator)
     {
         $this->localeSettings = $localeSettings;
@@ -36,15 +32,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats date time
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|int|null $timeType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @param string|null $pattern
-     * @return string
+     * {@inheritdoc}
      */
     public function format($date, $dateType = null, $timeType = null, $locale = null, $timeZone = null, $pattern = null)
     {
@@ -55,20 +43,18 @@ class DateTimeFormatter
 
         // use Formatter if we have DateTime object and return the incoming argument otherwise
         if ($dateTime) {
+            if (!$pattern) {
+                $pattern = $this->getPattern($dateType, $timeType, $locale);
+            }
             $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
+
             return $formatter->format((int)$dateTime->format('U'));
         }
         return $date;
     }
 
     /**
-     * Formats date without time
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatDate($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -76,12 +62,7 @@ class DateTimeFormatter
     }
 
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatYear($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -91,12 +72,7 @@ class DateTimeFormatter
     }
 
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatQuarter($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -105,14 +81,8 @@ class DateTimeFormatter
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
-
     /**
-     * @param \DateTime|string|int $date
-     * @param string|int|null      $dateType
-     * @param string|null          $locale
-     * @param string|null          $timeZone
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function formatMonth($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -122,13 +92,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats day without time and year
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $dateType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatDay($date, $dateType = null, $locale = null, $timeZone = null)
     {
@@ -138,13 +102,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Formats time without date
-     *
-     * @param \DateTime|string|int $date
-     * @param string|int|null $timeType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @return string
+     * {@inheritdoc}
      */
     public function formatTime($date, $timeType = null, $locale = null, $timeZone = null)
     {
@@ -152,16 +110,23 @@ class DateTimeFormatter
     }
 
     /**
-     * Get the pattern used for the IntlDateFormatter
+     * {@inheritdoc}
+     */
+    public function getPattern($dateType, $timeType, $locale = null, $value = null)
+    {
+        return $this->updatePattern($dateType, $timeType, $locale);
+    }
+
+    /**
+     * Update cached pattern
      *
      * @param int|string  $dateType Constant of IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
      * @param int|string  $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
      * @param string|null $locale
-     * @param string|null $value
-     *
+     * @param string|null $pattern
      * @return string
      */
-    public function getPattern($dateType, $timeType, $locale = null, $value = null)
+    public function updatePattern($dateType, $timeType, $locale = null, $pattern = null): string
     {
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
@@ -179,10 +144,13 @@ class DateTimeFormatter
         $timeType = $this->parseDateType($timeType);
 
         $key = md5(serialize([$dateType, $timeType, $locale]));
+        if ($pattern) {
+            $this->cachedPatterns[$key] = $pattern;
+        }
+
         if (!isset($this->cachedPatterns[$key])) {
-            $this->cachedPatterns[$key] =
-                (new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN))
-                    ->getPattern();
+            $intlFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
+            $this->cachedPatterns[$key] = $intlFormatter->getPattern();
         }
 
         return $this->cachedPatterns[$key];
@@ -210,8 +178,8 @@ class DateTimeFormatter
         if (!isset($this->cachedFormatters[$key])) {
             $this->cachedFormatters[$key] = new \IntlDateFormatter(
                 $this->localeSettings->getLanguage(),
-                null,
-                null,
+                \IntlDateFormatter::NONE,
+                \IntlDateFormatter::NONE,
                 $timeZone,
                 \IntlDateFormatter::GREGORIAN,
                 $pattern
@@ -255,11 +223,7 @@ class DateTimeFormatter
     }
 
     /**
-     * Returns DateTime by $data and $timezone and false otherwise
-     *
-     * @param \DateTimeInterface|string|int $date
-     *
-     * @return \DateTimeInterface|false
+     * {@inheritdoc}
      */
     public function getDateTime($date)
     {

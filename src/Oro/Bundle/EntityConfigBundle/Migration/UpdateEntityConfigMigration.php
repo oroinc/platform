@@ -6,17 +6,18 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\ResetContainerMigration;
 
-class UpdateEntityConfigMigration implements Migration
+/**
+ * Update entity config migration
+ */
+class UpdateEntityConfigMigration implements Migration, ResetContainerMigration
 {
     /**
      * @var CommandExecutor
      */
     protected $commandExecutor;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     */
     public function __construct(CommandExecutor $commandExecutor)
     {
         $this->commandExecutor = $commandExecutor;

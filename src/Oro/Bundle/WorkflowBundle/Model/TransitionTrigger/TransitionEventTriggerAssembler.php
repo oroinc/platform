@@ -12,9 +12,6 @@ class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
     /** @var TransitionEventTriggerVerifierInterface */
     private $triggerVerifier;
 
-    /**
-     * @param TransitionEventTriggerVerifierInterface $triggerVerifier
-     */
     public function __construct(TransitionEventTriggerVerifierInterface $triggerVerifier)
     {
         $this->triggerVerifier = $triggerVerifier;

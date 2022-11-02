@@ -15,9 +15,6 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     /** @var WorkflowTranslationHelper */
     private $translationHelper;
 
-    /**
-     * @param WorkflowTranslationHelper $translationHelper
-     */
     public function __construct(WorkflowTranslationHelper $translationHelper)
     {
         $this->translationHelper = $translationHelper;

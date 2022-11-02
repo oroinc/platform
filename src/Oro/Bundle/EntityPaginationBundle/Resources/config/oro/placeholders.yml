@@ -10,9 +10,9 @@ placeholders:
                     order: 100
     items:
         entity_pagination_view:
-            template: OroEntityPaginationBundle:Placeholder:viewPagination.html.twig
+            template: '@@OroEntityPagination/Placeholder/viewPagination.html.twig'
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
 
         entity_pagination_edit:
-            template: OroEntityPaginationBundle:Placeholder:editPagination.html.twig
+            template: '@@OroEntityPagination/Placeholder/editPagination.html.twig'
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\ActionBundle\Exception\AttributeException;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Guesses type mapping for a field.
+ */
 abstract class AbstractGuesser
 {
     /**
@@ -48,12 +51,6 @@ abstract class AbstractGuesser
      */
     protected $doctrineTypeMappingProvider;
 
-    /**
-     * @param FormRegistry    $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     * @param ConfigProvider  $formConfigProvider
-     */
     public function __construct(
         FormRegistry $formRegistry,
         ManagerRegistry $managerRegistry,
@@ -66,9 +63,6 @@ abstract class AbstractGuesser
         $this->formConfigProvider = $formConfigProvider;
     }
 
-    /**
-     * @param DoctrineTypeMappingProvider|null $doctrineTypeMappingProvider
-     */
     public function setDoctrineTypeMappingProvider(DoctrineTypeMappingProvider $doctrineTypeMappingProvider = null)
     {
         $this->doctrineTypeMappingProvider = $doctrineTypeMappingProvider;
@@ -105,6 +99,7 @@ abstract class AbstractGuesser
      * @param string|PropertyPathInterface $propertyPath
      *
      * @return array|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function guessMetadataAndField($rootClass, $propertyPath)
     {

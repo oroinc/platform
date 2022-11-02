@@ -2,62 +2,51 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LanguageCodeFormatterTest extends TestCase
 {
     /** @var LanguageCodeFormatter */
-    protected $formatter;
+    private $formatter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
+    private $localeSettings;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->translator   = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $this->formatter = new LanguageCodeFormatter($this->translator, $this->configManager);
+        $this->formatter = new LanguageCodeFormatter($this->translator, $this->localeSettings);
     }
 
     /**
-     * @param string $value
-     * @param string $expected
-     *
      * @dataProvider formatLanguageCodeProvider
      */
-    public function testFormatLanguageCode($value, $expected)
+    public function testFormatLanguageCode(string $value, string $expected)
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturn('N/A');
 
-        $this->configManager->expects($value ? $this->once() : $this->never())
-            ->method('get')
-            ->with(LanguageCodeFormatter::CONFIG_KEY_DEFAULT_LANGUAGE)
+        $this->localeSettings->expects($value ? $this->once() : $this->never())
+            ->method('getLanguage')
             ->willReturn('en');
 
         $this->assertSame($expected, $this->formatter->format($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatLanguageCodeProvider()
+    public function formatLanguageCodeProvider(): array
     {
         return [
             [
@@ -72,34 +61,39 @@ class LanguageCodeFormatterTest extends TestCase
                 'value' => '',
                 'expected' => 'N/A',
             ],
+            [
+                'value' => 'en_plastimo',
+                'expected' => 'English Plastimo',
+            ],
+            [
+                'value' => 'en_CA_plastimo',
+                'expected' => 'Canadian English Plastimo',
+            ],
+            [
+                'value' => 'fr_plastimo_FR',
+                'expected' => 'French Plastimo FR',
+            ]
         ];
     }
 
     /**
-     * @param string $value
-     * @param string $expected
-     *
      * @dataProvider formatLocaleCodeProvider
      */
-    public function testFormatLocaleCode($value, $expected)
+    public function testFormatLocaleCode(string $value, string $expected)
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturn('N/A');
 
-        $this->configManager->expects($value ? $this->once() : $this->never())
-            ->method('get')
-            ->with(LanguageCodeFormatter::CONFIG_KEY_DEFAULT_LANGUAGE)
+        $this->localeSettings->expects($value ? $this->once() : $this->never())
+            ->method('getLanguage')
             ->willReturn('en');
 
         $this->assertSame($expected, $this->formatter->formatLocale($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatLocaleCodeProvider()
+    public function formatLocaleCodeProvider(): array
     {
         return [
             [
@@ -114,6 +108,14 @@ class LanguageCodeFormatterTest extends TestCase
                 'value' => '',
                 'expected' => 'N/A',
             ],
+            [
+                'value' => 'en_plastimo',
+                'expected' => 'English Plastimo',
+            ],
+            [
+                'value' => 'en_CA_plastimo',
+                'expected' => 'English (Canada) Plastimo',
+            ]
         ];
     }
 }

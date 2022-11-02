@@ -6,60 +6,58 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The provider for placeholders configuration.
+ */
 class PlaceholderProvider
 {
-    const APPLICABLE = 'applicable';
+    private const APPLICABLE    = 'applicable';
+    private const ACL           = 'acl';
+    private const RESOURCE_TYPE = 'placeholder_items';
 
-    /** @var array */
-    protected $placeholders;
+    /** @var PlaceholderConfigurationProvider */
+    private $configProvider;
 
     /** @var ResolverInterface */
-    protected $resolver;
+    private $resolver;
 
     /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var FeatureChecker */
-    protected $featureChecker;
+    private $featureChecker;
 
-    /**
-     * @param array                         $placeholders
-     * @param ResolverInterface             $resolver
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param FeatureChecker                $featureChecker
-     */
     public function __construct(
-        array $placeholders,
+        PlaceholderConfigurationProvider $configProvider,
         ResolverInterface $resolver,
         AuthorizationCheckerInterface $authorizationChecker,
         FeatureChecker $featureChecker
     ) {
-        $this->placeholders = $placeholders;
+        $this->configProvider = $configProvider;
         $this->resolver = $resolver;
         $this->authorizationChecker = $authorizationChecker;
         $this->featureChecker = $featureChecker;
     }
 
     /**
-     * Gets items by placeholder name
+     * Gets items by placeholder name.
      *
      * @param string $placeholderName
      * @param array  $variables
      *
      * @return array
      */
-    public function getPlaceholderItems($placeholderName, array $variables)
+    public function getPlaceholderItems(string $placeholderName, array $variables): ?array
     {
         $result = [];
 
-        if (!isset($this->placeholders['placeholders'][$placeholderName])) {
-            return $result;
-        }
-
-        foreach ($this->placeholders['placeholders'][$placeholderName]['items'] as $itemName) {
-            $item = $this->getItem($itemName, $variables);
-            if (!empty($item)) {
-                $result[] = $item;
+        $placeholderItems = $this->configProvider->getPlaceholderItems($placeholderName);
+        if ($placeholderItems) {
+            foreach ($placeholderItems as $itemName) {
+                $item = $this->getItem($itemName, $variables);
+                if (!empty($item)) {
+                    $result[] = $item;
+                }
             }
         }
 
@@ -67,62 +65,54 @@ class PlaceholderProvider
     }
 
     /**
-     * Gets item by name
-     *
-     * @param string $itemName
-     * @param array  $variables
-     *
-     * @return array|null
+     * Gets item by name.
      */
-    public function getItem($itemName, array $variables)
+    public function getItem(string $itemName, array $variables): ?array
     {
-        if (!isset($this->placeholders['items'][$itemName])) {
-            // the requested item does not exist
+        $item = $this->configProvider->getItemConfiguration($itemName);
+        if (!$item) {
             return null;
         }
 
-        $item = $this->placeholders['items'][$itemName];
-        if (!$this->featureChecker->isResourceEnabled($itemName, 'placeholder_items')) {
+        if (!$this->featureChecker->isResourceEnabled($itemName, self::RESOURCE_TYPE)) {
             return null;
         }
-        if (isset($item['acl'])) {
-            if ($this->isGranted($item['acl'])) {
-                // remove 'acl' attribute as it is not needed anymore
-                unset($item['acl']);
-            } else {
-                // the access denied for the requested item
+
+        if (isset($item[self::ACL])) {
+            if (!$this->isGranted($item[self::ACL])) {
                 return null;
             }
+
+            // remove 'acl' attribute as it is not needed anymore
+            unset($item[self::ACL]);
         }
-        if (array_key_exists(self::APPLICABLE, $item)) {
-            if ($this->resolveApplicable($item[self::APPLICABLE], $variables)) {
-                // remove 'applicable' attribute as it is not needed anymore
-                unset($item[self::APPLICABLE]);
-            } else {
-                // the requested item is not applicable in the current context
+
+        if (\array_key_exists(self::APPLICABLE, $item)) {
+            if (!$this->isApplicable($item[self::APPLICABLE], $variables)) {
                 return null;
             }
+
+            // remove 'applicable' attribute as it is not needed anymore
+            unset($item[self::APPLICABLE]);
         }
 
         return $this->resolver->resolve($item, $variables);
     }
 
     /**
-     * @param array|string $conditions
-     * @param array $variables
+     * @param string[]|string $conditions
+     * @param array           $variables
+     *
      * @return bool
      */
-    protected function resolveApplicable($conditions, array $variables)
+    private function isApplicable($conditions, array $variables): bool
     {
         $resolved = true;
-        $conditions = (array) $conditions;
+        $conditions = (array)$conditions;
         foreach ($conditions as $condition) {
-            $resolved = $this->resolver->resolve(
-                [
-                    self::APPLICABLE => $condition
-                ],
-                $variables
-            )[self::APPLICABLE];
+            $value = [self::APPLICABLE => $condition];
+            $value = $this->resolver->resolve($value, $variables);
+            $resolved = $value[self::APPLICABLE];
             if (!$resolved) {
                 break;
             }
@@ -132,26 +122,22 @@ class PlaceholderProvider
     }
 
     /**
-     * Checks if an access to a resource is granted to the caller
-     *
-     * @param string|array $acl
+     * @param string[]|string $acl
      *
      * @return bool
      */
-    protected function isGranted($acl)
+    private function isGranted($acl): bool
     {
-        if (!is_array($acl)) {
+        if (!\is_array($acl)) {
             return $this->authorizationChecker->isGranted($acl);
         }
 
-        $result = true;
         foreach ($acl as $val) {
             if (!$this->authorizationChecker->isGranted($val)) {
-                $result = false;
-                break;
+                return false;
             }
         }
 
-        return $result;
+        return true;
     }
 }

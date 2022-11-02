@@ -14,9 +14,6 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider variableDefinitionsProvider
-     *
-     * @param array $configuration
-     * @param array $expected
      */
     public function testParseVariableDefinitions(array $configuration, array $expected)
     {
@@ -27,10 +24,8 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function variableDefinitionsProvider()
+    public function variableDefinitionsProvider(): array
     {
         return [
             'empty_set' => [
@@ -107,13 +102,8 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getOptionsProvider
-     *
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $expected
-     * @param mixed  $default
      */
-    public function testGetOptions(array $options, $key, $expected, $default = null)
+    public function testGetOptions(array $options, ?string $key, mixed $expected, array $default = null)
     {
         $result = WorkflowDefinitionClonerHelper::getOption($key, $options, $default);
 
@@ -122,10 +112,8 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function getOptionsProvider()
+    public function getOptionsProvider(): array
     {
         return [
             'empty_set' => [
@@ -249,12 +237,8 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider copyConfigurationVariablesProvider
-     *
-     * @param array $definition
-     * @param array $source
-     * @param array $expected
      */
-    public function testCopyConfigurationVariables($definition, $source, $expected)
+    public function testCopyConfigurationVariables(array $definition, array $source, array $expected)
     {
         $sourceDefinition = $this->createDefinition();
         $existingDefinition = $this->createDefinition();
@@ -278,10 +262,8 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function copyConfigurationVariablesProvider()
+    public function copyConfigurationVariablesProvider(): array
     {
         return [
             'no_existing_definition' => [
@@ -452,10 +434,7 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return WorkflowDefinition
-     */
-    protected function createDefinition()
+    private function createDefinition(): WorkflowDefinition
     {
         $step1 = new WorkflowStep();
         $step1->setName('step1');

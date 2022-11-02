@@ -18,10 +18,6 @@ class ChannelActionHandlerTransactionDecorator implements ChannelActionHandlerIn
      */
     private $actionHandler;
 
-    /**
-     * @param EntityManagerInterface        $entityManager
-     * @param ChannelActionHandlerInterface $actionHandler
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         ChannelActionHandlerInterface $actionHandler

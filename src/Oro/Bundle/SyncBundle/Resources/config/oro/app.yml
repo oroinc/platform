@@ -5,11 +5,9 @@ gos_web_socket:
         port: "%websocket_bind_port%"      # The port the socket server will listen on
         host: "%websocket_bind_address%"   # (optional) The host ip to bind to
         router:
-            resources: ~
+            resources: []
         origin_check: true
 
-    # We don`t need assets of GosWebSocketBundle
-    assetic: false
     # We don`t need server connection parameters provided by GosWebSocketBundle in TWIG.
     shared_config: false
 

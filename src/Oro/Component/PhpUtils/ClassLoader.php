@@ -8,17 +8,10 @@ namespace Oro\Component\PhpUtils;
  */
 class ClassLoader
 {
-    /** @var string */
-    private $namespacePrefix;
+    private string $namespacePrefix;
+    private string $path;
 
-    /** @var string */
-    private $path;
-
-    /**
-     * @param string $namespacePrefix
-     * @param string $path
-     */
-    public function __construct($namespacePrefix, $path)
+    public function __construct(string $namespacePrefix, string $path)
     {
         $this->namespacePrefix = $namespacePrefix;
         $this->path = $path . DIRECTORY_SEPARATOR;
@@ -27,7 +20,7 @@ class ClassLoader
     /**
      * Registers this class loader on the SPL autoload stack.
      */
-    public function register()
+    public function register(): void
     {
         spl_autoload_register([$this, 'loadClass']);
     }
@@ -35,30 +28,24 @@ class ClassLoader
     /**
      * Removes this class loader from the SPL autoload stack.
      */
-    public function unregister()
+    public function unregister(): void
     {
         spl_autoload_unregister([$this, 'loadClass']);
     }
 
     /**
      * Loads the given class.
-     *
-     * @param string $className
-     *
-     * @return bool TRUE if the class has been successfully loaded, FALSE otherwise.
      */
-    public function loadClass($className)
+    public function loadClass(string $className): bool
     {
-        if (0 !== strpos($className, $this->namespacePrefix)) {
+        if (!str_starts_with($className, $this->namespacePrefix)) {
             return false;
         }
 
         $file = $this->path . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
-        if (!is_file($file)) {
+        if (false === @include $file) {
             return false;
         }
-
-        require $file;
 
         return true;
     }

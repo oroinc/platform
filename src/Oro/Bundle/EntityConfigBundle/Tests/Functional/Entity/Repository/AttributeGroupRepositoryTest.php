@@ -10,28 +10,20 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class AttributeGroupRepositoryTest extends WebTestCase
 {
-    /**
-     * @var AttributeGroupRepository
-     */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->loadFixtures([LoadAttributeFamilyData::class]);
+    }
 
-        $this->loadFixtures([
-            LoadAttributeFamilyData::class,
-        ]);
-
-        $this->repository = $this
-            ->getContainer()
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepositoryForClass(AttributeGroup::class);
+    private function getRepository(): AttributeGroupRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(AttributeGroup::class);
     }
 
     public function testGetGroupsByIdsWithEmptyIdsArray()
     {
-        $this->assertEquals([], $this->repository->getGroupsByIds([]));
+        $this->assertEquals([], $this->getRepository()->getGroupsByIds([]));
     }
 
     public function testGetGroupsByIds()
@@ -46,7 +38,7 @@ class AttributeGroupRepositoryTest extends WebTestCase
                 $group2->getId() => $group2,
                 $emptyGroup->getId() => $emptyGroup
             ],
-            $this->repository->getGroupsByIds([
+            $this->getRepository()->getGroupsByIds([
                 $group1->getId(),
                 $group2->getId(),
                 $emptyGroup->getId()
@@ -62,7 +54,7 @@ class AttributeGroupRepositoryTest extends WebTestCase
                 $this->getReference(LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_1),
                 $this->getReference(LoadAttributeGroupData::REGULAR_ATTRIBUTE_GROUP_1)
             ],
-            $this->repository->getGroupsWithAttributeRelations($attributeFamily)
+            $this->getRepository()->getGroupsWithAttributeRelations($attributeFamily)
         );
     }
 }

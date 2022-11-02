@@ -4,29 +4,29 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
 class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityMetadata
-     */
-    protected $classMetadata;
+    /** @var EntityMetadata */
+    private $classMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->classMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $this->classMetadata = new EntityMetadata(DemoEntity::class);
         $this->classMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 
     public function testSerialize()
     {
+        $this->classMetadata->addFieldMetadata(new FieldMetadata(DemoEntity::class, 'id'));
         $this->assertEquals($this->classMetadata, unserialize(serialize($this->classMetadata)));
     }
 
     public function testMerge()
     {
-        $newMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $newMetadata = new EntityMetadata(DemoEntity::class);
         $newMetadata->mode = ConfigModel::MODE_READONLY;
         $this->classMetadata->merge($newMetadata);
 
@@ -48,8 +48,8 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'custom' => 'test_route_custom',
-                'view' => 'test_route_view',
-                'name' => 'test_route_name',
+                'view'   => 'test_route_view',
+                'name'   => 'test_route_name',
                 'create' => 'test_route_create',
             ],
             $metadata->getRoutes()
@@ -58,14 +58,14 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRouteFromAnnotationValues()
     {
-        $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
+        $metadata = new EntityMetadata(DemoEntity::class);
 
-        $metadata->routeView   = 'test_route_view';
-        $metadata->routeName   = 'test_route_name';
+        $metadata->routeView = 'test_route_view';
+        $metadata->routeName = 'test_route_name';
         $metadata->routeCreate = 'test_route_create';
-        $metadata->routeEdit   = 'test_route_edit';
+        $metadata->routeEdit = 'test_route_edit';
         $metadata->routeDelete = 'test_route_delete';
-        $metadata->routes      = ['custom' => 'test_route_custom'];
+        $metadata->routes = ['custom' => 'test_route_custom'];
 
         $this->assertEquals('test_route_view', $metadata->getRoute());
         $this->assertEquals('test_route_view', $metadata->getRoute('view'));
@@ -75,8 +75,9 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRouteGeneratedAutomaticallyInNonStrictMode()
     {
-        $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
+        $metadata = new EntityMetadata(DemoEntity::class);
 
+        $this->assertEquals('oro_demoentity_view', $metadata->getRoute());
         $this->assertEquals('oro_demoentity_view', $metadata->getRoute('view', false));
         $this->assertEquals('oro_demoentity_index', $metadata->getRoute('name', false));
         $this->assertEquals('oro_demoentity_create', $metadata->getRoute('create', false));
@@ -84,22 +85,17 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getRouteThrowExceptionProvider
-     *
-     * @param string $name
      */
-    public function testGetRouteThrowExceptionInStrictMode($name)
+    public function testGetRouteThrowExceptionInStrictMode(string $name)
     {
-        $this->expectException('\LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('No route "%s" found for entity', $name));
 
-        $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
+        $metadata = new EntityMetadata(DemoEntity::class);
         $metadata->getRoute($name, true);
     }
 
-    /**
-     * @return array
-     */
-    public function getRouteThrowExceptionProvider()
+    public function getRouteThrowExceptionProvider(): array
     {
         return [
             ['view'],
@@ -109,97 +105,89 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasRouteDataProvider
-     *
-     * @param string $routeName
-     * @param bool $strict
-     * @param bool $expected
-     * @param array $properties
      */
-    public function testHasRoute($routeName, $strict, $expected, array $properties = [])
+    public function testHasRoute(string $routeName, bool $strict, bool $expected, array $properties = [])
     {
-        $metadata = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $metadata = new EntityMetadata(DemoEntity::class);
 
         foreach ($properties as $name => $value) {
-            $metadata->$name = $value;
+            $metadata->{$name} = $value;
         }
 
-        $this->assertEquals($expected, $metadata->hasRoute($routeName, $strict));
+        $this->assertSame($expected, $metadata->hasRoute($routeName, $strict));
     }
 
-    /**
-     * @return array
-     */
-    public function hasRouteDataProvider()
+    public function hasRouteDataProvider(): array
     {
         return [
             [
                 'routeName' => 'name',
-                'strict' => false,
-                'expected' => true
+                'strict'    => false,
+                'expected'  => true
             ],
             [
                 'routeName' => 'name',
-                'strict' => true,
-                'expected' => false
+                'strict'    => true,
+                'expected'  => false
             ],
             [
-                'routeName' => 'name',
-                'strict' => true,
-                'expected' => true,
+                'routeName'  => 'name',
+                'strict'     => true,
+                'expected'   => true,
                 'properties' => [
                     'routeName' => 'value'
                 ]
             ],
             [
                 'routeName' => 'view',
-                'strict' => false,
-                'expected' => true
+                'strict'    => false,
+                'expected'  => true
             ],
             [
                 'routeName' => 'view',
-                'strict' => true,
-                'expected' => false
+                'strict'    => true,
+                'expected'  => false
             ],
             [
-                'routeName' => 'view',
-                'strict' => true,
-                'expected' => true,
+                'routeName'  => 'view',
+                'strict'     => true,
+                'expected'   => true,
                 'properties' => [
                     'routeView' => 'value'
                 ]
             ],
             [
                 'routeName' => 'create',
-                'strict' => false,
-                'expected' => true
+                'strict'    => false,
+                'expected'  => true
             ],
             [
                 'routeName' => 'create',
-                'strict' => true,
-                'expected' => false
+                'strict'    => true,
+                'expected'  => false
             ],
             [
-                'routeName' => 'create',
-                'strict' => true,
-                'expected' => true,
+                'routeName'  => 'create',
+                'strict'     => true,
+                'expected'   => true,
                 'properties' => [
                     'routeCreate' => 'value'
                 ]
             ],
             [
                 'routeName' => 'test',
-                'strict' => false,
-                'expected' => false
+                'strict'    => false,
+                'expected'  => false
             ],
             [
                 'routeName' => 'test',
-                'strict' => true,
-                'expected' => false
+                'strict'    => true,
+                'expected'  => false
             ],
             [
-                'routeName' => 'test',
-                'strict' => false,
-                'expected' => true,
+                'routeName'  => 'test',
+                'strict'     => false,
+                'expected'   => true,
                 'properties' => [
                     'routes' => ['test' => 'value']
                 ]

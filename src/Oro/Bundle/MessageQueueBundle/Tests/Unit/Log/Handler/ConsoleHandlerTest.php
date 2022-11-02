@@ -23,13 +23,15 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ConsoleHandler */
     private $handler;
 
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
         $this->output = $this->createMock(OutputInterface::class);
 
         $this->handler = new ConsoleHandler($this->consumerState);
-        $this->handler->setOutput($this->output);
     }
 
     public function testIsHandlingWhenConsumptionIsNotStarted()
@@ -37,6 +39,8 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->output->expects(self::never())
             ->method('getVerbosity');
 
+        $input = $this->createMock(InputInterface::class);
+        $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
         self::assertFalse($this->handler->isHandling([]));
     }
 
@@ -47,6 +51,8 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
 
         $this->consumerState->startConsumption();
+        $input = $this->createMock(InputInterface::class);
+        $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
         self::assertTrue($this->handler->isHandling(['level' => Logger::DEBUG]));
     }
 
@@ -57,6 +63,8 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->output->expects(self::never())
             ->method('write');
 
+        $input = $this->createMock(InputInterface::class);
+        $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
         self::assertFalse($this->handler->handle([]));
     }
 
@@ -74,6 +82,8 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->consumerState->startConsumption();
+        $input = $this->createMock(InputInterface::class);
+        $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
         self::assertFalse(
             $this->handler->handle([
                 'datetime' => new \DateTime('2018-07-06 09:16:05'),
@@ -90,6 +100,8 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
     public function testCommandEventSubscriber()
     {
         $this->consumerState->startConsumption();
+        $input = $this->createMock(InputInterface::class);
+        $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
         $handler = new ConsoleHandler($this->consumerState);
 
         $commandEvent = new ConsoleCommandEvent(
@@ -114,7 +126,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message [] []' . "\n");
+            ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message' . "\n");
         self::assertFalse(
             $this->handler->handle([
                 'datetime' => new \DateTime('2018-07-06 09:16:05'),

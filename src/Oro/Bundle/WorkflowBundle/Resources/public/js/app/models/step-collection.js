@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var StepCollection;
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var StepModel = require('./step-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const StepModel = require('./step-model');
 
-    StepCollection = BaseCollection.extend({
+    const StepCollection = BaseCollection.extend({
         model: StepModel,
 
         comparator: 'order',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function StepCollection() {
-            StepCollection.__super__.constructor.apply(this, arguments);
+        constructor: function StepCollection(...args) {
+            StepCollection.__super__.constructor.apply(this, args);
         }
     });
 

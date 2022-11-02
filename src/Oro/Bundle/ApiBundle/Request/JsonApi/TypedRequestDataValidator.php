@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * This class can be used to validate that the request data contains valid JSON.API object(s).
+ * This class can be used to validate that the request data contains valid JSON:API object(s).
  * Unlike the RequestDataValidator, this validator checks the primary resource type
  * and identifier (if requested).
  * @link http://jsonapi.org/format/#crud
@@ -51,11 +51,13 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
             $primaryResourceClass,
             $primaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
                 $this->validatePrimaryDataObject($data, $primaryResourceClass, $primaryResourceId, $pointer);
-                $this->validateAttributesAndRelationships($data, $pointer);
                 if ($allowIncludedResources) {
                     $this->validateIncludedResources($requestData);
                 } else {
@@ -90,6 +92,9 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
             $primaryResourceClass,
             $requirePrimaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestDataCollection($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
@@ -97,6 +102,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                     foreach ($data as $key => $item) {
                         $itemPointer = $this->buildPointer($pointer, $key);
                         if (\is_array($item)) {
+                            $this->validateResourceObjectStructure($item, $itemPointer);
                             if ($this->validateRequiredNotBlankString($item, JsonApiDoc::TYPE, $itemPointer)) {
                                 $this->validatePrimaryDataObjectType($item, $primaryResourceClass, $itemPointer);
                             }
@@ -134,6 +140,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         $primaryResourceId,
         string $pointer
     ): void {
+        $this->validateResourceObjectStructure($data, $pointer);
         if (null === $primaryResourceId) {
             if ($this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer)) {
                 $this->validatePrimaryDataObjectType($data, $primaryResourceClass, $pointer);
@@ -143,15 +150,9 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
             $this->validatePrimaryDataObjectType($data, $primaryResourceClass, $pointer);
             $this->validatePrimaryDataObjectId($data, $primaryResourceId, $pointer);
         }
+        $this->validateAttributesAndRelationships($data, $pointer);
     }
 
-    /**
-     * @param array  $data
-     * @param string $primaryResourceClass
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validatePrimaryDataObjectType(
         array $data,
         string $primaryResourceClass,
@@ -188,7 +189,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                 $this->buildPointer($pointer, JsonApiDoc::ID),
                 \sprintf(
                     'The \'%1$s\' property of the primary data object'
-                    . ' should match \'%1$s\' parameter of the query sting',
+                    . ' should match \'%1$s\' parameter of the query string',
                     JsonApiDoc::ID
                 )
             );
@@ -199,10 +200,6 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         return true;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $message
-     */
     protected function addConflictError(string $pointer, string $message): void
     {
         $this->addErrorObject(

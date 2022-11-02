@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
@@ -28,7 +29,7 @@ abstract class AbstractLoadSegmentData extends AbstractFixture
             $entity->setOwner($owner);
             $entity->setType($segmentType);
             $entity->setOrganization($organization);
-            $entity->setDefinition(json_encode($data['definition']));
+            $entity->setDefinition(QueryDefinitionUtil::encodeDefinition($data['definition']));
 
             $this->setReference($segmentReference, $entity);
 
@@ -38,8 +39,5 @@ abstract class AbstractLoadSegmentData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @return array
-     */
     abstract protected function getSegmentsData(): array;
 }

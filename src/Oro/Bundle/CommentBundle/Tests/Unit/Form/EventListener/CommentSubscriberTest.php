@@ -3,73 +3,51 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommentSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
-
-    /**
-     * SetUp test environment
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new CommentSubscriber();
-        $this->event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->subscriber);
-        unset($this->form);
-        unset($this->event);
     }
 
     public function testGetSubscribedEvents()
     {
         $result = $this->subscriber->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
     }
 
     /**
      * @dataProvider getTestData
-     *
-     * @param bool $has
-     * @param int $removeCount
      */
-    public function testPreSetData($has, $removeCount)
+    public function testPreSetData(bool $has, int $removeCount)
     {
-        $this->form->expects($this->once())
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
             ->method('has')
             ->with('owner')
-            ->will($this->returnValue($has));
-        $this->form->expects($this->exactly($removeCount))
+            ->willReturn($has);
+        $form->expects($this->exactly($removeCount))
             ->method('remove')
             ->with('owner');
-        $this->event->expects($this->once())
+
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($this->form));
-        $this->subscriber->preSetData($this->event);
+            ->willReturn($form);
+
+        $this->subscriber->preSetData($event);
     }
 
-    public function getTestData()
+    public function getTestData(): array
     {
         return [
             'with owner' => [true, 1],

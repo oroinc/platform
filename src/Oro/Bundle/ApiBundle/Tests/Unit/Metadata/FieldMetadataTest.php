@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
@@ -85,6 +88,21 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testToArrayHiddenField()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setHidden();
+
+        self::assertEquals(
+            [
+                'name'   => 'testName',
+                'hidden' => true
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
     public function testNameInConstructor()
     {
         $fieldMetadata = new FieldMetadata('fieldName');
@@ -145,6 +163,19 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $fieldMetadata->setDirection(true, true);
         self::assertTrue($fieldMetadata->isInput());
         self::assertTrue($fieldMetadata->isOutput());
+    }
+
+    public function testHidden()
+    {
+        $fieldMetadata = new FieldMetadata();
+
+        self::assertFalse($fieldMetadata->isHidden());
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+        $fieldMetadata->setHidden();
+        self::assertTrue($fieldMetadata->isHidden());
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
     }
 
     public function testNullable()

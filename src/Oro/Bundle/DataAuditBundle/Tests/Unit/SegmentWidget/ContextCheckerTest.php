@@ -7,21 +7,22 @@ use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 class ContextCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextChecker */
-    protected $contextChecker;
+    private $contextChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextChecker = new ContextChecker();
     }
 
-    /** @dataProvider isApplicableDataProvider */
-    public function testIsApplicable(array $context, $result)
+    /**
+     * @dataProvider isApplicableDataProvider
+     */
+    public function testIsApplicable(array $context, bool $result)
     {
         $this->assertEquals($result, $this->contextChecker->isApplicableInContext($context));
     }
 
-    /** @return array */
-    public function isApplicableDataProvider()
+    public function isApplicableDataProvider(): array
     {
         return [
             'applicable'          => [[ContextChecker::DISABLED_PARAM => false], true],

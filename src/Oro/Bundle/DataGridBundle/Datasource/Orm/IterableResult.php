@@ -13,7 +13,7 @@ class IterableResult extends BufferedIdentityQueryResultIterator implements Iter
     /**
      * {@inheritDoc}
      */
-    public function next()
+    public function next(): void
     {
         parent::next();
 

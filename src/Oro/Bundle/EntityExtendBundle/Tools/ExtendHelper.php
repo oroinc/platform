@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
  * Provides utility static methods to work with extended entities.
@@ -78,7 +78,7 @@ class ExtendHelper
 
         return sprintf(
             '%s_%s',
-            Inflector::tableize(self::getShortClassName($targetEntityClassName)),
+            InflectorFactory::create()->tableize(self::getShortClassName($targetEntityClassName)),
             $hash
         );
     }
@@ -138,6 +138,9 @@ class ExtendHelper
      */
     public static function getRelationType($relationKey)
     {
+        if ($relationKey === null) {
+            return null;
+        }
         $parts = explode('|', $relationKey);
         $numberOfParts = count($parts);
         if ($numberOfParts < 4 || $numberOfParts > 5) {
@@ -207,15 +210,15 @@ class ExtendHelper
 
         $enumCode = sprintf(
             '%s_%s_%s',
-            Inflector::tableize($shortClassName),
-            Inflector::tableize($fieldName),
+            InflectorFactory::create()->tableize($shortClassName),
+            InflectorFactory::create()->tableize($fieldName),
             dechex(crc32($entityClassName . '::' . $fieldName))
         );
 
         if (null !== $maxEnumCodeSize && strlen($enumCode) > $maxEnumCodeSize) {
             $enumCode = sprintf(
                 '%s_%s',
-                Inflector::tableize($shortClassName),
+                InflectorFactory::create()->tableize($shortClassName),
                 dechex(crc32($entityClassName . '::' . $fieldName))
             );
             if (strlen($enumCode) > $maxEnumCodeSize) {
@@ -242,7 +245,7 @@ class ExtendHelper
      */
     public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
-        if (strlen($enumValueName) === 0) {
+        if ($enumValueName === '') {
             if (!$throwExceptionIfInvalidName) {
                 return '';
             }
@@ -276,23 +279,31 @@ class ExtendHelper
     private static function convertEnumNameToCode($name)
     {
         if ($name && function_exists('iconv')) {
-            $originalName = $name;
-            $name = @iconv('utf-8', 'ascii//TRANSLIT', $name);
-            if (false === $name) {
+            $locale = setlocale(LC_CTYPE, 0);
+            if ('C' === $locale || false === $locale) {
+                $transliteratedName = @iconv('utf-8', 'ascii//TRANSLIT', $name);
+            } else {
+                setlocale(LC_CTYPE, 'C');
+                $transliteratedName = @iconv('utf-8', 'ascii//TRANSLIT', $name);
+                setlocale(LC_CTYPE, $locale);
+            }
+            if (false === $transliteratedName) {
                 throw new \RuntimeException(sprintf(
                     "Can't convert the string '%s' with the 'iconv' function. " .
                     "Please check that the 'iconv' extension is configured correctly.",
-                    $originalName
+                    $name
                 ));
             }
-            if (strpos($name, '?') !== false) {
-                $name = hash('crc32', $originalName);
+            if (str_contains($transliteratedName, '?')) {
+                $name = hash('crc32', $name);
+            } else {
+                $name = $transliteratedName;
             }
         }
 
         $result = strtolower(
             preg_replace(
-                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+                ['/ +/', '/-+/', '/[^a-z0-9\_]+/i', '/_{2,}/'],
                 ['_', '_', '', '_'],
                 trim($name)
             )
@@ -372,7 +383,7 @@ class ExtendHelper
      */
     public static function isCustomEntity($className)
     {
-        return strpos($className, self::ENTITY_NAMESPACE) === 0;
+        return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
 
     /**
@@ -384,7 +395,7 @@ class ExtendHelper
      */
     public static function isExtendEntityProxy($className)
     {
-        return strpos($className, self::ENTITY_NAMESPACE) === 0;
+        return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
 
     /**
@@ -414,7 +425,7 @@ class ExtendHelper
     {
         $parts = explode('\\', $extendClassName);
         $shortClassName = array_pop($parts);
-        if (strpos($shortClassName, 'Extend') === 0) {
+        if (str_starts_with($shortClassName, 'Extend')) {
             $shortClassName = substr($shortClassName, 6);
         }
         $proxyShortClassName = 'EX_' . array_shift($parts);
@@ -518,7 +529,7 @@ class ExtendHelper
      */
     public static function updatedPendingValue($currentVal, array $changeSet)
     {
-        list($oldVal, $newVal) = $changeSet;
+        [$oldVal, $newVal] = $changeSet;
         if (!is_array($oldVal) || !is_array($newVal) || !is_array($currentVal)) {
             return $newVal;
         }

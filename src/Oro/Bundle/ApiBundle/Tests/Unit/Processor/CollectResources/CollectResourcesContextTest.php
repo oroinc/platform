@@ -10,7 +10,7 @@ class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
     /** @var CollectResourcesContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CollectResourcesContext();
     }
@@ -26,5 +26,13 @@ class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setAccessibleResources(['Test\Class']);
         self::assertEquals(['Test\Class'], $this->context->getAccessibleResources());
+    }
+
+    public function testAccessibleAsAssociationResources()
+    {
+        self::assertEquals([], $this->context->getAccessibleAsAssociationResources());
+
+        $this->context->setAccessibleAsAssociationResources(['Test\Class']);
+        self::assertEquals(['Test\Class'], $this->context->getAccessibleAsAssociationResources());
     }
 }

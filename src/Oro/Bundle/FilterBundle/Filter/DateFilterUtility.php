@@ -9,6 +9,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Prepare data for Date filter
+ */
 class DateFilterUtility
 {
     /** @var LocaleSettings */
@@ -30,10 +33,6 @@ class DateFilterUtility
         DateModifierInterface::PART_YEAR  => 'YEAR',
     ];
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param Compiler       $compiler
-     */
     public function __construct(LocaleSettings $localeSettings, Compiler $compiler)
     {
         $this->localeSettings     = $localeSettings;
@@ -64,7 +63,7 @@ class DateFilterUtility
             ],
             $data['value']
         );
-        $data['type']  = isset($data['type']) ? $data['type'] : DateRangeFilterType::TYPE_BETWEEN;
+        $data['type']  = $data['type'] ?? DateRangeFilterType::TYPE_BETWEEN;
 
         // values will not be used, so just unset them
         if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
@@ -81,6 +80,7 @@ class DateFilterUtility
             'date_start_original' => $this->getArrayValue($data['value'], 'start_original'),
             'date_end_original'   => $this->getArrayValue($data['value'], 'end_original'),
             'type'                => $data['type'],
+            'in_group'            => $data['in_group'] ?? false,
             'part'                => $this->getArrayValue($data, 'part', DateModifierInterface::PART_VALUE),
             'field'               => $field
         ];
@@ -125,11 +125,11 @@ class DateFilterUtility
             $field = $this->getEnforcedTimezoneFunction($this->partToDateFunction[$data['part']], $field, $type);
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $field = $this->getEnforcedTimezoneQuarter($field, $type);
-        } elseif ($data['part'] === DateModifierInterface::PART_VALUE &&
-              strpos($field, 'MONTH') === false &&
-              $this->containsMonthVariable($data)
+        } elseif ($data['part'] === DateModifierInterface::PART_VALUE
+            && !str_contains($field, 'MONTH')
+            && $this->containsMonthVariable($data)
         ) {
-            $field              = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
+            $field = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
             $data['date_start'] = $this->formatDate($data['date_start'], 'm');
             $data['date_end']   = $this->formatDate($data['date_end'], 'm');
         }
@@ -252,9 +252,7 @@ class DateFilterUtility
      */
     protected function getArrayValue(array $data, $key, $defaultValue = null)
     {
-        return isset($data[$key])
-            ? $data[$key]
-            : $defaultValue;
+        return $data[$key] ?? $defaultValue;
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithIcon;
@@ -10,24 +12,23 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithoutIcon;
 
 class TypesRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    const CHANNEL_TYPE_ONE   = 'type1';
-    const CHANNEL_TYPE_TWO   = 'type2';
-    const TRANSPORT_TYPE_ONE = 'transport1';
-    const TRANSPORT_TYPE_TWO = 'transport2';
+    private const CHANNEL_TYPE_ONE = 'type1';
+    private const CHANNEL_TYPE_TWO = 'type2';
+    private const TRANSPORT_TYPE_ONE = 'transport1';
+    private const TRANSPORT_TYPE_TWO = 'transport2';
+
+    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $transport1;
+
+    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $transport2;
 
     /** @var TypesRegistry */
-    protected $typesRegistry;
+    private $typesRegistry;
 
-    /** @var TransportInterface */
-    protected $transport1;
-
-    /** @var TransportInterface */
-    protected $transport2;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->transport1 = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\TransportInterface')
-            ->disableOriginalConstructor()->getMock();
+        $this->transport1 = $this->createMock(TransportInterface::class);
         $this->transport2 = clone $this->transport1;
 
         $this->typesRegistry = new TypesRegistry();
@@ -41,12 +42,12 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
     public function testGetRegisteredChannelTypes()
     {
         $this->assertInstanceOf(
-            'Doctrine\Common\Collections\Collection',
+            Collection::class,
             $this->typesRegistry->getRegisteredChannelTypes()
         );
 
         $this->assertContainsOnlyInstancesOf(
-            'Oro\Bundle\IntegrationBundle\Provider\ChannelInterface',
+            ChannelInterface::class,
             $this->typesRegistry->getRegisteredChannelTypes()
         );
     }
@@ -63,8 +64,8 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             [
-                self::CHANNEL_TYPE_ONE => ["label" => "oro.type1.label", "icon" => "bundles/acmedemo/img/logo.png"],
-                self::CHANNEL_TYPE_TWO => ["label" => "oro.type2.label"],
+                self::CHANNEL_TYPE_ONE => ['label' => 'oro.type1.label', 'icon' => 'bundles/acmedemo/img/logo.png'],
+                self::CHANNEL_TYPE_TWO => ['label' => 'oro.type2.label'],
             ],
             $this->typesRegistry->getAvailableIntegrationTypesDetailedData()
         );
@@ -78,11 +79,9 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetTransportType1()
     {
+        $this->expectException(\LogicException::class);
         $this->assertEquals(
             $this->transport1,
             $this->typesRegistry->getTransportType('error1', 'error2')
@@ -92,7 +91,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
     public function testGetRegisteredTransportTypes()
     {
         $this->assertInstanceOf(
-            'Doctrine\Common\Collections\Collection',
+            Collection::class,
             $this->typesRegistry->getRegisteredTransportTypes(self::CHANNEL_TYPE_ONE)
         );
     }

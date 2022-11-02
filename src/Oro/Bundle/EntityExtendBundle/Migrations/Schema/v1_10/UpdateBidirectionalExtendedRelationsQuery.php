@@ -3,14 +3,22 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_10;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
+use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Query\AbstractEntityConfigQuery;
 use Psr\Log\LoggerInterface;
 
-class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuery
+/**
+ * Update all extended relations with `bidirectional` option set to true.
+ */
+class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuery implements
+    ConfigurationHandlerAwareInterface
 {
     const LIMIT = 100;
+
+    protected ConfigurationHandler $configurationHandler;
 
     /**
      * {@inheritdoc}
@@ -18,6 +26,14 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
     public function getDescription()
     {
         return 'Update all extended relations with `bidirectional` option set to true';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
+    {
+        $this->configurationHandler = $configurationHandler;
     }
 
     /**
@@ -73,6 +89,7 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
                 'bidirectional',
                 $bidirectional
             );
+            $query->setConfigurationHandler($this->configurationHandler);
             $query->setConnection($this->connection);
             $query->execute($logger);
         }

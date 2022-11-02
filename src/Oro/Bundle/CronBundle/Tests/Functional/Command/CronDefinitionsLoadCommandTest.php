@@ -4,7 +4,6 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -12,47 +11,41 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CronDefinitionsLoadCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
     public function testShouldLoadCommandDefinitionFromApplication()
     {
-        $this->getScheduleRepository()->createQueryBuilder('d')->delete()->getQuery()->execute();
+        /** @var EntityRepository $scheduleRepository */
+        $scheduleRepository = self::getContainer()->get('doctrine')->getRepository(Schedule::class);
+        $scheduleRepository->createQueryBuilder('d')->delete()->getQuery()->execute();
 
-        $schedules = $this->getScheduleRepository()->findAll();
+        $schedules = $scheduleRepository->findAll();
 
         //guard
         $this->assertCount(0, $schedules);
 
         $result = $this->runCommand('oro:cron:definitions:load');
 
-        $this->assertContains('Removing all previously loaded commands...', $result);
-        $this->assertContains('Processing command ', $result);
-        $this->assertContains(' setting up schedule..', $result);
+        self::assertStringContainsString('Removing all previously loaded commands...', $result);
+        self::assertStringContainsString('Processing command ', $result);
+        self::assertStringContainsString(' setting up schedule..', $result);
 
-        $schedules = $this->getScheduleRepository()->findAll();
-
+        $schedules = $scheduleRepository->findAll();
         $this->assertGreaterThan(0, count($schedules));
     }
 
     public function testShouldNotLoadCommandDefinitionFromApplicationIfNotImplement()
     {
+        $this->markTestIncomplete('Requires a proper test stub as it now excludes itself from the list');
         $result = $this->runCommand('oro:cron:definitions:load');
 
-        $this->assertContains(
+        self::assertStringContainsString(
             'Processing command "oro:cron:definitions:load": '.
-            'Skipping, the command does not implement CronCommandInterface',
+            'Skipping, the command does not implement CronCommandScheduleDefinitionInterface',
             $result
         );
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    private function getScheduleRepository()
-    {
-        return $this->getContainer()->get('doctrine')->getRepository(Schedule::class);
     }
 }

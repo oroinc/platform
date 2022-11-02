@@ -9,21 +9,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouteContextConfigurator */
-    protected $configurator;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    protected function setUp()
+    /** @var RouteContextConfigurator */
+    private $configurator;
+
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
         $this->configurator = new RouteContextConfigurator($this->requestStack);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->configurator);
     }
 
     public function testConfigureContextWithOutRequest()
@@ -33,7 +28,8 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertSame(null, $context->get('route_name'));
+        $this->assertNull($context->get('route_name'));
+        $this->assertFalse($context->get('is_xml_http_request'));
     }
 
     public function testConfigureContextWithRequest()
@@ -42,12 +38,14 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $request = Request::create('');
         $request->attributes->set('_route', 'testRoteName');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
         $this->requestStack->push($request);
         $this->configurator->configureContext($context);
 
         $context->resolve();
         $this->assertSame('testRoteName', $context->get('route_name'));
+        $this->assertTrue($context->get('is_xml_http_request'));
     }
 
     public function testConfigureContextWithSubRequest()
@@ -62,6 +60,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $context->resolve();
         $this->assertSame('testRoteName', $context->get('route_name'));
+        $this->assertFalse($context->get('is_xml_http_request'));
     }
 
     public function testConfigureContextWithRequestAndDataSetInContext()

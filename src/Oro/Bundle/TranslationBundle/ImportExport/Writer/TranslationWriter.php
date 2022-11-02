@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
+/**
+ * Batch job's writer.
+ */
 class TranslationWriter implements ItemWriterInterface
 {
     /** @var ManagerRegistry */
@@ -16,10 +19,6 @@ class TranslationWriter implements ItemWriterInterface
     /** @var TranslationManager */
     protected $translationManager;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param TranslationManager $translationManager
-     */
     public function __construct(ManagerRegistry $registry, TranslationManager $translationManager)
     {
         $this->registry = $registry;

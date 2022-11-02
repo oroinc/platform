@@ -3,119 +3,65 @@
 namespace Oro\Bundle\EmailBundle\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Processes entity route variables.
+ */
 class EntityRouteVariableProcessor implements VariableProcessorInterface
 {
-    /** @var RouterInterface */
-    protected $router;
-
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var UrlProvider */
+    private $urlProvider;
 
-    /** @var EntityConfigManager */
-    protected $entityConfigManager;
-
-    /** @var string */
-    protected $basePath;
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
-        RouterInterface $router,
         DoctrineHelper $doctrineHelper,
-        ConfigManager $configManager,
-        EntityConfigManager $entityConfigManager
+        UrlProvider $urlProvider,
+        LoggerInterface $logger
     ) {
-        $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
-        $this->configManager = $configManager;
-        $this->entityConfigManager = $entityConfigManager;
+        $this->urlProvider = $urlProvider;
+        $this->logger = $logger;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function process($variable, array $definition, array $data = [])
+    public function process(string $variable, array $processorArguments, TemplateData $data): void
     {
-        if (!$this->isValid($variable, $definition, $data)) {
-            return sprintf('{{ \'%s\' }}', $variable);
-        }
-
-        $params = [];
-
-        if (!preg_match('/^.*(_index|_create)$/', $definition['route'])) {
-            $params = [
-                'id' => $this->doctrineHelper->getSingleEntityIdentifier($data['entity'], false),
-            ];
-        }
-
-        return sprintf('{{ \'%s\' }}', $this->getBasePath() . $this->router->generate($definition['route'], $params));
+        $data->setComputedVariable($variable, $this->getUrl($processorArguments['route'], $variable, $data));
     }
 
-    /**
-     * @param string $variable
-     *
-     * @return bool
-     */
-    protected function supports($variable)
+    private function getUrl(string $routeName, string $variable, TemplateData $data): ?string
     {
-        return in_array($variable, [
-            'entity.url.index',
-            'entity.url.view',
-            'entity.url.create',
-            'entity.url.update',
-            'entity.url.delete',
-        ], true);
-    }
+        $entity = $data->getEntityVariable($data->getParentVariablePath($variable));
 
-    /**
-     * @param $variable
-     * @param array $definition
-     * @param array $data
-     *
-     * @return bool
-     */
-    protected function isValid($variable, array $definition, array $data = [])
-    {
-        if (!$this->supports($variable)) {
-            return false;
+        $url = null;
+        try {
+            $params = [];
+            if (!preg_match('/^.*(_index|_create)$/', $routeName)) {
+                $params['id'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
+            $url = $this->urlProvider->getAbsoluteUrl($routeName, $params);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                sprintf('The variable "%s" cannot be resolved.', $variable),
+                [
+                    'exception' => $e,
+                    'entity'    => is_object($entity) ? ClassUtils::getClass($entity) : gettype($entity)
+                ]
+            );
         }
 
-        if (!isset($definition['route']) || !$this->router->getRouteCollection()->get($definition['route'])) {
-            return false;
-        }
-
-        if (!isset($data['entity']) || !$this->doctrineHelper->isManageableEntity($data['entity'])) {
-            return false;
-        }
-
-
-        $entityClass = ClassUtils::getRealClass(get_class($data['entity']));
-        $extendConfigProvider = $this->entityConfigManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($entityClass)
-            || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return string
-     */
-    private function getBasePath()
-    {
-        if (!isset($this->basePath)) {
-            $this->basePath = $this->configManager->get('oro_ui.application_url');
-        }
-
-        return $this->basePath;
+        return $url;
     }
 }

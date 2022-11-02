@@ -6,9 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Class BaseProduct
+ * Base Product Entity class.
  *
- * @package Oro\Bundle\BusinessEntitiesBundle\Entity
  * @ORM\MappedSuperclass
  */
 class BaseProduct
@@ -236,7 +235,7 @@ class BaseProduct
     }
 
     /**
-     * @param \DateTime updatedAt
+     * @param \DateTime $updatedAt
      *
      * @return $this
      */

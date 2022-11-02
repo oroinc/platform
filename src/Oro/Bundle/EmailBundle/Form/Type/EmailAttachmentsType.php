@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Form type for collection of Email Attachments.
+ */
 class EmailAttachmentsType extends AbstractType
 {
     /**
@@ -44,9 +47,6 @@ class EmailAttachmentsType extends AbstractType
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'sanitizeAttachments']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function sanitizeAttachments(FormEvent $event)
     {
         /** @var Collection $attachments */

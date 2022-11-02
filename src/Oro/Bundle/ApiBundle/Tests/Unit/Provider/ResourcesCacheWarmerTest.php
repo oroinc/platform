@@ -20,7 +20,7 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcesCacheWarmer */
     private $cacheWarmer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
         $this->subresourcesProvider = $this->createMock(SubresourcesProvider::class);
@@ -36,6 +36,8 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
     {
         $version = Version::LATEST;
         $requestType = new RequestType(['rest']);
+        $this->resourcesProvider->expects(self::once())
+            ->method('clearCache');
         $this->resourcesProvider->expects(self::once())
             ->method('getResources')
             ->with($version, $requestType)

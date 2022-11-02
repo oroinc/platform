@@ -2,46 +2,51 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityProvider;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as UserConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityListChainProvider */
-    protected $provider;
+    private const TEST_ACTIVITY_CLASS = EntityStub::class;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routeHelper;
+    private $routeHelper;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var TestActivityProvider */
-    protected $testActivityProvider;
+    private $testActivityProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -50,21 +55,43 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->testActivityProvider = new TestActivityProvider();
+    }
 
-        $this->provider = new ActivityListChainProvider(
+    private function getActivityListChainProvider(string $testActivityAclClass = null): ActivityListChainProvider
+    {
+        $activityAclClasses = [];
+        if ($testActivityAclClass) {
+            $activityAclClasses[self::TEST_ACTIVITY_CLASS] = $testActivityAclClass;
+        }
+
+        $providerContainer = TestContainerBuilder::create()
+            ->add(self::TEST_ACTIVITY_CLASS, $this->testActivityProvider)
+            ->getContainer($this);
+
+        return new ActivityListChainProvider(
+            [self::TEST_ACTIVITY_CLASS],
+            $activityAclClasses,
+            $providerContainer,
             $this->doctrineHelper,
             $this->configManager,
             $this->translator,
             $this->routeHelper,
             $this->tokenAccessor
         );
-        $this->provider->addProvider($this->testActivityProvider);
+    }
+
+    public function testGetProviders()
+    {
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals(
+            [self::TEST_ACTIVITY_CLASS => $this->testActivityProvider],
+            $provider->getProviders()
+        );
     }
 
     public function testIsApplicableTarget()
     {
-        $targetClassName   = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
-        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+        $targetClassName = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
@@ -75,15 +102,15 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             ->with('entity', $targetClassName)
             ->willReturn(new EntityConfigId('entity', $targetClassName));
 
+        $provider = $this->getActivityListChainProvider();
         $this->assertTrue(
-            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+            $provider->isApplicableTarget($targetClassName, self::TEST_ACTIVITY_CLASS)
         );
     }
 
     public function testIsApplicableTargetForNotSupportedTargetEntity()
     {
-        $targetClassName   = 'Test\NotSupportedTargetEntity';
-        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+        $targetClassName = 'Test\NotSupportedTargetEntity';
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
@@ -94,28 +121,29 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             ->with('entity', $targetClassName)
             ->willReturn(new EntityConfigId('entity', $targetClassName));
 
+        $provider = $this->getActivityListChainProvider();
         $this->assertFalse(
-            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+            $provider->isApplicableTarget($targetClassName, self::TEST_ACTIVITY_CLASS)
         );
     }
 
     public function testIsApplicableTargetForNotRegisteredActivityEntity()
     {
-        $targetClassName   = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
+        $targetClassName = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
         $activityClassName = 'Test\NotRegisteredActivityEntity';
 
         $this->configManager->expects($this->never())
             ->method('hasConfig');
 
+        $provider = $this->getActivityListChainProvider();
         $this->assertFalse(
-            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+            $provider->isApplicableTarget($targetClassName, $activityClassName)
         );
     }
 
     public function testIsApplicableTargetForNotConfigurableTargetEntity()
     {
-        $targetClassName   = 'Test\NotConfigurableTargetEntity';
-        $activityClassName = TestActivityProvider::ACTIVITY_CLASS_NAME;
+        $targetClassName = 'Test\NotConfigurableTargetEntity';
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
@@ -124,16 +152,18 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('getId');
 
+        $provider = $this->getActivityListChainProvider();
         $this->assertFalse(
-            $this->provider->isApplicableTarget($targetClassName, $activityClassName)
+            $provider->isApplicableTarget($targetClassName, self::TEST_ACTIVITY_CLASS)
         );
     }
 
     public function testGetSupportedActivities()
     {
+        $provider = $this->getActivityListChainProvider();
         $this->assertEquals(
-            [TestActivityProvider::ACTIVITY_CLASS_NAME],
-            $this->provider->getSupportedActivities()
+            [self::TEST_ACTIVITY_CLASS],
+            $provider->getSupportedActivities()
         );
     }
 
@@ -143,8 +173,10 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($testEntity)
-            ->will($this->returnValue(TestActivityProvider::ACTIVITY_CLASS_NAME));
-        $this->assertTrue($this->provider->isSupportedEntity($testEntity));
+            ->willReturn(self::TEST_ACTIVITY_CLASS);
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertTrue($provider->isSupportedEntity($testEntity));
     }
 
     public function testIsSupportedEntityWrongEntity()
@@ -153,146 +185,132 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($testEntity)
-            ->will($this->returnValue('\stdClass'));
-        $this->assertFalse($this->provider->isSupportedEntity($testEntity));
+            ->willReturn(\stdClass::class);
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertFalse($provider->isSupportedEntity($testEntity));
     }
 
     public function testIsSupportedTargetEntity()
     {
-        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
-        $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
+        $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
+        $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        $correctTarget,
-                        $notCorrectTarget
-                    ]
-                )
-            );
+            ->willReturn([$correctTarget, $notCorrectTarget]);
 
         $testEntity = new \stdClass();
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($testEntity)
-            ->will($this->returnValue($correctTarget->getClassName()));
+            ->willReturn($correctTarget->getClassName());
 
-        $this->assertTrue($this->provider->isSupportedTargetEntity($testEntity));
+        $provider = $this->getActivityListChainProvider();
+        $this->assertTrue($provider->isSupportedTargetEntity($testEntity));
     }
 
     public function testIsSupportedTargetEntityWrongEntity()
     {
-        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
-        $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
+        $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
+        $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        $correctTarget,
-                        $notCorrectTarget
-                    ]
-                )
-            );
+            ->willReturn([$correctTarget, $notCorrectTarget]);
 
         $testEntity = new \stdClass();
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($testEntity)
-            ->will($this->returnValue($notCorrectTarget->getClassName()));
+            ->willReturn($notCorrectTarget->getClassName());
 
-        $this->assertFalse($this->provider->isSupportedTargetEntity($testEntity));
+        $provider = $this->getActivityListChainProvider();
+        $this->assertFalse($provider->isSupportedTargetEntity($testEntity));
     }
 
     public function testGetSubject()
     {
         $testEntity = new \stdClass();
         $testEntity->subject = 'test';
-        $this->assertEquals('test', $this->provider->getSubject($testEntity));
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals('test', $provider->getSubject($testEntity));
     }
 
     public function testGetDescription()
     {
         $testEntity = new \stdClass();
         $testEntity->description = 'test';
-        $this->assertEquals('test', $this->provider->getDescription($testEntity));
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals('test', $provider->getDescription($testEntity));
     }
 
     public function testGetEmptySubject()
     {
         $testEntity = new TestTarget(1);
-        $this->assertNull($this->provider->getSubject($testEntity));
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertNull($provider->getSubject($testEntity));
     }
 
     public function testGetTargetEntityClasses()
     {
-        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
-        $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
+        $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
+        $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        $correctTarget,
-                        $notCorrectTarget
-                    ]
-                )
-            );
+            ->willReturn([$correctTarget, $notCorrectTarget]);
 
-        $this->assertEquals(['Acme\\DemoBundle\\Entity\\CorrectEntity'], $this->provider->getTargetEntityClasses());
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals(['Acme\DemoBundle\Entity\CorrectEntity'], $provider->getTargetEntityClasses());
     }
 
     public function getTargetEntityClassesOnEmptyTargetList()
     {
         $this->configManager->expects($this->once())
             ->method('getIds')
-            ->will(
-                $this->returnValue([])
-            );
+            ->willReturn([]);
 
-        $this->assertEquals([], $this->provider->getTargetEntityClasses());
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals([], $provider->getTargetEntityClasses());
 
         /**
          * Each subsequent execution of getTargetEntityClasses should NOT collect targets again
          */
-        $this->provider->getTargetEntityClasses();
-    }
-
-    public function testGetProviderForEntity()
-    {
-        $testEntity = new \stdClass();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($testEntity)
-            ->willReturn('Test\Entity');
-        $this->assertEquals($this->testActivityProvider, $this->provider->getProviderForEntity($testEntity));
+        $provider->getTargetEntityClasses();
     }
 
     public function testGetActivityListOption()
     {
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
-        $configId = new EntityConfigId('entity', 'Test\Entity');
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $configId = new EntityConfigId('entity', self::TEST_ACTIVITY_CLASS);
         $entityConfig = new Config($configId);
-        $userConfig = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $userConfig = $this->createMock(UserConfig::class);
 
         $entityConfig->set('icon', 'test_icon');
         $entityConfig->set('label', 'test_label');
-        $entityConfigProvider->expects($this->once())->method('getConfig')->willReturn($entityConfig);
-        $this->translator->expects($this->once())->method('trans')->with('test_label')->willReturn('test_label');
-        $this->routeHelper->expects($this->once())->method('getUrlSafeClassName')
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($entityConfig);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('test_label')
+            ->willReturn('test_label');
+        $this->routeHelper->expects($this->once())
+            ->method('getUrlSafeClassName')
             ->willReturn('Test_Entity');
-        $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->willReturn($entityConfigProvider);
 
-        $result = $this->provider->getActivityListOption($userConfig);
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getActivityListOption($userConfig);
         $this->assertEquals(
             [
                 'Test_Entity' => [
-                    'icon'     => 'test_icon',
-                    'label'    => 'test_label',
-                    'template' => 'test_template.js.twig',
+                    'icon'         => 'test_icon',
+                    'label'        => 'test_label',
+                    'template'     => 'test_template.js.twig',
                     'has_comments' => true,
                 ]
             ],
@@ -302,13 +320,16 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUpdatedActivityList()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repo = $this->createMock(ActivityListRepository::class);
 
         $activityEntity = new ActivityList();
-        $repo->expects($this->once())->method('findOneBy')->willReturn($activityEntity);
-        $em->expects($this->once())->method('getRepository')->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($activityEntity);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
 
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';
@@ -319,61 +340,185 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->testActivityProvider->setTargets([new \stdClass()]);
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
-            ->willReturnCallback(
-                function ($entity) use ($testEntity) {
-                    if ($entity === $testEntity) {
-                        return 'Test\Entity';
-                    }
-
-                    return get_class($entity);
+            ->willReturnCallback(function ($entity) use ($testEntity) {
+                if ($entity === $testEntity) {
+                    return self::TEST_ACTIVITY_CLASS;
                 }
-            );
 
-        $result = $this->provider->getUpdatedActivityList($testEntity, $em);
+                return get_class($entity);
+            });
+
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getUpdatedActivityList($testEntity, $em);
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
     }
 
+
+    public function testGetNewActivityList()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->id = 123;
+        $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
+        $testEntity->owner = new User();
+        $testEntity->updatedBy = new User();
+
+        $targetEntity = new \stdClass();
+
+        $this->testActivityProvider->setTargets([$targetEntity]);
+        $this->doctrineHelper->expects(self::exactly(3))
+            ->method('getEntityClass')
+            ->withConsecutive(
+                [self::identicalTo($testEntity)],
+                [self::identicalTo($testEntity)],
+                [self::identicalTo($targetEntity)]
+            )
+            ->willReturnCallback(function ($entity) use ($testEntity) {
+                return $entity === $testEntity
+                    ? self::TEST_ACTIVITY_CLASS
+                    : get_class($entity);
+            });
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->with(self::identicalTo($testEntity))
+            ->willReturn($testEntity->id);
+
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getNewActivityList($testEntity);
+        $this->assertEquals(ActivityList::VERB_CREATE, $result->getVerb());
+        $this->assertEquals($testEntity->subject, $result->getSubject());
+        $this->assertEquals($testEntity->description, $result->getDescription());
+        $this->assertSame($testEntity->owner, $result->getOwner());
+        $this->assertSame($testEntity->updatedBy, $result->getUpdatedBy());
+        $this->assertEquals(self::TEST_ACTIVITY_CLASS, $result->getRelatedActivityClass());
+        $this->assertEquals($testEntity->id, $result->getRelatedActivityId());
+    }
+
     public function testGetSupportedOwnerActivities()
     {
-        $ownerClasses = $this->provider->getSupportedOwnerActivities();
-        $this->assertCount(1, $ownerClasses);
-        $this->assertEquals([TestActivityProvider::ACL_CLASS], $ownerClasses);
+        $provider = $this->getActivityListChainProvider();
+        $this->assertEquals(
+            [self::TEST_ACTIVITY_CLASS],
+            $provider->getSupportedOwnerActivities()
+        );
+        $this->assertEquals(
+            self::TEST_ACTIVITY_CLASS,
+            $provider->getSupportedOwnerActivity(self::TEST_ACTIVITY_CLASS)
+        );
+
+        $testActivityAclClass = 'Test\AclClass';
+        $provider = $this->getActivityListChainProvider($testActivityAclClass);
+        $this->assertEquals(
+            [$testActivityAclClass],
+            $provider->getSupportedOwnerActivities()
+        );
+        $this->assertEquals(
+            $testActivityAclClass,
+            $provider->getSupportedOwnerActivity(self::TEST_ACTIVITY_CLASS)
+        );
     }
 
     public function testIsSupportedOwnerEntity()
     {
-        $testEntity = new \stdClass();
+        $testEntityClass = self::TEST_ACTIVITY_CLASS;
+        $testEntity = new $testEntityClass();
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
-            ->with($testEntity)
-            ->willReturn(TestActivityProvider::ACL_CLASS);
+            ->with($this->identicalTo($testEntity))
+            ->willReturn($testEntityClass);
 
-        $this->assertTrue($this->provider->isSupportedEntity($testEntity));
+        $provider = $this->getActivityListChainProvider();
+        $this->assertTrue($provider->isSupportedEntity($testEntity));
     }
 
-    public function testGetProviderForOwnerEntity()
+    public function testGetProviderByClassWhenProvidersAreNotInitializedYet()
     {
-        $testEntity = new \stdClass();
-
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturn(TestActivityProvider::ACL_CLASS);
-
-        $this->assertEquals(
+        $provider = $this->getActivityListChainProvider();
+        $this->assertSame(
             $this->testActivityProvider,
-            $this->provider->getProviderForOwnerEntity($testEntity)
+            $provider->getProviderByClass(self::TEST_ACTIVITY_CLASS)
+        );
+    }
+
+    public function testGetProviderByClassWhenProvidersAlreadyInitialized()
+    {
+        $provider = $this->getActivityListChainProvider();
+
+        // initialize providers
+        $provider->getProviders();
+
+        $this->assertSame(
+            $this->testActivityProvider,
+            $provider->getProviderByClass(self::TEST_ACTIVITY_CLASS)
+        );
+    }
+
+    public function testGetProviderForEntity()
+    {
+        $testEntityClass = self::TEST_ACTIVITY_CLASS;
+        $testEntity = new $testEntityClass();
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($this->identicalTo($testEntity))
+            ->willReturn($testEntityClass);
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertSame(
+            $this->testActivityProvider,
+            $provider->getProviderForEntity($testEntity)
         );
     }
 
     public function testGetProviderByOwnerClass()
     {
-        $this->assertEquals(
+        $provider = $this->getActivityListChainProvider();
+        $this->assertSame(
             $this->testActivityProvider,
-            $this->provider->getProviderByOwnerClass(TestActivityProvider::ACTIVITY_CLASS_NAME)
+            $provider->getProviderByOwnerClass(self::TEST_ACTIVITY_CLASS)
         );
+    }
+
+    public function testGetProviderForOwnerEntity()
+    {
+        $testEntityClass = self::TEST_ACTIVITY_CLASS;
+        $testEntity = new $testEntityClass();
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($this->identicalTo($testEntity))
+            ->willReturn($testEntityClass);
+
+        $provider = $this->getActivityListChainProvider();
+        $this->assertSame(
+            $this->testActivityProvider,
+            $provider->getProviderForOwnerEntity($testEntity)
+        );
+    }
+
+    public function testGetActivityListEntitiesByActivityEntityForEntityWithoutId()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
+        $testEntity->owner = new User();
+        $testEntity->updatedBy = new User();
+
+        $this->testActivityProvider->setTargets([new \stdClass()]);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($entity) use ($testEntity) {
+                if ($entity === $testEntity) {
+                    return self::TEST_ACTIVITY_CLASS;
+                }
+
+                return get_class($entity);
+            });
+
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getActivityListEntitiesByActivityEntity($testEntity);
+        $this->assertNull($result);
     }
 }

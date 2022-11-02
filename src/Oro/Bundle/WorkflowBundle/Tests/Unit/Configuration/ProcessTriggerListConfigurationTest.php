@@ -9,24 +9,15 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessTriggerListConfiguration
-     */
-    protected $configuration;
+    /** @var ProcessTriggerListConfiguration */
+    private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }
 
-    protected function tearDown()
-    {
-        unset($this->configuration);
-    }
-
     /**
-     * @param array $input
-     * @param array $expected
      * @dataProvider processDataProvider
      */
     public function testProcess(array $input, array $expected)
@@ -34,10 +25,7 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             [

@@ -15,7 +15,7 @@ class Restriction
 
     /** @var string */
     protected $attribute;
-    
+
     /** @var string */
     protected $field;
 
@@ -101,7 +101,7 @@ class Restriction
     public function setAttribute($attribute)
     {
         $this->attribute = $attribute;
-        
+
         return $this;
     }
 

@@ -5,8 +5,35 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
+    public function testCustomAttribute()
+    {
+        $attrName = 'test';
+
+        $entityConfig = new EntityConfig();
+        self::assertFalse($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+
+        $entityConfig->set($attrName, null);
+        self::assertTrue($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+        self::assertEquals([$attrName => null], $entityConfig->toArray());
+
+        $entityConfig->set($attrName, false);
+        self::assertTrue($entityConfig->has($attrName));
+        self::assertFalse($entityConfig->get($attrName));
+        self::assertEquals([$attrName => false], $entityConfig->toArray());
+
+        $entityConfig->remove($attrName);
+        self::assertFalse($entityConfig->has($attrName));
+        self::assertNull($entityConfig->get($attrName));
+        self::assertSame([], $entityConfig->toArray());
+    }
+
     public function testToArray()
     {
         $entityConfig = new EntityConfig();
@@ -127,7 +154,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['test' => 'ASC'], $entityConfig->getOrderBy());
         $this->assertEquals(['order_by' => ['test' => 'ASC']], $entityConfig->toArray());
 
-        $entityConfig->setOrderBy();
+        $entityConfig->setOrderBy([]);
         $this->assertEquals([], $entityConfig->getOrderBy());
         $this->assertEquals([], $entityConfig->toArray());
     }
@@ -141,15 +168,29 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $entityConfig->getMaxResults());
         $this->assertEquals(['max_results' => 123], $entityConfig->toArray());
 
-        $entityConfig->setMaxResults();
+        $entityConfig->setMaxResults(null);
         $this->assertNull($entityConfig->getMaxResults());
         $this->assertEquals([], $entityConfig->toArray());
+    }
+
+    public function testHasMore()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertFalse($entityConfig->getHasMore());
+
+        $entityConfig->setHasMore(true);
+        $this->assertTrue($entityConfig->getHasMore());
+        $this->assertSame(['has_more' => true], $entityConfig->toArray());
+
+        $entityConfig->setHasMore(false);
+        $this->assertFalse($entityConfig->getHasMore());
+        $this->assertSame([], $entityConfig->toArray());
     }
 
     public function testHints()
     {
         $entityConfig = new EntityConfig();
-        $this->assertEquals([], $entityConfig->getHints());
+        $this->assertSame([], $entityConfig->getHints());
 
         $entityConfig->addHint('hint1');
         $entityConfig->addHint('hint2', 'val');
@@ -169,8 +210,46 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['hints' => [['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint2', 'val');
-        $this->assertEquals([], $entityConfig->getHints());
-        $this->assertEquals([], $entityConfig->toArray());
+        $this->assertSame([], $entityConfig->getHints());
+        $this->assertSame([], $entityConfig->toArray());
+    }
+
+    public function testInnerJoinAssociations()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+
+        $entityConfig->addInnerJoinAssociation('association1');
+        $this->assertEquals(['association1'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1']], $entityConfig->toArray());
+
+        $entityConfig->addInnerJoinAssociation('association2');
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->addInnerJoinAssociation('association1');
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association1');
+        $this->assertEquals(['association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association1');
+        $this->assertEquals(['association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association2');
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+        $this->assertSame([], $entityConfig->toArray());
+
+        $entityConfig->setInnerJoinAssociations(['association1', 'association2']);
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->setInnerJoinAssociations([]);
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+        $this->assertSame([], $entityConfig->toArray());
     }
 
     public function testPostSerializeHandler()
@@ -178,13 +257,30 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeHandler());
 
-        $handler = 'test';
+        $handler = function (array $item, array $context) : array {
+        };
         $entityConfig->setPostSerializeHandler($handler);
         $this->assertSame($handler, $entityConfig->getPostSerializeHandler());
-        $this->assertEquals(['post_serialize' => 'test'], $entityConfig->toArray());
+        $this->assertEquals(['post_serialize' => $handler], $entityConfig->toArray());
 
-        $entityConfig->setPostSerializeHandler();
+        $entityConfig->setPostSerializeHandler(null);
         $this->assertNull($entityConfig->getPostSerializeHandler());
+        $this->assertEquals([], $entityConfig->toArray());
+    }
+
+    public function testPostSerializeCollectionHandler()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
+
+        $handler = function (array $items, array $context) : array {
+        };
+        $entityConfig->setPostSerializeCollectionHandler($handler);
+        $this->assertSame($handler, $entityConfig->getPostSerializeCollectionHandler());
+        $this->assertEquals(['post_serialize_collection' => $handler], $entityConfig->toArray());
+
+        $entityConfig->setPostSerializeCollectionHandler(null);
+        $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
         $this->assertEquals([], $entityConfig->toArray());
     }
 }

@@ -11,8 +11,7 @@ class QueryFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testFactory()
     {
-        $indexer = $this->getMockBuilder(Indexer::class)
-            ->disableOriginalConstructor()->getMock();
+        $indexer = $this->createMock(Indexer::class);
 
         $query = $this->createMock(Query::class);
 

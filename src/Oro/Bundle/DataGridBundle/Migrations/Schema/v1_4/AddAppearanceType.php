@@ -14,7 +14,7 @@ class AddAppearanceType implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addAppearanceTypeTable($schema);
-        
+
         $table = $schema->getTable('oro_grid_view');
         $table->addColumn('appearanceType', 'string', ['notnull' => false, 'length' => 32]);
         $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE', []);
@@ -27,9 +27,6 @@ class AddAppearanceType implements Migration
         $table->addColumn('appearanceData', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addAppearanceTypeTable(Schema $schema)
     {
         $table = $schema->createTable('oro_grid_appearance_type');

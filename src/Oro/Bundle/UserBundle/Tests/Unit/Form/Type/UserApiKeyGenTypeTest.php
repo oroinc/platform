@@ -7,6 +7,7 @@ use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {
@@ -16,23 +17,20 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(UserApiKeyGenType::class, $userApi);
         $form->submit([]);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $this->assertEquals($userApi, $form->getData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testApiKeyElementIdIsRequiredOption()
     {
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => null]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testApiKeyElementIdIsStringOption()
     {
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => new \stdClass]);
     }
 
@@ -63,7 +61,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getExtensions()
     {

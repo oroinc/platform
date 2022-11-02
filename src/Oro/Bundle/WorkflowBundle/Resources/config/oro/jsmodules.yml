@@ -1,0 +1,36 @@
+aliases:
+    oro/datagrid/action/workflow-activate-action$: oroworkflow/js/datagrid/action/workflow-activate-action
+    oro/datagrid/action/workflow-deactivate-action$: oroworkflow/js/datagrid/action/workflow-deactivate-action
+    oroworkflow/transition-dialog-widget$: oroworkflow/js/app/widget/transition-dialog-widget
+app-modules:
+    - oroworkflow/js/app/modules/entity-filter-preset-module
+configs:
+    oroworkflow/js/tools/path-finder/finder: {}
+dynamic-imports:
+    orodatagrid:
+        - oro/datagrid/action/workflow-activate-action
+        - oro/datagrid/action/workflow-deactivate-action
+        - oroworkflow/js/datagrid/workflow-datagrid-builder
+    oroworkflow:
+        - oroworkflow/js/app/components/activate-form-widget-component
+        - oroworkflow/js/app/components/button-component
+        - oroworkflow/js/app/components/workflow-editor-component
+        - oroworkflow/js/app/components/workflow-viewer-component
+        - oroworkflow/js/app/views/flowchart/flowchart-container-view
+        - oroworkflow/js/app/views/process-status-toggle-btn-view
+        - oroworkflow/js/app/views/transition/transition-error-view
+        - oroworkflow/js/app/views/workflow-activate-btn-view
+        - oroworkflow/js/app/views/workflow-deactivate-btn-view
+        - oroworkflow/js/app/views/workflow-form-widget-view
+        - oroworkflow/transition-dialog-widget
+map:
+    '*':
+        jsplumb: oroworkflow/js/extend/jsplumb
+    oroworkflow/js/extend/jsplumb:
+        jsplumb: '@oroinc/jsplumb/dist/js/jsPlumb-1.7.10'
+shim:
+    '@oroinc/jsplumb/dist/js/jsPlumb-1.7.10':
+        imports:
+            -
+                additionalCode: var define = false;
+                wrapper: window

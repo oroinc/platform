@@ -1,4 +1,4 @@
-{% extends 'OroEntityConfigBundle:Config:fieldUpdate.html.twig' %}
+{% extends '@OroEntityConfig/Config/fieldUpdate.html.twig' %}
 
 {% if field.id %}
     {% oro_title_set({params : {'%attributeName%': field.fieldName}}) %}
@@ -7,6 +7,8 @@
 {% endif %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_attribute_index', {alias: entityAlias})) }}
     {% if is_granted('oro_attribute_create') %}
         {% set html = UI.saveAndCloseButton({'route': 'oro_attribute_index', 'params': {alias: entityAlias}}) %}

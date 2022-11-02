@@ -2,80 +2,153 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
+use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 
 class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var AuditFieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider;
+
     /** @var EntityToEntityChangeArrayConverter */
     private $converter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        $this->provider = $this->createMock(AuditFieldTypeProvider::class);
+        $this->provider->expects($this->any())
+            ->method('getFieldType')
+            ->willReturn(AuditFieldTypeRegistry::TYPE_STRING);
+
         $this->converter = new EntityToEntityChangeArrayConverter();
+        $this->converter->setAuditFieldTypeProvider(new AuditFieldTypeProvider());
     }
 
     /**
      * @dataProvider entityConversionDataProvider
-     * @param array $changeSet
      */
     public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet)
     {
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->any())
+            ->method('hasMetadataFor')
+            ->willReturn(false);
+        $metadata = $this->createMock(ClassMetadata::class);
+
         $em = $this->getEntityManager();
+        $em->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
 
         $expected = [
             'entity_class' => EntityAdditionalFields::class,
-            'entity_id' => 1,
-            'change_set' => $expectedChangeSet,
-            'additional_fields' => []
+            'entity_id' => '0',
         ];
 
-        $converted = $this->converter->convertEntityToArray($em, new EntityAdditionalFields(), $changeSet);
+        if ($expectedChangeSet) {
+            $expected['change_set'] = $expectedChangeSet;
+        }
+
+        $converted = $this->converter->convertNamedEntityToArray($em, new EntityAdditionalFields(), $changeSet);
 
         $this->assertEquals($expected, $converted);
     }
 
     /**
      * @dataProvider additionalFieldsDataProvider
-     * @param array $fields
-     * @param array $expectedFields
      */
     public function testAdditionalFieldsAddedIfEntityHasThem(array $fields, array $expectedFields)
     {
-        $em = $this->getEntityManager();
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->any())
+            ->method('hasMetadataFor')
+            ->willReturn(false);
 
-        $converted = $this->converter->convertEntityToArray($em, new EntityAdditionalFields($fields), []);
+        $em = $this->getEntityManager();
+        $em->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+
+        $converted = $this->converter->convertNamedEntityToArray($em, new EntityAdditionalFields($fields), []);
 
         $this->assertArrayHasKey('additional_fields', $converted);
         $this->assertEquals($expectedFields, $converted['additional_fields']);
+    }
+
+    public function testConvertCollection()
+    {
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->any())
+            ->method('hasMetadataFor')
+            ->willReturn(true);
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $em = $this->getEntityManager();
+        $em->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+
+        $field = new \stdClass();
+        $field->prop = 'value';
+
+        $converted = $this->converter->convertNamedEntityToArray(
+            $em,
+            new EntityAdditionalFields(),
+            [
+                'collection' => [
+                    null,
+                    new ArrayCollection([$field]),
+                ],
+            ]
+        );
+
+        $this->assertArrayHasKey('change_set', $converted);
+        $this->assertEquals(
+            [
+                'collection' => [
+                    null,
+                    [
+                        'entity_class' => ArrayCollection::class,
+                        'entity_id' => '0',
+                    ],
+                ],
+            ],
+            $converted['change_set']
+        );
     }
 
     public function testEmptyAdditionalFieldsWhenEntityDoesNotHaveAny()
     {
         $em = $this->getEntityManager();
 
-        $converted = $this->converter->convertEntityToArray($em, new EntityAdditionalFields(), []);
+        $converted = $this->converter->convertNamedEntityToArray($em, new EntityAdditionalFields(), []);
 
-        $this->assertArrayHasKey('additional_fields', $converted);
-        $this->assertEmpty($converted['additional_fields']);
+        $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
     public function testEmptyAdditionalFieldsWhenEntityDoesNotImplementInterface()
     {
         $em = $this->getEntityManager();
 
-        $converted = $this->converter->convertEntityToArray($em, new \stdClass(), []);
+        $converted = $this->converter->convertNamedEntityToArray($em, new \stdClass(), []);
 
-        $this->assertArrayHasKey('additional_fields', $converted);
-        $this->assertEmpty($converted['additional_fields']);
+        $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
-    /**
-     * @return array
-     */
-    public function additionalFieldsDataProvider()
+    public function additionalFieldsDataProvider(): array
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
         $resource = fopen(__FILE__, 'rb');
@@ -96,10 +169,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function entityConversionDataProvider()
+    public function entityConversionDataProvider(): array
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
         $resource = fopen(__FILE__, 'rb');
@@ -125,23 +195,18 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
      */
     private function getEntityManager()
     {
-        $property = $this->createMock(\ReflectionProperty::class);
-        $property->expects($this->once())
-            ->method('getValue')
-            ->willReturn(1);
-
-        $classMetadata = $this->createMock(ClassMetadataInfo::class);
-        $classMetadata->expects($this->once())
-            ->method('getSingleIdReflectionProperty')
-            ->willReturn($property);
-
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->willReturn($classMetadata);
         $em->expects($this->any())
             ->method('contains')
             ->willReturn(false);
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects($this->any())
+            ->method('getSingleIdentifierValue')
+            ->willReturn('0');
 
         return $em;
     }

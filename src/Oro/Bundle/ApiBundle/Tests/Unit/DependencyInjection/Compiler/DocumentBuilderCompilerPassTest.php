@@ -4,21 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DocumentBuilderCompilerPass */
-    private $compiler;
+    private DocumentBuilderCompilerPass $compiler;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $factory;
+    private Definition $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new DocumentBuilderCompilerPass();
@@ -29,14 +30,20 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoDocumentBuilders()
+    public function testProcessWhenNoDocumentBuilders(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->factory->getArgument(0));
+        self::assertEquals([], $this->factory->getArgument('$documentBuilders'));
+
+        $serviceLocatorReference = $this->factory->getArgument('$container');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
         $documentBuilder1->setShared(false);
@@ -63,37 +70,27 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['document_builder1', 'rest'],
                 ['document_builder2', null]
             ],
-            $this->factory->getArgument(0)
-        );
-    }
-
-    public function testProcessWhenDocumentBuilderIsNotPublic()
-    {
-        $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
-        $documentBuilder1->setShared(false);
-        $documentBuilder1->setPublic(false);
-        $documentBuilder1->addTag(
-            'oro.api.document_builder',
-            ['requestType' => 'rest']
+            $this->factory->getArgument('$documentBuilders')
         );
 
-        $this->compiler->process($this->container);
-
+        $serviceLocatorReference = $this->factory->getArgument('$container');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                ['document_builder1', 'rest']
+                'document_builder1' => new ServiceClosureArgument(new Reference('document_builder1')),
+                'document_builder2' => new ServiceClosureArgument(new Reference('document_builder2'))
             ],
-            $this->factory->getArgument(0)
+            $serviceLocatorDef->getArgument(0)
         );
-        self::assertTrue($documentBuilder1->isPublic());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The document builder service "document_builder1" should be non shared.
-     */
-    public function testProcessWhenDocumentBuilderIsShared()
+    public function testProcessWhenDocumentBuilderIsShared(): void
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The document builder service "document_builder1" should be non shared.');
+
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
         $documentBuilder1->addTag(
             'oro.api.document_builder',

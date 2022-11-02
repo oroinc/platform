@@ -1,3 +1,4 @@
+@ticket-BAP-21510
 @ticket-BAP-15034
 Feature: Tags create and grid management
   In order to manage tags
@@ -19,17 +20,17 @@ Feature: Tags create and grid management
     When I save and close form
     Then I should see "Taxonomy has been saved" flash message
 
-  Scenario: Create tags
-    Given I login as administrator
+  Scenario: Checking for empty Tag grid and Create tags
     And I go to System / Tags Management / Tags
+    And there is no records in grid
     And I click "Create Tag"
     And I fill form with:
-      | Name        | Tag A      |
+      | Name        | TagA       |
       | Taxonomy    | A Taxonomy |
     When I save and create new form
     Then I should see "Tag saved" flash message
     And I fill form with:
-      | Name        | Tag B      |
+      | Name        | TagB       |
       | Taxonomy    | B Taxonomy |
     When I save and close form
     Then I should see "Tag saved" flash message
@@ -37,11 +38,29 @@ Feature: Tags create and grid management
     Scenario: Check tags on grid with sorting
       And I sort grid by "Taxonomy"
       And should see following grid:
-        | Name  | Taxonomy   |
-        | Tag A | A Taxonomy |
-        | Tag B | B Taxonomy |
+        | Name | Taxonomy   |
+        | TagA | A Taxonomy |
+        | TagB | B Taxonomy |
       And I sort grid by "Taxonomy"
       And should see following grid:
-        | Name  | Taxonomy   |
-        | Tag B | B Taxonomy |
-        | Tag A | A Taxonomy |
+        | Name | Taxonomy   |
+        | TagB | B Taxonomy |
+        | TagA | A Taxonomy |
+
+  Scenario: Check update, filter and search tags on grid
+    When I click "Edit" on row "TagA" in grid
+    And I fill form with:
+      | Name | TagC |
+    Then I save and close form
+    And I should see "Tag saved" flash message
+    And should see following grid:
+      | Name | Taxonomy   |
+      | TagB | B Taxonomy |
+      | TagC | A Taxonomy |
+
+    And filter Name as is equal to "TagB"
+    And should see following grid:
+      | Name | Taxonomy   |
+      | TagB | B Taxonomy |
+    And I click "Search by tag" on row "TagB" in grid
+    And I should see "No results were found"

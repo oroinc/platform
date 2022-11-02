@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,8 +17,8 @@ class LoadActivityData extends AbstractFixture
     public function load(ObjectManager $manager)
     {
         /** @var User $user */
-        $user = $manager->getRepository('OroUserBundle:User')->findOneByUsername('admin');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $user = $manager->getRepository(User::class)->findOneByUsername('admin');
+        $organization = $manager->getRepository(Organization::class)->getFirst();
 
         $testActivityTarget = new TestActivityTarget();
         $testActivity1 = new TestActivity();

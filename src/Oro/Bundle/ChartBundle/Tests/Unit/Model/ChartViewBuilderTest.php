@@ -2,197 +2,225 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ChartBundle\Exception\BadMethodCallException;
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ChartBundle\Model\ChartView;
 use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
+use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
+use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
+use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Component\Testing\ReflectionUtil;
+use Twig\Environment;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEMPLATE = 'template.twig.html';
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
+    /** @var TransformerFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $transformerFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $transformerFactory;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $twig;
+    /** @var ChartViewBuilder */
+    private $builder;
 
-    /**
-     * @var ChartViewBuilder
-     */
-    protected $builder;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->transformerFactory = $this
-            ->getMockBuilder('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->twig = $this->createMock('Twig_Environment');
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->transformerFactory = $this->createMock(TransformerFactory::class);
+        $this->twig = $this->createMock(Environment::class);
 
-        $this->builder = new ChartViewBuilder($this->configProvider, $this->transformerFactory, $this->twig);
+        $this->builder = new ChartViewBuilder(
+            $this->configProvider,
+            $this->transformerFactory,
+            $this->twig
+        );
+    }
+
+    private function getData(ChartViewBuilder $builder): DataInterface
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'data');
+    }
+
+    private function getOptions(ChartViewBuilder $builder): array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'options');
+    }
+
+    private function getDatagridColumnsDefinition(ChartViewBuilder $builder): array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'datagridColumnsDefinition');
+    }
+
+    private function getDataMapping(ChartViewBuilder $builder): ?array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'dataMapping');
     }
 
     public function testSetData()
     {
-        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = $this->createMock(DataInterface::class);
 
-        $this->assertEquals($this->builder, $this->builder->setData($data));
-        $this->assertAttributeEquals($data, 'data', $this->builder);
+        self::assertSame($this->builder, $this->builder->setData($data));
+        self::assertEquals($data, $this->getData($this->builder));
     }
 
     public function testSetArrayData()
     {
-        $arrayData = array('foo' => 'bar');
+        $result = $this->builder->setArrayData(['foo' => 'bar']);
 
-        $this->assertEquals($this->builder, $this->builder->setArrayData($arrayData));
-        $this->assertAttributeInstanceOf('Oro\Bundle\ChartBundle\Model\Data\ArrayData', 'data', $this->builder);
-        $this->assertAttributeEquals(new ArrayData($arrayData), 'data', $this->builder);
+        self::assertSame($this->builder, $result);
+        self::assertInstanceOf(ArrayData::class, $this->getData($this->builder));
+        self::assertEquals(new ArrayData(['foo' => 'bar']), $this->getData($this->builder));
     }
 
     public function testSetDataGrid()
     {
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $columnsDefintion = array('foo' => array('foo' => 'bar'));
-        $config = DatagridConfiguration::create(array('columns' => $columnsDefintion));
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $columnsDefinition = ['foo' => ['foo' => 'bar']];
+        $config = DatagridConfiguration::create(['columns' => $columnsDefinition]);
 
-        $datagrid->expects($this->once())
+        $datagrid->expects(self::once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertEquals($this->builder, $this->builder->setDataGrid($datagrid));
-        $this->assertAttributeInstanceOf('Oro\Bundle\ChartBundle\Model\Data\DataGridData', 'data', $this->builder);
-        $this->assertAttributeEquals(new DataGridData($datagrid), 'data', $this->builder);
-        $this->assertAttributeEquals($columnsDefintion, 'datagridColumnsDefinition', $this->builder);
+        $result = $this->builder->setDataGrid($datagrid);
+
+        self::assertSame($this->builder, $result);
+        self::assertInstanceOf(DataGridData::class, $this->getData($this->builder));
+        self::assertEquals(new DataGridData($datagrid), $this->getData($this->builder));
+        self::assertEquals($columnsDefinition, $this->getDatagridColumnsDefinition($this->builder));
     }
 
     public function testSetDataMapping()
     {
-        $dataMapping = array('foo' => 'bar');
+        $dataMapping = ['foo' => 'bar'];
 
-        $this->assertEquals($this->builder, $this->builder->setDataMapping($dataMapping));
-        $this->assertAttributeEquals($dataMapping, 'dataMapping', $this->builder);
+        $result = $this->builder->setDataMapping($dataMapping);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals($dataMapping, $this->getDataMapping($this->builder));
     }
 
     public function testSetDataMappingIgnored()
     {
-        $dataMapping = array('foo' => 'foo');
+        $dataMapping = ['foo' => 'foo'];
 
-        $this->assertEquals($this->builder, $this->builder->setDataMapping($dataMapping));
-        $this->assertAttributeEmpty('dataMapping', $this->builder);
+        $result = $this->builder->setDataMapping($dataMapping);
+
+        self::assertSame($this->builder, $result);
+        self::assertEmpty($this->getDataMapping($this->builder));
     }
 
     public function testSetOptions()
     {
-        $options = array(
+        $options = [
             'name' => 'foo',
-            'data_schema' => array('foo' => array('field_name' => 'foo', 'type' => 'integer'))
-        );
+            'data_schema' => ['foo' => ['field_name' => 'foo', 'type' => 'integer']]
+        ];
         $expectedOptions = $options;
-        $expectedOptions['settings'] = array();
+        $expectedOptions['settings'] = [];
 
-        $this->assertEquals($this->builder, $this->builder->setOptions($options));
-        $this->assertAttributeEquals($expectedOptions, 'options', $this->builder);
+        $result = $this->builder->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithDataGridColumnsDefinitionMerge()
     {
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $columnsDefintion = array('bar' => array('name' => 'bar', 'label' => 'Foo label', 'frontend_type' => 'int'));
-        $config = DatagridConfiguration::create(array('columns' => $columnsDefintion));
+        $columnsDefinition = ['bar' => ['name' => 'bar', 'label' => 'Foo label', 'frontend_type' => 'int']];
 
-        $datagrid->expects($this->once())
+        $config = DatagridConfiguration::create(['columns' => $columnsDefinition]);
+
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $datagrid->expects(self::once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $options = array('name' => 'foo', 'data_schema' => array('foo' => 'bar'), 'settings' => array());
+        $options = ['name' => 'foo', 'data_schema' => ['foo' => 'bar'], 'settings' => []];
         $expectedOptions = $options;
-        $expectedOptions['data_schema'] = array(
-            'foo' => array(
+        $expectedOptions['data_schema'] = [
+            'foo' => [
                 'field_name' => 'bar',
                 'label' => 'Foo label',
                 'type' => 'int',
-            )
-        );
+            ]
+        ];
 
-        $this->assertEquals($this->builder, $this->builder->setDataGrid($datagrid)->setOptions($options));
-        $this->assertAttributeEquals($expectedOptions, 'options', $this->builder);
+        $result = $this->builder->setDataGrid($datagrid)->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have "name" key.
-     */
     public function testSetOptionsWithoutName()
     {
-        $options = array('foo' => 'bar');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have "name" key.');
 
-        $this->assertEquals($this->builder, $this->builder->setOptions($options));
-        $this->assertAttributeEquals($options, 'options', $this->builder);
+        $options = ['foo' => 'bar'];
+
+        $result = $this->builder->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals($options, $this->getOptions($this->builder));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have "data_schema" key with array.
-     */
     public function testSetOptionsWithoutDataSchema()
     {
-        $options = array('name' => 'foo', 'data_schema' => 'foo');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have "data_schema" key with array.');
 
-        $this->assertEquals($this->builder, $this->builder->setOptions($options));
-        $this->assertAttributeEquals($options, 'options', $this->builder);
+        $options = ['name' => 'foo', 'data_schema' => 'foo'];
+
+        $result = $this->builder->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals($options, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithDataMapping()
     {
-        $options = array(
+        $options = [
             'name' => 'foo',
-            'data_schema' => array(
-                'label' => array('field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'),
-                'value' => array('label' => 'Bar Label', 'type' => 'string')
-            ),
-            'data_mapping' => array('foo' => 'bar'),
-        );
+            'data_schema' => [
+                'label' => ['field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'],
+                'value' => ['label' => 'Bar Label', 'type' => 'string']
+            ],
+            'data_mapping' => ['foo' => 'bar'],
+        ];
 
-        $this->assertEquals($this->builder, $this->builder->setOptions($options));
-        $this->assertAttributeEquals(
-            array('foo' => 'bar'),
-            'dataMapping',
-            $this->builder
-        );
+        $result = $this->builder->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals(['foo' => 'bar'], $this->getDataMapping($this->builder));
     }
 
     public function testSetOptionsWithDataMappingFromDataSchema()
     {
-        $options = array(
+        $options = [
             'name' => 'foo',
-            'data_schema' => array(
-                'label' => array('field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'),
-                'value' => array('label' => 'Bar Label', 'type' => 'integer')
-            )
-        );
+            'data_schema' => [
+                'label' => ['field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'],
+                'value' => ['label' => 'Bar Label', 'type' => 'integer']
+            ]
+        ];
 
-        $this->assertEquals($this->builder, $this->builder->setOptions($options));
-        $this->assertAttributeEquals(
-            array(
-                'label' => 'foo',
-                'value' => 'value',
-            ),
-            'dataMapping',
-            $this->builder
-        );
+        $result = $this->builder->setOptions($options);
+
+        self::assertSame($this->builder, $result);
+        self::assertEquals(['label' => 'foo', 'value' => 'value'], $this->getDataMapping($this->builder));
     }
 
     public function testGetView()
@@ -200,37 +228,46 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
 
-        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = new ArrayData([]);
 
-        $chartConfig = array(
+        $chartConfig = [
             'template' => $chartTemplate,
-            'default_settings' => array('bar' => 'baz'),
-        );
+            'default_settings' => ['bar' => 'baz'],
+        ];
 
-        $options = array(
+        $options = [
             'name' => $chartName,
-            'settings' => array('foo' => 'bar'),
-        );
+            'settings' => ['foo' => 'bar'],
+        ];
 
-        $expectedVars = array(
-            'options' => array(
+        $expectedVars = [
+            'options' => [
                 'name' => $chartName,
-                'settings' => array('foo' => 'bar', 'bar' => 'baz'),
-            ),
+                'settings' => ['foo' => 'bar', 'bar' => 'baz'],
+            ],
             'config' => $chartConfig
-        );
+        ];
 
-        $this->setExpectedChartConfig($chartName, $chartConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getChartConfig')
+            ->with($chartName)
+            ->willReturn($chartConfig);
 
         $chartView = $this->builder->setOptions($options)
             ->setData($data)
             ->getView();
 
-        $this->assertInstanceOf('Oro\Bundle\ChartBundle\Model\ChartView', $chartView);
-        $this->assertAttributeEquals($expectedVars, 'vars', $chartView);
-        $this->assertAttributeEquals($this->twig, 'twig', $chartView);
-        $this->assertAttributeEquals($chartTemplate, 'template', $chartView);
-        $this->assertAttributeEquals($data, 'data', $chartView);
+        // assertions
+        self::assertInstanceOf(ChartView::class, $chartView);
+
+        $this->twig->expects(self::once())
+            ->method('render')
+            ->with(
+                $chartTemplate,
+                array_merge($expectedVars, ['data' => $data->toArray()])
+            );
+
+        $chartView->render();
     }
 
     public function testGetViewWithDataTransformer()
@@ -238,92 +275,82 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
 
-        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
-        $dataTransformer = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface');
-        $transformedData = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = new ArrayData([]);
+        $dataTransformer = $this->createMock(TransformerInterface::class);
         $dataTransformerServiceId = 'data_transformer';
 
-        $chartConfig = array(
+        $chartConfig = [
             'data_transformer' => $dataTransformerServiceId,
             'template' => $chartTemplate,
-            'default_settings' => array(),
-        );
+            'default_settings' => [],
+        ];
 
-        $options = array('name' => $chartName, 'settings' => array('foo' => 'bar'));
+        $options = ['name' => $chartName, 'settings' => ['foo' => 'bar']];
 
-        $this->setExpectedChartConfig($chartName, $chartConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getChartConfig')
+            ->with($chartName)
+            ->willReturn($chartConfig);
 
-        $this->transformerFactory->expects($this->once())
+        $this->transformerFactory->expects(self::once())
             ->method('createTransformer')
-            ->will($this->returnValue($dataTransformer));
+            ->willReturn($dataTransformer);
 
-        $dataTransformer->expects($this->once())
+        $dataTransformer->expects(self::once())
             ->method('transform')
             ->with($data, $options)
-            ->will($this->returnValue($transformedData));
+            ->willReturn(new ArrayData([]));
 
         $chartView = $this->builder->setOptions($options)
             ->setData($data)
             ->getView();
 
-        $this->assertInstanceOf('Oro\Bundle\ChartBundle\Model\ChartView', $chartView);
-        $this->assertAttributeEquals($transformedData, 'data', $chartView);
+        // assertions
+        self::assertInstanceOf(ChartView::class, $chartView);
+
+        $this->twig->expects(self::once())
+            ->method('render')
+            ->with(
+                self::anything(),
+                ['options' => $options, 'config' => $chartConfig, 'data' => $data->toArray()]
+            );
+
+        $chartView->render();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Config of chart "chart_name" must have "template" key.
-     */
     public function testGetViewFailsWhenConfigDontHaveTemplate()
     {
-        $chartName = 'chart_name';
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Config of chart "chart_name" must have "template" key.');
 
-        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $this->configProvider->expects(self::once())
+            ->method('getChartConfig')
+            ->with('chart_name')
+            ->willReturn([]);
 
-        $chartConfig = array();
-
-        $options = array('name' => $chartName);
-
-        $this->setExpectedChartConfig($chartName, $chartConfig);
-
-        $this->builder->setOptions($options)
-            ->setData($data)
-            ->getView();
+        $this->builder->setOptions(['name' => 'chart_name'])->setData(new ArrayData([]))->getView();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setOptions() was not called.
-     */
     public function testGetViewFailsWhenOptionsNotSet()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage("Can't build result when setOptions() was not called.");
+
         $this->builder->getView();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setData() was not called.
-     */
     public function testGetViewFailsWhenDataNotSet()
     {
-        $chartName = 'foo';
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage("Can't build result when setData() was not called.");
 
-        $options = array('name' => $chartName);
-
-        $chartConfig = array(
-            'template' => 'foo.html.twig',
-            'default_settings' => array('bar' => 'baz'),
-        );
-
-        $this->setExpectedChartConfig($chartName, $chartConfig);
-        $this->builder->setOptions($options)->getView();
-    }
-
-    protected function setExpectedChartConfig($chartName, array $chartConfig)
-    {
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getChartConfig')
-            ->with($chartName)
-            ->will($this->returnValue($chartConfig));
+            ->with('chart_name')
+            ->willReturn([
+                'template' => 'foo.html.twig',
+                'default_settings' => ['bar' => 'baz'],
+            ]);
+        $this->builder->setOptions(['name' => 'chart_name'])->getView();
     }
 }

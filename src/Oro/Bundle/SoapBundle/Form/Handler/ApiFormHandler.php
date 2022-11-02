@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SoapBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Symfony\Component\Form\FormInterface;
@@ -27,12 +27,6 @@ class ApiFormHandler implements FormAwareInterface
      */
     protected $entityManager;
 
-    /**
-     *
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $entityManager
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $entityManager)
     {
         $this->form          = $form;

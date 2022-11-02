@@ -1,0 +1,21 @@
+services:
+    Oro\Component\MessageQueue\Client\Meta\TopicsCommand:
+        arguments:
+            - '@oro_message_queue.topic.registry'
+            - '@oro_message_queue.client.meta.topic_meta_registry'
+            - '@oro_message_queue.client.meta.topic_description_provider'
+        tags:
+            - { name: console.command }
+
+    Oro\Component\MessageQueue\Client\Meta\DestinationsCommand:
+        arguments:
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+        tags:
+            - { name: console.command }
+
+    Oro\Component\MessageQueue\Client\CreateQueuesCommand:
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+        tags:
+            - { name: console.command }

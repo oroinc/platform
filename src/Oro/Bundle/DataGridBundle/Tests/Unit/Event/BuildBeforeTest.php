@@ -3,15 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class BuildBeforeTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_STRING = 'testString';
+    private const TEST_STRING = 'testString';
 
     public function testEventCreation()
     {
-        $grid   = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $grid = $this->createMock(DatagridInterface::class);
         $config = DatagridConfiguration::create([]);
 
         $event = new BuildBefore($grid, $config);

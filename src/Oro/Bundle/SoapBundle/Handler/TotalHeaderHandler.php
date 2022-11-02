@@ -11,6 +11,9 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
+/**
+ * Includes total count in the response.
+ */
 class TotalHeaderHandler implements IncludeHandlerInterface
 {
     const HEADER_NAME = 'X-Include-Total-Count';
@@ -18,9 +21,6 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
 
-    /**
-     * @param CountQueryBuilderOptimizer $countQueryOptimizer
-     */
     public function __construct(CountQueryBuilderOptimizer $countQueryOptimizer)
     {
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;
@@ -42,6 +42,7 @@ class TotalHeaderHandler implements IncludeHandlerInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function handle(Context $context)
     {

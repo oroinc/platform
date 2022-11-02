@@ -8,21 +8,17 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 class ArrayPagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayPager */
-    protected $arrayPager;
+    private $arrayPager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrayPager = new ArrayPager();
     }
 
     /**
      * @dataProvider pageDataProvider
-     * @param int $currentPage
-     * @param int $maxPerPage
-     * @param int $arrayLength
-     * @param int $expectedLength
      */
-    public function testApply($currentPage, $maxPerPage, $arrayLength, $expectedLength)
+    public function testApply(int $currentPage, int $maxPerPage, int $arrayLength, int $expectedLength)
     {
         $this->arrayPager->setPage($currentPage);
         $this->arrayPager->setMaxPerPage($maxPerPage);
@@ -35,7 +31,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount($expectedLength, $datasource->getResults());
     }
 
-    public function pageDataProvider()
+    public function pageDataProvider(): array
     {
         return [
             ['currentPage' => 1, 'maxPerPage' => 25, 'arrayLength' => 50, 'expectedLength' => 25],
@@ -45,11 +41,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $rowsCount
-     * @return array
-     */
-    protected function prepareResults($rowsCount = 50)
+    private function prepareResults(int $rowsCount = 50): array
     {
         $arraySource  = [];
 

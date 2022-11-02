@@ -4,44 +4,33 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadStuckRootJobData;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadStuckRootJobDependentData;
-use Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\DependentMessageProcessorStub;
-use Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\UniqueMessageProcessorStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
-use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
+use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 
 class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
-    /** @var * MessageProducerInterface */
-    protected $messageProcessor;
+    use MessageQueueExtension;
 
-    /** @var QueueConsumer */
-    protected $consumer;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
+
+        self::purgeMessageQueue();
 
         $this->loadFixtures([
             LoadStuckRootJobData::class,
             LoadStuckRootJobDependentData::class
         ]);
-
-        $container = self::getContainer();
-        $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
-        $this->consumer = $container->get('oro_test.consumption.queue_consumer');
     }
 
-    public function testMessageProcessionUpdatesRootJobAfterException()
+    public function testMessageProcessionUpdatesRootJobAfterException(): void
     {
-        $uniqueJobName = UniqueMessageProcessorStub::TEST_JOB_NAME;
-        $dependentJobName = DependentMessageProcessorStub::TEST_JOB_NAME;
+        $uniqueJobName = UniqueMessageProcessor::TEST_JOB_NAME;
+        $dependentJobName = DependentMessageProcessor::TEST_JOB_NAME;
 
         $stuckUniqueRootJob = $this->getEntityManager()->getRepository(Job::class)
             ->findOneBy(['name' => $uniqueJobName, 'jobProgress' => 0]);
@@ -50,10 +39,8 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
             ->findOneBy(['name' => $dependentJobName, 'jobProgress' => 0]);
         self::assertNotEmpty($stuckRootJobDependent);
 
-        $this->consumer->bind('oro.default', $this->messageProcessor);
-        $this->consumer->consume(new ChainExtension([
-            new LimitConsumptionTimeExtension(new \DateTime('+5 seconds'))
-        ]));
+        // oro.message_queue.unique_test_topic + oro.message_queue.job.root_job_stopped + oro.message_queue.test_topic.
+        self::consume(3);
 
         $stuckUniqueRootJob = $this->getEntityManager()->getRepository(Job::class)
             ->findOneBy(['name' => $uniqueJobName, 'jobProgress' => 0]);
@@ -64,11 +51,15 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
     }
 
     /**
-     * @param $classManager
-     * @return EntityManager
+     * {@inheritdoc}
      */
-    private function getEntityManager($classManager = Job::class)
+    protected function getDataFixturesExecutorEntityManager()
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($classManager);
+        return $this->getEntityManager();
+    }
+
+    private function getEntityManager(): EntityManager
+    {
+        return self::getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 }

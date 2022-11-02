@@ -3,38 +3,40 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Trait for testing processors with import/export logic.
+ */
 trait MessageProcessTrait
 {
     use MessageQueueExtension;
 
-    /**
-     * @return string
-     */
-    protected function processExportMessage(ContainerInterface $container, Client $client)
+    protected function processExportMessage(ContainerInterface $container, Client $client): string
     {
-        $sentMessages = $this->getSentMessages();
-        $exportMessageData = reset($sentMessages);
-        $this->clearMessageCollector();
+        $sentMessage = self::getSentMessage(PreExportTopic::getName());
+        self::clearMessageCollector();
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(json_encode($exportMessageData['message']));
+        $message->setBody(json_encode($sentMessage));
+
+        $session = $this->createMock(SessionInterface::class);
 
         /** @var ExportMessageProcessor $processor */
         $processor = $container->get('oro_importexport.async.export');
-        $processorResult = $processor->process($message, $this->createSessionInterfaceMock());
+        $processorResult = $processor->process($message, $session);
 
         $this->assertEquals(ExportMessageProcessor::ACK, $processorResult);
 
-        $sentMessages = $this->getSentMessages();
+        $sentMessages = self::getSentMessages();
         foreach ($sentMessages as $messageData) {
-            if (Topics::SEND_NOTIFICATION_EMAIL === $messageData['topic']) {
+            if (SendEmailNotificationTemplateTopic::getName() === $messageData['topic']) {
                 break;
             }
         }
@@ -48,26 +50,18 @@ trait MessageProcessTrait
             $this->getUrl('oro_importexport_export_download', ['fileName' => $filename]),
             [],
             [],
-            $this->generateNoHashNavigationHeader()
+            self::generateNoHashNavigationHeader()
         );
 
         $result = $client->getResponse();
 
-        $this->assertResponseStatusCodeEquals($result, 200);
-        $this->assertResponseContentTypeEquals($result, 'text/csv');
-        $this->assertStringStartsWith(
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, 'text/csv');
+        self::assertStringStartsWith(
             'attachment; filename="' . $filename,
             $result->headers->get('Content-Disposition')
         );
 
         return $result->getFile()->getPathname();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionInterfaceMock()
-    {
-        return $this->getMockBuilder(SessionInterface::class)->getMock();
     }
 }

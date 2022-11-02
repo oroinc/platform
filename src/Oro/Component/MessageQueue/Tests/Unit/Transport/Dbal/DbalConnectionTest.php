@@ -47,8 +47,7 @@ class DbalConnectionTest extends \PHPUnit\Framework\TestCase
         $dbalConnection = $this->createDBALConnectionMock();
         $dbalConnection
             ->expects($this->once())
-            ->method('close')
-        ;
+            ->method('close');
 
         $connection = new DbalConnection($dbalConnection, 'table');
         $connection->close();

@@ -1,17 +1,19 @@
 /* @theme: admin.oro; */
 
 table.acl-table {
-    tr.default-field table tr.default-field td {
-        background-color: #f5f5f5;
+    /* stylelint-disable selector-max-compound-selectors */
+    tr table tr td {
+        vertical-align: middle;
     }
 
     tr table tr:first-child td {
         border-top: 0;
     }
 
-    tr table tr td {
-        vertical-align: middle;
+    tr.default-field table tr.default-field td {
+        background-color: $primary-860;
     }
+    /* stylelint-enable selector-max-compound-selectors */
 
     .access_level_value {
         min-height: 30px;
@@ -21,5 +23,3 @@ table.acl-table {
         width: 120px;
     }
 }
-
-

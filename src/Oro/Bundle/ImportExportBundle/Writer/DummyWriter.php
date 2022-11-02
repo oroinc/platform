@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+/**
+ * Batch job writer that skips writing operation.
+ */
 class DummyWriter implements ItemWriterInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function write(array $items)
     {

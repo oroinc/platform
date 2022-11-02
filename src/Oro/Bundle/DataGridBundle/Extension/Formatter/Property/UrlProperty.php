@@ -3,8 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Datagrid property formatter for rendering a URL
+ */
 class UrlProperty extends AbstractProperty
 {
     const ROUTE_KEY       = 'route';
@@ -21,9 +25,6 @@ class UrlProperty extends AbstractProperty
      */
     protected $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
@@ -34,10 +35,14 @@ class UrlProperty extends AbstractProperty
      */
     public function getRawValue(ResultRecordInterface $record)
     {
+        $referenceType = $this->getOr(self::IS_ABSOLUTE_KEY, false)
+            ? UrlGeneratorInterface::ABSOLUTE_URL
+            : UrlGeneratorInterface::ABSOLUTE_PATH;
+
         $route = $this->router->generate(
             $this->get(self::ROUTE_KEY),
             $this->getParameters($record),
-            $this->getOr(self::IS_ABSOLUTE_KEY, false)
+            $referenceType
         );
 
         return $route . $this->getOr(self::ANCHOR_KEY);

@@ -3,204 +3,273 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerAuthorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupProvider;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var AuthorizationChecker */
     private $authorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerAuthorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $container = TestContainerBuilder::create()
-            ->add('authorization_checker', $this->innerAuthorizationChecker)
-            ->add('object_identity_factory', $this->objectIdentityFactory)
-            ->add('annotation_provider', $this->annotationProvider)
-            ->getContainer($this);
-
         $this->authorizationChecker = new AuthorizationChecker(
-            new ServiceLink($container, 'authorization_checker'),
-            new ServiceLink($container, 'object_identity_factory'),
-            new ServiceLink($container, 'annotation_provider'),
+            $this->innerAuthorizationChecker,
+            $this->objectIdentityFactory,
+            $this->annotationProvider,
+            $this->groupProvider,
             $this->logger
         );
     }
 
-    public function testIsGrantedWithAclAnnotationIdAndNoObject()
+    public function testIsGrantedWithAclAnnotationIdAndNoObject(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
-        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $annotation->expects($this->once())
+        $annotation = $this->createMock(Acl::class);
+        $annotation->expects(self::once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
-        $annotation->expects($this->once())
+            ->willReturn('method_annotation');
+        $annotation->expects(self::once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
-        $this->objectIdentityFactory->expects($this->once())
+            ->willReturn('TEST_PERMISSION');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
+        $this->objectIdentityFactory->expects(self::once())
             ->method('get')
             ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
-        $this->annotationProvider->expects($this->at(0))
+            ->willReturn($oid);
+        $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('TestAnnotation')
-            ->will($this->returnValue($annotation));
-        $this->logger->expects($this->once())
+            ->willReturn($annotation);
+        $this->logger->expects(self::once())
             ->method('debug');
-        $this->innerAuthorizationChecker->expects($this->once())
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($oid))
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestAnnotation');
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function testIsGrantedWithAclAnnotationIdAndWithObject()
+    public function testIsGrantedWithAclAnnotationIdAndWithObject(): void
     {
         $obj = new \stdClass();
-        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $annotation->expects($this->once())
+        $annotation = $this->createMock(Acl::class);
+        $annotation->expects(self::once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
-        $annotation->expects($this->once())
+            ->willReturn('method_annotation');
+        $annotation->expects(self::once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
-        $this->objectIdentityFactory->expects($this->never())
+            ->willReturn('TEST_PERMISSION');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
+        $this->objectIdentityFactory->expects(self::never())
             ->method('get');
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('TestAnnotation')
-            ->will($this->returnValue($annotation));
-        $this->logger->expects($this->once())
+            ->willReturn($annotation);
+        $this->logger->expects(self::once())
             ->method('debug');
-        $this->innerAuthorizationChecker->expects($this->once())
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($obj))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($obj))
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestAnnotation', $obj);
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function testIsGrantedWithEmptyPermission()
+    public function testIsGrantedWithEmptyPermission(): void
     {
         $oid = new ObjectIdentity('test', 'action');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
         $this->objectIdentityFactory->expects(self::never())
             ->method(self::anything());
         $this->annotationProvider->expects(self::never())
             ->method(self::anything());
         $this->logger->expects(self::never())
             ->method(self::anything());
-        $this->innerAuthorizationChecker->expects($this->once())
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('', self::identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->authorizationChecker->isGranted('', $oid)
         );
     }
 
-    public function testIsGrantedWithRoleName()
+    public function testIsGrantedWithRoleName(): void
     {
-        $this->annotationProvider->expects($this->once())
+        $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('TestRole')
-            ->will($this->returnValue(null));
-        $this->innerAuthorizationChecker->expects($this->once())
+            ->willReturn(null);
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('TestRole'), $this->equalTo(null))
-            ->will($this->returnValue(true));
+            ->with('TestRole', $this->isNull())
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestRole');
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function testIsGrantedWithRoleNames()
+    public function testIsGrantedWithString(): void
     {
-        $this->annotationProvider->expects($this->never())
-            ->method('findAnnotationById');
-        $this->innerAuthorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo(array('TestRole1', 'TestRole2')), $this->equalTo(null))
-            ->will($this->returnValue(true));
-
-        $result = $this->authorizationChecker->isGranted(array('TestRole1', 'TestRole2'));
-        $this->assertTrue($result);
-    }
-
-    public function testIsGrantedWithString()
-    {
-        $oid = new ObjectIdentity('1', 'TestType');
-        $obj = 'Entity:SomeClass';
-        $this->annotationProvider->expects($this->once())
+        $oid = new ObjectIdentity('entity', 'SomeClass');
+        $obj = 'entity:SomeClass';
+        $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('PERMISSION')
-            ->will($this->returnValue(false));
-        $this->objectIdentityFactory->expects($this->at(0))
+            ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
+        $this->objectIdentityFactory->expects(self::once())
             ->method('get')
-            ->with($this->equalTo($obj))
-            ->will($this->returnValue($oid));
-        $this->innerAuthorizationChecker->expects($this->once())
+            ->with($obj)
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('PERMISSION'), $oid)
-            ->will($this->returnValue(true));
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function testIsGrantedWithCombinedString()
+    public function testIsGrantedWithStringAndNotDefaultAclGroup(): void
     {
-        $this->innerAuthorizationChecker->expects($this->once())
+        $oid = new ObjectIdentity('entity', 'TestType');
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('group');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with('entity:group@TestType')
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('VIEW'), 'entity:AcmeDemoBundle:Test')
-            ->will($this->returnValue(true));
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
 
-        $result = $this->authorizationChecker->isGranted('VIEW;entity:AcmeDemoBundle:Test');
-        $this->assertTrue($result);
+        $result = $this->authorizationChecker->isGranted('PERMISSION', 'entity:TestType');
+        self::assertTrue($result);
     }
 
-    public function testIsGrantedWithObject()
+    public function testIsGrantedWithStringThatContainsAclGroup(): void
+    {
+        $oid = new ObjectIdentity('entity', 'SomeClass');
+        $obj = 'entity:group@SomeClass';
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with($obj)
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithCombinedString(): void
+    {
+        $oid = new ObjectIdentity('entity', 'TestType');
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with('entity:TestType')
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($oid))
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('VIEW;entity:TestType');
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithObject(): void
     {
         $obj = new \stdClass();
-        $this->annotationProvider->expects($this->once())
+        $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('PERMISSION')
-            ->will($this->returnValue(false));
-        $this->innerAuthorizationChecker->expects($this->once())
+            ->willReturn(null);
+        $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with($this->equalTo('PERMISSION'), $this->equalTo($obj))
-            ->will($this->returnValue(true));
+            ->with('PERMISSION', $obj)
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
-        $this->assertTrue($result);
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedForNotAclProtectedClass(): void
+    {
+        $obj = 'Test\Class';
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with($obj)
+            ->willThrowException(new InvalidDomainObjectException());
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $obj)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
+        self::assertTrue($result);
     }
 }

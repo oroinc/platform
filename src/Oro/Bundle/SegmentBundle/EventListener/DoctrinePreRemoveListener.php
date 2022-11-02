@@ -9,35 +9,27 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 /**
- * Remove records from segment snapshot when referenced entity removed.
+ * Removes records from segment snapshot when referenced entity is removed.
  */
 class DoctrinePreRemoveListener
 {
     /** @var ConfigManager */
-    protected $cm;
+    private $configManager;
 
     /** @var array */
-    protected $deleteEntities = [];
+    private $deleteEntities = [];
 
-    /**
-     * @param ConfigManager $cm
-     */
-    public function __construct(ConfigManager $cm)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->cm = $cm;
+        $this->configManager = $configManager;
     }
 
-    /**
-     * Remove references from snapshot table
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function preRemove(LifecycleEventArgs $args)
+    public function preRemove(LifecycleEventArgs $args): void
     {
         $entity = $args->getEntity();
         $className = ClassUtils::getClass($entity);
 
-        if ($this->cm->hasConfig($className)) {
+        if ($this->configManager->hasConfig($className)) {
             $metadata  = $args->getEntityManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
             $this->deleteEntities[] = [
@@ -47,10 +39,7 @@ class DoctrinePreRemoveListener
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->deleteEntities) {
             $em = $args->getEntityManager();

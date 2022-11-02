@@ -1,5 +1,5 @@
-{% extends 'OroUserBundle::layout.html.twig' %}
-{% form_theme form with 'OroUIBundle:Form:login.html.twig' %}
+{% extends '@OroUser/layout.html.twig' %}
+{% form_theme form with '@OroUI/Form/login.html.twig' %}
 
 {% block bodyClass %}login-page{% endblock %}
 
@@ -7,30 +7,34 @@
     <div class="container">
         <div class="form-wrapper">
             <div class="form-wrapper__inner">
+                {% set resetLabel = 'Reset'|trans %}
+                {% set cancelLabel = 'Cancel'|trans %}
+                {% set showLabels = (resetLabel|length <= 9) and (cancelLabel|length <= 9) %}
+                {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
                 {{ form_start(form, {
                     'action': path('oro_user_reset_reset', { token: token }),
                     'attr': {
-                        'class': 'form-signin form-reset'
+                        'class': 'form-vertical form-signin form-signin--reset ' ~ layoutName
                     }
                 }) }}
                     <div class="title-box">
                         <h2 class="title">{{ 'Password Reset'|trans }}</h2>
                     </div>
-                    <fieldset class="oro-forgot-password">
+                    <fieldset class="field-set form-signin__fieldset">
                         {% if form.vars.errors|length > 0 %}
                             <div class="alert alert-error" role="alert">
                                 {{ form_errors(form) }}
                             </div>
                         {% endif %}
                         {{ form_rest(form) }}
-                        <div class="form-row form-signin__footer form-signin__footer--reset">
-                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ 'Cancel'|trans }}</a>
-                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ 'Reset'|trans }}</button>
+                        <div class="form-row form-signin__footer">
+                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ resetLabel }}</button>
+                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ cancelLabel }}</a>
                         </div>
                     </fieldset>
                 {{ form_end(form) }}
             </div>
-            <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>
+            <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
         </div>
     </div>
 {% endblock %}

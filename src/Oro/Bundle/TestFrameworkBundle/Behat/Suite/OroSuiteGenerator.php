@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Suite;
 
-use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Testwork\Suite\Generator\SuiteGenerator;
-use Behat\Testwork\Suite\GenericSuite;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Generates a suite using provided name and settings.
+ */
 class OroSuiteGenerator implements SuiteGenerator
 {
-    const SUITE_TYPE_SYMFONY = 'symfony_bundle';
-    const SUITE_TYPE_GENERIC = null;
+    private const SUITE_TYPE_SYMFONY = 'symfony_bundle';
+    private const SUITE_TYPE_GENERIC = null;
 
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
+    protected KernelInterface $kernel;
 
     public function __construct(KernelInterface $kernel)
     {
@@ -36,8 +34,8 @@ class OroSuiteGenerator implements SuiteGenerator
     public function generateSuite($suiteName, array $settings)
     {
         try {
-            $bundleName = isset($settings['bundle']) ? $settings['bundle'] : $suiteName;
-            $bundle = $this->kernel->getBundle('!' . $bundleName);
+            $bundleName = $settings['bundle'] ?? $suiteName;
+            $bundle = $this->kernel->getBundle($bundleName);
             $settings['type'] = self::SUITE_TYPE_SYMFONY;
             $settings['bundle'] = $bundleName;
 
@@ -45,7 +43,7 @@ class OroSuiteGenerator implements SuiteGenerator
         } catch (\InvalidArgumentException $e) {
             $settings['type'] = self::SUITE_TYPE_GENERIC;
 
-            return new GenericSuite($suiteName, $settings);
+            return new OroGenericSuite($suiteName, $settings, $this->kernel->getProjectDir());
         }
     }
 }

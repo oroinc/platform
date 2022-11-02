@@ -1,27 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Configuration;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Configuration */
-    protected $configuration;
-
-    protected function setUp()
-    {
-        $this->configuration = new Configuration();
-    }
-
-    public function testGetConfigTreeBuilder()
-    {
-        $this->assertInstanceOf(TreeBuilder::class, $this->configuration->getConfigTreeBuilder());
-    }
-
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
         $processor = new Processor();
         $expected = [
@@ -39,31 +26,25 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ],
                 'debug' => true
             ],
-            'api' => [
-                'crowdin' => [
-                    'endpoint' => Configuration::DEFAULT_CROWDIN_API_URL
-                ],
-                'oro_service' => [
-                    'endpoint' => Configuration::DEFAULT_PROXY_API_URL,
-                    'key' => ''
-                ]
+            'translation_service' => [
+                'apikey' => ''
             ],
-            'default_api_adapter' => Configuration::DEFAULT_ADAPTER,
+            'package_names' => [],
             'debug_translator' => false,
             'locales' => [],
             'default_required' => true,
-            'manager_registry' => 'doctrine',
-            'templating' => 'OroTranslationBundle::default.html.twig'
+            'templating' => '@OroTranslation/default.html.twig',
+            'translatable_dictionaries' => []
         ];
 
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $processor->processConfiguration(
-                $this->configuration,
+                new Configuration(),
                 [
                     'oro_translation' => [
                         'js_translation' => [],
-                        'api' => []
+                        'translation_service' => []
                     ]
                 ]
             )

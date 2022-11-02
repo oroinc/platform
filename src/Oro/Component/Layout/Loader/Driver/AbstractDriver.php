@@ -8,6 +8,10 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
+/**
+ * Abstract implementation of DriverInterface based on a filesystem cache storage,
+ * to load layout update instance  based on given file resource.
+ */
 abstract class AbstractDriver implements DriverInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
@@ -107,7 +111,7 @@ abstract class AbstractDriver implements DriverInterface
     {
         $name = pathinfo($file, PATHINFO_FILENAME);
 
-        if (strpos($name, self::ELEMENT_PREFIX) === 0) {
+        if (str_starts_with($name, self::ELEMENT_PREFIX)) {
             return new VisitorCollection([new ElementDependentVisitor(substr($name, 1))]);
         }
 
@@ -179,10 +183,9 @@ abstract class AbstractDriver implements DriverInterface
             '/',
             DIRECTORY_SEPARATOR,
             sprintf(
-                '%s/%s/%s/%s.php',
+                '%s/%s/%s.php',
                 $this->getCacheDir(),
-                substr($class, 0, 2),
-                substr($class, 2, 2),
+                substr($class, 0, 4),
                 substr($class, 4)
             )
         );
@@ -197,13 +200,7 @@ abstract class AbstractDriver implements DriverInterface
     protected function writeCacheFile($file, $content)
     {
         $dir = dirname($file);
-        if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new \RuntimeException(sprintf('Unable to create the cache directory (%s).', $dir));
-            }
-        } elseif (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the cache directory (%s).', $dir));
-        }
+        $this->createCacheDirectory($dir);
 
         $tmpFile = tempnam($dir, basename($file));
         if (false !== @file_put_contents($tmpFile, $content)) {
@@ -216,6 +213,27 @@ abstract class AbstractDriver implements DriverInterface
         }
 
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+    }
+
+    protected function createCacheDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            if (false === @mkdir($dir, 0777, true)) {
+                $error = error_get_last();
+                clearstatcache(true, $dir);
+                if (!\is_dir($dir)) {
+                    // Try to call is_dir again in 0.01 second, in case the parallel process already created it
+                    usleep(10000);
+                    if (!\is_dir($dir)) {
+                        throw new \RuntimeException(
+                            sprintf('Unable to create the cache directory (%s). %s', $dir, $error['message'])
+                        );
+                    }
+                }
+            }
+        } elseif (!is_writable($dir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the cache directory (%s).', $dir));
+        }
     }
 
     /**

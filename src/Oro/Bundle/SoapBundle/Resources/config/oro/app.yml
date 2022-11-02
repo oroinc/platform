@@ -2,10 +2,20 @@ security:
     firewalls:
         wsse_secured:
             pattern: ^/api/rest.*
+            provider: oro_user
             stateless:  true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
                 profile:  "UsernameToken"
             context: main
-            logout_on_user_change: true
+            organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
+                token_provider:             oro_security.token.provider.rememberme
+                secret:                     '%secret%'
+                name:                       BAPRM
+                lifetime:                   1209600   # stay logged for two weeks
+                httponly:                   true
+                csrf_protected_mode:        true
+            guard: # see "main" firewall
+                authenticators:
+                    - oro_user.impersonation_authenticator

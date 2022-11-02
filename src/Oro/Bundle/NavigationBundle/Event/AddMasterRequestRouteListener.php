@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * When menu item is forwarded in Controller, request doesn't contain "_route" attribute.
@@ -15,10 +15,7 @@ class AddMasterRequestRouteListener
     /** @var array */
     protected $masterRequestRoute;
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if ($event->isMasterRequest()) {

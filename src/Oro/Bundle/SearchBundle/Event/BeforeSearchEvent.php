@@ -3,9 +3,12 @@
 namespace Oro\Bundle\SearchBundle\Event;
 
 use Oro\Bundle\SearchBundle\Query\Query;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class BeforeSearchEvent extends Event
+/**
+ * Event which is triggered before search query is executed and gives possibility to adjust search query.
+ */
+class BeforeSearchEvent extends Event implements SearchQueryAwareEventInterface
 {
     const EVENT_NAME = "oro_search.before_search";
 
@@ -14,9 +17,6 @@ class BeforeSearchEvent extends Event
      */
     protected $query;
 
-    /**
-     * @param Query $query
-     */
     public function __construct(Query $query)
     {
         $this->query = $query;

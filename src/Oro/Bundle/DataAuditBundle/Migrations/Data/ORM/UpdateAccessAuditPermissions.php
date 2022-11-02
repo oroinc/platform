@@ -3,7 +3,8 @@
 namespace Oro\Bundle\DataAuditBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
@@ -51,7 +52,7 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
-        if (!$this->container->hasParameter('installed') || !$this->container->getParameter('installed')) {
+        if (!$this->container->get(ApplicationState::class)->isInstalled()) {
             return;
         }
 
@@ -60,7 +61,7 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
             return;
         }
 
-        $roles = $this->loadRoles();
+        $roles = $this->loadRoles($manager);
         $oldObjectIdentity = $this->createObjectIdentity(self::ACL_ACTION_AUDIT);
         $newObjectIdentity = $aclManager->getOid(self::ACL_ENTITY_AUDIT);
 
@@ -84,14 +85,13 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
     }
 
     /**
+     * @param ObjectManager $manager
+     *
      * @return Role[]
      */
-    private function loadRoles()
+    private function loadRoles(ObjectManager $manager)
     {
-        return $this->container
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepository('OroUserBundle:Role')
-            ->findAll();
+        return $manager->getRepository(Role::class)->findAll();
     }
 
     /**
@@ -105,13 +105,10 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
         $permission
     ) {
         $aclManager = $this->getAclManager();
-        $extension = $aclManager->getExtensionSelector()->select($objectIdentity);
-        $maskBuilders = $extension->getAllMaskBuilders();
-
+        $maskBuilders = $aclManager->getAllMaskBuilders($objectIdentity);
         foreach ($maskBuilders as $maskBuilder) {
-            if ($maskBuilder->hasMask('MASK_' . $permission)) {
+            if ($maskBuilder->hasMaskForPermission($permission)) {
                 $maskBuilder->add($permission);
-
                 $aclManager->setPermission($securityIdentity, $objectIdentity, $maskBuilder->get());
             }
         }
@@ -288,8 +285,6 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
      *
      * In fact, it does not delete ACEs of "class" type, because of ACL manager implementation specialties, so
      * only Object Identities are deleted.
-     *
-     * @param ObjectIdentityInterface $objectIdentity
      */
     private function deleteAclForObjectIdentity(ObjectIdentityInterface $objectIdentity)
     {

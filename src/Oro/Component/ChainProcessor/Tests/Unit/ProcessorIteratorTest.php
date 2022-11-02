@@ -4,8 +4,8 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,7 +18,7 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             new ChainApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertProcessors(
@@ -39,7 +39,7 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             new ChainApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertProcessors(
@@ -51,56 +51,6 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUnknownProcessor()
-    {
-        $context = new Context();
-        $processors = [
-            ['processor1', []],
-            ['processor2', []],
-            ['processor3', []]
-        ];
-
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->at(0))
-            ->method('getProcessor')
-            ->with('processor1')
-            ->willReturn(new ProcessorMock('processor1'));
-        $factory->expects($this->at(1))
-            ->method('getProcessor')
-            ->with('processor2')
-            ->willReturn(null);
-        $factory->expects($this->at(2))
-            ->method('getProcessor')
-            ->with('processor3')
-            ->willReturn(new ProcessorMock('processor3'));
-
-        $iterator = new ProcessorIterator(
-            $processors,
-            $context,
-            new ChainApplicableChecker(),
-            $factory
-        );
-
-        $iterator->rewind();
-        $this->assertEquals(new ProcessorMock('processor1'), $iterator->current());
-        $this->assertTrue($iterator->valid());
-
-        $iterator->next();
-        try {
-            $iterator->current();
-        } catch (\RuntimeException $e) {
-            $this->assertEquals('The processor "processor2" does not exist.', $e->getMessage());
-        }
-        $this->assertTrue($iterator->valid());
-
-        $iterator->next();
-        $this->assertEquals(new ProcessorMock('processor3'), $iterator->current());
-        $this->assertTrue($iterator->valid());
-
-        $iterator->next();
-        $this->assertFalse($iterator->valid());
-    }
-
     public function testApplicableCheckerGetterAndSetter()
     {
         $applicableChecker = new ChainApplicableChecker();
@@ -109,7 +59,7 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             [],
             new Context(),
             $applicableChecker,
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertSame($applicableChecker, $iterator->getApplicableChecker());
@@ -133,7 +83,7 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             new ChainApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $iterator->rewind();
@@ -150,12 +100,12 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface
+     * @return ProcessorRegistryInterface
      */
-    protected function getProcessorFactory()
+    protected function getProcessorRegistry()
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -163,7 +113,7 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**

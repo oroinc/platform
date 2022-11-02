@@ -8,17 +8,17 @@ namespace Oro\Bundle\ApiBundle\Processor;
  */
 class SingleItemContext extends Context
 {
-    /** an identifier of an entity */
-    const ID = 'id';
+    /** @var mixed */
+    private $id;
 
     /**
      * Gets an identifier of an entity
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getId()
     {
-        return $this->get(self::ID);
+        return $this->id;
     }
 
     /**
@@ -28,6 +28,6 @@ class SingleItemContext extends Context
      */
     public function setId($id)
     {
-        $this->set(self::ID, $id);
+        $this->id = $id;
     }
 }

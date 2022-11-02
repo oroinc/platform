@@ -3,35 +3,34 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Twig\TwigFilter;
 
 /**
- * Allows get formatted date and calendar date range by user localization settings
+ * Overrides existing Twig filters to use the default localization settings of the current organization:
+ *   - oro_format_datetime
+ *   - oro_format_date
+ *   - oro_format_day
+ *   - oro_format_time
  *
- * @deprecated Since 1.11, will be removed after 1.13.
+ * It also provides a new Twig filter to explicitly use the organization localization settings:
+ *   - oro_format_datetime_organization
  *
- * @todo it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
+ * It's a temporary workaround to fix dates in notification emails until CRM-5758 is implemented.
  */
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->container->get('oro_config.global');
-    }
-
     /**
      * {@inheritdoc}
      */
     public function getFilters()
     {
         $filters = parent::getFilters();
-        $filters[] = new \Twig_SimpleFilter(
+        $filters[] = new TwigFilter(
             'oro_format_datetime_organization',
-            [$this, 'formatDateTimeOrganization'],
-            ['is_safe' => ['html']]
+            [$this, 'formatDateTimeOrganization']
         );
 
         return $filters;
@@ -57,42 +56,72 @@ class DateTimeOrganizationExtension extends DateTimeExtension
      */
     public function formatDateTimeOrganization($date, array $options = [])
     {
-        $dateType = $this->getOption($options, 'dateType');
-        $timeType = $this->getOption($options, 'timeType');
-        $organization = $this->getOption($options, 'organization');
+        [$locale, $timeZone] = $this->getLocaleSettings($options['organization'] ?? null, $options);
 
-        list($locale, $timeZone) = $this->getLocaleSettings($organization, $options);
-
-        $result = $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
-
-        return $result;
+        return $this->getDateTimeFormatter()->format(
+            $date,
+            $options['dateType'] ?? null,
+            $options['timeType'] ?? null,
+            $locale,
+            $timeZone
+        );
     }
 
     /**
      * @param OrganizationInterface|null $organization
      * @param array                      $options
      *
-     * @return array ['locale', 'timezone']
+     * @return array [locale, timezone]
      */
     protected function getLocaleSettings($organization, array $options)
     {
         if ($organization instanceof OrganizationInterface) {
             $configManager = $this->getConfigManager();
-            $locale = $configManager->get('oro_locale.locale');
+            $localizationId = $configManager->get(
+                Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION)
+            );
+
+            $locale = $this->getFormattingCode((int) $localizationId);
             $timeZone = $configManager->get('oro_locale.timezone');
         } else {
-            $locale = $this->getOption($options, 'locale');
-            $timeZone = $this->getOption($options, 'timeZone');
+            $locale = $options['locale'] ?? null;
+            $timeZone = $options['timeZone'] ?? null;
         }
 
         return [$locale, $timeZone];
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $localizationId
+     * @return string
      */
-    public function getName()
+    protected function getFormattingCode(int $localizationId)
     {
-        return 'oro_locale_datetime_organization';
+        $localizationData = $this->getLocalizationManager()->getLocalizationData($localizationId);
+
+        return $localizationData['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
+    }
+
+    /**
+     * {@inheritdoc]
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_config.global' => ConfigManager::class,
+                'oro_locale.manager.localization' => LocalizationManager::class,
+            ]
+        );
+    }
+    protected function getConfigManager(): ConfigManager
+    {
+        return $this->container->get('oro_config.global');
+    }
+
+    protected function getLocalizationManager(): LocalizationManager
+    {
+        return $this->container->get('oro_locale.manager.localization');
     }
 }

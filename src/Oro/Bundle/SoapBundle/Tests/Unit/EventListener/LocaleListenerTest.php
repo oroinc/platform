@@ -1,31 +1,27 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\EventListener;
+namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SoapBundle\EventListener\LocaleListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LocaleListener */
-    protected $listener;
+    private string $defaultLocale;
 
-    /** @var string */
-    protected $defaultLocale;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $customLocale = 'fr';
 
@@ -34,34 +30,21 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $request->setDefaultLocale($this->defaultLocale);
 
         $translationListener = new TranslatableListener();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->setMethods(['get'])
-            ->getMock();
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturn($translationListener);
-        $this->listener = new LocaleListener($container);
-        $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
-        $this->assertEquals($customLocale, $request->getLocale());
-        $this->assertEquals($customLocale, $translationListener->getListenerLocale());
+        $listener = new LocaleListener($translationListener);
+        $listener->onKernelRequest($this->createRequestEvent($request));
+
+        self::assertEquals($customLocale, $request->getLocale());
+        self::assertEquals($customLocale, $translationListener->getListenerLocale());
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return GetResponseEvent
-     */
-    protected function createGetResponseEvent(Request $request)
+    private function createRequestEvent(Request $request): RequestEvent
     {
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
-            ->getMock();
+        $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         return $event;
     }

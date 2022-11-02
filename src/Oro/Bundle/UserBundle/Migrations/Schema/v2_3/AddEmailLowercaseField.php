@@ -9,7 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 /**
- * This migration adds new field 'emailLowercase' to CustomerUser entity
+ * This migration adds new field 'emailLowercase' to User entity
  * which is required for case insensitive email validation.
  */
 class AddEmailLowercaseField implements Migration, OrderedMigrationInterface

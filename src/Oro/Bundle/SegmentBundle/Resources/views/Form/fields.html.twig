@@ -1,5 +1,5 @@
 {% block oro_segment_filter_builder_row %}
-    {% if form.name is defined %}
+    {% if form.name is defined and not form.name.rendered %}
         {{ form_row(form.name, {
             'attr': {'class': 'control-group-oro_segment_filter_builder_segment_name'}
         }) }}
@@ -10,8 +10,8 @@
 {% endblock %}
 
 {% block oro_segment_filter_builder_widget %}
-    {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
-    {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+    {% import '@OroSegment/macros.html.twig' as segmentQD %}
+    {% import '@OroQueryDesigner/macros.html.twig' as QD %}
 
     {% set segment = form.vars.value %}
     {% set id = form.vars.id %}
@@ -24,14 +24,17 @@
     {{ form_widget(form.entity) }}
     {{ form_widget(form.definition) }}
     {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
+    {% if not isMobileVersion() %}
     {{ segmentQD.query_designer_condition_builder({
         'id': coditionBuilderId,
         'currentSegmentId': segment.id|default(null),
         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
         'conditionBuilderOptions': condition_builder_options,
         'metadata': metadata,
-        'column_chain_template_selector': '#' ~ column_chain_template_id
+        'column_chain_template_selector': '#' ~ column_chain_template_id,
+        'fieldConditionOptions': field_condition_options|default([]),
     }) }}
+    {% endif %}
 
     {% set widgetOptions = {
         valueSource:                '[data-ftid=' ~ definitionId ~ ']',

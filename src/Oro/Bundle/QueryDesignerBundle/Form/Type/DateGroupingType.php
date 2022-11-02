@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to manage the grouping by date section in the query designer.
+ */
 class DateGroupingType extends AbstractType
 {
     const NAME = 'oro_query_designer_date_grouping';
@@ -28,7 +31,7 @@ class DateGroupingType extends AbstractType
                 DateFieldChoiceType::class,
                 [
                     'required'            => true,
-                    'label'               => 'oro.report.form.date_grouping_field.label',
+                    'label'               => 'oro.query_designer.form.date_grouping.date_field.label',
                     'page_component_name' => 'date-grouping-field-choice',
                 ]
             )
@@ -37,7 +40,7 @@ class DateGroupingType extends AbstractType
                 CheckboxType::class,
                 [
                     'required' => false,
-                    'label' => 'oro.report.form.use_skip_empty_periods.label',
+                    'label' => 'oro.query_designer.form.date_grouping.use_skip_empty_periods.label',
                 ]
             )
             ->add(
@@ -45,7 +48,7 @@ class DateGroupingType extends AbstractType
                 CheckboxType::class,
                 [
                     'required' => false,
-                    'label' => 'oro.report.form.use_date_grouping_filter.label',
+                    'label' => 'oro.query_designer.form.date_grouping.use_date_grouping_filter.label',
                 ]
             );
     }

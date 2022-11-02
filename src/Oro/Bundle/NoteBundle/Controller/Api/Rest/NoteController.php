@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -18,10 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("note")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Note entity.
  */
-class NoteController extends RestController implements ClassResourceInterface
+class NoteController extends RestController
 {
     /**
      * Get notes for given entity
@@ -74,7 +70,7 @@ class NoteController extends RestController implements ClassResourceInterface
     /**
      * Get note
      *
-     * @param string $id Note id
+     * @param int $id Note id
      *
      * @ApiDoc(
      *      description="Get note item",
@@ -83,7 +79,7 @@ class NoteController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_note_view")
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -100,7 +96,7 @@ class NoteController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_note_update")
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -136,7 +132,7 @@ class NoteController extends RestController implements ClassResourceInterface
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

@@ -9,23 +9,20 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import\Stub\StubWorkflowI
 
 class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowImportProcessorSupervisor
-     */
+    /** @var WorkflowImportProcessorSupervisor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new WorkflowImportProcessorSupervisor();
     }
 
     public function testProcessProxyParent()
     {
-        /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $parent */
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
 
-        $first = $this->createImportProcessorMock('targetA', 'resourceA', ['setParent', 'process']);
-        $second = $this->createImportProcessorMock('targetB', 'resourceB', ['setParent', 'process']);
+        $first = $this->getImportProcessor('targetA', 'resourceA', ['setParent', 'process']);
+        $second = $this->getImportProcessor('targetB', 'resourceB', ['setParent', 'process']);
 
         $content = ['content'];
         $file = new \SplFileInfo(__FILE__);
@@ -34,19 +31,27 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->processor->addImportProcessor($second);
         $this->processor->setParent($parent);
 
-        $first->expects($this->once())->method('setParent')->with($parent);
-        $first->expects($this->once())->method('process')->with($content, $file);
+        $first->expects($this->once())
+            ->method('setParent')
+            ->with($parent);
+        $first->expects($this->once())
+            ->method('process')
+            ->with($content, $file);
 
         $this->processor->process($content, $file);
 
-        $second->expects($this->once())->method('setParent')->with($parent);
-        $second->expects($this->once())->method('process')->with($content, $file);
+        $second->expects($this->once())
+            ->method('setParent')
+            ->with($parent);
+        $second->expects($this->once())
+            ->method('process')
+            ->with($content, $file);
         $this->processor->process($content, $file);
     }
 
     public function testSkipProcessed()
     {
-        $once = $this->createImportProcessorMock('targetA', 'resourceA', ['setParent', 'process']);
+        $once = $this->getImportProcessor('targetA', 'resourceA', ['setParent', 'process']);
 
         $content = ['content'];
         $file = new \SplFileInfo(__FILE__);
@@ -55,7 +60,9 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->processor->addImportProcessor($once);
         $this->processor->addImportProcessor($once);
 
-        $once->expects($this->once())->method('process')->with($content, $file);
+        $once->expects($this->once())
+            ->method('process')
+            ->with($content, $file);
 
         $this->processor->process($content, $file);
         $this->processor->process($content, $file);
@@ -186,7 +193,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $fromB->setParent($parent);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/Recursion met\. ' .
             'File `([^`]+)` tries to import workflow `B` for `A` that currently imports it too in `([^`]+)`/'
         );
@@ -197,12 +204,9 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $target
-     * @param string $resource
-     * @param array $methods
      * @return WorkflowImportProcessor|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function createImportProcessorMock(string $target, string $resource, array $methods = [])
+    private function getImportProcessor(string $target, string $resource, array $methods = [])
     {
         $builder = $this->getMockBuilder(WorkflowImportProcessor::class);
         $builder->disableOriginalConstructor();
@@ -213,21 +217,19 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        $builder->setMethods($methods);
+        $builder->onlyMethods($methods);
 
         $workflowImportProcessor = $builder->getMock();
-        $workflowImportProcessor->expects($this->any())->method('getTarget')->willReturn($target);
-        $workflowImportProcessor->expects($this->any())->method('getResource')->willReturn($resource);
+        $workflowImportProcessor->expects($this->any())
+            ->method('getTarget')
+            ->willReturn($target);
+        $workflowImportProcessor->expects($this->any())
+            ->method('getResource')
+            ->willReturn($resource);
 
         return $workflowImportProcessor;
     }
 
-    /**
-     * @param callable $processCallback
-     * @param string $target
-     * @param string $resource
-     * @return StubWorkflowImportCallbackProcessor
-     */
     private function createCallbackProcessor(
         callable $processCallback,
         string $target,

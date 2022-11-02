@@ -12,55 +12,47 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 class LazyResultTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
-    protected $elements = [];
+    private $elements = [];
 
     /** @var int */
-    protected $count = 42;
+    private $count = 42;
 
     /** @var array */
-    protected $aggregatedData = [
+    private $aggregatedData = [
         'test_name' => [
             'field' => 'test_field_name',
             'function' => Query::AGGREGATE_FUNCTION_COUNT
         ]
     ];
 
-    /** @var Query */
-    protected $query;
-
     /** @var LazyResult */
-    protected $result;
+    private $result;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->elements = [
             new Item(
                 'OroTestBundle:test',
                 1,
-                'test title first',
                 'http://example.com',
                 []
             ),
             new Item(
                 'OroTestBundle:test',
                 2,
-                'test title second',
                 'http://example.com',
                 []
             ),
             new Item(
                 'OroTestBundle:test',
                 3,
-                'test title third',
                 'http://example.com',
                 []
             )
         ];
 
-        $this->query = new Query();
-
         $this->result = new LazyResult(
-            $this->query,
+            new Query(),
             $this->getCallbackFunction($this->elements),
             $this->getCallbackFunction($this->count),
             $this->getCallbackFunction($this->aggregatedData)
@@ -173,7 +165,6 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $item = new Item(
             'OroTestBundle:test',
             4,
-            'test title third',
             'http://example.com',
             []
         );
@@ -188,7 +179,6 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $item = new Item(
             'OroTestBundle:test',
             4,
-            'test title third',
             'http://example.com',
             []
         );
@@ -213,11 +203,7 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->elements, $items);
     }
 
-    /**
-     * @param mixed $value
-     * @return \Closure
-     */
-    protected function getCallbackFunction($value)
+    private function getCallbackFunction(mixed $value): \Closure
     {
         return function () use ($value) {
             return $value;

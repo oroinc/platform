@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles the action of creating or editing a business unit
+ */
 class BusinessUnitHandler
 {
     use RequestHandlerTrait;
@@ -22,16 +26,19 @@ class BusinessUnitHandler
     /** @var ObjectManager */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
-    public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
-    {
+    /** @var OwnerTreeProviderInterface */
+    private $ownerTreeProvider;
+
+    public function __construct(
+        FormInterface $form,
+        RequestStack $requestStack,
+        ObjectManager $manager,
+        OwnerTreeProviderInterface $ownerTreeProvider
+    ) {
         $this->form    = $form;
         $this->requestStack = $requestStack;
         $this->manager = $manager;
+        $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
     /**
@@ -73,6 +80,7 @@ class BusinessUnitHandler
         $this->removeUsers($entity, $removeUsers);
         $this->manager->persist($entity);
         $this->manager->flush();
+        $this->ownerTreeProvider->clearCache();
     }
 
     /**

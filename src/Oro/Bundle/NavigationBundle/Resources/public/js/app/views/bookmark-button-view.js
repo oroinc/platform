@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var BookmarkButtonView;
-    var mediator = require('oroui/js/mediator');
-    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
-    var document = window.document;
-    var titleRendered = null;
+    const mediator = require('oroui/js/mediator');
+    const PageRegionView = require('oroui/js/app/views/base/page-region-view');
+    const document = window.document;
+    let titleRendered = null;
 
-    BookmarkButtonView = PageRegionView.extend({
+    const BookmarkButtonView = PageRegionView.extend({
         pageItems: ['navigationElements', 'titleShort', 'titleSerialized'],
 
         /**
@@ -25,18 +24,20 @@ define(function(require) {
         listen: {
             'add collection': 'updateState',
             'remove collection': 'updateState',
-            'reset collection': 'updateState'
+            'reset collection': 'updateState',
+            'page:afterChange mediator': 'updateState',
+            'route:change mediator': 'updateState'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BookmarkButtonView() {
-            BookmarkButtonView.__super__.constructor.apply(this, arguments);
+        constructor: function BookmarkButtonView(options) {
+            BookmarkButtonView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!options.navigationElementType) {
@@ -52,45 +53,44 @@ define(function(require) {
         },
 
         render: function() {
-            var titleSerialized;
-            var titleShort;
-
             this.updateState();
 
-            var data = this.getTemplateData();
+            const data = this.getTemplateData();
             if (!data || !data.navigationElements) {
                 // no data, it is initial auto render, skip rendering
                 return this;
             }
 
             if (data.navigationElements[this.navigationElementType]) {
-                titleShort = data.titleShort;
-                this.$el.show();
+                this.$el.removeClass('hide');
+                if (data.titleShort) {
+                    this.$el.data('title-rendered-short', data.titleShort);
+                }
                 /**
                  * Setting serialized titles for pinbar button
                  */
                 if (data.titleSerialized) {
-                    titleSerialized = JSON.parse(data.titleSerialized);
-                    this.$el.data('title', titleSerialized);
+                    const titleSerialized = JSON.parse(data.titleSerialized);
+                    if (titleSerialized.template) {
+                        this.$el.data('title', titleSerialized);
+                    }
                 }
-                this.$el.data('title-rendered-short', titleShort);
             } else {
-                this.$el.hide();
+                this.$el.addClass('hide');
             }
 
             return this;
         },
 
         updateState: function() {
-            var model;
-            model = this.collection.getCurrentModel();
+            const model = this.collection.getCurrentModel();
             this.$el.toggleClass('gold-icon', Boolean(model));
         },
 
         onToggle: function() {
-            var attrs;
-            var Model;
-            var model = this.collection.getCurrentModel();
+            let attrs;
+            let Model;
+            let model = this.collection.getCurrentModel();
             if (model) {
                 this.collection.trigger('toRemove', model);
             } else {
@@ -102,7 +102,7 @@ define(function(require) {
         },
 
         getItemAttrs: function() {
-            var title = this.$el.data('title');
+            const title = this.$el.data('title');
             return {
                 url: mediator.execute('currentUrl'),
                 title_rendered: titleRendered || this.$el.data('title-rendered'),

@@ -18,8 +18,6 @@ class TranslationKeySource implements TranslationKeySourceInterface
     private $data;
 
     /**
-     * @param TranslationKeyTemplateInterface $keyTemplate
-     * @param array $data
      * @throws \InvalidArgumentException
      */
     public function __construct(TranslationKeyTemplateInterface $keyTemplate, array $data = [])

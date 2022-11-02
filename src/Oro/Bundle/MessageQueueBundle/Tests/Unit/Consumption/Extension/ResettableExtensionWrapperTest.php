@@ -14,7 +14,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
-    const EXTENSION_SERVICE_ID = 'service_id';
+    private const EXTENSION_SERVICE_ID = 'service_id';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
@@ -22,7 +22,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
     /** @var ResettableExtensionWrapper */
     private $resettableExtensionWrapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
 

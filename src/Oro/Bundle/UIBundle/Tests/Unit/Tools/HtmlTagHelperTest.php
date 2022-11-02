@@ -3,32 +3,299 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Component\Filesystem\Filesystem;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var HtmlTagHelper */
-    protected $helper;
+    use TempDirExtension;
 
-    /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagProvider;
+    private HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider;
 
-    /** @var string */
-    private $cachePath;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    protected function setUp()
+    private HtmlTagHelper $helper;
+
+    protected function setUp(): void
     {
-        $this->cachePath = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'cache_test_data';
-        mkdir($this->cachePath);
-        $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
-        $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
+        $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->getTempDir('cache_test_data'));
+
+        $this->helper->setAttribute('img', 'usemap', 'CDATA');
+        $this->helper->setAttribute('img', 'ismap', 'Bool');
+
+        $this->helper->setElement('map', 'Block', 'Flow', 'Common', true);
+        $this->helper->setAttribute('map', 'id', 'ID');
+        $this->helper->setAttribute('map', 'name', 'CDATA');
+
+        $this->helper->setElement('area', 'Inline', 'Empty', 'Common', true);
+        $this->helper->setAttribute('area', 'id', 'ID');
+        $this->helper->setAttribute('area', 'name', 'CDATA');
+        $this->helper->setAttribute('area', 'title', 'Text');
+        $this->helper->setAttribute('area', 'alt', 'Text');
+        $this->helper->setAttribute('area', 'coords', 'CDATA');
+        $this->helper->setAttribute('area', 'accesskey', 'Character');
+        $this->helper->setAttribute('area', 'nohref', 'Bool');
+        $this->helper->setAttribute('area', 'href', 'URI');
+        $this->helper->setAttribute('area', 'shape', 'Enum#rect,circle,poly,default');
+        $this->helper->setAttribute('area', 'target', 'Enum#_blank,_self,_target,_top');
+        $this->helper->setAttribute('area', 'tabindex', 'Text');
     }
 
-    protected function tearDown()
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testSanitize(string $value, array $allowableTags, array $allowedRel, string $expected): void
     {
-        $fileSystem = new Filesystem();
-        $fileSystem->remove($this->cachePath);
+        $this->htmlTagProvider->expects($this->never())
+            ->method('getIframeRegexp');
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowableTags);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedRel')
+            ->willReturn($allowedRel);
+
+        $this->assertEquals($expected, $this->helper->sanitize($value));
+    }
+
+    public function testSanitizeWithNullValue(): void
+    {
+        $this->helper->sanitize('<p>sometext</p>', 'default');
+        $this->assertInstanceOf(\HTMLPurifier_ErrorCollector::class, $this->helper->getLastErrorCollector());
+        $this->helper->sanitize('', 'default');
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
+    /**
+     * @dataProvider iframeDataProvider
+     */
+    public function testSanitizeIframe(string $value, array $allowedElements, string $allowedTags, string $expected)
+    {
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getIframeRegexp')
+            ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedTags')
+            ->willReturn($allowedTags);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowedElements);
+
+        $this->assertEquals($expected, $this->helper->sanitize($value));
+    }
+
+    /**
+     * @dataProvider errorCollectorWithoutErrorsDataProvider
+     */
+    public function testGetLastErrorCollectorWithoutErrors(
+        string $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
+        $this->assertLastErrorCollector($htmlValue, $allowedElements, $expectedResult);
+    }
+
+    /**
+     * @dataProvider errorCollectorWithErrorsDataProvider
+     */
+    public function testGetLastErrorCollectorWithErrors(
+        string $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
+        $this->translator->expects($this->atLeastOnce())
+            ->method('trans')
+            ->willReturnCallback(function ($id) {
+                if (str_contains($id, 'oro.htmlpurifier.messages')) {
+                    return 'Unrecognized $CurrentToken.Serialized tag removed';
+                }
+
+                return $id;
+            });
+
+        $this->helper->setTranslator($this->translator);
+
+        $this->assertLastErrorCollector($htmlValue, $allowedElements, $expectedResult);
+    }
+
+    public function assertLastErrorCollector(
+        string $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn($allowedElements);
+
+        $this->helper->sanitize($htmlValue);
+
+        $this->assertNotNull($this->helper->getLastErrorCollector());
+        $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getRaw());
+    }
+
+    public function testGetLastErrorCollectorEmpty(): void
+    {
+        $this->assertNull($this->helper->getLastErrorCollector());
+    }
+
+    public function dataProvider(): array
+    {
+        return array_merge($this->sanitizeDataProvider(), $this->xssDataProvider());
+    }
+
+    public function errorCollectorWithoutErrorsDataProvider(): array
+    {
+        return [
+            'without errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div', 'h1'],
+                'expectedResult' => [],
+            ],
+        ];
+    }
+
+    public function errorCollectorWithErrorsDataProvider(): array
+    {
+        return [
+            'with errors' => [
+                'htmlValue' => '<div><h1>Hello World!</h1></div>',
+                'allowedElements' => ['div'],
+                'expectedResult' => [
+                    [1, 1, 'Unrecognized <h1> tag removed', []],
+                    [1, 1, 'Unrecognized </h1> tag removed', []],
+                ],
+            ],
+        ];
+    }
+
+    public function iframeDataProvider(): array
+    {
+        return [
+            'iframe allowed' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.youtube.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+            ],
+            'iframe invalid src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>',
+            ],
+            'iframe bypass src' => [
+                'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
+                    'XWyzuVHRe0A?bypass=https://www.youtube.com/embed/XWyzuVHRe0A' .
+                    'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
+                'allowedElements' => ['iframe[id|allowfullscreen|src]'],
+                'allowedTags' => '<iframe></iframe>',
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>',
+            ],
+        ];
+    }
+
+    /**
+     * @link https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
+     */
+    private function xssDataProvider(): array
+    {
+        $str = '<IMG SRC=&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&' .
+            '#x58&#x53&#x53&#x27&#x29>';
+
+        return [
+            'image' => ['<IMG SRC="javascript:alert(\'XSS\');">', [], [], ''],
+            'script' => ['<script>alert(\'xss\');</script>', [], [], ''],
+            'coded' => [$str, [], [], ''],
+            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], [], ''],
+        ];
+    }
+
+    private function sanitizeDataProvider(): array
+    {
+        $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">' .
+            '<map name="planetmap">' .
+            '<area shape="rect" coords="0,0,82,126" href="sun.htm" alt="Sun" tabindex="-1">' .
+            '<area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury" tabindex="0">' .
+            '<area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus" tabindex="1">' .
+            '</map>';
+
+        return [
+            'default' => ['sometext', [], [], 'sometext'],
+            'not allowed tag' => ['<p>sometext</p>', ['a'], [], 'sometext'],
+            'allowed tag' => ['<p>sometext</p>', ['p'], [], '<p>sometext</p>'],
+            'mixed' => ['<p>sometext</p></br>', ['p'], [], '<p>sometext</p>'],
+            'attribute' => ['<p class="class">sometext</p>', ['p[class]'], [], '<p class="class">sometext</p>'],
+            'mixed attribute' => [
+                '<p class="class">sometext</p><span data-attr="mixed">',
+                ['p[class]'],
+                [],
+                '<p class="class">sometext</p>',
+            ],
+            'prepare allowed' => [
+                '<a>first text</a><c>second text</c>',
+                ['a', 'b'],
+                [],
+                '<a>first text</a>second text',
+            ],
+            'rel attribute allowed' => [
+                '<a rel="alternate">first text</a>',
+                ['a[rel]'],
+                ['alternate'],
+                '<a rel="alternate">first text</a>',
+            ],
+            'rel attribute disallowed' => [
+                '<a rel="alternate">first text</a>',
+                ['a'],
+                ['alternate'],
+                '<a>first text</a>',
+            ],
+            'rel attribute not listed' => [
+                '<a rel="appendix">first text</a>',
+                ['a[rel]'],
+                ['alternate'],
+                '<a>first text</a>',
+            ],
+            'prepare not allowed' => ['<p>sometext</p>', ['a[class]'], [], 'sometext'],
+            'prepare with allowed' => ['<p>sometext</p>', ['a', 'p[class]'], [], '<p>sometext</p>'],
+            'prepare attribute' => ['<p>sometext</p>', ['a[class]', 'p'], [], '<p>sometext</p>'],
+            'prepare attributes' => ['<p>sometext</p>', ['p[class|style]'], [], '<p>sometext</p>'],
+            'prepare or condition' => ['<p>sometext</p>', ['a[href|target=_blank]', 'b/p'], [], '<p>sometext</p>'],
+            'prepare empty' => ['<p>sometext</p>', ['[href|target=_blank],/'], [], 'sometext'],
+            'default attributes set' => ['<p>sometext</p>', ['@[style]', 'a'], [], 'sometext'],
+            'default attributes set with allowed' => ['<p>sometext</p>', ['@[style]', 'p'], [], '<p>sometext</p>'],
+            'id attribute' => [
+                '<div id="test" data-id="test2">sometext</div>',
+                ['div[id]'],
+                [],
+                '<div id="test">sometext</div>',
+            ],
+            'map element' => [
+                $mapHtml,
+                [
+                    'img[src|width|height|alt|usemap]',
+                    'map[name]',
+                    'area[shape|coords|href|alt|tabindex]',
+                ],
+                [],
+                $mapHtml,
+            ],
+        ];
     }
 
     public function testGetStripped()
@@ -41,21 +308,14 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shortStringProvider
-     *
-     * @param string $expected
-     * @param string $actual
-     * @param int $maxLength
      */
-    public function testGetShort($expected, $actual, $maxLength)
+    public function testGetShort(string $expected, string $actual, int $maxLength)
     {
         $shortBody = $this->helper->shorten($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
     }
 
-    /**
-     * @return array
-     */
-    public static function shortStringProvider()
+    public static function shortStringProvider(): array
     {
         return [
             ['абв абв абв', 'абв абв абв абв ', 12],
@@ -67,6 +327,10 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHtmlPurify()
     {
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getUriSchemes')
+            ->willReturn(['http' => true, 'https' => true]);
+
         $testString = <<<STR
 <html dir="ltr">
 <head>
@@ -115,20 +379,15 @@ HTML;
 
     /**
      * @dataProvider longStringProvider
-     * @param $value
-     * @param $expected
      */
-    public function testStripLongWords($value, $expected)
+    public function testStripLongWords(string $value, string $expected)
     {
         $result = $this->helper->stripLongWords($value);
 
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function longStringProvider()
+    public function longStringProvider(): array
     {
         return [
             [
@@ -208,16 +467,59 @@ HTML;
                     'M7Gho8HnScfSQ2B1gfuIUQ9rDXb6vrh2BezrwcVXPQdQMCgQoB5cYm8YKx5He4HV' .
                     'gEXFa4viVaXVWGnsEniZicMuiEARBlDrbJV6d4XfIvUVN98jx8RqBDnLH B2lq8s' .
                     'tnBZ8UgofSwwyELB9E7q5c1Oo91GWyNYBmAYCo0Q4lzL3ZtqBF5ciXleGPPJ2zRO' .
-                    'RryyZqPxOBS5Q4EZSwbOgxB2'
+                    'RryyZqPxOBS5Q4EZSwbOgxB2',
             ],
             [
                 'value' => 'single',
-                'expected' => 'single'
+                'expected' => 'single',
             ],
             [
                 'value' => 'double   stripped',
-                'expected' => 'double stripped'
-            ]
+                'expected' => 'double stripped',
+            ],
         ];
+    }
+
+    public function testSanitizeWithTranslator(): void
+    {
+        $htmlValue = "<div>\n    <h1>Hello World!</h1>\n    </div>";
+        $expectedResult = [
+            new Error("Unrecognized <h1> tag removed", ">\n    <h1>Hello World!</h"),
+            new Error("Unrecognized </h1> tag removed", "World!</h1>\n    </div>"),
+        ];
+
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['div']);
+
+        $this->helper->sanitize($htmlValue);
+
+        $this->assertNotNull($this->helper->getLastErrorCollector());
+        $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
+    }
+
+    public function testSanitizeReturnsSameContent(): void
+    {
+        $htmlValue = "<ul style=\"margin-bottom:0px;\">\n    <li>Hello world</li>\n</ul>";
+
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['ul[style]', 'li']);
+
+        // When error collection disabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', false)
+        );
+
+        $this->assertNull($this->helper->getLastErrorCollector());
+
+        // When error collection disabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', true)
+        );
+
+        $this->assertEquals([], $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
     }
 }

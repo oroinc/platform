@@ -1,13 +1,12 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    var TagModel;
     /**
      * @export  orotag/js/model
      * @class   orotag.Model
      * @extends Backbone.Model
      */
-    TagModel = Backbone.Model.extend({
+    const TagModel = Backbone.Model.extend({
         defaults: {
             owner: false,
             notSaved: false,
@@ -17,10 +16,10 @@ define(['backbone'], function(Backbone) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TagModel() {
-            TagModel.__super__.constructor.apply(this, arguments);
+        constructor: function TagModel(attrs, options) {
+            TagModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

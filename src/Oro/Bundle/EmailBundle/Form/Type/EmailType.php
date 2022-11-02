@@ -7,15 +7,18 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,6 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Form type to represent email
+ */
 class EmailType extends AbstractType
 {
     /** @var AuthorizationCheckerInterface */
@@ -40,13 +46,6 @@ class EmailType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param EmailRenderer                 $emailRenderer
-     * @param EmailModelBuilderHelper       $emailModelBuilderHelper
-     * @param ConfigManager                 $configManager
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -96,12 +95,12 @@ class EmailType extends AbstractType
             ->add(
                 'cc',
                 EmailAddressRecipientsType::class,
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                ['required' => false, 'attr' => ['class' => 'taggable-field'], 'label' => 'oro.email.cc.label']
             )
             ->add(
                 'bcc',
                 EmailAddressRecipientsType::class,
-                ['required' => false, 'attr' => ['class' => 'taggable-field']]
+                ['required' => false, 'attr' => ['class' => 'taggable-field'], 'label' => 'oro.email.bcc.label']
             )
             ->add('subject', TextType::class, ['required' => true, 'label' => 'oro.email.subject.label'])
             ->add(
@@ -158,6 +157,7 @@ class EmailType extends AbstractType
                 'contexts',
                 ContextsSelectType::class,
                 [
+                    'label' => "oro.email.contexts.label",
                     'collectionModel' => true,
                     'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',
@@ -181,10 +181,32 @@ class EmailType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'fillFormByTemplate']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
+    }
+
+    public function postSubmit(PostSubmitEvent $event)
+    {
+        $form = $event->getForm();
+        if ($form->isValid()) {
+            return;
+        }
+
+        // Add validation errors to attachments model.
+        /** @var Form $attachmentForm */
+        foreach ($event->getForm()->get('attachments') as $attachmentForm) {
+            /** @var EmailAttachment $emailAttachment */
+            $emailAttachment = $attachmentForm->getData();
+            if (!$emailAttachment) {
+                continue;
+            }
+            foreach ($attachmentForm->getErrors(true) as $error) {
+                $emailAttachment->addError($error->getMessage());
+            }
+        }
     }
 
     /**
-     * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function initChoicesByEntityName(FormEvent $event)
     {
@@ -192,7 +214,8 @@ class EmailType extends AbstractType
         $data = $event->getData();
         if (null === $data ||
             is_array($data) && empty($data['entityClass']) ||
-            is_object($data) && null === $data->getEntityClass()) {
+            is_object($data) && null === $data->getEntityClass()
+        ) {
             return;
         }
 
@@ -205,9 +228,12 @@ class EmailType extends AbstractType
             $event->setData($data);
         }
 
-        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
+        if (!$form->has('template')) {
+            return;
+        }
 
+        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         FormUtils::replaceField(
             $form,
             'template',
@@ -226,9 +252,6 @@ class EmailType extends AbstractType
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function fillFormByTemplate(FormEvent $event)
     {
         /** @var Email|null $data */

@@ -1,20 +1,17 @@
 /* @theme: admin.oro; */
 
 footer.footer {
-    position: fixed;
-    bottom: 0;
-
     .alert {
         margin: 0;
         border-radius: 0;
-        border: solid #2b343e;
+        border: solid $primary;
         border-width: 1px 0 0;
-        background: #313a45;
+        background: $primary-100;
         text-shadow: none;
         text-align: left;
         padding: 10px 12px;
-        color: #fff;
-        font-weight: bold;
+        color: $primary-inverse;
+        font-weight: font-weight('bold');
         font-size: 11px;
         line-height: 12px;
 
@@ -23,7 +20,7 @@ footer.footer {
 
             .btn-close {
                 float: left;
-                color: #fff;
+                color: $primary-inverse;
                 cursor: pointer;
             }
         }

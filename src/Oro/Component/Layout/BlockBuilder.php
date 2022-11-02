@@ -19,12 +19,6 @@ final class BlockBuilder implements BlockBuilderInterface
     /** @var string */
     private $id;
 
-    /**
-     * @param LayoutManipulatorInterface $layoutManipulator
-     * @param RawLayout                $rawLayout
-     * @param BlockTypeHelperInterface $typeHelper
-     * @param ContextInterface         $context
-     */
     public function __construct(
         LayoutManipulatorInterface $layoutManipulator,
         RawLayout $rawLayout,

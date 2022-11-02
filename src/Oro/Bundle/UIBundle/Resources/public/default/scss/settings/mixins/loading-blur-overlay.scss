@@ -1,0 +1,22 @@
+/* @theme: default; */
+
+@mixin loading-blur-overlay {
+    position: relative;
+
+    pointer-events: none;
+    user-select: none;
+
+    @include loading-blur();
+
+    &::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        z-index: z('dropdown');
+
+        content: '';
+    }
+}

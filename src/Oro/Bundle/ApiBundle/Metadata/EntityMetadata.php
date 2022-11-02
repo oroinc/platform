@@ -12,32 +12,31 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  * The metadata for an entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityMetadata implements ToArrayInterface
+class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
 {
-    /** @var string */
-    private $className;
-
-    /** @var bool */
-    private $inherited = false;
-
-    /** @var bool */
-    private $hasIdGenerator = false;
-
+    private string $className;
+    private bool $inherited = false;
+    private bool $hasIdGenerator = false;
     /** @var string[] */
-    private $identifiers = [];
-
+    private array $identifiers = [];
     /** @var MetaPropertyMetadata[] */
-    private $metaProperties = [];
-
+    private array $metaProperties = [];
+    /** @var LinkMetadataInterface[] */
+    private array $links = [];
     /** @var FieldMetadata[] */
-    private $fields = [];
-
+    private array $fields = [];
     /** @var AssociationMetadata[] */
-    private $associations = [];
+    private array $associations = [];
+    private ?ParameterBag $attributes = null;
+    private ?TargetMetadataAccessorInterface $targetMetadataAccessor = null;
 
-    /** @var ParameterBag|null */
-    private $attributes;
+    public function __construct(string $className)
+    {
+        $this->className = $className;
+    }
 
     /**
      * Makes a deep copy of the object.
@@ -48,33 +47,30 @@ class EntityMetadata implements ToArrayInterface
             $attributes = $this->attributes->toArray();
             $this->attributes->clear();
             foreach ($attributes as $key => $val) {
-                if (is_object($val)) {
+                if (\is_object($val)) {
                     $val = clone $val;
                 }
                 $this->attributes->set($key, $val);
             }
         }
         $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
+        $this->links = ConfigUtil::cloneObjects($this->links);
         $this->fields = ConfigUtil::cloneObjects($this->fields);
         $this->associations = ConfigUtil::cloneObjects($this->associations);
     }
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
-     *
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
         if (null !== $this->attributes) {
             $result = $this->attributes->toArray();
         }
-        if ($this->className) {
-            $result['class'] = $this->className;
-        }
+        $result['class'] = $this->className;
         if ($this->inherited) {
             $result['inherited'] = $this->inherited;
         }
@@ -85,15 +81,19 @@ class EntityMetadata implements ToArrayInterface
         if (!empty($identifiers)) {
             $result['identifiers'] = $identifiers;
         }
-        $metaProperties = $this->convertPropertiesToArray($this->metaProperties);
+        $metaProperties = ConfigUtil::convertPropertiesToArray($this->metaProperties);
         if (!empty($metaProperties)) {
             $result['meta_properties'] = $metaProperties;
         }
-        $fields = $this->convertPropertiesToArray($this->fields);
+        $links = ConfigUtil::convertPropertiesToArray($this->links);
+        if (!empty($links)) {
+            $result['links'] = $links;
+        }
+        $fields = ConfigUtil::convertPropertiesToArray($this->fields);
         if (!empty($fields)) {
             $result['fields'] = $fields;
         }
-        $associations = $this->convertPropertiesToArray($this->associations);
+        $associations = ConfigUtil::convertPropertiesToArray($this->associations);
         if (!empty($associations)) {
             $result['associations'] = $associations;
         }
@@ -102,38 +102,27 @@ class EntityMetadata implements ToArrayInterface
     }
 
     /**
-     * @param ToArrayInterface[] $properties
-     *
-     * @return array
+     * Sets an accessor to target metadata by a specified target class name.
+     * It is used for multi-target associations.
+     * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
      */
-    private function convertPropertiesToArray(array $properties)
+    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor): void
     {
-        $result = [];
-        foreach ($properties as $name => $property) {
-            $data = $property->toArray();
-            unset($data['name']);
-            $result[$name] = $data;
-        }
-
-        return $result;
+        $this->targetMetadataAccessor = $targetMetadataAccessor;
     }
 
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
 
     /**
-     * Sets FQCN of an entity.
-     *
-     * @param string $className
+     * Replaces FQCN of an entity.
      */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->className = $className;
     }
@@ -143,7 +132,7 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return string[]
      */
-    public function getIdentifierFieldNames()
+    public function getIdentifierFieldNames(): array
     {
         return $this->identifiers;
     }
@@ -153,27 +142,23 @@ class EntityMetadata implements ToArrayInterface
      *
      * @param string[] $fieldNames
      */
-    public function setIdentifierFieldNames(array $fieldNames)
+    public function setIdentifierFieldNames(array $fieldNames): void
     {
         $this->identifiers = $fieldNames;
     }
 
     /**
      * Whether the entity has some strategy to generate identifier value.
-     *
-     * @return bool
      */
-    public function hasIdentifierGenerator()
+    public function hasIdentifierGenerator(): bool
     {
         return $this->hasIdGenerator;
     }
 
     /**
      * Sets a flag indicates whether the entity has some strategy to generate identifier value.
-     *
-     * @param bool $hasIdentifierGenerator
      */
-    public function setHasIdentifierGenerator($hasIdentifierGenerator)
+    public function setHasIdentifierGenerator(bool $hasIdentifierGenerator): void
     {
         $this->hasIdGenerator = $hasIdentifierGenerator;
     }
@@ -182,32 +167,50 @@ class EntityMetadata implements ToArrayInterface
      * Whether an entity is inherited object.
      * It can be an entity implemented by Doctrine table inheritance
      * or by another feature, for example by associations provided by OroPlatform.
-     *
-     * @return bool
      */
-    public function isInheritedType()
+    public function isInheritedType(): bool
     {
         return $this->inherited;
     }
 
     /**
      * Sets inheritance flag.
-     *
-     * @param bool $inherited
      */
-    public function setInheritedType($inherited)
+    public function setInheritedType(bool $inherited): void
     {
         $this->inherited = $inherited;
     }
 
     /**
-     * Checks whether metadata of the given field, association or meta property exists.
-     *
-     * @param string $propertyName
-     *
-     * @return bool
+     * Gets metadata for the given entity class.
      */
-    public function hasProperty($propertyName)
+    public function getEntityMetadata(string $className): ?EntityMetadata
+    {
+        if (null === $this->targetMetadataAccessor || $className === $this->className) {
+            return null;
+        }
+
+        return $this->targetMetadataAccessor->getTargetMetadata($className, null);
+    }
+
+    /**
+     * Gets the name of the given property in the source entity.
+     * Returns NULL if the property does not exist.
+     */
+    public function getPropertyPath(string $propertyName): ?string
+    {
+        $property = $this->getProperty($propertyName);
+        if (null === $property) {
+            return null;
+        }
+
+        return $property->getPropertyPath();
+    }
+
+    /**
+     * Checks whether metadata of the given field, association or meta property exists.
+     */
+    public function hasProperty(string $propertyName): bool
     {
         return
             $this->hasField($propertyName)
@@ -217,12 +220,8 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Gets a property metadata by its name.
-     *
-     * @param string $propertyName
-     *
-     * @return PropertyMetadata|null
      */
-    public function getProperty($propertyName)
+    public function getProperty(string $propertyName): ?PropertyMetadata
     {
         if (isset($this->fields[$propertyName])) {
             return $this->fields[$propertyName];
@@ -239,10 +238,8 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Removes metadata of a field or association.
-     *
-     * @param string $propertyName
      */
-    public function removeProperty($propertyName)
+    public function removeProperty(string $propertyName): void
     {
         if ($this->hasField($propertyName)) {
             $this->removeField($propertyName);
@@ -255,11 +252,8 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Renames a field or association.
-     *
-     * @param string $oldName
-     * @param string $newName
      */
-    public function renameProperty($oldName, $newName)
+    public function renameProperty(string $oldName, string $newName): void
     {
         if ($this->hasField($oldName)) {
             $this->renameField($oldName, $newName);
@@ -272,12 +266,8 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Finds a property metadata by the given property path.
-     *
-     * @param string $propertyPath
-     *
-     * @return PropertyMetadata|null
      */
-    public function getPropertyByPropertyPath($propertyPath)
+    public function getPropertyByPropertyPath(string $propertyPath): ?PropertyMetadata
     {
         $property = $this->getByPropertyPath($this->fields, $propertyPath);
         if (null === $property) {
@@ -290,14 +280,9 @@ class EntityMetadata implements ToArrayInterface
         return $property;
     }
 
-    /**
-     * @param PropertyMetadata[] $properties
-     * @param string             $propertyPath
-     *
-     * @return PropertyMetadata|null
-     */
-    private function getByPropertyPath(array $properties, $propertyPath)
+    private function getByPropertyPath(array $properties, string $propertyPath): ?PropertyMetadata
     {
+        /** @var PropertyMetadata $property */
         foreach ($properties as $property) {
             if ($property->getPropertyPath() === $propertyPath) {
                 return $property;
@@ -312,47 +297,31 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return MetaPropertyMetadata[] [meta property name => MetaPropertyMetadata, ...]
      */
-    public function getMetaProperties()
+    public function getMetaProperties(): array
     {
         return $this->metaProperties;
     }
 
     /**
      * Checks whether metadata of the given meta property exists.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return bool
      */
-    public function hasMetaProperty($metaPropertyName)
+    public function hasMetaProperty(string $metaPropertyName): bool
     {
         return isset($this->metaProperties[$metaPropertyName]);
     }
 
     /**
      * Gets metadata of a meta property.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return MetaPropertyMetadata|null
      */
-    public function getMetaProperty($metaPropertyName)
+    public function getMetaProperty(string $metaPropertyName): ?MetaPropertyMetadata
     {
-        if (!isset($this->metaProperties[$metaPropertyName])) {
-            return null;
-        }
-
-        return $this->metaProperties[$metaPropertyName];
+        return $this->metaProperties[$metaPropertyName] ?? null;
     }
 
     /**
      * Adds metadata of a meta property.
-     *
-     * @param MetaPropertyMetadata $metaProperty
-     *
-     * @return MetaPropertyMetadata
      */
-    public function addMetaProperty(MetaPropertyMetadata $metaProperty)
+    public function addMetaProperty(MetaPropertyMetadata $metaProperty): MetaPropertyMetadata
     {
         $this->metaProperties[$metaProperty->getName()] = $metaProperty;
 
@@ -361,21 +330,16 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Removes metadata of a meta property.
-     *
-     * @param string $metaPropertyName
      */
-    public function removeMetaProperty($metaPropertyName)
+    public function removeMetaProperty(string $metaPropertyName): void
     {
         unset($this->metaProperties[$metaPropertyName]);
     }
 
     /**
-     * Renames existing meta property
-     *
-     * @param string $oldName
-     * @param string $newName
+     * Renames existing meta property.
      */
-    public function renameMetaProperty($oldName, $newName)
+    public function renameMetaProperty(string $oldName, string $newName): void
     {
         $metadata = $this->getMetaProperty($oldName);
         if (null !== $metadata) {
@@ -386,51 +350,79 @@ class EntityMetadata implements ToArrayInterface
     }
 
     /**
+     * Gets metadata for all links.
+     *
+     * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * Checks whether metadata of the given link exists.
+     */
+    public function hasLink(string $linkName): bool
+    {
+        return isset($this->links[$linkName]);
+    }
+
+    /**
+     * Gets metadata of a link.
+     */
+    public function getLink(string $linkName): ?LinkMetadataInterface
+    {
+        return $this->links[$linkName] ?? null;
+    }
+
+    /**
+     * Adds metadata of a link.
+     */
+    public function addLink(string $name, LinkMetadataInterface $link): LinkMetadataInterface
+    {
+        $this->links[$name] = $link;
+
+        return $link;
+    }
+
+    /**
+     * Removes metadata of a link.
+     */
+    public function removeLink(string $linkName): void
+    {
+        unset($this->links[$linkName]);
+    }
+
+    /**
      * Gets metadata for all fields.
      *
      * @return FieldMetadata[] [field name => FieldMetadata, ...]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
      * Checks whether metadata of the given field exists.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
-    public function hasField($fieldName)
+    public function hasField(string $fieldName): bool
     {
         return isset($this->fields[$fieldName]);
     }
 
     /**
      * Gets metadata of a field.
-     *
-     * @param string $fieldName
-     *
-     * @return FieldMetadata|null
      */
-    public function getField($fieldName)
+    public function getField(string $fieldName): ?FieldMetadata
     {
-        if (!isset($this->fields[$fieldName])) {
-            return null;
-        }
-
-        return $this->fields[$fieldName];
+        return $this->fields[$fieldName] ?? null;
     }
 
     /**
      * Adds metadata of a field.
-     *
-     * @param FieldMetadata $field
-     *
-     * @return FieldMetadata
      */
-    public function addField(FieldMetadata $field)
+    public function addField(FieldMetadata $field): FieldMetadata
     {
         $this->fields[$field->getName()] = $field;
 
@@ -439,21 +431,16 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Removes metadata of a field.
-     *
-     * @param string $fieldName
      */
-    public function removeField($fieldName)
+    public function removeField(string $fieldName): void
     {
         unset($this->fields[$fieldName]);
     }
 
     /**
      * Renames existing field
-     *
-     * @param string $oldName
-     * @param string $newName
      */
-    public function renameField($oldName, $newName)
+    public function renameField(string $oldName, string $newName): void
     {
         $metadata = $this->getField($oldName);
         if (null !== $metadata) {
@@ -468,47 +455,31 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return AssociationMetadata[] [association name => AssociationMetadata, ...]
      */
-    public function getAssociations()
+    public function getAssociations(): array
     {
         return $this->associations;
     }
 
     /**
      * Checks whether metadata of the given association exists.
-     *
-     * @param string $associationName
-     *
-     * @return bool
      */
-    public function hasAssociation($associationName)
+    public function hasAssociation(string $associationName): bool
     {
         return isset($this->associations[$associationName]);
     }
 
     /**
      * Gets metadata of an association.
-     *
-     * @param string $associationName
-     *
-     * @return AssociationMetadata|null
      */
-    public function getAssociation($associationName)
+    public function getAssociation(string $associationName): ?AssociationMetadata
     {
-        if (!isset($this->associations[$associationName])) {
-            return null;
-        }
-
-        return $this->associations[$associationName];
+        return $this->associations[$associationName] ?? null;
     }
 
     /**
      * Adds metadata of an association.
-     *
-     * @param AssociationMetadata $association
-     *
-     * @return AssociationMetadata
      */
-    public function addAssociation(AssociationMetadata $association)
+    public function addAssociation(AssociationMetadata $association): AssociationMetadata
     {
         $this->associations[$association->getName()] = $association;
 
@@ -517,21 +488,16 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Removes metadata of an association.
-     *
-     * @param string $associationName
      */
-    public function removeAssociation($associationName)
+    public function removeAssociation(string $associationName): void
     {
         unset($this->associations[$associationName]);
     }
 
     /**
      * Renames existing association
-     *
-     * @param string $oldName
-     * @param string $newName
      */
-    public function renameAssociation($oldName, $newName)
+    public function renameAssociation(string $oldName, string $newName): void
     {
         $metadata = $this->getAssociation($oldName);
         if (null !== $metadata) {
@@ -543,24 +509,16 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Checks whether an additional attribute exists.
-     *
-     * @param string $attributeName
-     *
-     * @return bool
      */
-    public function has($attributeName)
+    public function has(string $attributeName): bool
     {
         return null !== $this->attributes && $this->attributes->has($attributeName);
     }
 
     /**
      * Gets an additional attribute.
-     *
-     * @param string $attributeName
-     *
-     * @return mixed|null
      */
-    public function get($attributeName)
+    public function get(string $attributeName): mixed
     {
         if (null === $this->attributes) {
             return null;
@@ -571,11 +529,8 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Sets an additional attribute.
-     *
-     * @param string $attributeName
-     * @param mixed  $value
      */
-    public function set($attributeName, $value)
+    public function set(string $attributeName, mixed $value): void
     {
         if (null === $this->attributes) {
             $this->attributes = new ParameterBag();
@@ -585,32 +540,24 @@ class EntityMetadata implements ToArrayInterface
 
     /**
      * Removes an additional attribute.
-     *
-     * @param string $attributeName
      */
-    public function remove($attributeName)
+    public function remove(string $attributeName): void
     {
-        if (null !== $this->attributes) {
-            $this->attributes->remove($attributeName);
-        }
+        $this->attributes?->remove($attributeName);
     }
 
     /**
      * Checks whether the metadata has at least one identifier field.
-     *
-     * @return bool
      */
-    public function hasIdentifierFields()
+    public function hasIdentifierFields(): bool
     {
         return !empty($this->identifiers);
     }
 
     /**
      * Checks whether the metadata contains only identifier fields(s).
-     *
-     * @return bool
      */
-    public function hasIdentifierFieldsOnly()
+    public function hasIdentifierFieldsOnly(): bool
     {
         $idFields = $this->getIdentifierFieldNames();
         if (empty($idFields)) {
@@ -622,13 +569,13 @@ class EntityMetadata implements ToArrayInterface
             return false;
         }
 
-        if (count($this->getAssociations()) > 0) {
+        if (\count($this->getAssociations()) > 0) {
             return false;
         }
 
         return
-            count($fields) === count($idFields)
-            && count(array_diff_key($fields, array_flip($idFields))) === 0;
+            \count($fields) === \count($idFields)
+            && \count(array_diff_key($fields, array_flip($idFields))) === 0;
     }
 
     /**
@@ -639,19 +586,14 @@ class EntityMetadata implements ToArrayInterface
      * @return mixed The value of identifier field
      *               or array ([field name => value, ...]) if the entity has composite identifier
      */
-    public function getIdentifierValue($entity)
+    public function getIdentifierValue(object $entity): mixed
     {
-        if (!is_object($entity)) {
-            throw new \InvalidArgumentException(
-                sprintf('Expected argument of type "object", "%s" given.', gettype($entity))
-            );
-        }
-
-        $numberOfIdFields = count($this->identifiers);
+        $numberOfIdFields = \count($this->identifiers);
         if (0 === $numberOfIdFields) {
-            throw new RuntimeException(
-                sprintf('The entity "%s" does not have identifier field(s).', $this->className)
-            );
+            throw new RuntimeException(sprintf(
+                'The entity "%s" does not have identifier field(s).',
+                $this->className
+            ));
         }
 
         $reflClass = new \ReflectionClass($entity);
@@ -667,14 +609,7 @@ class EntityMetadata implements ToArrayInterface
         return $this->getPropertyValue($entity, $reflClass, reset($this->identifiers));
     }
 
-    /**
-     * @param object           $entity
-     * @param \ReflectionClass $reflClass
-     * @param string           $fieldName
-     *
-     * @return mixed
-     */
-    private function getPropertyValue($entity, \ReflectionClass $reflClass, $fieldName)
+    private function getPropertyValue(object $entity, \ReflectionClass $reflClass, string $fieldName): mixed
     {
         $propertyName = $fieldName;
         $property = $this->getProperty($fieldName);
@@ -683,9 +618,11 @@ class EntityMetadata implements ToArrayInterface
         }
         $property = ReflectionUtil::getProperty($reflClass, $propertyName);
         if (null === $property) {
-            throw new RuntimeException(
-                sprintf('The class "%s" does not have property "%s".', $reflClass->name, $propertyName)
-            );
+            throw new RuntimeException(sprintf(
+                'The class "%s" does not have property "%s".',
+                $reflClass->name,
+                $propertyName
+            ));
         }
         if (!$property->isPublic()) {
             $property->setAccessible(true);

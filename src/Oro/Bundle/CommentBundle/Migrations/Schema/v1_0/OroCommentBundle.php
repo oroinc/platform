@@ -19,9 +19,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     /** @var CommentExtension */
     protected $comment;
 
-    /**
-     * @param CommentExtension $commentExtension
-     */
     public function setCommentExtension(CommentExtension $commentExtension)
     {
         $this->comment = $commentExtension;
@@ -39,8 +36,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws SchemaException
      */
     public static function createCommentTable(Schema $schema)
@@ -79,28 +74,16 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
         );
     }
 
-    /**
-     * @param Schema           $schema
-     * @param CommentExtension $commentExtension
-     */
     public static function addCommentToEmail(Schema $schema, CommentExtension $commentExtension)
     {
         $commentExtension->addCommentAssociation($schema, 'oro_email');
     }
 
-    /**
-     * @param Schema           $schema
-     * @param CommentExtension $commentExtension
-     */
     public static function addCommentToNote(Schema $schema, CommentExtension $commentExtension)
     {
         $commentExtension->addCommentAssociation($schema, 'oro_note');
     }
 
-    /**
-     * @param Schema              $schema
-     * @param AttachmentExtension $attachmentExtension
-     */
     public static function addAttachment(Schema $schema, AttachmentExtension $attachmentExtension)
     {
         $attachmentExtension->addFileRelation(

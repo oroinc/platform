@@ -9,14 +9,14 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Oro\Bundle\SearchBundle\Entity\Item
-     */
-    private $item;
+    private Item $item;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->item = new Item();
     }
@@ -66,29 +66,6 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->item->getEntity());
         $this->item->setEntity('test entity');
         $this->assertEquals('test entity', $this->item->getEntity());
-    }
-
-    public function testTitle()
-    {
-        $this->assertNull($this->item->getTitle());
-        $this->item->setTitle('test title');
-        $this->assertEquals('test title', $this->item->getTitle());
-    }
-
-    public function testSetLongTitleWithNonLatinUTF8Chars()
-    {
-        $this->item->setTitle(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut sem cursus ligula consectetur iaculis. '
-            . 'Sed ac viverra mi, in auctor tortor. Aliquam id est laoreet, ultricies lectus a, aliquam lectus. Aenean'
-            . ' ac tristique eros. Integer vestibulum volutpatälacus, eu lobortis sapien condimentum in.'
-        );
-
-        self::assertEquals(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut sem cursus ligula consectetur iaculis. '
-            . 'Sed ac viverra mi, in auctor tortor. Aliquam id est laoreet, ultricies lectus a, aliquam lectus. Aenean'
-            . ' ac tristique eros. Integer vestibulum volutpatä',
-            $this->item->getTitle()
-        );
     }
 
     public function testIntegerField()
@@ -167,21 +144,21 @@ class ItemTest extends \PHPUnit\Framework\TestCase
     public function testSaveItemData()
     {
         $this->item->saveItemData(
-            array(
-                'text' => array(
+            [
+                'text' => [
                     'test_field' => 'test text'
-                ),
-                'integer' => array(
+                ],
+                'integer' => [
                     'test_integer' => 10,
                     'test_integer_array' => [2, 3]
-                ),
-                'datetime' => array(
+                ],
+                'datetime' => [
                     'test_datetime' => new \DateTime('2013-01-01')
-                ),
-                'decimal' => array(
+                ],
+                'decimal' => [
                     'test_decimal' => 10.26
-                )
-            )
+                ]
+            ]
         );
 
         $textFields = $this->item->getTextFields();
@@ -197,12 +174,12 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10.26, $decimalFields->get(0)->getValue());
 
         $this->item->saveItemData(
-            array(
-                'integer' => array(
+            [
+                'integer' => [
                     'test_integer' => 10,
                     'test_integer_array' => [5]
-                ),
-            )
+                ],
+            ]
         );
 
         $integerFields = $this->item->getIntegerFields();
@@ -210,23 +187,13 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(5, $integerFields->get(3)->getValue());
     }
 
-    public function testSetWeight()
+    public function testSetGetWeight()
     {
-        $this->assertAttributeEquals(1, 'weight', $this->item);
+        self::assertEquals(1.0, $this->item->getWeight());
 
         $weight = 4.2;
         $this->item->setWeight($weight);
 
-        $this->assertAttributeEquals($weight, 'weight', $this->item);
-    }
-
-    public function testGetWeight()
-    {
-        $this->assertEquals(1, $this->item->getWeight());
-
-        $weight = 4.2;
-        $this->item->setWeight($weight);
-
-        $this->assertEquals($weight, $this->item->getWeight());
+        self::assertEquals($weight, $this->item->getWeight());
     }
 }

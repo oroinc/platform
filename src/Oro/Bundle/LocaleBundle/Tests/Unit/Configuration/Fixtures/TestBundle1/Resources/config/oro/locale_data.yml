@@ -1,0 +1,4 @@
+US:
+    currency_code: USD
+    phone_prefix: '1'
+    default_locale: en_US

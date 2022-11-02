@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\File;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
@@ -12,8 +14,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
     public function testShouldSplitFile()
     {
         $reader = $this->createReaderMock();
-        $reader
-            ->expects($this->once())
+        $reader->expects($this->once())
             ->method('initializeByContext')
             ->with(new Context([
                 Context::OPTION_FILE_PATH => 'test.csv',
@@ -21,8 +22,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 Context::OPTION_ENCLOSURE => '|',
             ]));
 
-        $reader
-            ->expects($this->exactly(3))
+        $reader->expects($this->exactly(3))
             ->method('read')
             ->with(new Context([
                 Context::OPTION_FILE_PATH => 'test.csv',
@@ -30,20 +30,16 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 Context::OPTION_ENCLOSURE => '|',
             ]))
             ->willReturnOnConsecutiveCalls([1, 2], [3, 4], false);
-        $reader
-            ->expects($this->once())
+        $reader->expects($this->once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
         $fileManagerMock = $this->createFileManagerMock();
         $writer = $this->createWriterMock();
-        $writer
-            ->expects($this->exactly(2))
-            ->method('setImportExportContext')
-        ;
+        $writer->expects($this->exactly(2))
+            ->method('setImportExportContext');
 
-        $writer
-            ->expects($this->exactly(2))
+        $writer->expects($this->exactly(2))
             ->method('write')
             ->withConsecutive(
                 [[[1, 2]]],
@@ -55,6 +51,53 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $batchFileManager->setConfigurationOptions([
             Context::OPTION_DELIMITER => ';',
             Context::OPTION_ENCLOSURE => '|',
+        ]);
+        $splittedFiles = $batchFileManager->splitFile('test.csv');
+        $this->assertCount(2, $splittedFiles);
+    }
+
+    public function testShouldSplitFileWithCustomBatchSize(): void
+    {
+        $context = new Context(
+            [
+                Context::OPTION_FILE_PATH => 'test.csv',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_ENCLOSURE => '|',
+                Context::OPTION_BATCH_SIZE => 3,
+            ]
+        );
+
+        $reader = $this->createReaderMock();
+        $reader->expects($this->once())
+            ->method('initializeByContext')
+            ->with($context);
+        $reader->expects($this->exactly(6))
+            ->method('read')
+            ->with($context)
+            ->willReturnOnConsecutiveCalls([1, 2], [3, 4], [5, 6], [7, 8], [9, 10], false);
+        $reader->expects($this->once())
+            ->method('getHeader')
+            ->willReturn(['a', 'b']);
+
+        $fileManagerMock = $this->createFileManagerMock();
+
+        $writer = $this->createWriterMock();
+        $writer->expects($this->exactly(2))
+            ->method('setImportExportContext');
+
+        $writer->expects($this->exactly(2))
+            ->method('write')
+            ->withConsecutive(
+                [[[1, 2], [3, 4], [5, 6]]],
+                [[[7, 8], [9, 10]]]
+            );
+        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+        $batchFileManager->setReader($reader);
+        $batchFileManager->setWriter($writer);
+        $batchFileManager->setConfigurationOptions([
+            Context::OPTION_DELIMITER => ';',
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_BATCH_SIZE => 3,
         ]);
         $splittedFiles = $batchFileManager->splitFile('test.csv');
         $this->assertCount(2, $splittedFiles);
@@ -83,15 +126,13 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManagerMock = $this->createFileManagerMock();
 
         $reader = $this->createReaderMock();
-        $reader
-            ->expects($this->exactly(2))
+        $reader->expects($this->exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
                 [new Context(['filePath' => 'test1'])],
                 [new Context(['filePath' => 'test2'])]
             );
-        $reader
-            ->expects($this->exactly(5))
+        $reader->expects($this->exactly(5))
             ->method('read')
             ->withConsecutive(
                 [new Context(['filePath' => 'test1'])],
@@ -101,26 +142,21 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 [new Context(['filePath' => 'test2'])]
             )
             ->willReturnOnConsecutiveCalls(1, 2, false, 3, false);
-        $reader
-            ->expects($this->once())
+        $reader->expects($this->once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
         $writer = $this->createWriterMock();
-        $writer
-            ->expects($this->once())
+        $writer->expects($this->once())
             ->method('setImportExportContext')
             ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
-        $writer
-            ->expects($this->at(1))
+        $writer->expects($this->exactly(2))
             ->method('write')
-            ->with([1, 2]);
-        $writer
-            ->expects($this->at(2))
-            ->method('write')
-            ->with([3]);
-        $writer
-            ->expects($this->once())
+            ->withConsecutive(
+                [[1, 2]],
+                [[3]]
+            );
+        $writer->expects($this->once())
             ->method('close');
 
         $batchFileManager = new BatchFileManager($fileManagerMock, 10);
@@ -135,15 +171,13 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManagerMock = $this->createFileManagerMock();
 
         $reader = $this->createReaderMock();
-        $reader
-            ->expects($this->exactly(2))
+        $reader->expects($this->exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
                 [new Context(['filePath' => 'test1'])],
                 [new Context(['filePath' => 'test2'])]
             );
-        $reader
-            ->expects($this->exactly(6))
+        $reader->expects($this->exactly(6))
             ->method('read')
             ->withConsecutive(
                 [new Context(['filePath' => 'test1'])],
@@ -154,30 +188,22 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 [new Context(['filePath' => 'test2'])]
             )
             ->willReturnOnConsecutiveCalls(1, 2, 3, false, 4, false);
-        $reader
-            ->expects($this->once())
+        $reader->expects($this->once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
         $writer = $this->createWriterMock();
-        $writer
-            ->expects($this->once())
+        $writer->expects($this->once())
             ->method('setImportExportContext')
             ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
-        $writer
-            ->expects($this->at(1))
+        $writer->expects($this->exactly(3))
             ->method('write')
-            ->with([1, 2]);
-        $writer
-            ->expects($this->at(2))
-            ->method('write')
-            ->with([3]);
-        $writer
-            ->expects($this->at(3))
-            ->method('write')
-            ->with([4]);
-        $writer
-            ->expects($this->once())
+            ->withConsecutive(
+                [[1, 2]],
+                [[3]],
+                [[4]]
+            );
+        $writer->expects($this->once())
             ->method('close');
 
         $batchFileManager = new BatchFileManager($fileManagerMock, 2);

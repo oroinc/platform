@@ -9,9 +9,6 @@ class WorkflowHandler extends AbstractHandler
      */
     protected $handlers = array();
 
-    /**
-     * @param ConfigurationHandlerInterface $handler
-     */
     public function addHandler(ConfigurationHandlerInterface $handler)
     {
         $this->handlers[] = $handler;

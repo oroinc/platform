@@ -1,35 +1,50 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ReflectionClassHelper;
+use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Generate layout updates from config files
+ */
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    const NODE_ACTIONS = 'actions';
+    public const NODE_ACTIONS = 'actions';
 
-    const PATH_ATTR = '__path';
+    public const PATH_ATTR = '__path';
 
     /** @var ConfigLayoutUpdateGeneratorExtensionInterface[] */
-    protected $extensions = [];
+    protected array $extensions = [];
 
-    /** @var ReflectionClassHelper */
-    protected $helper;
+    protected ?ReflectionClassHelper $helper = null;
 
-    /**
-     * @param ConfigLayoutUpdateGeneratorExtensionInterface $extension
-     */
+    private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
+
+    private ValidatorInterface $validator;
+
+    private ?ExpressionLanguageSyntax $constraint = null;
+
+    public function __construct(
+        ValidatorInterface $validator,
+        ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer
+    ) {
+        $this->validator = $validator;
+        $this->expressionLanguageCacheWarmer = $expressionLanguageCacheWarmer;
+    }
+
     public function addExtension(ConfigLayoutUpdateGeneratorExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doGenerateBody(GeneratorData $data)
+    protected function doGenerateBody(GeneratorData $data): string
     {
         $body   = [];
         $source = $data->getSource();
@@ -45,7 +60,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             array_walk(
                 $arguments,
-                function (&$arg) {
+                static function (&$arg) {
                     $arg = var_export($arg, true);
                 }
             );
@@ -62,14 +77,16 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     /**
      * Validates given resource data, checks that "actions" node exists and consist valid actions.
      *
-     * {@inheritdoc}
+     * @throws SyntaxException
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function validate(GeneratorData $data)
+    protected function validate(GeneratorData $data): void
     {
         $source = $data->getSource();
 
-        if (!(is_array($source) && isset($source[self::NODE_ACTIONS]) && is_array($source[self::NODE_ACTIONS]))) {
+        if (!(\is_array($source) && isset($source[self::NODE_ACTIONS]) && \is_array($source[self::NODE_ACTIONS]))) {
             throw new SyntaxException(sprintf('expected array with "%s" node', self::NODE_ACTIONS), $source);
         }
 
@@ -82,15 +99,15 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 $path = self::NODE_ACTIONS . '.' . $nodeNo;
             }
 
-            if (!is_array($actionDefinition)) {
+            if (!\is_array($actionDefinition)) {
                 throw new SyntaxException('expected array with action name as key', $actionDefinition, $path);
             }
 
             $actionName = key($actionDefinition);
-            $arguments  = is_array($actionDefinition[$actionName])
+            $arguments  = \is_array($actionDefinition[$actionName])
                 ? $actionDefinition[$actionName] : [$actionDefinition[$actionName]];
 
-            if (strpos($actionName, '@') !== 0) {
+            if (!str_starts_with($actionName, '@')) {
                 throw new SyntaxException(
                     sprintf('action name should start with "@" symbol, current name "%s"', $actionName),
                     $actionDefinition,
@@ -102,7 +119,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             if (!$this->getHelper()->hasMethod($actionName)) {
                 throw new SyntaxException(
-                    sprintf('unknown action "%s", should be one of LayoutManipulatorInterface\'s methods', $actionName),
+                    sprintf('unknown action "%s", should be one of LayoutManipulatorInterface methods', $actionName),
                     $actionDefinition,
                     $path
                 );
@@ -112,25 +129,21 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 throw new SyntaxException($this->getHelper()->getLastError(), $actionDefinition, $path);
             }
         }
+
+        $this->processExpressionsRecursive($source);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
+    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection): void
     {
         foreach ($this->extensions as $extension) {
             $extension->prepare($data, $visitorCollection);
         }
     }
 
-    /**
-     * @return ReflectionClassHelper
-     */
-    protected function getHelper()
+    protected function getHelper(): ReflectionClassHelper
     {
         if (null === $this->helper) {
-            $this->helper = new ReflectionClassHelper('Oro\Component\Layout\LayoutManipulatorInterface');
+            $this->helper = new ReflectionClassHelper(LayoutManipulatorInterface::class);
         }
 
         return $this->helper;
@@ -144,5 +157,51 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     protected function normalizeActionName(&$actionName)
     {
         $actionName = substr($actionName, 1);
+    }
+
+    private function processExpressionsRecursive(array $source, ?string $path = null): void
+    {
+        if ($path) {
+            $path .= '.';
+        }
+
+        foreach ($source as $key => $value) {
+            if (!$value) {
+                continue;
+            }
+
+            if (\is_array($value)) {
+                $this->processExpressionsRecursive($value, $path . $key);
+                continue;
+            }
+
+            if (\is_string($value) && '=' === $value[0]) {
+                $expression = substr($value, 1);
+                $violationList = $this->validator->validate($expression, $this->getConstraint());
+
+                if ($violationList->count()) {
+                    $messages = [];
+                    foreach ($violationList as $violation) {
+                        $messages[] = $violation->getMessage();
+                    }
+
+                    throw new SyntaxException(implode("\n", $messages), $source, $path . $key);
+                }
+
+                $this->expressionLanguageCacheWarmer->collect($expression);
+            }
+        }
+    }
+
+    private function getConstraint(): ExpressionLanguageSyntax
+    {
+        if (!$this->constraint) {
+            $this->constraint = new ExpressionLanguageSyntax([
+                'service' => 'oro_layout.expression_language.expression_validator',
+                'message' => '{{ syntax_error }}',
+            ]);
+        }
+
+        return $this->constraint;
     }
 }

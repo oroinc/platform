@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +22,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultExclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->firstExclusionProvider = $this->createMock(ExclusionProviderInterface::class);
@@ -30,12 +30,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $exclusionProviders
-     *
-     * @return ExclusionProviderRegistry
-     */
-    private function getRegistry(array $exclusionProviders)
+    private function getRegistry(array $exclusionProviders): ExclusionProviderRegistry
     {
         return new ExclusionProviderRegistry(
             $exclusionProviders,
@@ -44,12 +39,11 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an exclusion provider for the request "rest,another".
-     */
     public function testGetExclusionProviderForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an exclusion provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getExclusionProvider($requestType);

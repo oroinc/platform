@@ -3,12 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * This trait can be used in migrations that remove "workflowItem" and "workflowStep" fields.
+ */
 trait RemoveWorkflowFieldsTrait
 {
-    /**
-     * @param Table $table
-     */
     protected function removeWorkflowFields(Table $table)
     {
         $workflowTables = [
@@ -26,5 +28,15 @@ trait RemoveWorkflowFieldsTrait
                 $table->dropColumn($column);
             }
         }
+    }
+
+    /**
+     * @param string   $entityClass
+     * @param QueryBag $queries
+     */
+    protected function removeConfigsForWorkflowFields($entityClass, QueryBag $queries)
+    {
+        $queries->addPostQuery(new RemoveFieldQuery($entityClass, 'workflowItem'));
+        $queries->addPostQuery(new RemoveFieldQuery($entityClass, 'workflowStep'));
     }
 }

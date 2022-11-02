@@ -5,44 +5,29 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Process;
 use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ProcessTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessDefinition $processDefinition
-     */
-    protected $processDefinition;
+    /** @var ProcessDefinition|\PHPUnit\Framework\MockObject\MockObject */
+    private $processDefinition;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory $conditionFactory
-     */
-    protected $conditionFactory;
+    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $conditionFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler $actionAssembler
-     */
-    protected $actionAssembler;
+    /** @var ActionAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionAssembler;
 
-    /**
-     * @var Process
-     */
-    protected $process;
+    /** @var Process */
+    private $process;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->actionAssembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processDefinition = $this->createMock(ProcessDefinition::class);
+        $this->conditionFactory = $this->createMock(ExpressionFactory::class);
+        $this->actionAssembler = $this->createMock(ActionAssembler::class);
 
         $this->process = new Process($this->actionAssembler, $this->conditionFactory, $this->processDefinition);
     }
@@ -52,18 +37,17 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $context = ['context'];
         $configuration = ['config'];
 
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->getMock();
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->exactly(2))
             ->method('execute')
             ->with($context);
 
         $this->processDefinition->expects($this->once())
             ->method('getActionsConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
         $this->actionAssembler->expects($this->once())
             ->method('assemble')
-            ->will($this->returnValue($action));
+            ->willReturn($action);
 
         $this->process->execute($context);
         $this->process->execute($context);
@@ -81,7 +65,6 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
             ->method('create')
             ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration);
 
-
         $this->assertTrue($this->process->isApplicable([]));
     }
 
@@ -98,7 +81,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
 
         $this->processDefinition->expects($this->once())
             ->method('getPreConditionsConfiguration')
-            ->will($this->returnValue($conditionConfiguration));
+            ->willReturn($conditionConfiguration);
 
         $this->conditionFactory->expects($this->once())
             ->method('create')
@@ -122,22 +105,20 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
                 ['test' => []]
             ]
         ];
-        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $condition = $this->createMock(ConfigurableCondition::class);
         $condition->expects($this->any())
             ->method('evaluate')
             ->with($context)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->processDefinition->expects($this->once())
             ->method('getPreConditionsConfiguration')
-            ->will($this->returnValue($conditionConfiguration));
+            ->willReturn($conditionConfiguration);
 
         $this->conditionFactory->expects($this->once())
             ->method('create')
             ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration)
-            ->will($this->returnValue($condition));
+            ->willReturn($condition);
 
         $this->assertFalse($this->process->isApplicable($context));
         $this->assertFalse($this->process->isApplicable($context));
@@ -158,27 +139,26 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
                 ['test' => []]
             ]
         ];
-        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $condition = $this->createMock(ConfigurableCondition::class);
         $condition->expects($this->any())
             ->method('evaluate')
             ->with($context)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->processDefinition->expects($this->once())
             ->method('getPreConditionsConfiguration')
-            ->will($this->returnValue($conditionConfiguration));
+            ->willReturn($conditionConfiguration);
 
         $this->conditionFactory->expects($this->once())
             ->method('create')
             ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration)
-            ->will($this->returnValue($condition));
+            ->willReturn($condition);
 
         $this->processDefinition->expects($this->never())
             ->method('getActionsConfiguration');
         $this->actionAssembler->expects($this->never())
             ->method('assemble');
+
         $this->process->execute($context);
     }
 }

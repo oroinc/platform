@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Should be dispatched before or after the normalization.
+ */
 class NormalizeEntityEvent extends Event
 {
     /** @var object */
@@ -51,11 +54,7 @@ class NormalizeEntityEvent extends Event
         return $this->fullData;
     }
 
-    /**
-     * @param string $name
-     * @param array $value
-     */
-    public function setResultField($name, array $value)
+    public function setResultFieldValue(string $name, mixed $value): void
     {
         $this->result[$name] = $value;
     }

@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validation constraint checking if workflow transition is allowed.
+ */
 class TransitionIsAllowed extends Constraint
 {
     /**
@@ -28,6 +31,8 @@ class TransitionIsAllowed extends Constraint
      */
     public function __construct(WorkflowItem $workflowItem, $transitionName)
     {
+        parent::__construct();
+
         $this->workflowItem = $workflowItem;
         $this->transitionName = $transitionName;
     }

@@ -11,41 +11,29 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
  */
 class EntityAliasLoader
 {
-    /** @var EntityClassProviderInterface[] */
-    private $entityClassProviders = [];
+    /** @var iterable|EntityClassProviderInterface[] */
+    private $entityClassProviders;
 
-    /** @var EntityAliasProviderInterface[] */
-    private $entityAliasProviders = [];
-
-    /**
-     * Registers entity class name provider.
-     *
-     * @param EntityClassProviderInterface $provider
-     */
-    public function addEntityClassProvider(EntityClassProviderInterface $provider)
-    {
-        $this->entityClassProviders[] = $provider;
-    }
+    /** @var iterable|EntityAliasProviderInterface[] */
+    private $entityAliasProviders;
 
     /**
-     * Registers entity alias provider.
-     *
-     * @param EntityAliasProviderInterface $provider
+     * @param iterable|EntityClassProviderInterface[] $entityClassProviders
+     * @param iterable|EntityAliasProviderInterface[] $entityAliasProviders
      */
-    public function addEntityAliasProvider(EntityAliasProviderInterface $provider)
+    public function __construct(iterable $entityClassProviders, iterable $entityAliasProviders)
     {
-        $this->entityAliasProviders[] = $provider;
+        $this->entityClassProviders = $entityClassProviders;
+        $this->entityAliasProviders = $entityAliasProviders;
     }
 
     /**
      * Loads entity aliases into the storage.
      *
-     * @param EntityAliasStorage $storage
-     *
      * @throws InvalidEntityAliasException if an alias or a plural alias for any entity is not valid
      * @throws DuplicateEntityAliasException if duplicated entity alias is detected
      */
-    public function load(EntityAliasStorage $storage)
+    public function load(EntityAliasStorage $storage): void
     {
         foreach ($this->entityClassProviders as $entityClassProvider) {
             $entityClasses = $entityClassProvider->getClassNames();
@@ -60,12 +48,7 @@ class EntityAliasLoader
         }
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityAlias|null
-     */
-    protected function getEntityAlias($entityClass)
+    protected function getEntityAlias(string $entityClass): ?EntityAlias
     {
         $entityAlias = null;
         foreach ($this->entityAliasProviders as $entityAliasProvider) {

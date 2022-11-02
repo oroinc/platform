@@ -4,103 +4,85 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Another;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActivityManagerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $activityConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $groupingConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupingConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $associationManager;
+    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $associationManager;
+
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
     /** @var ActivityManager */
-    protected $manager;
+    private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $doctrine->expects($this->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test', 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity']
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Test', 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity']
+            ]);
 
-        $this->activityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->activityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->associationManager =
-            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
-                ->disableOriginalConstructor()
-                ->getMock();
         $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager = new ActivityManager(
             new DoctrineHelper($doctrine),
@@ -112,11 +94,6 @@ class ActivityManagerTest extends OrmTestCase
             $this->associationManager,
             $featureChecker
         );
-
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->manager->setEventDispatcher($this->eventDispatcher);
     }
 
@@ -130,11 +107,11 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
 
         $this->assertTrue(
             $this->manager->hasActivityAssociations($targetEntityClass)
@@ -150,11 +127,11 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
 
         $this->assertFalse(
             $this->manager->hasActivityAssociations($targetEntityClass)
@@ -168,7 +145,7 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse(
             $this->manager->hasActivityAssociations($targetEntityClass)
@@ -178,7 +155,7 @@ class ActivityManagerTest extends OrmTestCase
     public function testHasActivityAssociation()
     {
         $activityEntityClass = 'Test\Activity';
-        $targetEntityClass   = 'Test\Entity';
+        $targetEntityClass = 'Test\Entity';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', ['Test\OtherActivity', $activityEntityClass]);
@@ -186,11 +163,11 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->activityConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
 
         $this->assertTrue(
             $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
@@ -203,18 +180,18 @@ class ActivityManagerTest extends OrmTestCase
     public function testHasActivityAssociationForNoActivities()
     {
         $activityEntityClass = 'Test\Activity';
-        $targetEntityClass   = 'Test\Entity';
+        $targetEntityClass = 'Test\Entity';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
 
         $this->activityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
 
         $this->assertFalse(
             $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
@@ -224,12 +201,12 @@ class ActivityManagerTest extends OrmTestCase
     public function testHasActivityAssociationForNonConfigurableEntity()
     {
         $activityEntityClass = 'Test\Activity';
-        $targetEntityClass   = 'Test\Entity';
+        $targetEntityClass = 'Test\Entity';
 
         $this->activityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($targetEntityClass)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse(
             $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
@@ -238,24 +215,24 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::ADD_ACTIVITY);
+            ->with(self::anything(), Events::ADD_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->addActivityTarget($activityEntity, $targetEntity)
@@ -264,17 +241,17 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForAlreadyAddedTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->never())
             ->method('addActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -286,13 +263,13 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForNotSupportedTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->never())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -307,7 +284,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForNullTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $activityEntity->expects($this->never())
             ->method('supportActivityTarget');
@@ -323,21 +300,21 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargets()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
 
         $this->assertTrue(
             $this->manager->addActivityTargets($activityEntity, [$targetEntity])
@@ -346,17 +323,17 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetsForAlreadyAddedTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->never())
             ->method('addActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -368,13 +345,13 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetsForNotSupportedTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->never())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -389,24 +366,24 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('removeActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::REMOVE_ACTIVITY);
+            ->with(self::anything(), Events::REMOVE_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->removeActivityTarget($activityEntity, $targetEntity)
@@ -415,17 +392,17 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNotExistingTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $activityEntity->expects($this->once())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->never())
             ->method('removeActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -437,13 +414,13 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNotSupportedTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
-        $targetEntity   = new Target();
+        $activityEntity = $this->createMock(ActivityInterface::class);
+        $targetEntity = new Target();
 
         $activityEntity->expects($this->once())
             ->method('supportActivityTarget')
             ->with(get_class($targetEntity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $activityEntity->expects($this->never())
             ->method('hasActivityTarget')
             ->with($this->identicalTo($targetEntity));
@@ -458,7 +435,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNullTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $activityEntity->expects($this->never())
             ->method('supportActivityTarget');
@@ -474,39 +451,31 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
 
         $activityEntity->expects($this->exactly(2))
             ->method('supportActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [get_class($oldTargetEntity), true],
-                        [get_class($newTargetEntity), true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [get_class($oldTargetEntity), true],
+                [get_class($newTargetEntity), true],
+            ]);
         $activityEntity->expects($this->exactly(2))
             ->method('hasActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$oldTargetEntity, true],
-                        [$newTargetEntity, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$oldTargetEntity, true],
+                [$newTargetEntity, false],
+            ]);
         $activityEntity->expects($this->once())
             ->method('removeActivityTarget')
             ->with($this->identicalTo($oldTargetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
         $activityEntity->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($newTargetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
 
         $this->assertTrue(
             $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
@@ -515,37 +484,29 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNoAssociationWithOldTarget()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
 
         $activityEntity->expects($this->exactly(2))
             ->method('supportActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [get_class($oldTargetEntity), true],
-                        [get_class($newTargetEntity), true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [get_class($oldTargetEntity), true],
+                [get_class($newTargetEntity), true],
+            ]);
         $activityEntity->expects($this->exactly(2))
             ->method('hasActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$oldTargetEntity, false],
-                        [$newTargetEntity, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$oldTargetEntity, false],
+                [$newTargetEntity, false],
+            ]);
         $activityEntity->expects($this->never())
             ->method('removeActivityTarget');
         $activityEntity->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($newTargetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
 
         $this->assertTrue(
             $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
@@ -554,35 +515,27 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNewTargetAlreadyExist()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
 
         $activityEntity->expects($this->exactly(2))
             ->method('supportActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [get_class($oldTargetEntity), true],
-                        [get_class($newTargetEntity), true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [get_class($oldTargetEntity), true],
+                [get_class($newTargetEntity), true],
+            ]);
         $activityEntity->expects($this->exactly(2))
             ->method('hasActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$oldTargetEntity, true],
-                        [$newTargetEntity, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$oldTargetEntity, true],
+                [$newTargetEntity, true],
+            ]);
         $activityEntity->expects($this->once())
             ->method('removeActivityTarget')
             ->with($this->identicalTo($oldTargetEntity))
-            ->will($this->returnValue($activityEntity));
+            ->willReturn($activityEntity);
         $activityEntity->expects($this->never())
             ->method('addActivityTarget');
 
@@ -593,31 +546,23 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNoChanges()
     {
-        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock(ActivityInterface::class);
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
 
         $activityEntity->expects($this->exactly(2))
             ->method('supportActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [get_class($oldTargetEntity), true],
-                        [get_class($newTargetEntity), true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [get_class($oldTargetEntity), true],
+                [get_class($newTargetEntity), true],
+            ]);
         $activityEntity->expects($this->exactly(2))
             ->method('hasActivityTarget')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$oldTargetEntity, false],
-                        [$newTargetEntity, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$oldTargetEntity, false],
+                [$newTargetEntity, true],
+            ]);
         $activityEntity->expects($this->never())
             ->method('removeActivityTarget');
         $activityEntity->expects($this->never())
@@ -631,13 +576,13 @@ class ActivityManagerTest extends OrmTestCase
     public function testGetActivityAssociations()
     {
         $targetEntityClass = 'Test\Entity';
-        $activity1Class    = 'Test\Activity1';
-        $activity2Class    = 'Test\Activity2';
+        $activity1Class = 'Test\Activity1';
+        $activity2Class = 'Test\Activity2';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activity1Class, $activity2Class]);
 
-        $activityAssociationName   = ExtendHelper::buildAssociationName(
+        $activityAssociationName = ExtendHelper::buildAssociationName(
             $targetEntityClass,
             ActivityScope::ASSOCIATION_KIND
         );
@@ -666,45 +611,29 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->extendConfigProvider->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, $activityAssociationName, true],
-                        [$activity2Class, $activityAssociationName, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, $activityAssociationName, true],
+                [$activity2Class, $activityAssociationName, true],
+            ]);
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, $activityAssociationName, $activityAssociation1Config],
-                        [$activity2Class, $activityAssociationName, $activityAssociation2Config],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, $activityAssociationName, $activityAssociation1Config],
+                [$activity2Class, $activityAssociationName, $activityAssociation2Config],
+            ]);
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, null, $activity1EntityConfig],
-                        [$activity2Class, null, $activity2EntityConfig],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, null, $activity1EntityConfig],
+                [$activity2Class, null, $activity2EntityConfig],
+            ]);
         $this->activityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$targetEntityClass, null, $targetEntityActivityConfig],
-                        [$activity1Class, null, $activity1ActivityConfig],
-                        [$activity2Class, null, $activity2ActivityConfig],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$targetEntityClass, null, $targetEntityActivityConfig],
+                [$activity1Class, null, $activity1ActivityConfig],
+                [$activity2Class, null, $activity2ActivityConfig],
+            ]);
 
         $this->assertEquals(
             [
@@ -733,12 +662,12 @@ class ActivityManagerTest extends OrmTestCase
     public function testGetActivityAssociationsNoSchemaUpdate()
     {
         $targetEntityClass = 'Test\Entity';
-        $activityClass     = 'Test\Activity';
+        $activityClass = 'Test\Activity';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activityClass]);
 
-        $activityAssociationName   = ExtendHelper::buildAssociationName(
+        $activityAssociationName = ExtendHelper::buildAssociationName(
             $targetEntityClass,
             ActivityScope::ASSOCIATION_KIND
         );
@@ -751,15 +680,15 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass, null)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($activityClass, $activityAssociationName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($activityClass, $activityAssociationName)
-            ->will($this->returnValue($activityAssociationConfig));
+            ->willReturn($activityAssociationConfig);
         $this->entityConfigProvider->expects($this->never())
             ->method('getConfig');
 
@@ -772,13 +701,13 @@ class ActivityManagerTest extends OrmTestCase
     public function testGetActivityActions()
     {
         $targetEntityClass = 'Test\Entity';
-        $activity1Class    = 'Test\Activity1';
-        $activity2Class    = 'Test\Activity2';
+        $activity1Class = 'Test\Activity1';
+        $activity2Class = 'Test\Activity2';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activity1Class, $activity2Class]);
 
-        $activityAssociationName   = ExtendHelper::buildAssociationName(
+        $activityAssociationName = ExtendHelper::buildAssociationName(
             $targetEntityClass,
             ActivityScope::ASSOCIATION_KIND
         );
@@ -808,45 +737,29 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->extendConfigProvider->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, $activityAssociationName, true],
-                        [$activity2Class, $activityAssociationName, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, $activityAssociationName, true],
+                [$activity2Class, $activityAssociationName, true],
+            ]);
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, $activityAssociationName, $activityAssociation1Config],
-                        [$activity2Class, $activityAssociationName, $activityAssociation2Config],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, $activityAssociationName, $activityAssociation1Config],
+                [$activity2Class, $activityAssociationName, $activityAssociation2Config],
+            ]);
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$activity1Class, null, $activity1EntityConfig],
-                        [$activity2Class, null, $activity2EntityConfig],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$activity1Class, null, $activity1EntityConfig],
+                [$activity2Class, null, $activity2EntityConfig],
+            ]);
         $this->activityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$targetEntityClass, null, $targetEntityActivityConfig],
-                        [$activity1Class, null, $activity1ActivityConfig],
-                        [$activity2Class, null, $activity2ActivityConfig],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$targetEntityClass, null, $targetEntityActivityConfig],
+                [$activity1Class, null, $activity1ActivityConfig],
+                [$activity2Class, null, $activity2ActivityConfig],
+            ]);
 
         $this->assertEquals(
             [
@@ -874,12 +787,12 @@ class ActivityManagerTest extends OrmTestCase
     public function testGetActivityActionsNoSchemaUpdate()
     {
         $targetEntityClass = 'Test\Entity';
-        $activityClass     = 'Test\Activity';
+        $activityClass = 'Test\Activity';
 
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activityClass]);
 
-        $activityAssociationName   = ExtendHelper::buildAssociationName(
+        $activityAssociationName = ExtendHelper::buildAssociationName(
             $targetEntityClass,
             ActivityScope::ASSOCIATION_KIND
         );
@@ -892,15 +805,15 @@ class ActivityManagerTest extends OrmTestCase
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass, null)
-            ->will($this->returnValue($targetEntityActivityConfig));
+            ->willReturn($targetEntityActivityConfig);
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($activityClass, $activityAssociationName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($activityClass, $activityAssociationName)
-            ->will($this->returnValue($activityAssociationConfig));
+            ->willReturn($activityAssociationConfig);
         $this->entityConfigProvider->expects($this->never())
             ->method('getConfig');
 
@@ -912,10 +825,10 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddFilterByTargetEntity()
     {
-        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
-        $targetEntityId    = 123;
+        $targetEntityClass = Target::class;
+        $targetEntityId = 123;
 
-        $qb = $this->em->getRepository('Test:Activity')->createQueryBuilder('activity')
+        $qb = $this->em->getRepository(Activity::class)->createQueryBuilder('activity')
             ->select('activity');
 
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
@@ -938,25 +851,25 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddFilterByTargetEntityWithSeveralRootEntities()
     {
-        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
-        $targetEntityId    = 123;
+        $targetEntityClass = Target::class;
+        $targetEntityId = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity(
             $qb,
             $targetEntityClass,
             $targetEntityId,
-            'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity'
+            Activity::class
         );
 
         $this->assertEquals(
             'SELECT activity, another'
-            . ' FROM Test:Activity activity, Test:Another another'
+            . ' FROM ' . Activity::class . ' activity, ' . Another::class . ' another'
             . ' WHERE another.id = activity.id AND activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
@@ -970,51 +883,50 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The query must have at least one root entity.
-     */
     public function testAddFilterByTargetEntityWithEmptyQuery()
     {
-        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
-        $targetEntityId    = 123;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The query must have at least one root entity.');
+
+        $targetEntityClass = Target::class;
+        $targetEntityId = 123;
 
         $qb = $this->em->createQueryBuilder();
 
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The $activityEntityClass must be specified if the query has several root entities.
-     */
     public function testAddFilterByTargetEntityWithSeveralRootEntitiesButWithoutActivityEntityClassSpecified()
     {
-        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
-        $targetEntityId    = 123;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The $activityEntityClass must be specified if the query has several root entities.'
+        );
+
+        $targetEntityClass = Target::class;
+        $targetEntityId = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "Entity\NotRoot" must be the root entity.
-     */
     public function testAddFilterByTargetEntityWithInvalidActivityEntityClassSpecified()
     {
-        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
-        $targetEntityId    = 123;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "Entity\NotRoot" must be the root entity.');
+
+        $targetEntityClass = Target::class;
+        $targetEntityId = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity(

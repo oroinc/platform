@@ -1,8 +1,8 @@
 /* @theme: admin.oro; */
 
-.inner-permissions-grid {
-    margin-top: 16px;
+/* stylelint-disable no-descending-specificity */
 
+.inner-permissions-grid {
     .oro-datagrid {
         margin: 0;
     }
@@ -13,23 +13,28 @@
     }
 
     .grid-header-cell:first-child {
-        width: 160px;
+        // plus grid-header inner offset
+        width: $role-collapse-action-container-width + $capabilities-offset;
     }
 
     .collapse-expand-action-container {
         display: flex;
         align-items: center;
-        width: $role-collapse-expand-action-container-width - 7;
+        flex-shrink: 0;
+        width: $role-collapse-action-container-width;
 
         .collapse-action {
-            margin-#{$end}: 16px;
+            margin-right: $inner-permissions-grid-collapse-action-offset;
 
             font-size: $role-capability-icon-size;
             text-align: center;
+            line-height: 1;
 
             color: $role-capability-icon-expand-color;
 
-            @include fa-icon($fa-var-minus-square-o);
+            @include fa-icon($fa-var-minus-square-o, before, true) {
+                vertical-align: bottom;
+            }
 
             &.collapsed {
                 @include fa-icon($fa-var-plus-square-o);
@@ -38,21 +43,24 @@
     }
 
     .entity-name {
-        font-weight: bold;
+        padding-right: $inner-permissions-grid-entity-name-offset;
+
+        font-weight: $inner-permissions-grid-entity-name-weight;
     }
 
     .entity-row-action {
-        position: relative;
+        margin-left: auto;
     }
 
     .fields-list {
-        > :first-child {
-            margin-top: 8px;
-        }
+        padding-left: $inner-permissions-grid-fields-list-indent;
+        padding-bottom: $inner-permissions-grid-fields-list-offset;
+    }
 
-        > :last-child {
-            margin-bottom: 8px;
-        }
+    .field-name {
+        width: $role-collapse-action-container-width - $inner-permissions-grid-fields-list-indent;
+
+        padding-right: $inner-permissions-grid-entity-name-offset;
     }
 
     .collapse {
@@ -60,29 +68,55 @@
     }
 
     .role-permissions-action-launcher {
-        max-height: 24px;
+        max-height: $inner-permissions-grid-launcher-min-height;
     }
 
     .grid-header-cell-label {
-        min-width: $role-collapse-expand-action-container-width;
+        min-width: $role-collapse-action-container-width;
     }
 }
+
 .field-less .collapse-action {
     display: none;
 }
 
-.entity-permission-container {
+.entity-permission-container,
+.field-permission-container {
     display: flex;
     justify-content: flex-start;
 
-    .action-permissions {
+    padding: $entity-permission-container-offset 0;
+
+    .action-permissions-container {
         flex-grow: 1;
+        flex-wrap: wrap;
     }
+
+    + .collapsing,
+    + .collapse {
+        // datagrid row bottom offset
+        padding-top: $entity-permission-collapse-offset;
+    }
+}
+
+.field-permission-container {
+    padding: $field-permission-container-padding;
+
+    &:not(:last-child) {
+        border-bottom: $field-permission-container-border-bottom;
+    }
+}
+
+.action-permissions-container {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .action-permissions {
     display: flex;
     align-items: center;
+    flex-grow: 1;
+    flex-wrap: wrap;
     margin: 0;
 
     list-style: none;
@@ -90,19 +124,24 @@
     @include clearfix();
 
     &__item {
-        width: 160px;
-        margin-#{$end}: 15px;
+        width: $action-permissions-item-width;
+        padding-right: $action-permissions-item-offset;
+
+        line-height: $action-permissions-item-line-height;
 
         .dropdown-toggle {
-            cursor: pointer;
             position: relative;
+
+            vertical-align: middle;
+
+            cursor: pointer;
 
             &:hover,
             &.active {
                 @include fa-icon($role-capability-icon-action, after, true) {
                     position: absolute;
                     top: 2px;
-                    #{$end}: 4px;
+                    right: 0;
 
                     // Reset Bootstrap styles
                     width: auto;
@@ -119,18 +158,21 @@
     }
 
     &__item-wrapper {
-        padding-#{$end}: 20px;
+        display: inline-block;
+        padding-right: $action-permissions-item-wrapper-offset;
         max-width: 100%;
-
-        float: #{$start};
 
         color: $role-capability-item-color;
 
         overflow: hidden;
-
-        text-overflow: ellipsis;
-
         white-space: nowrap;
+
+        vertical-align: middle;
+
+        &.readonly {
+            padding-top: $entity-permission-container-offset;
+            padding-bottom: $entity-permission-container-offset;
+        }
     }
 
     &__item-wrapper--no-access {
@@ -143,56 +185,48 @@
 
     &__label {
         display: inline-block;
-        overflow: hidden;
+        vertical-align: middle;
 
-        text-overflow: ellipsis;
-
-        vertical-align: bottom;
+        @include text-line-truncate($action-permissions-label-trim-width, true);
     }
 
+    &__value,
     &__dropdown-toggle {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include text-line-truncate($action-permissions-toggle-trim-width, true);
+
         &:focus {
-            font-weight: normal;
+            font-weight: font-weight('light');
         }
     }
 }
 
-.field-permission-container {
-    margin-#{$start}: $role-collapse-expand-action-container-offset;
-    padding: 12px 0;
-
-    border-top: 1px solid $general-border-color;
-
-    &:first-child {
-        margin-top: 4px;
-
-        border-top: 0 none;
-    }
-
-    .field-name {
-        float: #{$start};
-        width: $role-collapse-expand-action-container-width - $role-collapse-expand-action-container-offset;
-    }
-
-    .action-permissions {
-        margin-#{$start}: 20px;
-    }
-}
-
-.role-permissions-action-launcher {
-    .launchers-list .launcher-item a&:hover,
-    .launchers-list .launcher-item a&:focus {
-        background: transparent !important;
+.launchers-list .launcher-item {
+    a.role-permissions-action-launcher {
+        &:hover,
+        &:focus {
+            // stylelint-disable-next-line declaration-no-important
+            background: transparent !important;
+        }
     }
 }
 
 .dropdown-menu__role-permissions-action {
     .grid .entity-row-action {
-        padding: 5px 0;
+        padding: $entity-permission-entity-row-action-offset;
     }
+}
 
-    .dropdown-menu-collection__list > li {
-        white-space: nowrap;
-        margin: 0;
+@include media-breakpoint-down(xs) {
+    .inner-permissions-grid {
+        .grid-header-cell:first-child {
+            width: $inner-permissions-grid-grid-header-cell-xs-width + $capabilities-offset;
+        }
+
+        .collapse-expand-action-container {
+            width: $inner-permissions-grid-grid-header-cell-xs-width;
+        }
     }
 }

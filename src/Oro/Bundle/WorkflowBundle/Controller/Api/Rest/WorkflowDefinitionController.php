@@ -2,33 +2,28 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @Rest\NamePrefix("oro_api_workflow_definition_")
+ * REST API controller for workflow definitions.
  */
-class WorkflowDefinitionController extends FOSRestController
+class WorkflowDefinitionController extends AbstractFOSRestController
 {
     /**
      * REST GET item
      *
      * @param WorkflowDefinition $workflowDefinition
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(
      *      description="Get workflow definition",
      *      resource=true
@@ -38,7 +33,13 @@ class WorkflowDefinitionController extends FOSRestController
      */
     public function getAction(WorkflowDefinition $workflowDefinition)
     {
-        return $this->handleView($this->view($workflowDefinition, Codes::HTTP_OK));
+        $config = $this->getWorkflowDefinitionSerializationConfig();
+        $entitySerializer = $this->get('oro_workflow.rest_api.entity_serializer');
+        $data = $entitySerializer->serializeEntities([$workflowDefinition], WorkflowDefinition::class, $config);
+
+        return $this->handleView(
+            $this->view($this->updateWorkflowDefinitionSerializedData($data[0], ''), Response::HTTP_OK)
+        );
     }
 
     /**
@@ -51,10 +52,6 @@ class WorkflowDefinitionController extends FOSRestController
      * @param WorkflowDefinition $workflowDefinition
      * @param Request $request
      * @return Response
-     * @Rest\Put(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(
      *      description="Update workflow definition",
      *      resource=true
@@ -80,12 +77,12 @@ class WorkflowDefinitionController extends FOSRestController
             return $this->handleView(
                 $this->view(
                     ['error' => $exception->getMessage()],
-                    Codes::HTTP_BAD_REQUEST
+                    Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
-        return $this->handleView($this->view($workflowDefinition->getName(), Codes::HTTP_OK));
+        return $this->handleView($this->view($workflowDefinition->getName(), Response::HTTP_OK));
     }
 
     /**
@@ -94,10 +91,6 @@ class WorkflowDefinitionController extends FOSRestController
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json", "workflowDefinition"=null}
-     * )
      * @ApiDoc(
      *      description="Create new workflow definition",
      *      resource=true
@@ -127,12 +120,12 @@ class WorkflowDefinitionController extends FOSRestController
             return $this->handleView(
                 $this->view(
                     ['error' => $exception->getMessage()],
-                    Codes::HTTP_BAD_REQUEST
+                    Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
-        return $this->handleView($this->view($builtDefinition->getName(), Codes::HTTP_OK));
+        return $this->handleView($this->view($builtDefinition->getName(), Response::HTTP_OK));
     }
 
     /**
@@ -142,10 +135,6 @@ class WorkflowDefinitionController extends FOSRestController
      * - HTTP_NO_CONTENT (204)
      * - HTTP_FORBIDDEN (403)
      *
-     * @Rest\Delete(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Delete workflow definition")
      * @Acl(
      *      id="oro_workflow_definition_delete",
@@ -160,12 +149,61 @@ class WorkflowDefinitionController extends FOSRestController
     public function deleteAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem()) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         } else {
             $this->getHandler()->deleteWorkflowDefinition($workflowDefinition);
 
-            return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+            return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         }
+    }
+
+    protected function getWorkflowDefinitionSerializationConfig(): array
+    {
+        return [
+            'fields' => [
+                'entityAcls' => null,
+                'scopes' => null,
+                'steps' => null,
+                'restrictions' => ['exclude' => true]
+            ]
+        ];
+    }
+
+    /**
+     * Converts field names to snake case and remove items with NULL value.
+     */
+    protected function updateWorkflowDefinitionSerializedData(array $data, string $path): array
+    {
+        $result = [];
+        $pathPrefix = $path;
+        if ('' !== $path) {
+            $pathPrefix .= '.';
+        }
+        foreach ($data as $name => $value) {
+            if (null === $value) {
+                continue;
+            }
+            if (\is_array($value)) {
+                if (ArrayUtil::isAssoc($value)) {
+                    $value = $this->updateWorkflowDefinitionSerializedData($value, $pathPrefix . $name);
+                } else {
+                    $rows = [];
+                    foreach ($value as $k => $v) {
+                        if (\is_array($v)) {
+                            $v = $this->updateWorkflowDefinitionSerializedData($v, $pathPrefix . $name);
+                        }
+                        $rows[$k] = $v;
+                    }
+                    $value = $rows;
+                }
+            }
+            if ('configuration' !== $path) {
+                $name = strtolower(preg_replace('/[A-Z]+/', '_\\0', $name));
+            }
+            $result[$name] = $value;
+        }
+
+        return $result;
     }
 
     /**

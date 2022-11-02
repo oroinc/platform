@@ -3,82 +3,69 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EmailBundle\EventListener\EntityConfigListener;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
 class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CACHE_KEY = 'testCache.Key';
-    const TEST_CLASS_NAME = 'someClassName';
+    /** @var TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailRendererConfigProvider;
 
     /** @var EntityConfigListener */
-    protected $listener;
+    private $listener;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
-            ->disableOriginalConstructor()->getMock();
+        $this->emailRendererConfigProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
 
-        $this->listener = new EntityConfigListener($this->cache, self::TEST_CACHE_KEY);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->cache);
-        unset($this->listener);
+        $this->listener = new EntityConfigListener($this->emailRendererConfigProvider);
     }
 
     /**
      * @dataProvider changeSetProvider
-     *
-     * @param $scope
-     * @param $changeSet
-     * @param $shouldClearCache
      */
-    public function testPreFlush($scope, $changeSet, $shouldClearCache)
+    public function testPreFlush(string $scope, array $changeSet, bool $shouldClearCache)
     {
         $config = new Config(new FieldConfigId($scope, 'Test\Entity', 'testField'));
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->exactly($scope === 'email' ? 1 : 0))
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects(self::exactly($scope === 'email' ? 1 : 0))
             ->method('getConfigChangeSet')
-            ->with($this->identicalTo($config))
-            ->will($this->returnValue($changeSet));
+            ->with(self::identicalTo($config))
+            ->willReturn($changeSet);
 
-        $this->cache->expects($this->exactly($shouldClearCache ? 1 : 0))
-            ->method('delete')
-            ->with(self::TEST_CACHE_KEY);
+        if ($shouldClearCache) {
+            $this->emailRendererConfigProvider->expects(self::once())
+                ->method('clearCache');
+        } else {
+            $this->emailRendererConfigProvider->expects(self::never())
+                ->method('clearCache');
+        }
 
         $this->listener->preFlush(new PreFlushConfigEvent([$scope => $config], $configManager));
     }
 
-    /**
-     * @return array
-     */
-    public function changeSetProvider()
+    public function changeSetProvider(): array
     {
-        return array(
-            'email config changed'     => array(
+        return [
+            'email config changed'     => [
                 'scope'            => 'email',
-                'change'           => array('available_in_template' => array(true, false)),
+                'change'           => ['available_in_template' => [true, false]],
                 'shouldClearCache' => true
-            ),
-            'email config not changed' => array(
+            ],
+            'email config not changed' => [
                 'scope'            => 'email',
-                'change'           => array(),
+                'change'           => [],
                 'shouldClearCache' => false
-            ),
-            'not email config'         => array(
+            ],
+            'not email config'         => [
                 'scope'            => 'someConfigScope',
-                'change'           => array(),
+                'change'           => [],
                 'shouldClearCache' => false
-            )
-        );
+            ]
+        ];
     }
 }

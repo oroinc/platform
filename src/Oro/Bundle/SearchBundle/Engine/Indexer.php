@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -9,10 +10,10 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Search index accesser class.
+ * Search index accessor class.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -21,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Indexer
 {
     const TEXT_ALL_DATA_FIELD   = 'all_text';
+    const NAME_FIELD            = 'system_entity_name';
+    const ID_FIELD              = 'system_entity_id';
 
     const RELATION_ONE_TO_ONE   = 'one-to-one';
     const RELATION_MANY_TO_MANY = 'many-to-many';
@@ -29,7 +32,7 @@ class Indexer
 
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
-    /** @var EngineInterface */
+    /** @var ExtendedEngineInterface */
     protected $engine;
 
     /** @var ObjectMapper */
@@ -44,25 +47,16 @@ class Indexer
     /** @var bool */
     protected $isAllowedApplyAcl = true;
 
-    /**
-     * @param EngineInterface   $engine
-     * @param ObjectMapper        $mapper
-     * @param SecurityProvider    $securityProvider
-     * @param AclHelper           $searchAclHelper
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
-        EngineInterface        $engine,
-        ObjectMapper             $mapper,
-        SecurityProvider         $securityProvider,
-        AclHelper                $searchAclHelper,
-        EventDispatcherInterface $dispatcher
+        ExtendedEngineInterface $engine,
+        ObjectMapper $mapper,
+        SecurityProvider $securityProvider,
+        AclHelper $searchAclHelper
     ) {
-        $this->engine           = $engine;
-        $this->mapper           = $mapper;
+        $this->engine = $engine;
+        $this->mapper = $mapper;
         $this->securityProvider = $securityProvider;
-        $this->searchAclHelper  = $searchAclHelper;
-        $this->dispatcher       = $dispatcher;
+        $this->searchAclHelper = $searchAclHelper;
     }
 
     /**
@@ -114,57 +108,88 @@ class Indexer
     }
 
     /**
-     * @param  string  $searchString
-     * @param  integer $offset
-     * @param  integer $maxResults
-     * @param  string  $from
-     * @param  integer $page
+     * @param string|null          $searchString
+     * @param int|null             $offset
+     * @param int|null             $maxResults
+     * @param string|string[]|null $from
+     * @param int|null             $page
      *
      * @return Query
      */
-    public function getSimpleSearchQuery($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
-    {
+    public function getSimpleSearchQuery(
+        ?string $searchString,
+        ?int $offset = 0,
+        ?int $maxResults = 0,
+        $from = null,
+        ?int $page = 0
+    ): Query {
+        $query = $this->select();
+        $criteria = $query->getCriteria();
+
+        $nameField = Criteria::implodeFieldTypeName(Query::TYPE_TEXT, self::NAME_FIELD);
+        QueryBuilderUtil::checkField($nameField);
+
+        $query->addSelect($nameField . ' as name');
+        $query->from($from ?: '*');
+
         $searchString = trim($searchString);
-        $query        = $this->select();
-
-        if ($from) {
-            $query->from($from);
-        } else {
-            $query->from('*');
-        }
-
         if ($searchString) {
-            $query->andWhere(self::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+            $criteria->where(Criteria::expr()->contains(
+                Criteria::implodeFieldTypeName(Query::TYPE_TEXT, self::TEXT_ALL_DATA_FIELD),
+                $searchString
+            ));
         }
 
-        if ($maxResults > 0) {
-            $query->setMaxResults($maxResults);
-        } else {
-            $query->setMaxResults(Query::INFINITY);
-        }
-
+        $criteria->setMaxResults($maxResults > 0 ? $maxResults : Query::INFINITY);
         if ($page > 0) {
-            $query->setFirstResult($maxResults * ($page - 1));
-        } elseif ($offset > 0) {
-            $query->setFirstResult($offset);
+            $offset = $maxResults * ($page - 1);
+        }
+        if ($offset > 0) {
+            $criteria->setFirstResult($offset);
         }
 
         return $query;
     }
 
     /**
-     * @param  string  $searchString
-     * @param  integer $offset
-     * @param  integer $maxResults
-     * @param  string  $from
-     * @param  integer $page
+     * @param string|null          $searchString
+     * @param int|null             $offset
+     * @param int|null             $maxResults
+     * @param string|string[]|null $from
+     * @param int|null             $page
+     *
      * @return Result
      */
-    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
-    {
+    public function simpleSearch(
+        ?string $searchString,
+        ?int $offset = 0,
+        ?int $maxResults = 0,
+        $from = null,
+        ?int $page = 0
+    ): Result {
         $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
+    }
+
+    /**
+     * @param string|null $searchString
+     * @param null        $from
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(
+        ?string $searchString,
+        $from = null
+    ): array {
+        $query = $this->getSimpleSearchQuery($searchString, 0, 0, $from, 0);
+
+        $this->prepareQuery($query);
+
+        return $this->engine->getDocumentsCountGroupByEntityFQCN($query);
     }
 
     /**
@@ -231,8 +256,6 @@ class Indexer
 
     /**
      * Do query manipulations such as ACL apply etc.
-     *
-     * @param Query $query
      */
     protected function prepareQuery(Query $query)
     {
@@ -246,7 +269,7 @@ class Indexer
     /**
      * Apply special behavior of class inheritance processing
      *
-     * @param Query $query
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyModesBehavior(Query $query)
     {

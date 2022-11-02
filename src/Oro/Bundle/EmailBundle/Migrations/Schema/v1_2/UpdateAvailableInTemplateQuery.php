@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
-use Metadata\MetadataFactory;
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -12,7 +10,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Sets value of email.available_in_template attribute to TRUE for all fields
  * except a value of this attribute is changed by an user
- * and has own @ConfigField annotations with email.available_in_template attribute
+ * and has own ConfigField annotations with email.available_in_template attribute
  */
 class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
 {
@@ -39,9 +37,6 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
     /** @var MetadataFactory */
     protected $metadataFactory;
 
-    /**
-     * @param MetadataFactory $metadataFactory
-     */
     public function __construct(MetadataFactory $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
@@ -81,9 +76,8 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
                 // skip if a class no longer exists
                 continue;
             }
-            $fieldConfigs        = $this->loadFieldConfigs($logger, $className);
+            $fieldConfigs = $this->loadFieldConfigs($logger, $className);
             $fieldsChangedByUser = $this->loadFieldsChangedByUser($logger, $className);
-            /** @var EntityMetadata $metadata */
             $metadata = $this->metadataFactory->getMetadataForClass($className);
             foreach ($fieldConfigs as $fieldName => $fieldConfig) {
                 if (isset($fieldsChangedByUser[$fieldName])) {
@@ -94,12 +88,12 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
                     // skip because this data type should not be available in email templates
                     continue;
                 }
-                if ($metadata && $metadata->configurable && isset($metadata->propertyMetadata[$fieldName])) {
-                    /** @var FieldMetadata $fieldMetadata */
-                    $fieldMetadata = $metadata->propertyMetadata[$fieldName];
+                if (null !== $metadata && isset($metadata->fieldMetadata[$fieldName])) {
+                    $fieldMetadata = $metadata->fieldMetadata[$fieldName];
                     if (isset($fieldMetadata->defaultValues['email'])
-                        && array_key_exists('available_in_template', $fieldMetadata->defaultValues['email'])) {
-                        // skip because this field has @ConfigField annotations with email.available_in_template
+                        && array_key_exists('available_in_template', $fieldMetadata->defaultValues['email'])
+                    ) {
+                        // skip because this field has ConfigField annotations with email.available_in_template
                         continue;
                     }
                 }
@@ -119,7 +113,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
                 $types  = ['data' => 'array', 'id' => 'integer'];
                 $this->logQuery($logger, $query, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $params, $types);
+                    $this->connection->executeStatement($query, $params, $types);
                 }
             }
         }

@@ -3,11 +3,14 @@
 namespace Oro\Bundle\LocaleBundle\ImportExport\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
+/**
+ * Normalizes objects which implements AbstractLocalizedFallbackValue class.
+ */
 class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 {
     /** @var ManagerRegistry */
@@ -43,7 +46,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
     }
 
     /** {@inheritdoc} */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $result = [];
 
@@ -58,48 +61,73 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         return $result;
     }
 
-    /** {@inheritdoc} */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!is_array($data)) {
             return new ArrayCollection();
         }
-        $itemType = $this->getItemType($class);
+
+        $itemType = $this->getItemType($type);
         if (!$itemType) {
             return new ArrayCollection($data);
         }
+
         $result = new ArrayCollection();
+        if (!isset($data[LocalizationCodeFormatter::DEFAULT_LOCALIZATION])) {
+            // Default localized fallback value should be always present.
+            $data[LocalizationCodeFormatter::DEFAULT_LOCALIZATION] = [];
+        }
+
         foreach ($data as $localizationName => $item) {
-            // Create new object instead of clone because cloned object could have extended fields with excessive data
-            /** @var LocalizedFallbackValue $object */
-            $object = new $this->localizedFallbackValueClass;
-
-            if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
-                if (!array_key_exists($localizationName, $this->localizations)) {
-                    $this->localizations[$localizationName] = clone $this->localization;
-                    $this->localizations[$localizationName]->setName($localizationName);
-                }
-                $object->setLocalization($this->localizations[$localizationName]);
-            }
-
-            if (array_key_exists('fallback', $item)) {
-                $object->setFallback((string)$item['fallback']);
-            }
-            if (array_key_exists('text', $item)) {
-                $object->setText((string)$item['text']);
-            }
-            if (array_key_exists('string', $item)) {
-                $object->setString((string)$item['string']);
-            }
-
-            $result->set($localizationName, $object);
+            $result->set($localizationName, $this->createLocalizedFallbackValue($itemType, $item, $localizationName));
         }
 
         return $result;
     }
 
+    protected function createLocalizedFallbackValue(
+        string $className,
+        array $item,
+        string $localizationName
+    ): AbstractLocalizedFallbackValue {
+        // Creates new object instead of clone because cloned object could have extended fields with excessive data.
+        /** @var AbstractLocalizedFallbackValue $object */
+        $object = new $className();
+
+        $object->setLocalization($this->getLocalization($localizationName));
+
+        if (array_key_exists('fallback', $item)) {
+            $object->setFallback($item['fallback'] ? (string)$item['fallback'] : null);
+        }
+
+        if (array_key_exists('text', $item)) {
+            $object->setText((string)$item['text']);
+        }
+
+        if (array_key_exists('string', $item)) {
+            $object->setString((string)$item['string']);
+        }
+
+        return $object;
+    }
+
+    protected function getLocalization(string $localizationName): ?Localization
+    {
+        if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION
+            && !array_key_exists($localizationName, $this->localizations)) {
+            $this->localizations[$localizationName] = clone $this->localization;
+            $this->localizations[$localizationName]->setName($localizationName);
+        }
+
+        return $this->localizations[$localizationName] ?? null;
+    }
+
     /** {@inheritdoc} */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if (!parent::supportsNormalization($data, $format, $context)) {
             return false;
@@ -109,7 +137,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
     }
 
     /** {@inheritdoc} */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         if (!parent::supportsDenormalization($data, $type, $format, $context)) {
             return false;

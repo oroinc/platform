@@ -9,6 +9,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
+/**
+ * Dashboard configuration converter for Business Unit select values.
+ */
 class WidgetBusinessUnitSelectConverter extends WidgetEntitySelectConverter
 {
     /** @var OwnerHelper */
@@ -50,8 +53,9 @@ class WidgetBusinessUnitSelectConverter extends WidgetEntitySelectConverter
 
         $qb = $this->entityManager->getRepository($this->entityClass)->createQueryBuilder('e');
         $qb->where(
-            $qb->expr()->in(sprintf('e.%s', $identityField), $value)
+            $qb->expr()->in(sprintf('e.%s', $identityField), ':ids')
         );
+        $qb->setParameter('ids', $value);
 
         return $this->aclHelper->apply($qb)->getResult();
     }

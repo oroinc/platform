@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Symfony\Component\Form\FormInterface;
@@ -33,13 +33,6 @@ class PageStateHandler
      */
     protected $tokenStorage;
 
-    /**
-     *
-     * @param FormInterface         $form
-     * @param RequestStack          $requestStack
-     * @param ObjectManager         $manager
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -82,8 +75,6 @@ class PageStateHandler
 
     /**
      * "Success" form handler
-     *
-     * @param AbstractPageState $entity
      */
     protected function onSuccess(AbstractPageState $entity)
     {

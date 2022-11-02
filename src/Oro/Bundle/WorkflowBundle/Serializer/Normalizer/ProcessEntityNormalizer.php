@@ -2,27 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessEntityNormalizer extends AbstractProcessNormalizer
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    protected ManagerRegistry $registry;
 
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;
@@ -30,13 +20,13 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         $processJob = $this->getProcessJob($context);
         $entityClass = $this->getClass($object);
-        $normalizedData = array('className' => $entityClass);
+        $normalizedData = ['className' => $entityClass];
 
         if ($processJob->getProcessTrigger()->getEvent() != ProcessTrigger::EVENT_DELETE) {
             $entityId = $this->doctrineHelper->getSingleEntityIdentifier($object);
@@ -45,9 +35,9 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
             return $normalizedData;
         }
 
-        $normalizedData['entityData'] = array();
+        $normalizedData['entityData'] = [];
 
-        $classMetadata  = $this->getClassMetadata($entityClass);
+        $classMetadata = $this->getClassMetadata($entityClass);
         $fieldNames = $classMetadata->getFieldNames();
 
         foreach ($fieldNames as $name) {
@@ -59,9 +49,9 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $className = $data['className'];
 
@@ -69,12 +59,12 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
             return $this->registry->getManagerForClass($className)->find($className, $data['entityId']);
         }
 
-        $entityData = !empty($data['entityData']) ? $data['entityData'] : array();
+        $entityData = !empty($data['entityData']) ? $data['entityData'] : [];
         $classMetadata = $this->getClassMetadata($className);
         $entity = $classMetadata->getReflectionClass()->newInstanceWithoutConstructor();
 
         foreach ($entityData as $name => $value) {
-            $value = $this->serializer->denormalize($value, null, $format, $context);
+            $value = $this->serializer->denormalize($value, '', $format, $context);
 
             $reflectionProperty = $classMetadata->getReflectionProperty($name);
             $reflectionProperty->setAccessible(true);
@@ -85,26 +75,22 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return is_object($data) && $this->doctrineHelper->isManageableEntity($data);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_array($data) && !empty($data['className']);
     }
 
-    /**
-     * @param string $className
-     * @return ClassMetadata
-     */
-    protected function getClassMetadata($className)
+    protected function getClassMetadata(string $className): ClassMetadata
     {
         return $this->registry->getManagerForClass($className)->getClassMetadata($className);
     }

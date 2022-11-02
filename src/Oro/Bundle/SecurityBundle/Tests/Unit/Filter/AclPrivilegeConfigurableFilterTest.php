@@ -11,86 +11,119 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclPrivilegeConfigurableFilter */
-    protected $filter;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    public function testFilterWhenNoFilters()
     {
-        /** @var ConfigurablePermissionProvider|\PHPUnit\Framework\MockObject\MockObject $permissionProvider */
+        $configurableName = 'test';
+        $configurablePermission = $this->createMock(ConfigurablePermission::class);
+
+        $aclPrivilege = new AclPrivilege();
+        $aclPrivileges = new ArrayCollection([$aclPrivilege]);
+        $expected = new ArrayCollection([$aclPrivilege]);
+
         $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);
-        $permissionProvider->expects($this->any())->method('get')
-            ->willReturn($this->createMock(ConfigurablePermission::class));
+        $permissionProvider->expects(self::any())
+            ->method('get')
+            ->with($configurableName)
+            ->willReturn($configurablePermission);
 
-        $this->filter = new AclPrivilegeConfigurableFilter($permissionProvider);
+        $filter = new AclPrivilegeConfigurableFilter([], $permissionProvider);
+        $result = $filter->filter($aclPrivileges, $configurableName);
+
+        self::assertEquals($expected->toArray(), $result->toArray());
+        self::assertNotSame($aclPrivileges, $result);
     }
 
-    /**
-     * @dataProvider filtersProvider
-     *
-     * @param array $filters
-     * @param ArrayCollection $aclPrivileges
-     * @param ArrayCollection $expected
-     */
-    public function testFilter(array $filters, ArrayCollection $aclPrivileges, ArrayCollection $expected)
+    public function testFilterWhenNoFiltersThatSupportFiltering()
     {
-        foreach ($filters as $filter) {
-            $this->filter->addConfigurableFilter($filter);
-        }
+        $configurableName = 'test';
+        $configurablePermission = $this->createMock(ConfigurablePermission::class);
 
-        $this->assertEquals(
-            $expected->toArray(),
-            $this->filter->filter($aclPrivileges, 'default')->toArray()
-        );
-    }
+        $aclPrivilege = new AclPrivilege();
+        $aclPrivileges = new ArrayCollection([$aclPrivilege]);
+        $expected = new ArrayCollection([$aclPrivilege]);
 
-    /**
-     * @return \Generator
-     */
-    public function filtersProvider()
-    {
-        $emptyCollection = new ArrayCollection();
-        $notEmptyCollection = new ArrayCollection([new AclPrivilege()]);
-
-        yield 'without filters' => [
-            'filters' => [],
-            'aclPrivileges' => $notEmptyCollection,
-            'expected' => $notEmptyCollection
-        ];
-
-        yield 'not supported filter' => [
-            'filters' => [$this->createFilter(false, false)],
-            'aclPrivileges' => $notEmptyCollection,
-            'expected' => $notEmptyCollection
-        ];
-
-        yield 'supported filter' => [
-            'filters' => [$this->createFilter(true, true)],
-            'aclPrivileges' => $notEmptyCollection,
-            'expected' => $notEmptyCollection
-        ];
-
-        yield 'supported filter and filter return false' => [
-            'filters' => [$this->createFilter(true, false)],
-            'aclPrivileges' => $notEmptyCollection,
-            'expected' => $emptyCollection
-        ];
-    }
-
-    /**
-     * @param bool $isSupported
-     * @param bool $result
-     *
-     * @return AclPrivilegeConfigurableFilterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createFilter($isSupported, $result)
-    {
         $filter = $this->createMock(AclPrivilegeConfigurableFilterInterface::class);
-        $filter->expects($this->any())->method('isSupported')->willReturn($isSupported);
-        $filter->expects($this->any())->method('filter')->willReturn($result);
+        $filter->expects(self::once())
+            ->method('isSupported')
+            ->with(self::identicalTo($aclPrivilege))
+            ->willReturn(false);
+        $filter->expects(self::never())
+            ->method('filter');
 
-        return $filter;
+        $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);
+        $permissionProvider->expects(self::any())
+            ->method('get')
+            ->with($configurableName)
+            ->willReturn($configurablePermission);
+
+        $filter = new AclPrivilegeConfigurableFilter([$filter], $permissionProvider);
+        $result = $filter->filter($aclPrivileges, $configurableName);
+
+        self::assertEquals($expected->toArray(), $result->toArray());
+        self::assertNotSame($aclPrivileges, $result);
+    }
+
+    public function testFilterWhenFiltersThatSupportFilteringExist()
+    {
+        $configurableName = 'test';
+        $configurablePermission = $this->createMock(ConfigurablePermission::class);
+
+        $aclPrivilege = new AclPrivilege();
+        $aclPrivileges = new ArrayCollection([$aclPrivilege]);
+        $expected = new ArrayCollection([$aclPrivilege]);
+
+        $filter = $this->createMock(AclPrivilegeConfigurableFilterInterface::class);
+        $filter->expects(self::once())
+            ->method('isSupported')
+            ->with(self::identicalTo($aclPrivilege))
+            ->willReturn(true);
+        $filter->expects(self::once())
+            ->method('filter')
+            ->with(self::identicalTo($aclPrivilege))
+            ->willReturn(true);
+
+        $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);
+        $permissionProvider->expects(self::any())
+            ->method('get')
+            ->with($configurableName)
+            ->willReturn($configurablePermission);
+
+        $filter = new AclPrivilegeConfigurableFilter([$filter], $permissionProvider);
+        $result = $filter->filter($aclPrivileges, $configurableName);
+
+        self::assertEquals($expected->toArray(), $result->toArray());
+        self::assertNotSame($aclPrivileges, $result);
+    }
+
+    public function testFilterWhenFiltersThatSupportFilteringExistAndFilterReturnsFalse()
+    {
+        $configurableName = 'test';
+        $configurablePermission = $this->createMock(ConfigurablePermission::class);
+
+        $aclPrivilege = new AclPrivilege();
+        $aclPrivileges = new ArrayCollection([$aclPrivilege]);
+        $expected = new ArrayCollection();
+
+        $filter = $this->createMock(AclPrivilegeConfigurableFilterInterface::class);
+        $filter->expects(self::once())
+            ->method('isSupported')
+            ->with(self::identicalTo($aclPrivilege))
+            ->willReturn(true);
+        $filter->expects(self::once())
+            ->method('filter')
+            ->with(self::identicalTo($aclPrivilege))
+            ->willReturn(false);
+
+        $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);
+        $permissionProvider->expects(self::any())
+            ->method('get')
+            ->with($configurableName)
+            ->willReturn($configurablePermission);
+
+        $filter = new AclPrivilegeConfigurableFilter([$filter], $permissionProvider);
+        $result = $filter->filter($aclPrivileges, $configurableName);
+
+        self::assertEquals($expected->toArray(), $result->toArray());
+        self::assertNotSame($aclPrivileges, $result);
     }
 }

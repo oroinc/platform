@@ -5,21 +5,16 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Client;
 use Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory;
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettings;
 use Oro\Bundle\SoapBundle\Client\SoapClient;
-use PHPUnit\Framework\TestCase;
 
-class SoapClientTest extends TestCase
+class SoapClientTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NativeSoapClientFactory|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var NativeSoapClientFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $clientFactory;
 
-    /**
-     * @var SoapClient
-     */
+    /** @var SoapClient */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clientFactory = $this->createMock(NativeSoapClientFactory::class);
 
@@ -29,27 +24,25 @@ class SoapClientTest extends TestCase
     public function testSend()
     {
         $wsdlFilePath = null;
-        $methodName = '__setLocation';
+        $methodName = '__setSoapHeaders';
         $soapOptions = ['1', '2'];
         $settings = new SoapClientSettings($wsdlFilePath, $methodName, $soapOptions);
 
-        $soapResult = 'result';
+        $soapResult = true;
         $soapData = ['1', '2'];
 
         $soapClient = $this->createMock(\SoapClient::class);
-        $soapClient
-            ->expects(static::once())
+        $soapClient->expects(self::once())
             ->method($methodName)
             ->with($soapData)
             ->willReturn($soapResult);
 
-        $this->clientFactory
-            ->expects(static::once())
+        $this->clientFactory->expects(self::once())
             ->method('create')
             ->with($wsdlFilePath, $soapOptions)
             ->willReturn($soapClient);
 
-        static::assertSame(
+        self::assertSame(
             $soapResult,
             $this->client->send($settings, $soapData)
         );

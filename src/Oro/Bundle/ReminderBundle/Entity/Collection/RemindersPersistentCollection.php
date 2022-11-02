@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 
+/**
+ * Collection of Reminder entities fetched using \Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository
+ */
 class RemindersPersistentCollection extends AbstractLazyCollection
 {
     /**
@@ -138,7 +141,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }
@@ -146,7 +149,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
@@ -154,9 +157,9 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
-        return $this->remove($offset);
+        $this->remove($offset);
     }
 
     /**

@@ -7,7 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentTypeStub extends PercentType
 {
-    const NAME = 'percent_stub';
+    private const NAME = 'percent_stub';
 
     /**
      * {@inheritdoc}

@@ -2,54 +2,75 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
 {
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The "columns" definition does not exist.
-     */
-    public function testEmpty()
+    public function testEntityNotSpecified()
     {
-        $model = new QueryDesignerModel();
-        $model->setDefinition(json_encode([]));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The entity must be specified.');
+
+        $model = new QueryDesigner();
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition(['columns' => ['name' => 'column1']]));
         $builder = $this->createDatagridConfigurationBuilder($model);
         $builder->getConfiguration();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The "columns" definition must not be empty.
-     */
-    public function testEmptyColumns()
+    public function testNullDefinition()
     {
-        $model = new QueryDesignerModel();
-        $model->setDefinition(json_encode(['columns' => []]));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition does not exist.');
+
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
+    }
+
+    public function testEmptyDefinition()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition does not exist.');
+
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition([]));
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
+    }
+
+    public function testEmptyColumnsInDefinition()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition must not be empty.');
+
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition(['columns' => []]));
         $builder = $this->createDatagridConfigurationBuilder($model);
         $builder->getConfiguration();
     }
 
     public function testNoFilters()
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => '']
             ]
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string']
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -67,12 +88,6 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
                     'column_aliases' => [
                         'column1' => 'c1',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -101,24 +116,22 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
 
     public function testNoJoins()
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => '']
             ],
             'filters' => []
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string']
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -136,12 +149,6 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
                     'column_aliases' => [
                         'column1' => 'c1',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [

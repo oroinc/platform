@@ -3,15 +3,15 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
-use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
+use Symfony\Component\Form\Guess\Guess;
 
 class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultColumnOptionsGuesser */
-    protected $guesser;
+    private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new DefaultColumnOptionsGuesser();
     }
@@ -23,10 +23,10 @@ class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $guess = $this->guesser->guessFormatter('TestClass', 'testProp', $type);
         $this->assertEquals($expected, $guess->getOptions());
-        $this->assertEquals(ColumnGuess::LOW_CONFIDENCE, $guess->getConfidence());
+        $this->assertEquals(Guess::LOW_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function guessFormatterProvider()
+    public function guessFormatterProvider(): array
     {
         return [
             ['integer', ['frontend_type' => Property::TYPE_INTEGER]],

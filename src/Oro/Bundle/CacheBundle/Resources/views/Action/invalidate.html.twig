@@ -1,8 +1,8 @@
-{% extends 'OroActionBundle:Operation:form.html.twig' %}
+{% extends '@OroAction/Operation/form.html.twig' %}
 {% block form %}
     {% set buttonOptions = operation.definition.buttonOptions %}
     {% set pageComponentOptions = {} %}
-    <div class="widget-content invalidate-cache-content" data-page-component-module="orocache/js/app/components/invalidate-cache-component">
+    <div class="invalidate-cache-content" data-page-component-module="orocache/js/app/components/invalidate-cache-component">
         {% set attr = {'id': form.vars.id, 'data-collect': 'true', 'class': 'form-dialog invalidate-cache-form'} %}
         {% if buttonOptions.page_component_module is defined %}
             {% set attr = attr|merge({'data-page-component-module': buttonOptions.page_component_module}) %}
@@ -11,10 +11,10 @@
             <table>
                 <tbody>
                 <tr class="invalidate-cache-tr">
-                    <td class="invalidate-cache-td-labels">{{ 'oro.cache.invalidate.label'|trans }}:&nbsp;</td>
-                    <td>{{ form_widget(form.invalidateType, { 'attr': {'class': 'cache-invalidate-type'}}) }}</td>
-                    <td class="invalidate-cache-td-labels">&nbsp;{{ 'oro.cache.invalidate.at.label'|trans }}&nbsp;</td>
-                    <td class="invalidate-cache-td-fields">{{ form_widget(form.invalidateCacheAt)}}</td>
+                    <td class="invalidate-cache-td-labels invalidate-cache-label">{{ 'oro.cache.invalidate.label'|trans }}:&nbsp;</td>
+                    <td class="invalidate-cache-td-fields invalidate-cache-field">{{ form_widget(form.invalidateType, { 'attr': {'class': 'cache-invalidate-type'}}) }}</td>
+                    <td class="invalidate-cache-td-labels invalidate-cache-at">&nbsp;{{ 'oro.cache.invalidate.at.label'|trans }}&nbsp;</td>
+                    <td class="invalidate-cache-td-fields invalidate-cache-date">{{ form_widget(form.invalidateCacheAt)}}</td>
                 </tr>
                 </tbody>
             </table>

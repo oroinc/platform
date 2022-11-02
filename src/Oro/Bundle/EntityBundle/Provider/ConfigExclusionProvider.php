@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 
 /**
  * Provides exclude logic to filter entities and fields based on exclude rules.
@@ -10,17 +12,20 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 class ConfigExclusionProvider implements ExclusionProviderInterface
 {
     /** @var EntityRuleMatcher */
-    protected $matcher;
+    private $entityHierarchyProvider;
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param array                            $excludeRules
-     */
+    /** @var EntityRuleMatcher */
+    private $configProvider;
+
+    /** @var EntityRuleMatcher|null */
+    private $matcher;
+
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
-        $excludeRules
+        EntityConfigurationProvider $configProvider
     ) {
-        $this->matcher = new EntityRuleMatcher($entityHierarchyProvider, $excludeRules);
+        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -28,7 +33,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredEntity($className)
     {
-        return $this->matcher->isEntityMatched($className);
+        return $this->getMatcher()->isEntityMatched($className);
     }
 
     /**
@@ -36,7 +41,11 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        return $this->matcher->isFieldMatched($metadata->name, $fieldName, $metadata->getTypeOfField($fieldName));
+        return $this->getMatcher()->isFieldMatched(
+            $metadata->name,
+            $fieldName,
+            $metadata->getTypeOfField($fieldName)
+        );
     }
 
     /**
@@ -44,6 +53,21 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        return $this->matcher->isFieldMatched($metadata->name, $associationName);
+        return $this->getMatcher()->isFieldMatched($metadata->name, $associationName);
+    }
+
+    /**
+     * @return EntityRuleMatcher
+     */
+    private function getMatcher()
+    {
+        if (null === $this->matcher) {
+            $this->matcher = new EntityRuleMatcher(
+                $this->entityHierarchyProvider,
+                $this->configProvider->getConfiguration(EntityConfiguration::EXCLUSIONS)
+            );
+        }
+
+        return $this->matcher;
     }
 }

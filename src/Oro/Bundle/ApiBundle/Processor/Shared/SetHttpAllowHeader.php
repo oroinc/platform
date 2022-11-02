@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -22,9 +22,6 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    /**
-     * @param ResourcesProvider $resourcesProvider
-     */
     public function __construct(ResourcesProvider $resourcesProvider)
     {
         $this->resourcesProvider = $resourcesProvider;
@@ -52,18 +49,13 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return bool
-     */
     protected function isApplicable(Context $context): bool
     {
         return
             !$context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)
             && (
                 Response::HTTP_METHOD_NOT_ALLOWED === $context->getResponseStatusCode()
-                || (ApiActions::OPTIONS === $context->getAction() && $context->isSuccessResponse())
+                || (ApiAction::OPTIONS === $context->getAction() && $context->isSuccessResponse())
             );
     }
 
@@ -78,11 +70,11 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     protected function getHttpMethodToActionsMapForResourceWithoutIdentifier()
     {
         return [
-            Request::METHOD_OPTIONS => ApiActions::OPTIONS,
-            Request::METHOD_GET     => ApiActions::GET,
-            Request::METHOD_PATCH   => ApiActions::UPDATE,
-            Request::METHOD_POST    => ApiActions::CREATE,
-            Request::METHOD_DELETE  => ApiActions::DELETE
+            Request::METHOD_OPTIONS => ApiAction::OPTIONS,
+            Request::METHOD_GET     => ApiAction::GET,
+            Request::METHOD_PATCH   => ApiAction::UPDATE,
+            Request::METHOD_POST    => ApiAction::CREATE,
+            Request::METHOD_DELETE  => ApiAction::DELETE
         ];
     }
 

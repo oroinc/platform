@@ -2,20 +2,16 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmbeddedForm */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EmbeddedForm();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     /**
@@ -24,36 +20,26 @@ class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
     public function testGetSet($property, $value, $expected)
     {
         if ($value !== null) {
-            call_user_func_array([$this->entity, 'set' . ucfirst($property)], [$value]);
+            call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
         }
         $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
     }
 
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        return array(
-            'owner' => array('owner', $organization, $organization),
-        );
+        $organization = $this->createMock(Organization::class);
+
+        return [
+            'owner' => ['owner', $organization, $organization],
+        ];
     }
 
-    /**
-     * @test
-     */
-    public function shouldBeConstructed()
+    public function testShouldSetEntityPropertiesAndReturnBack()
     {
-        new EmbeddedForm();
-    }
-
-    /**
-     * @test
-     */
-    public function shouldSetEntityPropertiesAndReturnBack()
-    {
-        $formType = uniqid('AnyFormType');
-        $css = uniqid('styles');
-        $title = uniqid('title');
-        $successMessage = uniqid('success message');
+        $formType = 'Test\Type';
+        $css = 'test styles';
+        $title = 'test title';
+        $successMessage = 'test success message';
 
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType($formType);

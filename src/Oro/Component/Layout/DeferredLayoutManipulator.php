@@ -6,6 +6,8 @@ namespace Oro\Component\Layout;
  * Implements the layout manipulator which allows to perform manipulations in random order
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 {
@@ -123,10 +125,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     protected $links = [];
 
-    /**
-     * @param LayoutRegistryInterface   $registry
-     * @param RawLayoutBuilderInterface $rawLayoutBuilder
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder
@@ -440,6 +438,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * Executes all add new items related actions which were skipped by {@see executeAddActions} method,
      * but may be executed after removing/modifying some arguments
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function executeAdaptiveAddActions()
     {

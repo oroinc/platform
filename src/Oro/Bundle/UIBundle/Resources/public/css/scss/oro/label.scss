@@ -1,0 +1,28 @@
+/* @theme: admin.oro; */
+
+.label {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 $badge-padding-x;
+    font-size: $base-font-size--s;
+    font-weight: font-weight('light');
+    line-height: 1.2;
+    border-radius: $border-radius;
+
+    &-large {
+        font-size: $base-font-size;
+    }
+
+    .page-title__path & {
+        @extend .badge;
+        @extend .badge-pill;
+
+        border: none;
+    }
+}
+
+@each $color, $values in $label-theme-keys {
+    .label-#{$color} {
+        @include label-custom-variant($values...);
+    }
+}

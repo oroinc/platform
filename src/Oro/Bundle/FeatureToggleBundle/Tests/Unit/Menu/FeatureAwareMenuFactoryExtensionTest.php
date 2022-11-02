@@ -7,28 +7,22 @@ use Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension;
 
 class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
-    /**
-     * @var FeatureAwareMenuFactoryExtension
-     */
+    /** @var FeatureAwareMenuFactoryExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        /** @var FeatureChecker $featureChecker */
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->extension = new FeatureAwareMenuFactoryExtension($this->featureChecker);
     }
 
     public function testBuildOptionsChangeToNotAllowed()
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
             ->with('route_name', 'routes')
             ->willReturn(false);
@@ -47,22 +41,16 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array $options
      */
     public function testBuildOptionsNoChanges(array $options)
     {
-        $this->featureChecker
-            ->expects($this->never())
+        $this->featureChecker->expects($this->never())
             ->method('isResourceEnabled');
 
         $this->extension->buildOptions($options);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [

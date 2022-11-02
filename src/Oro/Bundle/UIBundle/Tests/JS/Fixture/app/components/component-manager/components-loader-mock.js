@@ -1,81 +1,101 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    var ComponentNeedsB = BaseComponent.extend({
+    const ComponentNeedsB = BaseComponent.extend({
         relatedSiblingComponents: {
             componentB: 'component-b'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ComponentNeedsB() {
-            ComponentNeedsB.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsB(options) {
+            ComponentNeedsB.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNeedsCE = BaseComponent.extend({
+    const ComponentNeedsCE = BaseComponent.extend({
         relatedSiblingComponents: {
             componentC: 'component-c',
             componentE: 'component-e'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ComponentNeedsCE() {
-            ComponentNeedsCE.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsCE(options) {
+            ComponentNeedsCE.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNeedsA = BaseComponent.extend({
+    const ComponentNeedsA = BaseComponent.extend({
         relatedSiblingComponents: {
             componentA: 'component-a'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ComponentNeedsA() {
-            ComponentNeedsA.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNeedsA(options) {
+            ComponentNeedsA.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentExtendNoNeedA = ComponentNeedsA.extend({
+    const ComponentExtendNoNeedA = ComponentNeedsA.extend({
         relatedSiblingComponents: {
             componentA: false
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ComponentExtendNoNeedA() {
-            ComponentExtendNoNeedA.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentExtendNoNeedA(options) {
+            ComponentExtendNoNeedA.__super__.constructor.call(this, options);
         }
     });
 
-    var ComponentNoNeeds = BaseComponent.extend({
+    const ComponentNoNeeds = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ComponentNoNeeds() {
-            ComponentNoNeeds.__super__.constructor.apply(this, arguments);
+        constructor: function ComponentNoNeeds(options) {
+            ComponentNoNeeds.__super__.constructor.call(this, options);
         }
     });
 
-    var components = {
+    const FooComponent = BaseComponent.extend({
+        /**
+         * @inheritdoc
+         */
+        constructor: function FooComponent(options) {
+            FooComponent.__super__.constructor.call(this, options);
+        }
+    });
+
+    const BarComponent = BaseComponent.extend({
+        /**
+         * @inheritdoc
+         */
+        constructor: function BarComponent(options) {
+            BarComponent.__super__.constructor.call(this, options);
+        }
+    });
+
+    const components = {
         'js/needs-b-component': ComponentNeedsB,
         'js/needs-ce-component': ComponentNeedsCE,
         'js/needs-a-component': ComponentNeedsA,
         'js/extend-no-need-a-component': ComponentExtendNoNeedA,
-        'js/no-needs-component': ComponentNoNeeds
+        'js/no-needs-component': ComponentNoNeeds,
+        'js/foo-component': FooComponent,
+        'js/bar-component': BarComponent
     };
 
     return function(moduleName) {
-        var deferred = $.Deferred();
+        const deferred = $.Deferred();
         setTimeout(function() {
             deferred.resolve(components[moduleName]);
         }, 0);

@@ -11,6 +11,7 @@ Table of Contents
  - [Create Entity](#create-entity)
  - [Remove Entity](#remove-entity)
  - [Find Entity](#find-entity)
+ - [Flush Entity](#flush-entity)
  - [Format String](#format-string)
  - [Call Method](#call-method)
  - [Create DateTime](#create-date-time)
@@ -39,20 +40,20 @@ Assign Value
 
 **Configuration Example**
 ```
-- @assign_value:
+- '@assign_value':
     conditions:
         # optional condition configuration
     parameters: [$call_successfull, true]
 
 OR
 
-- @assign_value:
+- '@assign_value':
     parameters:
         attribute: $call_successfull
         value: true
 OR
 
-- @assign_value: [$call_successfull, true]
+- '@assign_value': [$call_successfull, true]
 ```
 
 Assign Active User
@@ -69,11 +70,11 @@ Assign Active User
 
 **Configuration Example**
 ```
-- @assign_active_user: $opportunity_owner
+- '@assign_active_user': $opportunity_owner
 
 OR
 
-- @assign_active_user:
+- '@assign_active_user':
     parameters:
         attribute: $opportunity_owner
 ```
@@ -92,19 +93,19 @@ Unset Value
 
 **Configuration Example**
 ```
-- @unset_value:
+- '@unset_value':
     conditions:
         # optional condition configuration
     parameters: [$call_successfull]
 
 OR
 
-- @unset_value:
+- '@unset_value':
     parameters:
         attribute: $call_successfull
 OR
 
-- @unset_value: [$call_successfull]
+- '@unset_value': [$call_successfull]
 ```
 
 Count
@@ -140,14 +141,14 @@ Create Object
 
 **Configuration Example**
 ```
-- @create_object:
+- '@create_object':
     class: \DateTimeZone
     arguments: ['UTC']
     attribute: $.result.timezone
 
 OR
 
-- @create_object:
+- '@create_object':
     class: \DateTime
     arguments: ['2014-04-01']
     data:
@@ -168,12 +169,12 @@ Create Entity
  - class - fully qualified class name of entity to be created;
  - attribute - attribute that will contain the created entity instance;
  - flush - (optional) when flush in DB should be performed.
-           Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
+           Immediately after entity creation if ``true`` or later if ``false`` (default value: `false);
  - data - (optional) array of data that should be set to entity.
 
 **Configuration Example**
 ```
-- @create_entity:
+- '@create_entity':
     conditions:
         # optional condition configuration
     parameters:
@@ -187,7 +188,7 @@ Create Entity
 
 OR
 
-- @create_entity:
+- '@create_entity':
     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
     attribute: $conversation
     flush: true # entity will be flushed to DB immediately after creation
@@ -213,7 +214,7 @@ Remove Entity
 
 **Configuration Example**
 ```
-- @remove_entity:
+- '@remove_entity':
     target: $.data #remove the entity being processed
 ```
 
@@ -236,7 +237,7 @@ Find Entity
 
 **Configuration Example**
 ```
-- @find_entity:
+- '@find_entity':
     conditions:
         # optional condition configuration
     parameters:
@@ -246,14 +247,14 @@ Find Entity
 
 OR
 
-- @find_entity:
+- '@find_entity':
     class: Oro\Bundle\SalesBundle\Entity\OpportunityCloseReason
     identifier: 'won'
     attribute: $close_reason
 
 OR
 
-- @find_entity:
+- '@find_entity':
     class: Oro\Bundle\AccountBundle\Entity\Account
     attribute: $account
     where:
@@ -261,6 +262,32 @@ OR
     order_by:
         date_created: desc
     case_insensitive: true
+```
+
+Flush Entity
+-----------
+
+**Class:** Oro\Component\Action\Action\FlushEntity
+
+**Alias:** flush_entity
+
+**Description:** Flush entity with specified class instance.
+
+**Parameters:**
+ - entity - data will contain entity instance;
+
+**Configuration Example**
+```
+- '@flush_entity':
+     entity: $.someEntity #flush entity stored in some attribute
+
+OR
+
+- '@flush_entity': $.someEntity
+
+OR
+
+- '@flush_entity': ~ #flush context entity
 ```
 
 Format String
@@ -279,7 +306,7 @@ Format String
 
 **Configuration Example**
 ```
-- @format_string:
+- '@format_string':
     attribute: $opportunity_name
     string: '%customer_name% - %shopping_cart_id%'
     arguments:
@@ -305,7 +332,7 @@ Call Method
 
 **Configuration Example**
 ```
-- @call_method:
+- '@call_method':
     conditions:
         # optional condition configuration
     parameters:
@@ -316,7 +343,7 @@ Call Method
 
 OR
 
-- @call_method: # add Address to Contact
+- '@call_method': # add Address to Contact
     attribute: $.result.addressResult
     object: $lead.contact
     method: addAddress
@@ -341,16 +368,16 @@ Create Date Time
 
 **Configuration Example**
 ```
-- @create_datetime:
-    attribute: $sales_funnel_start_datetime
+- '@create_datetime':
+    attribute: $action_start_datetime
 
 OR
 
-- @create_datetime:
+- '@create_datetime':
     conditions:
             # optional condition configuration
     parameters:
-        attribute: $sales_funnel_start_date
+        attribute: $action_start_date
         time: '2014-04-01 12:12:00' # must use quotes because time parameter requires string value
         timezone: Europe/Kiev
 ```
@@ -371,18 +398,18 @@ Redirect
 
 **Configuration Example**
 ```
-- @redirect:
+- '@redirect':
     parameters:
         url: http://google.com
 
 OR
 
-- @redirect:
+- '@redirect':
     url: http://google.com
 
 OR
 
-- @redirect:
+- '@redirect':
     parameters:
         route: some_route_name
         route_parameters: {id: $some_entity.id}
@@ -399,22 +426,22 @@ Tree Executor
 
 **Configuration Example**
 ```
-- @tree:
+- '@tree':
     conditions:
         # optional condition configuration
     actions:
-        - @create_entity:
+        - '@create_entity':
             # action configuration here
-        - @tree:
+        - '@tree':
             # action configuration here
         # other action
 
 OR
 
-- @tree:
-    - @create_entity:
+- '@tree':
+    - '@create_entity':
         # action configuration here
-    - @tree:
+    - '@tree':
         # action configuration here
     # other action
 
@@ -431,20 +458,20 @@ Foreach
 
 **Configuration Example**
 ```
-- @foreach:
+- '@foreach':
     array: $order.relatedCalls
     value: $.result.value
     actions:
-        - @assign_value: [$.result.value.subject, 'Test Subject']
+        - '@assign_value': [$.result.value.subject, 'Test Subject']
 
 OR
 
-- @foreach:
+- '@foreach':
     array: $order.relatedCalls
     key: $.result.key
     value: $.result.value
     actions:
-        - @assign_value: [$.result.value.subject, $.result.key]
+        - '@assign_value': [$.result.value.subject, $.result.key]
 
 ```
 
@@ -491,12 +518,13 @@ Flash Message
 **Alias:** flash_message
 
 **Description:** Add flash message to session flash bag. Provides ability to show flash messages on frontend.
-Messages are passed through translator.
+Messages are passed through a translator by default, but it can be disabled via the `translate` parameter.
 
 **Parameters:**
- - message - message itself, will be passed to translator;
- - message_parameters - (optional) message parameters, that will be passed to translator as second argument;
- - type - (optional) message type applicable for Flash Bag. Set to info by default;
+ - message - a message;
+ - message_parameters - (optional) message parameters;
+ - translate - (optional) whether a message is a translation key and it should be passed to a translator. The default value is `true`;
+ - type - (optional) message type applicable for Flash Bag. The default value is `'info'`;
 
 **Configuration Example**
 ```
@@ -525,7 +553,7 @@ Call Service Method
 
 **Configuration Example**
 ```
-- @call_service_method:
+- '@call_service_method':
     conditions:
         # optional condition configuration
     parameters:
@@ -536,7 +564,7 @@ Call Service Method
 
 OR
 
-- @call_method:
+- '@call_method':
     attribute: $.em
     service: doctrine
     method: getManagerForClass
@@ -561,7 +589,7 @@ Find Entities
 
 **Configuration Example**
 ```
-- @find_entities:
+- '@find_entities':
     class: Acme\Bundle\DemoBundle\Entity\User
     attribute: $.users
     where:
@@ -589,21 +617,21 @@ Increase Value
 
 **Configuration Example**
 ```
-- @increase_value:
+- '@increase_value':
     attribute: $.some_value
     value: 5
 
 OR
 
-- @increase_value:
+- '@increase_value':
     attribute: $.some_value
     value: -5
 
 OR
 
-- @increase_value: [$.some_value, 5]
+- '@increase_value': [$.some_value, 5]
 
 OR
 
-- @increase_value: $.some_value
+- '@increase_value': $.some_value
 ```

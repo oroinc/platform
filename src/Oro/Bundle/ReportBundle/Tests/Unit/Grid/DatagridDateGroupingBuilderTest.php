@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
@@ -17,34 +19,29 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $calendarDateEntity = CalendarDate::class;
+    private string $calendarDateEntity = CalendarDate::class;
 
-    /**
-     * @var DatagridDateGroupingBuilder
-     */
-    protected $datagridDateGroupingBuilder;
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
 
-    /**
-     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config
-     */
-    protected $config;
+    /** @var JoinIdentifierHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $joinIdHelper;
 
-    /**
-     * @var JoinIdentifierHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $joinIdHelper;
+    /** @var DateHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateHelper;
 
-    protected function setUp()
+    /** @var DatagridDateGroupingBuilder */
+    private $datagridDateGroupingBuilder;
+
+    protected function setUp(): void
     {
         $this->config = DatagridConfiguration::create([]);
-        $this->joinIdHelper = $this->getMockBuilder(JoinIdentifierHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->joinIdHelper = $this->createMock(JoinIdentifierHelper::class);
+        $this->dateHelper = $this->createMock(DateHelper::class);
+
         $this->datagridDateGroupingBuilder = new DatagridDateGroupingBuilder(
             $this->calendarDateEntity,
+            $this->dateHelper,
             $this->joinIdHelper
         );
     }
@@ -52,31 +49,34 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     public function testIgnoreIfGroupingNotRequired()
     {
         $report = new Report();
-        $this->joinIdHelper->expects($this->never())->method('getFieldName');
+        $this->joinIdHelper->expects($this->never())
+            ->method('getFieldName');
 
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
 
-        $report->setDefinition(json_encode([DateGroupingType::DATE_GROUPING_NAME => []]));
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => []
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
 
-        $report->setDefinition(
-            json_encode([DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']])
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
-        $report->setDefinition(
-            json_encode([DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']])
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
     }
 
     /**
-     * @param array $params
      * @dataProvider exceptionTestProvider
      */
-    public function testThrowsIfInvalidGrid($params)
+    public function testThrowsIfInvalidGrid(array $params)
     {
         $this->expectException(InvalidDatagridConfigException::class);
-        $this->joinIdHelper->expects($this->never())->method('getFieldName');
+        $this->joinIdHelper->expects($this->never())
+            ->method('getFieldName');
         $this->config->merge($params);
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired(
             $this->config,
@@ -84,10 +84,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function exceptionTestProvider()
+    public function exceptionTestProvider(): array
     {
         return [
             [
@@ -110,8 +107,11 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigPassesButTableAliasThrows()
     {
-        $this->joinIdHelper->expects($this->once())->method('getFieldName');
-        $this->joinIdHelper->expects($this->once())->method('explodeColumnName')->willReturn(['noneValidValue']);
+        $this->joinIdHelper->expects($this->once())
+            ->method('getFieldName');
+        $this->joinIdHelper->expects($this->once())
+            ->method('explodeColumnName')
+            ->willReturn(['noneValidValue']);
         $this->expectException(InvalidDatagridConfigException::class);
         $this->config->merge($this->getPreconfiguredConfig());
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired(
@@ -122,15 +122,24 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validConfigurationProvider
-     * @param Report $report
-     * @param [] $inputConfig
-     * @param [] $expectedConfig
      */
-    public function testValidDateGroupingConfiguration($report, $inputConfig, $expectedConfig)
+    public function testValidDateGroupingConfiguration(Report $report, array $inputConfig, array $expectedConfig)
     {
-        $this->joinIdHelper->expects($this->once())->method('getFieldName');
-        $this->joinIdHelper->expects($this->once())->method('explodeColumnName')->willReturn(['']);
+        $this->joinIdHelper->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('createdAt');
+
+        $this->joinIdHelper->expects($this->once())
+            ->method('explodeColumnName')
+            ->willReturn(['']);
+
         $this->config->merge($inputConfig);
+
+        $this->dateHelper->expects($this->once())
+            ->method('getConvertTimezoneExpression')
+            ->with('t1.createdAt')
+            ->willReturn("CONVERT_TZ(t1.createdAt, '+00:00', '+10:00')");
+
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired(
             $this->config,
             $report
@@ -139,10 +148,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedConfig, $this->config->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function validConfigurationProvider()
+    public function validConfigurationProvider(): array
     {
         $originalConfig3 = $this->getPreconfiguredConfig();
         $originalConfig3['source']['query']['join']['left'][0] = [
@@ -154,7 +160,11 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
             $originalConfig3['source']['query']['join']['left'][0];
 
         return [
-            [$this->getPreconfiguredReport(), $this->getPreconfiguredConfig(), $this->getExpectedConfig(true)],
+            [
+                $this->getPreconfiguredReport(),
+                $this->getPreconfiguredConfig(),
+                $this->getExpectedConfig(true)
+            ],
             [
                 $this->getPreconfiguredReport('createdAt', false),
                 $this->getPreconfiguredConfig(),
@@ -168,32 +178,20 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $fieldName
-     * @param bool $useSkipEmptyPeriods
-     * @return Report
-     */
-    protected function getPreconfiguredReport($fieldName = 'createdAt', $useSkipEmptyPeriods = true)
+    private function getPreconfiguredReport(string $fieldName = 'createdAt', bool $useSkipEmptyPeriods = true): Report
     {
         $report = new Report();
-        $report->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::FIELD_NAME_ID => $fieldName,
-                        DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => $useSkipEmptyPeriods,
-                    ],
-                ]
-            )
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::FIELD_NAME_ID => $fieldName,
+                DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => $useSkipEmptyPeriods,
+            ]
+        ]));
 
         return $report;
     }
 
-    /**
-     * @return array
-     */
-    protected function getPreconfiguredConfig()
+    private function getPreconfiguredConfig(): array
     {
         return [
             'columns' => [
@@ -266,11 +264,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param bool $includeEmptyPeriods
-     * @return array
-     */
-    protected function getExpectedConfig($includeEmptyPeriods = false)
+    private function getExpectedConfig(bool $includeEmptyPeriods = false): array
     {
         $additional = [
             'filters' => [
@@ -283,7 +277,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
                         'calendar_entity' => $this->calendarDateEntity,
                         'target_entity' => null,
                         'not_nullable_field' => 't1.id',
-                        'joined_column' => null,
+                        'joined_column' => 'createdAt',
                         'joined_table' => 't1',
                         'options' => [
                             'field_options' => [
@@ -300,7 +294,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
                     'datePeriodFilter' => [
                         'label' => 'oro.report.datagrid.column.time_period.label',
                         'type' => 'datetime',
-                        'data_name' => 't1.',
+                        'data_name' => 't1.createdAt',
                     ],
                 ],
                 'default' => [
@@ -329,7 +323,9 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
                                 'join' => User::class,
                                 'alias' => 't1',
                                 'conditionType' => 'WITH',
-                                'condition' => 'CAST(calendarDate.date as DATE) = CAST(t1. as DATE)',
+                                'condition' =>
+                                    'CAST(calendarDate.date as DATE) = '
+                                    . "CAST(CONVERT_TZ(t1.createdAt, '+00:00', '+10:00') as DATE)",
                             ],
                         ],
                     ],
@@ -376,7 +372,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'oro.report.datagrid.column.time_period.label',
             ],
         ];
-        $columns = $columns + $originalConfig['columns'];
+        $columns += $originalConfig['columns'];
         $originalConfig['columns'] = $columns;
         $originalConfig['source']['query']['from'][0] = [
             'alias' => 'calendarDate',

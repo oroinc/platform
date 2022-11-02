@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block oro_entity_extend_enum_value_collection_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% if not disabled %}
         <div class="enum-value-collection" {{ UI.renderPageComponentAttributes({
             module: 'oroui/js/app/components/view-component',

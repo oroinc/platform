@@ -9,12 +9,12 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 
 class AuditFieldTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         AuditFieldTypeRegistry::addType('testingtype', 'testingtype');
     }
 
-    public function teardown()
+    protected function tearDown(): void
     {
         AuditFieldTypeRegistry::removeType('testingtype');
     }
@@ -22,8 +22,13 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provider
      */
-    public function testAuditField($field, $dataType, $newValue, $oldValue, $expectedDataType)
-    {
+    public function testAuditField(
+        string $field,
+        string $dataType,
+        mixed $newValue,
+        mixed $oldValue,
+        string $expectedDataType
+    ) {
         $auditField = new AuditField($field, $dataType, $newValue, $oldValue);
         $auditField->setTranslationDomain('message');
         $this->assertEquals($expectedDataType, $auditField->getDataType());
@@ -33,7 +38,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('message', $auditField->getTranslationDomain());
     }
 
-    public function provider()
+    public function provider(): array
     {
         return [
             ['field', 'boolean', true, false, 'boolean'],
@@ -63,8 +68,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theId', 'theName');
         $field->calculateNewValue();
 
-        $this->assertEquals(null, $field->getOldValue());
-        $this->assertEquals("\nRemoved: theName", $field->getNewValue());
+        $this->assertEquals('Removed: theName', $field->getOldValue());
+        $this->assertEquals(null, $field->getNewValue());
     }
 
     public function testShouldAllowAddSomeEntitiesRemovedFromCollection()
@@ -74,8 +79,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
         $field->calculateNewValue();
 
-        $this->assertEquals(null, $field->getOldValue());
-        $this->assertEquals("\nRemoved: theName, theAnotherName", $field->getNewValue());
+        $this->assertEquals('Removed: theName, theAnotherName', $field->getOldValue());
+        $this->assertEquals(null, $field->getNewValue());
     }
 
     public function testShouldAllowAddEntityAddedToCollection()
@@ -134,8 +139,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $field->mergeCollectionField($anotherField);
         $field->calculateNewValue();
 
-        $this->assertEquals(null, $field->getOldValue());
-        $this->assertEquals("Added: theName\nRemoved: theAnotherName", $field->getNewValue());
+        $this->assertEquals('Removed: theAnotherName', $field->getOldValue());
+        $this->assertEquals('Added: theName', $field->getNewValue());
     }
 
     public function testShouldMergeNotEmptyCollectionFields()
@@ -145,13 +150,13 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
 
         $anotherField = new AuditField('field', 'text', null, null);
-        $anotherField->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId', 'theFooName');
-        $anotherField->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theBarName');
+        $anotherField->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId2', 'theFooName');
+        $anotherField->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId2', 'theBarName');
 
         $field->mergeCollectionField($anotherField);
         $field->calculateNewValue();
 
-        $this->assertEquals(null, $field->getOldValue());
-        $this->assertEquals("Added: theName, theFooName\nRemoved: theAnotherName, theBarName", $field->getNewValue());
+        $this->assertEquals('Removed: theAnotherName, theBarName', $field->getOldValue());
+        $this->assertEquals('Added: theName, theFooName', $field->getNewValue());
     }
 }

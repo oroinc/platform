@@ -3,68 +3,72 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\EntityParameterInterface;
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 
 class AttributeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
+     *
      * @param string $property
-     * @param mixed $value
+     * @param string|array $value
      */
-    public function testGettersAndSetters($property, $value)
+    public function testGettersAndSetters(string $property, string|array $value): void
     {
         $getter = 'get' . ucfirst($property);
         $setter = 'set' . ucfirst($property);
         $obj = new Attribute();
         $this->assertInstanceOf(
-            'Oro\Bundle\ActionBundle\Model\Attribute',
-            call_user_func_array(array($obj, $setter), array($value))
+            Attribute::class,
+            $obj->$setter($value)
         );
-        $this->assertEquals($value, call_user_func_array(array($obj, $getter), array()));
+        $this->assertEquals($value, $obj->$getter());
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            'name' => array('name', 'test'),
-            'label' => array('label', 'test'),
-            'type' => array('type', 'string'),
-            'options' => array('options', array('key' => 'value'))
-        );
+        return [
+            'name' => ['name', 'test'],
+            'label' => ['label', 'test'],
+            'type' => ['type', 'string'],
+            'options' => ['options', ['key' => 'value']],
+            'default' => ['default', ['sample_value']],
+        ];
     }
 
-    public function testGetSetOption()
+    public function testGetSetOption(): void
     {
         $obj = new Attribute();
-        $obj->setOptions(array('key' => 'test'));
+        $obj->setOptions(['key' => 'test']);
         $this->assertEquals('test', $obj->getOption('key'));
         $obj->setOption('key2', 'test2');
-        $this->assertEquals(array('key' => 'test', 'key2' => 'test2'), $obj->getOptions());
+        $this->assertEquals(['key' => 'test', 'key2' => 'test2'], $obj->getOptions());
         $obj->setOption('key', 'test_changed');
         $this->assertEquals('test_changed', $obj->getOption('key'));
     }
 
-    public function testEntityAclAllowed()
+    public function testEntityAclAllowed(): void
     {
         $attribute = new Attribute();
 
         $this->assertTrue($attribute->isEntityUpdateAllowed());
         $this->assertTrue($attribute->isEntityDeleteAllowed());
 
-        $attribute->setEntityAcl(array('update' => false, 'delete' => false));
+        $attribute->setEntityAcl(['update' => false, 'delete' => false]);
         $this->assertFalse($attribute->isEntityUpdateAllowed());
         $this->assertFalse($attribute->isEntityDeleteAllowed());
 
-        $attribute->setEntityAcl(array('update' => true, 'delete' => true));
+        $attribute->setEntityAcl(['update' => true, 'delete' => true]);
         $this->assertTrue($attribute->isEntityUpdateAllowed());
         $this->assertTrue($attribute->isEntityDeleteAllowed());
     }
 
-    public function testInstanceAndInternalType()
+    public function testInstanceAndInternalType(): void
     {
         $attribute = new Attribute();
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\EntityParameterInterface', $attribute);
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ParameterInterface', $attribute);
+        $this->assertInstanceOf(EntityParameterInterface::class, $attribute);
+        $this->assertInstanceOf(ParameterInterface::class, $attribute);
 
         $this->assertEquals('attribute', $attribute->getInternalType());
     }

@@ -2,180 +2,153 @@
 
 namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Layout\BlockViewCache;
-use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * The provider of layout theme resources.
+ * The provider for layout theme resources
+ * that are loaded from "Resources/views/layouts" directories.
  */
-class ThemeResourceProvider implements ResourceProviderInterface
+class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourceProviderInterface
 {
-    const CACHE_KEY = 'oro_layout.theme_updates_resources';
-    const CACHE_LAST_MODIFICATION_DATE = 'oro_layout.last_modification_date';
+    /** @var LastModificationDateProvider */
+    private $lastModificationDateProvider;
 
     /** @var LayoutUpdateLoaderInterface */
     private $loader;
 
-    /** @var array */
-    private $resources = [];
-
-    /** @var array */
-    private $excludedPaths = [];
-
-    /** @var Cache */
-    private $cache;
-
     /** @var BlockViewCache */
     private $blockViewCache;
 
+    /** @var string[] */
+    private $excludeFilePathPatterns;
+
+    /** @var string[] */
+    private $additionalResourcePaths;
+
     /**
-     * @param LayoutUpdateLoaderInterface $loader
-     * @param BlockViewCache $blockViewCache
-     * @param array $excludedPaths
+     * @param string                       $cacheFile
+     * @param bool                         $debug
+     * @param LastModificationDateProvider $lastModificationDateProvider
+     * @param LayoutUpdateLoaderInterface  $loader
+     * @param BlockViewCache               $blockViewCache
+     * @param string[]                     $excludeFilePathPatterns
+     * @param string[]                     $additionalResourcePaths
      */
     public function __construct(
+        string $cacheFile,
+        bool $debug,
+        LastModificationDateProvider $lastModificationDateProvider,
         LayoutUpdateLoaderInterface $loader,
         BlockViewCache $blockViewCache,
-        array $excludedPaths = []
+        array $excludeFilePathPatterns = [],
+        array $additionalResourcePaths = []
     ) {
+        parent::__construct($cacheFile, $debug);
+        $this->lastModificationDateProvider = $lastModificationDateProvider;
         $this->loader = $loader;
-        $this->excludedPaths = $excludedPaths;
         $this->blockViewCache = $blockViewCache;
-    }
-
-    /**
-     * @param Cache $cache
-     *
-     * @return ThemeResourceProvider
-     */
-    public function setCache(Cache $cache)
-    {
-        $this->cache = $cache;
-
-        return $this;
+        $this->excludeFilePathPatterns = $excludeFilePathPatterns;
+        $this->additionalResourcePaths = $additionalResourcePaths;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResources()
+    public function getResources(): array
     {
-        if (!$this->resources) {
-            $resources = false;
-            if (null !== $this->cache) {
-                $resources = $this->cache->fetch(self::CACHE_KEY);
-            }
-            if (false === $resources) {
-                $this->loadResources();
-            } else {
-                $this->resources = $resources;
-            }
-        }
-
-        return $this->resources;
+        return $this->doGetConfig();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadResources(ContainerBuilder $container = null, array $resources = [])
+    public function findApplicableResources(array $paths): array
     {
-        $resources = array_merge($resources, $this->getConfigLoader()->load($container));
-        foreach ($resources as $resource) {
-            /**
-             * $resource->data contains data in following format
-             * [
-             *    'directory-where-updates-found' => [
-             *       'found update absolute filename',
-             *       ...
-             *    ]
-             * ]
-             */
-            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($this->excludedPaths, $resource->data);
-            $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
-
-            $this->resources = array_merge_recursive($this->resources, $resourceThemeLayoutUpdates);
-        }
-
-        if ($this->cache instanceof Cache) {
-            $this->cache->save(self::CACHE_KEY, $this->resources);
-
-            $now = new \DateTime('now', new \DateTimeZone('UTC'));
-            $this->cache->save(self::CACHE_LAST_MODIFICATION_DATE, $now);
-
-            $this->blockViewCache->reset();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findApplicableResources(array $paths)
-    {
-        $result = [];
-
+        $values = [];
+        $resources = $this->getResources();
         foreach ($paths as $path) {
-            $pathArray = explode(DIRECTORY_SEPARATOR, $path);
-
-            $value = $this->getResources();
-            for ($i = 0, $length = count($pathArray); $i < $length; ++$i) {
-                $value = $this->readValue($value, $pathArray[$i]);
-
+            $value = $resources;
+            $pathElements = \explode(DIRECTORY_SEPARATOR, $path);
+            foreach ($pathElements as $pathElement) {
+                $value = $this->readValue($value, $pathElement);
                 if (null === $value) {
                     break;
                 }
             }
 
-            if ($value && is_array($value)) {
-                $result = array_merge($result, array_filter($value, 'is_string'));
+            if ($value && \is_array($value)) {
+                $values[] = \array_filter($value, '\is_string');
             }
         }
+        if (!empty($values)) {
+            $values = \array_merge(...$values);
+        }
 
-        return $result;
+        return $values;
     }
 
     /**
-     * @return CumulativeConfigLoader
+     * {@inheritdoc}
      */
-    private function getConfigLoader()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        $filenamePatterns = $this->loader->getUpdateFileNamePatterns();
-        $configLoader = new CumulativeConfigLoader(
-            'oro_layout_updates_list',
-            [new LayoutUpdateCumulativeResourceLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
+        $themeLayoutUpdates = $this->loadThemeLayoutUpdates($resourcesContainer);
+
+        $this->lastModificationDateProvider->updateLastModificationDate(
+            new \DateTime('now', new \DateTimeZone('UTC'))
         );
 
-        return $configLoader;
+        $this->blockViewCache->reset();
+
+        return $themeLayoutUpdates;
     }
 
     /**
-     * @param array $existThemePaths
-     * @param array $themes
+     * @param ResourcesContainerInterface $resourcesContainer
      *
      * @return array
      */
-    private function filterThemeLayoutUpdates(array $existThemePaths, array $themes)
+    private function loadThemeLayoutUpdates(ResourcesContainerInterface $resourcesContainer)
     {
-        foreach ($themes as $theme => $themePaths) {
-            foreach ($themePaths as $pathIndex => $path) {
-                if (is_string($path) && isset($existThemePaths[$path])) {
-                    unset($themePaths[$pathIndex]);
-                }
-            }
-            if (empty($themePaths)) {
-                unset($themes[$theme]);
-            } else {
-                $themes[$theme] = $themePaths;
-            }
+        $themeLayoutUpdates = [];
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout_updates_list',
+            $this->getThemeLayoutUpdatesPathsLoaders()
+        );
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            $themeLayoutUpdates[] = $this->sortThemeLayoutUpdates($resource->data);
         }
 
-        return $themes;
+        return \array_merge_recursive(...$themeLayoutUpdates);
     }
 
+    /**
+     * @return FolderContentCumulativeLoader[]
+     */
+    private function getThemeLayoutUpdatesPathsLoaders()
+    {
+        $paths = array_merge(['Resources/views/layouts/'], $this->additionalResourcePaths);
+        $loaders = [];
+        foreach ($paths as $path) {
+            $loaders[] = new FolderContentCumulativeLoader(
+                $path,
+                -1,
+                false,
+                new LayoutUpdateFileMatcher(
+                    $this->loader->getUpdateFileNamePatterns(),
+                    $this->excludeFilePathPatterns
+                )
+            );
+        }
+
+        return $loaders;
+    }
 
     /**
      * @param array $updates
@@ -187,7 +160,7 @@ class ThemeResourceProvider implements ResourceProviderInterface
         $directories = [];
         $files = [];
         foreach ($updates as $key => $update) {
-            if (is_array($update)) {
+            if (\is_array($update)) {
                 $update = $this->sortThemeLayoutUpdates($update);
                 $directories[$key] = $update;
             } else {
@@ -195,22 +168,22 @@ class ThemeResourceProvider implements ResourceProviderInterface
             }
         }
 
-        sort($files);
-        ksort($directories);
-        $updates = array_merge($files, $directories);
+        \sort($files);
+        \ksort($directories);
+        $updates = \array_merge($files, $directories);
 
         return $updates;
     }
 
     /**
-     * @param array $array
+     * @param mixed  $array
      * @param string $property
      *
      * @return array|null
      */
     private function readValue($array, $property)
     {
-        if (is_array($array) && isset($array[$property])) {
+        if (\is_array($array) && isset($array[$property])) {
             return $array[$property];
         }
 

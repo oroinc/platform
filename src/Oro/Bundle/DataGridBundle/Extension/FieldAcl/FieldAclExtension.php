@@ -44,11 +44,6 @@ class FieldAclExtension extends AbstractExtension
      */
     protected $ownershipFields = [];
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigManager                 $configManager
-     * @param OwnershipQueryHelper          $ownershipQueryHelper
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,

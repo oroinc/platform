@@ -2,6 +2,14 @@ api:
     entities:
         Oro\Bundle\AddressBundle\Entity\Address:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
+            fields:
+                createdAt:
+                    property_path: created
+                updatedAt:
+                    property_path: updated
+                customRegion:
+                    exclude: false # set manually because this field is marked as excluded in entity.yml
+                    property_path: regionText
 
         Oro\Bundle\AddressBundle\Entity\AddressType:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
@@ -28,28 +36,3 @@ api:
                 fields:
                     iso2Code:
                         allow_array: true
-
-    relations:
-        Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-            fields:
-                owner:
-                    exclude: true
-        Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress:
-            fields:
-                types:
-                    order_by:
-                        name: ASC
-        Oro\Bundle\AddressBundle\Entity\AbstractEmail:
-            exclusion_policy: all
-            fields:
-                email: ~
-                primary: ~
-            order_by:
-                primary: DESC
-        Oro\Bundle\AddressBundle\Entity\AbstractPhone:
-            exclusion_policy: all
-            fields:
-                phone: ~
-                primary: ~
-            order_by:
-                primary: DESC

@@ -21,18 +21,21 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
      */
     public function getExtensions()
     {
-        $attributeManagerMock = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManagerMock = $this->createMock(AttributeManager::class);
 
-        $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeManagerMock->expects($this->any())
+            ->method('getActiveAttributesByClass')
+            ->willReturn([]);
 
         return [
             new PreloadedExtension([
                 CollectionType::class => new CollectionType(),
                 AttributeGroupType::class => new AttributeGroupType(),
                 LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
-                AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock)
+                AttributeMultiSelectType::class => new AttributeMultiSelectType(
+                    $attributeManagerMock,
+                    $this->getTranslator()
+                )
             ], []),
 
         ];
@@ -79,8 +82,9 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
             ],
         ];
 
-        $form->submit($submittedData, [$existingEntity]);
+        $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $existingEntity->addLabel($this->createLocalizedValue('Group1 Label 2'));
         $entity = new AttributeGroup();

@@ -1,0 +1,14 @@
+services:
+    oro_importexport.handler.export.stub:
+        decorates: oro_importexport.handler.export
+        parent: oro_importexport.handler.export
+        public: true
+
+    oro_importexport.file.file_manager.stub:
+        decorates: oro_importexport.file.file_manager
+        parent: oro_importexport.file.file_manager
+        public: true
+
+    oro_importexport.tests.reader.entity:
+        parent: oro_importexport.reader.entity
+        public: true

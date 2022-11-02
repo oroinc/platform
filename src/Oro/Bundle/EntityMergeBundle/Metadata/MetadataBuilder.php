@@ -29,12 +29,6 @@ class MetadataBuilder
     /** @var ConfigProvider */
     protected $entityExtendProvider;
 
-    /**
-     * @param MetadataFactory $metadataFactory
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigProvider $entityExtendConfigProvider
-     */
     public function __construct(
         MetadataFactory $metadataFactory,
         DoctrineHelper $doctrineHelper,
@@ -65,17 +59,13 @@ class MetadataBuilder
         $this->addUnmappedDynamicFields($result, $classMetadata);
 
         $this->eventDispatcher->dispatch(
-            MergeEvents::BUILD_METADATA,
-            new EntityMetadataEvent($result)
+            new EntityMetadataEvent($result),
+            MergeEvents::BUILD_METADATA
         );
 
         return $result;
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata $classMetadata
-     */
     protected function addUnmappedDynamicFields(EntityMetadata $entityMetadata, ClassMetadata $classMetadata)
     {
         $metadata = array_map(
@@ -90,10 +80,6 @@ class MetadataBuilder
         array_map([$entityMetadata, 'addFieldMetadata'], $metadata);
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata $classMetadata
-     */
     protected function addDoctrineFields(EntityMetadata $entityMetadata, ClassMetadata $classMetadata)
     {
         $fields = array_diff(
@@ -174,10 +160,6 @@ class MetadataBuilder
         );
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata $classMetadata
-     */
     protected function addDoctrineAssociations(EntityMetadata $entityMetadata, ClassMetadata $classMetadata)
     {
         $associations = array_diff(
@@ -194,10 +176,6 @@ class MetadataBuilder
         }
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata  $classMetadata
-     */
     protected function addDoctrineInverseAssociations(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata

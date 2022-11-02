@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
+/**
+ * Workflow variable key template.
+ */
 class WorkflowVariableTemplate extends WorkflowTemplate
 {
     const NAME = 'workflow_variable';
@@ -9,7 +12,7 @@ class WorkflowVariableTemplate extends WorkflowTemplate
     /**
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return parent::getTemplate() . '.variable.{{ variable_name }}';
     }

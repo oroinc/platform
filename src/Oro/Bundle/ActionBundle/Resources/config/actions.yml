@@ -1,8 +1,16 @@
 services:
+    oro_action.action_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # actions
+        tags:
+            - { name: container.service_locator }
+
     oro_action.action_factory:
         class: 'Oro\Component\Action\Action\ActionFactory'
         arguments:
-            - '@service_container'
+            - '@oro_action.action_locator'
             - []
 
     oro_action.action_assembler:
@@ -215,6 +223,9 @@ services:
         tags:
             - { name: oro_action.action, alias: refresh_grid }
 
+    Oro\Bundle\ActionBundle\Action\RunActionGroup:
+        alias: oro_action.action.run_action_group
+
     oro_action.action.run_action_group:
         class: 'Oro\Bundle\ActionBundle\Action\RunActionGroup'
         arguments:
@@ -288,3 +299,11 @@ services:
             - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro_action.action, alias: substring }
+
+    oro_action.action.render_template:
+        class: Oro\Component\Action\Action\RenderTemplate
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@twig'
+        tags:
+            - { name: oro_action.action, alias: render_template }

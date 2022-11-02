@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% oro_title_set({params : {"%name%": entity.name}}) %}
 
@@ -16,11 +16,14 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set localizationInfo %}
         {{ UI.renderProperty('oro.locale.localization.name.label'|trans, entity.name) }}
         {{ UI.renderProperty('oro.locale.localization.title.label'|trans, entity.defaultTitle) }}
         {{ UI.renderProperty('oro.locale.localization.language.label'|trans, entity.languageCode|oro_locale_code_title) }}
         {{ UI.renderProperty('oro.locale.localization.formatting_code.label'|trans, entity.formattingCode|oro_formatting_code_title) }}
+        {{ UI.renderProperty('oro.locale.localization.rtl_mode.label'|trans, entity.rtlMode ? 'Yes'|trans : 'No'|trans) }}
 
         {% if entity.parentLocalization %}
             {{ UI.renderHtmlProperty(

@@ -3,15 +3,19 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Import strategy for FieldConfigModel entity.
+ */
 class EntityFieldImportStrategy extends AbstractImportStrategy
 {
     /** @var TranslatorInterface */
@@ -26,33 +30,21 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     /** @var FieldNameValidationHelper */
     protected $fieldValidationHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param ConstraintFactory $constraintFactory
-     */
     public function setConstraintFactory(ConstraintFactory $constraintFactory)
     {
         $this->constraintFactory = $constraintFactory;
     }
 
-    /**
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function setFieldTypeProvider(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * @param FieldNameValidationHelper $fieldValidationHelper
-     */
     public function setFieldValidationHelper(FieldNameValidationHelper $fieldValidationHelper)
     {
         $this->fieldValidationHelper = $fieldValidationHelper;
@@ -102,14 +94,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
-        $errors = array_merge(
-            (array)$this->strategyHelper->validateEntity(
-                $entity,
-                null,
-                new GroupSequence(['FieldConfigModel', 'Sql', 'ChangeTypeField'])
-            ),
-            $this->validateEntityFields($entity)
-        );
+        $errors = $this->getErrors($entity);
 
         if ($errors) {
             $this->addErrors($errors);
@@ -131,9 +116,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $this->strategyHelper->addValidationErrors((array)$errors, $this->context);
     }
 
-    /**
-     * @param FieldConfigModel $entity
-     */
     protected function updateContextCounters(FieldConfigModel $entity)
     {
         $fieldName = $entity->getFieldName();
@@ -184,7 +166,13 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
                             $errors[] = sprintf('%s.%s.%s: %s', $scope, $code, $key, implode(' ', $result));
                         }
                     }
-                } elseif (isset($config['constraints'])) {
+                }
+                if (isset($config['constraints'])) {
+                    $config['constraints'] = ConfigModelConstraintsHelper::configureConstraintsWithConfigModel(
+                        $config['constraints'],
+                        $entity
+                    );
+
                     $result = $this->strategyHelper->validateEntity(
                         $scopeData[$code],
                         $this->constraintFactory->parse($config['constraints'])
@@ -198,5 +186,44 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         }
 
         return $errors;
+    }
+
+    protected function getValidationGroups(): array
+    {
+        return ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
+    }
+
+    protected function getValidationGroupsForNewField(): array
+    {
+        return ['UniqueField', 'UniqueMethod'];
+    }
+
+    protected function isNewField(FieldConfigModel $entity): bool
+    {
+        if (!$entity->getFieldName() || !$entity->getEntity() || !$entity->getEntity()->getClassName()) {
+            return false;
+        }
+
+        return null === $this->fieldValidationHelper->findFieldConfig(
+            $entity->getEntity()->getClassName(),
+            $entity->getFieldName()
+        );
+    }
+
+    private function getErrors(FieldConfigModel $entity): array
+    {
+        $validationGroups = $this->getValidationGroups();
+        if ($this->isNewField($entity)) {
+            $validationGroups = array_merge($validationGroups, $this->getValidationGroupsForNewField());
+        }
+
+        return array_merge(
+            (array)$this->strategyHelper->validateEntity(
+                $entity,
+                null,
+                new GroupSequence($validationGroups)
+            ),
+            $this->validateEntityFields($entity)
+        );
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -20,9 +21,6 @@ class NormalizeEntityId implements ProcessorInterface
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -36,7 +34,7 @@ class NormalizeEntityId implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
-        if (!is_string($entityId)) {
+        if (!\is_string($entityId)) {
             // an entity identifier does not exist or it is already normalized
             return;
         }
@@ -48,9 +46,15 @@ class NormalizeEntityId implements ProcessorInterface
         }
 
         try {
-            $context->setId(
-                $this->getEntityIdTransformer($context->getRequestType())->reverseTransform($entityId, $metadata)
-            );
+            $normalizedEntityId = $this->getEntityIdTransformer($context->getRequestType())
+                ->reverseTransform($entityId, $metadata);
+            $context->setId($normalizedEntityId);
+            if (null === $normalizedEntityId) {
+                $context->addNotResolvedIdentifier(
+                    'id',
+                    new NotResolvedIdentifier($entityId, $context->getClassName())
+                );
+            }
         } catch (\Exception $e) {
             $context->addError(
                 Error::createValidationError(Constraint::ENTITY_ID)->setInnerException($e)
@@ -58,11 +62,6 @@ class NormalizeEntityId implements ProcessorInterface
         }
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

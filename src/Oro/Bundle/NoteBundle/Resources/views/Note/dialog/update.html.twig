@@ -1,5 +1,5 @@
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig', _self] %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% if saved %}
     {% set widgetResponse = {
@@ -15,16 +15,11 @@
     <div class="widget-content">
         <div class="form-container">
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
-                <fieldset class="form-horizontal control-group">
-                    <label>
-                        {{ form_widget(form.message) }}
-                        {{ form_errors(form.message) }}
-                    </label>
-                    <div class="pull-left">
+                <fieldset class="form-horizontal">
+                    {{ form_row(form.message) }}
+                    <div class="control-group-container">
                         {{ form_widget(form.attachment) }}
                     </div>
-                </fieldset>
-                <fieldset class="form-horizontal">
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

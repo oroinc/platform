@@ -3,11 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTranslatableEntityFixture extends AbstractFixture implements ContainerAwareInterface
 {
@@ -34,9 +34,6 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
      */
     protected $translationLocales;
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $this->translator = $this->container->get('translator');
@@ -136,8 +133,6 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
 
     /**
      * Load entities to DB
-     *
-     * @param ObjectManager $manager
      */
     abstract protected function loadEntities(ObjectManager $manager);
 }

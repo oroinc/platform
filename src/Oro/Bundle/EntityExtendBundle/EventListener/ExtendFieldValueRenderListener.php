@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -19,6 +19,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Updates extend fields config before value render
+ */
 class ExtendFieldValueRenderListener
 {
     const ENTITY_VIEW_ROUTE = 'oro_entity_view';
@@ -44,13 +47,6 @@ class ExtendFieldValueRenderListener
     /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
 
-    /**
-     * @param ConfigManager                 $configManager
-     * @param UrlGeneratorInterface         $router
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityClassNameHelper         $entityClassNameHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         UrlGeneratorInterface $router,
@@ -162,7 +158,7 @@ class ExtendFieldValueRenderListener
         $targetFieldName = $fieldConfig->get('target_field');
         $targetClassName = $fieldConfig->get('target_entity');
 
-        if (!class_exists($targetClassName)) {
+        if ($targetFieldName === null || ($targetClassName && !class_exists($targetClassName))) {
             return ['title' => ''];
         }
 

@@ -13,45 +13,33 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableTokenStorageInterface
 {
     /** @var TokenStorageInterface */
-    protected $mainTokenStorage;
+    private $mainTokenStorage;
 
     /** @var TokenStorageInterface */
-    protected $embeddedFormTokenStorage;
+    private $embeddedFormTokenStorage;
 
     /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var array */
-    protected $sessionOptions;
+    private $requestStack;
 
     /** @var string */
-    protected $embeddedFormRouteName;
-
-    /** @var string */
-    protected $sessionIdFieldName;
+    private $embeddedFormRouteName;
 
     /**
      * @param TokenStorageInterface $mainTokenStorage
      * @param TokenStorageInterface $embeddedFormTokenStorage
      * @param RequestStack          $requestStack
-     * @param array                 $sessionOptions
      * @param string                $embeddedFormRouteName
-     * @param string                $sessionIdFieldName
      */
     public function __construct(
         TokenStorageInterface $mainTokenStorage,
         TokenStorageInterface $embeddedFormTokenStorage,
         RequestStack $requestStack,
-        array $sessionOptions,
-        $embeddedFormRouteName,
-        $sessionIdFieldName
+        $embeddedFormRouteName
     ) {
         $this->mainTokenStorage = $mainTokenStorage;
         $this->embeddedFormTokenStorage = $embeddedFormTokenStorage;
         $this->requestStack = $requestStack;
-        $this->sessionOptions = $sessionOptions;
         $this->embeddedFormRouteName = $embeddedFormRouteName;
-        $this->sessionIdFieldName = $sessionIdFieldName;
     }
 
     /**
@@ -97,16 +85,25 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
     /**
      * @return TokenStorageInterface|ClearableTokenStorageInterface
      */
-    protected function getTokenStorage()
+    private function getTokenStorage()
     {
-        $request = $this->requestStack->getMasterRequest();
-        $isEmbeddedFormRequest =
-            null !== $request
-            && !$request->cookies->has($this->sessionOptions['name'])
-            && $request->attributes->get('_route') === $this->embeddedFormRouteName;
-
-        return $isEmbeddedFormRequest
+        return $this->isEmbeddedFormRequest()
             ? $this->embeddedFormTokenStorage
             : $this->mainTokenStorage;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isEmbeddedFormRequest()
+    {
+        $request = $this->requestStack->getMainRequest();
+        if (null === $request || $request->attributes->get('_route') !== $this->embeddedFormRouteName) {
+            return false;
+        }
+
+        $session = $request->hasSession() ? $request->getSession() : null;
+
+        return $session && !$request->cookies->has($session->getName());
     }
 }

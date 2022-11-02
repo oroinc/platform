@@ -3,67 +3,57 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Extension\Acceptor;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpFoundation\Request;
 
 class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME = 'test_entity';
-    const GRID_NAME   = 'test_grid';
+    private const ENTITY_NAME = 'test_entity';
+    private const GRID_NAME   = 'test_grid';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datagridManager;
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagridManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $storage;
+    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $storage;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $paginationManager;
+    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $paginationManager;
 
-    /**
-     * @var StorageDataCollector
-     */
-    protected $collector;
+    /** @var StorageDataCollector */
+    private $collector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->datagridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->datagridManager = $this->createMock(Manager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->storage = $this->createMock(EntityPaginationStorage::class);
+        $this->paginationManager = $this->createMock(EntityPaginationManager::class);
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->paginationManager =
-            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $datagridManagerLink = $this->createMock(ServiceLink::class);
+        $datagridManagerLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->datagridManager);
 
         $this->collector = new StorageDataCollector(
-            new ServiceLink($this->datagridManager),
+            $datagridManagerLink,
             $this->doctrineHelper,
             $this->storage,
             $this->paginationManager
@@ -72,7 +62,9 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testCollectWithDisabledPagination()
     {
-        $this->setPaginationEnabled(false);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(false);
         $this->datagridManager->expects($this->never())
             ->method('getDatagridByRequestParams');
 
@@ -81,7 +73,9 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testCollectWithEmptyGridRequest()
     {
-        $this->setPaginationEnabled(true);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
         $this->datagridManager->expects($this->never())
             ->method('getDatagridByRequestParams');
 
@@ -92,7 +86,9 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
     {
         $invalidGridName = 'invalid';
 
-        $this->setPaginationEnabled(true);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
         $this->datagridManager->expects($this->once())
             ->method('getDatagridByRequestParams')
             ->with($invalidGridName)
@@ -105,7 +101,9 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testCollectGridNotApplicable()
     {
-        $this->setPaginationEnabled(true);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
         $this->buildDataGrid();
         $this->storage->expects($this->never())
             ->method('hasData');
@@ -117,12 +115,14 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
     {
         $scope = EntityPaginationManager::VIEW_SCOPE;
 
-        $this->setPaginationEnabled(true);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
         $this->buildDataGrid(true);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $this->isType('string'), $scope)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->storage->expects($this->never())
             ->method('setData');
 
@@ -137,13 +137,17 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $entityIds = [1, 2, 3];
         $paginationLimit = 100;
 
-        $this->setPaginationEnabled(true);
-        $this->setPaginationLimit($paginationLimit);
-        $this->buildDataGrid(true, $state, $scope, $entityIds, $paginationLimit);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->paginationManager->expects($this->atLeastOnce())
+            ->method('getLimit')
+            ->willReturn($paginationLimit);
+        $this->buildDataGrid(true, $state, $entityIds, $paginationLimit);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $hash, $scope)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->storage->expects($this->once())
             ->method('setData')
             ->with(self::ENTITY_NAME, $hash, $entityIds, $scope);
@@ -159,13 +163,17 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $entityIds = [1, 2, 3];
         $paginationLimit = 2;
 
-        $this->setPaginationEnabled(true);
-        $this->setPaginationLimit($paginationLimit);
-        $this->buildDataGrid(true, $state, $scope, $entityIds, $paginationLimit);
+        $this->paginationManager->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->paginationManager->expects($this->once())
+            ->method('getLimit')
+            ->willReturn($paginationLimit);
+        $this->buildDataGrid(true, $state, $entityIds, $paginationLimit);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $hash, $scope)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->storage->expects($this->once())
             ->method('setData')
             ->with(self::ENTITY_NAME, $hash, [], $scope);
@@ -173,36 +181,24 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->collector->collect($this->getGridRequest(), $scope));
     }
 
-    /**
-     * @param bool $isApplicable
-     * @param array $state
-     * @param string $scope
-     * @param array $entityIds
-     * @param int $entitiesLimit
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function buildDataGrid(
-        $isApplicable = false,
+    private function buildDataGrid(
+        bool $isApplicable = false,
         array $state = [],
-        $scope = EntityPaginationManager::VIEW_SCOPE,
         array $entityIds = [],
-        $entitiesLimit = 0
-    ) {
+        int $entitiesLimit = 0
+    ): void {
         $metadata = ['state' => $state];
         $metadataObject = MetadataObject::create($metadata);
-        $permission = EntityPaginationManager::getPermission($scope);
         $identifierField = 'id';
 
         $this->paginationManager->expects($this->any())
             ->method('isDatagridApplicable')
-            ->will($this->returnValue($isApplicable));
+            ->willReturn($isApplicable);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('getRootEntities')
-            ->will($this->returnValue([self::ENTITY_NAME]));
+            ->willReturn([self::ENTITY_NAME]);
         $queryBuilder->expects($this->any())
             ->method('setFirstResult')
             ->with(0);
@@ -213,90 +209,61 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')
             ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(new ClassMetadata(self::ENTITY_NAME)));
+            ->willReturn(new ClassMetadata(self::ENTITY_NAME));
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifierFieldName')
             ->with(self::ENTITY_NAME)
-            ->will($this->returnValue($identifierField));
+            ->willReturn($identifierField);
 
         $entities = [];
         foreach ($entityIds as $id) {
             $entities[] = new ResultRecord([$identifierField => $id]);
         }
 
-        $dataSource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dataSource = $this->createMock(OrmDatasource::class);
         $dataSource->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
         $dataSource->expects($this->any())
             ->method('getResults')
-            ->will($this->returnValue($entities));
+            ->willReturn($entities);
 
-        $acceptor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
+        $acceptor = $this->createMock(Acceptor::class);
         $result = ResultsObject::create(['data' => []]);
         $acceptor->expects($this->any())
             ->method('acceptResult')
             ->with($result)
-            ->willReturnCallback(
-                function ($result) use ($entities) {
-                    return $result->setTotalRecords(count($entities));
-                }
-            );
+            ->willReturnCallback(function ($result) use ($entities) {
+                return $result->setTotalRecords(count($entities));
+            });
 
-        $dataGrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid = $this->createMock(DatagridInterface::class);
         $dataGrid->expects($this->any())
             ->method('getMetadata')
-            ->will($this->returnValue($metadataObject));
+            ->willReturn($metadataObject);
         $config = ['options' => ['entity_pagination' => true]];
         $configObject = DatagridConfiguration::create($config);
         $dataGrid->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($configObject));
+            ->willReturn($configObject);
         $dataGrid->expects($this->any())
             ->method('getAcceptor')
-            ->will($this->returnValue($acceptor));
+            ->willReturn($acceptor);
         $dataGrid->expects($this->any())
             ->method('getDatasource')
-            ->will($this->returnValue($dataSource));
+            ->willReturn($dataSource);
         $dataGrid->expects($this->any())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag($state)));
+            ->willReturn(new ParameterBag($state));
 
         $this->datagridManager->expects($this->once())
             ->method('getDatagridByRequestParams')
             ->with(self::GRID_NAME)
-            ->will($this->returnValue($dataGrid));
-
-        return $dataGrid;
+            ->willReturn($dataGrid);
     }
 
-    /**
-     * @return Request
-     */
-    protected function getGridRequest()
+    private function getGridRequest(): Request
     {
         return new Request(['grid' => [self::GRID_NAME => []]]);
-    }
-
-    /**
-     * @param bool $enabled
-     */
-    protected function setPaginationEnabled($enabled)
-    {
-        $this->paginationManager->expects($this->any())
-            ->method('isEnabled')
-            ->will($this->returnValue($enabled));
-    }
-
-    /**
-     * @param int $limit
-     */
-    protected function setPaginationLimit($limit)
-    {
-        $this->paginationManager->expects($this->any())
-            ->method('getLimit')
-            ->will($this->returnValue($limit));
     }
 }

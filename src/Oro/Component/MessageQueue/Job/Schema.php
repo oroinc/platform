@@ -28,8 +28,6 @@ class Schema extends BaseSchema
 
     /**
      * Merges ACL schema with the given schema.
-     *
-     * @param BaseSchema $schema
      */
     public function addToSchema(BaseSchema $schema)
     {

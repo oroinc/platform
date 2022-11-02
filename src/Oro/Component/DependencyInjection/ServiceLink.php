@@ -2,7 +2,7 @@
 
 namespace Oro\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * This class contain link to the service

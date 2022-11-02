@@ -20,19 +20,12 @@ class AuthenticationFailureListener
     /** @var string */
     private $messageKey;
 
-    /**
-     * @param string $providerKey
-     * @param string $messageKey
-     */
     public function __construct(string $providerKey, string $messageKey)
     {
         $this->providerKey = $providerKey;
         $this->messageKey = $messageKey;
     }
 
-    /**
-     * @param AuthenticationFailureEvent $event
-     */
     public function onAuthenticationFailure(AuthenticationFailureEvent $event)
     {
         if ($this->isApplicable($event->getAuthenticationException(), $event->getAuthenticationToken())) {
@@ -47,10 +40,11 @@ class AuthenticationFailureListener
      */
     protected function isApplicable(AuthenticationException $exception, TokenInterface $token)
     {
-        return $exception instanceof BadCredentialsException &&
-            strpos($exception->getMessageKey(), 'Invalid credentials.') === 0 &&
-            $token instanceof UsernamePasswordToken &&
-            $token->getProviderKey() === $this->providerKey;
+        return
+            $exception instanceof BadCredentialsException
+            && str_starts_with($exception->getMessageKey(), 'Invalid credentials.')
+            && $token instanceof UsernamePasswordToken
+            && $token->getProviderKey() === $this->providerKey;
     }
 
     /**

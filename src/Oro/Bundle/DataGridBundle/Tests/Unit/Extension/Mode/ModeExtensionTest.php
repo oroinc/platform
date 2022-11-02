@@ -9,21 +9,16 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 
 class ModeExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ModeExtension
-     */
-    protected $extension;
+    /** @var ModeExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ModeExtension();
         $this->extension->setParameters(new ParameterBag());
     }
 
-    /**
-     * @return array
-     */
-    public function isApplicableDataProvider()
+    public function isApplicableDataProvider(): array
     {
         return [
             'empty' => [
@@ -46,11 +41,9 @@ class ModeExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $config
-     * @param bool $isApplicable
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(array $config, $isApplicable)
+    public function testIsApplicable(array $config, bool $isApplicable)
     {
         $configObject = DatagridConfiguration::create($config);
         $this->assertSame($isApplicable, $this->extension->isApplicable($configObject));

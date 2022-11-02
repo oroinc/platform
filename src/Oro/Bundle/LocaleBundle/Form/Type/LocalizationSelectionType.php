@@ -2,47 +2,71 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a list of Localizations to choose the necessary localizations in system configuration.
+ */
 class LocalizationSelectionType extends AbstractType
 {
-    const NAME = 'oro_locale_localization_selection';
+    private const NAME = 'oro_locale_localization_selection';
+
+    /** @var LocalizationManager */
+    private $localizationManager;
+
+    /** @var LocalizationChoicesProvider */
+    private $localizationChoicesProvider;
+
+    public function __construct(
+        LocalizationManager $localizationManager,
+        LocalizationChoicesProvider $localizationChoicesProvider
+    ) {
+        $this->localizationManager = $localizationManager;
+        $this->localizationChoicesProvider = $localizationChoicesProvider;
+    }
 
     /**
-     * @var ConfigManager
+     * {@inheritdoc}
      */
-    protected $configManager;
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'choices' => $this->getLocalizationChoices(null),
+            'placeholder' => '',
+            'translatable_options' => false,
+            'configs' => [
+                'placeholder' => 'oro.locale.localization.form.placeholder.select_localization',
+            ],
+            Configuration::ENABLED_LOCALIZATIONS => null
+        ]);
+        $resolver->setAllowedTypes(Configuration::ENABLED_LOCALIZATIONS, ['null', 'array']);
+    }
 
     /**
-     * @var LocaleSettings
+     * {@inheritdoc}
      */
-    protected $localeSettings;
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $localizationChoices = $this->getLocalizationChoices($options[Configuration::ENABLED_LOCALIZATIONS]);
+
+        $view->vars['choices'] = array_filter(
+            $view->vars['choices'],
+            function (ChoiceView $choiceView) use ($localizationChoices) {
+                return in_array($choiceView->data, $localizationChoices, true);
+            }
+        );
+    }
 
     /**
-     * @var LocalizationManager
-     */
-    protected $localizationManager;
-
-    /**
-     * @var LocalizationChoicesProvider
-     */
-    protected $localizationChoicesProvider;
-
-    /**
-     * @var string
-     */
-    protected $localizationSelectorConfigKey;
-
-    /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -50,7 +74,7 @@ class LocalizationSelectionType extends AbstractType
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getBlockPrefix()
     {
@@ -58,97 +82,28 @@ class LocalizationSelectionType extends AbstractType
     }
 
     /**
-     * @param ConfigManager $configManager
-     * @param LocaleSettings $localeSettings
-     * @param LocalizationManager $localizationManager
-     * @param LocalizationChoicesProvider $localizationChoicesProvider
-     */
-    public function __construct(
-        ConfigManager $configManager,
-        LocaleSettings $localeSettings,
-        LocalizationManager $localizationManager,
-        LocalizationChoicesProvider $localizationChoicesProvider
-    ) {
-        $this->configManager = $configManager;
-        $this->localeSettings = $localeSettings;
-        $this->localizationManager = $localizationManager;
-        $this->localizationChoicesProvider = $localizationChoicesProvider;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'choices' => function (Options $options) {
-                $localizations = $this->getLocalizations();
-
-                if ($options['full_localization_list']) {
-                    return $localizations;
-                }
-
-                $localizations = $this->checkLocalizations($localizations);
-
-                return $this->getChoices($localizations, $options['compact']);
-            },
-            'compact' => false,
-            'full_localization_list' => false,
-            'placeholder' => '',
-            'translatable_options' => false,
-            'configs' => [
-                'placeholder' => 'oro.locale.localization.form.placeholder.select_localization',
-            ],
-        ]);
-    }
-
-    /**
-     * @param array $localizations
-     * @param boolean $isCompact
-     * @return array
-     */
-    protected function getChoices(array $localizations, $isCompact)
-    {
-        if ($isCompact) {
-            $choices = array_combine($localizations, $localizations);
-        } else {
-            $localizationChoices = $this->localizationChoicesProvider->getLocalizationChoices();
-            $choices = array_intersect_key($localizationChoices, $localizations);
-        }
-
-        return $choices;
-    }
-
-    /**
-     * @param array $localizations
-     *
-     * @return array
-     */
-    protected function checkLocalizations(array $localizations)
-    {
-        foreach ($localizations as $label => $id) {
-            $localization = $this->localizationManager->getLocalization($id);
-            if (!($localization instanceof Localization)) {
-                unset($localizations[$label]);
-            }
-        }
-
-        return $localizations;
-    }
-
-    /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getParent()
     {
         return OroChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    protected function getLocalizations()
+    private function getLocalizationChoices(?array $enabledLocalization): array
     {
-        return $this->localizationChoicesProvider->getLocalizationChoices();
+        $availableLocalizations = $this->localizationChoicesProvider->getLocalizationChoices();
+
+        if ($enabledLocalization !== null) {
+            $enabledLocalization = $this->localizationManager->getLocalizations($enabledLocalization);
+
+            $availableLocalizations = array_flip(
+                array_intersect_key(
+                    array_flip($availableLocalizations),
+                    $enabledLocalization
+                )
+            );
+        }
+
+        return $availableLocalizations;
     }
 }

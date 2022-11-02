@@ -8,17 +8,12 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
 {
-    const TYPE_NAME = 'custom_type';
+    protected const TYPE_NAME = 'custom_type';
 
-    /**
-     * @var BlockTypeInterface
-     */
+    /** @var BlockTypeInterface */
     protected $type;
 
-    /**
-     * @return array
-     */
-    protected function getOptionsConfig()
+    protected function getOptionsConfig(): array
     {
         return [
             'option' => null,
@@ -49,12 +44,14 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                         static::TYPE_NAME,
                         '_test_block_1'
                     ],
-                    'cache_key' => '_test:block--1_' . static::TYPE_NAME,
+                    'cache_key' => '_test:block--1_' . static::TYPE_NAME . '_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain' => 'messages',
                     'option_default' => 'value',
                     'option_default_false' => false,
                     'option_default_null' => null,
                     'option_required' => true,
+                    '_blockThemes' => [],
+                    '_formThemes' => [],
                 ]
             ],
             $view,
@@ -64,8 +61,6 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
 
     /**
      * @dataProvider buildViewDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testBuildView(array $options, array $expected)
     {
@@ -78,10 +73,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         $this->assertBlockView($expected, $view, false);
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         $id = '_' . static::TYPE_NAME . '_id';
         $options = [
@@ -101,7 +93,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                 static::TYPE_NAME,
                 $id
             ],
-            'cache_key' => $id . '_' .static::TYPE_NAME,
+            'cache_key' => $id . '_' .static::TYPE_NAME . '_ad7b81dea42cf2ef7525c274471e3ce6',
             'translation_domain' => 'test_translation_domain',
             'option_default' => 'value',
             'option_default_false' => false,
@@ -110,6 +102,8 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
             'attr' => ['test_attr' => 'test_attr_val'],
             'label' => 'Test Label',
             'label_attr' => ['test_label_attr' => 'test_label_attr_val'],
+            '_blockThemes' => [],
+            '_formThemes' => [],
         ];
         return [
             [
@@ -164,9 +158,9 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
     /**
      * @param OptionsConfigTrait $object
      */
-    protected function assertSetOptionException($object)
+    protected function assertSetOptionException($object): void
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Option setting "test" not supported. Supported settings is [default, required]'
         );

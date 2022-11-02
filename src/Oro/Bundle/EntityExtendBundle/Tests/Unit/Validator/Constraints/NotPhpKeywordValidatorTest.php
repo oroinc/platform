@@ -4,50 +4,39 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeywordValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NotPhpKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+class NotPhpKeywordValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
-    /** @var NotPhpKeywordValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->validator = new NotPhpKeywordValidator();
-        $this->validator->initialize($this->context);
+        return new NotPhpKeywordValidator();
     }
 
     /**
      * @dataProvider validateDataProvider
      */
-    public function testValidate($value, $violation)
+    public function testValidate(string $value, bool $valid)
     {
         $constraint = new NotPhpKeyword();
-
-        if ($violation) {
-            $this->context->expects($this->once())
-                ->method('addViolation')
-                ->with($constraint->message);
-        } else {
-            $this->context->expects($this->never())
-                ->method('addViolation');
-        }
-
         $this->validator->validate($value, $constraint);
+
+        if ($valid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $value)
+                ->assertRaised();
+        }
     }
 
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
-            ['', false],
-            ['test', false],
-            ['class', true],
-            ['CLASS', true],
+            ['', true],
+            ['test', true],
+            ['class', false],
+            ['CLASS', false],
         ];
     }
 }

@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\GenericHeader;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
-use Zend\Mail\Header\GenericHeader;
-use Zend\Mail\Headers;
 
 class AttachmentTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
     private $part;
 
     /** @var Attachment */
     private $attachment;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->part = $this->createMock(Part::class);
 
         $this->attachment = new Attachment($this->part);
     }
@@ -29,29 +29,27 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     {
         $headers = new \stdClass();
 
-        $this->part
-            ->expects($this->once())
+        $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
+            ->willReturn($headers);
 
         $result = $this->attachment->getHeaders();
 
-        $this->assertTrue($headers === $result);
+        $this->assertSame($headers, $result);
     }
 
     public function testGetHeader()
     {
         $header = new \stdClass();
 
-        $this->part
-            ->expects($this->once())
+        $this->part->expects($this->once())
             ->method('getHeader')
-            ->with($this->equalTo('SomeHeader'), $this->equalTo('string'))
-            ->will($this->returnValue($header));
+            ->with('SomeHeader', 'string')
+            ->willReturn($header);
 
         $result = $this->attachment->getHeader('SomeHeader', 'string');
 
-        $this->assertTrue($header === $result);
+        $this->assertSame($header, $result);
     }
 
     public function testGetFileNameWithContentDispositionExists()
@@ -60,34 +58,29 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $testEncoding = 'SomeEncoding';
 
         // Content-Disposition header
-        $contentDispositionHeader = $this->getMockBuilder('Zend\Mail\Header\GenericHeader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contentDispositionHeader = $this->createMock(GenericHeader::class);
         $contentDispositionHeader->expects($this->once())
             ->method('getFieldValue')
-            ->will($this->returnValue('attachment; filename=' . $testFileName));
+            ->willReturn('attachment; filename=' . $testFileName);
         $contentDispositionHeader->expects($this->once())
             ->method('getEncoding')
-            ->will($this->returnValue($testEncoding));
+            ->willReturn($testEncoding);
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->once())
             ->method('has')
-            ->with($this->equalTo('Content-Disposition'))
-            ->will($this->returnValue(true));
+            ->with('Content-Disposition')
+            ->willReturn(true);
 
         // Part object
         $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $this->part
-            ->expects($this->once())
+            ->willReturn($headers);
+        $this->part->expects($this->once())
             ->method('getHeader')
-            ->with($this->equalTo('Content-Disposition'))
-            ->will($this->returnValue($contentDispositionHeader));
+            ->with('Content-Disposition')
+            ->willReturn($contentDispositionHeader);
 
         $result = $this->attachment->getFileName();
 
@@ -101,41 +94,32 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $testEncoding = 'SomeEncoding';
 
         // Content-Disposition header
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contentTypeHeader = $this->createMock(ContentType::class);
         $contentTypeHeader->expects($this->once())
             ->method('getParameter')
-            ->with($this->equalTo('name'))
-            ->will($this->returnValue($testFileName));
+            ->with('name')
+            ->willReturn($testFileName);
         $contentTypeHeader->expects($this->once())
             ->method('getEncoding')
-            ->will($this->returnValue($testEncoding));
+            ->willReturn($testEncoding);
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Disposition', false],
-                        ['Content-Type', true]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Content-Disposition', false],
+                ['Content-Type', true]
+            ]);
 
         // Part object
         $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $this->part
-            ->expects($this->once())
+            ->willReturn($headers);
+        $this->part->expects($this->once())
             ->method('getHeader')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue($contentTypeHeader));
+            ->with('Content-Type')
+            ->willReturn($contentTypeHeader);
 
         $result = $this->attachment->getFileName();
 
@@ -155,62 +139,39 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $decodedValue
     ) {
         // Content-Type header
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contentTypeHeader = $this->createMock(ContentType::class);
         if ($contentType !== null) {
             $contentTypeHeader->expects($this->once())
                 ->method('getType')
-                ->will($this->returnValue($contentType));
+                ->willReturn($contentType);
             $contentTypeHeader->expects($this->once())
                 ->method('getParameter')
-                ->with($this->equalTo('charset'))
-                ->will($this->returnValue($contentCharset));
-        }
-
-        // Content-Transfer-Encoding header
-        $contentTransferEncodingHeader = $this->getMockBuilder('Zend\Mail\Header\GenericHeader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        if ($contentTransferEncoding !== null) {
-            $contentTransferEncodingHeader->expects($this->once())
-                ->method('getFieldValue')
-                ->will($this->returnValue($contentTransferEncoding));
+                ->with('charset')
+                ->willReturn($contentCharset);
         }
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', $contentType !== null],
-                        ['Content-Transfer-Encoding', $contentTransferEncoding !== null],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Content-Type', $contentType !== null],
+                ['Content-Transfer-Encoding', $contentTransferEncoding !== null],
+            ]);
 
         // Part object
         $this->part->expects($this->any())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $this->part
-            ->expects($this->any())
+            ->willReturn($headers);
+        $this->part->expects($this->any())
             ->method('getHeader')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', null, $contentTypeHeader],
-                        ['Content-Transfer-Encoding', null, $contentTransferEncodingHeader],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Content-Type', null, $contentTypeHeader],
+                ['Content-Transfer-Encoding', 'array', (array)$contentTransferEncoding],
+            ]);
         $this->part->expects($this->once())
             ->method('getContent')
-            ->will($this->returnValue($contentValue));
+            ->willReturn($contentValue);
 
         $result = $this->attachment->getContent();
 
@@ -220,8 +181,6 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getEmbeddedContentIdProvider
-     * @param $rawHeaders
-     * @param $expected
      */
     public function testGetEmbeddedContentId($rawHeaders, $expected)
     {
@@ -236,25 +195,21 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
             $contentDispositionHeader = GenericHeader::fromString($rawHeaders['Content-Disposition']);
         }
 
-        $this->part
-            ->expects($this->any())
+        $this->part->expects($this->any())
             ->method('getHeader')
-            ->willReturnMap(
-                [
-                    ['Content-ID', null, $contentIdHeader],
-                    ['Content-Disposition', null, $contentDispositionHeader]
-                ]
-            );
+            ->willReturnMap([
+                ['Content-ID', null, $contentIdHeader],
+                ['Content-Disposition', null, $contentDispositionHeader]
+            ]);
 
-        $this->part
-            ->expects($this->any())
+        $this->part->expects($this->any())
             ->method('getHeaders')
             ->willReturn($headers);
 
         $this->assertEquals($expected, $this->attachment->getEmbeddedContentId());
     }
 
-    public static function getEmbeddedContentIdProvider()
+    public static function getEmbeddedContentIdProvider(): array
     {
         return [
             'embedded content_id from Content-ID Header' => [
@@ -286,7 +241,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function getContentProvider()
+    public static function getContentProvider(): array
     {
         return [
             '7bit' => [
@@ -361,6 +316,14 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
                 new Content('A value', 'SomeContentType', 'BINARY', 'ISO-8859-1'),
                 'A value'
             ],
+            'multi Content-Transfer-Encoding' => [
+                ['8Bit', 'Base64'],
+                'SomeContentType',
+                'ISO-8859-1',
+                base64_encode('A value'),
+                new Content(base64_encode('A value'), 'SomeContentType', 'Base64', 'ISO-8859-1'),
+                'A value'
+            ]
         ];
     }
 }

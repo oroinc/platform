@@ -21,14 +21,23 @@ oro_behat_extension:
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
           First Role:
-            locator: '//label[contains(.,"First Role")]/../span/input'
+            locator: '//label[contains(.,"First Role")]/../input[@type="checkbox"]'
             type: xpath
           Second Role:
-            locator: '//label[contains(.,"Second Role")]/../span/input'
+            locator: '//label[contains(.,"Second Role")]/../input[@type="checkbox"]'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
+          Organization Business Units:
+            locator: '//input[@name="oro_user_user_form[organizations][businessUnits]"]'
+            type: xpath
+            element: Select2Share
+          Avatar: 'oro_user_user_form[avatar][file]'
+          Birthday:
+            locator: 'input[id^="oro_user_user_form_birthday-uid"]'
+            type: css
+            element: DateTimePicker
 
     UserMenu:
       selector: {type: 'xpath', locator: '//*[@id="user-menu"]'}
@@ -48,9 +57,16 @@ oro_behat_extension:
         mapping:
           Use parent scope for Position: 'look_and_feel[oro_ui___navbar_position][use_parent_scope_value]'
 
+    User Reset Password Form:
+      selector: 'form[name="oro_user_reset_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          New password: 'oro_user_reset_form[plainPassword][first]'
+          Repeat password: 'oro_user_reset_form[plainPassword][second]'
+
     Sided Main Menu:
       selector: 'div.main-menu-sided'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UserRoleView:
       selector:
@@ -62,7 +78,14 @@ oro_behat_extension:
       selector: 'a[title="Edit profile"]'
 
     Username or Email:
-      selector: '.oro-forgot-password input[name="username"]'
+      selector: '.form-signin__fieldset input[name="username"]'
+
+    Users Grid:
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+      selector: 'div[data-page-component-name="users-grid"]'
+
+    Generate Key:
+      selector: '#btn-apigen'
 
   pages:
     Login:
@@ -72,6 +95,10 @@ oro_behat_extension:
     User Forgot Password:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserForgotPassword
       route: 'oro_user_reset_request'
+
+    User Password Reset:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserPasswordReset
+      route: 'oro_user_reset_reset'
 
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
@@ -110,14 +137,17 @@ oro_behat_extension:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
-        - OroUserBundle::FeatureContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
-        - OroSecurityBundle::ACLContext
-        - OroSecurityBundle::PermissionContext
-        - OroLocaleBundle::LocalizationContext
-        - OroActivityListBundle::ActivityContext
-        - OroDataGridBundle::GridContext
-        - OroEmailBundle::EmailContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\UserAttachmentContext
+        - Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+        - Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

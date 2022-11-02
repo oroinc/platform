@@ -49,7 +49,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($data->getEntity());
 
         $data['data'] = new \stdClass();
-        $this->assertInternalType('object', $data->getEntity());
+        $this->assertIsObject($data->getEntity());
     }
 
     public function testGetIterator()

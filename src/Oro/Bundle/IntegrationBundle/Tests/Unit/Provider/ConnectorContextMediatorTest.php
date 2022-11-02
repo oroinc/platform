@@ -2,100 +2,103 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
+use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\Container;
 
 class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConnectorContextMediator */
-    protected $contextMediator;
+    private $contextMediator;
 
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repo;
+    private $repo;
 
     /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $proxiedServiceID = 'registry';
 
-        $this->registry = $this->createMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $container      = new Container();
+        $this->registry = $this->createMock(TypesRegistry::class);
+        $container = new Container();
         $container->set($proxiedServiceID, $this->registry);
 
-        $this->repo = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
-            ->disableOriginalConstructor()->getMock();
+        $this->repo = $this->createMock(ChannelRepository::class);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
 
-        $em->expects($this->any())->method('getRepository')->with('OroIntegrationBundle:Channel')
-            ->will($this->returnValue($this->repo));
-        $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
-        $registry->expects($this->any())->method('getManager')
-            ->will($this->returnValue($em));
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->with('OroIntegrationBundle:Channel')
+            ->willReturn($this->repo);
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($em);
         $link = new ServiceLink($container, $proxiedServiceID);
 
         $this->contextMediator = new ConnectorContextMediator($link, $registry);
     }
 
-    protected function tearDown()
-    {
-        unset($this->repo, $this->registry, $this->contextMediator);
-    }
-
     /**
      * @dataProvider transportSourceProvider
-     *
-     * @param  mixed $source
-     * @param bool   $exceptionExpected
      */
-    public function testGetTransportFromSource($source, $exceptionExpected = false)
+    public function testGetTransportFromSource(mixed $source, mixed $exceptionExpected)
     {
         if (false !== $exceptionExpected) {
             $this->expectException($exceptionExpected);
         } else {
-            $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
-                ->will($this->returnValue(new \stdClass()));
+            $this->registry->expects($this->once())
+                ->method('getTransportTypeBySettingEntity')
+                ->willReturn(new \stdClass());
         }
 
         $this->contextMediator->getTransport($source);
     }
 
-    /**
-     * @return array
-     */
-    public function transportSourceProvider()
+    public function transportSourceProvider(): array
     {
         $integration = new Integration();
-        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $integration->setTransport($this->getMockForAbstractClass(Transport::class));
+
         return [
-            'bad source exception expected' => [false, '\LogicException'],
-            'channel given'                 => [$integration]
+            'bad source exception expected' => [false, \LogicException::class],
+            'channel given'                 => [$integration, false]
         ];
     }
 
     public function testGetTransportFromContext()
     {
-        $testID        = 1;
+        $testID = 1;
         $testTransport = new \stdClass();
-        $integration   = new Integration();
-        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $integration = new Integration();
+        $integration->setTransport($this->getMockForAbstractClass(Transport::class));
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')->with('channel')
-            ->will($this->returnValue($testID));
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects($this->once())
+            ->method('getOption')
+            ->with('channel')
+            ->willReturn($testID);
 
-        $this->repo->expects($this->once())->method('getOrLoadById')->with($testID)
-            ->will($this->returnValue($integration));
+        $this->repo->expects($this->once())
+            ->method('getOrLoadById')
+            ->with($testID)
+            ->willReturn($integration);
 
-        $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
-            ->will($this->returnValue($testTransport));
+        $this->registry->expects($this->once())
+            ->method('getTransportTypeBySettingEntity')
+            ->willReturn($testTransport);
 
         $result = $this->contextMediator->getTransport($context);
         $this->assertEquals($testTransport, $result);
@@ -103,16 +106,20 @@ class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetChannelFromContext()
     {
-        $testID      = 1;
+        $testID = 1;
         $integration = new Integration();
-        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $integration->setTransport($this->getMockForAbstractClass(Transport::class));
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')->with('channel')
-            ->will($this->returnValue($testID));
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects($this->once())
+            ->method('getOption')
+            ->with('channel')
+            ->willReturn($testID);
 
-        $this->repo->expects($this->once())->method('getOrLoadById')->with($testID)
-            ->will($this->returnValue($integration));
+        $this->repo->expects($this->once())
+            ->method('getOrLoadById')
+            ->with($testID)
+            ->willReturn($integration);
 
         $result = $this->contextMediator->getChannel($context);
         $this->assertEquals($integration, $result);
@@ -120,15 +127,18 @@ class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetInitializedTransport()
     {
-        $testTransport = $this->createMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
-        $transportEntity = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $testTransport = $this->createMock(TransportInterface::class);
+        $transportEntity = $this->getMockForAbstractClass(Transport::class);
         $integration = new Integration();
         $integration->setTransport($transportEntity);
 
-        $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
-            ->will($this->returnValue($testTransport));
+        $this->registry->expects($this->once())
+            ->method('getTransportTypeBySettingEntity')
+            ->willReturn($testTransport);
 
-        $testTransport->expects($this->once())->method('init')->with($transportEntity);
+        $testTransport->expects($this->once())
+            ->method('init')
+            ->with($transportEntity);
 
         $result = $this->contextMediator->getInitializedTransport($integration);
         $this->assertEquals($testTransport, $result);

@@ -50,14 +50,12 @@ class AbstractTransitionTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $workflowDefinition = (new WorkflowDefinition())->setName('workflowName');
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Can not assemble trigger for transition %s in workflow %s by provided options %s.',
-                'transitionName',
-                'workflowName',
-                var_export(['optKey' => 'optVal'], 1)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Can not assemble trigger for transition %s in workflow %s by provided options %s.',
+            'transitionName',
+            'workflowName',
+            var_export(['optKey' => 'optVal'], 1)
+        ));
 
         $assembler->assemble(
             ['optKey' => 'optVal'],

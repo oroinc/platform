@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Migrations\Data\ORM;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
@@ -12,6 +12,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Imports country and regions data into the application. Includes translations for the English language.
+ */
 class LoadCountryData extends AbstractTranslatableEntityFixture implements
     VersionedFixtureInterface,
     ContainerAwareInterface
@@ -52,7 +55,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     public function getVersion()
     {
-        return '1.2';
+        return '1.3';
     }
 
     /**
@@ -156,9 +159,6 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
 
     /**
      * Load countries and regions to DB
-     *
-     * @param ObjectManager $manager
-     * @param array $countries
      */
     protected function loadCountriesAndRegions(ObjectManager $manager, array $countries)
     {

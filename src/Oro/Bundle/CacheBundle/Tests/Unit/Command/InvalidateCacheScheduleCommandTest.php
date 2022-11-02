@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\Handler;
+namespace Oro\Bundle\CacheBundle\Tests\Unit\Command;
 
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionHandlerInterface;
@@ -12,26 +12,25 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class InvalidateCacheScheduleCommandTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConfigure()
+    public function testConfigure(): void
     {
-        $command = new InvalidateCacheScheduleCommand();
+        $command = new InvalidateCacheScheduleCommand($this->createMock(ContainerInterface::class));
 
-        static::assertSame('oro:cache:invalidate:schedule', $command->getName());
+        self::assertSame('oro:cache:invalidate:schedule', $command->getName());
 
         $arguments = $command->getDefinition()->getArguments();
 
-        static::assertSame('service', $arguments['service']->getName());
-        static::assertTrue($arguments['service']->isRequired());
+        self::assertSame('service', $arguments['service']->getName());
+        self::assertTrue($arguments['service']->isRequired());
 
-        static::assertSame('parameters', $arguments['parameters']->getName());
-        static::assertFalse($arguments['parameters']->isRequired());
+        self::assertSame('parameters', $arguments['parameters']->getName());
+        self::assertFalse($arguments['parameters']->isRequired());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $serviceDefinition = 'service.definition';
         $parameters = [
@@ -40,13 +39,19 @@ class InvalidateCacheScheduleCommandTest extends \PHPUnit\Framework\TestCase
         ];
 
         $service = $this->createMock(InvalidateCacheActionHandlerInterface::class);
-        $service->expects(static::once())
+        $service->expects(self::once())
             ->method('handle')
             ->with(new InvalidateCacheDataStorage($parameters));
 
-        $application = $this->buildApplicationWithService($serviceDefinition, $service);
+        $application = $this->buildApplicationWithService();
 
-        $command = new InvalidateCacheScheduleCommand();
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects(self::once())
+            ->method('get')
+            ->with($serviceDefinition)
+            ->willReturn($service);
+
+        $command = new InvalidateCacheScheduleCommand($container);
         $command->setApplication($application);
 
         $inputDefinition = new InputDefinition();
@@ -64,32 +69,12 @@ class InvalidateCacheScheduleCommandTest extends \PHPUnit\Framework\TestCase
         $command->execute($input, new NullOutput());
     }
 
-    /**
-     * @param string $serviceDefinition
-     * @param object $service
-     *
-     * @return Application|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function buildApplicationWithService($serviceDefinition, $service)
+    private function buildApplicationWithService(): Application
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects(static::once())
-            ->method('get')
-            ->with($serviceDefinition)
-            ->willReturn($service);
-
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel->expects(static::once())
-            ->method('getContainer')
-            ->willReturn($container);
-
         $application = $this->createMock(Application::class);
-        $application->expects(static::once())
+        $application->expects(self::once())
             ->method('getHelperSet')
             ->willReturn(new HelperSet());
-        $application->expects(static::once())
-            ->method('getKernel')
-            ->willReturn($kernel);
 
         return $application;
     }

@@ -2,52 +2,34 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 class ProcessJobRepositoryTest extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var ProcessJobRepository
-     */
-    protected $repository;
-
-    /**
-     * @var Registry
-     */
-    protected $registry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
-        $this->registry      = $this->getContainer()->get('doctrine');
-        $this->entityManager = $this->registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
-        $this->repository    = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
-
-        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
+        $this->loadFixtures([LoadProcessEntities::class]);
     }
 
     public function testDeleteByHashes()
     {
         // fixture data
-        $jobsAmount   = ProcessJobRepository::DELETE_HASH_BATCH + 1;
+        $jobsAmount = ProcessJobRepository::DELETE_HASH_BATCH + 1;
         $entityHashes = $this->createProcessJobs($jobsAmount);
 
         // test
         $this->assertEquals($jobsAmount, $this->getJobsCount($entityHashes));
-        $this->repository->deleteByHashes($entityHashes);
+        $this->getRepository()->deleteByHashes($entityHashes);
         $this->assertEquals(0, $this->getJobsCount($entityHashes));
     }
 
@@ -56,7 +38,7 @@ class ProcessJobRepositoryTest extends WebTestCase
         $count = 5;
         $this->createProcessJobs($count);
 
-        $expectedJobs = $this->repository->findAll();
+        $expectedJobs = $this->getRepository()->findAll();
 
         $this->assertCount($count, $expectedJobs);
 
@@ -68,24 +50,35 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $this->assertCount($count, $ids);
 
-        $actualJobs = $this->repository->findByIds($ids);
+        $actualJobs = $this->getRepository()->findByIds($ids);
 
         $this->assertEquals($expectedJobs, $actualJobs);
 
         array_shift($ids);
 
-        $actualJobs = $this->repository->findByIds($ids);
+        $actualJobs = $this->getRepository()->findByIds($ids);
 
         $this->assertCount($count - 1, $actualJobs);
     }
 
-    /**
-     * @param array $hashes
-     * @return int
-     */
-    protected function getJobsCount(array $hashes)
+    private function getDoctrine(): ManagerRegistry
     {
-        $queryBuilder = $this->repository->createQueryBuilder('job')
+        return $this->getContainer()->get('doctrine');
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        return $this->getDoctrine()->getManagerForClass(ProcessJob::class);
+    }
+
+    private function getRepository(): ProcessJobRepository
+    {
+        return $this->getDoctrine()->getRepository(ProcessJob::class);
+    }
+
+    private function getJobsCount(array $hashes): int
+    {
+        $queryBuilder = $this->getRepository()->createQueryBuilder('job')
             ->select('COUNT(job.id) as jobsCount');
 
         return (int)$queryBuilder->where($queryBuilder->expr()->in('job.entityHash', $hashes))
@@ -93,33 +86,27 @@ class ProcessJobRepositoryTest extends WebTestCase
             ->getSingleScalarResult();
     }
 
-    /**
-     * @return User
-     */
-    protected function getUser()
+    private function getUser(): User
     {
-        return $this->registry->getRepository('OroUserBundle:User')
+        return $this->getDoctrine()->getRepository(User::class)
             ->createQueryBuilder('user')
             ->setMaxResults(1)
             ->getQuery()
             ->getSingleResult();
     }
 
-    /**
-     * @param integer $count
-     * @return array
-     */
-    protected function createProcessJobs($count)
+    private function createProcessJobs(int $count): array
     {
-        $definition = $this->entityManager->find(
-            'OroWorkflowBundle:ProcessDefinition',
+        $entityManager = $this->getEntityManager();
+        $definition = $entityManager->find(
+            ProcessDefinition::class,
             LoadProcessEntities::FIRST_DEFINITION
         );
 
-        $trigger = $this->entityManager->getRepository('OroWorkflowBundle:ProcessTrigger')
+        $trigger = $entityManager->getRepository(ProcessTrigger::class)
             ->findOneBy(['definition' => $definition]);
 
-        $entity       = $this->getUser();
+        $entity = $this->getUser();
         $entityHashes = [];
 
         for ($i = 0; $i < $count; $i++) {
@@ -130,12 +117,12 @@ class ProcessJobRepositoryTest extends WebTestCase
             $job->setProcessTrigger($trigger)
                 ->setEntityId($i)
                 ->setData($processData);
-            $this->entityManager->persist($job);
+            $entityManager->persist($job);
 
             $entityHashes[] = $job->getEntityHash();
         }
 
-        $this->entityManager->flush();
+        $entityManager->flush();
 
         return $entityHashes;
     }

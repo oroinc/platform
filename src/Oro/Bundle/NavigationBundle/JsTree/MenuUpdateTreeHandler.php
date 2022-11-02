@@ -4,8 +4,11 @@ namespace Oro\Bundle\NavigationBundle\JsTree;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Returns a formatted menu updates tree.
+ */
 class MenuUpdateTreeHandler
 {
     const MENU_ITEM_DIVIDER_LABEL = '---------------';
@@ -16,10 +19,6 @@ class MenuUpdateTreeHandler
      */
     protected $translator;
 
-
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -99,7 +98,7 @@ class MenuUpdateTreeHandler
         if ($entity->getExtra('divider', false)) {
             $text = self::MENU_ITEM_DIVIDER_LABEL;
         } elseif (!$entity->getExtra('translate_disabled', false)) {
-            $text = $this->translator->trans($text);
+            $text = $this->translator->trans((string) $text);
         }
 
         return [

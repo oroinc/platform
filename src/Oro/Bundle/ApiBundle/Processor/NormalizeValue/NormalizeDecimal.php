@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
  */
 class NormalizeDecimal extends AbstractProcessor
 {
-    const REQUIREMENT = '-?\d*\.?\d+';
+    private const REQUIREMENT = '-?\d*\.?\d+';
 
     /**
      * {@inheritdoc}
@@ -40,9 +40,9 @@ class NormalizeDecimal extends AbstractProcessor
     protected function normalizeValue($value)
     {
         $normalizedValue = $value;
-        if (0 === strpos($normalizedValue, '.')) {
+        if (str_starts_with($normalizedValue, '.')) {
             $normalizedValue = '0' . $normalizedValue;
-        } elseif (0 === strpos($normalizedValue, '-.')) {
+        } elseif (str_starts_with($normalizedValue, '-.')) {
             $normalizedValue = '-0' . substr($normalizedValue, 1);
         }
 

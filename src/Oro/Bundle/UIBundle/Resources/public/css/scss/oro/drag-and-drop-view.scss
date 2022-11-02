@@ -1,0 +1,27 @@
+/* @theme: admin.oro; */
+
+.drag-n-drop-sorting-view {
+    &__wrapper {
+        &.disabled {
+            .removeRow {
+                pointer-events: $drag-n-drop-sorting-view-wrapper-remove-fow-pointer-events;
+            }
+        }
+    }
+
+    &__column {
+        width: $drag-n-drop-sorting-view-column-width;
+    }
+
+    &__column_options {
+        min-width: $drag-n-drop-sorting-view-column-options-min-width;
+    }
+
+    .table-bordered {
+        display: $drag-n-drop-sorting-view-table-bordered-display;
+    }
+
+    .grid-container {
+        margin-bottom: $drag-n-drop-sorting-view-grid-container-offset-bottom;
+    }
+}

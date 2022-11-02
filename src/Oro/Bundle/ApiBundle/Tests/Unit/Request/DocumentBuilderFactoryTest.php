@@ -6,24 +6,19 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $documentBuilders
-     *
-     * @return DocumentBuilderFactory
-     */
-    private function getDocumentBuilderFactory(array $documentBuilders)
+    private function getDocumentBuilderFactory(array $documentBuilders): DocumentBuilderFactory
     {
         return new DocumentBuilderFactory(
             $documentBuilders,
@@ -72,12 +67,11 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a document builder for the request "another".
-     */
     public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a document builder for the request "another".');
+
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api']
         ]);

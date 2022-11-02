@@ -8,32 +8,43 @@ oro_tag_bundle.taxonomy:
     type:         annotation
     prefix:       /taxonomy
 
-oro_tag_api:
-    resource:     "@OroTagBundle/Controller/Api/Rest/TagController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
 
-oro_taxonomy_api:
-    resource:     "@OroTagBundle/Controller/Api/Rest/TaxonomyController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
+#
+# OLD REST API ROUTES
+#
+
+oro_api_delete_tag:
+    path: '/api/rest/{version}/tags/{id}.{_format}'
+    methods: [DELETE]
     defaults:
-        version:  latest
- 
-oro_taggable_api:
-    resource:     "@OroTagBundle/Controller/Api/Rest/TaggableController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
+        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TagController::deleteAction'
+        _format: json
+        version: latest
     requirements:
-        version:  latest|v1
-        _format:  json
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_taxonomy:
+    path: '/api/rest/{version}/taxonomies/{id}.{_format}'
+    methods: [DELETE]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TaxonomyController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_taggable:
+    path: '/api/rest/{version}/tags/{entity}/{entityId}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TaggableController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        entityId: \d+
+        _format: json
+        version: latest|v1

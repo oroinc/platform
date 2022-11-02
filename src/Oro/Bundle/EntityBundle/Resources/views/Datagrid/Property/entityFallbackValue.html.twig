@@ -1,0 +1,12 @@
+{% set entity = oro_entity_reference(entityClassName, record.getValue('id')) %}
+{% set fallbackType = oro_entity_fallback_type(entity, fieldName) %}
+{% set fallbackValue = oro_entity_fallback_value(entity, fieldName) %}
+
+{% if fallbackType == 'boolean' %}
+    {{ fallbackValue ? 'Yes'|trans : 'No'|trans }}
+{% elseif fallbackType == 'array' %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {{ UI.renderList(fallbackValue) }}
+{% else %}
+    {{ fallbackValue|default('') }}
+{% endif %}

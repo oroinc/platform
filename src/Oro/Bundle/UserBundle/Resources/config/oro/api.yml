@@ -1,5 +1,8 @@
 api:
     entity_aliases:
+        Extend\Entity\EV_Auth_Status:
+            alias: userauthstatus
+            plural_alias: userauthstatuses
         Oro\Bundle\UserBundle\Api\Model\UserProfile:
             alias: userprofile
             plural_alias: userprofile
@@ -7,20 +10,35 @@ api:
     entities:
         Oro\Bundle\UserBundle\Entity\Group:
             documentation_resource: '@OroUserBundle/Resources/doc/api/group.md'
+
         Oro\Bundle\UserBundle\Entity\Role:
             documentation_resource: '@OroUserBundle/Resources/doc/api/role.md'
-            delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
-            delete_handler: oro_user.handler.delete
             fields:
                 emails:
-                    data_type: array
+                    data_type: objects
                     exclusion_policy: all
                     fields:
                         email: ~
                 emailLowercase:
+                    exclude: true
+                usernameLowercase:
+                    exclude: true
+                passwordChangedAt:
+                    form_options:
+                        mapped: false
+                passwordRequestedAt:
+                    form_options:
+                        mapped: false
+                loginCount:
+                    form_options:
+                        mapped: false
+                lastLogin:
+                    form_options:
+                        mapped: false
+                emailOrigins:
                     exclude: true
             actions:
                 delete:
@@ -29,6 +47,11 @@ api:
                     exclude: false # set manually because this entity is marked as a dictionary
                 create:
                     exclude: false # set manually because this entity is marked as a dictionary
+                    fields:
+                        password:
+                            exclude: false # set manually because this field is excluded globally
+                            form_options:
+                                property_path: plainPassword
                 update:
                     exclude: false # set manually because this entity is marked as a dictionary
 
@@ -36,17 +59,14 @@ api:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
 
         Oro\Bundle\UserBundle\Entity\Email:
-            # this entity does not have own Data API resource
+            # this entity does not have own API resource
             actions: false
 
         Oro\Bundle\UserBundle\Api\Model\UserProfile:
-            fields:
-                id:
-                    description: The unique identifier of a user.
+            documentation_resource: '@OroUserBundle/Resources/doc/api/user_profile.md'
             actions:
                 get:
                     description: Get current logged in user
-                    documentation: Retrieve a record of the currently logged in user.
                 get_list: false
                 create: false
                 update: false

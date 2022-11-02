@@ -2,24 +2,32 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
+use Twig\Compiler;
+use Twig\Error\SyntaxError;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
+
 /**
- * Class TitleNode
- * @package Oro\Bundle\NavigationBundle\Twig
+ * Compile title node to template
  */
-class TitleNode extends \Twig_Node
+class TitleNode extends Node
 {
-    public function __construct(\Twig_Node $expr = null, $lineno = 0, $tag = null)
+    /**
+     * @param Node|null $expr
+     * @param int $lineno
+     * @param null $tag
+     */
+    public function __construct(Node $expr = null, $lineno = 0, $tag = null)
     {
-        parent::__construct(array('expr' => $expr), array(), $lineno, $tag);
+        parent::__construct(['expr' => $expr], [], $lineno, $tag);
     }
 
     /**
      * Compile title node to template
      *
-     * @param  \Twig_Compiler     $compiler
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler)
     {
         $node = $this->getNode('expr');
 
@@ -29,20 +37,20 @@ class TitleNode extends \Twig_Node
 
         // take first argument array node
         foreach ($nodes as $childNode) {
-            if ($childNode instanceof \Twig_Node_Expression_Array) {
+            if ($childNode instanceof ArrayExpression) {
                 $arguments = $childNode;
 
                 break;
             }
         }
 
-        if (is_null($arguments)) {
-            throw new \Twig_Error_Syntax('Function oro_title_set expected argument: array');
+        if ($arguments === null) {
+            throw new SyntaxError('Function oro_title_set expected argument: array');
         }
 
         $compiler
             ->raw("\n")
-            ->write('$this->env->getExtension("oro_title")->set(')
+            ->write(sprintf('$this->env->getExtension("%s")->set(', TitleExtension::class))
             ->subcompile($arguments)
             ->raw(");\n");
     }

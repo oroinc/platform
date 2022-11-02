@@ -1,9 +1,7 @@
 {% block oro_region_widget %}
     {# // check if block was not included yet #}
-    {% set _block = block('oro_region_updater_js') %}
-    {% if (_block is empty) %}
-        {% include 'OroAddressBundle:Include:javascript.html.twig' %}
-        {{ block('oro_region_updater_js')|raw }}
+    {% if block('oro_region_updater_js') is not defined %}
+        {{ block('oro_region_updater_js', '@OroAddress/Include/javascript.html.twig')|raw }}
     {% endif %}
 
     {% if country_field is not defined or country_field is empty %}
@@ -22,43 +20,23 @@
         {% set attr = attr|merge({'attr': {'data-validation': { NotBlank: null}|json_encode} }) %}
     {% endif %}
 
-    {{ form_widget(form, attr) }}
-    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
-    {% set regionView = regionView|default('oroaddress/js/region/view') %}
-
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-    <div {{ UI.renderPageComponentAttributes({
-        view: regionView,
-        options: {
-            _sourceElement: '#' ~ country_field.vars.id,
-            target: '#' ~ id ,
-            simpleEl: '#' ~ region_text_field.vars.id,
-            collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
-            showSelect: showSelect,
-            regionRequired: required
-        }
-    }) }}></div>
-
-    <style type="text/css">
-        {% if showSelect %}
-            #{{ id }} {
-                display: block;
+    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) ? ' show-select' : '' %}
+    <div class="region-widget{{ showSelect }}">
+        {{ form_widget(form, attr) }}
+        {% set regionView = regionView|default('oroaddress/js/region/view') %}
+        {% import '@OroUI/macros.html.twig' as UI %}
+        <div {{ UI.renderPageComponentAttributes({
+            view: regionView,
+            options: {
+                _sourceElement: '#' ~ country_field.vars.id,
+                target: '#' ~ id ,
+                simpleEl: '#' ~ region_text_field.vars.id,
+                collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
+                showSelect: showSelect,
+                regionRequired: required
             }
-
-            #{{ region_text_field.vars.id }} {
-                display: none;
-            }
-        {% else %}
-            #{{ id }} {
-                display: none;
-            }
-
-            #{{ region_text_field.vars.id }} {
-                display: block;
-            }
-        {% endif %}
-    </style>
+        }) }}></div>
+    </div>
 {% endblock oro_region_widget %}
 
 {% block oro_email_widget %}
@@ -69,11 +47,13 @@
             </label>
         </div>
         {{ form_errors(form.email) }}
-        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-            <div class="collection-element-other clearfix">
-                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
-            </div>
-            {{ form_errors(child) }}
+        {% for child in form.children %}
+            {% if child.vars.extra_field is defined and child.vars.extra_field %}
+                <div class="collection-element-other clearfix">
+                    {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+                </div>
+                {{ form_errors(child) }}
+            {% endif %}
         {% endfor %}
     </div>
     {{ form_rest(form) }}
@@ -87,11 +67,13 @@
             </label>
         </div>
         {{ form_errors(form.phone) }}
-        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-            <div class="collection-element-other clearfix">
-                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
-            </div>
-            {{ form_errors(child) }}
+        {% for child in form.children %}
+            {% if child.vars.extra_field is defined and child.vars.extra_field %}
+                <div class="collection-element-other clearfix">
+                    {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+                </div>
+                {{ form_errors(child) }}
+            {% endif %}
         {% endfor %}
     </div>
     {{ form_rest(form) }}
@@ -137,15 +119,17 @@
 {%  endblock %}
 
 {% block oro_address_collection_widget %}
-    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-address-collection' }) %}
+    {% import _self as addressIncludeFields %}
+
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'collection-fields-list-bg oro-address-collection' }) %}
     {{ block('oro_collection_widget') }}
     {% set id = id ~ '_collection' %}
-    {{ _self.oro_collection_validate_types_js(_context) }}
+    {{ addressIncludeFields.oro_collection_validate_types_js(_context) }}
 {% endblock %}
 
 {% macro oro_collection_validate_types_js(context) %}
     {% if context.form.vars.prototype.types is defined %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
 
         <div {{ UI.renderPageComponentAttributes({
             view: 'oroaddress/js/app/views/address-collection-view',

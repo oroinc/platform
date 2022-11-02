@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
+use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisitor;
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension;
+use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -11,12 +13,12 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionLanguage|\PHPUnit\Framework\MockObject\MockObject */
-    protected $expressionLanguage;
+    private $expressionLanguage;
 
     /** @var ExpressionGeneratorExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expressionLanguage = $this->createMock(ExpressionLanguage::class);
 
@@ -31,7 +33,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('parse');
 
         $this->extension->prepare(
-            $this->createGeneratorData([]),
+            new GeneratorData([]),
             $visitors
         );
 
@@ -46,9 +48,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('parse');
 
         $this->extension->prepare(
-            $this->createGeneratorData([
-                ExpressionGeneratorExtension::NODE_CONDITIONS => null
-            ]),
+            new GeneratorData([ExpressionGeneratorExtension::NODE_CONDITIONS => null]),
             $visitors
         );
 
@@ -59,27 +59,20 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $visitors = new VisitorCollection();
 
-        $expression = $this->getMockBuilder(ParsedExpression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expression = $this->createMock(ParsedExpression::class);
 
         $this->expressionLanguage->expects($this->once())
             ->method('parse')
             ->with('true')
-            ->will($this->returnValue($expression));
+            ->willReturn($expression);
 
         $this->extension->prepare(
-            $this->createGeneratorData([
-                ExpressionGeneratorExtension::NODE_CONDITIONS => 'true'
-            ]),
+            new GeneratorData([ExpressionGeneratorExtension::NODE_CONDITIONS => 'true']),
             $visitors
         );
 
         $this->assertCount(1, $visitors);
-        $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisitor',
-            $visitors->current()
-        );
+        $this->assertInstanceOf(ExpressionConditionVisitor::class, $visitors->current());
     }
 
     public function testUnknownConditions()
@@ -89,45 +82,31 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->expressionLanguage->expects($this->once())
             ->method('parse')
             ->with('unknown')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->extension->prepare(
-            $this->createGeneratorData([
-                ExpressionGeneratorExtension::NODE_CONDITIONS => 'unknown'
-            ]),
+            new GeneratorData([ExpressionGeneratorExtension::NODE_CONDITIONS => 'unknown']),
             $visitors
         );
 
         $this->assertCount(0, $visitors);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\SyntaxException
-     * @expectedExceptionMessage Syntax error: invalid conditions. some error at "conditions"
-     */
     public function testInvalidConditions()
     {
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Syntax error: invalid conditions. some error at "conditions"');
+
         $visitors = new VisitorCollection();
 
         $this->expressionLanguage->expects($this->once())
             ->method('parse')
             ->with('true')
-            ->will($this->throwException(new \Exception('some error')));
+            ->willThrowException(new \Exception('some error'));
 
         $this->extension->prepare(
-            $this->createGeneratorData([
-                ExpressionGeneratorExtension::NODE_CONDITIONS => 'true'
-            ]),
+            new GeneratorData([ExpressionGeneratorExtension::NODE_CONDITIONS => 'true']),
             $visitors
         );
-    }
-
-    /**
-     * @param array $source
-     * @return GeneratorData
-     */
-    protected function createGeneratorData(array $source)
-    {
-        return new GeneratorData($source);
     }
 }

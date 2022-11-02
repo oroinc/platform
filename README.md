@@ -11,7 +11,7 @@ high quality of the code and powerful features like:
  - Multi layer application configuration
  - Entity and entity fields manager
  - Users, roles and multi scope permissions management
- - REST API with JSON API standard support
+ - REST API with JSON:API standard support
  - Reports, Workflows, Data audit and many other features
  
 OroPlatform is a good starting point for any kind of business applications, from custom intranet apps to
@@ -23,6 +23,9 @@ OroPlatform is a composer package that requires an application to initialize and
 A [platform-application](https://github.com/orocrm/platform-application) is an example of such application which
 simplifies initial project setup and configuration.
 
-## Documentation
-  
-The documentation for OroPlatform can be found [here](http://www.oroinc.com/doc/orocrm/).
+Resources
+---------
+
+  * [OroCommerce, OroCRM and OroPlatform Documentation](https://doc.oroinc.com)
+  * [Contributing](https://doc.oroinc.com/community/contribute/)
+  * [Reporting a Security Issue](https://doc.oroinc.com/community/report-issues/security/)

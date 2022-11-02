@@ -13,9 +13,6 @@ class BlockOptionsResolver
     /** @var OptionsResolver[] */
     protected $resolvers = [];
 
-    /**
-     * @param LayoutRegistryInterface $registry
-     */
     public function __construct(LayoutRegistryInterface $registry)
     {
         $this->registry = $registry;

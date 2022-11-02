@@ -57,10 +57,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Constructor
-     *
-     * @param EmailAddressManager $emailAddressManager
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailAddressManager $emailAddressManager,
@@ -74,8 +70,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Register EmailUser object
-     *
-     * @param EmailUser $obj
      */
     public function addEmailUser(EmailUser $obj)
     {
@@ -85,7 +79,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Register EmailAddress object
      *
-     * @param EmailAddress $obj
      * @throws \LogicException
      */
     public function addAddress(EmailAddress $obj)
@@ -115,7 +108,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Register EmailFolder object
      *
-     * @param EmailFolder $obj
      * @throws \LogicException
      */
     public function addFolder(EmailFolder $obj)
@@ -147,8 +139,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Tell the given EntityManager to manage this batch
-     *
-     * @param EntityManager $em
      */
     public function persist(EntityManager $em)
     {
@@ -190,8 +180,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Persist EmailUser objects
-     *
-     * @param EntityManager $em
      */
     protected function persistEmailUsers(EntityManager $em)
     {
@@ -200,14 +188,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         foreach ($this->emailUsers as $emailUser) {
             $em->persist($emailUser);
 
-            $this->eventDispatcher->dispatch(EmailUserAdded::NAME, new EmailUserAdded($emailUser));
+            $this->eventDispatcher->dispatch(new EmailUserAdded($emailUser), EmailUserAdded::NAME);
         }
     }
 
     /**
      * Replaces emails with already existing in DB emails to avoid duplicates
-     *
-     * @param EntityManager $em
      */
     protected function processDuplicateEmails(EntityManager $em)
     {
@@ -285,8 +271,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Tell the given EntityManager to manage EmailAddress objects in this batch
-     *
-     * @param EntityManager $em
      */
     protected function persistAddresses(EntityManager $em)
     {
@@ -306,8 +290,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Tell the given EntityManager to manage EmailFolder objects in this batch
-     *
-     * @param EntityManager $em
      */
     protected function persistFolders(EntityManager $em)
     {
@@ -330,9 +312,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Make sure that all objects in this batch have correct EmailAddress references
-     *
-     * @param EmailAddress $old
-     * @param EmailAddress $new
      */
     protected function updateAddressReferences(EmailAddress $old, EmailAddress $new)
     {
@@ -350,9 +329,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Make sure that all objects in this batch have correct EmailFolder references
-     *
-     * @param EmailFolder $oldFolder
-     * @param EmailFolder $newFolder
      */
     protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {

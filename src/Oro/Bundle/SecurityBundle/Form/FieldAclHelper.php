@@ -24,11 +24,6 @@ class FieldAclHelper
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigManager                 $configManager
-     * @param DoctrineHelper                $doctrineHelper
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
@@ -116,8 +111,6 @@ class FieldAclHelper
     /**
      * Adds FieldAccessGranted constraint violation to the given form field errors.
      * If the form field has other errors, they are removed.
-     *
-     * @param FormInterface $formField
      */
     public function addFieldModificationDeniedFormError(FormInterface $formField)
     {

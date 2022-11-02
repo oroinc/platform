@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
+/**
+ * Grid view model.
+ */
 class View implements ViewInterface
 {
     /** @var string */
@@ -71,7 +74,7 @@ class View implements ViewInterface
         $appearanceType = 'grid'
     ) {
         $this->name            = $name;
-        $this->label           = $name;
+        $this->label           = (string) $name;
         $this->filtersData     = $filtersData;
         $this->sortersData     = $sortersData;
         $this->type            = $type;
@@ -86,7 +89,7 @@ class View implements ViewInterface
      */
     public function setLabel($label)
     {
-        $this->label = $label;
+        $this->label = (string) $label;
 
         return $this;
     }
@@ -96,7 +99,7 @@ class View implements ViewInterface
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }

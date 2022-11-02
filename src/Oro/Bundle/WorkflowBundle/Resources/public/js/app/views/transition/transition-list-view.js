@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var TransitionsListView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var TransitionRowView = require('./transition-row-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const TransitionRowView = require('./transition-row-view');
 
-    TransitionsListView = BaseView.extend({
+    const TransitionsListView = BaseView.extend({
         options: {
             listElBodyEl: 'tbody',
             template: null,
@@ -17,18 +16,18 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TransitionsListView() {
-            TransitionsListView.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionsListView(options) {
+            TransitionsListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var template = this.options.template || $('#transition-list-template').html();
+            const template = this.options.template || $('#transition-list-template').html();
             this.template = _.template(template);
             this.rowViews = [];
 
@@ -44,7 +43,7 @@ define(function(require) {
         },
 
         addItem: function(item) {
-            var rowView = new TransitionRowView({
+            const rowView = new TransitionRowView({
                 model: item,
                 workflow: this.options.workflow,
                 stepFrom: this.options.stepFrom

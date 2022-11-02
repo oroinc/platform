@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var EntityCollection;
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var routing = require('routing');
+    const _ = require('underscore');
+    const SyncMachine = require('chaplin').SyncMachine;
+    const routing = require('routing');
     /** @type {Registry} */
-    var registry = require('oroui/js/app/services/registry');
-    var entitySync = require('oroentity/js/app/models/entity-sync');
-    var EntityModel = require('oroentity/js/app/models/entity-model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    const registry = require('oroui/js/app/services/registry');
+    const entitySync = require('oroentity/js/app/models/entity-sync');
+    const EntityModel = require('oroentity/js/app/models/entity-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @class EntityCollection
      * @extends BaseCollection
      * @mixes {Chaplin.SyncMachine}
      */
-    EntityCollection = BaseCollection.extend(_.extend({}, Chaplin.SyncMachine, /** @lends EntityCollection.prototype */{
+    const EntityCollection = BaseCollection.extend(_.extend({}, SyncMachine, /** @lends EntityCollection.prototype */{
         ROUTE: {
             // returns a list of entities of the given type
             // path: /api/{entity}
@@ -39,7 +38,7 @@ define(function(require) {
                 throw new TypeError('Entity type is required for EntityCollection');
             }
             if (data && data.data) {
-                // assume it is raw data from JSON API and it need to be parsed
+                // assume it is raw data from JSON:API and it need to be parsed
                 options.parse = true;
             }
             this.on('reset', this.onReset);
@@ -71,7 +70,7 @@ define(function(require) {
          * @return {Object.<string, {data: Array.<Object>}>}
          */
         toJSON: function(options) {
-            var data = this.map(function(model) {
+            const data = this.map(function(model) {
                 return model.toJSON(options).data;
             });
             return {data: data};
@@ -82,7 +81,7 @@ define(function(require) {
         },
 
         url: function(method, params) {
-            var route = this.ROUTE[method];
+            const route = this.ROUTE[method];
             if (!route) {
                 throw new Error('Method `' + method + '` is not supported by the collection');
             }
@@ -117,10 +116,10 @@ define(function(require) {
 
         /**
          * Method is overloaded to support raw data
-         * @inheritDoc
+         * @inheritdoc
          */
         modelId: function(attrs) {
-            var id;
+            let id;
             if (_.isObject(attrs) && 'data' in attrs && _.size(attrs) === 1) {
                 // assume it is a rawData for model
                 id = _.result(attrs.data, 'id');
@@ -132,15 +131,15 @@ define(function(require) {
 
         /**
          * Method is overloaded to replace model creating process
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             if (this._isModel(attrs)) {
                 return attrs;
             }
-            var params = _.defaults({data: attrs.data},
+            const params = _.defaults({data: attrs.data},
                 options ? _.pick(options, 'parse', 'silent') : {});
-            var model = EntityModel.getEntityModel(params, this);
+            const model = EntityModel.getEntityModel(params, this);
             if (!model.validationError) {
                 return model;
             }
@@ -150,7 +149,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to relieve models from registry
-         * @inheritDoc
+         * @inheritdoc
          */
         remove: function(models, options) {
             EntityCollection.__super__.remove.call(this, models, options);
@@ -163,7 +162,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to handle model dispose event and cleanup reference
-         * @inheritDoc
+         * @inheritdoc
          */
         _onModelEvent: function(event, model, collection, options) {
             if (event === 'dispose' && !this.disposed) {

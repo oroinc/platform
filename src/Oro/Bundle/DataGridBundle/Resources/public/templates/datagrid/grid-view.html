@@ -3,6 +3,8 @@
     <div class="views-group">
         <div id="<%- gridViewTogglerId %>"
              data-toggle="dropdown"
+             data-adjust-height
+             data-placement="bottom-start"
              class="grid-views-toogler <% if (disabled) { %>disabled<% } %>"
              role="button"
              aria-haspopup="true"
@@ -11,11 +13,13 @@
             <% // this is already escaped in the title template %>
             <%= title %>
         </div>
-        <div class="grid-views-dropdown dropdown-menu" aria-labelledby="<%- gridViewTogglerId %>">
+
+        <% iconClass = _.filter(choices, function(choice) {return choice.icon !== false}).length ? ' has-icons' : '' %>
+        <div class="grid-views-dropdown dropdown-menu<%-iconClass %>" aria-labelledby="<%- gridViewTogglerId %>">
             <% _.each(choices, function (choice) { %>
-                <a class="dropdown-item" href="#" data-value="<%- choice.value %>">
+                <a class="grid-views-item dropdown-item" href="#" role="button" data-value="<%- choice.value %>">
                     <% if (choice.icon) { %>
-                        <span class="<%- choice.icon %>" aria-hidden="true"></span>
+                        <span class="grid-views-choice-icon <%- choice.icon %>" aria-hidden="true"></span>
                     <% } %>
                     <span class="grid-views-choice">
                         <%- choice.label %>
@@ -31,6 +35,8 @@
         <button id="<%- gridViewActionsTogglerId %>"
                 class="grid-view-btn btn btn-link"
                 data-toggle="dropdown"
+                data-placement="bottom-start"
+                data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"
                 aria-haspopup="true"
                 aria-expanded="false"
         >
@@ -39,12 +45,12 @@
         <div class="dropdown-menu" aria-labelledby="<%- gridViewActionsTogglerId %>">
             <% _.each(actions, function(action) { %>
                 <% if (action.enabled) { %>
-                    <a href="#" class="dropdown-item <%- action.name %>"><%- action.label %></a>
+                    <a href="#" role="button" class="grid-views-item dropdown-item <%- action.name %>"><%- action.label %></a>
                 <% } %>
             <% }); %>
         </div>
         <% if (dirty) { %>
-            <span class="edited-label">&nbsp;-&nbsp;<%- editedLabel %></span>
+            <span class="edited-label">-&nbsp;<%- editedLabel %></span>
         <% } %>
     </div>
 <% } %>

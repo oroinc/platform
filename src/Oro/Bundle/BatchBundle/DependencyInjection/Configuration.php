@@ -10,11 +10,10 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-
-        $treeBuilder->root('oro_batch')
+        $treeBuilder = new TreeBuilder('oro_batch');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('log_batch')
                     ->info('Enables/Disables writing of batch log files for each batch job in var/logs/batch directory')

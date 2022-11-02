@@ -2,46 +2,43 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType as BaseCollectionType;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CollectionType
-     */
-    protected $type;
+    /** @var CollectionType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new CollectionType();
     }
 
     public function testBuildForm()
     {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(FormBuilderInterface::class);
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber'));
+            ->with($this->isInstanceOf(CollectionTypeSubscriber::class));
 
-        $options = array();
+        $options = [];
         $this->type->buildForm($builder, $options);
     }
 
     /**
      * @dataProvider buildViewDataProvider
-     * @param array $options
-     * @param array $expectedVars
      */
     public function testBuildView(array $options, array $expectedVars)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $view = new FormView();
 
         $this->type->buildView($view, $form, $options);
@@ -52,10 +49,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         return [
             [
@@ -97,12 +91,11 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "entry_type" is missing.
-     */
     public function testConfigureOptionsWithoutType()
     {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "entry_type" is missing.');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([]);
@@ -233,16 +226,10 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_collection', $this->type->getName());
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(
-            [
-            ]
-        );
+        $resolver->setDefaults([]);
 
         return $resolver;
     }

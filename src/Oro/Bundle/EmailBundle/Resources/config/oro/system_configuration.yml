@@ -65,13 +65,18 @@ system_configuration:
 
         oro_email.minimum_input_length:
             data_type: integer
-            type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             search_type: text
             options:
                 label: oro.email.system_configuration.email_autocomplete_configuration.minimum_input_length.label
-                scale: 0
+                required: true
                 constraints:
                     - NotBlank: ~
+                    - Range:
+                        min: 0
+                    - Type:
+                        type: integer
+
 
         oro_email.signature:
             data_type: string
@@ -118,6 +123,7 @@ system_configuration:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.host.label
                 constraints:
+                    - NotBlank: ~
                     - Length:
                         min: 3
                         max: 255
@@ -131,6 +137,7 @@ system_configuration:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.port.label
                 constraints:
+                    - NotBlank: ~
                     - Range:
                         min: 0
                         max: 65535
@@ -150,7 +157,6 @@ system_configuration:
                 constraints:
                     - Choice:
                         choices: ['', ssl, tls]
-                required: true
 
         oro_email.smtp_settings_username:
             data_type: string
@@ -177,6 +183,19 @@ system_configuration:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
                 required: false
 
+        oro_email.attachment_max_size:
+            data_type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            search_type: text
+            priority: 60
+            options:
+                label: oro.email.system_configuration.attachment.max_size.label
+                tooltip: oro.email.system_configuration.attachment.max_size.tooltip
+                required: true
+                constraints:
+                    - NotBlank: ~
+                    - GreaterThanOrEqual: 0
+
         oro_email.attachment_sync_enable:
             data_type: boolean
             type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
@@ -195,6 +214,9 @@ system_configuration:
                 label: oro.email.system_configuration.attachment_sync.max_size.label
                 tooltip: oro.email.form.tooltip.attachment_sync.max_size
                 required: true
+                constraints:
+                    - NotBlank: ~
+                    - GreaterThanOrEqual: 0
 
         oro_email.attachment_preview_limit:
             data_type: number
@@ -205,6 +227,9 @@ system_configuration:
                 label: oro.email.system_configuration.attachment_sync.preview_limit.label
                 tooltip: oro.email.form.tooltip.attachment_sync.preview_limit
                 required: true
+                constraints:
+                    - NotBlank: ~
+                    - GreaterThanOrEqual: 0
 
         oro_email.user_mailbox:
             type: Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
@@ -261,6 +286,7 @@ system_configuration:
                                             - oro_email.default_button_reply
                                     attachment_configuration:
                                         children:
+                                            - oro_email.attachment_max_size
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
                                             - oro_email.attachment_preview_limit
@@ -292,6 +318,7 @@ system_configuration:
                                         children:
                                             - oro_email.show_recent_emails_in_user_bar
                             user_email_configuration:
+                                handler: '@oro_email.form.handler.user_email_config::handle'
                                 children:
                                     signature_configuration:
                                         children:

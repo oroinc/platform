@@ -5,19 +5,15 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
- * If it was requested, adds "title" meta property value to each result item.
+ * Adds "title" meta property value to each result item if it was requested.
  */
 class LoadTitleMetaPropertyForCollection extends LoadTitleMetaProperty
 {
     /**
      * {@inheritdoc}
      */
-    protected function updateData(
-        array $data,
-        $entityClass,
-        EntityDefinitionConfig $config,
-        $titleFieldName
-    ) {
-        return $this->addTitles($data, $entityClass, $config, $titleFieldName);
+    protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array
+    {
+        return $this->addTitles($data, $entityClass, $config);
     }
 }

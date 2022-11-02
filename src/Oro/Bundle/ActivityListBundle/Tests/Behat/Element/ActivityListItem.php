@@ -12,8 +12,17 @@ class ActivityListItem extends Element
 {
     public function collapse()
     {
-        $this->find('css', 'a.accordion-toggle')->click();
+        $this->find('css', 'a[data-toggle="collapse"]')->click();
         $this->getDriver()->waitForAjax();
+    }
+
+    /**
+     * @return NodeElement[]
+     */
+    public function getActions(): array
+    {
+        $this->find('css', 'div.activity-actions .dropdown-toggle')->mouseOver();
+        return $this->findAll('css', 'li.activity-action a');
     }
 
     /**
@@ -22,11 +31,7 @@ class ActivityListItem extends Element
      */
     public function getActionLink($linkTitle)
     {
-        $this->find('css', 'div.activity-actions .dropdown-toggle')->mouseOver();
-        $links = $this->findAll('css', 'li.activity-action a');
-
-        /** @var NodeElement $link */
-        foreach ($links as $link) {
+        foreach ($this->getActions() as $link) {
             if (preg_match(sprintf('/%s/i', $linkTitle), $link->getText())) {
                 return $link;
             }
@@ -52,7 +57,7 @@ class ActivityListItem extends Element
             throw new \InvalidArgumentException(sprintf('Context "%s" does not exist.', $content));
         }
 
-        $existingContext->find('css', 'i.fa-close')->click();
+        $existingContext->find('css', 'span.fa-close')->click();
     }
 
     public function hasContext($text)
@@ -66,9 +71,6 @@ class ActivityListItem extends Element
         self::fail(sprintf('Context with "%s" name not found', $text));
     }
 
-    /**
-     * @param TableNode $table
-     */
     public function addComment(TableNode $table)
     {
         $addCommentButton = $this->find('css', '.add-comment-button');
@@ -123,7 +125,6 @@ class ActivityListItem extends Element
     {
         return $this->findAll('css', 'div.activity-context-activity-list div.context-item');
     }
-
 
     /**
      * @return \DateTime

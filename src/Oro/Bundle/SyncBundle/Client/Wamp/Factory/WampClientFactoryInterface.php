@@ -9,10 +9,5 @@ use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
  */
 interface WampClientFactoryInterface
 {
-    /**
-     * @param ClientAttributes $clientAttributes
-     *
-     * @return WampClient
-     */
     public function createClient(ClientAttributes $clientAttributes): WampClient;
 }

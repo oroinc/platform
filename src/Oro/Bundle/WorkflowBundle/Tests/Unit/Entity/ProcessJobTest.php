@@ -5,35 +5,28 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ProcessJobTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessJob
-     */
-    protected $entity;
+    /** @var ProcessJob */
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new ProcessJob();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     public function testGetId()
     {
-        $this->assertNull($this->entity->getId());
+        self::assertNull($this->entity->getId());
 
         $testValue = 1;
-        $reflectionProperty = new \ReflectionProperty('\Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->entity, $testValue);
-
-        $this->assertEquals($testValue, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $testValue);
+        self::assertSame($testValue, $this->entity->getId());
     }
 
     /**
@@ -47,29 +40,25 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
 
-        $this->assertEquals($defaultValue, $this->entity->$getter());
-        $this->assertSame($this->entity, $this->entity->$setter($testValue));
-        $this->assertSame($testValue, $this->entity->$getter());
+        self::assertEquals($defaultValue, $this->entity->$getter());
+        self::assertSame($this->entity, $this->entity->$setter($testValue));
+        self::assertSame($testValue, $this->entity->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
-        return array(
-            'processTrigger' => array('processTrigger', new ProcessTrigger()),
-            'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
-            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData()),
-        );
+        return [
+            'processTrigger' => ['processTrigger', new ProcessTrigger()],
+            'serializedData' => ['serializedData', serialize(['some' => 'data'])],
+            'data' => ['data', new ProcessData(['some' => 'data']), new ProcessData()],
+        ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\SerializerException
-     * @expectedExceptionMessage Cannot deserialize data of process job. Serializer is not available.
-     */
     public function testGetDataWithSerializationFails()
     {
+        $this->expectException(SerializerException::class);
+        $this->expectExceptionMessage('Cannot deserialize data of process job. Serializer is not available.');
+
         $this->entity->setSerializedData('serialized_data');
         $this->entity->getData();
     }
@@ -80,65 +69,65 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
     public function testGetDataWithSerialization($data)
     {
         $isDataNull = is_null($data);
-        $serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->getMockForAbstractClass(SerializerInterface::class);
 
         if (!$isDataNull && empty($data)) {
             $originalData = new ProcessData($data);
             $serializedData = $data;
-            $serializer->expects($this->never())
+            $serializer->expects(self::never())
                 ->method('deserialize');
         } else {
             $originalData = $isDataNull ? null : new ProcessData($data);
             $serializedData = 'serialized_data';
-            $serializer->expects($this->exactly($isDataNull ? 2 : 1))
+            $serializer->expects(self::exactly($isDataNull ? 2 : 1))
                 ->method('deserialize')
-                ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\ProcessData', 'json')
-                ->will($this->returnValue($originalData));
+                ->with($serializedData, ProcessData::class, 'json')
+                ->willReturn($originalData);
         }
 
         $this->entity->setSerializer($serializer, 'json');
         $this->entity->setSerializedData($serializedData);
 
-        $this->assertEquals($originalData, $this->entity->getData());
-        $this->assertEquals($originalData, $this->entity->getData());
+        self::assertEquals($originalData, $this->entity->getData());
+        self::assertEquals($originalData, $this->entity->getData());
     }
 
-    public function getDataWithSerializationProvider()
+    public function getDataWithSerializationProvider(): array
     {
-        return array(
-            'when data is null' => array(
+        return [
+            'when data is null' => [
                 'data' => null
-            ),
-            'when data is empty' => array(
-                'data' => array()
-            ),
-            'when data is filled' => array(
-                'data' => array('some_data' => 'some_value')
-            )
-        );
+            ],
+            'when data is empty' => [
+                'data' => []
+            ],
+            'when data is filled' => [
+                'data' => ['some_data' => 'some_value']
+            ]
+        ];
     }
 
     public function testGetDataWithEmptySerializedData()
     {
         $data = $this->entity->getData();
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\ProcessData', $data);
-        $this->assertTrue($data->isEmpty());
+        self::assertInstanceOf(ProcessData::class, $data);
+        self::assertTrue($data->isEmpty());
     }
 
     public function testSetSerializedData()
     {
-        $this->assertAttributeEmpty('serializedData', $this->entity);
+        self::assertEmpty($this->entity->getSerializedData());
         $data = 'serialized_data';
         $this->entity->setSerializedData($data);
-        $this->assertAttributeEquals($data, 'serializedData', $this->entity);
+        self::assertEquals($data, $this->entity->getSerializedData());
     }
 
     public function testGetSerializedData()
     {
-        $this->assertNull($this->entity->getSerializedData());
+        self::assertNull($this->entity->getSerializedData());
         $data = 'serialized_data';
         $this->entity->setSerializedData($data);
-        $this->assertEquals($data, $this->entity->getSerializedData());
+        self::assertEquals($data, $this->entity->getSerializedData());
     }
 
     public function testSetGetEntityIdAndHash()
@@ -154,35 +143,33 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
 
         $this->entity->setProcessTrigger($trigger);
 
-        $this->assertNull($this->entity->getEntityId());
-        $this->assertNull($this->entity->getEntityHash());
+        self::assertNull($this->entity->getEntityId());
+        self::assertNull($this->entity->getEntityHash());
 
         $this->entity->setEntityId($entityId);
 
-        $this->assertEquals($entityId, $this->entity->getEntityId());
-        $this->assertEquals(ProcessJob::generateEntityHash($entityClass, $entityId), $this->entity->getEntityHash());
+        self::assertEquals($entityId, $this->entity->getEntityId());
+        self::assertEquals(ProcessJob::generateEntityHash($entityClass, $entityId), $this->entity->getEntityHash());
 
         $this->entity->setEntityId(null);
 
-        $this->assertNull($this->entity->getEntityId());
-        $this->assertNull($this->entity->getEntityHash());
+        self::assertNull($this->entity->getEntityId());
+        self::assertNull($this->entity->getEntityHash());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Process trigger must be defined for process jo
-     */
     public function testSetEntityIdNoTrigger()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Process trigger must be defined for process jo');
+
         $this->entity->setEntityId(1);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Process definition must be defined for process jo
-     */
     public function testSetEntityIdNoDefinition()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Process definition must be defined for process jo');
+
         $this->entity->setProcessTrigger(new ProcessTrigger());
         $this->entity->setEntityId(1);
     }

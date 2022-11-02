@@ -2,41 +2,40 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRendererRegistry */
-    protected $registry;
+    private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRendererRegistry();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The layout renderer named "" was not found.
-     */
     public function testGetUndefinedDefaultRenderer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The layout renderer named "" was not found.');
+
         $this->registry->getRenderer();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The layout renderer named "undefined" was not found.
-     */
     public function testGetUndefinedRenderer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The layout renderer named "undefined" was not found.');
+
         $this->registry->getRenderer('undefined');
     }
 
     public function testGetRenderer()
     {
         // prepare data
-        $renderer1 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
-        $renderer2 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
+        $renderer1 = $this->createMock(LayoutRendererInterface::class);
+        $renderer2 = $this->createMock(LayoutRendererInterface::class);
         $this->registry->addRenderer('test1', $renderer1);
         $this->registry->addRenderer('test2', $renderer2);
         $this->registry->setDefaultRenderer('test2');

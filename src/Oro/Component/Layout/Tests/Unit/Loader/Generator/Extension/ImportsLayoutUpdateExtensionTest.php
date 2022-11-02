@@ -11,9 +11,9 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportsLayoutUpdateExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ImportsLayoutUpdateExtension();
     }
@@ -56,8 +56,6 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prepareWithoutNodeImportsDataProvider
-     *
-     * @param array $source
      */
     public function testPrepareWithoutNodeImports(array $source)
     {
@@ -67,10 +65,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepare(new GeneratorData($source), $collection);
     }
 
-    /**
-     * @return array
-     */
-    public function prepareWithoutNodeImportsDataProvider()
+    public function prepareWithoutNodeImportsDataProvider(): array
     {
         return [
             'without imports' => [
@@ -110,8 +105,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 
         $collection = $this->createMock(VisitorCollection::class);
         $collection->expects($this->never())
-            ->method('append')
-            ->with(new ImportLayoutUpdateVisitor());
+            ->method('append');
 
         $this->extension->prepare(new GeneratorData([], $filename), $collection);
     }
@@ -141,12 +135,12 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $collection = $this->createMock(VisitorCollection::class);
-        $collection->expects($this->at(0))
+        $collection->expects($this->exactly(2))
             ->method('append')
-            ->with(new ImportsAwareLayoutUpdateVisitor($imports));
-        $collection->expects($this->at(1))
-            ->method('append')
-            ->with(new ImportLayoutUpdateVisitor());
+            ->withConsecutive(
+                [new ImportsAwareLayoutUpdateVisitor($imports)],
+                [new ImportLayoutUpdateVisitor()]
+            );
 
         $this->extension->prepare(new GeneratorData($source, $filename), $collection);
     }

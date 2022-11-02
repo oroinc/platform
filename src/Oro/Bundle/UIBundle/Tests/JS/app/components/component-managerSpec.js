@@ -2,11 +2,9 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
-    var ComponentManager = require('oroui/js/app/components/component-manager');
-    var requirejsExposure = require('requirejs-exposure');
-    var exposure = requirejsExposure.disclose('oroui/js/app/components/component-manager');
-    var componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
+    const $ = require('jquery');
+    const componentManagerModuleInjector = require('inject-loader!oroui/js/app/components/component-manager');
+    const componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
     require('oroui/js/app/modules/component-shortcuts-module');
     require('orofrontend/js/app/modules/component-shortcuts-module');
 
@@ -15,6 +13,14 @@ define(function(require) {
     }
 
     describe('Component Manager', function() {
+        let ComponentManager;
+
+        beforeEach(function() {
+            ComponentManager = componentManagerModuleInjector({
+                'oroui/js/app/services/load-modules': jasmine.createSpy().and.callFake(componentsLoadModule)
+            });
+        });
+
         it('Initialize widget placed inside own separated layout', function() {
             window.setFixtures([
                 '<div id="container" data-layout="separate">',
@@ -24,8 +30,8 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
 
             expect(elements.length).toEqual(0);
         });
@@ -37,9 +43,9 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
-            var $element = $(elements[0]);
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
+            const $element = $(elements[0]);
 
             expect(elements.length).toEqual(1);
             expect($element.data()).toEqual({
@@ -57,35 +63,49 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
-            var $element = $(elements[0]);
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
+            const $element = $(elements[0]);
 
             expect(elements.length).toEqual(1);
             expect($element.data()).toEqual({
                 pageComponentModule: 'oroui/js/app/components/jquery-widget-component',
                 pageComponentOptions: {
                     printPage: '',
-                    widgetModule: 'orofrontend/blank/js/widgets/print-page-widget'
+                    widgetModule: 'orofrontend/default/js/widgets/print-page-widget'
                 }
             });
         });
 
         describe('required sibling components', function() {
-            var tools = exposure.retrieve('tools');
-            var originalLoadModules = tools.loadModules;
+            describe('simple dependency', function() {
+                let manager;
+                beforeEach(async function() {
+                    window.setFixtures([
+                        '<div id="container" data-layout="separate">',
+                        '<div data-page-component-name="component-c" ' +
+                            'data-page-component-module="js/needs-a-component"></div>',
+                        '<div data-page-component-name="component-a" ' +
+                            'data-page-component-module="js/bar-component"></div>',
+                        '</div>'
+                    ].join(''));
+                    manager = new ComponentManager($('#container'));
+                    return manager.init();
+                });
 
-            beforeEach(function() {
-                tools.loadModules = jasmine.createSpy().and.callFake(componentsLoadModule);
-            });
+                it('reference is established', function() {
+                    expect(manager.get('component-c').componentA).toBeDefined();
+                });
 
-            afterEach(function() {
-                exposure.retrieve('tools').loadModules = originalLoadModules;
+                it('when sibling is disposed, then reference is undefined', function() {
+                    manager.get('component-a').dispose();
+                    expect(manager.get('component-c').componentA).toBeUndefined();
+                });
             });
 
             describe('override required componentName with options', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-c" ' +
@@ -101,7 +121,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -110,8 +130,8 @@ define(function(require) {
             });
 
             describe('remove dependency over component extend', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-d" ' +
@@ -119,7 +139,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -128,8 +148,8 @@ define(function(require) {
             });
 
             describe('complex dependencies', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -143,7 +163,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -154,8 +174,8 @@ define(function(require) {
             });
 
             describe('missing required sibling component', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -163,7 +183,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('has to be undefined', function() {
@@ -172,8 +192,8 @@ define(function(require) {
             });
 
             describe('options parameter is not able to remove dependency', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -188,7 +208,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('reference on sibling component nevertheless established', function() {
@@ -197,8 +217,8 @@ define(function(require) {
             });
 
             describe('circular dependency', function() {
-                var manager;
-                beforeEach(function(done) {
+                let manager;
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -213,12 +233,136 @@ define(function(require) {
                     ].join(''));
                     manager = new ComponentManager($('#container'));
                     spyOn(manager, '_handleError');
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('check error', function() {
                     expect(manager._handleError).toHaveBeenCalled();
                     expect(manager._handleError.calls.mostRecent().args[1].message).toContain('circular dependency');
+                });
+            });
+        });
+
+        describe('delays component\'s initialization until UI event,', () => {
+            let manager;
+            beforeEach(async function() {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div data-page-component-name="component-foo"
+                                data-page-component-module="js/foo-component"></div>
+                        </div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                return manager.init();
+            });
+
+            it('component initially not initialized', () => {
+                expect(manager.get('component-foo')).toBeNull();
+            });
+
+            describe('after click event', () => {
+                beforeEach(async function() {
+                    $('#init-on').click();
+                    return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
+                });
+
+                it('component gets initialized', () => {
+                    expect(manager.get('component-foo')).not.toBeNull();
+                });
+            });
+        });
+
+        describe('`init-on-asap` component within `init-on` element', () => {
+            let manager;
+            beforeEach(async function() {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div
+                                data-page-component-init-on="asap"
+                                data-page-component-name="component-bar" 
+                                data-page-component-module="js/bar-component"></div>
+                        </div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                return manager.init();
+            });
+
+            it('initially initialized', () => {
+                expect(manager.get('component-bar')).not.toBeNull();
+            });
+        });
+
+        describe('`init-on` rule applies only on component within same layout,', () => {
+            let managerA;
+            let managerB;
+            beforeEach(async function() {
+                window.setFixtures(`
+                    <div id="container-a" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div
+                                data-page-component-name="component-bar" 
+                                data-page-component-module="js/bar-component"></div>
+                            <div id="container-b" data-layout="separate">
+                                <div
+                                    data-page-component-name="component-foo" 
+                                    data-page-component-module="js/bar-component"></div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                managerA = new ComponentManager($('#container-a'));
+                managerB = new ComponentManager($('#container-b'));
+                return $.when(
+                    managerA.init(),
+                    managerB.init()
+                );
+            });
+
+            it('component im outer layout is not initially initialized`', () => {
+                expect(managerA.get('component-bar')).toBeNull();
+            });
+
+            it('component in nested layout is initially initialized', () => {
+                expect(managerB.get('component-foo')).not.toBeNull();
+            });
+        });
+
+        describe('delegated `init-on` event handler to third party element`', () => {
+            let manager;
+            beforeEach(async function() {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on"></div>
+                        <div
+                            data-page-component-init-on="click #init-on"
+                            data-page-component-name="component-bar" 
+                            data-page-component-module="js/bar-component"></div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                return manager.init();
+            });
+
+            it('component initially not initialized', () => {
+                expect(manager.get('component-bar')).toBeNull();
+            });
+
+            describe('after click event', () => {
+                beforeEach(async function() {
+                    $('#init-on').click();
+                    return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
+                });
+
+                it('component gets initialized', () => {
+                    expect(manager.get('component-bar')).not.toBeNull();
                 });
             });
         });

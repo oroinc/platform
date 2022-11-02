@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
+/**
+ * Accepts datagrid extensions to datagrid datasource, results object or metadata object
+ */
 class Acceptor
 {
     /** @var DatagridConfiguration */
@@ -26,9 +29,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param DatasourceInterface $datasource
-     */
     public function acceptDatasource(DatasourceInterface $datasource)
     {
         $extensions = $this->getExtensions();
@@ -37,9 +37,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param ResultsObject $result
-     */
     public function acceptResult(ResultsObject $result)
     {
         $extensions = $this->getExtensions();
@@ -48,9 +45,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param MetadataObject $data
-     */
     public function acceptMetadata(MetadataObject $data)
     {
         $extensions = $this->getExtensions();
@@ -80,7 +74,9 @@ class Acceptor
     {
         $comparisonClosure = function (ExtensionVisitorInterface $a, ExtensionVisitorInterface $b) {
             if ($a->getPriority() === $b->getPriority()) {
-                return 0;
+                # For PHP 7 we returned 0, but for PHP 8, to preserve the order after sort, we should return -1.
+                # This is just a workaround that should be replaced with the explicit order for dependent extensions.
+                return -1;
             }
 
             return $a->getPriority() > $b->getPriority() ? -1 : 1;

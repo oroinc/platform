@@ -8,23 +8,24 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GroupTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ROLE = 'ROLE_FOO';
+    private const TEST_ROLE = 'ROLE_FOO';
 
-    /**
-     * @var Group
-     */
-    protected $group;
+    /** @var Group */
+    private $group;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->group = new Group();
     }
 
     public function testGroup()
     {
-        $name  = 'Users';
+        $name = 'Users';
 
         $this->assertEmpty($this->group->getId());
         $this->assertEmpty($this->group->getName());
@@ -36,11 +37,11 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRoleLabelsAsString()
     {
-        $roleFoo  = new Role('ROLE_FOO');
+        $roleFoo = new Role('ROLE_FOO');
         $roleFoo->setLabel('Role foo');
         $this->group->addRole($roleFoo);
 
-        $roleBar  = new Role('ROLE_BAR');
+        $roleBar = new Role('ROLE_BAR');
         $roleBar->setLabel('Role bar');
         $this->group->addRole($roleBar);
 
@@ -68,12 +69,11 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->group->hasRole($role));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
-     */
     public function testHasRoleThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string');
+
         $this->group->hasRole(new \stdClass());
     }
 
@@ -97,18 +97,17 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->group->hasRole($role));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string
-     */
     public function testRemoveRoleThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string');
+
         $this->group->removeRole(new \stdClass());
     }
 
     public function testSetRolesWithArrayArgument()
     {
-        $roles = array(new Role(self::TEST_ROLE));
+        $roles = [new Role(self::TEST_ROLE)];
         $this->assertCount(0, $this->group->getRoles());
         $this->group->setRoles($roles);
         $this->assertEquals($roles, $this->group->getRoles()->toArray());
@@ -116,18 +115,19 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testSetRolesWithCollectionArgument()
     {
-        $roles = new ArrayCollection(array(new Role(self::TEST_ROLE)));
+        $roles = new ArrayCollection([new Role(self::TEST_ROLE)]);
         $this->assertCount(0, $this->group->getRoles());
         $this->group->setRoles($roles);
         $this->assertEquals($roles->toArray(), $this->group->getRoles()->toArray());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $roles must be an instance of Doctrine\Common\Collections\Collection or an array
-     */
     public function testSetRolesThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            '$roles must be an instance of Doctrine\Common\Collections\Collection or an array'
+        );
+
         $this->group->setRoles('roles');
     }
 
@@ -145,8 +145,8 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testOrganization()
     {
-        $entity         = new Group();
-        $organization   = new Organization();
+        $entity = new Group();
+        $organization = new Organization();
 
         $this->assertNull($entity->getOrganization());
         $entity->setOrganization($organization);

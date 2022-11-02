@@ -16,9 +16,13 @@ system_configuration:
             priority: 40
             options:
                 label:  oro.user.system_configuration.fields.password_min_length.label
+                required: true
                 constraints:
+                    - NotBlank: ~
                     - Range:
                         min: 1
+                    - Type:
+                        type: integer
 
         oro_user.password_numbers:
             data_type: boolean
@@ -71,7 +75,7 @@ system_configuration:
                 required: false
                 resettable: false
                 constraints:
-                    - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint: ~
+                    - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOption: ~
 
     tree:
         system_configuration:

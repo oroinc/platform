@@ -1,7 +1,6 @@
 services:
     oro_api.update_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update_subresource
@@ -10,7 +9,6 @@ services:
 
     oro_api.add_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - add_subresource
@@ -19,7 +17,6 @@ services:
 
     oro_api.delete_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete_subresource
@@ -48,18 +45,18 @@ services:
     oro_api.change_subresource.json_api.validate_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\ValidateRequestData
         tags:
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, collection: false, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_input, collection: false, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, collection: false, requestType: json_api, priority: 90 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, requestType: json_api, collection: false, priority: 90 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_input, requestType: json_api, collection: false, priority: 90 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: json_api, collection: false, priority: 90 }
 
     oro_api.change_subresource.json_api.validate_request_data.collection:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\ValidateRequestData
         arguments:
             - true # identifiers of primary resources are required
         tags:
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, requestType: json_api, collection: true, priority: 90 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_input, requestType: json_api, collection: true, priority: 90 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: json_api, collection: true, priority: 90 }
 
     oro_api.change_subresource.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\Rest\NormalizeRequestData

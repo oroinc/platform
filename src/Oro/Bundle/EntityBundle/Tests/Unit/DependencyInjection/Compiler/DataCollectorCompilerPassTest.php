@@ -2,68 +2,160 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer;
 use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
+use Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector;
+use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
+use Oro\Bundle\EntityBundle\DataCollector\ProfilingManagerRegistry;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Bundle\EntityBundle\ORM\Registry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DataCollectorCompilerPass
-     */
-    protected $compilerPass;
+    private DataCollectorCompilerPass $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new DataCollectorCompilerPass();
     }
 
-    public function testProcess()
+    public function testConfigureWhenProfilingIsDisabled(): void
     {
-        $connections = [
-            'default' => 'doctrine.dbal.logger.profiling.default',
-            'search' => 'doctrine.dbal.logger.profiling.search',
-            'config' => 'doctrine.dbal.logger.profiling.config',
-        ];
-
-        $collectorDefinition = new Definition(DuplicateQueriesDataCollector::class);
-
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
-
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_entity.profiler.duplicate_queries_data_collector')
-            ->willReturn($collectorDefinition);
-
-        $containerBuilder->expects($this->exactly(count($connections)))
-            ->method('has')
-            ->willReturn(true);
-
-        /** @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject $doctrine */
-        $doctrine = $this->createMock(RegistryInterface::class);
-
-        $doctrine->expects($this->once())
-            ->method('getConnectionNames')
-            ->willReturn($connections);
-
-        $containerBuilder->expects($this->once())
-            ->method('get')
-            ->with('doctrine')
-            ->willReturn($doctrine);
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->setParameter('oro_entity.orm.hydrators', []);
+        $containerBuilder->register('oro_entity.profiler.duplicate_queries_data_collector');
+        $containerBuilder->register('oro_entity.profiler.orm_data_collector');
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $containerBuilder->set('doctrine', $doctrine);
+        $containerBuilder->register('doctrine');
 
         $this->compilerPass->process($containerBuilder);
 
-        $this->assertSameSize($connections, $collectorDefinition->getMethodCalls());
-        $methodCalls = $collectorDefinition->getMethodCalls();
-        foreach ($connections as $connectionName => $serviceId) {
-            $methodCall = current($methodCalls);
-            $arguments = $methodCall[1];
-            $this->assertEquals($connectionName, $arguments[0]);
-            $this->assertEquals($serviceId, (string)$arguments[1]);
-            next($methodCalls);
-        }
+        self::assertFalse($containerBuilder->hasParameter('oro_entity.orm.hydrators'));
+    }
+
+    public function testConfigureDuplicateQueriesDataCollector(): void
+    {
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->register('profiler');
+        $containerBuilder->setParameter('oro_entity.orm.hydrators', []);
+        $containerBuilder->register('oro_entity.profiler.orm_data_collector');
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $containerBuilder->set('doctrine', $doctrine);
+        $containerBuilder->register('doctrine');
+
+        $duplicateQueriesCollectorDef = new Definition(DuplicateQueriesDataCollector::class);
+        $containerBuilder->setDefinition(
+            'oro_entity.profiler.duplicate_queries_data_collector',
+            $duplicateQueriesCollectorDef
+        );
+
+        $connections = [
+            'default' => 'doctrine.dbal.logger.profiling.default',
+            'search'  => 'doctrine.dbal.logger.profiling.search',
+            'config'  => 'doctrine.dbal.logger.profiling.config'
+        ];
+        $doctrine->expects(self::once())
+            ->method('getConnectionNames')
+            ->willReturn($connections);
+
+        $containerBuilder->register('doctrine.dbal.logger.profiling.default', SQLLogger::class);
+        $containerBuilder->register('doctrine.dbal.logger.profiling.config', SQLLogger::class);
+
+        $this->compilerPass->process($containerBuilder);
+
+        self::assertEquals(
+            [
+                ['addLogger', ['default', new Reference('doctrine.dbal.logger.profiling.default')]],
+                ['addLogger', ['config', new Reference('doctrine.dbal.logger.profiling.config')]]
+            ],
+            $duplicateQueriesCollectorDef->getMethodCalls()
+        );
+    }
+
+    public function testConfigureOrmDataCollector(): void
+    {
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->register('profiler');
+        $containerBuilder->register('oro_entity.profiler.duplicate_queries_data_collector');
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::once())
+            ->method('getConnectionNames')
+            ->willReturn([]);
+        $containerBuilder->set('doctrine', $doctrine);
+
+        $doctrineDef = new Definition(Registry::class);
+        $containerBuilder->setDefinition('doctrine', $doctrineDef);
+
+        $containerBuilder->setParameter(
+            'oro_entity.orm.hydrators',
+            [
+                'Doctrine\ORM\Query::HYDRATE_OBJECT' => [
+                    'name' => 'ObjectHydrator'
+                ],
+                'another_hydrator'                   => [
+                    'name' => 'AnotherObjectHydrator'
+                ]
+            ]
+        );
+
+        $ormCollectorDef = new Definition(OrmDataCollector::class);
+        $containerBuilder->setDefinition('oro_entity.profiler.orm_data_collector', $ormCollectorDef);
+
+        $this->compilerPass->process($containerBuilder);
+
+        self::assertEquals(
+            [
+                Query::HYDRATE_OBJECT => [
+                    'name'         => 'ObjectHydrator',
+                    'loggingClass' => 'OroLoggingHydrator\LoggingObjectHydrator'
+                ],
+                'another_hydrator'    => [
+                    'name'         => 'AnotherObjectHydrator',
+                    'loggingClass' => 'OroLoggingHydrator\LoggingAnotherObjectHydrator'
+                ]
+            ],
+            $containerBuilder->getParameter('oro_entity.orm.hydrators')
+        );
+
+        $expectedCacheWarmerDef = new Definition(LoggingHydratorWarmer::class);
+        $expectedCacheWarmerDef->setPublic(false);
+        $expectedCacheWarmerDef->addArgument('%oro_entity.orm.hydrators%');
+        $expectedCacheWarmerDef->addTag('kernel.cache_warmer', ['priority' => 30]);
+        self::assertEquals(
+            $expectedCacheWarmerDef,
+            $containerBuilder->getDefinition('oro_entity.cache.warmer.logging_hydrator')
+        );
+
+        $expectedLoggerDef = new Definition(OrmLogger::class);
+        $expectedLoggerDef->setPublic(false);
+        $expectedLoggerDef->addArgument(
+            new Reference('debug.stopwatch', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+        );
+        self::assertEquals(
+            $expectedLoggerDef,
+            $containerBuilder->getDefinition('oro_entity.profiler.orm_logger')
+        );
+
+        self::assertEquals(
+            [new Reference('oro_entity.profiler.orm_logger')],
+            $ormCollectorDef->getArguments()
+        );
+
+        self::assertEquals(ProfilingManagerRegistry::class, $doctrineDef->getClass());
+        self::assertEquals(
+            [
+                ['setProfilingLogger', [new Reference('oro_entity.profiler.orm_logger')]],
+                ['setLoggingHydrators', ['%oro_entity.orm.hydrators%']]
+            ],
+            $doctrineDef->getMethodCalls()
+        );
     }
 }

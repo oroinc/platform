@@ -6,15 +6,12 @@ use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
 
 class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
 {
-    const WORKFLOW_NAME = 'test_flow';
+    private const WORKFLOW_NAME = 'test_flow';
 
     /** @var StartedWorkflowsBag */
     private $startedWorkflowsBag;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->startedWorkflowsBag = new StartedWorkflowsBag();
     }
@@ -35,12 +32,8 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider entityWorkflowProvider
-     *
-     * @param array $entityWorkflow
-     * @param $workflow
-     * @param bool $expected
      */
-    public function testHasWorkflowEntities(array $entityWorkflow, $workflow, $expected)
+    public function testHasWorkflowEntities(array $entityWorkflow, string $workflow, bool $expected)
     {
         foreach ($entityWorkflow as $item) {
             $this->startedWorkflowsBag->addWorkflowEntity($item['workflowName'], $item['entity']);
@@ -52,10 +45,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return \Generator
-     */
-    public function entityWorkflowProvider()
+    public function entityWorkflowProvider(): \Generator
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();

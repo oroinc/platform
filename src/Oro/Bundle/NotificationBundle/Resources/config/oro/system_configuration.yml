@@ -12,12 +12,19 @@ system_configuration:
             search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_email
+                required: true
+                constraints:
+                    - NotBlank: ~
+                    - Email: ~
         oro_notification.email_notification_sender_name:
             data_type: string
             type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_name
+                required: true
+                constraints:
+                    - NotBlank: ~
         oro_notification.mass_notification_template:
             data_type: string
             type: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType

@@ -31,13 +31,6 @@ class NavigationListener
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param ConfigProvider         $entityConfigProvider
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param AclHelper              $aclHelper
-     * @param FeatureChecker         $featureChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $entityConfigProvider,
@@ -52,9 +45,6 @@ class NavigationListener
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param ConfigureMenuEvent $event
-     */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->tokenAccessor->hasUser()) {
@@ -132,8 +122,6 @@ class NavigationListener
 
     /**
      * Adds a divider to the given menu
-     *
-     * @param ItemInterface $menu
      */
     protected function addDivider(ItemInterface $menu)
     {

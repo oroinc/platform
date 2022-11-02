@@ -14,17 +14,14 @@ class LexerTest extends \PHPUnit\Framework\TestCase
      * @param array $tokens
      * @param string $expression
      */
-    public function testTokenize(array $tokens, $expression)
+    public function testTokenize(array $tokens, string $expression): void
     {
         $tokens[] = new Token(Token::EOF_TYPE, null, strlen($expression) + 1);
         $lexer = new Lexer();
-        $this->assertEquals(new TokenStream($tokens), $lexer->tokenize($expression));
+        self::assertEquals(new TokenStream($tokens, $expression), $lexer->tokenize($expression));
     }
 
-    /**
-     * @return array
-     */
-    public function getTokenizeData()
+    public function getTokenizeData(): array
     {
         return [
             [

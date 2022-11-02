@@ -4,22 +4,19 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TransitionHandler
-     */
-    protected $handler;
+    /** @var TransitionHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new TransitionHandler();
     }
 
     /**
-     * @param array $expected
-     * @param array $input
      * @dataProvider handleDataProvider
      */
     public function testHandle(array $expected, array $input)
@@ -29,81 +26,79 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function handleDataProvider()
+    public function handleDataProvider(): array
     {
-        return array(
-            'simple configuration' => array(
-                'expected' => array(
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array('name' => 'test_step')
-                    ),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array('name' => 'test_attribute')
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+        return [
+            'simple configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_STEPS => [
+                        ['name' => 'test_step']
+                    ],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        ['name' => 'test_attribute']
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'test_transition',
                             'label' => 'Test Transition', //should be kept as filtering comes in separate service
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
-                            'form_options' => array(
-                                'attribute_fields' => array(
-                                    'test_attribute' => array(
-                                        'options' => array(
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'test_attribute' => [
+                                        'options' => [
                                             'required' => true,
-                                            'constraints' => array(array('NotBlank' => null)),
-                                        ),
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(
-                        array('name' => 'test_transition_definition')
-                    )
-                ),
-                'input' => array(
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array('name' => 'test_step')
-                    ),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array('name' => 'test_attribute')
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                                            'constraints' => [['NotBlank' => null]],
+                                        ],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
+                        ['name' => 'test_transition_definition']
+                    ]
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_STEPS => [
+                        ['name' => 'test_step']
+                    ],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        ['name' => 'test_attribute']
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'test_transition',
                             'label' => 'Test Transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
-                            'form_options' => array(
-                                'attribute_fields' => array(
-                                    'test_attribute' => array(
-                                        'options' => array(
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'test_attribute' => [
+                                        'options' => [
                                             'required' => true
-                                        ),
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(
-                        array('name' => 'test_transition_definition')
-                    )
-                ),
-            ),
-            'full configuration' => array(
-                'expected' => array(
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array('name' => 'test_step')
-                    ),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array('name' => 'test_attribute')
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                                        ],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
+                        ['name' => 'test_transition_definition']
+                    ]
+                ],
+            ],
+            'full configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_STEPS => [
+                        ['name' => 'test_step']
+                    ],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        ['name' => 'test_attribute']
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'test_transition',
                             'step_to' => 'test_step',
                             'is_start' => false,
@@ -112,30 +107,30 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
                             'acl_resource' => null,
                             'acl_message' => null,
                             'transition_definition' => 'test_transition_definition',
-                            'frontend_options' => array('class' => 'btn-primary'),
-                            'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                            'frontend_options' => ['class' => 'btn-primary'],
+                            'form_type' => WorkflowTransitionType::class,
                             'display_type' => 'dialog',
                             'label' => 'Test Transition',
-                            'form_options' => array(
-                                'attribute_fields' => array(
+                            'form_options' => [
+                                'attribute_fields' => [
                                     'test_attribute' => null,
-                                )
-                            ),
-                        )
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(
-                        array('name' => 'test_transition_definition')
-                    )
-                ),
-                'input' => array(
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array('name' => 'test_step')
-                    ),
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array('name' => 'test_attribute')
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                                ]
+                            ],
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
+                        ['name' => 'test_transition_definition']
+                    ]
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_STEPS => [
+                        ['name' => 'test_step']
+                    ],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        ['name' => 'test_attribute']
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'test_transition',
                             'label' => 'Test Transition',
                             'step_to' => 'test_step',
@@ -145,36 +140,36 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
                             'acl_resource' => null,
                             'acl_message' => null,
                             'transition_definition' => 'test_transition_definition',
-                            'frontend_options' => array('class' => 'btn-primary'),
-                            'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                            'frontend_options' => ['class' => 'btn-primary'],
+                            'form_type' => WorkflowTransitionType::class,
                             'display_type' => 'dialog',
-                            'form_options' => array(
-                                'attribute_fields' => array(
+                            'form_options' => [
+                                'attribute_fields' => [
                                     'test_attribute' => null
-                                )
-                            )
-                        )
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(
-                        array('name' => 'test_transition_definition')
-                    )
-                ),
-            )
-        );
+                                ]
+                            ]
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
+                        ['name' => 'test_transition_definition']
+                    ]
+                ],
+            ]
+        ];
     }
 
     public function testHandleEmptyConfiguration()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array(
-                array('name' => 'test_step')
-            ),
-            WorkflowConfiguration::NODE_TRANSITIONS => array(
-                array(
+        $configuration = [
+            WorkflowConfiguration::NODE_STEPS => [
+                ['name' => 'test_step']
+            ],
+            WorkflowConfiguration::NODE_TRANSITIONS => [
+                [
                     'step_to' => 'test_step',
-                )
-            ),
-        );
+                ]
+            ],
+        ];
 
         $result = $this->handler->handle($configuration);
 

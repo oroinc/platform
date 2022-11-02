@@ -4,95 +4,96 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAME = 'testGrid';
+    private const TEST_NAME = 'testGrid';
+    private const PARAMETERS_CLASS = ParameterBag::class;
 
-    const PARAMETERS_CLASS = 'Oro\Bundle\DataGridBundle\Datagrid\ParameterBag';
+    private RequestStack $requestStack;
+    private RequestParameterBagFactory $factory;
 
-    /** @var RequestParameterBagFactory */
-    protected $factory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $requestStack = new RequestStack();
-        $requestStack->push($this->request);
-        $this->factory = new RequestParameterBagFactory(self::PARAMETERS_CLASS, $requestStack);
+        $this->requestStack = new RequestStack();
+        $this->factory = new RequestParameterBagFactory(self::PARAMETERS_CLASS, $this->requestStack);
     }
 
-    public function testCreateParameters()
+    /**
+     * @dataProvider queryDataProvider
+     */
+    public function testCreateParameters(array $query, array $expectedParameters): void
     {
-        $gridName       = 'test_grid';
-        $gridParameters = array('foo' => 'bar');
+        $request = new Request($query);
+        $this->requestStack->push($request);
+        $parameters = $this->factory->createParameters(self::TEST_NAME);
 
-        $this->request->expects($this->at(0))
-            ->method('get')
-            ->with($gridName, [])
-            ->will($this->returnValue($gridParameters));
-        $this->request->expects($this->at(1))
-            ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
-            ->will($this->returnValue(array()));
-
-        $parameters = $this->factory->createParameters($gridName);
-
-        $this->assertInstanceOf(self::PARAMETERS_CLASS, $parameters);
-        $this->assertEquals($gridParameters, $parameters->all());
-    }
-
-    public function testCreateParametersWithMinifiedData()
-    {
-        $gridName    = 'test_grid';
-        $minifiedKey = 'f';
-        $minifiedVal = 'value';
-
-        $gridParameters     = array('foo' => 'bar');
-        $minifiedParameters = array($gridName => $minifiedKey . '=' . $minifiedVal);
-
-        $this->request->expects($this->at(0))
-            ->method('get')
-            ->with($gridName, [])
-            ->will($this->returnValue($gridParameters));
-        $this->request->expects($this->at(1))
-            ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
-            ->will($this->returnValue($minifiedParameters));
-
-        $parameters = $this->factory->createParameters($gridName);
-
-        $expectedParameters = $gridParameters;
-        $expectedParameters[ParameterBag::MINIFIED_PARAMETERS] = array($minifiedKey => $minifiedVal);
-
-        $this->assertInstanceOf(self::PARAMETERS_CLASS, $parameters);
         $this->assertEquals($expectedParameters, $parameters->all());
     }
 
-
-    public function testCreateParametersFromNotArrayRequestParams()
+    /**
+     * @dataProvider queryDataProvider
+     */
+    public function testCreateParametersFromRequest(array $query, array $expectedParameters): void
     {
-        $gridName = 'test_grid';
+        $parameters = $this->factory->createParametersFromRequest(new Request($query), self::TEST_NAME);
 
-        $this->request->expects($this->at(0))
-            ->method('get')
-            ->with($gridName, [])
-            ->will($this->returnValue('foo'));
-        $this->request->expects($this->at(1))
-            ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
-            ->will($this->returnValue(null));
+        $this->assertEquals($expectedParameters, $parameters->all());
+    }
 
-        $parameters = $this->factory->createParameters($gridName);
+    /**
+     * @dataProvider queryDataProvider
+     */
+    public function testFetchParameters(array $query, array $expectedParameters): void
+    {
+        $request = new Request($query);
+        $this->requestStack->push($request);
+        $parameters = $this->factory->fetchParameters(self::TEST_NAME);
 
-        $this->assertInstanceOf(self::PARAMETERS_CLASS, $parameters);
-        $this->assertEquals(array(), $parameters->all());
+        $this->assertEquals($expectedParameters, $parameters);
+    }
+
+    /**
+     * @dataProvider queryDataProvider
+     */
+    public function testFetchParametersFromRequest(array $query, array $expectedParameters): void
+    {
+        $parameters = $this->factory->fetchParametersFromRequest(new Request($query), self::TEST_NAME);
+
+        $this->assertEquals($expectedParameters, $parameters);
+    }
+
+    public function queryDataProvider(): array
+    {
+        return [
+            'empty query' => [
+                '$query' => [],
+                '$expectedParameters' => [],
+            ],
+            'regular parameters' => [
+                '$query' => [self::TEST_NAME => ['sample_key' => 'sample_value']],
+                '$expectedParameters' => ['sample_key' => 'sample_value'],
+            ],
+            'minified parameters' => [
+                '$query' => ['grid' => [self::TEST_NAME => 'sample_key=sample_value']],
+                '$expectedParameters' => [ParameterBag::MINIFIED_PARAMETERS => ['sample_key' => 'sample_value']],
+            ],
+            'both regular and minified parameters' => [
+                '$query' => [
+                    self::TEST_NAME => ['sample_key' => 'sample_value'],
+                    'grid' => [self::TEST_NAME => 'sample_key=sample_value'],
+                ],
+                '$expectedParameters' => [
+                    'sample_key' => 'sample_value',
+                    ParameterBag::MINIFIED_PARAMETERS => ['sample_key' => 'sample_value'],
+                ],
+            ],
+            'invalid minified parameters' => [
+                '$query' => ['grid' => [self::TEST_NAME => []]],
+                '$expectedParameters' => [],
+            ],
+        ];
     }
 }

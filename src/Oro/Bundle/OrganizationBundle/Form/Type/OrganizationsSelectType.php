@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,28 +14,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Select organization form type.
+ */
 class OrganizationsSelectType extends AbstractType
 {
-    /** @var  EntityManager */
-    protected $em;
+    private BusinessUnitManager $buManager;
+    private TokenAccessorInterface $tokenAccessor;
 
-    /** @var BusinessUnitManager */
-    protected $buManager;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /**
-     * @param EntityManager          $em
-     * @param BusinessUnitManager    $buManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
-        EntityManager $em,
         BusinessUnitManager $buManager,
         TokenAccessorInterface $tokenAccessor
     ) {
-        $this->em = $em;
         $this->buManager = $buManager;
         $this->tokenAccessor = $tokenAccessor;
     }
@@ -55,7 +43,6 @@ class OrganizationsSelectType extends AbstractType
                 ],
                 'organization_tree_ids'   => [],
                 'selected_organizations'  => [],
-                'selected_business_units' => [],
                 'inherit_data'            => true,
             ]
         );
@@ -109,9 +96,11 @@ class OrganizationsSelectType extends AbstractType
                 'required' => false,
                 'label' => 'oro.user.form.business_units.label',
                 'autocomplete_alias' => 'business_units_tree_search_handler',
+                'label_attr' => [
+                    'class' => 'business-units-label'
+                ],
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'component'   => 'bu-tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,
@@ -125,51 +114,23 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $buTree = $this->buManager->getBusinessUnitRepo()->getOrganizationBusinessUnitsTree(
-            $this->tokenAccessor->getOrganizationId()
-        );
-
-        $view->vars['organization_tree_ids'] = $buTree;
-
-        /** @var PersistentCollection $businessUnitData */
-        $businessUnitData = $view->vars['data']->getBusinessUnits();
-        if ($businessUnitData) {
-            $businessUnitData = $businessUnitData->map(
-                function ($item) {
-                    return $item->getId();
-                }
-            )->getValues();
-        }
-
+        $view->vars['attr']['class'] = 'control-group-choice';
+        $view->vars['organization_tree_ids'] = $this->buManager->getBusinessUnitRepo()
+            ->getOrganizationBusinessUnitsTree($this->tokenAccessor->getOrganizationId());
         $view->vars['default_organization'] = $this->tokenAccessor->getOrganizationId();
-        $view->vars['selected_organizations']  = [$this->tokenAccessor->getOrganizationId()];
-        $view->vars['selected_business_units'] = $businessUnitData;
-        $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
+        $view->vars['selected_organizations'] = [$this->tokenAccessor->getOrganizationId()];
     }
 
-    /**
-     * Adds organizations field to form
-     *
-     * @param FormBuilderInterface $builder
-     */
-    protected function addOrganizationsField(FormBuilderInterface $builder)
+    private function addOrganizationsField(FormBuilderInterface $builder): void
     {
         $builder->add(
             'organizations',
             EntityType::class,
             [
-                'class'    => 'OroOrganizationBundle:Organization',
+                'class' => Organization::class,
                 'choice_label' => 'name',
                 'multiple' => true
             ]
         );
-    }
-
-    /**
-     * @return User
-     */
-    protected function getLoggedInUser()
-    {
-        return $this->tokenAccessor->getUser();
     }
 }

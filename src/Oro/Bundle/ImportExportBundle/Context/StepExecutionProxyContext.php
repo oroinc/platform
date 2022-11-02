@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 
+/**
+ * Provides the ability to save and manage parameters
+ * Performs the role of an adapter and provides access to the original object
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
 {
     /**
@@ -104,9 +109,12 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
      */
     public function incrementReadCount($incrementBy = 1)
     {
-        $this->stepExecution->setReadCount(
-            $this->stepExecution->getReadCount() + $incrementBy
-        );
+        $incrementedRead = $this->getOption('incremented_read', true);
+        if ($incrementedRead) {
+            $this->stepExecution->setReadCount(
+                $this->stepExecution->getReadCount() + $incrementBy
+            );
+        }
     }
 
     /**

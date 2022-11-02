@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
@@ -15,42 +15,45 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'AcmeEntity';
+    private const CLASS_NAME = 'AcmeEntity';
 
-    /**
-     * @var AclProtectedTypeExtension
-     */
+    /** @var AclProtectedTypeExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $fieldAclHelper */
-        $fieldAclHelper = self::createMock(AclHelper::class);
+        $fieldAclHelper = $this->createMock(AclHelper::class);
 
         $this->extension = new AclProtectedTypeExtension($fieldAclHelper);
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes(): void
     {
-        self::assertEquals(EntityType::class, $this->extension->getExtendedType());
+        self::assertEquals([EntityType::class], AclProtectedTypeExtension::getExtendedTypes());
     }
 
     public function testConfigureOptionsWithEnabledAclOptions()
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
-        $idReader = self::createMock(IdReader::class);
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->expects(self::any())
+            ->method('isSingleId')
+            ->willReturn(true);
 
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
-        $queryBuilder = self::createMock(QueryBuilder::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
-        $repository = self::createMock(EntityRepository::class);
-        $repository->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
-        /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = self::createMock(ObjectManager::class);
-        $entityManager->expects(self::once())->method('getRepository')->willReturn($repository);
-        $entityManager->expects(self::once())->method('getClassMetadata')->willReturn($classMetadata);
+        $entityManager = $this->createMock(ObjectManager::class);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
         $optionResolver = new OptionsResolver();
         $this->extension->configureOptions($optionResolver);
@@ -69,19 +72,25 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     public function testConfigureOptionsWithDisabledAclOptions()
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
-        $idReader = self::createMock(IdReader::class);
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->expects(self::any())
+            ->method('isSingleId')
+            ->willReturn(true);
 
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
-        $queryBuilder = self::createMock(QueryBuilder::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
-        $repository = self::createMock(EntityRepository::class);
-        $repository->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
-        /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = self::createMock(ObjectManager::class);
-        $entityManager->expects(self::once())->method('getRepository')->willReturn($repository);
-        $entityManager->expects(self::once())->method('getClassMetadata')->willReturn($classMetadata);
+        $entityManager = $this->createMock(ObjectManager::class);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
         $optionResolver = new OptionsResolver();
         $this->extension->configureOptions($optionResolver);

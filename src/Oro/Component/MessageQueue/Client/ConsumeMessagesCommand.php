@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client;
 
@@ -7,68 +8,84 @@ use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
+/**
+ * Processes messages from the message-queue.
+ */
+class ConsumeMessagesCommand extends Command
 {
-    use ContainerAwareTrait;
     use LimitsExtensionsCommandTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this->configureLimitsExtensions();
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:consume';
 
-        $this
-            ->setName('oro:message-queue:consume')
-            ->setDescription('A client\'s worker that processes messages. '.
-                'By default it connects to default queue. '.
-                'It select an appropriate message processor based on a message headers')
-            ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from');
+    protected QueueConsumer $queueConsumer;
+
+    protected DestinationMetaRegistry $destinationMetaRegistry;
+
+    public function __construct(
+        QueueConsumer $queueConsumer,
+        DestinationMetaRegistry $destinationMetaRegistry
+    ) {
+        parent::__construct();
+
+        $this->queueConsumer = $queueConsumer;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function configure()
+    {
+        $this
+            ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from')
+            ->setDescription('Processes messages from the message-queue.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command processes messages from the message-queue
+using an appropriate message processor based on message headers.
+
+  <info>php %command.full_name%</info>
+
+It connects to the default queue, but a different name can be provided as the argument: 
+
+  <info>php %command.full_name% <clientDestinationName></info>
+
+HELP
+            )
+        ;
+
+        $this->configureLimitsExtensions();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $consumer = $this->getConsumer();
         $clientDestinationName = $input->getArgument('clientDestinationName');
         if ($clientDestinationName) {
-            $consumer->bind(
-                $this->getDestinationMetaRegistry()->getDestinationMeta($clientDestinationName)->getTransportName(),
-                $this->getProcessor()
+            $this->queueConsumer->bind(
+                $this->destinationMetaRegistry->getDestinationMeta($clientDestinationName)->getTransportQueueName()
             );
         } else {
-            foreach ($this->getDestinationMetaRegistry()->getDestinationsMeta() as $destinationMeta) {
-                $consumer->bind(
-                    $destinationMeta->getTransportName(),
-                    $this->getProcessor()
-                );
+            foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destinationMeta) {
+                $this->queueConsumer->bind($destinationMeta->getTransportQueueName());
             }
         }
 
         $extensions = $this->getLimitsExtensions($input, $output);
         array_unshift($extensions, $this->getLoggerExtension($input, $output));
 
-        $this->consume($consumer, $this->getConsumerExtension($extensions));
+        $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
+
+        return 0;
     }
 
-    /**
-     * @param QueueConsumer      $consumer
-     * @param ExtensionInterface $extension
-     */
-    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
+    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         try {
             $consumer->consume($extension);
@@ -77,48 +94,17 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         }
     }
 
-    /**
-     * @param array $extensions
-     *
-     * @return ExtensionInterface
-     */
-    protected function getConsumerExtension(array $extensions)
+    protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions);
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return ExtensionInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpUnusedParameterInspection
      */
-    protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
+    protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension(new ConsoleLogger($output));
-    }
-
-    /**
-     * @return QueueConsumer
-     */
-    private function getConsumer()
-    {
-        return $this->container->get('oro_message_queue.client.queue_consumer');
-    }
-
-    /**
-     * @return DestinationMetaRegistry
-     */
-    private function getDestinationMetaRegistry()
-    {
-        return $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
-    }
-
-    /**
-     * @return MessageProcessorInterface
-     */
-    private function getProcessor()
-    {
-        return $this->container->get('oro_message_queue.client.delegate_message_processor');
     }
 }

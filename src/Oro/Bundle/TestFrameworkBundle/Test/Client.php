@@ -5,15 +5,21 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser as BaseKernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class Client extends BaseClient
+/**
+ * Simulates a browser and makes requests to a Kernel object.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+class Client extends BaseKernelBrowser
 {
     const LOCAL_URL = 'http://localhost';
 
@@ -25,23 +31,24 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function request(
-        $method,
-        $uri,
-        array $parameters = array(),
-        array $files = array(),
-        array $server = array(),
-        $content = null,
-        $changeHistory = true
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        string $content = null,
+        bool $changeHistory = true
     ) {
         if (strpos($uri, 'http://') === false && strpos($uri, 'https://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
 
         if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
-            //generate new WSSE header
-            parent::setServerParameters(WebTestCase::generateWsseAuthHeader());
+            // generate new WSSE header
+            $this->mergeServerParameters(WebTestCase::generateWsseAuthHeader());
         }
 
         $hashNavigationHeader = $this->getHashNavigationHeader();
@@ -49,11 +56,21 @@ class Client extends BaseClient
             $server[$hashNavigationHeader] = 1;
         }
 
-        // set the session cookie
-        $sessionOptions = $this->kernel->getContainer()->getParameter('session.storage.options');
-        $this->getCookieJar()->set(new Cookie($sessionOptions['name'], 'test'));
+        $this->setSessionCookie($server);
 
-        parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+        if (($content === null || $content === '') && $parameters && in_array($method, ['POST', 'PATCH', 'PUT'])) {
+            $this->setServerParameter('CONTENT_TYPE', 'application/json');
+            $this->setServerParameter('HTTP_ACCEPT', 'application/json');
+
+            try {
+                $content = json_encode($parameters);
+                parent::request($method, $uri, [], $files, $server, $content, $changeHistory);
+            } finally {
+                unset($this->server['CONTENT_TYPE'], $this->server['HTTP_ACCEPT']);
+            }
+        } else {
+            parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+        }
 
         if ($this->isHashNavigationResponse($this->response, $server)) {
             /** @var InternalRequest $internalRequest */
@@ -114,7 +131,7 @@ class Client extends BaseClient
         $isRealRequest = false,
         $route = 'oro_datagrid_index'
     ) {
-        list($gridName, $gridParameters) = $this->parseGridParameters($gridParameters, $filter);
+        [$gridName, $gridParameters] = $this->parseGridParameters($gridParameters, $filter);
 
         if ($isRealRequest) {
             $this->request(
@@ -128,6 +145,12 @@ class Client extends BaseClient
 
             $request = Request::create($this->getUrl($route, $gridParameters));
             $container->get('request_stack')->push($request);
+
+            $session = $container->has('session')
+                ? $container->get('session')
+                : $container->get('session.factory')->createSession();
+            $request->setSession($session);
+
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
@@ -192,9 +215,15 @@ class Client extends BaseClient
      * @param bool $absolute
      * @return string
      */
-    protected function getUrl($name, $parameters = array(), $absolute = false)
+    protected function getUrl(string $name, array $parameters = [], bool $absolute = false)
     {
-        return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
+        return $this->getContainer()
+            ->get('router')
+            ->generate(
+                $name,
+                $parameters,
+                $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+            );
     }
 
     /**
@@ -291,11 +320,41 @@ class Client extends BaseClient
         return sprintf($html, $title, $title, $flashMessages, $content['beforeContentAddition'], $content['content']);
     }
 
-    /**
-     * @param array $server
-     */
     public function mergeServerParameters(array $server)
     {
         $this->server = array_replace($this->server, $server);
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getSessionName()
+    {
+        $container = $this->getContainer();
+
+        try {
+            $session = $container->get('request_stack')->getSession();
+        } catch (SessionNotFoundException $exception) {
+            $session = $container->has('session') ? $container->get('session') : null;
+        }
+
+        return $session?->getName();
+    }
+
+    private function setSessionCookie(array &$server)
+    {
+        if (array_key_exists('HTTP_X-WSSE', $server)) {
+            return;
+        }
+
+        if (array_key_exists('HTTP_SESSION', $server)) {
+            if ($server['HTTP_SESSION']) {
+                $sessionName = $this->getSessionName();
+                if ($sessionName && null === $this->getCookieJar()->get($sessionName)) {
+                    $this->getCookieJar()->set(new Cookie($sessionName, $server['HTTP_SESSION']));
+                }
+            }
+            unset($server['HTTP_SESSION']);
+        }
     }
 }

@@ -11,20 +11,16 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ChainConstraintTextExtractor */
     private $extractor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var ConstraintTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $extractors = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->extractor = new ChainConstraintTextExtractor();
-
         $firstExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
         $secondExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
 
-        $this->extractor->addExtractor($firstExtractor);
-        $this->extractor->addExtractor($secondExtractor);
-
         $this->extractors = [$firstExtractor, $secondExtractor];
+        $this->extractor = new ChainConstraintTextExtractor($this->extractors);
     }
 
     public function testGetConstraintStatusCodeByFirstExtractor()

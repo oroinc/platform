@@ -2,100 +2,96 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Provider;
 
-use Composer\Package\Package;
-use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
-use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
-
 class PackageProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PackageProvider */
-    protected $provider;
-
-    /** @var LocalRepositoryFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
-
-    protected function setUp()
-    {
-        $this->factory = $this->getMockBuilder('Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->provider = new PackageProvider($this->factory);
-    }
+    protected TestablePackageProvider $provider;
 
     public function testGetThirdPartyPackagesEmpty()
     {
-        $packages = [new Package('oro/platform', '1.0.0', '1.0.0')];
-
-        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
-        $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
-        $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
-
-        $this->assertEmpty($this->provider->getThirdPartyPackages());
+        $provider = new TestablePackageProvider();
+        $provider->setInstalledPackages(['oro/platform' => ['pretty_version' => '1.0.0']]);
+        $this->assertEmpty($provider->getThirdPartyPackages());
     }
 
     public function testGetThirdPartyPackages()
     {
-        $thirdPartyPackage = new Package('not-oro/platform', '1.0.0', '1.0.0');
-        $packages = [new Package('oro/platform', '1.0.0', '1.0.0'), $thirdPartyPackage];
-
-        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
-        $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
-        $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
-
+        $provider = new TestablePackageProvider();
+        $provider->setInstalledPackages([
+            'oro/platform' => ['pretty_version' => '1.0.0'],
+            'not-oro/platform' => ['pretty_version' => '1.0.0']
+        ]);
         $this->assertEquals(
-            [$thirdPartyPackage->getPrettyName() => $thirdPartyPackage],
-            $this->provider->getThirdPartyPackages()
+            ['not-oro/platform' => ['pretty_version' => '1.0.0', 'license' => []]],
+            $provider->getThirdPartyPackages()
         );
     }
 
     public function testGetOroPackagesEmpty()
     {
-        $packages = [new Package('not-oro/platform', '1.0.0', '1.0.0')];
-
-        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
-        $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
-        $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
-
-        $this->assertEmpty($this->provider->getOroPackages());
+        $provider = new TestablePackageProvider();
+        $provider->setInstalledPackages(['not-oro/platform' => ['pretty_version' => '1.0.0']]);
+        $this->assertEmpty($provider->getOroPackages());
     }
 
     public function testGetOroPackages()
     {
-        $thirdPartyPackage = new Package('not-oro/platform', '1.0.0', '1.0.0');
-        $oroPackage = new Package('oro/platform', '1.0.0', '1.0.0');
-        $packages = [$oroPackage, $thirdPartyPackage];
-
-        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
-        $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
-        $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
-
+        $provider = new TestablePackageProvider();
+        $provider->setInstalledPackages([
+            'oro/platform' => ['pretty_version' => '1.0.0'],
+            'not-oro/platform' => ['pretty_version' => '1.0.0']
+        ]);
         $this->assertEquals(
-            [$oroPackage->getPrettyName() => $oroPackage],
-            $this->provider->getOroPackages()
+            ['oro/platform' => ['pretty_version' => '1.0.0', 'license' => []]],
+            $provider->getOroPackages()
         );
     }
 
     public function testFilterOroPackages()
     {
-        $oroPackage = new Package('oro/platform', '1.0.0', '1.0.0');
-        $oroExtension = new Package('oro/some-extension', '1.0.0', '1.0.0');
-        $packages = [$oroPackage, $oroExtension];
+        $provider = new TestablePackageProvider();
+        $provider->setInstalledPackages([
+            'oro/platform' => ['pretty_version' => '1.0.0'],
+            'oro/some-extension' => ['pretty_version' => '1.0.0']
+        ]);
+        $this->assertEquals(
+            ['oro/platform' => ['pretty_version' => '1.0.0', 'license' => []]],
+            $provider->getOroPackages(false)
+        );
+        $this->assertEquals(
+            [
+                'oro/platform' => ['pretty_version' => '1.0.0', 'license' => []],
+                'oro/some-extension' => ['pretty_version' => '1.0.0', 'license' => []]
+            ],
+            $provider->getOroPackages()
+        );
+        $this->assertEmpty($provider->getThirdPartyPackages());
+    }
 
-        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
-        $repository->expects($this->atLeastOnce())->method('getCanonicalPackages')->willReturn($packages);
-        $this->factory->expects($this->atLeastOnce())->method('getLocalRepository')->willReturn($repository);
+    public function testLicenseRetrieval()
+    {
+        $file = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'installed.json';
+        $provider = new TestablePackageProvider($file);
+        $provider->setInstalledPackages([
+            'oro/platform' => ['pretty_version' => '1.0.0'],
+            'oro/crm' => ['pretty_version' => '1.0.0']
+        ]);
 
         $this->assertEquals(
-            [$oroPackage->getPrettyName() => $oroPackage],
-            $this->provider->getOroPackages(false)
+            [
+                'oro/platform' => ['pretty_version' => '1.0.0', 'license' => ['MIT']],
+                'oro/crm' => ['pretty_version' => '1.0.0', 'license' => ['OSL-3.0']]
+            ],
+            $provider->getOroPackages()
         );
+    }
 
-        $this->assertEquals(
-            [$oroPackage->getPrettyName() => $oroPackage, $oroExtension->getPrettyName() => $oroExtension],
-            $this->provider->getOroPackages()
-        );
+    public function testLicenseRetrievalFailure()
+    {
+        $file = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'wrong.json';
+        $this->expectErrorMessage(sprintf('File "%s" does not exists.', $file));
 
-        $this->assertEmpty($this->provider->getThirdPartyPackages());
+        $provider = new TestablePackageProvider($file);
+        $provider->setInstalledPackages(['oro/platform' => ['pretty_version' => '1.0.0']]);
+        $provider->getOroPackages();
     }
 }

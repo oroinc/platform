@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Test\Unit\Form\Handler;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -8,13 +8,14 @@ use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
@@ -31,7 +32,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();
@@ -40,7 +41,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
     }
 
-    public function testHandleUpdateWorksWithInvalidForm()
+    public function testHandleUpdateWorksWithInvalidForm(): void
     {
         $entity = (object)[];
         $this->form->expects($this->once())
@@ -53,16 +54,19 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->assertProcessEventsTriggered($this->form, $entity);
         $this->eventDispatcher->expects($this->exactly(2))
-            ->method('dispatch');
+            ->method('dispatch')
+            ->withConsecutive(
+                [new FormProcessEvent($this->form, $entity), Events::BEFORE_FORM_DATA_SET],
+                [new FormProcessEvent($this->form, $entity), Events::BEFORE_FORM_SUBMIT]
+            );
 
         $this->assertEquals(false, $this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testHandleUpdateWorksWithValidForm()
+    public function testHandleUpdateWorksWithValidForm(): void
     {
         $entity = (object)[];
         $this->form->expects($this->once())
@@ -75,11 +79,9 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('beginTransaction');
         $em->expects($this->once())
@@ -92,22 +94,25 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $this->assertProcessEventsTriggered($this->form, $entity);
-        $this->assertProcessAfterEventsTriggered($this->form, $entity);
         $this->eventDispatcher->expects($this->exactly(4))
-            ->method('dispatch');
+            ->method('dispatch')
+            ->withConsecutive(
+                [new FormProcessEvent($this->form, $entity), Events::BEFORE_FORM_DATA_SET],
+                [new FormProcessEvent($this->form, $entity), Events::BEFORE_FORM_SUBMIT],
+                [new AfterFormProcessEvent($this->form, $entity), Events::BEFORE_FLUSH],
+                [new AfterFormProcessEvent($this->form, $entity), Events::AFTER_FLUSH]
+            );
 
         $this->assertTrue($this->handler->process($entity, $this->form, $this->request));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test flush exception
-     */
-    public function testHandleUpdateWorksWhenFormFlushFailed()
+    public function testHandleUpdateWorksWhenFormFlushFailed(): void
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test flush exception');
+
         $entity = (object)[];
         $this->form->expects($this->once())
             ->method('setData')
@@ -119,11 +124,9 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('beginTransaction');
         $em->expects($this->once())
@@ -137,12 +140,12 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->handler->process($entity, $this->form, $this->request);
     }
 
-    public function testHandleUpdateBeforeFormDataSetInterrupted()
+    public function testHandleUpdateBeforeFormDataSetInterrupted(): void
     {
         $entity = (object)[];
         $this->request->setMethod('POST');
@@ -151,17 +154,17 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::BEFORE_FORM_DATA_SET)
-            ->willReturnCallback(
-                function ($name, FormProcessEvent $event) {
-                    $event->interruptFormProcess();
-                }
-            );
+            ->with($this->anything(), Events::BEFORE_FORM_DATA_SET)
+            ->willReturnCallback(function (FormProcessEvent $event) {
+                $event->interruptFormProcess();
+
+                return $event;
+            });
 
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testProcessFalseNotRequiredRequestMethod()
+    public function testProcessFalseNotRequiredRequestMethod(): void
     {
         $entity = (object)[];
         $this->request->setMethod('GET');
@@ -171,57 +174,35 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::BEFORE_FORM_DATA_SET, new FormProcessEvent($this->form, $entity));
+            ->with(new FormProcessEvent($this->form, $entity), Events::BEFORE_FORM_DATA_SET);
 
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testHandleUpdateInterruptedBeforeFormSubmit()
+    public function testHandleUpdateInterruptedBeforeFormSubmit(): void
     {
         $entity = (object)[];
         $this->request->setMethod('POST');
         $this->form->expects($this->never())
             ->method('submit');
 
-        $this->eventDispatcher->expects($this->at(1))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with(Events::BEFORE_FORM_SUBMIT)
-            ->willReturnCallback(
-                function ($name, FormProcessEvent $event) {
+            ->withConsecutive(
+                [$this->anything(), Events::BEFORE_FORM_DATA_SET],
+                [$this->anything(), Events::BEFORE_FORM_SUBMIT]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (FormProcessEvent $event) {
+                    return $event;
+                }),
+                new ReturnCallback(function (FormProcessEvent $event) {
                     $event->interruptFormProcess();
-                }
+
+                    return $event;
+                })
             );
 
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
-    }
-
-    /**
-     * @param FormInterface $form
-     * @param object $entity
-     */
-    protected function assertProcessEventsTriggered(FormInterface $form, $entity)
-    {
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with(Events::BEFORE_FORM_DATA_SET, new FormProcessEvent($form, $entity));
-
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(Events::BEFORE_FORM_SUBMIT, new FormProcessEvent($form, $entity));
-    }
-
-    /**
-     * @param FormInterface $form
-     * @param object $entity
-     */
-    protected function assertProcessAfterEventsTriggered(FormInterface $form, $entity)
-    {
-        $this->eventDispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $entity));
-
-        $this->eventDispatcher->expects($this->at(3))
-            ->method('dispatch')
-            ->with(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $entity));
     }
 }

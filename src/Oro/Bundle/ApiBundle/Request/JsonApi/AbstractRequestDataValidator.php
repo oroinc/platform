@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * The base class for the JSON.API request data typed and untyped validators.
+ * The base class for the JSON:API request data typed and untyped validators.
  */
 abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValidator
 {
@@ -22,6 +22,8 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
     public function validateMetaObject(array $requestData): array
     {
         return $this->doValidation(function () use ($requestData) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::META)) {
                 $this->validateSectionNotExist($requestData, JsonApiDoc::DATA);
                 $this->validateSectionNotExist($requestData, JsonApiDoc::INCLUDED);
@@ -29,12 +31,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         });
     }
 
-    /**
-     * @param array  $data
-     * @param string $rootSection
-     *
-     * @return bool
-     */
     protected function validateRequestData(array $data, string $rootSection): bool
     {
         $isValid = true;
@@ -55,12 +51,46 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
+    protected function validateResourceObjectStructure(array $data, string $pointer): bool
+    {
+        $isValid = true;
+
+        if (!\array_key_exists(0, $data)) {
+            $invalidProperties = \array_diff(\array_keys($data), $this->getResourceObjectProperties());
+            if (!empty($invalidProperties)) {
+                foreach ($invalidProperties as $invalidProperty) {
+                    $this->addError(
+                        $pointer,
+                        \sprintf('The \'%s\' property is not allowed for a resource object', $invalidProperty)
+                    );
+                }
+                $isValid = false;
+            }
+            $this->validateMetaSection($data, $pointer);
+            $this->validateLinksSection($data, $pointer);
+        }
+
+        return $isValid;
+    }
+
     /**
-     * @param array  $data
-     * @param string $rootSection
+     * Returns allowed properties for a resource object.
+     * @link https://jsonapi.org/format/#document-resource-objects
      *
-     * @return bool
+     * @return string[]
      */
+    protected function getResourceObjectProperties(): array
+    {
+        return [
+            JsonApiDoc::TYPE,
+            JsonApiDoc::ID,
+            JsonApiDoc::META,
+            JsonApiDoc::ATTRIBUTES,
+            JsonApiDoc::RELATIONSHIPS,
+            JsonApiDoc::LINKS
+        ];
+    }
+
     protected function validateRequestDataCollection(array $data, string $rootSection): bool
     {
         $isValid = true;
@@ -81,10 +111,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
     protected function validateAttributesAndRelationships(array $data, string $pointer): void
     {
         if (\array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
@@ -101,10 +127,7 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
     }
 
     /**
-     * @param array  $data
-     * @param string $pointer
-     *
-     * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateRelationships(array $data, string $pointer): bool
     {
@@ -148,9 +171,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
-    /**
-     * @param array $data
-     */
     protected function validateIncludedResources(array $data): void
     {
         if (\array_key_exists(JsonApiDoc::INCLUDED, $data)
@@ -158,7 +178,13 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         ) {
             $includedPointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::INCLUDED);
             foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
-                $this->validateTypeAndIdAreRequiredNotBlankString($item, $this->buildPointer($includedPointer, $key));
+                $pointer = $this->buildPointer($includedPointer, $key);
+                if (\is_array($item)) {
+                    $this->validateResourceObjectStructure($item, $pointer);
+                    $this->validateTypeAndIdAreRequiredNotBlankString($item, $pointer);
+                } else {
+                    $this->addError($pointer, 'The related resource should be an object');
+                }
             }
         }
     }

@@ -7,22 +7,15 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction;
 
 class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AjaxMassAction
-     */
-    protected $action;
+    /** @var AjaxMassAction */
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new AjaxMassAction();
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider setOptionsDataProvider
      */
     public function testSetOptions(array $source, array $expected)
@@ -35,10 +28,7 @@ class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setOptionsDataProvider()
+    public function setOptionsDataProvider(): array
     {
         return [
             'confirmation is empty' => [

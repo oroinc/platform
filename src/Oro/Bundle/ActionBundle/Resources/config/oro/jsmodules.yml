@@ -1,0 +1,7 @@
+aliases:
+    oro/datagrid/action/button-widget-action$: oroaction/js/datagrid/action/button-widget-action
+dynamic-imports:
+    commons:
+        - oroaction/js/app/components/button-component
+    orodatagrid:
+        - oro/datagrid/action/button-widget-action

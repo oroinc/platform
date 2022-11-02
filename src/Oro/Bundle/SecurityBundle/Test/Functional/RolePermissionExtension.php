@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Test\Functional;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
@@ -11,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
  * This trait can be used in functional tests where you need to change permissions for security roles.
@@ -22,22 +20,21 @@ trait RolePermissionExtension
 {
     /**
      * @afterInitClient
+     * @beforeResetClient
      */
-    protected function clearAclCache()
+    public static function clearAclCache(): void
     {
-        $container = self::getContainer();
-        if (null !== $container && !self::isDbIsolationPerTest()) {
-            $container->get('tests.security.acl.cache.doctrine')->clearCache();
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $cacheDriver = $em->getConfiguration()->getQueryCache();
+        if ($cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
         }
+        self::getContainer()->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
     }
 
     /**
      * Updates a permission for given entity for the given role.
-     *
-     * @param string $roleName
-     * @param string $entityClass
-     * @param int    $accessLevel
-     * @param string $permission
      */
     protected function updateRolePermission(
         string $roleName,
@@ -73,12 +70,6 @@ trait RolePermissionExtension
 
     /**
      * Updates a permission for given entity for the given role.
-     *
-     * @param string $roleName
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param int    $accessLevel
-     * @param string $permission
      */
     protected function updateRolePermissionForField(
         string $roleName,
@@ -119,10 +110,6 @@ trait RolePermissionExtension
 
     /**
      * Updates a permission for given action for the given role.
-     *
-     * @param string $roleName
-     * @param string $action
-     * @param bool   $value
      */
     protected function updateRolePermissionForAction(
         string $roleName,
@@ -148,11 +135,8 @@ trait RolePermissionExtension
         array $permissions,
         string $fieldName = null
     ): void {
-        /** @var ContainerInterface $container */
-        $container = self::getContainer();
-
         /** @var AclManager $aclManager */
-        $aclManager = $container->get('oro_security.acl.manager');
+        $aclManager = self::getContainer()->get('oro_security.acl.manager');
         $aclExtension = $aclManager
             ->getExtensionSelector()
             ->selectByExtensionKey(ObjectIdentityHelper::getExtensionKeyFromIdentityString($objectIdentity));
@@ -175,35 +159,28 @@ trait RolePermissionExtension
 
         if (!self::isDbIsolationPerTest()) {
             /** @var EntityManagerInterface $em */
-            $em = $container->get('doctrine')->getManager();
-            $cacheDriver = $em->getConfiguration()->getQueryCacheImpl();
-            if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-                $cacheDriver->deleteAll();
+            $em = self::getContainer()->get('doctrine')->getManager();
+            $cacheDriver = $em->getConfiguration()->getQueryCache();
+            if ($cacheDriver instanceof AdapterInterface) {
+                $cacheDriver->clear();
             }
         }
     }
 
-    /**
-     * @param MaskBuilder $maskBuilder
-     * @param array       $permissions
-     *
-     * @return int
-     */
     private function buildAclMask(MaskBuilder $maskBuilder, array $permissions): int
     {
-        $mask = $maskBuilder->reset()->get();
         foreach ($permissions as $permission => $accessLevel) {
-            $maskName = null;
+            $permissionName = null;
             if (is_int($accessLevel)) {
-                $maskName = sprintf('%s_%s', $permission, AccessLevel::getAccessLevelName($accessLevel));
+                $permissionName = sprintf('%s_%s', $permission, AccessLevel::getAccessLevelName($accessLevel));
             } elseif (true === $accessLevel) {
-                $maskName = $permission;
+                $permissionName = $permission;
             }
-            if (null !== $maskName && $maskBuilder->hasMask('MASK_' . $maskName)) {
-                $mask = $maskBuilder->add($maskName)->get();
+            if (null !== $permissionName && $maskBuilder->hasMaskForPermission($permissionName)) {
+                $maskBuilder->add($permissionName);
             }
         }
 
-        return $mask;
+        return $maskBuilder->get();
     }
 }

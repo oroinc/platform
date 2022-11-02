@@ -4,12 +4,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -80,12 +81,9 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
         }
     }
 
-    /**
-     * @param ObjectManager $om
-     */
     protected function loadEmailsDemo(ObjectManager $om)
     {
-        $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
+        $adminUser = $om->getRepository(User::class)->findOneByUsername('admin');
 
         foreach ($this->templates as $index => $template) {
             $isHead = false;
@@ -126,7 +124,6 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
                 false,
                 true
             );
-
 
             $emailUser->getEmail()->setEmailBody($emailBody);
             $emailUser->getEmail()->setMessageId(sprintf('<id+&?= %s@%s>', $index, 'bap.migration.generated'));

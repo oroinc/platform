@@ -11,10 +11,6 @@ class IndexerQuery extends AbstractSearchQuery
      */
     protected $indexer;
 
-    /**
-     * @param Indexer $indexer
-     * @param Query   $query
-     */
     public function __construct(Indexer $indexer, Query $query)
     {
         $this->indexer = $indexer;

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 
 /**
@@ -11,39 +12,29 @@ class CriteriaPlaceholdersResolver
 {
     use NormalizeFieldTrait;
 
-    /**
-     * @param Criteria $criteria
-     * @param string   $rootAlias
-     */
-    public function resolvePlaceholders(Criteria $criteria, string $rootAlias): void
+    public function resolvePlaceholders(CommonCriteria $criteria, string $rootAlias): void
     {
         $placeholders = $this->getPlaceholders($criteria, $rootAlias);
-        $this->processJoins($criteria, $placeholders);
+        if ($criteria instanceof Criteria) {
+            $this->processJoins($criteria, $placeholders);
+        }
         $this->processWhere($criteria, $placeholders);
         $this->processOrderBy($criteria, $placeholders);
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param string   $rootAlias
-     *
-     * @return array
-     */
-    private function getPlaceholders(Criteria $criteria, string $rootAlias): array
+    private function getPlaceholders(CommonCriteria $criteria, string $rootAlias): array
     {
         $placeholders = [Criteria::ROOT_ALIAS_PLACEHOLDER => $rootAlias];
-        $joins = $criteria->getJoins();
-        foreach ($joins as $path => $join) {
-            $placeholders[\sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
+        if ($criteria instanceof Criteria) {
+            $joins = $criteria->getJoins();
+            foreach ($joins as $path => $join) {
+                $placeholders[\sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
+            }
         }
 
         return $placeholders;
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param array    $placeholders
-     */
     private function processJoins(Criteria $criteria, array $placeholders): void
     {
         $joins = $criteria->getJoins();
@@ -58,11 +49,7 @@ class CriteriaPlaceholdersResolver
         }
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param array    $placeholders
-     */
-    private function processWhere(Criteria $criteria, array $placeholders): void
+    private function processWhere(CommonCriteria $criteria, array $placeholders): void
     {
         $whereExpr = $criteria->getWhereExpression();
         if ($whereExpr) {
@@ -71,11 +58,7 @@ class CriteriaPlaceholdersResolver
         }
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param array    $placeholders
-     */
-    private function processOrderBy(Criteria $criteria, array $placeholders): void
+    private function processOrderBy(CommonCriteria $criteria, array $placeholders): void
     {
         $orderBy = $criteria->getOrderings();
         if (!empty($orderBy)) {

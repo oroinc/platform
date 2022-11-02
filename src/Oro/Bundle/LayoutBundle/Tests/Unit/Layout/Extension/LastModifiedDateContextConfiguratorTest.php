@@ -2,26 +2,24 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
 use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator;
-use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider;
 use Oro\Component\Layout\LayoutContext;
 
 class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LastModificationDateProvider */
+    private $lastModificationDateProvider;
+
     /** @var ActionContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Cache
-     */
-    protected $cache;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->cache = $this->createMock('Doctrine\Common\Cache\Cache');
-        $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->cache);
+        $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
+
+        $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->lastModificationDateProvider);
     }
 
     public function testConfigureContextWithDefaultAction()
@@ -31,25 +29,38 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue(is_string($context[LastModifiedDateContextConfigurator::MAX_MODIFICATION_DATE_PARAM]));
+        $this->assertIsString($context['last_modification_date']);
     }
 
     public function testConfigureContext()
     {
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $lastModificationDate = new \DateTime('now - 1 hour', new \DateTimeZone('UTC'));
         $context = new LayoutContext();
 
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(ThemeResourceProvider::CACHE_LAST_MODIFICATION_DATE)
-            ->willReturn($now);
+        $this->lastModificationDateProvider->expects($this->once())
+            ->method('getLastModificationDate')
+            ->willReturn($lastModificationDate);
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
         $this->assertEquals(
-            $now->format(\DateTime::COOKIE),
-            $context[LastModifiedDateContextConfigurator::MAX_MODIFICATION_DATE_PARAM]
+            $lastModificationDate->format(\DateTime::COOKIE),
+            $context['last_modification_date']
         );
+    }
+
+    public function testConfigureContextWhenLastModificationDateDoesNotExist()
+    {
+        $context = new LayoutContext();
+
+        $this->lastModificationDateProvider->expects($this->once())
+            ->method('getLastModificationDate')
+            ->willReturn(null);
+
+        $this->contextConfigurator->configureContext($context);
+        $context->resolve();
+
+        $this->assertNotEmpty($context['last_modification_date']);
     }
 }

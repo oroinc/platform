@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     private $processor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new Configuration(['string', 'number']);
         $this->processor = new Processor();
@@ -30,8 +30,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processConfigurationDataProvider
-     * @param array $configs
-     * @param array $expected
      */
     public function testProcessConfiguration(array $configs, array $expected)
     {
@@ -40,7 +38,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationStructure
-     * @param array $configs
      */
     public function testInvalidConfigurationStructure(array $configs)
     {
@@ -50,7 +47,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationValues
-     * @param array $configs
      */
     public function testInvalidConfigurationValues(array $configs)
     {
@@ -58,10 +54,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processor->processConfiguration($this->configuration, $configs);
     }
 
-    /**
-     * @return array
-     */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'empty' => [
@@ -87,8 +80,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'sku' => [
                             'type' => 'string',
                             'data_name' => 'test',
-                            'enabled' => true,
+                            'renderable' => true,
                             'visible' => true,
+                            'disabled' => false,
                             'translatable' => true,
                             'force_like' => false,
                             'case_insensitive' => true,
@@ -118,8 +112,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'sku' => [
                             'type' => 'string',
                             'data_name' => 'test',
-                            'enabled' => true,
+                            'renderable' => true,
                             'visible' => true,
+                            'disabled' => false,
                             'translatable' => true,
                             'force_like' => true,
                             'case_insensitive' => true,
@@ -150,8 +145,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'sku' => [
                             'type' => 'string',
                             'data_name' => 'test',
-                            'enabled' => true,
+                            'renderable' => true,
                             'visible' => true,
+                            'disabled' => false,
                             'translatable' => true,
                             'force_like' => true,
                             'case_insensitive' => false,
@@ -182,8 +178,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'sku' => [
                             'type' => 'string',
                             'data_name' => 'test',
-                            'enabled' => true,
+                            'renderable' => true,
                             'visible' => true,
+                            'disabled' => false,
                             'translatable' => true,
                             'force_like' => true,
                             'case_insensitive' => true,
@@ -215,8 +212,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'sku' => [
                             'type' => 'string',
                             'data_name' => 'test',
-                            'enabled' => true,
+                            'renderable' => true,
                             'visible' => true,
+                            'disabled' => false,
                             'translatable' => true,
                             'force_like' => true,
                             'case_insensitive' => true,

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
@@ -18,7 +19,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
     /** @var CompleteErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +36,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
     public function testProcessWithoutErrors()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleter->expects(self::never())
             ->method('complete');
@@ -46,7 +47,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
     public function testProcess()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -57,11 +58,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
                 self::identicalTo($this->context->getRequestType()),
                 self::identicalTo($metadata)
             )
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');
@@ -81,11 +80,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->processor->process($this->context);
@@ -103,11 +100,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('test');
@@ -129,11 +124,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');
@@ -155,11 +148,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');
@@ -170,5 +161,64 @@ class CompleteErrorsTest extends GetProcessorTestCase
             ->setDetail('some exception');
 
         self::assertEquals([$expectedError], $this->context->getErrors());
+    }
+
+    public function testRemoveDuplicates()
+    {
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByPropertyPath('path1'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByPropertyPath('path2'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail2')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByPropertyPath('path1'))
+        );
+        $this->context->addError(
+            Error::create('title2', 'detail1')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByPropertyPath('path1'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByPointer('path1'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setStatusCode(400)
+                ->setSource(ErrorSource::createByParameter('path1'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setStatusCode(400)
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+                ->setSource(ErrorSource::createByParameter('path1'))
+        );
+        $this->context->addError(
+            Error::create('title1', 'detail1')
+        );
+
+        $expectedErrors = $this->context->getErrors();
+
+        // duplicate all errors
+        foreach ($expectedErrors as $error) {
+            $newError = clone $error;
+            if (null !== $error->getSource()) {
+                $newError->setSource(clone $error->getSource());
+            }
+            $this->context->addError($newError);
+        }
+
+        $this->processor->process($this->context);
+        self::assertSame($expectedErrors, $this->context->getErrors());
     }
 }

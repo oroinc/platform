@@ -5,24 +5,33 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UIBundle\Route\Router;
+use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Workflow definition controller
  * @Route("/workflowdefinition")
  */
-class WorkflowDefinitionController extends Controller
+class WorkflowDefinitionController extends AbstractController
 {
     /**
      * @Route(name="oro_workflow_definition_index")
@@ -39,7 +48,7 @@ class WorkflowDefinitionController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_workflow.entity.workflow_definition.class')
+            'entity_class' => WorkflowDefinition::class,
         ];
     }
 
@@ -48,7 +57,7 @@ class WorkflowDefinitionController extends Controller
      *      "/create",
      *      name="oro_workflow_definition_create"
      * )
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
      * @Acl(
      *      id="oro_workflow_definition_create",
      *      type="entity",
@@ -68,7 +77,7 @@ class WorkflowDefinitionController extends Controller
      *      "/update/{name}",
      *      name="oro_workflow_definition_update"
      * )
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
      * @Acl(
      *      id="oro_workflow_definition_update",
      *      type="entity",
@@ -85,10 +94,16 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem() || !$this->isEditable($workflowDefinition)) {
             throw new AccessDeniedException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+            ->getWorkflowTranslateLinks($workflowDefinition);
+        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
 
-        $form = $this->get('oro_workflow.form.workflow_definition');
+        $form = $this->get(FormFactoryInterface::class)->createNamed(
+            'oro_workflow_definition_form',
+            WorkflowDefinitionType::class,
+            null
+        );
+
         $form->setData($workflowDefinition);
 
         return [
@@ -121,7 +136,10 @@ class WorkflowDefinitionController extends Controller
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
+        $workflow = $this->get(WorkflowManagerRegistry::class)
+            ->getManager('system')
+            ->getWorkflow($workflowDefinition->getName());
+
         if (!count($workflow->getVariables())) {
             throw new AccessDeniedException();
         }
@@ -131,19 +149,19 @@ class WorkflowDefinitionController extends Controller
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
-                $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
+                $this->get(WorkflowVariablesHandler::class)
+                    ->updateWorkflowVariables($workflowDefinition, $form->getData());
 
                 $this->addFlash(
                     'success',
-                    $this->get('translator')->trans('oro.workflow.variable.save.success_message')
+                    $this->get(TranslatorInterface::class)->trans('oro.workflow.variable.save.success_message')
                 );
 
-                return $this->get('oro_ui.router')->redirect($workflowDefinition);
+                return $this->get(Router::class)->redirect($workflowDefinition);
             }
         }
 
-        $translateLinksProvider = $this->getTranslationsDatagridLinksProvider();
+        $translateLinksProvider = $this->get(TranslationsDatagridLinksProvider::class);
 
         return [
             'form' => $form->createView(),
@@ -158,16 +176,19 @@ class WorkflowDefinitionController extends Controller
      *      name="oro_workflow_definition_view"
      * )
      * @AclAncestor("oro_workflow_definition_view")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:view.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/view.html.twig")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition, true);
-        $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
+        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+            ->getWorkflowTranslateLinks($workflowDefinition);
+        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $workflow = $this->get(WorkflowManagerRegistry::class)
+            ->getManager('system')
+            ->getWorkflow($workflowDefinition->getName());
 
         return [
             'entity' => $workflowDefinition,
@@ -183,9 +204,7 @@ class WorkflowDefinitionController extends Controller
      */
     protected function isEditable(WorkflowDefinition $workflowDefinition)
     {
-        $checker = $this->get('oro_workflow.configuration.checker');
-
-        return $checker->isClean($workflowDefinition->getConfiguration());
+        return $this->get(ConfigurationChecker::class)->isClean($workflowDefinition->getConfiguration());
     }
 
     /**
@@ -193,7 +212,7 @@ class WorkflowDefinitionController extends Controller
      *
      * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")
      * @AclAncestor("oro_workflow_definition_update")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/activateForm.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/widget/activateForm.html.twig")
      *
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
@@ -206,8 +225,8 @@ class WorkflowDefinitionController extends Controller
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
-            $helper = $this->get('oro_workflow.helper.workflow_deactivation');
+            $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager();
+            $helper = $this->get(WorkflowDeactivationHelper::class);
             $data = $form->getData();
 
             try {
@@ -242,8 +261,7 @@ class WorkflowDefinitionController extends Controller
     private function deactivateWorkflows(WorkflowManager $workflowManager, array $workflowNames)
     {
         $deactivated = [];
-        /* @var $translationHelper WorkflowTranslationHelper */
-        $translationHelper = $this->get('oro_workflow.helper.translation');
+        $translationHelper = $this->get(WorkflowTranslationHelper::class);
 
         foreach ($workflowNames as $workflowName) {
             if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
@@ -263,18 +281,24 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * @return TranslationsDatagridLinksProvider
+     * {@inheritDoc}
      */
-    protected function getTranslationsDatagridLinksProvider()
+    public static function getSubscribedServices(): array
     {
-        return $this->get('oro_workflow.translation.translations_datagrid_links_provider');
-    }
-
-    /**
-     * @return TranslationProcessor
-     */
-    protected function getTranslationProcessor()
-    {
-        return $this->get('oro_workflow.translation.processor');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                FormFactoryInterface::class,
+                Router::class,
+                WorkflowManagerRegistry::class,
+                WorkflowVariablesHandler::class,
+                ConfigurationChecker::class,
+                WorkflowDeactivationHelper::class,
+                WorkflowTranslationHelper::class,
+                TranslationsDatagridLinksProvider::class,
+                TranslationProcessor::class,
+            ]
+        );
     }
 }

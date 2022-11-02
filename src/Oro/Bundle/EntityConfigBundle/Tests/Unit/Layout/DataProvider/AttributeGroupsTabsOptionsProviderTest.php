@@ -37,14 +37,12 @@ class AttributeGroupsTabsOptionsProviderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        /** @var AttributeRenderRegistry|\PHPUnit\Framework\MockObject\MockObject $attributeRenderRegistry */
         $attributeRenderRegistry = $this->createMock(AttributeRenderRegistry::class);
         $attributeRenderRegistry->expects($this->once())
             ->method('getNotRenderedGroups')
             ->with($attributeFamily)
             ->willReturn(new ArrayCollection([$firstGroup, $secondGroup]));
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         $localizationHelper->expects($this->any())
             ->method('getLocalizedValue')

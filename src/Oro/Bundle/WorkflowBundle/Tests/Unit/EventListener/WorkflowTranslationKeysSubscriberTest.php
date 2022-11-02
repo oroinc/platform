@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
@@ -18,13 +19,20 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationKeysSubscriber */
     private $translationKeysSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->translationKeysSubscriber = new WorkflowTranslationKeysSubscriber($this->translationManager);
+    }
+
+    private function getTranslationKey(string $key, string $domain): TranslationKey
+    {
+        $translationKey = new TranslationKey();
+        $translationKey->setKey($key);
+        $translationKey->setDomain($domain);
+
+        return $translationKey;
     }
 
     public function testImplementsSubscriberInterface()
@@ -39,8 +47,12 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translationManager->expects($this->once())
             ->method('findTranslationKey')
-            ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        $this->translationManager->expects($this->once())->method('flush');
+            ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturnCallback(function ($key, $domain) {
+                return $this->getTranslationKey($key, $domain);
+            });
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->ensureTranslationKeys($changes);
     }
@@ -76,25 +88,23 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translationManager->expects($this->any())
             ->method('findTranslationKey')
-            ->willReturnCallback(
-                function ($key, $domain) use (&$findTranslationKeys) {
-                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+            ->with($this->anything(), WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturnCallback(function ($key, $domain) use (&$findTranslationKeys) {
+                $findTranslationKeys[] = $key;
 
-                    $findTranslationKeys[] = $key;
-                }
-            );
+                return $this->getTranslationKey($key, $domain);
+            });
 
         $this->translationManager->expects($this->any())
             ->method('removeTranslationKey')
-            ->willReturnCallback(
-                function ($key, $domain) use (&$removeTranslationKeys) {
-                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+            ->willReturnCallback(function ($key, $domain) use (&$removeTranslationKeys) {
+                $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
 
-                    $removeTranslationKeys[] = $key;
-                }
-            );
+                $removeTranslationKeys[] = $key;
+            });
 
-        $this->translationManager->expects($this->once())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
 
@@ -116,12 +126,11 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Previous WorkflowDefinition expected, got null.
-     */
     public function testClearLogicExceptionOnAbsentPreviousDefinition()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Previous WorkflowDefinition expected, got null.');
+
         $this->translationKeysSubscriber->clearTranslationKeys(
             new WorkflowChangesEvent(new WorkflowDefinition(), null)
         );
@@ -134,7 +143,8 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->expects($this->once())
             ->method('removeTranslationKey')
             ->with('label_translation_key');
-        $this->translationManager->expects($this->once())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->deleteTranslationKeys(new WorkflowChangesEvent($deletedDefinition));
     }

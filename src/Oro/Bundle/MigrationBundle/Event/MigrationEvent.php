@@ -5,7 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Event;
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MigrationEvent extends Event
 {
@@ -19,9 +19,6 @@ class MigrationEvent extends Event
      */
     protected $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;

@@ -1,107 +1,157 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
+use Oro\Bundle\CronBundle\Tools\CronHelper;
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CronCommand extends ContainerAwareCommand
+/**
+ * Launches scheduled cron commands.
+ */
+class CronCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:cron';
+
+    private ManagerRegistry $doctrine;
+    private Mode $maintenanceMode;
+    private CronHelper $cronHelper;
+    private CommandRunnerInterface $commandRunner;
+    private CronCommandFeatureCheckerInterface $commandFeatureChecker;
+    private LoggerInterface $logger;
+    private string $environment;
+
+    public function __construct(
+        ManagerRegistry $doctrine,
+        Mode $maintenanceMode,
+        CronHelper $cronHelper,
+        CommandRunnerInterface $commandRunner,
+        CronCommandFeatureCheckerInterface $commandFeatureChecker,
+        LoggerInterface $logger,
+        string $environment
+    ) {
+        parent::__construct();
+        $this->doctrine = $doctrine;
+        $this->maintenanceMode = $maintenanceMode;
+        $this->cronHelper = $cronHelper;
+        $this->commandRunner = $commandRunner;
+        $this->commandFeatureChecker = $commandFeatureChecker;
+        $this->logger = $logger;
+        $this->environment = $environment;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:cron')
-            ->setDescription('Cron commands launcher');
+            ->setDescription('Launches scheduled cron commands.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command launches scheduled cron commands that are due for execution.
+
+This launcher only schedules the actual command executions by adding messages to the message queue
+and the commands are executed asynchronously, so ensure that the message consumer processes
+(<info>oro:message-queue:consume</info>) are running for the scheduled commands to be executed in time.
+
+The commands implementing <info>\Oro\Bundle\CronBundle\Command\SynchronousCommandInterface</info>
+are an exception to this rule as they are launched immediately.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-        /** @var $logger LoggerInterface */
-        $logger = $this->getContainer()->get('logger');
-
         // check for maintenance mode - do not run cron jobs if it is switched on
-        if ($this->getContainer()->get('oro_platform.maintenance')->isOn()) {
+        if ($this->maintenanceMode->isOn()) {
             $message = 'System is in maintenance mode, aborting';
             $output->writeln('');
             $output->writeln(sprintf('<error>%s</error>', $message));
-            $logger->error($message);
-            return;
+            $this->logger->error($message);
+
+            return 1;
         }
 
-        $schedules = $this->getAllSchedules();
-
+        $schedules = $this->doctrine->getRepository(Schedule::class)->findAll();
         /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
-            $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
-            if ($cronExpression->isDue()) {
-                /** @var CronCommandInterface $command */
-                $command = $this->getApplication()->get($schedule->getCommand());
+            if (!$this->commandFeatureChecker->isFeatureEnabled($schedule->getCommand())) {
+                $output->writeln(
+                    'Skipping command ' . $schedule->getCommand() . ' due to this feature is disabled',
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
 
-                // TODO: Should be properly refactored at BAP-13973
-                if ($command instanceof CronCommandInterface && !$command->isActive()) {
-                    $output->writeln(
-                        'Skipping not enabled command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    continue;
-                }
+            $cronExpression = $this->cronHelper->createCron($schedule->getDefinition());
+            if (!$cronExpression->isDue()) {
+                $output->writeln(
+                    'Skipping not due command '.$schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
 
-                // in case of synchronous cron command - run it in separate process
-                if ($command instanceof SynchronousCommandInterface) {
-                    $output->writeln(
-                        'Running synchronous command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    CommandRunner::runCommand(
-                        $schedule->getCommand(),
-                        array_merge(
-                            $schedule->getArguments(),
-                            ['--env' => $this->getContainer()->getParameter('kernel.environment')]
-                        )
-                    );
-                } else {
-                    // in case of common cron command - send the MQ message that will run this command
-                    $output->writeln(
-                        'Scheduling run for command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    $this->getCommandRunner()->run(
-                        $schedule->getCommand(),
-                        $this->resolveOptions($schedule->getArguments())
-                    );
-                }
+            $command = $this->getApplication()->get($schedule->getCommand());
+            if (($command instanceof CronCommandActivationInterface && !$command->isActive())
+                || !$command->isEnabled()
+            ) {
+                $output->writeln(
+                    'Skipping not enabled command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
+
+            // in case of synchronous cron command - run it in separate process
+            if ($command instanceof SynchronousCommandInterface) {
+                $output->writeln(
+                    'Running synchronous command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                CommandRunner::runCommand(
+                    $schedule->getCommand(),
+                    array_merge($schedule->getArguments(), ['--env' => $this->environment])
+                );
             } else {
-                $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
+                // in case of common cron command - send the MQ message that will run this command
+                $output->writeln(
+                    'Scheduling run for command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                $this->commandRunner->run(
+                    $schedule->getCommand(),
+                    $this->resolveOptions($schedule->getArguments())
+                );
             }
         }
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
+
+        return 0;
     }
 
     /**
      * Convert command arguments to options. It needed for correctly pass this arguments into ArrayInput:
      * new ArrayInput(['name' => 'foo', '--bar' => 'foobar']);
-     *
-     * @param array $commandOptions
-     * @return array
      */
-    protected function resolveOptions(array $commandOptions)
+    private function resolveOptions(array $commandOptions): array
     {
         $options = [];
         foreach ($commandOptions as $key => $option) {
@@ -112,48 +162,7 @@ class CronCommand extends ContainerAwareCommand
                 $options[$key] = $option;
             }
         }
+
         return $options;
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectManager
-     */
-    protected function getEntityManager($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    private function getRepository($className)
-    {
-        return $this->getEntityManager($className)->getRepository($className);
-    }
-
-    /**
-     * @return ArrayCollection|Schedule[]
-     */
-    private function getAllSchedules()
-    {
-        return new ArrayCollection($this->getRepository('OroCronBundle:Schedule')->findAll());
-    }
-
-    /**
-     * @return CronHelper
-     */
-    private function getCronHelper()
-    {
-        return $this->getContainer()->get('oro_cron.helper.cron');
-    }
-
-    /**
-     * @return CommandRunnerInterface
-     */
-    private function getCommandRunner()
-    {
-        return $this->getContainer()->get('oro_cron.async.command_runner');
     }
 }

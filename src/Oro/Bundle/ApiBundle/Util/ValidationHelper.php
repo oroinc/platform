@@ -12,9 +12,6 @@ class ValidationHelper
     /** @var MetadataFactoryInterface */
     protected $metadataFactory;
 
-    /**
-     * @param MetadataFactoryInterface $metadataFactory
-     */
     public function __construct(MetadataFactoryInterface $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;

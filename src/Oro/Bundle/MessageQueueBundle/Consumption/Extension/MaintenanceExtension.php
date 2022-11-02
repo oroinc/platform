@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Oro\Bundle\PlatformBundle\Maintenance\Mode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
+/**
+ * Checks whether the system in the maintenance mode
+ */
 class MaintenanceExtension extends AbstractExtension
 {
     /** @var Mode */

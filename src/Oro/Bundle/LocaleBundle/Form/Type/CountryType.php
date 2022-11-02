@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryType extends AbstractType
@@ -18,7 +18,7 @@ class CountryType extends AbstractType
         $resolver->setDefaults(
             [
                 'choice_loader' => new CallbackChoiceLoader(function () {
-                    return array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+                    return array_flip(Countries::getNames('en'));
                 })
             ]
         );

@@ -12,16 +12,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class TextFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var TextFilterType
-     */
+    /** @var TextFilterType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $translator             = $this->createMockTranslator();
+        $translator = $this->createMockTranslator();
         $this->type = new TextFilterType($translator);
-        $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new CustomFormExtension([new FilterType($translator)]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
@@ -65,14 +63,14 @@ class TextFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'simple text' => array(
-                'bindData' => array('type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                'formData' => array('type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                'viewData' => array(
-                    'value' => array('type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'),
-                ),
-            ),
-        );
+        return [
+            'simple text' => [
+                'bindData' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                'formData' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                'viewData' => [
+                    'value' => ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'text'],
+                ],
+            ],
+        ];
     }
 }

@@ -35,10 +35,10 @@ class MigrateConfigValuesQuery extends ParametrizedMigrationQuery
     {
         $configs = $this->loadConfigs($logger);
         foreach ($configs as $key => $value) {
-            $tableName = strpos($key, '#') === 0
+            $tableName = str_starts_with($key, '#')
                 ? 'oro_entity_config'
                 : 'oro_entity_config_field';
-            $id        = strpos($key, '#') === 0
+            $id = str_starts_with($key, '#')
                 ? (int)substr($key, 1)
                 : (int)$key;
 
@@ -47,7 +47,7 @@ class MigrateConfigValuesQuery extends ParametrizedMigrationQuery
             $types  = ['values' => 'array', 'id' => 'integer'];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
     }

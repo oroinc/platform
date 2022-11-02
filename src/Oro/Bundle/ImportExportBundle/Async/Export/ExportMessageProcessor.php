@@ -2,13 +2,14 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Responsible for getting export result.
+ */
 class ExportMessageProcessor extends ExportMessageProcessorAbstract
 {
     /**
@@ -21,18 +22,12 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     protected $doctrineHelper;
 
-    /**
-     * @param ExportHandler $exportHandler
-     */
-    public function setExportHandler(ExportHandler $exportHandler)
+    public function setExportHandler(ExportHandler $exportHandler): void
     {
         $this->exportHandler = $exportHandler;
     }
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper): void
     {
         $this->doctrineHelper = $doctrineHelper;
     }
@@ -42,7 +37,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::EXPORT];
+        return [ExportTopic::getName()];
     }
 
     /**
@@ -56,7 +51,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 ->find($body['organizationId']);
         }
 
-        $exportResult = $this->exportHandler->getExportResult(
+        return $this->exportHandler->getExportResult(
             $body['jobName'],
             $body['processorAlias'],
             $body['exportType'],
@@ -64,8 +59,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
             $body['outputFilePrefix'],
             $body['options']
         );
-
-        return $exportResult;
     }
 
     /**
@@ -73,23 +66,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     protected function getMessageBody(MessageInterface $message)
     {
-        $body = JSON::decode($message->getBody());
-        $body = array_replace_recursive([
-            'jobName' => null,
-            'processorAlias' => null,
-            'organizationId' => null,
-            'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'outputFormat' => 'csv',
-            'outputFilePrefix' => null,
-            'options' => [],
-        ], $body);
-
-        if (! isset($body['jobId'], $body['jobName'], $body['processorAlias'])) {
-            $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        return $body;
+        return $message->getBody();
     }
 }

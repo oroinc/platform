@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\Type\NumberType;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 
-class NumberTypeTest extends TypeTestCase
+class NumberTypeTest extends ApiFormTypeTestCase
 {
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue($scale, $value, $expected)
+    public function testWithValidValue(?int $scale, string $value, string $expected)
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
@@ -18,7 +18,7 @@ class NumberTypeTest extends TypeTestCase
         self::assertSame($expected, $form->getData());
     }
 
-    public function validValuesDataProvider()
+    public function validValuesDataProvider(): array
     {
         return [
             [null, '1.23456789', '1.23456789'],
@@ -31,14 +31,14 @@ class NumberTypeTest extends TypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue($scale, $value)
+    public function testWithInvalidValue(?int $scale, string $value)
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
         self::assertFalse($form->isSynchronized());
     }
 
-    public function invalidValuesDataProvider()
+    public function invalidValuesDataProvider(): array
     {
         return [
             [null, 'test'],

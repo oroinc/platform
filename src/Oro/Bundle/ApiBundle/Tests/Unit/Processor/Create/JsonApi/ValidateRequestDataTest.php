@@ -19,7 +19,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
     /** @var ValidateRequestData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
             'meta' => ['foo' => 'bar']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -56,7 +56,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
     {
         $requestData = [];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -80,7 +80,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
             'data' => ['type' => 'products', 'attributes' => ['foo' => 'bar']]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects(self::any())
@@ -103,13 +103,13 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
             'data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('products')
-            ->willReturn(Product::class);
+            ->with('test')
+            ->willReturn('Test\Entity');
 
         $this->context->setClassName(Product::class);
         $this->context->setMetadata($metadata);

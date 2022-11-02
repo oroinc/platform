@@ -5,101 +5,97 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwnerValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class BusinessUnitOwnerValidatorTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitOwnerValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var BusinessUnitOwnerValidator
-     */
-    protected $businessUnitOwnerValidator;
-
-    protected $constraint;
-
-    protected $context;
-
-    /**
-     * @var BusinessUnit
-     */
-    protected $businessUnit;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->businessUnit = new BusinessUnit();
+        return new BusinessUnitOwnerValidator();
+    }
 
-        $this->constraint = new BusinessUnitOwner();
-        $this->context = $this->getMockForAbstractClass(ExecutionContextInterface::class);
+    private function getBusinessUnit(int $id = null): BusinessUnit
+    {
+        $businessUnit = new BusinessUnit();
+        if (null !== $id) {
+            $businessUnit->setId($id);
+        }
 
-        $this->businessUnitOwnerValidator = new BusinessUnitOwnerValidator();
-        $this->businessUnitOwnerValidator->initialize($this->context);
+        return $businessUnit;
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new BusinessUnitOwner();
+        $this->assertEquals(BusinessUnitOwner::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidBusinessUnit()
     {
-        $this->businessUnit->setId(1);
-        $parentBusinessUnit = new BusinessUnit();
-        $parentBusinessUnit->setId(2);
-        $this->businessUnit->setOwner($parentBusinessUnit);
+        $businessUnit = $this->getBusinessUnit(1);
+        $businessUnit->setOwner($this->getBusinessUnit(2));
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidNewBothBusinessUnits()
     {
-        $parentBusinessUnit = new BusinessUnit();
-        $this->businessUnit->setOwner($parentBusinessUnit);
+        $businessUnit = $this->getBusinessUnit();
+        $businessUnit->setOwner($this->getBusinessUnit());
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidNewBusinessUnit()
     {
-        $parentBusinessUnit = new BusinessUnit();
-        $parentBusinessUnit->setId(1);
-        $this->businessUnit->setOwner($parentBusinessUnit);
+        $businessUnit = $this->getBusinessUnit();
+        $parentBusinessUnit = $this->getBusinessUnit(1);
+        $businessUnit->setOwner($parentBusinessUnit);
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidNewParentBusinessUnit()
     {
-        $this->businessUnit->setId(1);
-        $parentBusinessUnit = new BusinessUnit();
-        $this->businessUnit->setOwner($parentBusinessUnit);
+        $businessUnit = $this->getBusinessUnit(1);
+        $businessUnit->setOwner($this->getBusinessUnit());
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testInvalidBusinessUnit()
     {
-        $this->businessUnit->setId(1);
-        $this->businessUnit->setOwner($this->businessUnit);
+        $businessUnit = $this->getBusinessUnit(1);
+        $businessUnit->setOwner($businessUnit);
 
-        $this->context->expects($this->once())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testInvalidNewBusinessUnit()
     {
-        $this->businessUnit->setOwner($this->businessUnit);
+        $businessUnit = $this->getBusinessUnit();
+        $businessUnit->setOwner($businessUnit);
 
-        $this->context->expects($this->once())
-            ->method('addViolation');
+        $constraint = new BusinessUnitOwner();
+        $this->validator->validate($businessUnit, $constraint);
 
-        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 }

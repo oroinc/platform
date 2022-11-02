@@ -17,11 +17,6 @@ class WidgetConfigVisibilityFilter
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ResolverInterface             $resolver
-     * @param FeatureChecker                $featureChecker
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ResolverInterface $resolver,

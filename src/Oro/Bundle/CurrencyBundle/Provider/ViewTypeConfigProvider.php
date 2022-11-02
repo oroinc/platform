@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\CurrencyBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -18,9 +17,6 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
      */
     protected $viewType;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

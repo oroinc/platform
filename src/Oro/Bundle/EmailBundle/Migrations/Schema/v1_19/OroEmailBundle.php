@@ -16,9 +16,6 @@ class OroEmailBundle implements Migration
         static::oroEmailUserTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

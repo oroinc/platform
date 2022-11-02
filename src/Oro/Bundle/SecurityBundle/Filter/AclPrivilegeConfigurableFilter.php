@@ -6,37 +6,30 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 
+/**
+ * Delegates filtering of ACL privileges to child filters.
+ */
 class AclPrivilegeConfigurableFilter
 {
-    /** @var  AclPrivilegeConfigurableFilterInterface[] */
-    protected $configurableFilters = [];
+    /** @var iterable|AclPrivilegeConfigurableFilterInterface[] */
+    private $configurableFilters;
 
     /** @var ConfigurablePermissionProvider */
-    protected $configurablePermissionProvider;
+    private $configurablePermissionProvider;
 
     /**
-     * @param ConfigurablePermissionProvider $configurablePermissionProvider
+     * @param iterable|AclPrivilegeConfigurableFilterInterface[] $configurableFilters
+     * @param ConfigurablePermissionProvider                     $configurablePermissionProvider
      */
-    public function __construct(ConfigurablePermissionProvider $configurablePermissionProvider)
-    {
+    public function __construct(
+        iterable $configurableFilters,
+        ConfigurablePermissionProvider $configurablePermissionProvider
+    ) {
+        $this->configurableFilters = $configurableFilters;
         $this->configurablePermissionProvider = $configurablePermissionProvider;
     }
 
-    /**
-     * @param AclPrivilegeConfigurableFilterInterface $filter
-     */
-    public function addConfigurableFilter(AclPrivilegeConfigurableFilterInterface $filter)
-    {
-        $this->configurableFilters[] = $filter;
-    }
-
-    /**
-     * @param ArrayCollection $aclPrivileges
-     * @param string $configurableName
-     *
-     * @return ArrayCollection
-     */
-    public function filter(ArrayCollection $aclPrivileges, $configurableName)
+    public function filter(ArrayCollection $aclPrivileges, string $configurableName): ArrayCollection
     {
         $configurablePermission = $this->configurablePermissionProvider->get($configurableName);
 

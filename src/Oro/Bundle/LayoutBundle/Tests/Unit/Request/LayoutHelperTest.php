@@ -10,40 +10,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LayoutHelper
-     */
-    protected $helper;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $requestStack;
+    /** @var LayoutHelper */
+    private $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->helper = new LayoutHelper($this->requestStack);
     }
 
-    /**
-     * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
-     */
-    public function testGetLayoutAnnotation(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
-        $this->setUpRequestStack($request, $annotation);
-        $this->assertEquals($annotation, $this->helper->getLayoutAnnotation($request));
-    }
-
-    /**
-     * @return array
-     */
-    public function layoutHelperDataProvider()
+    public function layoutHelperDataProvider(): array
     {
         return [
             [
@@ -52,89 +32,54 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'request' => null,
-                'annotation' => $this->getLayoutAnnotationMock(),
+                'annotation' => $this->createMock(LayoutAnnotation::class),
             ],
             [
-                'request' => $this->createMock('Symfony\Component\HttpFoundation\Request'),
+                'request' => $this->createMock(Request::class),
                 'annotation' => null,
             ],
             [
-                'request' => $this->createMock('Symfony\Component\HttpFoundation\Request'),
-                'annotation' => $this->getLayoutAnnotationMock(),
+                'request' => $this->createMock(Request::class),
+                'annotation' => $this->createMock(LayoutAnnotation::class),
             ],
         ];
     }
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
-    public function testIsLayoutRequest(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
+    public function testIsLayoutRequest(?Request $request, ?LayoutAnnotation $annotation)
+    {
         $this->setUpRequestStack($request, $annotation);
-        $this->assertEquals((bool)$annotation, $this->helper->isLayoutRequest($request));
+        $this->assertEquals(null !== $annotation, $this->helper->isLayoutRequest($request));
     }
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
-    public function testIsTemplateRequest(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
-        $this->setUpRequestStack($request, $annotation);
-        $this->assertEquals(!(bool)$annotation, $this->helper->isTemplateRequest($request));
-    }
-
-    /**
-     * @return LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getLayoutAnnotationMock()
+    public function testIsTemplateRequest(?Request $request, ?LayoutAnnotation $annotation)
     {
-        return $this->getMockBuilder('Oro\Bundle\LayoutBundle\Annotation\Layout')->disableOriginalConstructor()
-            ->getMock();
+        $this->setUpRequestStack($request, $annotation);
+        $this->assertEquals(null === $annotation, $this->helper->isTemplateRequest($request));
     }
 
-    /**
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
-     * @param bool $isTemplate
-     */
-    protected function setUpRequestStack(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null,
-        $isTemplate = false
-    ) {
+    private function setUpRequestStack(?Request $request, ?LayoutAnnotation $annotation): void
+    {
         if ($request) {
             $this->requestStack->expects($this->never())
                 ->method('getCurrentRequest');
         } else {
-            $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+            $request = $this->createMock(Request::class);
             $this->requestStack->expects($this->once())
                 ->method('getCurrentRequest')
                 ->willReturn($request);
         }
 
-        /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject $attributes */
-        $attributes = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $attributes = $this->createMock(ParameterBag::class);
         $request->attributes = $attributes;
-        $attributes->expects($this->at(0))
+        $attributes->expects($this->once())
             ->method('get')
             ->with('_layout')
             ->willReturn($annotation);
-
-        if ($isTemplate) {
-            $template = $this->getMockBuilder('Sensio\Bundle\FrameworkExtraBundle\Configuration\Template')
-                ->disableOriginalConstructor()->getMock();
-            $attributes->expects($this->at(1))
-                ->method('get')
-                ->with('_template')
-                ->willReturn($template);
-        }
     }
 }

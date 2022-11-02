@@ -9,9 +9,6 @@ class TransitionEventTriggerCompoundVerifier implements TransitionEventTriggerVe
     /** @var array|TransitionEventTriggerVerifierInterface[] */
     protected $verifiers = [];
 
-    /**
-     * @param TransitionEventTriggerVerifierInterface $triggerVerifier
-     */
     public function addVerifier(TransitionEventTriggerVerifierInterface $triggerVerifier)
     {
         $this->verifiers[] = $triggerVerifier;

@@ -12,6 +12,7 @@ namespace Oro\Component\Layout;
  *  - only existing alias can be removed
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RawLayoutBuilder implements RawLayoutBuilderInterface
 {
@@ -490,7 +491,6 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this->rawLayout;
     }
 
-
     /**
      * Checks if the given value can be used as the block type name
      *
@@ -507,7 +507,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
             if (!is_string($blockType)) {
                 throw new Exception\UnexpectedTypeException($blockType, 'string or BlockTypeInterface', 'blockType');
             }
-            if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
+            if (!preg_match('/^[a-z][a-z0-9\_]*$/iD', $blockType)) {
                 throw new Exception\InvalidArgumentException(
                     sprintf(
                         'The "%s" string cannot be used as the name of the block type '

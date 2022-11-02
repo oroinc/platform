@@ -29,6 +29,7 @@ Feature: Navigation bar position
   Scenario: Create new menu item with empty url
     When I go to System/Menus
     And click view "application_menu" in grid
+    And I drag and drop "ProductsItem" before "RootItem"
     And click "Application menu item"
     And I Create Menu Item
     And I fill "Menu Form" with:

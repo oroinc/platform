@@ -2,38 +2,27 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
- * Implements VirtualFieldProviderInterface for enum and multiEnum types
+ * Provides virtual fields for enum and multiEnum types.
  */
 class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
 {
-    /** @var ConfigProvider */
-    protected $extendConfigProvider;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var ConfigManager */
+    private $configManager;
 
     /** @var array */
-    protected $virtualFields = [];
+    private $virtualFields = [];
 
-    /**
-     * Constructor
-     *
-     * @param ConfigProvider  $extendConfigProvider
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(
-        ConfigProvider $extendConfigProvider,
-        ManagerRegistry $doctrine
-    ) {
-        $this->extendConfigProvider = $extendConfigProvider;
-        $this->doctrine             = $doctrine;
+    /** @var array */
+    private $virtualFieldQueries = [];
+
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -55,7 +44,9 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
     {
         $this->ensureVirtualFieldsInitialized($className);
 
-        return isset($this->virtualFields[$className][$fieldName]);
+        return
+            isset($this->virtualFields[$className])
+            && array_key_exists($fieldName, $this->virtualFields[$className]);
     }
 
     /**
@@ -63,44 +54,84 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized($className);
+        $this->ensureVirtualFieldQueriesInitialized($className);
 
-        return $this->virtualFields[$className][$fieldName]['query'];
+        return $this->virtualFieldQueries[$className][$fieldName]['query'];
     }
 
     /**
-     * Makes sure virtual fields for the given entity are loaded
-     *
      * @param string $className
      */
-    protected function ensureVirtualFieldsInitialized($className)
+    private function ensureVirtualFieldsInitialized($className)
     {
         if (isset($this->virtualFields[$className])) {
             return;
         }
 
-        $em = $this->getManagerForClass($className);
-        if (!$em) {
+        $this->virtualFields[$className] = $this->loadVirtualFields($className);
+    }
+
+    /**
+     * @param string $className
+     */
+    private function ensureVirtualFieldQueriesInitialized($className)
+    {
+        if (isset($this->virtualFieldQueries[$className])) {
             return;
         }
 
-        $this->virtualFields[$className] = [];
-        $metadata = $em->getClassMetadata($className);
-        $associationNames = $metadata->getAssociationNames();
-        foreach ($associationNames as $associationName) {
-            if (!$this->extendConfigProvider->hasConfig($className, $associationName)) {
+        $this->ensureVirtualFieldsInitialized($className);
+        if (isset($this->virtualFields[$className])) {
+            $this->virtualFieldQueries[$className] = $this->loadVirtualFieldQueries($this->virtualFields[$className]);
+        }
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array [associationName => targetFieldName for enum and NULL for multiEnum, ...]
+     */
+    private function loadVirtualFields($className)
+    {
+        $result = [];
+        /** @var FieldConfigId[] $fieldIds */
+        $fieldIds = $this->configManager->getIds('extend', $className);
+        foreach ($fieldIds as $fieldId) {
+            $fieldType = $fieldId->getFieldType();
+            if ('enum' !== $fieldType && 'multiEnum' !== $fieldType) {
                 continue;
             }
-            /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $this->extendConfigProvider->getId($className, $associationName);
-            $fieldType = $fieldConfigId->getFieldType();
-            if ($fieldType === 'enum') {
-                $extendFieldConfig = $this->extendConfigProvider->getConfig($className, $associationName);
-                $this->virtualFields[$className][$associationName] = [
+            $associationName = $fieldId->getFieldName();
+            $fieldConfig = $this->configManager->getFieldConfig('extend', $className, $associationName);
+            if (!ExtendHelper::isFieldAccessible($fieldConfig)) {
+                continue;
+            }
+            $targetFieldName = null;
+            if ('enum' === $fieldType) {
+                $result[$associationName] = $fieldConfig->get('target_field');
+            } elseif ('multiEnum' === $fieldType) {
+                $result[$associationName] = null;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $virtualFields [associationName => targetFieldName for enum and NULL for multiEnum, ...]
+     *
+     * @return array [associationName => query, ...]
+     */
+    private function loadVirtualFieldQueries(array $virtualFields)
+    {
+        $result = [];
+        foreach ($virtualFields as $associationName => $targetFieldName) {
+            if ($targetFieldName) {
+                $result[$associationName] = [
                     'query' => [
                         'select' => [
-                            'expr'         => sprintf('target.%s', $extendFieldConfig->get('target_field')),
-                            'return_type'  => $fieldType,
+                            'expr'         => sprintf('target.%s', $targetFieldName),
+                            'return_type'  => 'enum',
                             'filter_by_id' => true
                         ],
                         'join'   => [
@@ -113,38 +144,22 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
                         ]
                     ]
                 ];
-            } elseif ($fieldType === 'multiEnum') {
-                $this->virtualFields[$className][$associationName] = [
+            } else {
+                $result[$associationName] = [
                     'query' => [
                         'select' => [
-                            'expr'        => sprintf(
+                            'expr'         => sprintf(
                                 'entity.%s',
                                 ExtendHelper::getMultiEnumSnapshotFieldName($associationName)
                             ),
-                            'return_type'  => $fieldType,
+                            'return_type'  => 'multiEnum',
                             'filter_by_id' => true
                         ]
                     ]
                 ];
             }
         }
-    }
 
-    /**
-     * Gets doctrine entity manager for the given class
-     *
-     * @param string $className
-     *
-     * @return EntityManager|null
-     */
-    protected function getManagerForClass($className)
-    {
-        try {
-            return $this->doctrine->getManagerForClass($className);
-        } catch (\ReflectionException $ex) {
-            // ignore not found exception
-        }
-
-        return null;
+        return $result;
     }
 }

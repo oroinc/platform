@@ -33,6 +33,7 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
      * @param bool            $dryRun
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
@@ -81,7 +82,7 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
             );
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
     }

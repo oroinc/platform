@@ -1,10 +1,12 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set gridName = 'attribute-family-grid' %}
 {% set pageTitle = attributeFamiliesLabel|trans %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_attribute_family_create') %}
         <div class="btn-group pull-right">
             {{ UI.addButton({

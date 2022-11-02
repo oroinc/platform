@@ -5,174 +5,151 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class StartWorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StartWorkflow
-     */
-    protected $action;
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|
-     */
-    protected $workflowManager;
+    /** @var StartWorkflow */
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array())
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
 
         $this->action = new StartWorkflow(new ContextAccessor(), $this->workflowManager);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->workflowManager);
-        unset($this->action);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array $options
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         $workflowItem = $this->createWorkflowItem();
 
         $actualContext = new ItemStub(
-            array(
+            [
                 'workflowName' => 'acmeWorkflow',
                 'entityValue' => new \DateTime('now'),
                 'startTransition' => 'acmeStartTransition',
                 'someKey' => 'someValue'
-            )
+            ]
         );
 
         $expectedContext = clone $actualContext;
         $expectedContext->workflowItem = $workflowItem;
 
-        return array(
-            'minimum options' => array(
-                'options' => array(
+        return [
+            'minimum options' => [
+                'options' => [
                     'name' => $actualContext->workflowName,
                     'attribute' => new PropertyPath('workflowItem'),
-                ),
+                ],
                 'actualContext' => $actualContext,
                 'expectedContext' => $expectedContext,
-            ),
-            'maximum plain option' => array(
-                'options' => array(
+            ],
+            'maximum plain option' => [
+                'options' => [
                     'name' => $actualContext->workflowName,
                     'attribute' => new PropertyPath('workflowItem'),
                     'entity' => new PropertyPath('entityValue'),
                     'transition' => $actualContext->startTransition,
-                    'data' => array(
+                    'data' => [
                         'plainData' => 'plainDataValue',
-                    )
-                ),
+                    ]
+                ],
                 'actualContext' => $actualContext,
                 'expectedContext' => $expectedContext,
-                'expectedData' => array(
+                'expectedData' => [
                     'plainData' => 'plainDataValue',
-                )
-            ),
-            'maximum property path options' => array(
-                'options' => array(
+                ]
+            ],
+            'maximum property path options' => [
+                'options' => [
                     'name' => new PropertyPath('workflowName'),
                     'attribute' => new PropertyPath('workflowItem'),
                     'entity' => new PropertyPath('entityValue'),
                     'transition' => new PropertyPath('startTransition'),
-                    'data' => array(
+                    'data' => [
                         'propertyData' => new PropertyPath('someKey'),
-                    ),
-                ),
+                    ],
+                ],
                 'actualContext' => $actualContext,
                 'expectedContext' => $expectedContext,
-                'expectedData' => array(
+                'expectedData' => [
                     'propertyData' => $expectedContext->someKey,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no name' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no name' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Workflow name parameter is required',
-            ),
-            'no attribute' => array(
-                'options' => array(
+            ],
+            'no attribute' => [
+                'options' => [
                     'name' => 'acmeWorkflow'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute name parameter is required',
-            ),
-            'invalid attribute' => array(
-                'options' => array(
+            ],
+            'invalid attribute' => [
+                'options' => [
                     'name' => 'acmeWorkflow',
                     'attribute' => 'notPropertyPath'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute must be valid property definition',
-            ),
-            'invalid entity' => array(
-                'options' => array(
+            ],
+            'invalid entity' => [
+                'options' => [
                     'name' => 'acmeWorkflow',
                     'attribute' => new PropertyPath('workflowItem'),
                     'entity' => 'notPropertyPath'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Entity must be valid property definition',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param ItemStub $actualContext
-     * @param ItemStub $expectedContext
-     * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
     public function testExecute(
         array $options,
         ItemStub $actualContext,
         ItemStub $expectedContext,
-        array $expectedData = array()
+        array $expectedData = []
     ) {
         $expectedWorkflowName = $expectedContext->workflowName;
         $expectedEntity = !empty($options['entity']) ? $expectedContext->entityValue : null;
@@ -182,7 +159,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->workflowManager->expects($this->once())
             ->method('startWorkflow')
             ->with($expectedWorkflowName, $expectedEntity, $expectedTransition, $expectedData)
-            ->will($this->returnValue($expectedWorkflowItem));
+            ->willReturn($expectedWorkflowItem);
 
         $this->action->initialize($options);
         $this->action->execute($actualContext);
@@ -190,10 +167,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedContext->getData(), $actualContext->getData());
     }
 
-    /**
-     * @return WorkflowItem
-     */
-    protected function createWorkflowItem()
+    private function createWorkflowItem(): WorkflowItem
     {
         $workflowItem = new WorkflowItem();
         $workflowItem->setId(1);
@@ -201,22 +175,21 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         return $workflowItem;
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Entity value must be an object
-     */
     public function testExecuteEntityNotAnObject()
     {
-        $options = array(
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Entity value must be an object');
+
+        $options = [
             'name' => 'acmeWorkflow',
             'attribute' => new PropertyPath('workflowItem'),
             'entity' => new PropertyPath('entityValue'),
-        );
+        ];
         $context = new ItemStub(
-            array(
+            [
                 'workflowName' => 'acmeWorkflow',
                 'entityValue' => 'notAnObject',
-            )
+            ]
         );
 
         $this->action->initialize($options);

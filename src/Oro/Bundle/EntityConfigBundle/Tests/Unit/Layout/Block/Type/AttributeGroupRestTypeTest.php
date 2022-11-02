@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\BlockType;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
@@ -15,13 +15,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {
-    /**
-     * @var AttributeRenderRegistry
-     */
-    protected $attributeRenderRegistry;
+    /** @var AttributeRenderRegistry */
+    private $attributeRenderRegistry;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {

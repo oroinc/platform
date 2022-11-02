@@ -14,9 +14,6 @@ class DefaultFormStartHandleProcessor implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -55,11 +52,6 @@ class DefaultFormStartHandleProcessor implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Transition $transition
-     * @return array
-     */
     protected function getFormAttributes(FormInterface $form, Transition $transition): array
     {
         $formOptions = $transition->getFormOptions();

@@ -7,9 +7,12 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Abstract class for workflow transition buttons config.
+ */
 abstract class AbstractTransitionButton implements ButtonInterface
 {
-    const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
+    const DEFAULT_TEMPLATE = '@OroWorkflow/Button/transitionButton.html.twig';
     const TRANSITION_JS_DIALOG_WIDGET = 'oroworkflow/transition-dialog-widget';
 
     /** @var Workflow */
@@ -21,11 +24,6 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /*** @var ButtonContext */
     protected $buttonContext;
 
-    /**
-     * @param Transition $transition
-     * @param Workflow $workflow
-     * @param ButtonContext $buttonContext
-     */
     public function __construct(Transition $transition, Workflow $workflow, ButtonContext $buttonContext)
     {
         $this->transition = $transition;
@@ -44,9 +42,17 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->transition->getButtonLabel();
+        return (string) $this->transition->getButtonLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAriaLabel(): ?string
+    {
+        return null; // not implemented
     }
 
     /**
@@ -102,14 +108,15 @@ abstract class AbstractTransitionButton implements ButtonInterface
                     'route' => $this->buttonContext->getRouteName(),
                     'datagrid' => $this->buttonContext->getDatagridName(),
                     'group' => $this->buttonContext->getGroup(),
-                    'originalUrl' => $showDialog ? null : $this->buttonContext->getOriginalUrl(),
+                    'originalUrl' => $showDialog ? null : urlencode($this->buttonContext->getOriginalUrl()),
                 ],
                 'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'requestMethod' => 'POST',
                 'dialogRoute' => $showDialog
                     ? $this->buttonContext->getFormDialogRoute()
                     : $this->buttonContext->getFormPageRoute(),
                 'additionalData' => $this->getDatagridData(),
-                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET,
+                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET
             ],
             $customData
         );

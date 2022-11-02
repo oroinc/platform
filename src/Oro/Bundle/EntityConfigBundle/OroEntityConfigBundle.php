@@ -4,7 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsStoragePass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,14 +14,16 @@ class OroEntityConfigBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\ServiceMethodPass);
         $container->addCompilerPass(new Compiler\EntityConfigPass);
-        $container->addCompilerPass(new Compiler\AttributeBlockTypeMapperPass());
-        $container->addCompilerPass(new Compiler\AttributeTypePass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_entity_config.registry.attribute_type',
+            'oro_entity_config.attribute_type',
+            'type'
+        ));
 
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAnnotationMappingDriver(
@@ -36,18 +39,13 @@ class OroEntityConfigBundle extends Bundle
             )
         );
 
-        $container
-            ->addCompilerPass(
-                new DefaultFallbackExtensionPass(
-                    [
-                        'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily' => [
-                            'label' => 'labels',
-                        ],
-                        'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup' => [
-                            'label' => 'labels',
-                        ],
-                    ]
-                )
-            );
+        $container->addCompilerPass(new EntityFallbackFieldsStoragePass([
+            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily' => [
+                'label' => 'labels'
+            ],
+            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup' => [
+                'label' => 'labels'
+            ],
+        ]));
     }
 }

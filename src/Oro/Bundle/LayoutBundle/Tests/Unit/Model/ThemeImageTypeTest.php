@@ -7,20 +7,18 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
 class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const NAME = 'main';
-    const LABEL = 'Main';
-    const MAX_NUMBER = 1;
+    private const NAME = 'main';
+    private const LABEL = 'Main';
+    private const MAX_NUMBER = 1;
 
-    const DIMENSION_1 = 'dim1';
-    const DIMENSION_2 = 'dim2';
-    const DIMENSION_3 = 'dim3';
+    private const DIMENSION_1 = 'dim1';
+    private const DIMENSION_2 = 'dim2';
+    private const DIMENSION_3 = 'dim3';
 
-    /**
-     * @var ThemeImageType
-     */
-    protected $imageType;
+    /** @var ThemeImageType */
+    private $imageType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->imageType = new ThemeImageType(
             self::NAME,
@@ -55,14 +53,9 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertHasDimension(50, 50);
     }
 
-    /**
-     * @param int $width
-     * @param int $height
-     */
-    private function assertHasDimension($width, $height)
+    private function assertHasDimension(int $width, int $height): void
     {
         $hasDimension = false;
-
         foreach ($this->imageType->getDimensions() as $dimension) {
             if ($dimension->getWidth() === $width && $dimension->getHeight() === $height) {
                 $hasDimension = true;
@@ -76,7 +69,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @return ThemeImageTypeDimension[]
      */
-    private function prepareInitialDimensions()
+    private function prepareInitialDimensions(): array
     {
         return [
             new ThemeImageTypeDimension(self::DIMENSION_1, 10, 20),

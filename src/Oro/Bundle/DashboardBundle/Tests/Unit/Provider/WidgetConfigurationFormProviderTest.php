@@ -1,39 +1,31 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Tests\Provider;
+namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Yaml\Yaml;
 
 class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
-            ->addTypeExtension(
-                new DataBlockExtension()
-            )
+            ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-    }
-
-    /**
-     * @expectedException Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException
-     */
     public function testGetFormShouldReturnExceptionIfNoFormIsDefinedForWidget()
     {
+        $this->expectException(InvalidArgumentException::class);
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
         $this->assertFalse($provider->hasForm('quick_launchpad_without_form'));
 
@@ -45,42 +37,31 @@ class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
         $this->assertTrue($provider->hasForm('quick_launchpad'));
         $form = $provider->getForm('quick_launchpad');
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+        $this->assertInstanceOf(FormInterface::class, $form);
 
         $this->assertTrue($form->has('some_field'));
         $this->assertTrue($form->has('some_another_field'));
         $this->assertCount(2, $form);
     }
 
-    /**
-     * Parse config fixture and validate through processorDecorator
-     *
-     * @param string $path
-     *
-     * @return array
-     */
-    protected function getConfig($path)
+    private function getConfig(string $path): array
     {
-        $config = Yaml::parse(file_get_contents($path));
-
-        return $config;
+        return Yaml::parse(file_get_contents($path));
     }
 
-    /**
-     * @param string $configPath
-     *
-     * @return SystemConfigurationFormProvider
-     */
-    protected function getProviderWithConfigLoaded($configPath)
+    private function getProviderWithConfigLoaded(string $configPath): WidgetConfigurationFormProvider
     {
-        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
         $config = $this->getConfig($configPath);
-        $provider = new WidgetConfigurationFormProvider(
-            new ConfigProvider($config['dashboards'], $eventDispatcher),
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getWidgetConfig')
+            ->willReturnCallback(function ($name) use ($config) {
+                return $config['dashboards']['widgets'][$name];
+            });
+
+        return new WidgetConfigurationFormProvider(
+            $configProvider,
             $this->factory
         );
-
-        return $provider;
     }
 }

@@ -103,8 +103,6 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
 
     /**
      * Add owner to table oro_file
-     *
-     * @param Schema $schema
      */
     public static function addOwnerToOroFile(Schema $schema)
     {
@@ -122,10 +120,6 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         );
     }
 
-    /**
-     * @param Schema              $schema
-     * @param AttachmentExtension $attachmentExtension
-     */
     public static function addAvatarToUser(Schema $schema, AttachmentExtension $attachmentExtension)
     {
         $attachmentExtension->addImageRelation(

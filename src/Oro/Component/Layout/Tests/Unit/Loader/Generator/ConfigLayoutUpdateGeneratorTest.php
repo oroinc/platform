@@ -1,41 +1,50 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
+use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ExpressionLanguageCacheWarmer|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheWarmer;
+
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $expressionValidator;
+
     /** @var ConfigLayoutUpdateGenerator */
-    protected $generator;
+    private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->generator = new ConfigLayoutUpdateGenerator();
+        $this->expressionValidator = $this->createMock(ValidatorInterface::class);
+        $this->cacheWarmer = $this->createMock(ExpressionLanguageCacheWarmer::class);
+
+        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionValidator, $this->cacheWarmer);
     }
 
-    protected function tearDown()
-    {
-        unset($this->generator);
-    }
-
-    public function testShouldCallExtensions()
+    public function testShouldCallExtensions(): void
     {
         $source = ['actions' => []];
 
-        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
-        $extension = $this->createMock(
-            'Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
-        );
+        $extension = $this->createMock(ConfigLayoutUpdateGeneratorExtensionInterface::class);
         $this->generator->addExtension($extension);
 
-        $extension->expects($this->once())
+        $extension->expects(self::once())
             ->method('prepare')
             ->with(
                 new GeneratorData($source),
-                $this->isInstanceOf('Oro\Component\Layout\Loader\Visitor\VisitorCollection')
+                self::isInstanceOf(VisitorCollection::class)
             );
 
         $this->generator->generate('testClassName', new GeneratorData($source));
@@ -43,24 +52,18 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resourceDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $exception
      */
-    public function testShouldValidateData($data, $exception = false)
+    public function testShouldValidateData(mixed $data, ?string $exception = null): void
     {
-        if (false !== $exception) {
-            $this->expectException('\Oro\Component\Layout\Exception\SyntaxException');
+        if (null !== $exception) {
+            $this->expectException(SyntaxException::class);
             $this->expectExceptionMessage($exception);
         }
 
         $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
-    /**
-     * @return array
-     */
-    public function resourceDataProvider()
+    public function resourceDataProvider(): array
     {
         return [
             'invalid data'                                                   => [
@@ -78,7 +81,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 '$exception' => 'Syntax error: unknown action "addSuperPuper", '
-                    . 'should be one of LayoutManipulatorInterface\'s methods at "actions.0"'
+                    . 'should be one of LayoutManipulatorInterface methods at "actions.0"'
             ],
             'should contains array with action definition in actions'        => [
                 '$data'      => [
@@ -106,27 +109,136 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    public function testGenerate()
+    public function testShouldValidateExpressionLanguageSyntax(): void
     {
-        $this->assertSame(
-<<<CLASS
+        $constraintErrorMessage = '"Unclosed "[" around position 4 for expression `data[["foo"].bar()`."';
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage(
+            'Syntax error: ' . $constraintErrorMessage . ' at "actions.0.@setOption.optionValue"'
+        );
+
+        $violationsList = new ConstraintViolationList([
+            new ConstraintViolation(
+                $constraintErrorMessage,
+                '',
+                [],
+                '',
+                '',
+                ''
+            ),
+        ]);
+        $this->expressionValidator->expects($this->once())
+            ->method('validate')
+            ->willReturn($violationsList);
+
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=data[["foo"].bar()',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->never())
+            ->method('collect');
+        $this->generator->generate('testClassName', new GeneratorData($data));
+    }
+
+    public function testShouldCollectExpressions(): void
+    {
+        $violationsList = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsList->expects($this->exactly(5))
+            ->method('count')
+            ->willReturn(0);
+        $this->expressionValidator->expects($this->exactly(5))
+            ->method('validate')
+            ->willReturn($violationsList);
+
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=context["foo"].bar()',
+                    ],
+                    '@add' => [
+                        'id' => 'foo',
+                        'options' => [
+                            'a' => '=bar',
+                            'b' => 'regularText',
+                            'c' => '=qux["a"].b(c)["d"]',
+                            'd' => [
+                                'nested' => [
+                                    'option' => '=context["a"].call(data["b"])',
+                                ],
+                            ],
+                        ],
+                    ],
+                    '@appendOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=context["baz"].qux()',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->exactly(5))
+            ->method('collect')
+            ->withConsecutive(
+                ['context["foo"].bar()'],
+                ['bar'],
+                ['qux["a"].b(c)["d"]'],
+                ['context["a"].call(data["b"])'],
+                ['context["baz"].qux()'],
+            );
+        $this->generator->generate('testClassName', new GeneratorData($data));
+    }
+
+    public function testForEmptyStringValue(): void
+    {
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->never())
+            ->method('collect');
+        $this->generator->generate('testClassName', new GeneratorData($data));
+    }
+
+    // @codingStandardsIgnoreStart
+    public function testGenerate(): void
+    {
+        self::assertSame(
+            <<<'CODE'
 <?php
 
 /**
  * Filename: testfilename.yml
  */
-
-class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
-    {
-        \$layoutManipulator->add( 'root', NULL, 'root' );
-        \$layoutManipulator->add( 'header', 'root', 'header' );
-        \$layoutManipulator->addAlias( 'header', 'header_alias' );
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
+        $layoutManipulator->add( 'root', NULL, 'root' );
+        $layoutManipulator->add( 'header', 'root', 'header' );
+        $layoutManipulator->addAlias( 'header', 'header_alias' );
     }
 }
-CLASS
+
+CODE
             ,
             $this->generator->generate(
                 'testClassName',

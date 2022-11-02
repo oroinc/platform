@@ -2,24 +2,28 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\RemoveMillisecondsFromDateTimeTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reverts https://github.com/symfony/symfony/pull/24401 to avoid BC break.
+ * Reverts https://github.com/symfony/symfony/pull/24401 to avoid BC break,
+ * https://github.com/symfony/symfony/pull/28466 and https://github.com/symfony/symfony/pull/28372 as well.
  * Also the default format is changed in OroDateTimeType
+ *
  * @see \Oro\Bundle\FormBundle\Form\Type\OroDateTimeType::setDefaultOptions
  */
 class DateTimeExtension extends AbstractTypeExtension
 {
-    const HTML5_FORMAT_WITHOUT_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    public const HTML5_FORMAT_WITHOUT_TIMEZONE = DateTimeType::HTML5_FORMAT;
+    public const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     /**
      * {@inheritdoc}
@@ -27,6 +31,14 @@ class DateTimeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['format' => self::HTML5_FORMAT_WITH_TIMEZONE]);
+        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+            if ($html5 && self::HTML5_FORMAT_WITHOUT_TIMEZONE !== $options['format']) {
+                // Option html5 cannot be set if the datetime format is not local.
+                return false;
+            }
+
+            return $html5;
+        });
     }
 
     /**
@@ -36,9 +48,11 @@ class DateTimeExtension extends AbstractTypeExtension
     {
         $pattern = is_string($options['format']) ? $options['format'] : null;
         if (self::HTML5_FORMAT_WITH_TIMEZONE === $pattern) {
-            $this->replaceLocalizedStringWithRfc3339ViewTransformer($builder, $options);
+            // old REST API should accept values with milliseconds,
+            // like "2014-03-04T20:00:00.123Z" or "2014-03-04T20:00:00.123+01:00"
+            $this->wrapLocalizedStringWithRemoveMillisecondsTransformer($builder);
         } elseif (self::HTML5_FORMAT_WITHOUT_TIMEZONE === $pattern) {
-            $this->replaceRfc3339WithLocalizedStringViewTransformer($builder, $pattern, $options);
+            $this->replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer($builder, $pattern, $options);
         }
     }
 
@@ -49,10 +63,8 @@ class DateTimeExtension extends AbstractTypeExtension
     {
         if (array_key_exists('type', $view->vars) && 'datetime-local' === $view->vars['type']) {
             $view->vars['type'] = 'datetime';
-        } elseif ($options['html5']
-            && 'single_text' === $options['widget']
-            && self::HTML5_FORMAT_WITH_TIMEZONE === $options['format']
-        ) {
+        } elseif (($options['html5'] || $options['format'] === self::HTML5_FORMAT_WITH_TIMEZONE)
+            && 'single_text' === $options['widget']) {
             $view->vars['type'] = 'datetime';
         }
     }
@@ -60,21 +72,16 @@ class DateTimeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return DateTimeType::class;
+        return [DateTimeType::class];
     }
 
     /**
-     * Replaces DateTimeToLocalizedStringTransformer with DateTimeToRfc3339Transformer view transformer.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * Wraps DateTimeToLocalizedStringTransformer with RemoveMillisecondsFromDateTimeTransformer view transformer.
      */
-    private function replaceLocalizedStringWithRfc3339ViewTransformer(
-        FormBuilderInterface $builder,
-        array $options
-    ) {
+    private function wrapLocalizedStringWithRemoveMillisecondsTransformer(FormBuilderInterface $builder)
+    {
         $transformerKey = null;
         $viewTransformers = $builder->getViewTransformers();
         foreach ($viewTransformers as $key => $viewTransformer) {
@@ -85,9 +92,8 @@ class DateTimeExtension extends AbstractTypeExtension
         }
         if (null !== $transformerKey) {
             $builder->resetViewTransformers();
-            $viewTransformers[$transformerKey] = new DateTimeToRfc3339Transformer(
-                $options['model_timezone'],
-                $options['view_timezone']
+            $viewTransformers[$transformerKey] = new RemoveMillisecondsFromDateTimeTransformer(
+                $viewTransformers[$transformerKey]
             );
             \rsort($viewTransformers);
             foreach ($viewTransformers as $key => $viewTransformer) {
@@ -97,13 +103,13 @@ class DateTimeExtension extends AbstractTypeExtension
     }
 
     /**
-     * Replaces DateTimeToRfc3339Transformer with DateTimeToLocalizedStringTransformer view transformer.
+     * Replaces DateTimeToHtml5LocalDateTimeTransformer with DateTimeToLocalizedStringTransformer view transformer.
      *
      * @param FormBuilderInterface $builder
-     * @param string               $pattern
-     * @param array                $options
+     * @param string $pattern
+     * @param array $options
      */
-    private function replaceRfc3339WithLocalizedStringViewTransformer(
+    private function replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer(
         FormBuilderInterface $builder,
         $pattern,
         array $options
@@ -111,7 +117,7 @@ class DateTimeExtension extends AbstractTypeExtension
         $transformerKey = null;
         $viewTransformers = $builder->getViewTransformers();
         foreach ($viewTransformers as $key => $viewTransformer) {
-            if ($viewTransformer instanceof DateTimeToRfc3339Transformer) {
+            if ($viewTransformer instanceof DateTimeToHtml5LocalDateTimeTransformer) {
                 $transformerKey = $key;
                 break;
             }

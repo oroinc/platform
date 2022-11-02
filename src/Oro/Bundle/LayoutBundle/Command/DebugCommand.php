@@ -1,174 +1,146 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
-use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
 use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
+use Oro\Bundle\LayoutBundle\Command\Util\MethodPhpDocExtractor;
+use Oro\Bundle\LayoutBundle\Console\Helper\DescriptorHelper;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutRegistryInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DebugCommand extends ContainerAwareCommand
+/**
+ * Displays layout configuration.
+ */
+class DebugCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:debug:layout';
+
+    private LayoutManager $layoutManager;
+    private array $blockTypes;
+    private array $dataProviders;
+    private MethodPhpDocExtractor $methodPhpDocExtractor;
+    private ?LayoutRegistry $layoutRegistry = null;
+
+    public function __construct(
+        LayoutManager $layoutManager,
+        MethodPhpDocExtractor $methodPhpDocExtractor,
+        array $blockTypes = [],
+        array $dataProviders = []
+    ) {
+        $this->layoutManager = $layoutManager;
+        $this->blockTypes = $blockTypes;
+        $this->dataProviders = $dataProviders;
+        $this->methodPhpDocExtractor = $methodPhpDocExtractor;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:layout:debug')
-            ->addOption(
-                'context',
-                null,
-                InputOption::VALUE_NONE,
-                'Show the configuration of the layout context'
+            ->addOption('type', 't', InputOption::VALUE_REQUIRED, 'Show block type configuration')
+            ->addOption('provider', 'p', InputOption::VALUE_REQUIRED, 'Show data provider configuration')
+            ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Output format', 'txt')
+            ->setDescription('Displays layout configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays layout configuration (default context,
+registered context configurators, block types and data providers).
+
+  <info>php %command.full_name%</info>
+
+The <info>--type</info> option can be used to see the specified block type details:
+
+  <info>php %command.full_name% --type=<block-type></info>
+
+The <info>--provider</info> option can be used to see the specified data provider details:
+
+  <info>php %command.full_name% --provider=<data-prodiver></info>
+
+HELP
             )
-            ->addOption(
-                'type',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Show the configuration of the layout block type'
-            )
-            ->setDescription('Displays the layout configuration.');
+            ->addUsage('--type=<block-type>')
+            ->addUsage('--provider=<data-prodiver>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var LayoutManager $layoutManager */
-        $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
-        $registry      = $layoutManager->getLayoutFactory()->getRegistry();
+        $io = new SymfonyStyle($input, $output);
 
-        // the layout context configuration
-        if ($input->getOption('context')) {
-            $context = new DebugLayoutContext();
-            $registry->configureContext($context);
-            $output->writeln('Context configurators:');
-            $contextConfigurators = array_map(
-                function ($configurator) {
-                    return get_class($configurator);
-                },
-                $registry->getContextConfigurators()
-            );
-            foreach ($contextConfigurators as $configurator) {
-                $output->writeln(' ' . $configurator);
+        if (null === $input->getOption('type') && null === $input->getOption('provider')) {
+            $object = null;
+            $options['data_providers'] = $this->dataProviders;
+            $options['block_types'] = $this->blockTypes;
+            // sort data providers and block types alphabetically
+            sort($options['data_providers']);
+            sort($options['block_types']);
+            foreach ($options as $k => $list) {
+                if (is_array($options[$k])) {
+                    sort($options[$k]);
+                }
             }
+            $options['context_configurators'] = $this->getContextConfigurators();
+            $options['context'] = $this->getContextItems();
+        } elseif ($dataProviderName = $input->getOption('provider')) {
+            $object = $this->getLayoutRegistry()->findDataProvider($dataProviderName);
+            if (null === $object) {
+                $io->error('Data provider not found.');
 
-            $this->dumpOptionResolver($context->getOptionsResolverDecorator(), $output);
-
-            $output->writeln('Known data values:');
-            $table = new Table($output);
-            $table->setHeaders(['Name']);
-            $table->setRows([]);
-            $dataValues = $context->data()->getKnownValues();
-            sort($dataValues);
-            foreach ($dataValues as $name) {
-                $table->addRow([$name]);
+                return 1;
             }
-            $table->render();
+            $options['name'] = $dataProviderName;
+            $options['class'] = \get_class($object);
+            $options['methods'] = $this->methodPhpDocExtractor->extractPublicMethodsInfo($object);
+            if (!array_key_exists('methods', $options)) {
+                $io->error('Data provider has no public methods that starts with "get" "has" or "is".');
 
-            return;
+                return 1;
+            }
+        } elseif ($blockTypeName = $input->getOption('type')) {
+            $registry = $this->getLayoutRegistry();
+            try {
+                $object = $this->layoutManager->getLayoutFactory()->getType($blockTypeName);
+            } catch (InvalidArgumentException $exception) {
+                $io->error('Block type not found.');
+
+                return 1;
+            }
+            $options['class'] = \get_class($object);
+            $options['hierarchy'] = $this->getBlockTypeHierarchy($object);
+            $options['type_extensions'] = $this->getBlockTypeExtensions($blockTypeName);
+            $options['options_resolver'] = $this->getBlockTypeOptionsResolver($blockTypeName, $registry);
         }
 
-        // the block type configuration
-        $blockTypeName = $input->getOption('type');
-        if ($blockTypeName) {
-            $blockType = $layoutManager->getLayoutFactory()->getType($blockTypeName);
-            $output->writeln(sprintf('Class: %s', get_class($blockType)));
-            $hierarchy  = [$blockTypeName];
-            $parentName = $blockType->getParent();
-            while ($parentName) {
-                array_unshift($hierarchy, $parentName);
-                $parentName = $registry->getType($parentName)->getParent();
-            }
-            $output->writeln(sprintf('Type inheritance: %s', implode(' <- ', $hierarchy)));
-            $output->writeln('Type extensions:');
-            $blockTypeExtensions = array_map(
-                function ($extension) {
-                    return get_class($extension);
-                },
-                $registry->getTypeExtensions($blockTypeName)
-            );
-            foreach ($blockTypeExtensions as $extension) {
-                $output->writeln(' ' . $extension);
-            }
-            $optionsResolver = $this->getBlockTypeOptionsResolver($blockTypeName, $registry);
-            $this->dumpOptionResolver($optionsResolver, $output);
-        }
+        $helper = new DescriptorHelper();
+        $options['format'] = $input->getOption('format');
+        $helper->describe($io, $object, $options);
+
+        return 0;
     }
 
-    /**
-     * @param DebugOptionsResolverDecorator $resolver
-     * @param OutputInterface      $output
-     */
-    protected function dumpOptionResolver(DebugOptionsResolverDecorator $resolver, OutputInterface $output)
-    {
-        $table = new Table($output);
-
-        $output->writeln('Default options:');
-        $table->setHeaders(['Name', 'Value']);
-        $table->setRows([]);
-        $options = $resolver->getDefaultOptions();
-        ksort($options);
-        foreach ($options as $name => $value) {
-            $table->addRow([$name, $this->formatValue($value)]);
-        }
-        $table->render();
-
-        $output->writeln('Defined options:');
-        $table->setHeaders(['Name', 'Type(s)']);
-        $table->setRows([]);
-        $options = $resolver->getDefinedOptions();
-        ksort($options);
-        foreach ($options as $name => $types) {
-            $table->addRow([$name, implode(', ', $types)]);
-        }
-        $table->render();
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return string
-     */
-    protected function formatValue($value)
-    {
-        if (is_object($value)) {
-            return sprintf('[%s]', get_class($value));
-        }
-        if (is_scalar($value)) {
-            if ($value === true) {
-                $formatted = 'true';
-            } elseif ($value === false) {
-                $formatted = 'false';
-            } elseif (is_string($value)) {
-                $formatted = sprintf('"%s"', $value);
-            } else {
-                $formatted = $value;
-            }
-
-            return sprintf('%s [%s]', $formatted, gettype($value));
-        }
-
-        return sprintf('[%s]', gettype($value));
-    }
-
-    /**
-     * @param string                  $blockTypeName
-     * @param LayoutRegistryInterface $registry
-     *
-     * @return DebugOptionsResolverDecorator
-     */
-    protected function getBlockTypeOptionsResolver($blockTypeName, LayoutRegistryInterface $registry)
-    {
-        $type       = $registry->getType($blockTypeName);
+    private function getBlockTypeOptionsResolver(
+        string $blockTypeName,
+        LayoutRegistryInterface $registry
+    ): DebugOptionsResolverDecorator {
+        $type = $registry->getType($blockTypeName);
         $parentName = $type->getParent();
 
         $decorator = $parentName
@@ -179,5 +151,65 @@ class DebugCommand extends ContainerAwareCommand
         $registry->configureOptions($blockTypeName, $decorator->getOptionResolver());
 
         return $decorator;
+    }
+
+    private function getBlockTypeHierarchy(
+        BlockTypeInterface $blockType
+    ): array {
+        $registry = $this->getLayoutRegistry();
+        $hierarchy = [$blockType->getName()];
+        $parentName = $blockType->getParent();
+        while ($parentName) {
+            array_unshift($hierarchy, $parentName);
+            $parentName = $registry->getType($parentName)->getParent();
+        }
+
+        return $hierarchy;
+    }
+
+    private function getContextConfigurators(): array
+    {
+        $registry = $this->getLayoutRegistry();
+        $contextConfigurators = array_map(
+            '\get_class',
+            $registry->getContextConfigurators()
+        );
+
+        return $contextConfigurators;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getContextItems()
+    {
+        $registry = $this->getLayoutRegistry();
+        $context = new LayoutContext();
+        $registry->configureContext($context);
+        $context->resolve();
+        $class = new \ReflectionClass(LayoutContext::class);
+        $property = $class->getProperty('items');
+        $property->setAccessible(true);
+
+        return $property->getValue($context);
+    }
+
+    private function getBlockTypeExtensions(string $blockTypeName): array
+    {
+        $registry = $this->getLayoutRegistry();
+
+        return array_map(
+            '\get_class',
+            $registry->getTypeExtensions($blockTypeName)
+        );
+    }
+
+    private function getLayoutRegistry(): LayoutRegistry
+    {
+        if (!$this->layoutRegistry) {
+            $this->layoutRegistry = $this->layoutManager->getLayoutFactory()->getRegistry();
+        }
+
+        return $this->layoutRegistry;
     }
 }

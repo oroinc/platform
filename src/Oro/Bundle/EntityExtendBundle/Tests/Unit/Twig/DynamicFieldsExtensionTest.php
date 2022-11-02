@@ -18,38 +18,42 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var DynamicFieldsExtension */
-    protected $extension;
+    /** @var ConfigProviderMock */
+    private $extendConfigProvider;
 
     /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
+    private $entityConfigProvider;
 
     /** @var ConfigProviderMock */
-    protected $entityConfigProvider;
-
-    /** @var ConfigProviderMock */
-    protected $viewConfigProvider;
+    private $viewConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldTypeHelper;
+    private $fieldTypeHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
+    private $dispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
-    protected $featureChecker;
+    private $featureChecker;
 
-    protected function setUp()
+    /** @var DynamicFieldsExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
@@ -70,9 +74,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->add('oro_entity_config.provider.entity', $this->entityConfigProvider)
             ->add('oro_entity_config.provider.view', $this->viewConfigProvider)
             ->add('oro_entity_extend.extend.field_type_helper', $this->fieldTypeHelper)
-            ->add('property_accessor', $propertyAccessor)
-            ->add('event_dispatcher', $this->dispatcher)
-            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add(PropertyAccessorInterface::class, $propertyAccessor)
+            ->add(EventDispatcherInterface::class, $this->dispatcher)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
             ->getContainer($this);
 
@@ -85,7 +89,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
      *
      * @return FieldConfigModel
      */
-    protected function getFieldConfigModel($entityClass, $fieldName)
+    private function getFieldConfigModel($entityClass, $fieldName)
     {
         $entityModel = new EntityConfigModel($entityClass);
         $fieldModel = new FieldConfigModel($fieldName);
@@ -94,7 +98,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         return $fieldModel;
     }
 
-    public function testGetFieldWhenAccessDenied()
+    public function testGetFieldWhenAccessDenied(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -114,7 +118,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenFieldInvisible()
+    public function testGetFieldWhenFieldInvisible(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -131,15 +135,17 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
+
+                return $event;
             });
 
         self::assertSame(
@@ -148,7 +154,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenFieldValueIsChangedByListener()
+    public function testGetFieldWhenFieldValueIsChangedByListener(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -168,15 +174,17 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
+
+                return $event;
             });
 
         self::assertSame(
@@ -189,7 +197,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenNoLabelAndViewType()
+    public function testGetFieldWhenNoLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -209,12 +217,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -227,7 +235,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWithLabelAndViewType()
+    public function testGetFieldWithLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -247,12 +255,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -265,7 +273,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForSystemField()
+    public function testGetFieldsForSystemField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -288,7 +296,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotAccessibleField()
+    public function testGetFieldsForNotAccessibleField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -311,7 +319,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotDisplayableField()
+    public function testGetFieldsForNotDisplayableField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -340,7 +348,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotAccessibleRelation()
+    public function testGetFieldsForNotAccessibleRelation(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -378,7 +386,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForAccessibleRelation()
+    public function testGetFieldsForAccessibleRelation(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -415,7 +423,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenAccessDenied()
+    public function testGetFieldsWhenAccessDenied(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -446,7 +454,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForInvisibleField()
+    public function testGetFieldsForInvisibleField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -473,15 +481,17 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
+
+                return $event;
             });
 
         self::assertSame(
@@ -490,7 +500,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenFieldValueIsChangedByListener()
+    public function testGetFieldsWhenFieldValueIsChangedByListener(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -518,15 +528,17 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
+
+                return $event;
             });
 
         self::assertSame(
@@ -541,7 +553,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenNoLabelAndViewType()
+    public function testGetFieldsWhenNoLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -569,12 +581,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -589,7 +601,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWithLabelAndViewType()
+    public function testGetFieldsWithLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -623,12 +635,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -643,7 +655,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsShouldBeInOriginalOrderIfNoPriority()
+    public function testGetFieldsShouldBeInOriginalOrderIfNoPriority(): void
     {
         $entity = new TestProduct();
         $entity->setId(123);
@@ -694,7 +706,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(self::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [
@@ -713,7 +725,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsShouldBeSortedByPriority()
+    public function testGetFieldsShouldBeSortedByPriority(): void
     {
         $entity = new TestProduct();
         $entity->setId(123);
@@ -764,7 +776,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(self::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [

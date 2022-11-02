@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var DisplayablePriorityView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    DisplayablePriorityView = BaseView.extend({
+    const DisplayablePriorityView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat(['prioritySelector']),
@@ -15,16 +14,16 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DisplayablePriorityView() {
-            DisplayablePriorityView.__super__.constructor.apply(this, arguments);
+        constructor: function DisplayablePriorityView(options) {
+            DisplayablePriorityView.__super__.constructor.call(this, options);
         },
 
         render: function() {
-            this._setPriorityDisabledStateByElement($('input[data-field="is_displayable"]'));
+            this._setPriorityDisabledStateByElement($('select[data-field="is_displayable"]'));
 
-            return DisplayablePriorityView.__super__.render.apply(this, arguments);
+            return DisplayablePriorityView.__super__.render.call(this);
         },
 
         onChange: function(e) {

@@ -3,8 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Datagrid Field Property formatter
+ */
 class FieldProperty extends AbstractProperty
 {
     /**
@@ -12,9 +15,6 @@ class FieldProperty extends AbstractProperty
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -34,7 +34,7 @@ class FieldProperty extends AbstractProperty
             array_walk(
                 $choices,
                 function ($item, $key) use ($translator, &$translated) {
-                    $translated[$translator->trans($key)] = $item;
+                    $translated[$translator->trans((string) $key)] = $item;
                 }
             );
 

@@ -3,74 +3,46 @@
 namespace Oro\Bundle\SoapBundle\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Sets translatable locale from current request
+ */
 class LocaleListener implements EventSubscriberInterface
 {
     const API_PREFIX = '/api/rest/';
 
-    /** @var TranslatableListener */
-    private $translatableListener = false;
+    private TranslatableListener $translatableListener;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TranslatableListener $translatableListener)
     {
-        $this->container = $container;
+        $this->translatableListener = $translatableListener;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
-        $locale = str_replace('-', '_', $request->query->get('locale'));
+        $locale = str_replace('-', '_', $request->query->get('locale', ''));
         if ($locale && $this->isApiRequest($request)) {
             $request->setLocale($locale);
-            $this->getTranslatableListener()->setTranslatableLocale($locale);
+            $this->translatableListener->setTranslatableLocale($locale);
         }
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
-    protected function isApiRequest(Request $request)
+    protected function isApiRequest(Request $request): bool
     {
-        return strpos($request->getPathInfo(), self::API_PREFIX) === 0;
+        return str_starts_with($request->getPathInfo(), self::API_PREFIX);
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
+        return [
             // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', -17)),
-        );
-    }
-
-    /**
-     * @return TranslatableListener
-     */
-    protected function getTranslatableListener()
-    {
-        if ($this->translatableListener === false) {
-            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
-        }
-
-        return $this->translatableListener;
+            KernelEvents::REQUEST  => [['onKernelRequest', -17]],
+        ];
     }
 }

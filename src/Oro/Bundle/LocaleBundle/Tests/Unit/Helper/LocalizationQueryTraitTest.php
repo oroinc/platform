@@ -11,30 +11,25 @@ class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
     use LocalizationQueryTrait;
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryBuilder;
+    private $queryBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
     }
 
     // joinDefaultLocalizedValue call tested implicitly
     public function testJoinDefaultLocalizedValue()
     {
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('joinAlias.string as fieldAlias')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('innerJoin')
             ->with('join', 'joinAlias', Join::WITH, 'joinAlias.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
         $this->assertSame(
             $this->queryBuilder,
@@ -44,15 +39,15 @@ class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testLeftJoinDefaultLocalizedValue()
     {
-        $this->queryBuilder->expects($this->at(0))
+        $this->queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('joinAlias.string as fieldAlias')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('join', 'joinAlias', Join::WITH, 'joinAlias.localization IS NULL')
-            ->willReturn($this->queryBuilder);
+            ->willReturnSelf();
 
         $this->assertSame(
             $this->queryBuilder,

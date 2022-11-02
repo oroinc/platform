@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 
 /**
- * The form registry is used to switch between default forms that are used on UI and Data API forms.
+ * The form registry is used to switch between default forms that are used on UI and API forms.
  * Unfortunately we have to use inheritance instead of aggregation because
  * some 3-rd party bundles can use FormRegistry instead of FormRegistryInterface.
  * An example of such usages is A2lix\TranslationFormBundle\TranslationForm\TranslationForm.
@@ -110,7 +110,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
             }
             if (!$isKnownType) {
                 throw new InvalidArgumentException(\sprintf(
-                    'The form type "%s" is not configured to be used in Data API.',
+                    'The form type "%s" is not configured to be used in API.',
                     $name
                 ));
             }

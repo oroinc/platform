@@ -6,13 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\AddressBundle\Model\ExtendCountry;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Country
+ * Address country entity
  *
  * @ORM\Table("oro_dictionary_country", indexes={
  *      @ORM\Index(name="country_name_idx", columns={"name"})
@@ -30,7 +29,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class Country extends ExtendCountry implements Translatable
 {
@@ -39,9 +37,6 @@ class Country extends ExtendCountry implements Translatable
      *
      * @ORM\Id
      * @ORM\Column(name="iso2_code", type="string", length=2)
-     * @JMS\Type("string")
-     * @JMS\SerializedName("iso2code")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
@@ -56,9 +51,6 @@ class Country extends ExtendCountry implements Translatable
      * @var string
      *
      * @ORM\Column(name="iso3_code", type="string", length=3)
-     * @JMS\Type("string")
-     * @JMS\SerializedName("iso3code")
-     * @JMS\Expose
      */
     protected $iso3Code;
 
@@ -67,8 +59,6 @@ class Country extends ExtendCountry implements Translatable
      *
      * @ORM\Column(name="name", type="string", length=255)
      * @Gedmo\Translatable
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $name;
 

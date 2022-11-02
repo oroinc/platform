@@ -1,24 +1,17 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractEmail;
 
 class AbstractEmailTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractEmail
-     */
-    protected $email;
+    /** @var AbstractEmail */
+    private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->email = $this->createEmail();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->email);
     }
 
     public function testConstructor()
@@ -64,50 +57,35 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isEqualDataProvider
-     *
-     * @param AbstractEmail $first
-     * @param mixed $second
-     * @param bool $expectedResult
      */
-    public function testIsEqual(AbstractEmail $first, $second, $expectedResult)
+    public function testIsEqual(AbstractEmail $first, ?AbstractEmail $second, bool $expectedResult)
     {
         $this->assertEquals($expectedResult, $first->isEqual($second));
     }
 
-    /**
-     * @return array
-     */
-    public function isEqualDataProvider()
+    public function isEqualDataProvider(): array
     {
-        $emailEmpty   = $this->createEmail();
+        $emailEmpty = $this->createEmail();
         $emailAddress = $this->createEmail('a@a.a');
 
-        return array(
-            'both empty'           => array($emailEmpty, $emailEmpty, true),
-            'one empty one unset'  => array($emailEmpty, null, false),
-            'one empty'            => array($this->createEmail(100), $emailEmpty, false),
-            'both with same id'    => array($this->createEmail('a@a.a', 100), $this->createEmail('b@b.b', 100), true),
-            'equals not empty'     => array($emailAddress, $emailAddress, true),
-            'not equals not empty' => array($emailAddress, $this->createEmail('b@b.b'), false),
-        );
+        return [
+            'both empty'           => [$emailEmpty, $emailEmpty, true],
+            'one empty one unset'  => [$emailEmpty, null, false],
+            'one empty'            => [$this->createEmail(100), $emailEmpty, false],
+            'both with same id'    => [$this->createEmail('a@a.a', 100), $this->createEmail('b@b.b', 100), true],
+            'equals not empty'     => [$emailAddress, $emailAddress, true],
+            'not equals not empty' => [$emailAddress, $this->createEmail('b@b.b'), false],
+        ];
     }
 
-    /**
-     * @param string|null $email
-     * @param int $id
-     * @return AbstractEmail|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createEmail($email = null, $id = null)
+    private function createEmail(string $email = null, int $id = null): AbstractEmail
     {
-        $arguments = array();
-
+        $arguments = [];
         if ($email) {
             $arguments[] = $email;
         }
 
-        /** @var AbstractEmail $email */
-        $email = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractEmail', $arguments);
-
+        $email = $this->getMockForAbstractClass(AbstractEmail::class, $arguments);
         if ($id) {
             $email->setId($id);
         }

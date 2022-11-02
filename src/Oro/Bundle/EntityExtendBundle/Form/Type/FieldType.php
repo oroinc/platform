@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form type that used to receive options for extended field type.
@@ -43,12 +43,6 @@ class FieldType extends AbstractType
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         TranslatorInterface $translator,
@@ -86,7 +80,11 @@ class FieldType extends AbstractType
             Select2ChoiceType::class,
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
-                'choice_attr' => function ($choiceKey) {
+                'choice_attr' => function ($choiceKey) use ($options) {
+                    if (in_array($choiceKey, $options['excludeTypes'])) {
+                        return ['disabled' => 'disabled'];
+                    }
+
                     $parts = explode('||', $choiceKey);
 
                     return count($parts) === 2 && ExtendHelper::getRelationType($parts[0])
@@ -113,7 +111,8 @@ class FieldType extends AbstractType
             ->setRequired(['class_name'])
             ->setDefaults(
                 [
-                    'require_js'   => [],
+                    'excludeTypes' => [],
+                    'jsmodules'   => [],
                     'block_config' => [
                         'general' => [
                             'title'    => $this->translator->trans('oro.entity_config.block_titles.general.label'),
@@ -137,6 +136,7 @@ class FieldType extends AbstractType
         $validation[FieldNameLength::class]['max'] = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
 
         $fieldName->vars['attr']['data-validation'] = \json_encode($validation);
+        $view->vars['excludeTypes'] = $options['excludeTypes'];
     }
 
     /**
@@ -237,8 +237,8 @@ class FieldType extends AbstractType
             /** @var FieldConfigId $targetFieldId */
             $targetFieldId = $relation['target_field_id'];
 
-            $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
-            $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+            $entityLabel = (string) $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
+            $fieldLabel  = (string) $entityProvider->getConfigById($targetFieldId)->get('label');
             $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
 
             $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();

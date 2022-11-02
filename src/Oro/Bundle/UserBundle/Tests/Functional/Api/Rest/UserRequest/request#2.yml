@@ -1,0 +1,17 @@
+# common test case
+request:
+    username: User_2_%str%
+    email: user_2_%str%@example.com
+    namePrefix: Mr.
+    firstName: firstName
+    middleName: middleName
+    lastName: lastName
+    nameSuffix: Sn.
+    enabled: true
+    plainPassword: 123123q
+    lastLogin: ~
+    userRoles: [3]
+    groups: ~
+    owner: 1
+response:
+    return: true

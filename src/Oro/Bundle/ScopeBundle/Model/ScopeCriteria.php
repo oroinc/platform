@@ -3,110 +3,125 @@
 namespace Oro\Bundle\ScopeBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Contains a set of parameters to filter Scope entities
+ * and provides methods to apply these parameters to scope related parts of ORM query.
+ *
+ * Note: parameters are sorted by priority,
+ * the higher the priority, the closer the parameter to the top of the parameter list.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ScopeCriteria implements \IteratorAggregate
 {
-    const IS_NOT_NULL = 'IS_NOT_NULL';
+    use NormalizeParameterValueTrait;
+
+    public const IS_NOT_NULL = 'IS_NOT_NULL';
+
+    /** @var array [parameter name => parameter value, ...] */
+    private $parameters;
+
+    /** @var ClassMetadataFactory */
+    private $classMetadataFactory;
+
+    /** @var string|null */
+    private $identifier;
 
     /**
-     * @var array
+     * @param array                $parameters           [parameter name => parameter value, ...]
+     * @param ClassMetadataFactory $classMetadataFactory The ORM metadata factory
      */
-    protected $context = [];
-
-    /**
-     * @var array
-     */
-    protected $fieldsInfo = [];
-
-    /**
-     * @param array $context
-     * @param array $fieldsInfo
-     */
-    public function __construct(array $context, array $fieldsInfo)
+    public function __construct(array $parameters, ClassMetadataFactory $classMetadataFactory)
     {
-        $this->context = $context;
-        $this->fieldsInfo = $fieldsInfo;
+        $this->parameters = $parameters;
+        $this->classMetadataFactory = $classMetadataFactory;
+    }
+
+    /**
+     * Gets unique identifier of a set of parameters represented by this criteria object.
+     */
+    public function getIdentifier(): string
+    {
+        if (null === $this->identifier) {
+            $this->identifier = $this->buildIdentifier();
+        }
+
+        return $this->identifier;
     }
 
     /**
      * @param QueryBuilder $qb
      * @param string       $alias
-     * @param array        $ignoreFields
-     *
-     * @return QueryBuilder
+     * @param string[]     $ignoreFields
      */
-    public function applyWhereWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
+    public function applyWhere(QueryBuilder $qb, string $alias, array $ignoreFields = []): void
     {
-        QueryBuilderUtil::checkIdentifier($alias);
-        foreach ($this->context as $field => $value) {
-            QueryBuilderUtil::checkIdentifier($field);
-            if (in_array($field, $ignoreFields, true)) {
-                continue;
-            }
-            $condition = null;
-            if ($this->isAdditionalJoinNeeds($field)) {
-                $localAlias = $alias.'_'.$field;
-                $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, true);
-                $qb->leftJoin($alias.'.'.$field, $alias.'_'.$field, Join::WITH, $condition);
-            } else {
-                $condition = $this->resolveBasicCondition($qb, $alias, $field, $value, true);
-            }
-            $qb->andWhere($condition);
-        }
-
-        return $qb;
+        $this->doApplyWhere($qb, $alias, $ignoreFields, false);
     }
 
     /**
      * @param QueryBuilder $qb
-     * @param string $alias
-     * @param array $ignoreFields
-     * @return QueryBuilder
+     * @param string       $alias
+     * @param string[]     $ignoreFields
      */
-    public function applyWhere(QueryBuilder $qb, $alias, array $ignoreFields = [])
+    public function applyWhereWithPriority(QueryBuilder $qb, string $alias, array $ignoreFields = []): void
     {
-        QueryBuilderUtil::checkIdentifier($alias);
-        foreach ($this->context as $field => $value) {
-            QueryBuilderUtil::checkIdentifier($field);
-            if (in_array($field, $ignoreFields, true)) {
+        $this->doApplyWhere($qb, $alias, $ignoreFields, true);
+    }
+
+    public function applyWhereWithPriorityForScopes(
+        QueryBuilder $qb,
+        string $alias,
+        array $ignoreFields = []
+    ): void {
+        $this->applyWhereWithPriority($qb, $alias, $ignoreFields);
+
+        $orX = $qb->expr()->orX();
+        foreach ($this->parameters as $field => $value) {
+            if (in_array($field, $ignoreFields)) {
                 continue;
             }
-            $condition = null;
-            if ($this->isAdditionalJoinNeeds($field)) {
-                $localAlias = $alias.'_'.$field;
-                $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, false);
-                $qb->leftJoin($alias.'.'.$field, $localAlias, Join::WITH, $condition);
-            } else {
-                $condition = $this->resolveBasicCondition($qb, $alias, $field, $value, false);
-            }
-            $qb->andWhere($condition);
+
+            QueryBuilderUtil::checkIdentifier($alias);
+            QueryBuilderUtil::checkIdentifier($field);
+            $aliasedField = $alias . '.' . $field;
+            $orX->add($qb->expr()->isNotNull($aliasedField));
         }
 
-        return $qb;
+        $fieldId = 'id';
+        QueryBuilderUtil::checkIdentifier($fieldId);
+        $groupBy = $alias . '.' . $fieldId;
+
+        $qb->andWhere($orX)->groupBy($groupBy);
     }
 
     /**
      * @param QueryBuilder $qb
-     * @param string $alias
-     * @param array $ignoreFields
+     * @param string       $alias
+     * @param string[]     $ignoreFields
      */
-    public function applyToJoin(QueryBuilder $qb, $alias, array $ignoreFields = [])
+    public function applyToJoin(QueryBuilder $qb, string $alias, array $ignoreFields = []): void
     {
         /** @var Join[] $joins */
         $joins = $qb->getDQLPart('join');
         $qb->resetDQLPart('join');
-        $this->reapplyJoins($qb, $joins, $alias, $ignoreFields);
+        $this->reapplyJoins($qb, $joins, $alias, $ignoreFields, false);
     }
 
     /**
      * @param QueryBuilder $qb
-     * @param string $alias
-     * @param array $ignoreFields
+     * @param string       $alias
+     * @param string[]     $ignoreFields
      */
-    public function applyToJoinWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
+    public function applyToJoinWithPriority(QueryBuilder $qb, string $alias, array $ignoreFields = []): void
     {
         /** @var Join[] $joins */
         $joins = $qb->getDQLPart('join');
@@ -115,35 +130,99 @@ class ScopeCriteria implements \IteratorAggregate
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param Join[] $joins
-     * @param string $alias
-     * @param array $ignoreFields
-     * @param bool $withPriority
+     * Returns all parameters.
+     * The parameters are sorted by priority, the higher the priority,
+     * the closer the parameter to the top of the parameter list.
      */
-    protected function reapplyJoins(QueryBuilder $qb, array $joins, $alias, array $ignoreFields, $withPriority = false)
+    public function toArray(): array
     {
+        return $this->parameters;
+    }
+
+    /**
+     * Returns an iterator by parameters are sorted by priority.
+     * The higher the priority, the earlier the parameter is returned by the iterator.
+     */
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->parameters);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $alias
+     * @param string[]     $ignoreFields
+     * @param bool         $withPriority
+     */
+    private function doApplyWhere(
+        QueryBuilder $qb,
+        string $alias,
+        array $ignoreFields,
+        bool $withPriority
+    ): void {
+        $scopeClassMetadata = $this->getClassMetadata(Scope::class);
+        QueryBuilderUtil::checkIdentifier($alias);
+        foreach ($this->parameters as $field => $value) {
+            QueryBuilderUtil::checkIdentifier($field);
+            if (\in_array($field, $ignoreFields, true)) {
+                continue;
+            }
+            $condition = null;
+            if ($this->isCollectionValuedAssociation($scopeClassMetadata, $field)) {
+                $localAlias = $alias . '_' . $field;
+                $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, $withPriority);
+                $qb->leftJoin($alias . '.' . $field, $localAlias, Join::WITH, $condition);
+            } else {
+                $condition = $this->resolveBasicCondition($qb, $alias, $field, $value, $withPriority);
+            }
+            $qb->andWhere($condition);
+        }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param Join[]       $joins
+     * @param string       $alias
+     * @param string[]     $ignoreFields
+     * @param bool         $withPriority
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function reapplyJoins(
+        QueryBuilder $qb,
+        array $joins,
+        string $alias,
+        array $ignoreFields,
+        bool $withPriority
+    ): void {
+        $scopeClassMetadata = $this->getClassMetadata(Scope::class);
         QueryBuilderUtil::checkIdentifier($alias);
         foreach ($joins as $join) {
-            if (is_array($join)) {
+            if (\is_array($join)) {
                 $this->reapplyJoins($qb, $join, $alias, $ignoreFields, $withPriority);
                 continue;
             }
 
-            $condition = $join->getCondition();
-            $usedFields = $this->getUsedFields($condition, $alias);
-            $parts = [$condition];
+            $parts = [];
             $additionalJoins = [];
+            $joinCondition = $join->getCondition();
+            if ($joinCondition) {
+                $parts[] = $joinCondition;
+            }
             if ($join->getAlias() === $alias) {
-                foreach ($this->context as $field => $value) {
-                    if (in_array($field, $ignoreFields, true) || in_array($field, $usedFields, true)) {
+                $usedFields = [];
+                if ($joinCondition) {
+                    $usedFields = $this->getUsedFields($joinCondition, $alias);
+                }
+                foreach ($this->parameters as $field => $value) {
+                    if (\in_array($field, $ignoreFields, true) || \in_array($field, $usedFields, true)) {
                         continue;
                     }
-                    if ($this->isAdditionalJoinNeeds($field)) {
-                        $localAlias = $alias.'_'.$field;
+                    if ($this->isCollectionValuedAssociation($scopeClassMetadata, $field)) {
                         $additionalJoins[$field] = $this->resolveBasicCondition(
                             $qb,
-                            $localAlias,
+                            $alias . '_' . $field,
                             'id',
                             $value,
                             $withPriority
@@ -154,15 +233,13 @@ class ScopeCriteria implements \IteratorAggregate
                 }
             }
 
-            $parts = array_filter($parts);
             $condition = $this->getConditionFromParts($parts, $withPriority);
             $this->applyJoinWithModifiedCondition($qb, $condition, $join);
             if (!empty($additionalJoins)) {
                 $additionalJoins = array_filter($additionalJoins);
                 foreach ($additionalJoins as $field => $condition) {
                     QueryBuilderUtil::checkIdentifier($field);
-                    $localAlias = $alias.'_'.$field;
-                    $qb->leftJoin($alias.'.'.$field, $localAlias, Join::WITH, $condition);
+                    $qb->leftJoin($alias . '.' . $field, $alias . '_' . $field, Join::WITH, $condition);
                     if (!$withPriority) {
                         $qb->andWhere($condition);
                     }
@@ -173,14 +250,20 @@ class ScopeCriteria implements \IteratorAggregate
 
     /**
      * @param QueryBuilder $qb
-     * @param string $alias
-     * @param string $field
-     * @param mixed $value
-     * @param bool $withPriority
-     * @return array
+     * @param string       $alias
+     * @param string       $field
+     * @param mixed        $value
+     * @param bool         $withPriority
+     *
+     * @return mixed
      */
-    protected function resolveBasicCondition(QueryBuilder $qb, $alias, $field, $value, $withPriority)
-    {
+    private function resolveBasicCondition(
+        QueryBuilder $qb,
+        string $alias,
+        string $field,
+        $value,
+        bool $withPriority
+    ) {
         QueryBuilderUtil::checkIdentifier($alias);
         QueryBuilderUtil::checkIdentifier($field);
 
@@ -191,7 +274,7 @@ class ScopeCriteria implements \IteratorAggregate
             $part = $qb->expr()->isNotNull($aliasedField);
         } else {
             $paramName = $alias . '_param_' . $field;
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $comparisonCondition = $qb->expr()->in($aliasedField, ':' . $paramName);
             } else {
                 $comparisonCondition = $qb->expr()->eq($aliasedField, ':' . $paramName);
@@ -213,12 +296,7 @@ class ScopeCriteria implements \IteratorAggregate
         return $part;
     }
 
-    /**
-     * @param array $parts
-     * @param bool $withPriority
-     * @return string
-     */
-    protected function getConditionFromParts(array $parts, $withPriority = false)
+    private function getConditionFromParts(array $parts, bool $withPriority): string
     {
         if ($withPriority) {
             $parts = array_map(
@@ -232,12 +310,7 @@ class ScopeCriteria implements \IteratorAggregate
         return implode(' AND ', $parts);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string $condition
-     * @param Join $join
-     */
-    protected function applyJoinWithModifiedCondition(QueryBuilder $qb, $condition, Join $join)
+    private function applyJoinWithModifiedCondition(QueryBuilder $qb, string $condition, Join $join): void
     {
         if (Join::INNER_JOIN === $join->getJoinType()) {
             $qb->innerJoin(
@@ -260,27 +333,12 @@ class ScopeCriteria implements \IteratorAggregate
     }
 
     /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->context;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->context);
-    }
-
-    /**
      * @param string $condition
      * @param string $alias
-     * @return array
+     *
+     * @return string[]
      */
-    protected function getUsedFields($condition, $alias)
+    private function getUsedFields(string $condition, string $alias): array
     {
         $fields = [];
         $parts = explode(' AND ', $condition);
@@ -295,15 +353,43 @@ class ScopeCriteria implements \IteratorAggregate
         return $fields;
     }
 
-    /**
-     * @param string $field
-     * @return bool
-     */
-    private function isAdditionalJoinNeeds($field)
+    private function getClassMetadata(string $entityClass): ClassMetadata
     {
-        if (isset($this->fieldsInfo[$field])) {
-            return in_array($this->fieldsInfo[$field]['relation_type'], ['manyToMany', 'oneToMany']);
+        return $this->classMetadataFactory->getMetadataFor($entityClass);
+    }
+
+    private function isCollectionValuedAssociation(ClassMetadata $classMetadata, string $field): bool
+    {
+        if (!$classMetadata->hasAssociation($field)) {
+            return false;
         }
-        return false;
+
+        return $classMetadata->isCollectionValuedAssociation($field);
+    }
+
+    private function buildIdentifier(): string
+    {
+        $result = '';
+        foreach ($this->parameters as $field => $value) {
+            $result .= sprintf('%s=%s;', $field, $this->normalizeParameterValue($value));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return mixed
+     */
+    private function getEntityId($entity)
+    {
+        $classMetadata = $this->getClassMetadata(ClassUtils::getClass($entity));
+        $id = $classMetadata->getFieldValue($entity, $classMetadata->getSingleIdentifierFieldName());
+        if (null === $id) {
+            $id = spl_object_hash($entity);
+        }
+
+        return $id;
     }
 }

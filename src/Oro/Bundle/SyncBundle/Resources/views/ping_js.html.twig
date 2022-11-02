@@ -1,6 +1,7 @@
-<script type="text/javascript">
-    require(['orosync/js/sync'],
-    function(sync) {
-        sync.subscribe('oro/ping', function () {});
-    });
-</script>
+{% if check_ws() %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+<div {{ UI.renderPageComponentAttributes({
+    module: 'orosync/js/app/components/ping-handler'
+}) }} ></div>
+{% endif %}

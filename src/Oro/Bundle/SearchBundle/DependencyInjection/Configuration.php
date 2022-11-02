@@ -7,24 +7,47 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_search';
-    const DEFAULT_ENGINE = 'orm';
+    public const DEFAULT_ENGINE_DSN = 'orm:';
 
     /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
-
-        $entitiesConfigConfiguration = new EntitiesConfigConfiguration();
+        $treeBuilder = new TreeBuilder('oro_search');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
-                ->scalarNode('engine')
+                ->scalarNode('engine_dsn')
                     ->cannotBeEmpty()
-                    ->defaultValue(self::DEFAULT_ENGINE)
+                    ->defaultValue(self::DEFAULT_ENGINE_DSN)
+                ->end()
+                ->arrayNode('required_plugins')
+                    ->prototype('array')->end()
+                    ->defaultValue([])
+                ->end()
+                ->arrayNode('required_attributes')
+                    ->info(
+                        'Contains an array of the required Elasticsearch attribute values to be checked on'
+                        . ' platform install or upgrade.' . PHP_EOL
+                        . 'The array\'s key determines the attribute name.'
+                    )->useAttributeAsKey('attribute_name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('value')
+                                ->info('Contains a proper Elasticsearch attribute value.')
+                                ->isRequired()
+                            ->end()
+                            ->scalarNode('err_message')
+                                ->info(
+                                    'Should contain a comprehensive message displayed'
+                                    . ' if Elasticsearch attribute value validation has failed.'
+                                )
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->defaultValue([])
                 ->end()
                 ->arrayNode('engine_parameters')
                     ->prototype('variable')->end()
@@ -33,9 +56,8 @@ class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                 ->end()
                 ->scalarNode('item_container_template')
-                    ->defaultValue('OroSearchBundle:Datagrid:itemContainer.html.twig')
+                    ->defaultValue('@OroSearch/Datagrid/itemContainer.html.twig')
                 ->end()
-                ->append($entitiesConfigConfiguration->getEntitiesConfigurationNode(new TreeBuilder()))
             ->end();
 
         return $treeBuilder;

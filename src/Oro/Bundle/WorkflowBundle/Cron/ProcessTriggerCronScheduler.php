@@ -5,14 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Cron;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
+/**
+ * Add and remove processes to scheduler
+ */
 class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
 {
-    /** @var string */
-    private static $command = HandleProcessTriggerCommand::NAME;
-
     /**
-     * @param ProcessTrigger $trigger
-     *
      * @throws \InvalidArgumentException
      */
     public function add(ProcessTrigger $trigger)
@@ -23,11 +21,14 @@ class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
             );
         }
 
-        $this->deferredScheduler->addSchedule(self::$command, $this->buildArguments($trigger), $trigger->getCron());
+        $this->deferredScheduler->addSchedule(
+            HandleProcessTriggerCommand::getDefaultName(),
+            $this->buildArguments($trigger),
+            $trigger->getCron()
+        );
     }
 
     /**
-     * @param ProcessTrigger $trigger
      * @throws \InvalidArgumentException
      */
     public function removeSchedule(ProcessTrigger $trigger)
@@ -38,7 +39,11 @@ class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
             );
         }
 
-        $this->deferredScheduler->removeSchedule(self::$command, $this->buildArguments($trigger), $trigger->getCron());
+        $this->deferredScheduler->removeSchedule(
+            HandleProcessTriggerCommand::getDefaultName(),
+            $this->buildArguments($trigger),
+            $trigger->getCron()
+        );
     }
 
     /**

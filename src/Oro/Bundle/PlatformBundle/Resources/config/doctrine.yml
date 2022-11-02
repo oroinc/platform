@@ -1,24 +1,55 @@
 services:
     doctrine.metadata.cache:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata' }
 
     doctrine.query.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'doctrine_query' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_query' }
 
     doctrine.metadata.cache.config:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata_config' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata_config' }
 
     doctrine.query.cache.config:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_query_config' }
+
+    oro_platform.dbal.schema.materialized_view.manager:
+        class: Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedViewSchemaManager
+        arguments:
+            - '@=service("doctrine").getConnection()'
+
+    oro_platform.sql_walker.use_materialized_view:
+        class: Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier
+        abstract: true
+        tags:
+            - { name: oro_entity.sql_walker, priority: -255 }
+
+    oro_platform.materialized_view.factory.by_query:
+        class: Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory
+
+    oro_platform.materialized_view.manager:
+        class: Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager
+        arguments:
+            - '@doctrine'
+            - '@oro_platform.materialized_view.factory.by_query'
+            - '@oro_platform.dbal.schema.materialized_view.manager'
         calls:
-            - [ setNamespace, [ 'doctrine_query_config' ] ]
+            - [setLogger, ['@logger']]
+
+    oro_platform.materialized_view.remover:
+        class: Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRemover
+        arguments:
+            - '@doctrine'
+            - '@oro_platform.materialized_view.manager'
+        calls:
+            - [setLogger, ['@logger']]

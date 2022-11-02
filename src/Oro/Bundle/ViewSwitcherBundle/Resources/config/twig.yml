@@ -1,0 +1,7 @@
+services:
+    oro_viewswitcher.twig.mobile_extension:
+        class: Oro\Bundle\ViewSwitcherBundle\Twig\DemoMobileExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }

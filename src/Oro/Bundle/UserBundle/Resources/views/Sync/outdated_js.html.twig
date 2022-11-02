@@ -1,10 +1,10 @@
-{% set roles = [] %}
-{% for role in app.user.roles %}
-    {% set roles = roles|merge([role.role]) %}
-{% endfor %}
-
-<script type="text/javascript">
-    require(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
+{% if check_ws() %}
+    {% set roles = [] %}
+    {% for role in app.user.userRoles %}
+        {% set roles = roles|merge([role.role]) %}
+    {% endfor %}
+<script>
+    loadModules(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
     function(sync, Modal, mediator, messenger, __) {
         var notifier = null;
         var sendNotification = true;
@@ -34,3 +34,4 @@
         });
     });
 </script>
+{% endif %}

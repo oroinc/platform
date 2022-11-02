@@ -3,21 +3,20 @@
 namespace Oro\Bundle\NavigationBundle\Menu\Matcher\Voter;
 
 use Knp\Menu\Matcher\Voter\UriVoter;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Voter based on the master request uri
+ */
 class RequestVoter extends UriVoter
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function setRequest(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        // Using master request, as sub-requests routes must not be taken into account when matching the menu items
+        $request = $requestStack->getMainRequest();
 
-        parent::__construct($request->getRequestUri());
-
-        return $this;
+        if ($request) {
+            parent::__construct($request->getRequestUri());
+        }
     }
 }

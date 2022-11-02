@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
 /**
  * Converts a string to string (actually a value is kept as is
- * because a sting value does not required any transformation).
+ * because a string value does not required any transformation).
  * Provides a regular expression that can be used to validate a string value.
  */
 class NormalizeString extends AbstractProcessor
 {
-    const REQUIREMENT = '.+';
+    private const REQUIREMENT = '.+';
 
     /**
      * {@inheritdoc}
@@ -38,7 +38,7 @@ class NormalizeString extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    public function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context)
     {
         $context->setRequirement($this->getRequirement());
     }

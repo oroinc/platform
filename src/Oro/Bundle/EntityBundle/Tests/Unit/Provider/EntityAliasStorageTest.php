@@ -7,12 +7,14 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasStorage */
-    private $storage;
+    private EntityAliasStorage $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage = new EntityAliasStorage();
     }
@@ -88,12 +90,13 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyAliasDataProvider
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException
-     * @expectedExceptionMessage The alias for the "Test\Entity1" entity must not be empty.
+     * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityAlias($value)
+    public function testValidateEmptyEntityAlias(?string $value)
     {
+        $this->expectException(InvalidEntityAliasException::class);
+        $this->expectExceptionMessage('The alias for the "Test\Entity1" entity must not be empty.');
+
         $this->storage->addEntityAlias(
             'Test\Entity1',
             new EntityAlias($value, 'plural_alias1')
@@ -101,19 +104,20 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyAliasDataProvider
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException
-     * @expectedExceptionMessage The plural alias for the "Test\Entity1" entity must not be empty.
+     * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityPluralAlias($value)
+    public function testValidateEmptyEntityPluralAlias(?string $value)
     {
+        $this->expectException(InvalidEntityAliasException::class);
+        $this->expectExceptionMessage('The plural alias for the "Test\Entity1" entity must not be empty.');
+
         $this->storage->addEntityAlias(
             'Test\Entity1',
             new EntityAlias('alias1', $value)
         );
     }
 
-    public function emptyAliasDataProvider()
+    public function emptyAliasDataProvider(): array
     {
         return [
             [null],
@@ -124,7 +128,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityAlias($value)
+    public function testValidateInvalidEntityAlias(string $value)
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -146,7 +150,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityPluralAlias($value)
+    public function testValidateInvalidEntityPluralAlias(string $value)
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -165,7 +169,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidAliasDataProvider()
+    public function invalidAliasDataProvider(): array
     {
         return [
             ['Alias'],

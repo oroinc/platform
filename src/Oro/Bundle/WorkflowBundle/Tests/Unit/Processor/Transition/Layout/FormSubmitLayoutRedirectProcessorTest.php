@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition\Layout;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
@@ -10,25 +11,35 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutRedirectProcessor;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormSubmitLayoutRedirectProcessor */
-    protected $processor;
+    private FormSubmitLayoutRedirectProcessor $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processor = new FormSubmitLayoutRedirectProcessor();
+        $sameSiteUrlHelper = $this->createMock(SameSiteUrlHelper::class);
+        $sameSiteUrlHelper
+            ->expects(self::any())
+            ->method('getSameSiteReferer')
+            ->with(self::isInstanceOf(Request::class))
+            ->willReturnCallback(
+                static function (Request $request) {
+                    return $request->headers->get('referer') ? $request->headers->get('referer') . '/safe' : '';
+                }
+            );
+
+        $this->processor = new FormSubmitLayoutRedirectProcessor($sameSiteUrlHelper);
     }
 
-    public function testRedirectFromWorkflowItemResult()
+    public function testRedirectFromWorkflowItemResult(): void
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->any())
+        $workflowItem->expects(self::any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects(self::any())
             ->method('getResult')
             ->willReturn(new WorkflowData(['redirectUrl' => '///workflow result url']));
 
@@ -39,16 +50,19 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///workflow result url'), $context->getResult());
-        $this->assertTrue($context->isProcessed());
+        self::assertEquals('///workflow result url', $context->getResult()->getTargetUrl());
+        self::assertTrue($context->isProcessed());
     }
 
-    public function testRedirectFromRequestHeadersReferer()
+    public function testRedirectFromRequestHeadersReferer(): void
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->any())->method('getResult')->willReturn(new WorkflowData([]));
+        $workflowItem->expects(self::any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects(self::any())
+            ->method('getResult')
+            ->willReturn(new WorkflowData([]));
 
         $request = new Request();
         $request->headers = new HeaderBag(['referer' => '///referer url']);
@@ -61,16 +75,19 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///referer url'), $context->getResult());
-        $this->assertTrue($context->isProcessed());
+        self::assertEquals('///referer url/safe', $context->getResult()->getTargetUrl());
+        self::assertTrue($context->isProcessed());
     }
 
-    public function testRedirectFromRequestOriginalUrl()
+    public function testRedirectFromRequestOriginalUrl(): void
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->any())->method('getResult')->willReturn(new WorkflowData([]));
+        $workflowItem->expects(self::any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects(self::any())
+            ->method('getResult')
+            ->willReturn(new WorkflowData([]));
 
         $request = new Request();
         $request->query = new ParameterBag(['originalUrl' => '///original url']);
@@ -83,16 +100,19 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('///original url'), $context->getResult());
-        $this->assertTrue($context->isProcessed());
+        self::assertEquals('///original url', $context->getResult()->getTargetUrl());
+        self::assertTrue($context->isProcessed());
     }
 
-    public function testRedirectToRootAsDefaultIfAnythingDefined()
+    public function testRedirectToRootAsDefaultIfAnythingDefined(): void
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->any())->method('getResult')->willReturn(new WorkflowData([]));
+        $workflowItem->expects(self::any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects(self::any())
+            ->method('getResult')
+            ->willReturn(new WorkflowData([]));
 
         $request = new Request();
 
@@ -104,27 +124,29 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new RedirectResponse('/'), $context->getResult());
-        $this->assertTrue($context->isProcessed());
+        self::assertEquals('/', $context->getResult()->getTargetUrl());
+        self::assertTrue($context->isProcessed());
     }
 
-    public function testSkipNotSavedFormContext()
+    public function testSkipNotSavedFormContext(): void
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('isSaved')->willReturn(false);
+        $context->expects(self::once())
+            ->method('isSaved')
+            ->willReturn(false);
 
-        $context->expects($this->never())->method('getResultType');
+        $context->expects(self::never())
+            ->method('getResultType');
 
         $this->processor->process($context);
     }
 
-    public function testSkipNotSupportedResultTypes()
+    public function testSkipNotSupportedResultTypes(): void
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('isSaved')->willReturn(true);
-        $context->expects($this->once())
+        $context->expects(self::once())
+            ->method('isSaved')->willReturn(true);
+        $context->expects(self::once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var SelectRowCell;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Backgrid = require('backgrid');
-    var template = require('tpl!orodatagrid/templates/datagrid/select-row-cell.html');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Backgrid = require('backgrid');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/select-row-cell.html');
 
     /**
      * Renders a checkbox for row selection.
@@ -14,7 +13,11 @@ define(function(require) {
      * @class   oro.datagrid.cell.SelectRowCell
      * @extends BaseView
      */
-    SelectRowCell = BaseView.extend({
+    const SelectRowCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         /** @property */
         className: 'select-row-cell renderable',
 
@@ -34,10 +37,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SelectRowCell() {
-            SelectRowCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectRowCell(options) {
+            SelectRowCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -49,7 +52,6 @@ define(function(require) {
          * @param {Backbone.Model} options.model
          */
         initialize: function(options) {
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -62,7 +64,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -70,7 +72,7 @@ define(function(require) {
             }
             delete this.column;
             delete this.$checkbox;
-            SelectRowCell.__super__.dispose.apply(this, arguments);
+            SelectRowCell.__super__.dispose.call(this);
         },
 
         /**
@@ -99,12 +101,16 @@ define(function(require) {
          */
         render: function() {
             // work around with trigger event to get current state of model (selected or not)
-            var state = {selected: false};
+            const state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.html(this.template({
                 checked: state.selected
             }));
             this.$checkbox = this.$el.find(this.checkboxSelector);
+
+            this.$checkbox.inputWidget('isInitialized')
+                ? this.$checkbox.inputWidget('refresh')
+                : this.$checkbox.inputWidget('create');
             return this;
         }
     });

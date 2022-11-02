@@ -5,29 +5,38 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var IndexEntityConfigDumperExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
         $this->extension = new IndexEntityConfigDumperExtension(
             $this->configManager,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+            new FieldTypeHelper($entityExtendConfigurationProvider)
         );
     }
 
@@ -50,17 +59,15 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('index', ['field1' => true]);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue([$config]));
+            ->willReturn([$config]);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -77,40 +84,28 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($config->getId()->getClassName(), 'field1')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -126,36 +121,24 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -172,40 +155,28 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($config->getId()->getClassName(), 'field1')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -236,36 +207,24 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $datagridFieldConfig2->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig, $fieldConfig2) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig, $fieldConfig2) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig, $fieldConfig2];
-                    }
-                )
-            );
+                return [$fieldConfig, $fieldConfig2];
+            });
         $datagridConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
             ->willReturnMap([
@@ -315,27 +274,21 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', $fieldType));
         $fieldConfig->set('is_extend', true);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -367,45 +320,33 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $datagridConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig));
+            ->willReturn($datagridFieldConfig);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -437,53 +378,45 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2', 'string')
         );
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datagridConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig1, $fieldConfig2) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig1, $fieldConfig2) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig1, $fieldConfig2];
-                    }
-                )
-            );
+                return [$fieldConfig1, $fieldConfig2];
+            });
 
-        $datagridConfigProvider->expects($this->at(0))
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
-            ->with($datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName())
-            ->will($this->returnValue(true));
-        $datagridConfigProvider->expects($this->at(1))
+            ->willReturnMap([
+                [$datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName(), true],
+                [$datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName(), true]
+            ]);
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->with($datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig1));
-        $datagridConfigProvider->expects($this->at(2))
-            ->method('hasConfig')
-            ->with($datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName())
-            ->will($this->returnValue(true));
-        $datagridConfigProvider->expects($this->at(3))
-            ->method('getConfig')
-            ->with($datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig2));
+            ->willReturnMap([
+                [
+                    $datagridFieldConfig1->getId()->getClassName(),
+                    $datagridFieldConfig1->getId()->getFieldName(),
+                    $datagridFieldConfig1
+                ],
+                [
+                    $datagridFieldConfig2->getId()->getClassName(),
+                    $datagridFieldConfig2->getId()->getFieldName(),
+                    $datagridFieldConfig2
+                ]
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('persist');

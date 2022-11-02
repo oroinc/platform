@@ -2,6 +2,9 @@
 
 namespace Oro\Component\PhpUtils;
 
+/**
+ * Provides utility static methods to get class information via the reflection.
+ */
 class ReflectionUtil
 {
     /**
@@ -14,15 +17,18 @@ class ReflectionUtil
      */
     public static function getProperty(\ReflectionClass $reflClass, $propertyName)
     {
-        $property = null;
+        if ($reflClass->hasProperty($propertyName)) {
+            return $reflClass->getProperty($propertyName);
+        }
+
+        $reflClass = $reflClass->getParentClass();
         while ($reflClass) {
             if ($reflClass->hasProperty($propertyName)) {
-                $property = $reflClass->getProperty($propertyName);
-                break;
+                return $reflClass->getProperty($propertyName);
             }
             $reflClass = $reflClass->getParentClass();
         }
 
-        return $property;
+        return null;
     }
 }

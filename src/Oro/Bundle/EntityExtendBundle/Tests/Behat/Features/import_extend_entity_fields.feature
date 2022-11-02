@@ -1,8 +1,7 @@
 @regression
 @ticket-BAP-16397
 @ticket-BB-14555
-# Unskip after BAP-17458
-@skip
+
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator
@@ -34,7 +33,6 @@ Feature: Import extend entity fields
     And I see view.is_displayable column
     And I see view.priority column
     And I see search.searchable column
-    And I see search.title_field column
     And I see dataaudit.auditable column
     And I see extend.precision column
     And I see extend.scale column
@@ -121,7 +119,7 @@ Feature: Import extend entity fields
       |                      | bigint | FieldText Label | no                   | 0                   |
       | correct_field_name_2 |        | FieldText Label | no                   | 0                   |
     And I import file
-    Then Email should contains the following "Errors: 6 processed: 7, read: 7, added: 1, updated: 0, replaced: 0" text
+    Then Email should contains the following "Errors: 6 processed: 1, read: 7, added: 1, updated: 0, replaced: 0" text
     When I reload the page
     Then I should see correct_field_name in grid
     And I should not see "correctFieldName"
@@ -180,32 +178,13 @@ Feature: Import extend entity fields
       | _loremipsum                                        | string | label value 17 | no                   | 0                   |
     When I import file
     Then Email should contains the following "Errors: 10 processed: 0, read: 10, added: 0, updated: 0, replaced: 0" text
+    And number of records should be 46
     When I reload the page
-    And I should not see "null"
-    # will be fixed in BB-14718
-    And I should see "LoremIpsumLoremIpsumLoremIpsumLoremIpsumLoremIpsum"
-    And I should not see "лорем_иъий"
-    # will be fixed in BB-14718
-    And I should see "A"
-    And I should not see "correctFieldName"
-    And I should not see "inc@rrect_field_name"
-    And I should not see "incorrect_field"
-    And I should not see "UNION"
-    And I should not see "correct_field_name_2"
-    And I should not see "U+004C"
-    And I should not see "&^$"
-    And I should not see "4&a"
-    And I should not see "&A"
-    And I should not see "#^*()"
-    And I should not see "_loremipsum"
-    And I should see "Update schema"
-    When I click update schema
-    Then I should see Schema updated flash message
+    Then number of records should be 46
+    And I should not see "Update schema"
 
   Scenario: It should be impossible to updated columns with similar names
-    Given I filter Name as is equal to "User"
-    And click View User in grid
-    And I fill template with data:
+    Given I fill template with data:
       | fieldName          | type   | entity.label            | datagrid.show_filter | datagrid.is_visible |
       | correct_field_name | bigint | FieldText Label         | no                   | 0                   |
       | correctFieldName   | bigint | FieldText Label updated | no                   | 0                   |
@@ -230,12 +209,3 @@ Feature: Import extend entity fields
     And I should see "FieldText Label updated" in grid
     And I should not see "correctFieldName"
     And I should not see "Update schema"
-
-  Scenario: It should be impossible to import columns with invalid field name
-    Given I fill template with data:
-      | fieldName                 | type   | entity.label       | datagrid.show_filter | datagrid.is_visible |
-      | <script>alert(1)</script> | string | string field Label | no                   | 0                   |
-    When I try import file
-    Then I should not see "Import File Field Validation" element with text "The mime type of the file is invalid" inside "Import File Form" element
-    When I reload the page
-    Then I should not see "Update schema"

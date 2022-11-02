@@ -3,36 +3,33 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Intl\Intl;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Intl\Currencies;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class LocaleExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to retrieve various localization-related settings:
+ *   - oro_currency_name
+ *   - oro_locale
+ *   - oro_language
+ *   - oro_is_rtl_mode
+ *   - oro_country
+ *   - oro_currency_symbol
+ *   - oro_currency
+ *   - oro_timezone
+ *   - oro_timezone_offset
+ *   - oro_format_address_by_address_country
+ */
+class LocaleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?LocaleSettings $localeSettings = null;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return LocaleSettings
-     */
-    protected function getLocaleSettings()
-    {
-        return $this->container->get('oro_locale.settings');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale';
     }
 
     /**
@@ -41,15 +38,16 @@ class LocaleExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_currency_name', [$this, 'getCurrencyName']),
-            new \Twig_SimpleFunction('oro_locale', [$this, 'getLocale']),
-            new \Twig_SimpleFunction('oro_language', [$this, 'getLanguage']),
-            new \Twig_SimpleFunction('oro_country', [$this, 'getCountry']),
-            new \Twig_SimpleFunction('oro_currency_symbol', [$this, 'getCurrencySymbolByCurrency']),
-            new \Twig_SimpleFunction('oro_currency', [$this, 'getCurrency']),
-            new \Twig_SimpleFunction('oro_timezone', [$this, 'getTimeZone']),
-            new \Twig_SimpleFunction('oro_timezone_offset', [$this, 'getTimeZoneOffset']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('oro_currency_name', [$this, 'getCurrencyName']),
+            new TwigFunction('oro_locale', [$this, 'getLocale']),
+            new TwigFunction('oro_language', [$this, 'getLanguage']),
+            new TwigFunction('oro_is_rtl_mode', [$this, 'isRtlMode']),
+            new TwigFunction('oro_country', [$this, 'getCountry']),
+            new TwigFunction('oro_currency_symbol', [$this, 'getCurrencySymbolByCurrency']),
+            new TwigFunction('oro_currency', [$this, 'getCurrency']),
+            new TwigFunction('oro_timezone', [$this, 'getTimeZone']),
+            new TwigFunction('oro_timezone_offset', [$this, 'getTimeZoneOffset']),
+            new TwigFunction(
                 'oro_format_address_by_address_country',
                 [$this, 'isFormatAddressByAddressCountry']
             ),
@@ -64,7 +62,7 @@ class LocaleExtension extends \Twig_Extension
      */
     public function getCurrencyName($currency, $displayLocale = null)
     {
-        return Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale);
+        return Currencies::getName($currency, $displayLocale);
     }
 
     /**
@@ -81,6 +79,11 @@ class LocaleExtension extends \Twig_Extension
     public function getLanguage()
     {
         return $this->getLocaleSettings()->getLanguage();
+    }
+
+    public function isRtlMode(): bool
+    {
+        return $this->getLocaleSettings()->isRtlMode();
     }
 
     /**
@@ -133,5 +136,24 @@ class LocaleExtension extends \Twig_Extension
     public function isFormatAddressByAddressCountry()
     {
         return $this->getLocaleSettings()->isFormatAddressByAddressCountry();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            LocaleSettings::class,
+        ];
+    }
+
+    private function getLocaleSettings(): LocaleSettings
+    {
+        if (null === $this->localeSettings) {
+            $this->localeSettings = $this->container->get(LocaleSettings::class);
+        }
+
+        return $this->localeSettings;
     }
 }

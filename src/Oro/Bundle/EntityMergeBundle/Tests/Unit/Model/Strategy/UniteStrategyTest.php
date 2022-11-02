@@ -3,8 +3,10 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -149,48 +151,29 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($collection->contains($collectionItem2));
     }
 
-    /**
-     * @param  array  $relatedEntities
-     * @return UniteStrategy
-     */
-    private function getStrategy(array $relatedEntities)
+    private function getStrategy(array $relatedEntities): UniteStrategy
     {
-        $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
 
-        $repository
-            ->expects($this->any())
+        $repository->expects($this->any())
             ->method('findBy')
-            ->will(
-                $this->returnCallback(
-                    function ($values) use ($relatedEntities) {
-                        return [
-                            $relatedEntities[$values['entityStub']->getId()-1]
-                        ];
-                    }
-                )
-            );
+            ->willReturnCallback(function (array $values) use ($relatedEntities) {
+                return [
+                    $relatedEntities[$values['entityStub']->getId() - 1]
+                ];
+            });
 
-        $doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $doctrineHelper->expects($this->any())
             ->method('getEntityIdentifierValue')
-            ->will(
-                $this->returnCallback(
-                    function ($value) {
-                        return $value->getId();
-                    }
-                )
-            );
+            ->willReturnCallback(function ($value) {
+                return $value->getId();
+            });
 
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
         $accessor = new DelegateAccessor([
             new InverseAssociationAccessor($doctrineHelper),
@@ -200,30 +183,20 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         return new UniteStrategy($accessor, $doctrineHelper);
     }
 
-    /**
-     * @param  EntityData $entityData
-     * @param  array      $metadata
-     * @param  array      $doctrineMetadata
-     * @return FieldData
-     */
-    private function createFieldData(EntityData $entityData, array $metadata, array $doctrineMetadata = [])
+    private function createFieldData(EntityData $entityData, array $metadata, array $doctrineMetadata = []): FieldData
     {
         $doctrineMetadata = new DoctrineMetadata($doctrineMetadata);
         $fieldMetadata = new FieldMetadata($metadata, $doctrineMetadata);
         $fieldMetadata->setEntityMetadata($entityData->getMetadata());
-        $fieldData = new FieldData($entityData, $fieldMetadata);
 
-        return $fieldData;
+        return new FieldData($entityData, $fieldMetadata);
     }
 
-    /**
-     * @param  object $masterEntity
-     * @param  object $sourceEntity
-     * @param  array  $doctrineMetadata
-     * @return EntityData
-     */
-    private function createEntityData($masterEntity = null, $sourceEntity = null, array $doctrineMetadata = [])
-    {
+    private function createEntityData(
+        object $masterEntity = null,
+        object $sourceEntity = null,
+        array $doctrineMetadata = []
+    ): EntityData {
         $doctrineMetadata = new DoctrineMetadata($doctrineMetadata);
         $metadata = new EntityMetadata([], $doctrineMetadata);
         $entityData = new EntityData($metadata, [$masterEntity, $sourceEntity]);

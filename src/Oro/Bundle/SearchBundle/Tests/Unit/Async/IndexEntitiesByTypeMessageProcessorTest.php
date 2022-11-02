@@ -1,17 +1,17 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,53 +19,50 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testCouldBeConstructedWithRequiredAttributes()
     {
+        $this->expectNotToPerformAssertions();
+
         new IndexEntitiesByTypeMessageProcessor(
-            $this->createDoctrineMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(JobRunner::class),
             $this->createMock(MessageProducerInterface::class),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldBeSubscribedForTopics()
     {
-        $expectedSubscribedTopics = [
-            Topics::INDEX_ENTITY_TYPE,
-        ];
-
-        $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByTypeMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            [
+                IndexEntitiesByTypeTopic::getName()
+            ],
+            IndexEntitiesByTypeMessageProcessor::getSubscribedTopics()
+        );
     }
 
     public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass()
     {
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getManagerForClass')
-        ;
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass');
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with('Entity manager is not defined for class: "entity-name"')
-        ;
+            ->with('Entity manager is not defined for class: "entity-name"');
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
-            }))
-        ;
+            });
 
-        $message = new NullMessage();
-        $message->setBody(JSON::encode([
+        $message = new Message();
+        $message->setBody([
             'entityClass' => 'entity-name',
             'jobId' => 12345,
-        ]));
+        ]);
 
         $processor = new IndexEntitiesByTypeMessageProcessor(
             $doctrine,
@@ -76,29 +73,5 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
-     */
-    protected function createDoctrineMock()
-    {
-        return $this->createMock(RegistryInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

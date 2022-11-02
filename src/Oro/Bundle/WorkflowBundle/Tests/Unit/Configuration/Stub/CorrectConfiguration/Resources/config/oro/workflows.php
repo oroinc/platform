@@ -44,7 +44,8 @@ return [
                 'options' => [
                     'class' => 'DateTime'
                 ],
-                'property_path' => null
+                'property_path' => null,
+                'default' => null,
             ],
             'second_attribute' => [
                 'type' => 'entity',
@@ -55,7 +56,8 @@ return [
                 ],
                 'options' => [
                     'class' => 'DateTime',
-                ]
+                ],
+                'default' => null,
             ]
         ],
         'variable_definitions' => [
@@ -119,8 +121,8 @@ return [
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'destination_page' => 'name',
-                'page_template' => 'Workflow:Test:pageTemplate.html.twig',
-                'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
+                'page_template' => '@OroWorkflow/Test/pageTemplate.html.twig',
+                'dialog_template' => '@OroWorkflow/Test/dialogTemplate.html.twig',
                 'form_options' => [
                     'attribute_fields' => [
                         'first_attribute' => [
@@ -247,7 +249,6 @@ return [
                 ],
                 'preconditions' => [
                     '@true' => null,
-                    '@condition1' => null,
                 ],
                 'conditions' => [
                     '@and' => [
@@ -266,7 +267,6 @@ return [
                 ],
                 'actions' => [
                     ['@custom_action2' => null],
-                    ['@custom_action' => null],
                 ]
             ]
         ],

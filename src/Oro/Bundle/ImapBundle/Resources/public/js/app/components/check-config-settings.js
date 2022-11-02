@@ -9,19 +9,19 @@ define(['jquery', 'underscore'], function($, _) {
      */
     return function(options) {
         function setVisibility(controlCheckbox, configValues) {
-            var isEnabled = $(controlCheckbox).is(':checked');
+            const isEnabled = $(controlCheckbox).is(':checked');
             configValues.each(function() {
                 $(this).closest('.control-group').toggle(isEnabled);
                 $(this).enable(isEnabled);
             });
         }
 
-        var $el = $(options._sourceElement);
-        var $parentContainer = $el.parent().parent();
-        var useImap = $parentContainer.find('.imap-config:checkbox');
-        var useSmtp = $parentContainer.find('.smtp-config:checkbox');
-        var imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
-        var smtpFields = $parentContainer.find('input.smtp-config,select.smtp-config').not(':checkbox');
+        const $el = $(options._sourceElement);
+        const $parentContainer = $el.parent().parent();
+        const useImap = $parentContainer.find('.imap-config:checkbox');
+        const useSmtp = $parentContainer.find('.smtp-config:checkbox');
+        const imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
+        const smtpFields = $parentContainer.find('input.smtp-config,select.smtp-config').not(':checkbox');
 
         setVisibility(useImap, imapFields);
         setVisibility(useSmtp, smtpFields);

@@ -29,10 +29,6 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
         $this->settings = $settings;
     }
 
-    /**
-     * @param NodeBuilder $node
-     * @param string      $section
-     */
     protected function callConfigureCallbacks(NodeBuilder $node, string $section): void
     {
         $callbacks = $this->settings->getConfigureCallbacks($section);

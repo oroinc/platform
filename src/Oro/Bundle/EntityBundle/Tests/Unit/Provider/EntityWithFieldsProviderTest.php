@@ -5,39 +5,37 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityWithFieldsProvider */
-    private $provider;
-
     /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityProvider;
 
     /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelper;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var EntityWithFieldsProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
         $this->entityProvider = $this->createMock(EntityProvider::class);
-        $this->configHelper = $this->createMock(EntityConfigHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->provider = new EntityWithFieldsProvider(
             $this->fieldProvider,
             $this->entityProvider,
-            $this->configHelper
+            $this->configManager
         );
     }
 
-    public function testGetFields()
+    public function testGetFields(): void
     {
         $className          = 'Test\Entity';
         $withVirtualFields  = true;
@@ -61,22 +59,21 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->entityProvider->expects($this->once())
+        $this->entityProvider->expects(self::once())
             ->method('getEntities')
             ->with(true, $applyExclusions)
-            ->will($this->returnValue($entities));
-        $this->fieldProvider->expects($this->once())
-            ->method('getFields')
+            ->willReturn($entities);
+        $this->fieldProvider->expects(self::once())
+            ->method('getEntityFields')
             ->with(
                 $className,
-                $withRelations,
-                $withVirtualFields,
-                false,
-                $withUnidirectional,
-                $applyExclusions,
-                $translate
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                | EntityFieldProvider::OPTION_TRANSLATE
             )
-            ->will($this->returnValue($fields));
+            ->willReturn($fields);
 
         $result = $this->provider->getFields(
             $withVirtualFields,
@@ -86,7 +83,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             $translate
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 $className => [
                     'name'         => $className,
@@ -105,27 +102,36 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWithRoutes()
+    public function testGetFieldsWithRoutes(): void
     {
-        $this->entityProvider->expects($this->once())
+        $className = 'Test\Entity';
+
+        $this->entityProvider->expects(self::once())
             ->method('getEntities')
             ->with(true, true, true)
-            ->willReturn([['name' => 'entity1']]);
+            ->willReturn([['name' => $className]]);
 
-        $this->fieldProvider->expects($this->once())
-            ->method('getFields')
-            ->with('entity1', true, false, false, false, true, true)
+        $this->fieldProvider->expects(self::once())
+            ->method('getEntityFields')
+            ->with(
+                $className,
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                | EntityFieldProvider::OPTION_TRANSLATE
+            )
             ->willReturn(['field1' => []]);
 
-        $this->configHelper->expects($this->once())
-            ->method('getAvailableRoutes')
-            ->with('entity1')
-            ->willReturn(['routeName' => 'routeValue']);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routes = ['routeName' => 'routeValue'];
+        $this->configManager->expects(self::once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'entity1' => [
-                    'name' => 'entity1',
+                $className => [
+                    'name' => $className,
                     'fields' => [
                         'field1' => [],
                     ],
@@ -138,7 +144,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForEntity()
+    public function testGetFieldsForEntity(): void
     {
         $className = 'Test\Entity';
         $withVirtualFields = true;
@@ -160,20 +166,19 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->entityProvider->expects($this->once())
+        $this->entityProvider->expects(self::once())
             ->method('getEnabledEntity')
             ->with($className, $applyExclusions, $translate)
             ->willReturn($entity);
-        $this->fieldProvider->expects($this->once())
-            ->method('getFields')
+        $this->fieldProvider->expects(self::once())
+            ->method('getEntityFields')
             ->with(
                 $className,
-                $withRelations,
-                $withVirtualFields,
-                false,
-                $withUnidirectional,
-                $applyExclusions,
-                $translate
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                | EntityFieldProvider::OPTION_TRANSLATE
             )
             ->willReturn($fields);
 
@@ -186,7 +191,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             $translate
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name'         => $className,
                 'label'        => 'Item',
@@ -203,26 +208,33 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForEntityWithRoutes()
+    public function testGetFieldsForEntityWithRoutes(): void
     {
         $className = 'Test\Entity';
 
-        $this->entityProvider->expects($this->once())
+        $this->entityProvider->expects(self::once())
             ->method('getEnabledEntity')
             ->with($className, true, true)
             ->willReturn(['name' => $className]);
 
-        $this->fieldProvider->expects($this->once())
-            ->method('getFields')
-            ->with($className, true, false, false, false, true, true)
+        $this->fieldProvider->expects(self::once())
+            ->method('getEntityFields')
+            ->with(
+                $className,
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                | EntityFieldProvider::OPTION_TRANSLATE
+            )
             ->willReturn(['field1' => []]);
 
-        $this->configHelper->expects($this->once())
-            ->method('getAvailableRoutes')
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routes = ['routeName' => 'routeValue'];
+        $this->configManager->expects(self::once())
+            ->method('getEntityMetadata')
             ->with($className)
-            ->willReturn(['routeName' => 'routeValue']);
+            ->willReturn($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name'   => $className,
                 'fields' => [
@@ -231,6 +243,42 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
                 'routes' => [
                     'routeName' => 'routeValue'
                 ]
+            ],
+            $this->provider->getFieldsForEntity($className, false, false, true, true, true, true)
+        );
+    }
+
+    public function testGetFieldsForEntityWithRoutesWhenEntityMetadataDoesNotExist(): void
+    {
+        $className = 'Test\Entity';
+
+        $this->entityProvider->expects(self::once())
+            ->method('getEnabledEntity')
+            ->with($className, true, true)
+            ->willReturn(['name' => $className]);
+
+        $this->fieldProvider->expects(self::once())
+            ->method('getEntityFields')
+            ->with(
+                $className,
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                | EntityFieldProvider::OPTION_TRANSLATE
+            )
+            ->willReturn(['field1' => []]);
+
+        $this->configManager->expects(self::once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn(null);
+
+        self::assertEquals(
+            [
+                'name'   => $className,
+                'fields' => [
+                    'field1' => []
+                ],
+                'routes' => []
             ],
             $this->provider->getFieldsForEntity($className, false, false, true, true, true, true)
         );

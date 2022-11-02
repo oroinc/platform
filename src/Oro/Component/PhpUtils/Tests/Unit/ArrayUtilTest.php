@@ -4,6 +4,10 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -798,10 +802,6 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mergeDataProvider
-     *
-     * @param array $expected
-     * @param array $first
-     * @param array $second
      */
     public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
     {

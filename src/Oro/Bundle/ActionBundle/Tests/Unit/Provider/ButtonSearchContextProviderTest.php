@@ -8,40 +8,28 @@ use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextHelper;
+    private $contextHelper;
 
     /** @var ButtonSearchContextProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextHelper = $this->createMock(ContextHelper::class);
+
         $this->provider = new ButtonSearchContextProvider($this->contextHelper);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->provider, $this->contextHelper);
-    }
-
-    /**
      * @dataProvider contextProvider
-     *
-     * @param array $context
      */
     public function testGetButtonSearchContext(array $context)
     {
         $context = $this->normalizeContext($context);
 
-        $this->contextHelper->expects($this->once())->method('getContext')->willReturn($context);
+        $this->contextHelper->expects($this->once())
+            ->method('getContext')
+            ->willReturn($context);
 
         $buttonSearchContext = $this->provider->getButtonSearchContext($context);
 
@@ -53,10 +41,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($context[ContextHelper::ROUTE_PARAM], $buttonSearchContext->getRouteName());
     }
 
-    /**
-     * @return array
-     */
-    public function contextProvider()
+    public function contextProvider(): array
     {
         return [
             'correct_int' => [
@@ -100,20 +85,16 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $context
-     * @return array
-     */
-    private function normalizeContext(array $context)
+    private function normalizeContext(array $context): array
     {
         return array_merge(
             [
-                ContextHelper::ROUTE_PARAM => null,
+                ContextHelper::ROUTE_PARAM => '',
                 ContextHelper::ENTITY_ID_PARAM => null,
                 ContextHelper::ENTITY_CLASS_PARAM => null,
-                ContextHelper::DATAGRID_PARAM => null,
-                ContextHelper::GROUP_PARAM => null,
-                ContextHelper::FROM_URL_PARAM => null,
+                ContextHelper::DATAGRID_PARAM => '',
+                ContextHelper::GROUP_PARAM => '',
+                ContextHelper::FROM_URL_PARAM => '',
             ],
             $context
         );

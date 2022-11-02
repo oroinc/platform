@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Removes empty collection elements and sets the first non-empty item as primary.
+ */
 class CollectionTypeSubscriber implements EventSubscriberInterface
 {
     /**
@@ -24,8 +27,6 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
 
     /**
      * Removes empty collection elements.
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -46,7 +47,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
     /**
      * Remove empty items to prevent validation.
      *
-     * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event)
     {

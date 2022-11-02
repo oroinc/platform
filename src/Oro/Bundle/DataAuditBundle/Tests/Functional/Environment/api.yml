@@ -1,0 +1,16 @@
+api:
+    entity_aliases:
+        Extend\Entity\EV_Audit_Enum:
+            alias:        testapiauditenum
+            plural_alias: testapiauditenums
+        Extend\Entity\EV_Audit_Muenum:
+            alias:        testapiauditmultienum
+            plural_alias: testapiauditmultienums
+
+    entities:
+        Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner:
+            fields:
+              enumProperty:
+                  exclude: true
+              multiEnumProperty:
+                  exclude: true

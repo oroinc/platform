@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 class ConfigTest extends \PHPUnit\Framework\TestCase
 {
@@ -11,7 +12,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
     {
         $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
-        $values = array('firstKey' => 'firstValue', 'secondKey' => new \stdClass());
+        $values = ['firstKey' => 'firstValue', 'secondKey' => new \stdClass()];
         $config->setValues($values);
 
         $clone = clone $config;
@@ -24,24 +25,22 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
     {
         $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
-        $values = array(
+        $values = [
             'firstKey' => 'firstValue',
             'secondKey' => 'secondValue',
             'thirdKey' => 3,
             'fourthKey' => new \stdClass(),
             'falseKey' => false,
             'nullKey' => null,
-        );
+        ];
         $config->setValues($values);
 
         $this->assertEquals($values, $config->all());
         $this->assertEquals(
-            array('firstKey' => 'firstValue'),
-            $config->all(
-                function ($value) {
-                    return $value == 'firstValue';
-                }
-            )
+            ['firstKey' => 'firstValue'],
+            $config->all(function ($value) {
+                return 'firstValue' === $value;
+            })
         );
 
         $this->assertEquals('firstValue', $config->get('firstKey'));
@@ -73,7 +72,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('default', $config->get('nonExistKey', false, 'default'));
         $this->assertEquals([], $config->get('nonExistKey', false, []));
 
-        $this->expectException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $config->get('nonExistKey', true);
     }
 

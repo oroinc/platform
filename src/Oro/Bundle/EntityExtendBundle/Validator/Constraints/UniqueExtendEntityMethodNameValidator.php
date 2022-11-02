@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -16,24 +17,26 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
-
     /** @var ClassMethodNameChecker */
     protected $methodNameChecker;
 
-    /**
-     * @param FieldNameValidationHelper $validationHelper
-     * @param ClassMethodNameChecker    $methodNameChecker
-     *
-     */
-    public function __construct(FieldNameValidationHelper $validationHelper, ClassMethodNameChecker $methodNameChecker)
-    {
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
+    public function __construct(
+        FieldNameValidationHelper $validationHelper,
+        ClassMethodNameChecker $methodNameChecker,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         parent::__construct($validationHelper);
 
         $this->methodNameChecker = $methodNameChecker;
+        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
+     * @param UniqueExtendEntityMethodName $constraint
+     * @param FieldConfigModel $value
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
@@ -56,10 +59,11 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
             return;
         }
 
+        $realRelationType = $this->fieldTypeHelper->getUnderlyingType($value->getType());
         if ($this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$getters)
             || $this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$setters)
             || (
-                in_array($value->getType(), RelationType::$anyToAnyRelations, true)
+                in_array($realRelationType, RelationType::$anyToAnyRelations, true)
                 && $this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$relationMethods)
             )
         ) {
@@ -82,7 +86,7 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
     }
 
     /**
-     * @param string           $relationType
+     * @param string $relationType
      * @param FieldConfigModel $value
      *
      * @return string|null
@@ -114,7 +118,7 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 
     /**
      * @param EntityConfigModel $entityConfigModel
-     * @param string            $relationKey
+     * @param string $relationKey
      *
      * @return array
      */
@@ -157,8 +161,8 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
     }
 
     /**
-     * @param string   $className
-     * @param string   $fieldName
+     * @param string $className
+     * @param string $fieldName
      * @param string[] $methods
      *
      * @return bool

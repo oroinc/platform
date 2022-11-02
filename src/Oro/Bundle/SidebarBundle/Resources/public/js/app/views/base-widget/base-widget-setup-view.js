@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var BaseSetupView;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
     require('jquery.validate');
 
-    BaseSetupView = BaseView.extend({
+    const BaseSetupView = BaseView.extend({
         tagName: 'form',
 
         listen: {
@@ -17,14 +17,14 @@ define(function(require) {
         validation: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BaseSetupView() {
-            BaseSetupView.__super__.constructor.apply(this, arguments);
+        constructor: function BaseSetupView(options) {
+            BaseSetupView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             BaseSetupView.__super__.render.call(this);
@@ -33,8 +33,13 @@ define(function(require) {
                 this.$('[name=' + fieldName + ']').data('validation', rules);
             }, this);
             this.$el.validate({
-                submitHandler: _.bind(this.onSubmit, this)
+                submitHandler: this.onSubmit.bind(this)
             });
+
+            if (!_.isMobile()) {
+                mediator.execute('layout:adjustLabelsWidth', this.$el);
+            }
+
             return this;
         },
 
@@ -58,7 +63,7 @@ define(function(require) {
          * Handles from submit after validation
          */
         onSubmit: function() {
-            var settings = this.fetchFromData();
+            const settings = this.fetchFromData();
             if (!tools.isEqualsLoosely(settings, this.model.get('settings'))) {
                 this.model.set('settings', settings);
             }

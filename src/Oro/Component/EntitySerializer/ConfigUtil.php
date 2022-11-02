@@ -33,6 +33,12 @@ class ConfigUtil
      */
     public const CLASS_NAME = '__class__';
 
+    /**
+     * a key of a record contains an additional information about a collection,
+     * e.g. "has_more" flag indicates whether a collection has more records than it was requested.
+     */
+    public const INFO_RECORD_KEY = '_';
+
     /** a list of fields */
     public const FIELDS = 'fields';
 
@@ -45,11 +51,14 @@ class ConfigUtil
     /** exclude only fields are marked as excluded */
     public const EXCLUSION_POLICY_NONE = 'none';
 
-    /** a flag indicates whether using of Doctrine partial object is disabled */
+    /** a flag indicates whether using of Doctrine partial objects is disabled */
     public const DISABLE_PARTIAL_LOAD = 'disable_partial_load';
 
     /** a list Doctrine query hints */
     public const HINTS = 'hints';
+
+    /** a list of associations for which INNER JOIN should be used instead of LEFT JOIN */
+    public const INNER_JOIN_ASSOCIATIONS = 'inner_join_associations';
 
     /** the ordering of the result */
     public const ORDER_BY = 'order_by';
@@ -57,8 +66,24 @@ class ConfigUtil
     /** the maximum number of items in the result */
     public const MAX_RESULTS = 'max_results';
 
-    /** a handler that can be used to modify serialized data */
+    /**
+     * a flag indicates whether an additional element with
+     * key "_" {@see ConfigUtil::INFO_RECORD_KEY} and value ['has_more' => true]
+     * should be added to a collection if it has more records than it was requested.
+     */
+    public const HAS_MORE = 'has_more';
+
+    /** a handler that can be used to modify serialized data for a single item */
     public const POST_SERIALIZE = 'post_serialize';
+
+    /** a handler that can be used to modify serialized data for a list of items */
+    public const POST_SERIALIZE_COLLECTION = 'post_serialize_collection';
+
+    /**
+     * a query that should be used to load an association data
+     * @see \Oro\Component\EntitySerializer\AssociationQuery
+     */
+    public const ASSOCIATION_QUERY = 'association_query';
 
     /** a flag indicates whether the field should be excluded */
     public const EXCLUDE = 'exclude';
@@ -76,16 +101,16 @@ class ConfigUtil
     /** the data transformer to be applies to the field value */
     public const DATA_TRANSFORMER = 'data_transformer';
 
-    /** a symbol that is used to delimite element is a path */
+    /** a symbol that is used to delimit element in a path */
     public const PATH_DELIMITER = '.';
 
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
     public const COLLAPSE_FIELD = '_collapse_field';
 
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
     public const EXCLUDED_FIELDS = '_excluded_fields';
 
-    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    /** @internal filled automatically by ConfigConverter and used only during serialization */
     public const RENAMED_FIELDS = '_renamed_fields';
 
     /**
@@ -108,7 +133,7 @@ class ConfigUtil
             return $value;
         }
 
-        throw new \UnexpectedValueException(\sprintf(
+        throw new \UnexpectedValueException(sprintf(
             'Expected value of type "array, string or nothing", "%s" given.',
             \is_object($value) ? \get_class($value) : \gettype($value)
         ));
@@ -198,20 +223,6 @@ class ConfigUtil
     public static function getFieldConfig($config, $field)
     {
         return $config[self::FIELDS][$field] ?? [];
-    }
-
-    /**
-     * Checks whether a property path represents some metadata property like '__class__' or '__discriminator__'
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
-     *
-     * @deprecated since 2.0. Use Oro\Component\EntitySerializer\FieldAccessor::isMetadataProperty instead
-     */
-    public static function isMetadataProperty($propertyPath)
-    {
-        return \strpos($propertyPath, '__') === 0;
     }
 
     /**

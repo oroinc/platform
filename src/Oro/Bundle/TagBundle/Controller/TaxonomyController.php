@@ -5,13 +5,20 @@ namespace Oro\Bundle\TagBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TaxonomyController extends Controller
+/**
+ * CRUD for tag taxonomies.
+ */
+class TaxonomyController extends AbstractController
 {
     /**
      * @Route(
@@ -30,9 +37,9 @@ class TaxonomyController extends Controller
      */
     public function indexAction()
     {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_tag.taxonomy.entity.class')
-        );
+        return [
+            'entity_class' => Taxonomy::class
+        ];
     }
 
     /**
@@ -43,11 +50,11 @@ class TaxonomyController extends Controller
      *      class="OroTagBundle:Taxonomy",
      *      permission="CREATE"
      * )
-     * @Template("OroTagBundle:Taxonomy:update.html.twig")
+     * @Template("@OroTag/Taxonomy/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Taxonomy());
+        return $this->update(new Taxonomy(), $request);
     }
 
     /**
@@ -60,9 +67,9 @@ class TaxonomyController extends Controller
      * )
      * @Template
      */
-    public function updateAction(Taxonomy $entity)
+    public function updateAction(Taxonomy $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -96,22 +103,39 @@ class TaxonomyController extends Controller
 
     /**
      * @param Taxonomy $entity
+     * @param Request $request
      * @return array|RedirectResponse
      */
-    protected function update(Taxonomy $entity)
+    protected function update(Taxonomy $entity, Request $request)
     {
-        if ($this->get('oro_tag.form.handler.taxonomy')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        if ($this->get(TaxonomyHandler::class)->process($entity)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.taxonomy.controller.saved.message')
+                $this->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
-        return array(
+        return [
             'entity' => $entity,
             'form' => $this->get('oro_tag.form.taxonomy')->createView(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                'oro_tag.form.taxonomy' => Form::class,
+                TaxonomyHandler::class,
+            ]
         );
     }
 }

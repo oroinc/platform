@@ -16,7 +16,7 @@ class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ValidationExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
 
@@ -52,15 +52,16 @@ class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'error_mapping'              => [],
-                'invalid_message'            => 'This value is not valid.',
+                'error_mapping' => [],
+                'invalid_message' => 'This value is not valid.',
                 'invalid_message_parameters' => [],
-                'allow_extra_fields'         => false,
-                'extra_fields_message'       => 'This form should not contain extra fields.',
-                'validation_groups'          => null,
-                'constraints'                => [],
-                'enable_validation'          => true,
-                'enable_full_validation'     => false
+                'legacy_error_messages' => true,
+                'allow_extra_fields' => false,
+                'extra_fields_message' => 'This form should not contain extra fields.',
+                'validation_groups' => null,
+                'constraints' => [],
+                'enable_validation' => true,
+                'enable_full_validation' => false,
             ],
             $resolver->resolve()
         );
@@ -74,15 +75,16 @@ class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'error_mapping'              => [],
-                'invalid_message'            => 'This value is not valid.',
+                'error_mapping' => [],
+                'invalid_message' => 'This value is not valid.',
                 'invalid_message_parameters' => [],
-                'allow_extra_fields'         => false,
-                'extra_fields_message'       => 'This form should not contain extra fields.',
-                'validation_groups'          => null,
-                'constraints'                => [],
-                'enable_validation'          => false,
-                'enable_full_validation'     => false
+                'legacy_error_messages' => true,
+                'allow_extra_fields' => false,
+                'extra_fields_message' => 'This form should not contain extra fields.',
+                'validation_groups' => null,
+                'constraints' => [],
+                'enable_validation' => false,
+                'enable_full_validation' => false,
             ],
             $resolver->resolve(['enable_validation' => false])
         );
@@ -96,15 +98,16 @@ class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'error_mapping'              => [],
-                'invalid_message'            => 'This value is not valid.',
+                'error_mapping' => [],
+                'invalid_message' => 'This value is not valid.',
                 'invalid_message_parameters' => [],
-                'allow_extra_fields'         => false,
-                'extra_fields_message'       => 'This form should not contain extra fields.',
-                'validation_groups'          => null,
-                'constraints'                => [],
-                'enable_validation'          => true,
-                'enable_full_validation'     => true
+                'legacy_error_messages' => true,
+                'allow_extra_fields' => false,
+                'extra_fields_message' => 'This form should not contain extra fields.',
+                'validation_groups' => null,
+                'constraints' => [],
+                'enable_validation' => true,
+                'enable_full_validation' => true,
             ],
             $resolver->resolve(['enable_full_validation' => true])
         );

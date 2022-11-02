@@ -6,42 +6,29 @@ use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePersonGroup;
 
 class BasePersonGroupTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAME = 'testGroupName';
-    const TEST_ID   = 123;
+    private const TEST_NAME = 'testGroupName';
+    private const TEST_ID = 123;
 
-    /** @var BasePersonGroup */
-    protected $entity;
+    private BasePersonGroup $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BasePersonGroup();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     /**
      * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
      */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
     {
         if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
+            call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
         }
 
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         return [
             'id'   => ['id', self::TEST_ID, self::TEST_ID],

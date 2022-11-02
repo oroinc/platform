@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var AbstractConditionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var conditionTemplate = require('tpl!oroquerydesigner/templates/condition.html');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const conditionTemplate = require('tpl-loader!oroquerydesigner/templates/condition.html');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    AbstractConditionView = BaseView.extend({
+    const AbstractConditionView = BaseView.extend({
         template: conditionTemplate,
 
         /**
@@ -24,7 +23,7 @@ define(function(require) {
         },
 
         events: function() {
-            var events = {};
+            const events = {};
             events['change .' + this.options.filterContainerClass] = '_onFilterChange';
             return events;
         },
@@ -36,13 +35,13 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = AbstractConditionView.__super__.getTemplateData.call(this);
+            const data = AbstractConditionView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this.options, ['choiceInputClass', 'filterContainerClass']));
             return data;
         },
 
         render: function() {
-            var choiceInputView = this.subview('choice-input');
+            const choiceInputView = this.subview('choice-input');
             if (choiceInputView) {
                 this.stopListening(choiceInputView);
                 this.removeSubview('choice-input');
@@ -65,7 +64,7 @@ define(function(require) {
             this.listenTo(choiceInputView, 'change', this._onChoiceInputChanged);
             this.$filterContainer = this.$('.' + this.options.filterContainerClass);
 
-            var choiceInputValue = this._getInitialChoiceInputValue();
+            const choiceInputValue = this._getInitialChoiceInputValue();
 
             if (choiceInputValue) {
                 this.setChoiceInputValue(choiceInputValue);
@@ -79,7 +78,7 @@ define(function(require) {
         },
 
         _onChoiceInputChanged: function(selectedItem) {
-            var choiceInputValue = this._getInitialChoiceInputValue();
+            const choiceInputValue = this._getInitialChoiceInputValue();
             if (!selectedItem) {
                 this._removeFilter();
             } else if (choiceInputValue !== selectedItem.id) {
@@ -97,9 +96,9 @@ define(function(require) {
         },
 
         _getApplicableFilterId: function(conditions) {
-            var filterId = null;
-            var matchedBy = null;
-            var self = this;
+            let filterId = null;
+            let matchedBy = null;
+            const self = this;
 
             if (!_.isUndefined(conditions.filter)) {
                 // the criteria parameter represents a filter
@@ -107,7 +106,7 @@ define(function(require) {
             }
 
             _.each(this.options.filters, function(filter, id) {
-                var matched;
+                let matched;
 
                 if (!_.isEmpty(filter.applicable)) {
                     // check if a filter conforms the given criteria
@@ -129,7 +128,7 @@ define(function(require) {
         },
 
         _matchApplicable: function(applicable, criteria) {
-            var hierarchy = this.options.hierarchy[criteria.entity] || [];
+            const hierarchy = this.options.hierarchy[criteria.entity] || [];
             return _.find(applicable, function(item) {
                 return _.every(item, function(value, key) {
                     if (key === 'entity' && hierarchy.length) {
@@ -141,12 +140,12 @@ define(function(require) {
         },
 
         _getFilterValue: function() {
-            var criterion = _.result(this.getValue(), 'criterion');
+            const criterion = _.result(this.getValue(), 'criterion');
             return _.result(criterion, 'data');
         },
 
         _appendFilter: function(filter) {
-            var filterValue = this._getFilterValue();
+            const filterValue = this._getFilterValue();
 
             if (filterValue) {
                 filter.value = filterValue;
@@ -176,12 +175,12 @@ define(function(require) {
         },
 
         _onUpdate: function() {
-            var value = this._collectValue();
+            const value = this._collectValue();
             this.setValue(value);
         },
 
         _collectValue: function() {
-            var value = {};
+            let value = {};
 
             if (!this._hasEmptyFilter()) {
                 value = {
@@ -193,7 +192,7 @@ define(function(require) {
         },
 
         _getFilterCriterion: function() {
-            var data = this.filter.getValue();
+            const data = this.filter.getValue();
 
             if (this.filter.filterParams) {
                 data.params = this.filter.filterParams;
@@ -214,8 +213,8 @@ define(function(require) {
         },
 
         setChoiceInputValue: function(name) {
-            var deferred = $.Deferred();
-            var columnName = _.result(this.getValue(), 'columnName');
+            const deferred = $.Deferred();
+            const columnName = _.result(this.getValue(), 'columnName');
             if (columnName !== name) {
                 this.once('filter-appended filter-removed', function() {
                     deferred.resolve();

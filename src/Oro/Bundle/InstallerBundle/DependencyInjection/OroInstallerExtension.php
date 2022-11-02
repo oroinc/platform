@@ -18,7 +18,5 @@ class OroInstallerExtension extends Extension
 
         $loader->load('services.yml');
         $loader->load('commands.yml');
-
-        $this->addClassesToCompile(['Oro\Bundle\InstallerBundle\EventListener\RequestListener']);
     }
 }

@@ -26,13 +26,10 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionTriggersAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->assembler = $this->getMockBuilder(WorkflowTransitionTriggersAssembler::class)
-            ->disableOriginalConstructor()->getMock();
-
-        $this->updater = $this->getMockBuilder(TransitionTriggersUpdater::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->assembler = $this->createMock(WorkflowTransitionTriggersAssembler::class);
+        $this->updater = $this->createMock(TransitionTriggersUpdater::class);
 
         $this->listener = new WorkflowTransitionTriggersListener($this->assembler, $this->updater);
     }
@@ -62,7 +59,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
                 $this->assertTrue(method_exists($this->listener, $call));
             } elseif (is_array($call)) {
                 foreach ($call as $method) {
-                    list($method) = $method;
+                    [$method] = $method;
                     $this->assertTrue(method_exists($this->listener, $method));
                 }
             }
@@ -78,18 +75,18 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
 
         $event = new WorkflowChangesEvent($definition);
 
-        $this->assembler->expects($this->once())->method('assembleTriggers')->with($definition)->willReturn(
-            [
-                $trigger1,
-                $trigger2
-            ]
-        );
+        $this->assembler->expects($this->once())
+            ->method('assembleTriggers')
+            ->with($definition)
+            ->willReturn([$trigger1, $trigger2]);
 
         $this->listener->createTriggers($event);//pre event job
 
         $triggersBag = new TriggersBag($definition, [$trigger1, $trigger2]);
 
-        $this->updater->expects($this->once())->method('updateTriggers')->with($triggersBag);
+        $this->updater->expects($this->once())
+            ->method('updateTriggers')
+            ->with($triggersBag);
 
         $this->listener->updateTriggers($event);//after event job
     }
@@ -99,7 +96,9 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
         $definition = new WorkflowDefinition();
         $event = new WorkflowChangesEvent($definition);
 
-        $this->updater->expects($this->once())->method('removeTriggers')->with($definition);
+        $this->updater->expects($this->once())
+            ->method('removeTriggers')
+            ->with($definition);
 
         $this->listener->deleteTriggers($event);
     }

@@ -5,20 +5,18 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about boolean attribute type.
+ */
 class BooleanAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'boolean';
-    }
+    public const TRUE_VALUE = 1;
+    public const FALSE_VALUE = 0;
 
     /**
      * {@inheritdoc}
      */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return false;
     }
@@ -26,15 +24,15 @@ class BooleanAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
-        return false;
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -52,7 +50,7 @@ class BooleanAttributeType implements AttributeTypeInterface
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        throw new \RuntimeException('Not supported');
+        return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }
 
     /**
@@ -60,6 +58,6 @@ class BooleanAttributeType implements AttributeTypeInterface
      */
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return $originalValue ? 1 : 0;
+        return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }
 }

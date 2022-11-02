@@ -16,9 +16,6 @@ class BlockTypeHelper implements BlockTypeHelperInterface
     /** @var array */
     protected $nameMap = [];
 
-    /**
-     * @param LayoutRegistryInterface $registry
-     */
     public function __construct(LayoutRegistryInterface $registry)
     {
         $this->registry = $registry;

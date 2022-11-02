@@ -15,43 +15,31 @@ use Symfony\Component\Validator\Validation;
 
 class ImportTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistry
-     */
-    protected $processorRegistry;
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
 
-    /**
-     * @var ImportType
-     */
-    protected $type;
+    /** @var ImportType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processorRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
         $this->type = new ImportType($this->processorRegistry);
         parent::setUp();
     }
 
     /**
      * @dataProvider submitDataProvider
-     * @param mixed $submitData
-     * @param mixed $formData
-     * @param array $formOptions
      */
-    public function testSubmit($submitData, $formData, array $formOptions)
+    public function testSubmit(array $submitData, ImportData $formData, array $formOptions)
     {
         $this->processorRegistry->expects($this->any())
             ->method('getProcessorAliasesByEntity')
-            ->will(
-                $this->returnCallback(
-                    function ($type, $entityName) {
-                        \PHPUnit\Framework\Assert::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
-                        return array($type . $entityName);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($type, $entityName) {
+                self::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
+
+                return [$type . $entityName];
+            });
 
         $form = $this->factory->create(ImportType::class, null, $formOptions);
 
@@ -77,31 +65,31 @@ class ImportTypeTest extends FormIntegrationTestCase
         $this->assertEquals($formData, $form->getData());
     }
 
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         $data = new ImportData();
         $data->setProcessorAlias('importname');
 
-        return array(
-            'empty data' => array(
-                'submitData' => array(),
+        return [
+            'empty data' => [
+                'submitData' => [],
                 'formData' => $data,
-                'formOptions' => array(
+                'formOptions' => [
                     'entityName' => 'name'
-                )
-            ),
-            'alias options' => array(
-                'submitData' => array(),
+                ]
+            ],
+            'alias options' => [
+                'submitData' => [],
                 'formData' => $data,
-                'formOptions' => array(
+                'formOptions' => [
                     'entityName' => 'name',
                     'processorAliasOptions' => [
                         'expanded' => true,
                         'multiple' => false,
                     ],
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**

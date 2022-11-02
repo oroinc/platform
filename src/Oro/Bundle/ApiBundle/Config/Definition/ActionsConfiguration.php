@@ -34,26 +34,24 @@ class ActionsConfiguration extends AbstractConfigurationSection
     {
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
-            ->useAttributeAsKey('name')
+            ->useAttributeAsKey('')
             ->beforeNormalization()
                 ->always(function ($value) {
                     return false === $value
-                        ? \array_fill_keys($this->permissibleActions, false)
+                        ? array_fill_keys($this->permissibleActions, false)
                         : $value;
                 })
             ->end()
             ->validate()
                 ->always(function ($value) {
-                    $unknownActions = \array_diff(\array_keys($value), $this->permissibleActions);
+                    $unknownActions = array_diff(array_keys($value), $this->permissibleActions);
                     if (!empty($unknownActions)) {
-                        throw new \InvalidArgumentException(
-                            \sprintf(
-                                'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
-                                $this->sectionName,
-                                \implode(', ', $unknownActions),
-                                \implode(', ', $this->permissibleActions)
-                            )
-                        );
+                        throw new \InvalidArgumentException(sprintf(
+                            'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
+                            $this->sectionName,
+                            implode(', ', $unknownActions),
+                            implode(', ', $this->permissibleActions)
+                        ));
                     }
 
                     return $value;
@@ -77,9 +75,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureActionNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
@@ -101,10 +96,20 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::ACL_RESOURCE)->end()
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
-            ->integerNode(ConfigUtil::PAGE_SIZE)->min(-1)->end()
+            ->integerNode(ConfigUtil::PAGE_SIZE)
+                ->min(-1)
+                ->validate()
+                    ->always(function ($v) {
+                        if (0 !== $v) {
+                            return $v;
+                        }
+                        throw new \InvalidArgumentException('Expected a positive number or -1, but got 0.');
+                    })
+                ->end()
+            ->end()
             ->arrayNode(ConfigUtil::ORDER_BY)
                 ->performNoDeepMerging()
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('enum')->values(['ASC', 'DESC'])->end()
             ->end()
             ->booleanNode(ConfigUtil::DISABLE_SORTING)->end()
@@ -113,7 +118,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
@@ -126,16 +131,14 @@ class ActionsConfiguration extends AbstractConfigurationSection
                         if (\is_array($v)) {
                             return $v;
                         }
-                        throw new \InvalidArgumentException(
-                            'The value must be a string or an array.'
-                        );
+                        throw new \InvalidArgumentException('The value must be a string or an array.');
                     })
                 ->end()
             ->end();
         $this->addStatusCodesNode($node);
         $fieldNode = $node
             ->arrayNode(ConfigUtil::FIELDS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
@@ -143,11 +146,8 @@ class ActionsConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function postProcessActionConfig(array $config): array
     {
@@ -179,15 +179,12 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return $config;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     public function addStatusCodesNode(NodeBuilder $node): void
     {
         /** @var ArrayNodeDefinition $parentNode */
         $codeNode = $node
             ->arrayNode(ConfigUtil::STATUS_CODES)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                     ->beforeNormalization()
                         ->ifString()
@@ -205,9 +202,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->configureStatusCodeNode($codeNode);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureStatusCodeNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.status_code';
@@ -219,9 +213,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->addPostProcessCallbacks($parentNode, $sectionName);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
@@ -240,6 +231,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->enumNode(ConfigUtil::DIRECTION)
                 ->values([
                     ConfigUtil::DIRECTION_INPUT_ONLY,
@@ -249,17 +241,18 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
+                ->performNoDeepMerging()
+                ->prototype('variable')->end()
+            ->end()
+            ->scalarNode(ConfigUtil::POST_PROCESSOR)->end()
+            ->arrayNode(ConfigUtil::POST_PROCESSOR_OPTIONS)
+                ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end();
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FORM_TYPE])) {
@@ -267,6 +260,12 @@ class ActionsConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ConfigUtil::FORM_OPTIONS])) {
             unset($config[ConfigUtil::FORM_OPTIONS]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR])) {
+            unset($config[ConfigUtil::POST_PROCESSOR]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR_OPTIONS])) {
+            unset($config[ConfigUtil::POST_PROCESSOR_OPTIONS]);
         }
 
         return $config;

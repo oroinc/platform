@@ -14,7 +14,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
     /** @var AddIncludedEntitiesToResultDocument */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new AddIncludedEntitiesToResultDocument();
@@ -47,7 +47,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $includedEntities = new IncludedEntityCollection();
 
         $normalizedData = ['normalizedKey' => 'normalizedValue'];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $entityData = new IncludedEntityData('/included/0', 0);
         $entityData->setNormalizedData($normalizedData);
         $entityData->setMetadata($metadata);
@@ -74,7 +74,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $includedEntities = new IncludedEntityCollection();
 
         $normalizedData = ['normalizedKey' => 'normalizedValue'];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $entityData = new IncludedEntityData('/included/0', 0);
         $entityData->setNormalizedData($normalizedData);
         $entityData->setMetadata($metadata);

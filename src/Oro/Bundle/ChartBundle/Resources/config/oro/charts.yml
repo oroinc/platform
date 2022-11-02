@@ -18,7 +18,7 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:line.html.twig
+        template: '@OroChart/Chart/line.html.twig'
     multiline_chart:
         label: oro.chart.multiline_chart.label
         data_schema:
@@ -37,7 +37,7 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:multiline.html.twig
+        template: '@OroChart/Chart/multiline.html.twig'
     bar_chart:
         label: oro.chart.bar_chart.label
         data_schema:
@@ -55,7 +55,7 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:bar.html.twig
+        template: '@OroChart/Chart/bar.html.twig'
     horizontal_bar_chart:
         label: oro.chart.bar_chart.label
         data_schema:
@@ -73,7 +73,7 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:horizontal_bar.html.twig
+        template: '@OroChart/Chart/horizontal_bar.html.twig'
     stackedbar_chart:
         label: oro.chart.bar_chart.label
         data_schema:
@@ -91,7 +91,7 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:stackedbar.html.twig
+        template: '@OroChart/Chart/stackedbar.html.twig'
     pie_chart:
         label: oro.chart.pie_chart.label
         data_schema:
@@ -112,7 +112,7 @@ charts:
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
         data_transformer: oro_chart.data_transformer.pie_chart
-        template: OroChartBundle:Chart:pie.html.twig
+        template: '@OroChart/Chart/pie.html.twig'
     flow_chart:
         label: oro.chart.flow_chart.label
         data_schema:
@@ -135,4 +135,4 @@ charts:
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:flow.html.twig
+        template: '@OroChart/Chart/flow.html.twig'

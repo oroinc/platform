@@ -5,8 +5,10 @@ namespace Oro\Component\Layout;
 use Symfony\Component\Form\FormView;
 
 /**
+ * Layout block view model
+ *
  * @method BlockView getParent()
- * @property BlockView[] children
+ * @property BlockView[] $children
  */
 class BlockView extends FormView
 {

@@ -1,8 +1,9 @@
 datagrids:
     tag-grid:
         options:
-            entityHint: tags
+            entityHint: oro.tag.entity_plural_label
             entity_pagination: true
+        extended_entity_name: 'Oro\Bundle\TagBundle\Entity\Tag'
         acl_resource: oro_tag_view
         source:
             type: orm
@@ -15,7 +16,7 @@ datagrids:
                     - IDENTITY(t.taxonomy) as taxonomy
                     - ta.backgroundColor
                 from:
-                    - { table: OroTagBundle:Tag, alias: t }
+                    - { table: Oro\Bundle\TagBundle\Entity\Tag, alias: t }
                 join:
                     left:
                         taxonomy:
@@ -39,7 +40,7 @@ datagrids:
                 label: oro.taxonomy.background_color.label
                 type: twig
                 frontend_type: html
-                template: OroTagBundle:Tag:Datagrid/Property/background_color.html.twig
+                template: '@OroTag/Tag/Datagrid/Property/background_color.html.twig'
             usage:
                 label: oro.tag.datagrid.usage_count
                 type: field
@@ -71,7 +72,7 @@ datagrids:
                 taxonomyName:
                     data_name: taxonomyName
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                name: DESC
 
         filters:
             columns:
@@ -85,10 +86,10 @@ datagrids:
                 taxonomyName:
                     type: entity
                     data_name: t.taxonomy
-                    enabled: true
+                    renderable: true
                     options:
                         field_options:
-                            class: OroTagBundle:Taxonomy
+                            class: Oro\Bundle\TagBundle\Entity\Taxonomy
                             choice_label: name
                             translatable_options: false
         actions:
@@ -114,7 +115,7 @@ datagrids:
 
     tag-results-grid:
         options:
-            entityHint: results
+            entityHint: oro.tag.tagging.datagrid.entity_hint
         acl_resource: oro_tag_view
         source:
             type: orm
@@ -123,7 +124,7 @@ datagrids:
                     - tt.entityName
                     - tt.recordId
                 from:
-                    - { table: OroTagBundle:Tagging, alias: tt }
+                    - { table: Oro\Bundle\TagBundle\Entity\Tagging, alias: tt }
                 groupBy: tt.entityName, tt.recordId
                 where:
                     and:
@@ -136,8 +137,9 @@ datagrids:
 
     taxonomy-grid:
         options:
-            entityHint: taxonomies
+            entityHint: oro.tag.taxonomy.datagrid.entity_hint
             entity_pagination: true
+        extended_entity_name: 'Oro\Bundle\TagBundle\Entity\Taxonomy'
         acl_resource: oro_taxonomy_view
         source:
             type: orm
@@ -148,7 +150,7 @@ datagrids:
                     - t.backgroundColor
                     - COUNT(tt.id) as usage
                 from:
-                    - { table: OroTagBundle:Taxonomy, alias: t }
+                    - { table: Oro\Bundle\TagBundle\Entity\Taxonomy, alias: t }
                 join:
                     left:
                         tagging:
@@ -164,7 +166,7 @@ datagrids:
                 label: oro.taxonomy.background_color.label
                 type: twig
                 frontend_type: html
-                template: OroTagBundle:Tag:Datagrid/Property/background_color.html.twig
+                template: '@OroTag/Tag/Datagrid/Property/background_color.html.twig'
             usage:
                 label: oro.tag.datagrid.usage_count
                 type: field
@@ -193,7 +195,7 @@ datagrids:
                 usage:
                     data_name: usage
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                name: DESC
         filters:
             columns:
                 name:

@@ -1,0 +1,11 @@
+aliases:
+    oro/datagrid/action/map-action$: oroaddress/js/datagrid/action/map-action
+configs:
+    oroaddress/js/region/view: {}
+dynamic-imports:
+    orouser:
+        - oroaddress/js/app/components/address-book-component
+        - oroaddress/js/app/components/address-book-widget-component
+        - oroaddress/js/app/views/address-collection-view
+        - oroaddress/js/mapservice/googlemaps
+        - oroaddress/js/region/view

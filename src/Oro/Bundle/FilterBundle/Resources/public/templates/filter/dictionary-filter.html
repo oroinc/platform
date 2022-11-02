@@ -1,21 +1,23 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
 <div class="choice-filter dictionary-filter">
     <div class="btn-group btn-block">
-        <button id="<%- togglerId %>" class="btn dropdown-toggle" data-toggle="dropdown"
+        <button id="<%- togglerId %>" class="btn btn-square-default dropdown-toggle " data-toggle="dropdown"
+                data-inherit-parent-width="loosely"
+                data-adjust-height
                 aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('Filter criteria') %>">
             <%- selectedChoiceLabel %>
         </button>
         <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
             <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                <a class="dropdown-item choice-value" href="#" data-value="<%- option.value %>"><%- option.label %></a>
             </li>
             <% }); %>
         </ul>
     </div>
     <div class="value-field-frame">
-        <input type="text" name="select-values-autocomplete" class="select-values-autocomplete" placeholder="<%- _.__('Choose values') %>" value="" data-skip-focus>
-        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>">
+        <input type="text" name="select-values-autocomplete" class="select-values-autocomplete" placeholder="<%- _.__('Choose values') %>" value="">
+        <input class="name_input" type="hidden" name="<%- name %>" id="<%- name %>" value="<%- selectedChoice %>">
         <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
     </div>
 </div>

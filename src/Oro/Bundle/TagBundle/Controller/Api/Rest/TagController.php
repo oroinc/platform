@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("tag")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Tag entity.
  */
-class TagController extends RestController implements ClassResourceInterface
+class TagController extends RestController
 {
     /**
      * REST DELETE
@@ -33,13 +29,13 @@ class TagController extends RestController implements ClassResourceInterface
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -47,7 +43,7 @@ class TagController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -55,7 +51,7 @@ class TagController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {

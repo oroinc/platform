@@ -4,58 +4,31 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TabExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for rendering tabs:
+ *   - menuTabPanel
+ *   - tabPanel
+ */
+class TabExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
-    const DEFAULT_WIDGET_TYPE = 'block';
+    private const TEMPLATE = '@OroUI/tab_panel.html.twig';
+    private const DEFAULT_WIDGET_TYPE = 'block';
 
-    /** @var ContainerInterface */
-    protected $container;
+    protected ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return MenuExtension
-     */
-    protected function getMenuExtension()
-    {
-        return $this->container->get('oro_menu.twig.extension');
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get('router');
-    }
-
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
-    {
-        return $this->container->get('security.authorization_checker');
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get('translator');
     }
 
     /**
@@ -64,12 +37,12 @@ class TabExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'menuTabPanel',
                 [$this, 'menuTabPanel'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'tabPanel',
                 [$this, 'tabPanel'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -78,13 +51,13 @@ class TabExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment $environment
      * @param string $menuName
      * @param array $options
      *
      * @return string
      */
-    public function menuTabPanel(\Twig_Environment $environment, $menuName, $options = [])
+    public function menuTabPanel(TwigEnvironment $environment, $menuName, $options = [])
     {
         $tabs = $this->getTabs($menuName, $options);
 
@@ -99,8 +72,9 @@ class TabExtension extends \Twig_Extension
      * @param string $menuName
      * @param array  $options
      *
-     * @throws \Symfony\Component\Validator\Exception\InvalidArgumentException
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getTabs($menuName, $options = [])
     {
@@ -113,8 +87,10 @@ class TabExtension extends \Twig_Extension
                 continue;
             }
 
-            if (!$url = $child->getUri()) {
-                if ($route = $child->getExtra('widgetRoute')) {
+            $url = $child->getUri();
+            if (!$url) {
+                $route = $child->getExtra('widgetRoute');
+                if ($route) {
                     $routeParameters = array_merge(
                         $child->getExtra('widgetRouteParameters', []),
                         $options
@@ -159,12 +135,12 @@ class TabExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param TwigEnvironment $environment
      * @param array $tabs
      * @param array $options
      * @return string
      */
-    public function tabPanel(\Twig_Environment $environment, $tabs, array $options = [])
+    public function tabPanel(TwigEnvironment $environment, $tabs, array $options = [])
     {
         return $environment->render(
             self::TEMPLATE,
@@ -178,8 +154,33 @@ class TabExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_ui.tab_panel';
+        return [
+            'oro_menu.twig.extension' => MenuExtension::class,
+            RouterInterface::class,
+            AuthorizationCheckerInterface::class,
+            TranslatorInterface::class,
+        ];
+    }
+
+    protected function getMenuExtension(): MenuExtension
+    {
+        return $this->container->get('oro_menu.twig.extension');
+    }
+
+    protected function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(AuthorizationCheckerInterface::class);
+    }
+
+    protected function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
     }
 }

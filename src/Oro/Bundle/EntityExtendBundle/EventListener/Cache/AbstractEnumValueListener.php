@@ -14,9 +14,6 @@ abstract class AbstractEnumValueListener
      */
     protected $enumTranslationCache;
 
-    /**
-     * @param EnumTranslationCache $enumTranslationCache
-     */
     public function __construct(EnumTranslationCache $enumTranslationCache)
     {
         $this->enumTranslationCache = $enumTranslationCache;

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Helper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -18,57 +19,40 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityConfigProviderHelper */
     private $helper;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->helper = new EntityConfigProviderHelper($this->configManager);
-
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager->expects($this->once())
-            ->method('getProviders')
-            ->willReturn([$this->configProvider]);
     }
 
-
     /**
-     * @dataProvider getLayoutParamsDataProvider
-     * @param string|null $displayOnly
-     * @param array $actions
-     * @param array $expected
+     * @dataProvider getLayoutParamsForActionsDataProvider
      */
-    public function testGetLayoutParams($displayOnly, array $actions, array $expected)
+    public function testGetLayoutParamsForActions(?string $displayOnly, array $actions, array $expected)
     {
-        $propertyConfig = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn([$configProvider]);
 
-        $this->configProvider->expects($this->once())
+        $propertyConfig = $this->createMock(PropertyConfigContainer::class);
+        $configProvider->expects(self::once())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfig);
 
-        $propertyConfig->expects($this->once())
+        $propertyConfig->expects(self::once())
             ->method('getLayoutActions')
             ->with(PropertyConfigContainer::TYPE_FIELD)
             ->willReturn($actions);
-
-        $propertyConfig->expects($this->once())
-            ->method('getRequireJsModules')
+        $propertyConfig->expects(self::once())
+            ->method('getJsModules')
             ->willReturn([]);
 
-        $entity = new EntityConfigModel();
-        $entity->setMode('some mode');
-        $entity->setClassName('SomeClass');
+        $entity = new EntityConfigModel('Test\Entity');
+        $entity->setMode(ConfigModel::MODE_DEFAULT);
 
-        $configId = new EntityConfigId('extend', 'SomeClass');
+        $configId = new EntityConfigId('extend', $entity->getClassName());
         $config = new Config($configId, [
             'param1' => 'value1',
             'param2' => 'value2',
@@ -76,168 +60,217 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
             'params' => ['value4', 'value5']
         ]);
 
-        $this->configProvider->expects($this->any())
+        $configProvider->expects(self::any())
             ->method('getConfig')
-            ->with('SomeClass')
+            ->with($entity->getClassName())
             ->willReturn($config);
 
-        list($result, $requireJs) = $this->helper->getLayoutParams($entity, $displayOnly);
+        [$resultActions, $resultJsModules] = $this->helper->getLayoutParams($entity, $displayOnly);
 
-        $this->assertEquals($expected, $result);
-        $this->assertEquals([], $requireJs);
+        self::assertEquals($expected, $resultActions);
+        self::assertEquals([], $resultJsModules);
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function getLayoutParamsDataProvider()
+    public function getLayoutParamsForActionsDataProvider(): array
     {
         return [
-            'no params' => [
+            'no params'                                   => [
                 'displayOnly' => null,
-                'actions' => [
+                'actions'     => [
                     [
-                        'name' => 'some action name',
+                        'name'      => 'some action name',
                         'entity_id' => true
                     ]
                 ],
-                'expected' => [
+                'expected'    => [
                     [
-                        'name' => 'some action name',
+                        'name'      => 'some action name',
                         'entity_id' => true,
-                        'args' => ['id' => null]
+                        'args'      => ['id' => null]
                     ]
                 ]
             ],
-            'display only defined only in method' => [
+            'display only defined only in method'         => [
                 'displayOnly' => 'somestring',
-                'actions' => [
+                'actions'     => [
                     [
-                        'name' => 'some action name',
+                        'name'      => 'some action name',
                         'entity_id' => true
                     ]
                 ],
-                'expected' => [
-
-                ]
+                'expected'    => []
             ],
-            'display only defined in method and action' => [
+            'display only defined in method and action'   => [
                 'displayOnly' => 'somestring',
-                'actions' => [
+                'actions'     => [
                     [
-                        'name' => 'some action name',
-                        'entity_id' => true,
+                        'name'         => 'some action name',
+                        'entity_id'    => true,
                         'display_only' => 'somestring'
                     ]
                 ],
-                'expected' => [
+                'expected'    => [
                     [
-                        'name' => 'some action name',
-                        'entity_id' => true,
+                        'name'         => 'some action name',
+                        'entity_id'    => true,
                         'display_only' => 'somestring',
-                        'args' => ['id' => null]
+                        'args'         => ['id' => null]
                     ]
                 ]
             ],
-            'display only defined but not equls' => [
+            'display only defined but not equls'          => [
                 'displayOnly' => 'somestring',
-                'actions' => [
+                'actions'     => [
                     [
-                        'name' => 'some action name',
-                        'entity_id' => true,
+                        'name'         => 'some action name',
+                        'entity_id'    => true,
                         'display_only' => 'somestring2'
                     ]
                 ],
-                'expected' => [
-
-                ]
+                'expected'    => []
             ],
             'display only not passed but isset in action' => [
                 'displayOnly' => null,
-                'actions' => [
+                'actions'     => [
                     [
-                        'name' => 'some action name',
-                        'entity_id' => true,
+                        'name'         => 'some action name',
+                        'entity_id'    => true,
                         'display_only' => 'somestring2'
                     ]
                 ],
-                'expected' => [
+                'expected'    => []
+            ],
+            'filter mode true'                            => [
+                'displayOnly' => null,
+                'actions'     => [
+                    [
+                        'name'      => 'some action name',
+                        'entity_id' => true,
+                        'filter'    => ['mode' => ConfigModel::MODE_DEFAULT]
+                    ]
+                ],
+                'expected'    => [
+                    [
+                        'name'      => 'some action name',
+                        'entity_id' => true,
+                        'filter'    => ['mode' => ConfigModel::MODE_DEFAULT],
+                        'args'      => ['id' => null]
+                    ]
+                ]
+            ],
+            'filter mode false'                           => [
+                'displayOnly' => null,
+                'actions'     => [
+                    [
+                        'name'      => 'some action name',
+                        'entity_id' => true,
+                        'filter'    => ['mode' => ConfigModel::MODE_READONLY]
+                    ]
+                ],
+                'expected'    => []
+            ],
+            'filter via config failed'                    => [
+                'displayOnly' => null,
+                'actions'     => [
+                    [
+                        'name'      => 'some action name',
+                        'entity_id' => true,
+                        'filter'    => ['param1' => 'value2']
+                    ]
+                ],
+                'expected'    => []
+            ],
+            'filter via array value in config failed'     => [
+                'displayOnly' => null,
+                'actions'     => [
+                    [
+                        'name'      => 'some action name',
+                        'entity_id' => true,
+                        'filter'    => ['params' => ['not existing']]
+                    ]
+                ],
+                'expected'    => []
+            ],
+            'filter true'                                 => [
+                'displayOnly' => null,
+                'actions'     => [
+                    [
+                        'name'   => 'some action name',
+                        'filter' => ['param1' => 'value1']
+                    ]
+                ],
+                'expected'    => [
+                    [
+                        'name'   => 'some action name',
+                        'filter' => ['param1' => 'value1']
+                    ]
+                ]
+            ]
+        ];
+    }
 
-                ]
-            ],
-            'filter mode true' => [
-                'displayOnly' => null,
-                'actions' => [
-                    [
-                        'name' => 'some action name',
-                        'entity_id' => true,
-                        'filter' => ['mode' => 'some mode']
-                    ]
-                ],
-                'expected' => [
-                    [
-                        'name' => 'some action name',
-                        'entity_id' => true,
-                        'filter' => ['mode' => 'some mode'],
-                        'args' => ['id' => null]
-                    ]
-                ]
-            ],
-            'filter mode false' => [
-                'displayOnly' => null,
-                'actions' => [
-                    [
-                        'name' => 'some action name',
-                        'entity_id' => true,
-                        'filter' => ['mode' => 'some mode2']
-                    ]
-                ],
-                'expected' => [
+    /**
+     * @dataProvider getLayoutParamsForJsModulesDataProvider
+     */
+    public function testGetLayoutParamsForJsModules(array $jsModules, array $expected)
+    {
+        $configProvider1 = $this->createMock(ConfigProvider::class);
+        $configProvider2 = $this->createMock(ConfigProvider::class);
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn([$configProvider1, $configProvider2]);
 
-                ]
-            ],
-            'filter via config failed' => [
-                'displayOnly' => null,
-                'actions' => [
-                    [
-                        'name' => 'some action name',
-                        'entity_id' => true,
-                        'filter' => ['param1' => 'value2'],
-                    ]
-                ],
-                'expected' => [
+        $propertyConfig1 = $this->createMock(PropertyConfigContainer::class);
+        $configProvider1->expects(self::once())
+            ->method('getPropertyConfig')
+            ->willReturn($propertyConfig1);
+        $propertyConfig2 = $this->createMock(PropertyConfigContainer::class);
+        $configProvider2->expects(self::once())
+            ->method('getPropertyConfig')
+            ->willReturn($propertyConfig2);
 
-                ]
-            ],
-            'filter via array value in config failed' => [
-                'displayOnly' => null,
-                'actions' => [
-                    [
-                        'name' => 'some action name',
-                        'entity_id' => true,
-                        'filter' => ['params' => ['not existing']],
-                    ]
-                ],
-                'expected' => [
+        $propertyConfig1->expects(self::once())
+            ->method('getLayoutActions')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->willReturn([]);
+        $propertyConfig2->expects(self::once())
+            ->method('getLayoutActions')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->willReturn([]);
 
-                ]
+        $propertyConfig1->expects(self::once())
+            ->method('getJsModules')
+            ->willReturn($jsModules[0]);
+        $propertyConfig2->expects(self::once())
+            ->method('getJsModules')
+            ->willReturn($jsModules[1]);
+
+        $entity = new EntityConfigModel('Test\Entity');
+
+        [$resultActions, $resultJsModules] = $this->helper->getLayoutParams($entity);
+
+        self::assertEquals($expected, $resultJsModules);
+        self::assertEquals([], $resultActions);
+    }
+
+    public function getLayoutParamsForJsModulesDataProvider(): array
+    {
+        return [
+            'no JS modules'     => [
+                'jsModules' => [[], []],
+                'expected'  => []
             ],
-            'filter true' => [
-                'displayOnly' => null,
-                'actions' => [
-                    [
-                        'name' => 'some action name',
-                        'filter' => ['param1' => 'value1'],
-                    ]
-                ],
-                'expected' => [
-                    [
-                        'name' => 'some action name',
-                        'filter' => ['param1' => 'value1'],
-                    ]
-                ]
+            'one JS module'     => [
+                'jsModules' => [['module_1'], []],
+                'expected'  => ['module_1']
             ],
+            'several JS module' => [
+                'jsModules' => [['module_1', 'module_2'], ['module_3', 'module_4']],
+                'expected'  => ['module_1', 'module_2', 'module_3', 'module_4']
+            ]
         ];
     }
 }

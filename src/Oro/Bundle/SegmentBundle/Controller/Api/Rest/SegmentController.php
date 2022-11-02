@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -22,10 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("segment")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Segment entity.
  */
-class SegmentController extends RestController implements ClassResourceInterface
+class SegmentController extends RestController
 {
     /**
      * Get entity segments.
@@ -51,18 +45,21 @@ class SegmentController extends RestController implements ClassResourceInterface
     {
         $entityName = $this->get('oro_entity.routing_helper')
             ->resolveEntityClass($request->get('entityName'));
-        $page = $request->query->get('page', 1);
+        $page = (int)$request->query->get('page', 1);
         $term = $request->query->get('term');
-        $currentSegment = $request->query->get('currentSegment', null);
-        $statusCode = Codes::HTTP_OK;
+        $currentSegmentId = $request->query->get('currentSegment');
+        if (null !== $currentSegmentId) {
+            $currentSegmentId = (int)$currentSegmentId;
+        }
 
         /** @var SegmentManager $provider */
         $manager = $this->get('oro_segment.segment_manager');
 
+        $statusCode = Response::HTTP_OK;
         try {
-            $result = $manager->getSegmentByEntityName($entityName, $term, (int)$page, $currentSegment);
+            $result = $manager->getSegmentByEntityName($entityName, $term, $page, $currentSegmentId);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 
@@ -86,7 +83,7 @@ class SegmentController extends RestController implements ClassResourceInterface
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -103,19 +100,19 @@ class SegmentController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_segment_update")
      * @return Response
      */
-    public function postRunAction($id)
+    public function postRunAction(int $id)
     {
         /** @var Segment $segment */
         $segment = $this->getManager()->find($id);
         if (!$segment) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         try {
             $this->get('oro_segment.static_segment_manager')->run($segment);
-            return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+            return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         } catch (\LogicException $e) {
-            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view(null, Response::HTTP_BAD_REQUEST));
         }
     }
 

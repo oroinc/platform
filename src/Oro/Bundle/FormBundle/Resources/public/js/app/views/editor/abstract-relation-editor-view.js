@@ -29,35 +29,34 @@ define(function(require) {
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports AbstractRelationEditorView
      */
-    var AbstractRelationEditorView;
-    var SelectEditorView = require('./select-editor-view');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
+    const SelectEditorView = require('./select-editor-view');
+    const _ = require('underscore');
+    const loadModules = require('oroui/js/app/services/load-modules');
     require('jquery.select2');
 
-    AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
+    const AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
         input_delay: 250,
         currentTerm: '',
         DEFAULT_PER_PAGE: 20,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AbstractRelationEditorView() {
-            AbstractRelationEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractRelationEditorView(options) {
+            AbstractRelationEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            AbstractRelationEditorView.__super__.initialize.apply(this, arguments);
+            AbstractRelationEditorView.__super__.initialize.call(this, options);
             this.autocompleteApiAccessor = options.autocomplete_api_accessor.instance;
             this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
             if (options.input_delay) {
                 this.input_delay = options.input_delay;
             }
-            this.debouncedMakeRequest = _.debounce(_.bind(this.makeRequest, this), this.input_delay);
+            this.debouncedMakeRequest = _.debounce(this.makeRequest.bind(this), this.input_delay);
         },
 
         getAvailableOptions: function(options) {
@@ -73,34 +72,33 @@ define(function(require) {
         },
 
         makeRequest: function(options, autoCompleteUrlParameters) {
-            var _this = this;
             if (this.disposed) {
                 return;
             }
             this.currentRequest = this.autocompleteApiAccessor.send(autoCompleteUrlParameters);
-            this.currentRequest.done(function(response) {
-                if (_this.disposed) {
+            this.currentRequest.done(response => {
+                if (this.disposed) {
                     return;
                 }
-                if (_this.currentTerm === options.term) {
+                if (this.currentTerm === options.term) {
                     if (options.term === '' && options.page === 1) {
-                        _this.availableChoices = _this.addInitialResultItem(response.results);
+                        this.availableChoices = this.addInitialResultItem(response.results);
                     } else if (options.term === '' && options.page !== 1) {
-                        _this.availableChoices = _this.filterInitialResultItem(response.results);
+                        this.availableChoices = this.filterInitialResultItem(response.results);
                     } else {
-                        _this.availableChoices = _.clone(response.results);
+                        this.availableChoices = _.clone(response.results);
                     }
                     options.callback({
-                        results: _this.availableChoices,
+                        results: this.availableChoices,
                         page: autoCompleteUrlParameters.page,
                         term: autoCompleteUrlParameters.term,
                         more: response.more
                     });
                 }
             });
-            this.currentRequest.fail(function(ajax) {
+            this.currentRequest.fail(ajax => {
                 if (ajax.statusText !== 'abort') {
-                    if (!_this.disposed) {
+                    if (!this.disposed) {
                         options.callback({
                             results: [],
                             page: autoCompleteUrlParameters.page,
@@ -116,20 +114,20 @@ define(function(require) {
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
         processMetadata: function(columnMetadata) {
-            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
+            const apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
             if (!_.isObject(apiSpec)) {
                 throw new Error('`autocomplete_api_accessor` is required option');
             }
             if (!apiSpec.class) {
                 apiSpec.class = AbstractRelationEditorView.DEFAULT_ACCESSOR_CLASS;
             }
-            return tools.loadModuleAndReplace(apiSpec, 'class').then(function() {
+            return loadModules.fromObjectProp(apiSpec, 'class').then(() => {
                 if (!apiSpec.clientCache) {
                     apiSpec.clientCache = {
                         enable: true
                     };
                 }
-                var AutocompleteApiAccessor = apiSpec['class'];
+                const AutocompleteApiAccessor = apiSpec['class'];
                 apiSpec.instance = new AutocompleteApiAccessor(apiSpec);
                 if (!columnMetadata.inline_editing.editor.view_options) {
                     columnMetadata.inline_editing.editor.view_options = {};

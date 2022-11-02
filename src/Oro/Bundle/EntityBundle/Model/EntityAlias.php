@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-class EntityAlias implements \Serializable
+/**
+ * Information about an entity alias
+ */
+class EntityAlias
 {
     /** @var string */
     private $alias;
@@ -36,19 +39,13 @@ class EntityAlias implements \Serializable
         return $this->pluralAlias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->alias, $this->pluralAlias]);
+        return [$this->alias, $this->pluralAlias];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($this->alias, $this->pluralAlias) = unserialize($serialized);
+        [$this->alias, $this->pluralAlias] = $serialized;
     }
 }

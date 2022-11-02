@@ -1,0 +1,53 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\UserBundle\Controller\ConfigurationController:
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_config.user, key: Oro\Bundle\ConfigBundle\Config\ConfigManager }
+
+    Oro\Bundle\UserBundle\Controller\SecurityController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\UserBundle\Controller\UserController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_user.manager, key: Oro\Bundle\UserBundle\Entity\UserManager }
+            - { name: container.service_subscriber, id: oro_user.form.handler.user, key: Oro\Bundle\UserBundle\Form\Handler\UserHandler }
+
+    Oro\Bundle\UserBundle\Controller\ResetController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: monolog.logger.oro_security, key: Psr\Log\LoggerInterface }
+            - { name: container.service_subscriber, id: oro_user.provider.user_logging_info_provider, key: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider }
+            - { name: container.service_subscriber, id: oro_user.manager, key: Oro\Bundle\UserBundle\Entity\UserManager }
+            - { name: container.service_subscriber, id: oro_user.form.reset }
+            - { name: container.service_subscriber, id: oro_user.form.type.set_password.form }
+
+    Oro\Bundle\UserBundle\Controller\RoleController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_user.form.handler.acl_role, key: Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler }
+            - { name: container.service_subscriber, id: oro_sync.client.connection_checker, key: Oro\Bundle\SyncBundle\Client\ConnectionChecker }
+            - { name: container.service_subscriber, id: oro_sync.websocket_client, key: Oro\Bundle\SyncBundle\Client\WebsocketClient }
+            - { name: container.service_subscriber, id: oro_user.provider.role_privilege_capability_provider, key: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider }
+
+    Oro\Bundle\UserBundle\Controller\GroupController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_user.form.handler.group, key: Oro\Bundle\UserBundle\Form\Handler\GroupHandler }
+            - { name: container.service_subscriber, id: oro_user.form.group }

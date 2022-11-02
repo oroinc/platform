@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Options\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsSettings;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -12,15 +13,12 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCacheControl implements ProcessorInterface
 {
-    /** @var int */
-    private $preflightMaxAge;
+    /** @var CorsSettings */
+    private $corsSettings;
 
-    /**
-     * @param int $preflightMaxAge The amount of seconds the user agent is allowed to cache CORS preflight requests
-     */
-    public function __construct(int $preflightMaxAge)
+    public function __construct(CorsSettings $corsSettings)
     {
-        $this->preflightMaxAge = $preflightMaxAge;
+        $this->corsSettings = $corsSettings;
     }
 
     /**
@@ -30,12 +28,15 @@ class SetCacheControl implements ProcessorInterface
     {
         /** @var OptionsContext $context */
 
-        if ($this->preflightMaxAge > 0) {
+        if ($this->corsSettings->getPreflightMaxAge() > 0) {
             $responseHeaders = $context->getResponseHeaders();
             if (!$responseHeaders->has('Cache-Control')) {
                 // although OPTIONS requests are not cacheable, add "Cache-Control" header
                 // indicates that a caching is enabled to prevent making CORS preflight requests not cacheable
-                $responseHeaders->set('Cache-Control', \sprintf('max-age=%d, public', $this->preflightMaxAge));
+                $responseHeaders->set(
+                    'Cache-Control',
+                    sprintf('max-age=%d, public', $this->corsSettings->getPreflightMaxAge())
+                );
             }
             // the response depends on the Origin header value and should therefore not be served
             // from cache for any other origin

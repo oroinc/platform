@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oroquerydesigner':
-            - 'bundles/oroquerydesigner/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroquerydesigner/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroquerydesigner/css/scss/main.scss'

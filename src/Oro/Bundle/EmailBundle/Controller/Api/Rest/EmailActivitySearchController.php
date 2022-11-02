@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
@@ -16,15 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("email_search_relation")
- * @NamePrefix("oro_api_")
+ * REST API controller to find entities associated with an email activity.
  */
 class EmailActivitySearchController extends RestGetController
 {
     /**
      * Searches entities associated with the email activity.
-     *
-     * @Get("/activities/emails/relations/search")
      *
      * @QueryParam(
      *      name="page",

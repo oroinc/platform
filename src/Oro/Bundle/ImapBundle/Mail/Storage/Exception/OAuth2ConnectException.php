@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage\Exception;
 
-class OAuth2ConnectException extends \Zend\Mail\Storage\Exception\RuntimeException
+use Laminas\Mail\Storage\Exception\RuntimeException;
+
+/**
+ * An exception that is thrown when the Imap integration doesn't pass the authentication using OAuth2.
+ */
+class OAuth2ConnectException extends RuntimeException
 {
 }

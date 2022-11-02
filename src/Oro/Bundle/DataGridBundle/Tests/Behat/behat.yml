@@ -12,62 +12,90 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow
 
+    FirstTableRowColumn:
+      selector: 'tbody tr td:first-child'
+
+    TableRowStrict:
+      selector:
+        type: 'xpath'
+        locator: 'child::tbody/child::tr'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow
+
     Grid:
-      selector: 'div.grid-container'
+      selector: 'div.oro-datagrid'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
     GridHeader:
-      selector: '.grid-header:nth-child(1)'
+      selector: '.grid-container .grid-header:nth-child(1)'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader
 
     GridRow:
       selector: 'tbody tr'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
+    GridRowStrict:
+      selector:
+        type: 'xpath'
+        locator: "child::tbody/child::tr"
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
+
     GridTable:
-      selector: 'table.grid'
+      selector: '.grid-container table.grid-main-container'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     GridRowAction:
         selector: '.launchers-list a.action'
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridHeaderLink:
       selector: 'th a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridFilters:
       selector: 'div.filter-box'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
 
     GridFiltersState:
-        selector: 'div.filters-state'
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+        selector: '.filters-state'
 
     GridFiltersButton:
-      selector: 'div.toolbar div.actions-panel .action[title=Filters]'
+      selector: 'div.toolbar div.actions-panel .action[title="Filter Toggle"]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
     GridFilterStringItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem
 
+    GridFilterPriceItem:
+      selector: 'div.filter-item'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterPriceItem
+
     GridFilterChoice:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterChoice
+
+    GridFilterChoiceValueInput:
+      selector: '.value-field-frame .select2-input'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities
+
+    GridFilterChoiceTree:
+      selector: 'div.filter-item'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterChoiceTree
+
+    GridFilterChoiceTreeValueInput:
+      selector: '.select2-choices .select2-input'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\ChoiceTreeInput
 
     GridFilterItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterItem
 
-    GridFilterHintItem:
-      selector: 'span.filter-criteria-hint-item'
-
-    GridFilterHintLabel:
+    FrontendGridFilterHintLabel:
       selector: 'span.filter-criteria-hint-label'
 
-    GridFilterHint:
+    FrontendGridFilterHint:
       selector: 'span.filter-criteria-hint'
+
+    GridFilterHintLabel:
+      selector: 'div.filter-criteria-selector'
 
     GridFilterDateTimeItem:
       selector: 'div.filter-item'
@@ -75,31 +103,30 @@ oro_behat_extension:
 
     GridColumnManagerButton:
       selector: 'div.datagrid-settings > a.dropdown-toggle'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridColumnManager:
       selector: 'div.datagrid-settings > .dropdown-menu'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager
 
     GridSettingsManagerClose:
-      selector: 'div.datagrid-settings > .dropdown-menu .close'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: 'div.datagrid-settings > .dropdown-menu [data-role="close"]'
+
+    GridColumnManagerTabTitle:
+      selector: 'div.datagrid-settings__wrapper .nav-link:contains("Grid")'
 
     GridFilterManagerButton:
       selector: 'div.datagrid-settings__wrapper .nav-link:contains("Filters")'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridFilterManager:
       selector: '.dropdown-menu.show [id*="datagrid-settings-filters"] .datagrid-settings-table'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager
 
     GridColumnManagerTable:
-      selector: '.dropdown-menu.show [id*="datagrid-settings-grid"] div.datagrid-settings-table'
+      selector: '.dropdown-menu.show [id*="datagrid-settings-grid"] div.datagrid-settings-table > div.table-wrapper > table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     GridFilterManagerTab:
       selector: '.dropdown-menu.show [id*="datagrid-settings-filters"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MultipleChoice:
       selector: 'div.filter-item'
@@ -108,13 +135,30 @@ oro_behat_extension:
     DateTimePicker:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
 
+    DateTimePickerYearSelect:
+      selector: '.ui-datepicker-year'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select
+
+    DateTimePickerMonthSelect:
+      selector: '.ui-datepicker-month'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select
+
+    DateTimePickerYearSelect2:
+      selector:
+        locator: '//select[contains(@class,"ui-datepicker-year")]'
+        type: xpath
+
+    DateTimePickerMonthSelect2:
+      selector:
+        locator: '//select[contains(@class,"ui-datepicker-month")]'
+        type: xpath
+
     TimePicker:
       selector: 'input.timepicker-input'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker
 
     GridToolbar:
       selector: 'div.toolbar'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolbarPaginator:
       selector: 'div.toolbar div.pagination'
@@ -126,11 +170,9 @@ oro_behat_extension:
 
     GridToolbarActionRefresh:
         selector: 'div.toolbar div.actions-panel .refresh-action'
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridToolbarActionReset:
-        selector: 'div.toolbar div.actions-panel .refresh-action'
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+        selector: 'div.toolbar div.actions-panel .reset-action'
 
     GridToolBarTools:
       selector: 'div.toolbar .grid-toolbar-tools'
@@ -138,43 +180,36 @@ oro_behat_extension:
 
     GridRowActionMenu:
       selector: '.dropdown-menu__action-cell.show'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridMassActionMenu:
       selector: '.dropdown-menu.show'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridMassCheckMenu:
       selector: '.dropdown-menu.show'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .icon'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    MassActionCheckbox:
+      selector: 'th.grid-header-cell-massAction div.btn-group input[type="checkbox"]'
 
     MassActionButton:
       selector: '.grid-header-row .action-column .dropdown button'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     PageSize:
       selector: 'div.page-size'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Modal:
       selector: 'div.modal'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewList:
       selector: '.grid-views .views-group, .grid-views .grid-views__header'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewOptions:
       selector: '.grid-views .actions-group'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewOptionsLink:
       selector: '.grid-views .btn:contains("Options")'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Account Mobile Button:
       selector:
@@ -185,36 +220,37 @@ oro_behat_extension:
       selector: '.fullscreen-popup .datagrid-manager'
 
     Select All Button:
-      selector: 'a[data-role="datagrid-settings-select-all"]'
+      selector: '[data-role="datagrid-settings-select-all"]'
 
     Deselect All Button:
-      selector: 'a[data-role="datagrid-settings-unselect-all"]'
+      selector: '[data-role="datagrid-settings-unselect-all"]'
 
     Email Address Handle:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Email Address")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "Email Address")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
 
     First Name Handle:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "First Name")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "First Name")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
 
     Last Name In Grid Management:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Last Name")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "Last Name")]'
 
     Close Fullscreen Popup:
-      selector: '.fullscreen-popup__close'
+      selector: '.fullscreen-popup .close-dialog'
 
   suites:
     OroDataGridBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroUIBundle::ContextSelectorContext
-        - OroSecurityBundle::ACLContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\ContextSelectorContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

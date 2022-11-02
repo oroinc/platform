@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -11,7 +13,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Helper for getting entity workflows data used by UI
@@ -30,22 +32,21 @@ class WorkflowDataHelper
     /** @var UrlGeneratorInterface */
     protected $router;
 
-    /**
-     * @param WorkflowManager               $workflowManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TranslatorInterface           $translator
-     * @param UrlGeneratorInterface         $router
-     */
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     public function __construct(
         WorkflowManager $workflowManager,
         AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
-        UrlGeneratorInterface $router
+        UrlGeneratorInterface $router,
+        AclGroupProviderInterface $aclGroupProvider
     ) {
         $this->workflowManager = $workflowManager;
         $this->authorizationChecker = $authorizationChecker;
         $this->translator = $translator;
         $this->router = $router;
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -126,16 +127,19 @@ class WorkflowDataHelper
      */
     protected function getTransitionData(Transition $transition)
     {
-        $messageTranslation = $this->translator->trans($transition->getMessage(), [], 'workflows');
+        $message = (string) $transition->getMessage();
+        $messageTranslation = $this->translator->trans($message, [], 'workflows');
 
         // Do not show untranslated messages (i.e. user left the message input empty)
-        if (!$transition->getMessage() || $messageTranslation === $transition->getMessage()) {
+        if ($messageTranslation === $message) {
             $messageTranslation = '';
         }
 
+        $translatedLabel = $this->translator->trans((string) $transition->getLabel(), [], 'workflows');
+
         return [
             'name' => $transition->getName(),
-            'label' => $this->translator->trans($transition->getLabel(), [], 'workflows'),
+            'label' => $translatedLabel,
             'isStart' => $transition->isStart(),
             'hasForm' => $transition->hasForm(),
             'displayType' => $transition->getDisplayType(),
@@ -257,8 +261,9 @@ class WorkflowDataHelper
 
         // extra case to show start transition
         $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
-
-        if (null !== $defaultStartTransition) {
+        if (null !== $defaultStartTransition
+            && $this->isStartTransitionAllowed($workflow, $defaultStartTransition, $entity)
+        ) {
             $transitions[$defaultStartTransition->getName()] = $defaultStartTransition;
         }
 
@@ -308,8 +313,18 @@ class WorkflowDataHelper
      */
     protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
     {
-        $domainObject = new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName));
-
-        return $this->authorizationChecker->isGranted($permission, $domainObject);
+        return $this->authorizationChecker->isGranted(
+            $permission,
+            new DomainObjectWrapper(
+                $entity,
+                new ObjectIdentity(
+                    'workflow',
+                    ObjectIdentityHelper::buildType(
+                        $workflowName,
+                        $this->aclGroupProvider->getGroup()
+                    )
+                )
+            )
+        );
     }
 }

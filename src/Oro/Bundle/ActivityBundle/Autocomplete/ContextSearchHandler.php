@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -18,7 +18,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This is specified handler that search targets entities for specified activity class.
@@ -26,7 +26,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  * Can not use default Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface cause in this handler we manipulate
  * with different types of entities.
  *
- * Also @see Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer
+ * Also {@see \Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer}.
  */
 class ContextSearchHandler implements ConverterInterface
 {
@@ -156,7 +156,8 @@ class ContextSearchHandler implements ConverterInterface
             $items[] = new Item(
                 $target['entity'],
                 $target['id'],
-                $target['title']
+                null,
+                $target
             );
         }
 
@@ -171,10 +172,10 @@ class ContextSearchHandler implements ConverterInterface
      */
     public function convertItem($item)
     {
-        $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+        $this->dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
 
         /** @var Item $item */
-        $text      = $item->getRecordTitle();
+        $text      = $item->getSelectedData()['name'];
         $className = $item->getEntityName();
 
         if (strlen(trim($text)) === 0) {
@@ -281,9 +282,9 @@ class ContextSearchHandler implements ConverterInterface
 
         $qb = new UnionQueryBuilder($em);
         $qb
-            ->addSelect('id', 'id', Type::INTEGER)
+            ->addSelect('id', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
-            ->addSelect('entityTitle', 'title');
+            ->addSelect('entityName', 'name');
         foreach ($groupedTargets as $entityClass => $ids) {
             $nameDql = $this->nameResolver->prepareNameDQL(
                 $this->nameResolver->getNameDQL($entityClass, 'e'),
@@ -294,7 +295,7 @@ class ContextSearchHandler implements ConverterInterface
                 ->select(
                     'e.id AS id',
                     (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
-                    $nameDql . ' AS entityTitle'
+                    $nameDql . ' AS entityName'
                 );
             $subQb->where($subQb->expr()->in('e.id', $ids));
             $qb->addSubQuery($subQb->getQuery());
@@ -316,7 +317,7 @@ class ContextSearchHandler implements ConverterInterface
             return null;
         }
 
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+        $label = (string) $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }
@@ -340,7 +341,7 @@ class ContextSearchHandler implements ConverterInterface
         }
         /** dispatch oro_activity.search_aliases event */
         $event = new SearchAliasesEvent($aliases, $targetEntityClasses);
-        $this->dispatcher->dispatch(SearchAliasesEvent::EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, SearchAliasesEvent::EVENT_NAME);
         $aliases = $event->getAliases();
 
         return $aliases;

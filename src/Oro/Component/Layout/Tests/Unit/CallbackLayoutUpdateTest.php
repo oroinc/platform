@@ -8,12 +8,11 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 
 class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "callable", "integer" given.
-     */
     public function testInvalidCallbackType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "callable", "integer" given.');
+
         new CallbackLayoutUpdate(123);
     }
 
@@ -21,26 +20,22 @@ class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
     {
         $layoutUpdate = new CallbackLayoutUpdate([$this, 'callbackFunction']);
 
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $item              = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
+        $item = $this->createMock(LayoutItemInterface::class);
 
         $layoutManipulator->expects($this->once())
             ->method('add')
             ->with('id', 'parentId', 'blockType');
         $item->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('parentId'));
+            ->willReturn('parentId');
         $item->expects($this->once())
             ->method('getTypeName')
-            ->will($this->returnValue('blockType'));
+            ->willReturn('blockType');
 
         $layoutUpdate->updateLayout($layoutManipulator, $item);
     }
 
-    /**
-     * @param LayoutManipulatorInterface $layoutManipulator
-     * @param LayoutItemInterface        $item
-     */
     public function callbackFunction(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
         $layoutManipulator->add('id', $item->getId(), $item->getTypeName());

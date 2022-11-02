@@ -22,6 +22,14 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetEntityDescriptionTranslationKey()
+    {
+        $this->assertEquals(
+            'acme.product.entity_description',
+            EntityLabelBuilder::getEntityDescriptionTranslationKey('Acme\Bundle\ProductBundle\Entity\Product')
+        );
+    }
+
     public function testGetFieldLabelTranslationKey()
     {
         $this->assertEquals(
@@ -30,16 +38,31 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetFieldDescriptionTranslationKey()
+    {
+        $this->assertEquals(
+            'acme.product.sell_price.description',
+            EntityLabelBuilder::getFieldDescriptionTranslationKey(
+                'Acme\Bundle\ProductBundle\Entity\Product',
+                'sellPrice'
+            )
+        );
+    }
+
     /**
      * @dataProvider getTranslationKeyProvider
      */
-    public function testGetTranslationKey($expected, $propertyName, $className, $fieldName)
-    {
+    public function testGetTranslationKey(
+        string $expected,
+        string $propertyName,
+        string $className,
+        ?string  $fieldName
+    ) {
         $result = EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }
 
-    public function getTranslationKeyProvider()
+    public function getTranslationKeyProvider(): array
     {
         return [
             [

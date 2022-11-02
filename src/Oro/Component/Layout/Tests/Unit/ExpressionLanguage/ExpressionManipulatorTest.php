@@ -15,17 +15,17 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
         $expected = [
             'expression' => '!true === false',
             'node' => [
-                'Symfony\Component\ExpressionLanguage\Node\BinaryNode' => [
+                BinaryNode::class => [
                     'attributes' => [
                         'operator' => '==='
                     ],
                     'nodes' => [
                         'left' => [
-                            'Symfony\Component\ExpressionLanguage\Node\UnaryNode' => [
+                            UnaryNode::class => [
                                 'attributes' => ['operator' => '!'],
                                 'nodes' => [
                                     'node' => [
-                                        'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                                        ConstantNode::class => [
                                             'attributes' => ['value' => true],
                                         ]
                                     ]
@@ -33,7 +33,7 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
                             ]
                         ],
                         'right' => [
-                            'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                            ConstantNode::class => [
                                 'attributes' => ['value' => false],
                             ]
                         ]
@@ -49,14 +49,10 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return ParsedExpression
-     */
-    protected function createParsedExpression()
+    private function createParsedExpression(): ParsedExpression
     {
         $node = new BinaryNode('===', new UnaryNode('!', new ConstantNode(true)), new ConstantNode(false));
-        $parsedExpression = new ParsedExpression('!true === false', $node);
 
-        return $parsedExpression;
+        return new ParsedExpression('!true === false', $node);
     }
 }

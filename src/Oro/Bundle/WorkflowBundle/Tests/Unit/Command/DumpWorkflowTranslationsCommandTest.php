@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -10,81 +9,45 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflow;
+    private $workflow;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $output;
+    private $output;
 
     /** @var DumpWorkflowTranslationsCommand */
-    protected $command;
+    private $command;
 
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowTranslationHelper;
+    private $workflowTranslationHelper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->workflow = $this->createMock(Workflow::class);
         $this->workflowTranslationHelper = $this->createMock(WorkflowTranslationHelper::class);
-
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap([
-                ['oro_workflow.manager', 1, $this->workflowManager],
-                ['oro_workflow.helper.translation', 1, $this->workflowTranslationHelper],
-            ]));
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
 
-        $this->command = new DumpWorkflowTranslationsCommand();
-        $this->command->setContainer($this->container);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
+        $this->command = new DumpWorkflowTranslationsCommand(
             $this->workflowManager,
-            $this->workfow,
-            $this->container,
-            $this->input,
-            $this->output,
-            $this->command,
             $this->workflowTranslationHelper
         );
     }
 
     public function testGetName()
     {
-        $this->assertEquals(DumpWorkflowTranslationsCommand::NAME, $this->command->getName());
+        $this->assertEquals(DumpWorkflowTranslationsCommand::getDefaultName(), $this->command->getName());
     }
 
     public function testConfigure()
@@ -124,24 +87,26 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->input->expects($this->exactly(1))
+        $this->input->expects($this->once())
             ->method('getArgument')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['workflow', 'workflow1'],
-            ]));
+            ]);
 
-        $this->input->expects($this->exactly(1))
+        $this->input->expects($this->once())
             ->method('getOption')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['locale', 'locale1'],
-            ]));
+            ]);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
             ->with('workflow1')
             ->willReturn($this->workflow);
 
-        $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $this->workflow->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         $this->workflowTranslationHelper->expects($this->any())
             ->method('generateDefinitionTranslationKeys')

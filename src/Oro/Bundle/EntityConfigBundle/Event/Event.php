@@ -3,8 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
+/**
+ * Abstract Event class that extends Symfony Event with ConfigManager
+ */
 abstract class Event extends SymfonyEvent
 {
     /** @var ConfigManager */

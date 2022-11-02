@@ -1,0 +1,14 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: '@OroUI/layouts/default/dialog/dialog.html.twig'
+        - '@addTree':
+            items:
+                widget_content:
+                    blockType: widget_content
+                widget_actions:
+                    blockType: widget_actions
+            tree:
+                root:
+                    widget_content:
+                        widget_actions: ~

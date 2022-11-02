@@ -26,6 +26,9 @@ class StubButton implements ButtonInterface
     private $label = 'stub.button.label';
 
     /** @var string */
+    private $ariaLabel = 'stub.button.aria_label';
+
+    /** @var string */
     private $name = 'stub.button.name';
 
     /** @var string */
@@ -80,9 +83,15 @@ class StubButton implements ButtonInterface
     }
 
     /** {@inheritdoc} */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->label;
+        return (string) $this->label;
+    }
+
+    /** {@inheritdoc} */
+    public function getAriaLabel(): ?string
+    {
+        return $this->ariaLabel;
     }
 
     /** {@inheritdoc} */

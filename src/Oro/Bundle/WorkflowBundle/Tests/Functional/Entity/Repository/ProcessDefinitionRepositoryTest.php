@@ -3,42 +3,32 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 class ProcessDefinitionRepositoryTest extends WebTestCase
 {
-    /**
-     * @var ProcessDefinitionRepository
-     */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadProcessEntities::class]);
+    }
 
-        $this->repository = $this->getContainer()->get('doctrine')
-            ->getManagerForClass('OroWorkflowBundle:ProcessDefinition')
-            ->getRepository('OroWorkflowBundle:ProcessDefinition');
-
-        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
+    private function getRepository(): ProcessDefinitionRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(ProcessDefinition::class);
     }
 
     /**
-     * @param string $name
-     * @param int $expectedCount
-     *
      * @dataProvider findLikeNameDataProvider
      */
-    public function testFindLikeName($name, $expectedCount)
+    public function testFindLikeName(string $name, int $expectedCount)
     {
-        $this->assertCount($expectedCount, $this->repository->findLikeName($name));
+        $this->assertCount($expectedCount, $this->getRepository()->findLikeName($name));
     }
 
-    /**
-     * @return array
-     */
-    public function findLikeNameDataProvider()
+    public function findLikeNameDataProvider(): array
     {
         return [
             'empty_name' => [

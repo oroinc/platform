@@ -7,22 +7,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class UsernamePasswordOrganizationTokenTest extends WebTestCase
 {
-    /** @var Session $session */
-    protected $session;
-
-    /** {@inheritdoc} */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->session = $this->getContainer()->get('session');
     }
-    
+
     public function testSerializeReferenceWithoutError()
     {
+        $session = $this->getSession();
+
         $doctrine = $this->getContainer()->get('doctrine');
         /** @var EntityManagerInterface $objectManager */
         $objectManager = $doctrine->getManager();
@@ -41,18 +37,18 @@ class UsernamePasswordOrganizationTokenTest extends WebTestCase
 
         $token = new UsernamePasswordOrganizationToken($user, $user->getPassword(), 'key', $organization);
         $serialized = $token->serialize();
-        $this->session->set('serialized', $serialized);
-        $token->unserialize($this->session->get('serialized'));
+        $session->set('serialized', $serialized);
+        $token->unserialize($session->get('serialized'));
 
         $organization = $objectManager->getReference(Organization::class, $organization->getId());
         $user = $objectManager->getReference(User::class, $user->getId());
 
         $token = new UsernamePasswordOrganizationToken($user, $user->getPassword(), 'key', $organization);
-        $this->session->set('serialized', $serialized);
-        $token->unserialize($this->session->get('serialized'));
+        $session->set('serialized', $serialized);
+        $token->unserialize($session->get('serialized'));
 
         $serialized = $token->serialize();
-        $this->session->set('serialized', $serialized);
-        $token->unserialize($this->session->get('serialized'));
+        $session->set('serialized', $serialized);
+        $token->unserialize($session->get('serialized'));
     }
 }

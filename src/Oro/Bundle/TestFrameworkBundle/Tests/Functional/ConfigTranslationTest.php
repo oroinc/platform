@@ -3,8 +3,10 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -14,112 +16,223 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 class ConfigTranslationTest extends WebTestCase
 {
     /** @var Translator */
-    protected $translator;
+    private $translator;
+
+    /** @var ConfigManager */
+    private $configManager;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
+        $this->translator = self::getContainer()->get('translator');
+        $this->configManager = self::getContainer()->get('oro_entity_config.config_manager');
+
+        /**
+         * uncomment this line if you have added missing translations
+         * and do not want to run cache:clear after that
+         */
+        //$this->translator->rebuildCache();
     }
 
-    public function testConfigTranslationKeysExists()
+    public function testConfigurableEntitiesTranslationKeysShouldExist()
     {
-        $configProvider = $this->getContainer()->get('oro_entity_config.provider.entity');
-        $provider = $this->getContainer()->get('oro_test.entity_field_list_provider');
-
-        $fields = $provider->getFields(true, true, true, true, false);
         $missingTranslationKeys = [];
+        $entityConfigs = $this->configManager->getConfigs('entity');
+        foreach ($entityConfigs as $entityConfig) {
+            $entityClass = $entityConfig->getId()->getClassName();
+            if ($this->isTestEntity($entityClass)) {
+                continue;
+            }
 
-        foreach ($fields as $className => $options) {
-            $entityConfig = $configProvider->getConfig($className);
-            $missingTranslationKeys = array_merge(
-                $missingTranslationKeys,
-                $this->getMissingTranslationKeys($entityConfig)
-            );
+            $this->addMissingTranslationKeysForEntity($missingTranslationKeys, $entityConfig);
 
-            foreach ($options['fields'] as $field) {
-                if (!$configProvider->hasConfig($className, $field['name'])) {
-                    continue;
-                }
-
-                /**
-                 * We should not check translations of entities being created/used only in test environment.
-                 * It's done to avoid adding and accumulation of unnecessary test entity/field/relation translations.
-                 */
-                if (isset($field['related_entity_name'])
-                    && is_a(
-                        $field['related_entity_name'],
-                        'Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface',
-                        true
-                    )
+            $fieldConfigs = $this->configManager->getConfigs('entity', $entityClass);
+            foreach ($fieldConfigs as $fieldConfig) {
+                $fieldName = $fieldConfig->getId()->getFieldName();
+                $extendFieldConfig = $this->configManager->getFieldConfig('extend', $entityClass, $fieldName);
+                if ($extendFieldConfig->has('target_entity')
+                    && $this->isTestEntity($extendFieldConfig->get('target_entity'))
                 ) {
                     continue;
                 }
 
-                $fieldConfig = $configProvider->getConfig($className, $field['name']);
-                $missingTranslationKeys = array_merge(
-                    $missingTranslationKeys,
-                    $this->getMissingTranslationKeys($fieldConfig)
-                );
+                $this->addMissingTranslationKeysForField($missingTranslationKeys, $fieldConfig);
             }
         }
 
-        $this->assertEmpty($missingTranslationKeys, implode("\n", $missingTranslationKeys));
+        $this->assertMissingTranslationKeysEmpty($missingTranslationKeys);
     }
 
     /**
-     * @param ConfigInterface $config
-     *
-     * @return array
+     * @depends testConfigurableEntitiesTranslationKeysShouldExist
      */
-    protected function getMissingTranslationKeys(ConfigInterface $config)
+    public function testVirtualFieldsTranslationKeysShouldExist()
     {
-        $keys = ['label'];
-        if ($config->getId() instanceof EntityConfigId) {
-            $keys[] = 'plural_label';
-        }
-
         $missingTranslationKeys = [];
-        foreach ($keys as $key) {
-            $transKey = $config->get($key);
 
-            /**
-             * Ignore custom entities created for test environment only (class name starts with "Test").
-             * It's done to avoid adding and accumulation of unnecessary test entity/field/relation translations.
-             */
-            if (0 === strpos($transKey, 'extend.entity.test')) {
-                continue;
-            }
+        $fields = self::getContainer()->get('oro_test.entity_field_list_provider')
+            ->getFields(true, true, true, true, true, false);
+        foreach ($fields as $entityClass => $options) {
+            foreach ($options['fields'] as $field) {
+                $fieldName = $field['name'];
+                $fieldTranslatedLabel = $field['label'];
+                if (isset($field['related_entity_name']) && $this->isTestEntity($field['related_entity_name'])) {
+                    continue;
+                }
 
-            if (!$this->getTranslator()->hasTrans($transKey)) {
-                $configId = $config->getId();
-                if ($configId instanceof FieldConfigId) {
-                    $transKey .= sprintf(
-                        ' [Entity: %s; Field: %s]',
-                        $configId->getClassName(),
-                        $configId->getFieldName()
+                if (false !== strpos($fieldName, '::')) {
+                    $this->addMissingTranslationKeysForUnidirectionalAssociation(
+                        $missingTranslationKeys,
+                        $entityClass,
+                        $fieldName,
+                        $fieldTranslatedLabel
                     );
                 } else {
-                    $transKey .= sprintf(' [Entity: %s]', $configId->getClassName());
+                    $this->addMissingTranslationKeysForVirtualField(
+                        $missingTranslationKeys,
+                        $entityClass,
+                        $fieldName,
+                        $fieldTranslatedLabel
+                    );
                 }
-                $missingTranslationKeys[] = $transKey;
             }
         }
 
-        return $missingTranslationKeys;
+        $this->assertMissingTranslationKeysEmpty($missingTranslationKeys);
+    }
+
+    public function assertMissingTranslationKeysEmpty(array $missingTranslationKeys)
+    {
+        if ($missingTranslationKeys) {
+            self::fail(sprintf(
+                "Found %d missing translations:\n%s",
+                count($missingTranslationKeys),
+                implode("\n", $missingTranslationKeys)
+            ));
+        }
+    }
+
+    private function addMissingTranslationKeysForEntity(array &$missingTranslationKeys, ConfigInterface $config)
+    {
+        $configId = $config->getId();
+        if (!$configId instanceof EntityConfigId) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected an entity config. Config Id: %s.',
+                (string)$configId
+            ));
+        }
+
+        foreach (['label', 'plural_label', 'grid_all_view_label'] as $key) {
+            $transKey = $config->get($key);
+            if (!$this->hasTrans($transKey)) {
+                $missingTranslationKeys[] = $transKey . sprintf(' [Entity: %s]', $configId->getClassName());
+            }
+        }
+    }
+
+    private function addMissingTranslationKeysForField(array &$missingTranslationKeys, ConfigInterface $config)
+    {
+        $configId = $config->getId();
+        if (!$configId instanceof FieldConfigId) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected a field config. Config Id: %s.',
+                (string)$configId
+            ));
+        }
+
+        $transKey = $config->get('label');
+        if (!$this->hasTrans($transKey)) {
+            $missingTranslationKeys[] = $transKey
+                . sprintf(' [Entity: %s; Field: %s]', $configId->getClassName(), $configId->getFieldName());
+        }
     }
 
     /**
-     * @return Translator
+     * @param array  $missingTranslationKeys
+     * @param string $entityClass
+     * @param string $associationName
+     * @param string $associationTranslatedLabel
      */
-    protected function getTranslator()
-    {
-        if (!$this->translator) {
-            $this->translator = $this->getContainer()->get('translator');
+    private function addMissingTranslationKeysForUnidirectionalAssociation(
+        array &$missingTranslationKeys,
+        $entityClass,
+        $associationName,
+        $associationTranslatedLabel
+    ) {
+        // label format is "field label (entity label or entity plural label)"
+        if (false === strpos($associationTranslatedLabel, 'extend.entity.test')
+            && (
+                false !== strpos($associationTranslatedLabel, '.label (')
+                || $this->endsWith($associationTranslatedLabel, '.entity_label)')
+                || $this->endsWith($associationTranslatedLabel, '.entity_plural_label)')
+            )
+        ) {
+            $missingTranslationKeys[] = $associationTranslatedLabel
+                . sprintf(' [Entity: %s; Association: %s]', $entityClass, $associationName);
         }
+    }
 
-        return $this->translator;
+    /**
+     * @param array  $missingTranslationKeys
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $fieldTranslatedLabel
+     */
+    private function addMissingTranslationKeysForVirtualField(
+        array &$missingTranslationKeys,
+        $entityClass,
+        $fieldName,
+        $fieldTranslatedLabel
+    ) {
+        if (!$this->isTestLabel($fieldTranslatedLabel)
+            && $this->endsWith($fieldTranslatedLabel, '.label')
+        ) {
+            $missingTranslationKeys[] = $fieldTranslatedLabel
+                . sprintf(' [Entity: %s; Virtual Field: %s]', $entityClass, $fieldName);
+        }
+    }
+
+    /**
+     * @param string $transKey
+     *
+     * @return bool
+     */
+    private function hasTrans($transKey)
+    {
+        return $this->isTestLabel($transKey) || $this->translator->hasTrans($transKey);
+    }
+
+    /**
+     * @param string $haystack
+     * @param string $needle
+     *
+     * @return bool
+     */
+    private function endsWith($haystack, $needle)
+    {
+        return \substr($haystack, -\strlen($needle)) === $needle;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    private function isTestEntity($entityClass)
+    {
+        return is_a($entityClass, TestFrameworkEntityInterface::class, true);
+    }
+
+    /**
+     * @param string $transKey
+     *
+     * @return bool
+     */
+    private function isTestLabel($transKey)
+    {
+        return 0 === strpos($transKey, 'extend.entity.test');
     }
 }

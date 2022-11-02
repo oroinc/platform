@@ -8,21 +8,17 @@ use Oro\Component\Layout\LayoutContext;
 class WidgetPathProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetPathProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new WidgetPathProvider();
     }
 
     /**
      * @dataProvider pathsDataProvider
-     *
-     * @param string[]    $existingPaths
-     * @param string|null $widget
-     * @param string[]    $expectedPaths
      */
-    public function testGetPaths($existingPaths, $widget, $expectedPaths)
+    public function testGetPaths(array $existingPaths, ?string $widget, array $expectedPaths)
     {
         $context = new LayoutContext();
         $context->set('widget_container', $widget);
@@ -30,10 +26,7 @@ class WidgetPathProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedPaths, $this->provider->getPaths($existingPaths));
     }
 
-    /**
-     * @return array
-     */
-    public function pathsDataProvider()
+    public function pathsDataProvider(): array
     {
         return [
             [

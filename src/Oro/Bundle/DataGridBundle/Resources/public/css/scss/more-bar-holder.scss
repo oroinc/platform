@@ -1,62 +1,13 @@
 /* @theme: admin.oro; */
 
-.more-bar-holder {
-    position: relative;
-
-    display: inline-block;
-
-    .dropdown-toggle {
-        display: flex;
-        align-items: center;
-
-        padding: $more-bar-holder-toggle-offset;
-        height: $more-bar-holder-height;
-
-        font-size: $more-bar-holder-icon-font-size;
-        line-height: 1;
-        text-decoration: none;
-
-        color: $oro-datagrid-action-cell-color;
-
-        // Hide bootstrap arrow
-        &:before {
-            content: none;
-        }
-    }
-
-    .dropdown {
-        display: inline-block;
-    }
-
-    .dropdown-toggle:hover {
-        text-decoration: none;
-    }
-
-    &:hover {
-        .dropdown-toggle {
-            color: $oro-datagrid-action-cell-color-hover;
-        }
-    }
-}
-
-.launchers-dropdown-menu {
-    min-width: $oro-datagrid-action-size;
-    // Override bootstrap margin
-    margin: 0;
-    padding: $launchers-dropdown-menu-offset;
-
-    &.show {
-        // Override bootstrap margin
-        margin: 0;
-    }
-}
-
 .launchers-list {
     display: block;
     margin: 0;
     padding: $launchers-list-offset;
 
     white-space: nowrap;
+
+    @include list-unstyled();
 
     .action {
         display: block;
@@ -66,7 +17,7 @@
 
         &:active,
         &:hover {
-            color: $primary-400;
+            color: $launchers-list-action-color-hover;
         }
 
         &.mode-text-only,
@@ -89,7 +40,9 @@
 }
 
 .launcher-item {
-    float: none !important; // Undo Bootstrap styles
+    // Undo Bootstrap styles
+    // stylelint-disable-next-line declaration-no-important
+    float: none !important;
 
     text-align: left;
 
@@ -97,5 +50,63 @@
         display: table-cell;
 
         text-align: center;
+    }
+}
+
+.launchers-dropdown-menu {
+    min-width: $oro-datagrid-action-size;
+    // Override bootstrap margin
+    margin: 0;
+    padding: $launchers-dropdown-menu-offset;
+
+    &.show {
+        // Override bootstrap margin
+        margin: 0;
+    }
+
+    .launchers-list {
+        padding: $launchers-list-at-dropdown-offset;
+    }
+}
+
+.more-bar-holder {
+    position: relative;
+    display: inline-block;
+    line-height: $oro-datagrid-body-cell-line-height;
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+
+        padding: $more-bar-holder-toggle-offset;
+
+        font-size: $more-bar-holder-icon-font-size;
+        line-height: $more-bar-holder-line-height;
+        text-decoration: none;
+
+        color: $oro-datagrid-action-cell-color;
+
+        .icon {
+            line-height: inherit;
+        }
+
+        // Hide bootstrap arrow
+        &::before {
+            content: none;
+        }
+    }
+
+    .dropdown {
+        display: inline-block;
+    }
+
+    .dropdown-toggle:hover {
+        text-decoration: none;
+    }
+
+    &:hover {
+        .dropdown-toggle {
+            color: $oro-datagrid-action-cell-color-hover;
+        }
     }
 }

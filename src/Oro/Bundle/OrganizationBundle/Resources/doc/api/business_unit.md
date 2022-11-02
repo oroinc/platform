@@ -15,7 +15,7 @@ Retrieve a collection of business unit records.
 {@inheritdoc}
 
 ### create
-    
+
 Create a new business unit record.
 
 The created record is returned in the response.
@@ -26,38 +26,38 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"businessunits",
-      "attributes":{  
-         "name":"Acme, Central",
-         "phone":"798-682-5917",
-         "email":"central@acme.inc",
-         "fax":"547-58-95"
+{
+   "data": {
+      "type": "businessunits",
+      "attributes": {
+         "name": "Acme, Central",
+         "phone": "798-682-5917",
+         "email": "central@acme.inc",
+         "fax": "547-58-95"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "users":{  
-            "data":[  
-               {  
-                  "type":"users",
-                  "id":"1"
+         "users": {
+            "data": [
+               {
+                  "type": "users",
+                  "id": "1"
                },
-               {  
-                  "type":"users",
-                  "id":"2"
+               {
+                  "type": "users",
+                  "id": "2"
                }
             ]
          },
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          }
       }
@@ -70,31 +70,33 @@ Example:
 
 Edit a specific business unit record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"businessunits",
-      "id":"4",
-      "attributes":{  
-         "extend_description":"Business units represent a group of users with similar business or administrative tasks/roles.",
-         "phone":"798-682-59-17",
-         "website":"www.www.vom"
+{
+   "data": {
+      "type": "businessunits",
+      "id": "4",
+      "attributes": {
+         "extend_description": "Business units represent a group of users with similar business or administrative tasks/roles.",
+         "phone": "798-682-59-17",
+         "website": "www.www.vom"
       },
-      "relationships":{  
-         "users":{  
-            "data":[  
-               {  
-                  "type":"users",
-                  "id":"1"
+      "relationships": {
+         "users": {
+            "data": [
+               {
+                  "type": "users",
+                  "id": "1"
                },
-               {  
-                  "type":"users",
-                  "id":"2"
+               {
+                  "type": "users",
+                  "id": "2"
                }
             ]
          }
@@ -106,7 +108,7 @@ Example:
 
 ### delete
 
-Delete a specific business unit record
+Delete a specific business unit record.
 
 {@inheritdoc}
 
@@ -118,29 +120,19 @@ Delete a collection of business unit records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### name
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 
@@ -265,3 +257,18 @@ Example:
 #### delete_relationship
 
 Remove user records from a specific business unit record.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}

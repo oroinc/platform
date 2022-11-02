@@ -1,23 +1,22 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var DateFilter;
-    var template = require('tpl!orofilter/templates/filter/date-filter.html');
-    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
-    var dropdownTemplate = require('tpl!orofilter/templates/filter/date-filter-dropdown.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var __ = require('orotranslation/js/translator');
-    var ChoiceFilter = require('./choice-filter');
-    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
-    var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
-    var DateVariableHelper = require('orofilter/js/date-variable-helper');
-    var DateValueHelper = require('orofilter/js/date-value-helper');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var layout = require('oroui/js/layout');
-    var config = require('module').config();
+    const template = require('tpl-loader!orofilter/templates/filter/date-filter.html');
+    const fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
+    const dropdownTemplate = require('tpl-loader!orofilter/templates/filter/date-filter-dropdown.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const __ = require('orotranslation/js/translator');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const FilterDatePickerView = require('orofilter/js/app/views/datepicker/filter-datepicker-view').default;
+    const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
+    const DateVariableHelper = require('orofilter/js/date-variable-helper');
+    const DateValueHelper = require('orofilter/js/date-value-helper');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const layout = require('oroui/js/layout');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         inputClass: 'date-visual-element'
@@ -28,7 +27,7 @@ define(function(require) {
     /**
      * Date filter: filter type as option + interval begin and end dates
      */
-    DateFilter = ChoiceFilter.extend({
+    const DateFilter = ChoiceFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -73,6 +72,19 @@ define(function(require) {
             separator: '.filter-separator',
             endContainer: '.filter-end-date'
         },
+
+        /**
+         * @inheritdoc
+         */
+
+        className: 'date-filter-container',
+
+        /**
+         * CSS class for custom date range
+         *
+         * @property
+         */
+        customClass: 'date-filter-custom',
 
         /**
          * CSS class for visual date input elements
@@ -182,16 +194,16 @@ define(function(require) {
         autoUpdateRangeFilterType: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DateFilter() {
-            DateFilter.__super__.constructor.apply(this, arguments);
+        constructor: function DateFilter(options) {
+            DateFilter.__super__.constructor.call(this, options);
         },
 
         /**
          * @param {Object} options
          * @param {Array.<string>=} options.dayFormats List of acceptable day formats
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.dayFormats = options && options.dayFormats || [datetimeFormatter.getDayFormat()];
@@ -221,7 +233,7 @@ define(function(require) {
             // temp code to keep backward compatible
             if ($.isPlainObject(this.dateParts)) {
                 this.dateParts = _.map(this.dateParts, function(option, i) {
-                    var value = i.toString();
+                    const value = i.toString();
 
                     return {
                         value: value,
@@ -232,18 +244,18 @@ define(function(require) {
             }
 
             if (_.isUndefined(this.emptyPart)) {
-                var firstPart = _.first(this.dateParts).value;
+                const firstPart = _.first(this.dateParts).value;
                 this.emptyPart = {
                     type: (_.isEmpty(this.dateParts) ? '' : firstPart),
                     value: firstPart
                 };
             }
 
-            DateFilter.__super__.initialize.apply(this, arguments);
+            DateFilter.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -252,38 +264,54 @@ define(function(require) {
             delete this.dateParts;
             delete this.emptyPart;
             delete this.emptyValue;
+            // Remove event handlers from a part of the template
+            this.$(`[data-cid="filter-${this.cid}"]`).off(this.eventNamespace());
             DateFilter.__super__.dispose.call(this);
         },
 
         _getPickerConstructor: function() {
-            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
-                ? DatePickerView : VariableDatePickerView;
-        },
-
-        onChangeFilterType: function(e) {
-            var select = this.$el.find(e.currentTarget);
-            var value = select.val();
-            this.changeFilterType(value);
+            return this.isSimplePickerView() ? FilterDatePickerView : VariableDatePickerView;
         },
 
         /**
-         * @inheritDoc
+         * Picker will be in dropdown
+         * @returns {*|boolean}
+         */
+        isSimplePickerView() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables;
+        },
+
+        onChangeFilterType: function(e) {
+            const select = this.$el.find(e.currentTarget);
+            const value = select.val();
+            this.changeFilterType(value);
+        },
+
+        onFilterRemove(e) {
+            this.removeSubview('start');
+            this.removeSubview('end');
+            this._criteriaRenderd = false;
+        },
+
+        /**
+         * @inheritdoc
          */
         _applyValueAndHideCriteria: function() {
             this._beforeApply();
-            DateFilter.__super__._applyValueAndHideCriteria.apply(this);
+            DateFilter.__super__._applyValueAndHideCriteria.call(this);
         },
 
         changeFilterType: function(value) {
-            var startSeparatorEndSelector =
+            const startSeparatorEndSelector =
                 [this.selectors.startContainer, this.selectors.separator, this.selectors.endContainer].join(',');
-            var startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
-            var separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
-            var type = parseInt(value, 10);
+            const startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
+            const separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
+            const type = parseInt(value, 10);
             if (!isNaN(type)) {
                 // it's type
                 this.$(startSeparatorEndSelector).css('display', '');
-                var typeDefinedValues = [
+                this.$el.addClass(this.customClass);
+                const typeDefinedValues = [
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
                     this.typeDefinedValues.this_month,
@@ -293,6 +321,7 @@ define(function(require) {
                 ];
                 if (typeDefinedValues.indexOf(type) > -1) {
                     this.$(startSeparatorEndSelector).hide();
+                    this.$el.removeClass(this.customClass);
                     this.subview('start').setValue('');
                     this.subview('end').setValue('');
                 } else if (this.typeValues.moreThan === type) {
@@ -328,28 +357,33 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _renderCriteria: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var part = {value: value.part, type: value.part};
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const part = {value: value.part, type: value.part};
 
             this.dateWidgetOptions.part = part.type;
 
             this._updateRangeFilter(value, false);
 
-            var displayValue = this._formatDisplayValue(value);
-            var $filter = $(
+            const displayValue = this._formatDisplayValue(value);
+            const $filter = $(
                 this.template({
                     inputClass: this.inputClass,
                     value: displayValue,
                     parts: this._getParts(),
                     popoverContent: __('oro.filter.date.info'),
-                    renderMode: this.renderMode
+                    renderMode: this.renderMode,
+                    ...this.getTemplateDataProps()
                 })
             );
 
             this._appendFilter($filter);
+
+            $filter.attr('data-cid', `filter-${this.cid}`);
+            $filter.one(`remove${this.eventNamespace()}`, this.onFilterRemove.bind(this));
+
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
             this._renderSubViews();
@@ -359,24 +393,27 @@ define(function(require) {
             if (value) {
                 this._updateTooltipVisibility(value.part);
             }
-            this.on('update', _.bind(function() {
-                var value = this.getValue();
+            this.on('update', () => {
+                const value = this.getValue();
                 if (value) {
                     this._updateTooltipVisibility(value.part);
                 }
-            }, this));
+            });
+
+            this.$el.inputWidget('seekAndCreate');
 
             this._criteriaRenderd = true;
+            this._isRenderingInProgress = false;
         },
 
         _getParts: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var part = {value: value.part, type: value.part};
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const part = {value: value.part, type: value.part};
 
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
-            var datePartTemplate = this._getTemplate('fieldTemplate');
-            var parts = [];
+            const selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            const selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
+            const datePartTemplate = this._getTemplate('fieldTemplate');
+            const parts = [];
 
             // add date parts only if embed template used
             if (this.templateTheme !== '') {
@@ -387,7 +424,8 @@ define(function(require) {
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel,
                         selectedChoiceTooltip: this._getPartTooltip(value.part),
-                        renderMode: this.renderMode
+                        renderMode: this.renderMode,
+                        ...this.getTemplateDataProps()
                     })
                 );
             }
@@ -399,7 +437,8 @@ define(function(require) {
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel,
                     popoverContent: __('oro.filter.date.info'),
-                    renderMode: this.renderMode
+                    renderMode: this.renderMode,
+                    ...this.getTemplateDataProps()
                 })
             );
 
@@ -412,12 +451,12 @@ define(function(require) {
          * @protected
          */
         _renderSubViews: function() {
-            var name;
-            var selector;
-            var pickerView;
-            var options;
-            var value = this.criteriaValueSelectors.value;
-            var Picker = this._getPickerConstructor();
+            let name;
+            let selector;
+            let pickerView;
+            let options;
+            const value = this.criteriaValueSelectors.value;
+            const Picker = this._getPickerConstructor();
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
                     continue;
@@ -425,7 +464,7 @@ define(function(require) {
                 selector = value[name];
                 options = this._getPickerConfigurationOptions({
                     el: this.$(selector)
-                });
+                }, {criteriaValueName: name});
                 pickerView = new Picker(options);
                 this.subview(name, pickerView);
             }
@@ -438,43 +477,57 @@ define(function(require) {
         /**
          * Prepares configuration options for picker view
          *
-         * @param {Object} options
+         * @param {Object} optionsToMerge
+         * @param {Object} [parameters]
          * @returns {Object}
          * @protected
          */
-        _getPickerConfigurationOptions: function(options) {
-            _.extend(options, {
+        _getPickerConfigurationOptions: function(optionsToMerge, parameters = {}) {
+            const {startDateFieldAriaLabel, endDateFieldAriaLabel} = this.getTemplateDataProps();
+            const labelsMap = {
+                start: startDateFieldAriaLabel,
+                end: endDateFieldAriaLabel
+            };
+            let ariaLabel = null;
+
+            if (labelsMap[parameters.criteriaValueName]) {
+                ariaLabel = labelsMap[parameters.criteriaValueName];
+            }
+
+            _.extend(optionsToMerge, {
                 nativeMode: tools.isMobile(),
                 dateInputAttrs: {
                     'class': 'datepicker-input ' + this.inputClass,
-                    'placeholder': __('oro.form.choose_date')
+                    'placeholder': __('oro.form.choose_date'),
+                    'aria-label': ariaLabel
                 },
                 datePickerOptions: this.dateWidgetOptions,
                 dropdownTemplate: this._getTemplate('dropdownTemplate'),
                 backendFormat: datetimeFormatter.getDateFormat(),
                 dayFormats: this.dayFormats.slice()
             });
-            return options;
+
+            return optionsToMerge;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        _getCriteriaHint: function() {
-            var hint = '';
-            var option;
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+        _getCriteriaHint: function(...args) {
+            let hint = '';
+            let option;
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
             if (value.value) {
-                var start = value.value.start;
-                var end = value.value.end;
-                var type = value.type ? value.type.toString() : '';
+                const start = value.value.start;
+                const end = value.value.end;
+                const type = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
-                        hint += [__('more than'), start].join(' ');
+                        hint += [__('oro.filter.date.later_than'), start].join(' ');
                         break;
                     case this.typeValues.lessThan.toString():
-                        hint += [__('less than'), end].join(' ');
+                        hint += [__('oro.filter.date.earlier_than'), end].join(' ');
                         break;
                     case this.typeValues.equal.toString():
                         option = this._getChoiceOption(this.typeValues.equal);
@@ -487,21 +540,21 @@ define(function(require) {
                     case this.typeValues.notBetween.toString():
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.notBetween);
-                            hint += [option.label, start, __('and'), end].join(' ');
+                            hint += [option.label, start, __('oro.filter.date.and'), end].join(' ');
                         } else if (start) {
-                            hint += [__('before'), start].join(' ');
+                            hint += [__('oro.filter.date.before'), start].join(' ');
                         } else if (end) {
-                            hint += [__('after'), end].join(' ');
+                            hint += [__('oro.filter.date.after'), end].join(' ');
                         }
                         break;
                     default:
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.between);
-                            hint += [option.label, start, __('and'), end].join(' ');
+                            hint += [option.label, start, __('oro.filter.date.and'), end].join(' ');
                         } else if (start) {
-                            hint += [__('from'), start].join(' ');
+                            hint += [__('oro.filter.date.from'), start].join(' ');
                         } else if (end) {
-                            hint += [__('to'), end].join(' ');
+                            hint += [__('oro.filter.date.to'), end].join(' ');
                         }
                         break;
                 }
@@ -514,7 +567,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatDisplayValue: function(value) {
             if (value.value && value.value.start) {
@@ -527,7 +580,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue: function(value) {
             if (value.value && value.value.start) {
@@ -560,8 +613,8 @@ define(function(require) {
          * @protected
          */
         _updateRangeFilter: function(value, updateDom) {
-            var oldValue = tools.deepClone(value);
-            var type = parseInt(value.type);
+            const oldValue = tools.deepClone(value);
+            const type = parseInt(value.type);
             if (value.value &&
                 (type === this.typeValues.between || type === this.typeValues.notBetween)) {
                 if (value.value.start && value.value.end) {
@@ -569,10 +622,10 @@ define(function(require) {
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
                         !this.dateVariableHelper.isDateVariable(value.value.start)) {
                         // swap end/start date if no variables are used and end date is behind start date
-                        var end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
-                        var start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
+                        const end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
+                        const start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
                         if (end < start) {
-                            var endValue = value.value.end;
+                            const endValue = value.value.end;
                             value.value.end = value.value.start;
                             value.value.start = endValue;
                         }
@@ -645,12 +698,19 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
+         */
+        isUpdatable: function(newValue, oldValue) {
+            return !tools.isEqualsLoosely(newValue, oldValue);
+        },
+
+        /**
+         * @inheritdoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
-                var start = this.subview('start');
-                var end = this.subview('end');
+            if (this.isUpdatable(newValue, oldValue)) {
+                const start = this.subview('start');
+                const end = this.subview('end');
                 if (start && start.updateFront) {
                     start.updateFront();
                 }
@@ -662,13 +722,12 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
-            var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
-            $typeInput = this.$(this.criteriaValueSelectors.date_type);
+            const $typeInput = this.$(this.criteriaValueSelectors.date_type);
             if ($typeInput.val() !== value.type) {
                 $typeInput.val(value.type).trigger('change');
             }
@@ -679,11 +738,17 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
-            _.result(this.subview('start'), 'checkConsistency');
-            _.result(this.subview('end'), 'checkConsistency');
+            if (
+                this.subview('start') &&
+                this.subview('end') &&
+                typeof this._getPickerConstructor().prototype.checkConsistency === 'function'
+            ) {
+                this.subview('start').checkConsistency(document.activeElement);
+                this.subview('end').checkConsistency(document.activeElement);
+            }
 
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
@@ -696,17 +761,10 @@ define(function(require) {
             };
         },
 
-        /**
-         * @inheritDoc
-         */
-        _focusCriteria: function() {
-            this.$(this.criteriaSelector).focus();
-        },
-
         _getSelectedChoiceLabel: function(property, value) {
-            var selectedChoiceLabel = '';
+            let selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
-                var foundChoice = _.find(this[property], function(choice) {
+                const foundChoice = _.find(this[property], function(choice) {
                     return (String(choice.value) === String(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
@@ -728,15 +786,42 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _isDOMValueChanged: function() {
-            var thisDOMValue = this._readDOMValue();
+            const thisDOMValue = this._readDOMValue();
             return (
                 !_.isUndefined(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.type) &&
                 !_.isEqual(this.value, thisDOMValue)
             );
+        },
+
+        /**
+         * @return {jQuery}
+         */
+        getCriteriaValueFieldToFocus() {
+            const startView = this.subviewsByName['start'];
+
+            if (!startView.nativeMode) {
+                return this.$(`${this.criteriaSelector} .datepicker-input`).filter(':visible').first();
+            } else {
+                return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value.start}`);
+            }
+        },
+
+        getTemplateDataProps() {
+            const data = DateFilter.__super__.getTemplateDataProps.call(this);
+
+            return {
+                ...data,
+                startDateFieldAriaLabel: __('oro.filter.date.start_field.aria_label', {
+                    label: this.label
+                }),
+                endDateFieldAriaLabel: __('oro.filter.date.end_field.aria_label', {
+                    label: this.label
+                })
+            };
         }
     });
 

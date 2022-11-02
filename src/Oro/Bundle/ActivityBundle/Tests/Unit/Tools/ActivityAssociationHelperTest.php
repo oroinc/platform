@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Tools;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -13,16 +14,14 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var ActivityAssociationHelper */
-    protected $activityAssociationHelper;
+    private $activityAssociationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->activityAssociationHelper = new ActivityAssociationHelper($this->configManager);
     }
@@ -82,12 +81,10 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activityClass, $associationName, true],
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$activityClass, $associationName, true],
+            ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
@@ -119,12 +116,10 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activityClass, $associationName, true],
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$activityClass, $associationName, true],
+            ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
@@ -205,25 +200,21 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->exactly(3))
             ->method('hasConfig')
             ->with()
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$activity1Class, $associationName, true],
-                    [$activity2Class, $associationName, true],
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$activity1Class, $associationName, true],
+                [$activity2Class, $associationName, true],
+            ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('activity', $entityClass)
             ->willReturn($config);
         $this->configManager->expects($this->exactly(2))
             ->method('getFieldConfig')
-            ->willReturnMap(
-                [
-                    ['extend', $activity1Class, $associationName, $association1Config],
-                    ['extend', $activity2Class, $associationName, $association2Config],
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $activity1Class, $associationName, $association1Config],
+                ['extend', $activity2Class, $associationName, $association2Config],
+            ]);
 
         $this->assertTrue(
             $this->activityAssociationHelper->hasActivityAssociations($entityClass)

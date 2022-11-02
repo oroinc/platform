@@ -9,18 +9,15 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationChecker */
-    protected $checker;
+    private $checker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->checker = new ConfigurationChecker(new ContextAccessor());
     }
 
     /**
      * @dataProvider isCleanDataProvider
-     *
-     * @param array $config
-     * @param $expected
      */
     public function testIsClean(array $config, $expected)
     {
@@ -29,10 +26,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return \Generator
      */
-    public function isCleanDataProvider()
+    public function isCleanDataProvider(): \Generator
     {
         yield 'empty configuration' => [
             'config' => [],
@@ -47,7 +42,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
             'expected' => true
         ];
 
-        yield 'empty configuration' => [
+        yield 'non-empty nodes configuration' => [
             'configuration' => [
                 WorkflowConfiguration::NODE_TRANSITIONS => [
                     'test_transition' => [
@@ -61,10 +56,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -85,10 +78,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -109,10 +100,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -133,10 +122,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => ['config'],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -157,34 +144,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => ['config'],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
-                    ]
-                ]
-            ],
-            'expected' => false
-        ];
-
-        yield 'pre_conditions configuration' => [
-            'configuration' => [
-                WorkflowConfiguration::NODE_TRANSITIONS => [
-                    'test_transition' => [
-                        'form_options' => [
-                            'init_actions' => [],
-                            'form_init' => []
-                        ]
-                    ]
-                ],
-                WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
-                    'test_transition' => [
-                        'preactions' => [],
-                        'preconditions' => [],
-                        'pre_conditions' => ['config'],
-                        'conditions' => [],
-                        'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -205,10 +166,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => ['config'],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],
@@ -229,34 +188,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => ['config'],
-                        'post_actions' => []
-                    ]
-                ]
-            ],
-            'expected' => false
-        ];
-
-        yield 'post_actions configuration' => [
-            'configuration' => [
-                WorkflowConfiguration::NODE_TRANSITIONS => [
-                    'test_transition' => [
-                        'form_options' => [
-                            'init_actions' => [],
-                            'form_init' => []
-                        ]
-                    ]
-                ],
-                WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [
-                    'test_transition' => [
-                        'preactions' => [],
-                        'preconditions' => [],
-                        'pre_conditions' => [],
-                        'conditions' => [],
-                        'actions' => [],
-                        'post_actions' => ['config']
                     ]
                 ]
             ],
@@ -277,10 +210,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
                     'test_transition' => [
                         'preactions' => [],
                         'preconditions' => [],
-                        'pre_conditions' => [],
                         'conditions' => [],
                         'actions' => [],
-                        'post_actions' => []
                     ]
                 ]
             ],

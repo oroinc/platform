@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
@@ -11,16 +12,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class AssociationChoiceTypeTest extends AssociationTypeTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
-        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         return new AssociationChoiceType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
@@ -31,7 +30,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
+    public function testSubmit(bool $newVal, bool $oldVal, string $state, bool $isSetStateExpected)
     {
         $this->doTestSubmit(
             'enabled',
@@ -48,7 +47,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             [false, false, ExtendScope::STATE_ACTIVE, false],
@@ -69,11 +68,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         $this->assertEquals(ChoiceType::class, $this->getFormType()->getParent());
     }
 
-    /**
-     * @param string|null $cssClass
-     * @return array
-     */
-    protected function getDisabledFormView($cssClass = null)
+    protected function getDisabledFormView(string $cssClass = null): array
     {
         return [
             'disabled' => true,

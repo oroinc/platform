@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Oro\Component\Testing\ReflectionUtil;
 
 abstract class RendererEngineTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,19 +11,15 @@ abstract class RendererEngineTest extends \PHPUnit\Framework\TestCase
     {
         $renderingEngine = $this->createRendererEngine();
 
-        $reflectionClass = new \ReflectionClass(get_class($renderingEngine));
-        $property = $reflectionClass->getProperty('defaultThemes');
-        $property->setAccessible(true);
-
-        $actual = $property->getValue($renderingEngine);
+        $actual = ReflectionUtil::getPropertyValue($renderingEngine, 'defaultThemes');
         $this->assertNotContains('newThemePath', $actual);
 
         $renderingEngine->addDefaultThemes('newThemePath');
-        $actual = $property->getValue($renderingEngine);
+        $actual = ReflectionUtil::getPropertyValue($renderingEngine, 'defaultThemes');
         $this->assertContains('newThemePath', $actual);
 
         $renderingEngine->addDefaultThemes(['newThemePath2', 'newThemePath3']);
-        $actual = $property->getValue($renderingEngine);
+        $actual = ReflectionUtil::getPropertyValue($renderingEngine, 'defaultThemes');
         $this->assertContains('newThemePath2', $actual);
         $this->assertContains('newThemePath3', $actual);
     }

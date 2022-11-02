@@ -1,28 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var CommentComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var CommentFromView = require('orocomment/js/app/views/comment-form-view');
-    var CommentsView = require('orocomment/js/app/views/comments-view');
-    var CommentCollection = require('orocomment/js/app/models/comment-collection');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var DialogWidget = require('oro/dialog-widget');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const CommentFromView = require('orocomment/js/app/views/comment-form-view');
+    const CommentsView = require('orocomment/js/app/views/comments-view');
+    const CommentCollection = require('orocomment/js/app/models/comment-collection');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const DialogWidget = require('oro/dialog-widget');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
 
-    CommentComponent = BaseComponent.extend({
+    const CommentComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CommentComponent() {
-            CommentComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CommentComponent(options) {
+            CommentComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options || {};
@@ -62,10 +60,9 @@ define(function(require) {
         },
 
         createDialog: function(title, model) {
-            var loadingMaskView;
-            var dialogWidget = new DialogWidget({
+            const dialogWidget = new DialogWidget({
                 title: title,
-                el: $('<div><div class="comment-form-container" data-layout="separate"></div>'),
+                el: $('<div class="widget-content"><div class="comment-form-container" data-layout="separate"></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {
@@ -81,7 +78,7 @@ define(function(require) {
             dialogWidget.render();
 
             // bind dialog loader
-            loadingMaskView = new LoadingMaskView({
+            const loadingMaskView = new LoadingMaskView({
                 container: dialogWidget.loadingElement
             });
             dialogWidget.subview('loading', loadingMaskView);
@@ -96,10 +93,10 @@ define(function(require) {
                 return;
             }
 
-            var model = this.collection.create();
+            const model = this.collection.create();
 
             // init dialog
-            var dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
+            const dialogWidget = this.createDialog(__('oro.comment.dialog.add_comment.title'), model);
 
             model.once('sync', function() {
                 dialogWidget.remove();
@@ -109,18 +106,16 @@ define(function(require) {
         },
 
         onCommentEdit: function(model) {
-            var dialogWidget;
-
             if (!model.get('editable')) {
                 return;
             }
 
             // init dialog
-            dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
+            const dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
 
-            dialogWidget.listenTo(model, 'sync', _.bind(function() {
+            dialogWidget.listenTo(model, 'sync', () => {
                 dialogWidget.remove();
-            }, this));
+            });
         },
 
         onCommentRemove: function(model) {
@@ -128,13 +123,13 @@ define(function(require) {
                 return;
             }
 
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: __('oro.comment.deleteConfirmation')
             });
 
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 model.destroy();
-            }, this));
+            });
 
             confirm.open();
         },
@@ -144,8 +139,7 @@ define(function(require) {
         },
 
         _initFormView: function(parentView, model) {
-            var formView;
-            formView = new CommentFromView({
+            const formView = new CommentFromView({
                 template: this.formTemplate,
                 el: parentView.$('.comment-form-container'),
                 model: model
@@ -155,9 +149,9 @@ define(function(require) {
         },
 
         onFormSubmit: function(formView) {
-            var model = formView.model;
+            const model = formView.model;
 
-            var options = formView.fetchAjaxOptions({
+            const options = formView.fetchAjaxOptions({
                 url: model.url()
             });
 

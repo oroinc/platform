@@ -16,11 +16,6 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
     /** @var bool */
     protected $enableAdderAndRemover;
 
-    /**
-     * @param FormHelper $formHelper
-     * @param bool       $enableFullValidation
-     * @param bool       $enableAdderAndRemover
-     */
     public function __construct(
         FormHelper $formHelper,
         bool $enableFullValidation = false,
@@ -30,10 +25,6 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
         $this->enableAdderAndRemover = $enableAdderAndRemover;
     }
 
-    /**
-     * @param FormBuilderInterface     $formBuilder
-     * @param ChangeSubresourceContext $context
-     */
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
         $entryDataClass = $context->getClassName();

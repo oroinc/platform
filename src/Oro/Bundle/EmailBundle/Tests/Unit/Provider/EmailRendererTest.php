@@ -2,328 +2,192 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
+use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
+use Twig\Extension\SandboxExtension;
+use Twig\Loader\ArrayLoader;
+use Twig\Sandbox\SecurityPolicy;
 
 class EmailRendererTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $loader;
+    private TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $variablesProvider;
+    private ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $variablesProcessorRegistry;
+    private EmailRenderer $renderer;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $securityPolicy;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $sandbox;
-
-    /** @var string */
-    protected $cacheKey = 'test.key';
-
-    /** @var EmailRenderer */
-    protected $renderer = 'test.key';
-
-    /** @var TranslatorInterface */
-    protected $translation;
-
-    /**
-     * setup mocks
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->loader = $this->createMock('\Twig_Loader_String');
+        $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->securityPolicy = $this->getMockBuilder('\Twig_Sandbox_SecurityPolicy')
-            ->disableOriginalConstructor()->getMock();
+        $variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);
 
-        $this->sandbox = $this->getMockBuilder('\Twig_Extension_Sandbox')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $htmlTagHelper->expects(self::any())
+            ->method('sanitize')
+            ->with(self::isType(\PHPUnit\Framework\Constraint\IsType::TYPE_STRING), 'default', false)
+            ->willReturnCallback(static fn (string $content) => $content . '(sanitized)');
 
-        $this->sandbox->expects($this->exactly(3))->method('getName')
-            ->will($this->returnValue('sandbox'));
-        $this->sandbox->expects($this->once())->method('getSecurityPolicy')
-            ->will($this->returnValue($this->securityPolicy));
+        $translation = $this->createMock(TranslatorInterface::class);
+        $translation->expects(self::any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
-        $this->variablesProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\VariablesProvider')
-            ->disableOriginalConstructor()->getMock();
+        $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
+        $environment->addExtension(new SandboxExtension(new SecurityPolicy()));
+        $environment->addExtension(new HttpKernelExtension());
+        $environment->addExtension(new HtmlTagExtension($this->container));
 
-        $this->variablesProcessorRegistry = $this->getMockBuilder(VariableProcessorRegistry::class)
-            ->disableOriginalConstructor()->getMock();
-        $this->variablesProcessorRegistry->expects($this->any())->method('get')->willReturn(null);
-
-        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translation = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->getMock();
-        $this->translation->expects($this->any())->method('trans')
-            ->will($this->returnArgument(0));
-        ;
+        $this->renderer = new EmailRenderer(
+            $environment,
+            $this->configProvider,
+            $variablesProcessorRegistry,
+            $translation,
+            (new InflectorFactory())->build(),
+            $htmlTagHelper
+        );
     }
 
-    /**
-     * test configureSandbox method
-     */
-    public function testConfigureSandboxCached()
+    private function getEmailTemplate(string $content, string $subject = ''): EmailTemplateInterface
     {
-        $entityClass = 'TestEntity';
+        $emailTemplate = new EmailTemplateModel();
+        $emailTemplate->setContent($content);
+        $emailTemplate->setSubject($subject);
 
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with($this->cacheKey)
-            ->will(
-                $this->returnValue(
-                    serialize(
-                        [
-                            'properties' => [
-                                $entityClass => ['field2']
-                            ],
-                            'methods'    => [
-                                $entityClass => ['getField1']
-                            ]
-                        ]
-                    )
-                )
-            );
-
-        $this->getRendererInstance();
+        return $emailTemplate;
     }
 
-    /**
-     * configure Sanbox method with not cached scenario
-     */
-    public function testConfigureSandboxNotCached()
+    private function expectVariables(array $entityVariableProcessors = [], array $systemVariableValues = []): void
     {
-        $entityClass = 'TestEntity';
-
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with($this->cacheKey)
-            ->will($this->returnValue(false));
-
-        $this->cache
-            ->expects($this->once())
-            ->method('save')
-            ->with(
-                $this->cacheKey,
-                serialize(
-                    [
-                        'formatters' => [
-                            $entityClass => []
-                        ],
-                        'properties' => [
-                            $entityClass => ['field2']
-                        ],
-                        'methods'    => [
-                            $entityClass => ['getField1']
-                        ],
-                        'default_formatter' => [
-                            $entityClass => []
-                        ]
-                    ]
-                )
-            );
-
-        $this->variablesProvider->expects($this->once())
-            ->method('getEntityVariableGetters')
-            ->with(null)
-            ->will(
-                $this->returnValue(
-                    [$entityClass => ['field1' => 'getField1', 'field2' => null]]
-                )
-            );
-
-        $this->getRendererInstance();
+        $entityVariableProcessorsMap = [];
+        foreach ($entityVariableProcessors as $entityClass => $processors) {
+            $entityVariableProcessorsMap[] = [$entityClass, $processors];
+        }
+        $this->configProvider->expects(self::any())
+            ->method('getEntityVariableProcessors')
+            ->willReturnMap($entityVariableProcessorsMap);
+        $this->configProvider->expects(self::any())
+            ->method('getSystemVariableValues')
+            ->willReturn($systemVariableValues);
     }
 
-    /**
-     * Compile message test
-     */
-    public function testCompileMessage()
+    public function testCompilePreview(): void
+    {
+        $entity = new TestEntityForVariableProvider();
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties' => [],
+                'methods' => [get_class($entity) => ['getField1']],
+                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => [],
+            ]);
+
+        $template = 'test <a href="http://example.com">test</a> {{ system.testVar }}';
+
+        $emailTemplate = new EmailTemplateEntity();
+        $emailTemplate->setContent($template);
+        $emailTemplate->setSubject('');
+
+        self::assertSame($template.'(sanitized)', $this->renderer->compilePreview($emailTemplate));
+    }
+
+    public function testCompileMessage(): void
     {
         $entity = new TestEntityForVariableProvider();
         $entity->setField1('Test');
         $entityClass = get_class($entity);
-        $systemVars  = ['testVar' => 'test_system'];
+        $systemVars = ['testVar' => 'test_system'];
+        $entityVariableProcessors = [$entityClass => []];
+        $defaultFormatters = [$entityClass => ['field1' => 'formatter1']];
 
-        $this->cache->expects($this->any())->method('fetch')
-            ->with($this->cacheKey)
-            ->will(
-                $this->returnValue(
-                    serialize(
-                        [
-                            'properties' => [],
-                            'methods'    => [
-                                $entityClass => ['getField1']
-                            ]
-                        ]
-                    )
-                )
-            );
-
-        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1|oro_html_sanitize }} N/A';
         $subject = 'subject';
+        $content = 'test '
+            . '<a href="http://example.com">test</a>'
+            . ' {{ entity.getField1()|oro_html_sanitize }}'
+            . ' {% if entity.field2 is not empty %}{{ entity.field2|trim|raw }}{% endif %}'
+            . ' {{ max(0, 2) }}'
+            . ' {{ system.testVar }}'
+            . ' N/A';
 
-        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $emailTemplate->expects($this->once())->method('getContent')
-            ->will($this->returnValue($content));
-        $emailTemplate->expects($this->once())->method('getSubject')
-            ->will($this->returnValue($subject));
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties' => [],
+                'methods' => [$entityClass => ['getField1']],
+                'accessors' => [$entityClass => ['field1' => 'getField1']],
+                'default_formatters' => $defaultFormatters,
+            ]);
+        $this->expectVariables($entityVariableProcessors, $systemVars);
 
-        $this->variablesProvider->expects($this->once())->method('getSystemVariableValues')
-            ->will($this->returnValue($systemVars));
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('oro_ui.html_tag_helper')
+            ->willReturn($htmlTagHelper);
 
-        $templateParams = array(
+        $emailTemplate = $this->getEmailTemplate($content, $subject);
+        $templateParams = [
             'entity' => $entity,
-            'system' => $systemVars
-        );
+            'system' => $systemVars,
+        ];
 
-        $renderer = $this->getRendererInstance();
+        $result = $this->renderer->compileMessage($emailTemplate, $templateParams);
+        $expectedContent = 'test <a href="http://example.com">test</a>   2 test_system N/A';
 
-        $renderer->expects($this->at(0))
-            ->method('render')
-            ->with($content, $templateParams);
-        $renderer->expects($this->at(1))
-            ->method('render')
-            ->with($subject, $templateParams);
-
-        $result = $renderer->compileMessage($emailTemplate, $templateParams);
-
-        $this->assertInternalType('array', $result);
-        $this->assertCount(2, $result);
+        self::assertIsArray($result);
+        self::assertCount(2, $result);
+        self::assertSame($subject, $result[0]);
+        self::assertSame($expectedContent, $result[1]);
     }
 
-    public function testNotExistField()
+    public function testRenderTemplate(): void
     {
-        $content = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, ' .
-            '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}, {{ system.currentDate }}';
-
-        $entity2 = new TestEntityForVariableProvider();
-        $entity2->setField1(new \DateTime('now'));
+        $template = 'test '
+            . "\n"
+            . '{{ entity.field1 }}'
+            . "\n"
+            . '{{ system.currentDate }}';
 
         $entity = new TestEntityForVariableProvider();
-        $entity->setField1(new \DateTime('now'));
-        $entity->setField2($entity2);
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties' => [],
+                'methods' => [get_class($entity) => ['getField1']],
+                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => [],
+            ]);
+        $this->expectVariables([
+            get_class($entity) => [],
+        ], ['currentDate' => '10-12-2019']);
 
-        $this->cache
-            ->expects($this->any())
-            ->method('fetch')
-            ->with($this->cacheKey)
-            ->will(
-                $this->returnValue(
-                    serialize(
-                        [
-                            'properties' => [],
-                            'methods'    => [
-                                get_class($entity) => ['getField1']
-                            ]
-                        ]
-                    )
-                )
-            );
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('oro_ui.html_tag_helper')
+            ->willReturn($htmlTagHelper);
 
-        $renderer = $this->getRendererInstance();
-        $renderer->expects($this->any())->method('render')
-            ->will($this->returnArgument(0));
+        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
 
-        $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
-
-        $this->assertEquals(
-            'content oro.email.variable.not.found, {{ entity.field1|oro_format_name }}, ' .
-            '{{ entity.field2.field1|oro_format_name }}, oro.email.variable.not.found, ' .
-            '{{ system.currentDate }}',
-            $renderedContent = $result[1]
-        );
-    }
-
-    /**
-     * Compile template preview test
-     */
-    public function testCompilePreview()
-    {
-        $entity = new TestEntityForVariableProvider();
-
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with($this->cacheKey)
-            ->will(
-                $this->returnValue(
-                    serialize(
-                        [
-                            'properties' => [],
-                            'methods'    => [
-                                get_class($entity) => ['getField1']
-                            ]
-                        ]
-                    )
-                )
-            );
-
-        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1 }} {{ system.testVar }}';
-
-        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $emailTemplate->expects($this->once())
-            ->method('getContent')
-            ->will($this->returnValue($content));
-
-        $templateParams = array();
-
-        $renderer = $this->getRendererInstance();
-
-        $renderer->expects($this->at(0))
-            ->method('render')
-            ->with('{% verbatim %}' . $content . '{% endverbatim %}', $templateParams);
-        $renderer->compilePreview($emailTemplate);
-    }
-
-    /**
-     * @return EmailRenderer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    public function getRendererInstance()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject */
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject */
-        $em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrine
-            ->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($em));
-
-        return $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
-            ->setMethods(array('render'))
-            ->setConstructorArgs(array(
-                $this->loader,
-                array(),
-                $this->variablesProvider,
-                $this->cache,
-                $this->cacheKey,
-                $this->sandbox,
-                $this->translation,
-                $this->variablesProcessorRegistry,
-            ))
-            ->getMock();
+        $expectedRenderedResult =
+            'test '
+            . "\n"
+            . '10-12-2019';
+        self::assertSame($expectedRenderedResult, $result);
     }
 }

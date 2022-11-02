@@ -12,10 +12,6 @@ class OrmEntityClassProvider implements EntityClassProviderInterface
     /** @var ManagerBagInterface */
     protected $managerBag;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ManagerBagInterface $managerBag
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag)
     {
         $this->doctrineHelper = $doctrineHelper;

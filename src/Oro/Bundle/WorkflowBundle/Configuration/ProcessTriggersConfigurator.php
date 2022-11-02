@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -160,10 +160,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         return null;
     }
 
-    /**
-     * @param ProcessTrigger $existingTrigger
-     * @param ProcessTrigger $newTrigger
-     */
     private function update(ProcessTrigger $existingTrigger, ProcessTrigger $newTrigger)
     {
         $existingTrigger->import($newTrigger);
@@ -171,9 +167,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->notify($existingTrigger, 'updated');
     }
 
-    /**
-     * @param ProcessTrigger $newTrigger
-     */
     private function addForPersist(ProcessTrigger $newTrigger)
     {
         $this->forPersist[] = $newTrigger;
@@ -181,9 +174,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->notify($newTrigger, 'created');
     }
 
-    /**
-     * @param ProcessTrigger $processTrigger
-     */
     private function addForRemove(ProcessTrigger $processTrigger)
     {
         $this->forRemove[] = $processTrigger;
@@ -211,9 +201,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         );
     }
 
-    /**
-     * @param ProcessTrigger $trigger
-     */
     protected function ensureSchedule(ProcessTrigger $trigger)
     {
         if ($trigger->getCron()) {
@@ -221,9 +208,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param ProcessTrigger $trigger
-     */
     protected function dropSchedule(ProcessTrigger $trigger)
     {
         if ($trigger->getCron()) {
@@ -231,9 +215,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param ProcessDefinition $definition
-     */
     public function removeDefinitionTriggers(ProcessDefinition $definition)
     {
         foreach ($this->getRepository()->findByDefinitionName($definition->getName()) as $trigger) {

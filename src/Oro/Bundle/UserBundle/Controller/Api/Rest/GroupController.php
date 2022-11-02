@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -13,9 +11,9 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Group entity.
  */
-class GroupController extends RestController implements ClassResourceInterface
+class GroupController extends RestController
 {
     /**
      * Get the list of groups
@@ -63,7 +61,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_user_group_view")
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -98,7 +96,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_user_group_update")
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -123,7 +121,7 @@ class GroupController extends RestController implements ClassResourceInterface
      * )
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

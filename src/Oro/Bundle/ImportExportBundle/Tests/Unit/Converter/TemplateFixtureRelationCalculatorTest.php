@@ -2,90 +2,73 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Converter\TemplateFixtureRelationCalculator;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
 class TemplateFixtureRelationCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $templateManager;
+    /** @var TemplateManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $templateManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    /**
-     * @var TemplateFixtureRelationCalculator
-     */
-    protected $calculator;
+    /** @var TemplateFixtureRelationCalculator */
+    private $calculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->templateManager = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->templateManager = $this->createMock(TemplateManager::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
+
         $this->calculator = new TemplateFixtureRelationCalculator($this->templateManager, $this->fieldHelper);
     }
 
     /**
      * @dataProvider calculatorDataProvider
-     * @param \ArrayIterator $fixtureData
-     * @param string $field
-     * @param int $expected
      */
-    public function testGetMaxRelatedEntities(\ArrayIterator $fixtureData, $field, $expected)
+    public function testGetMaxRelatedEntities(\ArrayIterator $fixtureData, string $field, int $expected)
     {
         $entityName = 'stdClass';
 
-        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
+        $fixture = $this->createMock(TemplateFixtureInterface::class);
         $fixture->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($fixtureData));
+            ->willReturn($fixtureData);
 
         $this->templateManager->expects($this->once())
             ->method('getEntityFixture')
             ->with($entityName)
-            ->will($this->returnValue($fixture));
+            ->willReturn($fixture);
         $this->fieldHelper->expects($this->atLeastOnce())
             ->method('getObjectValue')
-            ->will(
-                $this->returnCallback(
-                    function ($obj, $field) {
-                        return $obj->$field;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($obj, $field) {
+                return $obj->{$field};
+            });
 
         $this->assertEquals($expected, $this->calculator->getMaxRelatedEntities($entityName, $field));
     }
 
-    /**
-     * @return array
-     */
-    public function calculatorDataProvider()
+    public function calculatorDataProvider(): array
     {
         $fixtureOne = new \stdClass();
         $fixtureOne->str = 'test';
-        $fixtureOne->emptyRelationArray = array();
-        $fixtureOne->emptyIterator = new \ArrayIterator(array());
-        $fixtureOne->relationArray = array(1, 2);
-        $fixtureOne->relationIterator = new \ArrayIterator(array(1, 2, 3));
+        $fixtureOne->emptyRelationArray = [];
+        $fixtureOne->emptyIterator = new \ArrayIterator([]);
+        $fixtureOne->relationArray = [1, 2];
+        $fixtureOne->relationIterator = new \ArrayIterator([1, 2, 3]);
 
         $fixtureTwo = new \stdClass();
-        $fixtureTwo->relationIterator = new \ArrayIterator(array(1, 2, 3, 4, 5));
+        $fixtureTwo->relationIterator = new \ArrayIterator([1, 2, 3, 4, 5]);
 
-        return array(
-            array(new \ArrayIterator(array($fixtureOne)), 'str', 1),
-            array(new \ArrayIterator(array($fixtureOne)), 'emptyRelationArray', 1),
-            array(new \ArrayIterator(array($fixtureOne)), 'emptyIterator', 1),
-            array(new \ArrayIterator(array($fixtureOne)), 'relationArray', 2),
-            array(new \ArrayIterator(array($fixtureOne, $fixtureTwo)), 'relationIterator', 5),
-        );
+        return [
+            [new \ArrayIterator([$fixtureOne]), 'str', 1],
+            [new \ArrayIterator([$fixtureOne]), 'emptyRelationArray', 1],
+            [new \ArrayIterator([$fixtureOne]), 'emptyIterator', 1],
+            [new \ArrayIterator([$fixtureOne]), 'relationArray', 2],
+            [new \ArrayIterator([$fixtureOne, $fixtureTwo]), 'relationIterator', 5],
+        ];
     }
 }

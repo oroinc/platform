@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\DeleteRelationsh
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder;
@@ -18,7 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME  = 'testAssociation';
+    private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
@@ -32,7 +33,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     /** @var BuildFormBuilder */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +42,12 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
         $this->processor = new BuildFormBuilder(
-            new FormHelper($this->formFactory, $this->propertyAccessor, $this->container),
+            new FormHelper(
+                $this->formFactory,
+                $this->createMock(DataTypeGuesser::class),
+                $this->propertyAccessor,
+                $this->container
+            ),
             $this->propertyAccessor
         );
 
@@ -57,7 +63,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -67,8 +73,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $formBuilder->expects(self::exactly(2))
             ->method('setDataMapper')
             ->withConsecutive(
-                self::isInstanceOf(PropertyPathMapper::class),
-                self::isInstanceOf(RemoveRelationshipMapper::class)
+                [self::isInstanceOf(PropertyPathMapper::class)],
+                [self::isInstanceOf(RemoveRelationshipMapper::class)]
             );
 
         $this->context->setParentConfig($parentConfig);

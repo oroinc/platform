@@ -10,14 +10,13 @@
             {% elseif items[key]['options']['label'] is defined %}
                 {% set label = items[key]['options']['label'] %}
             {% else %}
-                {% set label = key|capitalize|replace('_',' ') %}
+                {% set label = key|capitalize|replace({'_':' '}) %}
             {% endif %}
 
             {% if ('.entity_'~key not in data[1]|trans) %}
             <li>
-                {% set old = key in translatable ? data[0]|default('N/A')|trans : data[0] %}
                 {% set new = key in translatable ? data[1]|trans : data[1] %}
-                <b>{{ label|trans }}</b>: <s>{{ old }}</s> {{ new }}
+                <b>{{ label|trans }}</b>: {{ new|render_oro_entity_config_value }}
             </li>
             {% endif %}
         {% endfor %}

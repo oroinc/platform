@@ -1,7 +1,6 @@
 services:
     oro_api.add_relationship.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationshipProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - add_relationship
@@ -48,6 +47,13 @@ services:
             - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: 100 }
+
+    oro_api.add_relationship.handle_unidirectional_associations:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\HandleUnidirectionalAssociations
+        arguments:
+            - '@oro_api.form.unidirectional_association_handler'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -150 }
 
     #
     # save_data

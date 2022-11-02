@@ -1,22 +1,75 @@
-oro_attachment_bundle:
-    resource:     "@OroAttachmentBundle/Controller"
+oro_attachment:
+    resource:     "@OroAttachmentBundle/Controller/AttachmentController.php"
     type:         annotation
     prefix:       /
 
-oro_attachment_bundle_api:
-    resource: "@OroAttachmentBundle/Controller/Api/Rest/AttachmentController.php"
-    type: rest
-    prefix:       api/rest/{version}
+oro_filtered_attachment:
+    path: "media/cache/attachment/filter/{filter}/{filterMd5}/{id}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getFilteredImageAction }
     requirements:
-        version:  latest|v1
-    defaults:
-        version:  latest
+        id: '\d+'
+        filterMd5: '^[0-9a-f]{32}$'
 
-oro_attachment_bundle_file_api:
-    resource: "@OroAttachmentBundle/Controller/Api/Rest/FileController.php"
-    type: rest
-    prefix:       api/rest/{version}
+oro_resize_attachment:
+    path: "media/cache/attachment/resize/{id}/{width}/{height}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getResizedAttachmentImageAction }
     requirements:
-        version:  latest|v1
+        id: '\d+'
+        width: '\d+'
+        height: '\d+'
+
+oro_attachment_get_file:
+    path: "attachment/{action}/{id}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getFileAction }
+    requirements:
+        id: '\d+'
+        action: '(get|download)'
+
+oro_imagine_filter:
+    path: "/media/cache/resolve/{filter}/{path}"
+    defaults: { _controller: oro_attachment.controller.imagine:getFilteredImageAction }
+    methods: [ GET ]
+    requirements:
+        filter: '[a-z0-9_-]*'
+        path: .+
+
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_attachment:
+    path: '/api/rest/{version}/attachments/{id}.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_delete_attachment:
+    path: '/api/rest/{version}/attachments/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_get_file:
+    path: '/api/rest/{version}/files/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\FileController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|binary
+        version: latest|v1

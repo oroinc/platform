@@ -6,8 +6,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translates choices
+ */
 abstract class AbstractChoiceType extends AbstractType
 {
     /**
@@ -15,19 +18,11 @@ abstract class AbstractChoiceType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!empty($view->children['value'])) {
@@ -43,10 +38,6 @@ abstract class AbstractChoiceType extends AbstractType
 
     /**
      * Translates choices
-     *
-     * @param FormView $view
-     * @param FormView $valueFormView
-     * @param array    $options
      */
     protected function translateChoices(FormView $view, FormView $valueFormView, array $options)
     {
@@ -62,11 +53,7 @@ abstract class AbstractChoiceType extends AbstractType
             // translate choice values
             /** @var $choiceView ChoiceView */
             foreach ($valueFormView->vars['choices'] as $key => $choiceView) {
-                $choiceView->label = $this->translator->trans(
-                    $choiceView->label,
-                    array(),
-                    $translationDomain
-                );
+                $choiceView->label = $this->translator->trans((string) $choiceView->label, [], $translationDomain);
                 $valueFormView->vars['choices'][$key] = $choiceView;
             }
         }

@@ -3,44 +3,77 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectIdAccessor;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityExtension;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldExtension;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionExtension;
+
     /** @var AclExtensionSelector */
-    protected $selector;
+    private $selector;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $actionExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $objectIdAccessor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
-
-        $this->selector = new AclExtensionSelector($this->objectIdAccessor);
-
         $this->entityExtension = $this->getMockExtension('entity');
         $this->actionExtension = $this->getMockExtension('action');
         $this->fieldExtension = $this->getMockExtension('entity', false);
 
-        $this->selector->addAclExtension($this->entityExtension);
-        $this->selector->addAclExtension($this->actionExtension);
         $this->entityExtension->expects($this->any())
             ->method('getFieldExtension')
             ->willReturn($this->fieldExtension);
+
+        $container = TestContainerBuilder::create()
+            ->add('action_acl_extension', $this->actionExtension)
+            ->add('entity_acl_extension', $this->entityExtension)
+            ->getContainer($this);
+
+
+        $this->selector = new AclExtensionSelector(
+            ['action_acl_extension', 'entity_acl_extension'],
+            $container,
+            $this->objectIdAccessor
+        );
+    }
+
+    /**
+     * @return AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getMockExtension(string $supportedType, bool $setSupportsExpectation = true)
+    {
+        $extension = $this->createMock(AclExtensionInterface::class);
+        if ($setSupportsExpectation) {
+            $extension->expects($this->any())
+                ->method('supports')
+                ->willReturnCallback(function ($type, $id) use ($supportedType) {
+                    return $id === $supportedType;
+                });
+        }
+        $extension->expects($this->any())
+            ->method('getExtensionKey')
+            ->willReturn($supportedType);
+
+        return $extension;
     }
 
     public function testSelectByExtensionKeyForExistingExtension()
@@ -56,7 +89,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
     public function testSelectWthNullValue()
     {
         $result = $this->selector->select(null);
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension', $result);
+        $this->assertInstanceOf(NullAclExtension::class, $result);
     }
 
     public function testSelectEntityExtensionByStringValue()
@@ -69,12 +102,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->actionExtension, $this->selector->select('action:testAction'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: wrong:testAction. Type: testAction. Id: wrong.
-     */
     public function testSelectNotExistingExtensionByStringValue()
     {
+        $this->expectException(InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: wrong:testAction. Type: testAction. Id: wrong.'
+        );
+
         $this->selector->select('wrong:testAction');
     }
 
@@ -96,14 +130,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->actionExtension, $this->selector->select(new ObjectIdentity('action', 'testAction')));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: ObjectIdentity(wrong, testAction). Type: testAction. Id: wrong.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByWrongObjectIdentity()
     {
+        $this->expectException(InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: ObjectIdentity(wrong, testAction). Type: testAction. Id: wrong.'
+        );
+
         $this->selector->select(new ObjectIdentity('wrong', 'testAction'));
     }
 
@@ -128,14 +161,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: Oro\Bundle\SecurityBundle\Annotation\Acl. Type: wrong. Id: testAction.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByWrongAclAnnotation()
     {
+        $this->expectException(InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: Oro\Bundle\SecurityBundle\Annotation\Acl. Type: wrong. Id: testAction.'
+        );
+
         $this->selector->select(new AclAnnotation(['id' => 'wrong', 'type' => 'testAction']));
     }
 
@@ -159,14 +191,14 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: Symfony\Component\Security\Acl\Voter\FieldVote. Type: Test\Entity. Id: entity. Field: test.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByFieldVoteWhenFieldAclIsNotSupported()
     {
+        $this->expectException(InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: Symfony\Component\Security\Acl\Voter\FieldVote.'
+            . ' Type: Test\Entity. Id: entity. Field: test.'
+        );
+
         $this->fieldExtension->expects(self::once())
             ->method('supports')
             ->with('Test\Entity', 'entity')
@@ -190,12 +222,11 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: stdClass. Type: . Id: .
-     */
     public function testSelectByInvalidDomainObject()
     {
+        $this->expectException(InvalidDomainObjectException::class);
+        $this->expectExceptionMessage('An ACL extension was not found for: stdClass. Type: . Id: .');
+
         $val = new \stdClass();
 
         $this->objectIdAccessor->expects(self::once())
@@ -218,34 +249,23 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->selector->select($val, false));
     }
 
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequestedWhenPhpErrorOccurred()
+    {
+        $val = new \stdClass();
+
+        $this->objectIdAccessor->expects(self::once())
+            ->method('getId')
+            ->with(self::identicalTo($val))
+            ->willReturnCallback(function () {
+                throw new \Error();
+            });
+
+        self::assertNull($this->selector->select($val, false));
+    }
+
     public function testAll()
     {
         $result = $this->selector->all();
         $this->assertCount(2, $result);
-    }
-
-    /**
-     * @param string $supportedType
-     * @param bool   $setSupportsExpectation
-     *
-     * @return \Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockExtension($supportedType, $setSupportsExpectation = true)
-    {
-        $extension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
-        if ($setSupportsExpectation) {
-            $extension->expects($this->any())
-                ->method('supports')
-                ->willReturnCallback(
-                    function ($type, $id) use ($supportedType) {
-                        return $id === $supportedType;
-                    }
-                );
-        }
-        $extension->expects($this->any())
-            ->method('getExtensionKey')
-            ->willReturn($supportedType);
-
-        return $extension;
     }
 }

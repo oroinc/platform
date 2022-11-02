@@ -7,7 +7,8 @@ use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
@@ -23,18 +24,15 @@ class AssociationManagerTest extends WebTestCase
     use MessageQueueAssertTrait;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var AssociationManager */
-    protected $manager;
+    private $manager;
 
     /** @var array */
-    protected $dispatched = [];
+    private $dispatched = [];
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([
@@ -55,7 +53,7 @@ class AssociationManagerTest extends WebTestCase
     /**
      * {@inheritDoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatched = [];
     }
@@ -64,11 +62,11 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->processUpdateAllEmailOwners();
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $this->assertMessageSent(
-            Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
+            UpdateEmailOwnerAssociationsTopic::getName(),
             [
                 'ownerClass' => User::class,
                 'ownerIds' => [$owner->getId()],
@@ -82,7 +80,7 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->setQueued(false);
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $activityManager = $this->getActivityManager();
@@ -105,12 +103,12 @@ class AssociationManagerTest extends WebTestCase
 
         $this->assertDispatchedEvents([]);
 
-        $this->assertMessagesEmpty(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS);
+        $this->assertMessagesEmpty(UpdateEmailOwnerAssociationsTopic::getName());
     }
 
     public function testProcessUpdateEmailOwnerAsync()
     {
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $ids = [];
@@ -121,7 +119,7 @@ class AssociationManagerTest extends WebTestCase
         $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
 
         $this->assertMessageSent(
-            Topics::ADD_ASSOCIATION_TO_EMAILS,
+            AddEmailAssociationsTopic::getName(),
             [
                 'targetClass' => User::class,
                 'targetId' => $owner->getId(),
@@ -136,7 +134,7 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->setQueued(false);
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $activityManager = $this->getActivityManager();
@@ -159,23 +157,18 @@ class AssociationManagerTest extends WebTestCase
 
         $this->assertDispatchedEvents([]);
 
-        $this->assertMessagesEmpty(Topics::ADD_ASSOCIATION_TO_EMAILS);
+        $this->assertMessagesEmpty(AddEmailAssociationsTopic::getName());
     }
 
-    /**
-     * @param array $expected
-     */
-    protected function assertDispatchedEvents(array $expected)
+    private function assertDispatchedEvents(array $expected)
     {
-        sort($this->dispatched);
-
-        $this->assertEquals($expected, $this->dispatched);
+        self::assertEqualsCanonicalizing($expected, $this->dispatched);
     }
 
     /**
-     * @return array|Email[]
+     * @return Email[]
      */
-    protected function getTestEmails()
+    private function getTestEmails(): array
     {
         $emails = [];
         for ($i = 1; $i <= 10; $i++) {
@@ -188,7 +181,7 @@ class AssociationManagerTest extends WebTestCase
     /**
      * @return ActivityManager
      */
-    protected function getActivityManager()
+    private function getActivityManager()
     {
         return $this->getContainer()->get('oro_activity.manager');
     }
@@ -197,7 +190,7 @@ class AssociationManagerTest extends WebTestCase
      * @param string $className
      * @return EntityManager
      */
-    protected function getManagerForClass($className)
+    private function getManagerForClass($className)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }

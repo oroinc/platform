@@ -10,7 +10,7 @@ Oro\Bundle\UserBundle\Entity\User:
     username (unique): <username()>
     organization: '@organization'
     organizations: ['@organization']
-    roles: ['@adminRole']
+    userRoles: ['@adminRole']
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email (unique): <email()>
@@ -20,12 +20,11 @@ Oro\Bundle\UserBundle\Entity\User:
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:
     owner: '@userCharlie'
-    email: charlie@sheen.com
-    hasOwner: true
+    email: 'charlie@sheen.com'
 
 Oro\Bundle\EmailBundle\Entity\EmailRecipient:
   emailRecipient{1..5}:
-    name: '"John Doe" <admin@example.com>'
+    name: '"John Doe" \<admin@example.com\>'
     type: 'to'
     emailAddress: '@adminEmailAddress'
     email: '@email<current()>'
@@ -35,20 +34,18 @@ Oro\Bundle\EmailBundle\Entity\Email:
     subject: 'Merry Christmas'
     emailBody: '@emailBody1'
     sentAt: '<dateTimeBetween("-1 day", "now")>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween("-1 day", "now")>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser2']
   email{2..5}:
     subject: '<sentence(6, true)>'
     emailBody: '@emailBody<current()>'
     sentAt: '<dateTimeBetween("-200 days", "now")>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween("-200 days", "-1 day")>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser1']
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
   adminEmailUser1:

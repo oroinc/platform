@@ -2,7 +2,6 @@
 
 oro:
     user:
-        update_status.label: Update status
         suggest_password.label: Suggest password
         show_hide_password.label: Show/hide password
         reset_password:
@@ -39,7 +38,7 @@ oro:
             label: Capabilities
             select_all: Select All
             no_capabilities_available: This group has no capabilities
-        content_outdated: "The current role has been updated. Please, <a href=\"#\" onclick=\"window.location.reload(false);return false;\">refresh the page</a> to view new changes"
+        content_outdated: 'The current role has been updated. Please, <a href="#" data-action="page-refresh">refresh the page</a> to view new changes'
         permission:
             edit_label: Change "{{ label }}" permission
             mass_edit_label: Change all permissions of the entity

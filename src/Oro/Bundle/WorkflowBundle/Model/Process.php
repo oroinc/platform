@@ -37,11 +37,6 @@ class Process
      */
     protected $preCondition;
 
-    /**
-     * @param ActionAssembler $actionAssembler
-     * @param ConditionFactory $conditionFactory
-     * @param ProcessDefinition $processDefinition
-     */
     public function __construct(
         ActionAssembler $actionAssembler,
         ConditionFactory $conditionFactory,

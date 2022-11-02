@@ -1,0 +1,24 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Component\EntitySerializer\QueryFactory:
+            getToManyAssociationQueryBuilder:
+                associationMapping: true
+        Oro\Component\EntitySerializer\QueryModifier:
+            updateJoinQueryPart:
+                joinExpr: true
+                alias: true
+            updateJoinQueryPartForNestedAssociations:
+                joinExpr: true
+                alias: true
+            updateSelectQueryPart:
+                alias: true
+    safe_methods:
+        Oro\Component\EntitySerializer\DoctrineHelper:
+            getRootAlias: true
+            getEntityIdFieldName: true
+        Oro\Component\EntitySerializer\FieldAccessor:
+            getFieldsToSelect: true
+        Oro\Component\EntitySerializer\FieldConfig:
+            getTargetEntity: true
+            getPropertyPath: true

@@ -1,59 +1,66 @@
-define([
-    'module',
-    'oroui/js/mediator',
-    'jquery',
-    'underscore',
-    'oroui/js/error'
-], function(module, mediator, $, _, error) {
+define(function(require, exports, module) {
     'use strict';
 
-    var viewportManager;
+    const config = require('module-config').default(module.id);
+    const mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const error = require('oroui/js/error');
 
-    var screenMap = [
-        {
-            name: 'desktop',
-            max: Infinity
-        },
-        {
-            name: 'tablet',
-            max: 1099
-        },
-        {
-            name: 'tablet-small',
-            max: 992
-        },
-        {
-            name: 'mobile-landscape',
-            max: 640
-        },
-        {
-            name: 'mobile',
-            max: 414
-        }
-    ];
-
-    viewportManager = {
+    const viewportManager = {
         options: {
-            screenMap: screenMap
+            /**
+             * @default
+             * Default values of breakpoints synchronized with scss breakpoints
+             * @type {Array}
+             *
+             * [Default Breakpoints](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/UIBundle/Resources/public/default/scss/settings/_breakpoints.scss)
+             */
+            screenMap: []
         },
 
+        /**
+         * @property {Object}
+         */
         screenByTypes: {},
 
-        viewport: null,
+        /**
+         * @property {Object}
+         */
+        viewport: {
+            width: 0,
+            type: null
+        },
 
-        initialize: function() {
-            this.screenByTypes = this._prepareScreenMaps();
+        /**
+         * @property {Object}
+         */
+        allowTypes: null,
+
+        /**
+         * CSS variable prefix
+         * @property {String}
+         */
+        breakpointCSSVarPrefix: '--breakpoints-',
+
+        /**
+         * @inheritdoc
+         * @param options
+         */
+        initialize: function(options) {
+            this.screenByTypes = this._prepareScreenMaps(options.cssVariables || {});
 
             this.viewport = {
-                width: 0,
-                type: null,
                 isMobile: _.isMobile(),
-                isApplicable: _.bind(this.isApplicable, this)
+                isApplicable: this.isApplicable.bind(this)
             };
 
             mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);
         },
 
+        /**
+         * Get current viewport
+         * @returns {null}
+         */
         getViewport: function() {
             if (!this.viewport.type) {
                 this._calcViewport();
@@ -61,10 +68,28 @@ define([
             return this.viewport;
         },
 
+        /**
+         * Get breakpoints object or specific property by name
+         * @param name
+         * @returns {*}
+         */
+        getScreenType: function(name) {
+            if (_.isUndefined(name)) {
+                return this.screenByTypes;
+            }
+
+            return this._getScreenByTypes(name);
+        },
+
+        /**
+         * Check viewport ability
+         * @param testViewport
+         * @returns {boolean}
+         */
         isApplicable: function(testViewport) {
             this.getViewport();
-            var checker;
-            var isApplicable = true;
+            let checker;
+            let isApplicable = true;
 
             _.each(testViewport, function(testValue, check) {
                 checker = this['_' + check + 'Checker'];
@@ -76,49 +101,128 @@ define([
             return isApplicable;
         },
 
-        _prepareScreenMaps: function() {
-            var moduleScreenMap = this._getModuleScreenMaps();
-            var screenMap = this.options.screenMap;
-
-            if (this._isValidScreenMap(moduleScreenMap)) {
-                screenMap = _.filter(
-                    _.extend(
-                        {},
-                        _.indexBy(this.options.screenMap, 'name'),
-                        _.indexBy(moduleScreenMap, 'name')
-                    ), function(value) {
-                        return !value.skip;
-                    }
-                );
+        getAllowScreenTypes: function(screenType) {
+            if (!_.isArray(screenType)) {
+                screenType = [screenType];
             }
 
-            screenMap = _.chain(screenMap)
-                .sortBy('max')
-                .map(function(value, index, screenMap) {
-                    var smallerScreen = screenMap[index - 1] || null;
-                    value.min = smallerScreen ? smallerScreen.max + 1 : 0;
-                    return value;
-                })
-                .indexBy('name')
-                .value();
+            return _.intersection(this.viewport.allowTypes, screenType);
+        },
 
-            this.options.screenMap = _.values(screenMap);
+        /**
+         * Collect and resolve CSS variables by breakpoint prefix
+         * @param cssVariables
+         * @returns {*}
+         * @private
+         * See [documentation](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/css-variables.md)
+         */
+        _collectCSSBreakpoints: function(cssVariables) {
+            const regexpMax = /(max-width:\s?)([(\d+)]*)/g;
+            const regexpMin = /(min-width:\s?)([(\d+)]*)/g;
+
+            return _.reduce(cssVariables, function(collection, cssVar, varName) {
+                if (new RegExp(this.breakpointCSSVarPrefix).test(varName)) {
+                    let _result;
+
+                    const matchMax = cssVar.match(regexpMax);
+                    const matchMin = cssVar.match(regexpMin);
+
+                    if (matchMax || matchMin) {
+                        _result = {
+                            name: varName.replace(this.breakpointCSSVarPrefix, '')
+                        };
+
+                        matchMax ? _result['max'] = parseInt(matchMax[0].replace('max-width:', '')) : null;
+                        matchMin ? _result['min'] = parseInt(matchMin[0].replace('min-width:', '')) : null;
+
+                        collection.push(_result);
+                    }
+                }
+
+                return collection;
+            }, [], this);
+        },
+
+        /**
+         * Prepare breakpoint config object
+         * @param cssVariables
+         * @returns {*}
+         * @private
+         */
+        _prepareScreenMaps: function(cssVariables) {
+            const moduleScreenMap = this._getModuleScreenMaps();
+            const cssVariablesScreenMap = this._collectCSSBreakpoints(cssVariables);
+
+            let screenMap = _.filter(
+                _.extend(
+                    {},
+                    _.indexBy(this.options.screenMap, 'name'),
+                    this._isValidScreenMap(cssVariablesScreenMap)
+                        ? _.indexBy(cssVariablesScreenMap, 'name')
+                        : {},
+                    this._isValidScreenMap(moduleScreenMap)
+                        ? _.indexBy(moduleScreenMap, 'name')
+                        : {}
+                ), function(value) {
+                    return !value.skip;
+                }
+            );
+
+            screenMap = _.map(screenMap, function(screens) {
+                if (!screens.max) {
+                    screens.max = Infinity;
+                }
+
+                if (!screens.min) {
+                    screens.min = 0;
+                }
+
+                return screens;
+            });
+
+            screenMap = this._sortScreenTypes(screenMap);
+
+            this.options.screenMap = screenMap;
+
+            screenMap = _.indexBy(screenMap, 'name');
+            mediator.trigger('viewport:ready', screenMap);
 
             return screenMap;
         },
 
-        _getModuleScreenMaps: function() {
-            var arr = [];
+        _sortScreenTypes: function(screenMap) {
+            return screenMap.sort(function(a, b) {
+                const aMax = a.max || Infinity;
+                const aMin = a.min || 0;
+                const bMax = b.max || Infinity;
+                const bMin = b.min || 0;
+                return aMax - bMax || aMin - bMin;
+            });
+        },
 
-            if (!_.isUndefined(module.config().screenMap)) {
-                arr = module.config().screenMap;
+        /**
+         * Get from screen map from require config
+         * @returns {Array}
+         * @private
+         */
+        _getModuleScreenMaps: function() {
+            let arr = [];
+
+            if (!_.isUndefined(config.screenMap)) {
+                arr = config.screenMap;
             }
 
             return arr;
         },
 
+        /**
+         * Get need screen type
+         * @param screenType
+         * @returns {*}
+         * @private
+         */
         _getScreenByTypes: function(screenType) {
-            var defaultVal = null;
+            const defaultVal = null;
 
             if (_.isNull(screenType)) {
                 return defaultVal;
@@ -132,12 +236,22 @@ define([
             }
         },
 
+        /**
+         * Check is not empty array
+         * @param array
+         * @returns {boolean}
+         * @private
+         */
         _isValidScreenMap: function(array) {
-            return _.isArray(array) && array.length;
+            return !!(_.isArray(array) && array.length);
         },
 
+        /**
+         * On change viewport size handler
+         * @private
+         */
         _onResize: function() {
-            var oldViewportType = this.viewport.type;
+            const oldViewportType = this.viewport.type;
             this._calcViewport();
 
             if (!oldViewportType || oldViewportType !== this.viewport.type) {
@@ -145,14 +259,19 @@ define([
             }
         },
 
+        /**
+         * Calculate properties
+         * @private
+         */
         _calcViewport: function() {
-            var viewportWidth = window.innerWidth;
+            const viewportWidth = window.innerWidth;
             this.viewport.width = viewportWidth;
-            var screenMap = this.options.screenMap;
+            const screenMap = this.options.screenMap;
+            let inRange;
+            let screen;
+            const _result = [];
 
-            var inRange;
-            var screen;
-            for (var i = 0, stop = screenMap.length; i < stop; i++) {
+            for (let i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
 
                 inRange = this._isInRange({
@@ -162,12 +281,22 @@ define([
                 });
 
                 if (inRange) {
-                    this.viewport.type = screen.name;
-                    break;
+                    _result.push(screen.name);
                 }
             }
+
+            this.viewport.allowTypes = _result;
+            this.viewport.type = _.min(this.viewport.allowTypes, function(type) {
+                return Math.abs(viewportWidth - this.screenByTypes[type].max);
+            }, this);
         },
 
+        /**
+         *
+         * @param o
+         * @returns {*|boolean}
+         * @private
+         */
         _isInRange: function(o) {
             o.max = o.max || Infinity;
             o.min = o.min || 0;
@@ -176,48 +305,96 @@ define([
             return o.size && o.min <= o.size && o.size <= o.max;
         },
 
+        /**
+         * Screen type criteria
+         * @param screenType
+         * @returns {boolean}
+         * @private
+         */
         _screenTypeChecker: function(screenType) {
-            return screenType === 'any' || this.viewport.type === screenType;
+            return screenType === 'any' || !!this.getAllowScreenTypes(screenType).length;
         },
 
-        _minScreenTypeChecker: function(minScreenType) {
-            if (minScreenType === 'any') {
-                return true;
-            }
-
-            var viewport = this._getScreenByTypes(this.viewport.type);
-            var minViewport = this._getScreenByTypes(minScreenType);
-
-            return (_.isObject(viewport) && _.isObject(minViewport))
-                ? viewport.max >= minViewport.max
-                : false;
-        },
-
+        /**
+         * Max screen type criteria
+         * @param maxScreenType
+         * @returns {boolean}
+         * @private
+         */
         _maxScreenTypeChecker: function(maxScreenType) {
             if (maxScreenType === 'any') {
                 return true;
             }
 
-            var viewport = this._getScreenByTypes(this.viewport.type);
-            var maxViewport = this._getScreenByTypes(maxScreenType);
+            const maxViewport = this._getScreenByTypes(maxScreenType);
 
-            return (_.isObject(viewport) && _.isObject(maxViewport))
-                ? viewport.max <= maxViewport.max
-                : false;
+            return this.viewport.allowTypes.some(screenType => {
+                const viewport = this._getScreenByTypes(screenType);
+
+                return (_.isObject(viewport) && _.isObject(maxViewport))
+                    ? viewport.max <= maxViewport.max
+                    : false;
+            });
         },
 
+        /**
+         * Min screen type criteria
+         * @param minScreenType
+         * @returns {boolean}
+         * @private
+         */
+        _minScreenTypeChecker: function(minScreenType) {
+            if (minScreenType === 'any') {
+                return true;
+            }
+
+            const minViewport = this._getScreenByTypes(minScreenType);
+
+            return this.viewport.allowTypes.some(screenType => {
+                const viewport = this._getScreenByTypes(screenType);
+
+                return (_.isObject(viewport) && _.isObject(minViewport))
+                    ? viewport.max >= minViewport.max
+                    : false;
+            });
+        },
+
+        /**
+         * Width criteria
+         * @param width
+         * @returns {boolean}
+         * @private
+         */
         _widthChecker: function(width) {
             return this.viewport.width === width;
         },
 
+        /**
+         * Min width criteria
+         * @param minWidth
+         * @returns {boolean}
+         * @private
+         */
         _minWidthChecker: function(minWidth) {
             return this.viewport.width >= minWidth;
         },
 
+        /**
+         * Max width criteria
+         * @param maxWidth
+         * @returns {boolean}
+         * @private
+         */
         _maxWidthChecker: function(maxWidth) {
             return this.viewport.width <= maxWidth;
         },
 
+        /**
+         * Is mobile criteria
+         * @param isMobile
+         * @returns {boolean}
+         * @private
+         */
         _isMobileChecker: function(isMobile) {
             return this.viewport.isMobile === isMobile;
         }

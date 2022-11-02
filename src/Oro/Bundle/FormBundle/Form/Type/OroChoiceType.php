@@ -6,12 +6,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * General choice form type.
+ * Makes use of Select2 widget.
+ */
 class OroChoiceType extends AbstractType
 {
-    const NAME = 'oro_choice';
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -22,19 +24,13 @@ class OroChoiceType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'empty_data' => null,
                 'configs' => $defaults,
             ]
         );
 
         // OptionsResolver doesn't support merging of second level.
         // Without normalizer "configs" will be overridden (not merged) by user array
-        $resolver->setNormalizer(
-            'configs',
-            function (Options $options, $configs) use ($defaults) {
-                return array_merge($defaults, $configs);
-            }
-        );
+        $resolver->setNormalizer('configs', static fn (Options $options, $configs) => array_merge($defaults, $configs));
     }
 
     /**
@@ -48,16 +44,8 @@ class OroChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
-        return self::NAME;
+        return 'oro_choice';
     }
 }

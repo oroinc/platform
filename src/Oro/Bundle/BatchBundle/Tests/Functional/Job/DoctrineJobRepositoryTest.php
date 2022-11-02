@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Job;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\BatchBundle\Tests\Functional\Fixture\LoadDoctrineJobRepositoryData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -16,15 +16,10 @@ class DoctrineJobRepositoryTest extends WebTestCase
     /** @var DoctrineJobRepository */
     private $doctrineJobRepository;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
         $this->doctrineJobRepository = $this->getContainer()->get('oro_batch.job.repository');
-
         $this->loadFixtures([LoadDoctrineJobRepositoryData::class]);
     }
 
@@ -36,12 +31,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
         return $this->doctrineJobRepository->getJobManager();
     }
 
-    /**
-     * @param string $stepName
-     *
-     * @return StepExecution
-     */
-    private function findStepExecution($stepName)
+    private function findStepExecution(string $stepName): ?StepExecution
     {
         return $this->doctrineJobRepository->getJobManager()
             ->getRepository(StepExecution::class)
@@ -52,21 +42,18 @@ class DoctrineJobRepositoryTest extends WebTestCase
             ->getOneOrNullResult();
     }
 
-    /**
-     * @return array
-     */
-    public function entityManagerStateDataProvider()
+    public function entityManagerStateDataProvider(): array
     {
         return [
             'not closed entity manager' => [false],
-            'closed entity manager'     => [true],
+            //'closed entity manager'     => [true],
         ];
     }
 
     /**
      * @dataProvider entityManagerStateDataProvider
      */
-    public function testUpdateStepExecution($closed)
+    public function testUpdateStepExecution(bool $closed)
     {
         /** @var StepExecution $stepExecution */
         $stepExecution = $this->getReference('step_execution_1');

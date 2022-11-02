@@ -1,22 +1,24 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% oro_title_set({ params: { '%name%': entity.name, '%id%': entity.id } }) %}
 
 {% block breadcrumbs %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ parent() }}
 
-    <div class="pull-left">
-        {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
+    <span class="page-title__status">
+        {% include '@OroMessageQueue/Job/Datagrid/status.html.twig' with {'record': {'rootEntity': entity}} %}
 
         {% if entity.unique %}
-            <div class="badge badge-pill badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.unique'|trans }}</div>
+            {{ UI.badge('oro.message_queue_job.header.unique'|trans, 'info') }}
         {% endif %}
 
         {% if entity.interrupted %}
-            <div class="badge badge-pill badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.interrupted'|trans }}</div>
+            {{ UI.badge('oro.message_queue_job.header.interrupted'|trans, 'info') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% block stats %}
@@ -35,6 +37,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+
     {% set gridName  = 'oro_message_queue_child_jobs' %}
     {% set params  = {'root_job_id': entity.id} %}
     {% set renderParams = {

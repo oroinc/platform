@@ -3,24 +3,23 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumExclusionProvider;
 
 class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var EnumExclusionProvider */
-    protected $exclusionProvider;
+    private $exclusionProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->exclusionProvider = new EnumExclusionProvider($this->configManager);
     }

@@ -4,16 +4,17 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Condition;
 
 use Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var IsSystemConfigEqual */
-    protected $condition;
+    private $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
 
@@ -27,20 +28,15 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider initializeDataProvider
-     * @param array $options
-     * @param $message
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
      */
-    public function testInitializeExceptions(array $options, $message)
+    public function testInitializeExceptions(array $options, string $message)
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeDataProvider()
+    public function initializeDataProvider(): array
     {
         return [
             [
@@ -64,22 +60,15 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param mixed $configValue
-     * @param mixed $value
-     * @param bool $expected
      */
-    public function testEvaluate($configValue, $value, $expected)
+    public function testEvaluate(mixed $configValue, mixed $value, bool $expected)
     {
         $this->configManager->expects($this->once())->method('get')->with('test_key')->willReturn($configValue);
         $this->condition->initialize(['key' => 'test_key', 'value' => $value]);
         $this->assertEquals($expected, $this->condition->evaluate([]));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'string values not equal' => [

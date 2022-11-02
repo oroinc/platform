@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+/**
+ * Interface for ownership metadata
+ */
 interface OwnershipMetadataInterface
 {
     /**
@@ -40,40 +43,6 @@ interface OwnershipMetadataInterface
     public function isOrganizationOwned();
 
     /**
-     * Indicates whether the entity owner has basic level
-     *
-     * @return bool
-     * @deprecated since 2.3, use isUserOwned instead
-     */
-    public function isBasicLevelOwned();
-
-    /**
-     * Indicates whether the entity owner has local level
-     *
-     * @param bool $deep false by default
-     *
-     * @return bool
-     * @deprecated since 2.3, use isBusinessUnitOwned instead
-     */
-    public function isLocalLevelOwned($deep = false);
-
-    /**
-     * Indicates whether the entity owner has global level
-     *
-     * @return bool
-     * @deprecated since 2.3, use isOrganizationOwned instead
-     */
-    public function isGlobalLevelOwned();
-
-    /**
-     * Indicates whether the entity owner has system level
-     *
-     * @return bool
-     * @deprecated since 2.3
-     */
-    public function isSystemLevelOwned();
-
-    /**
      * Gets the name of the field is used to store the entity owner
      *
      * @return string
@@ -96,18 +65,6 @@ interface OwnershipMetadataInterface
      * @return string
      */
     public function getOrganizationColumnName();
-
-    /**
-     * @return string
-     * @deprecated since 2.3, use getOrganizationColumnName instead
-     */
-    public function getGlobalOwnerColumnName();
-
-    /**
-     * @return string
-     * @deprecated since 2.3, use getOrganizationFieldName instead
-     */
-    public function getGlobalOwnerFieldName();
 
     /**
      * Get list of allowed access level names

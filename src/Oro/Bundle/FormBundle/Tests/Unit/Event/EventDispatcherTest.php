@@ -4,25 +4,21 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Event;
 
 use Oro\Bundle\FormBundle\Event\EventDispatcher;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    private $eventDispatcher;
 
-    /**
-     * @var EventDispatcher
-     */
-    protected $immutableDispatcher;
+    /** @var EventDispatcher */
+    private $immutableDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->immutableDispatcher = new EventDispatcher($this->eventDispatcher);
     }
@@ -33,31 +29,29 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $eventName = 'test_event_name';
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($eventName, $event);
+            ->with($event, $eventName);
 
-        $this->immutableDispatcher->dispatch($eventName, $event);
+        $this->immutableDispatcher->dispatch($event, $eventName);
     }
 
     public function testDispatchFormEvent()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form */
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('form_name'));
-        $data = [];
+            ->willReturn('form_name');
 
-        $event = new FormProcessEvent($form, $data);
+        $event = new FormProcessEvent($form, []);
         $eventName = 'test_event_name';
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch');
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($eventName, $event);
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with($eventName . '.form_name', $event);
+            ->withConsecutive(
+                [$event, $eventName],
+                [$event, $eventName . '.form_name']
+            );
 
-        $this->immutableDispatcher->dispatch($eventName, $event);
+        $this->immutableDispatcher->dispatch($event, $eventName);
     }
 }

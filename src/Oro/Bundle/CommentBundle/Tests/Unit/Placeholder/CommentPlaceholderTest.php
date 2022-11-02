@@ -10,35 +10,30 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_REFERENCE = 'Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity';
+    private const TEST_ENTITY_REFERENCE = TestEntity::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commentAssociationHelper;
+    /** @var CommentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $commentAssociationHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var CommentPlaceholderFilter */
+    private $filter;
 
-    /** @var  CommentPlaceholderFilter */
-    protected $filter;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->commentAssociationHelper = $this->createMock(CommentAssociationHelper::class);
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
-            ->willReturnCallback(function ($entity) {
-                return !$entity instanceof \stdClass;
-            });
+            ->willReturnCallback(fn ($entity) => !$entity instanceof \stdClass);
 
         $this->filter = new CommentPlaceholderFilter(
             $this->commentAssociationHelper,
-            $this->doctrineHelper,
+            $doctrineHelper,
             $this->authorizationChecker
         );
     }
@@ -99,8 +94,8 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
 
         $this->commentAssociationHelper->expects($this->once())
             ->method('isCommentAssociationEnabled')
-            ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue(false));
+            ->with(self::TEST_ENTITY_REFERENCE)
+            ->willReturn(false);
 
         $this->assertFalse($this->filter->isApplicable(new TestEntity()));
     }
@@ -114,8 +109,8 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
 
         $this->commentAssociationHelper->expects($this->once())
             ->method('isCommentAssociationEnabled')
-            ->with(static::TEST_ENTITY_REFERENCE)
-            ->will($this->returnValue(true));
+            ->with(self::TEST_ENTITY_REFERENCE)
+            ->willReturn(true);
 
         $this->assertTrue($this->filter->isApplicable(new TestEntity()));
     }

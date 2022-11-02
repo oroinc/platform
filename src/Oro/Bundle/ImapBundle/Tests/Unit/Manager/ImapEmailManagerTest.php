@@ -1,25 +1,36 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
+use DateTime;
+use Laminas\Mail\Address\AddressInterface;
+use Laminas\Mail\Header\AbstractAddressList;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Header\MultipleHeadersInterface;
+use Laminas\Mail\Headers;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
+use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Zend\Mail\Header\HeaderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class ImapEmailManagerTest extends TestCase
 {
+    /** @var ImapConnector|\PHPUnit\Framework\MockObject\MockObject */
+    private $connector;
+
     /** @var ImapEmailManager */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connector = $this->createMock(ImapConnector::class);
+
         $this->manager = new ImapEmailManager($this->connector);
     }
 
@@ -30,99 +41,115 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
             ->with('test');
         $this->connector->expects($this->once())
             ->method('getSelectedFolder')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->manager->selectFolder('test');
         $this->assertEquals('test', $this->manager->getSelectedFolder());
     }
 
     /**
-     * @dataProvider getEmailsProvider
+     * @dataProvider getEmailsDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetEmails($strDate)
+    public function testGetEmails(string $strDate): void
     {
-        $toAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
-        $toAddress->expects($this->once())->method('toString')->will($this->returnValue('toEmail'));
+        $toAddress = $this->createMock(AddressInterface::class);
+        $toAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('toEmail');
         $toAddressList = $this->getMockForAbstractClass(
-            'Zend\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
             false,
             true,
-            ['getAddressList']
+            ['getAddressList', 'getFieldName']
         );
-        $toAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$toAddress]));
+        $toAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('To');
+        $toAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$toAddress]);
 
-        $ccAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
-        $ccAddress->expects($this->once())->method('toString')->will($this->returnValue('ccEmail'));
+        $ccAddress = $this->createMock(AddressInterface::class);
+        $ccAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('ccEmail');
         $ccAddressList = $this->getMockForAbstractClass(
-            'Zend\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
             false,
             true,
-            ['getAddressList']
+            ['getAddressList', 'getFieldName']
         );
-        $ccAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$ccAddress]));
+        $ccAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('Cc');
+        $ccAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$ccAddress]);
 
-        $bccAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
-        $bccAddress->expects($this->once())->method('toString')->will($this->returnValue('bccEmail'));
+        $bccAddress = $this->createMock(AddressInterface::class);
+        $bccAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('bccEmail');
         $bccAddressList = $this->getMockForAbstractClass(
-            'Zend\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
             false,
             true,
-            ['getAddressList']
+            ['getAddressList', 'getFieldName']
         );
-        $bccAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$bccAddress]));
+        $bccAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('Bcc');
+        $bccAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$bccAddress]);
 
         $this->connector->expects($this->once())
             ->method('getUidValidity')
-            ->will($this->returnValue(456));
+            ->willReturn(456);
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getHeader('Subject')],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader($strDate)],
-                ['Received', $this->getHeader('by server to email; ' . str_replace('59:', '58:', $strDate))],
-                ['InternalDate', $this->getHeader(str_replace('59:', '57:', $strDate))],
-                ['Importance', false],
-                ['Message-ID', $this->getHeader('MessageId')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getHeader('XThrId')],
-                ['X-GM-LABELS', false],
-                ['To', $toAddressList],
-                ['Cc', $ccAddressList],
-                ['Bcc', $bccAddressList],
-                ['References', $this->getHeader('References')],
-                ['Accept-Language', $this->getHeader('Accept-Language')],
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Subject', 'Subject'),
+                $this->getHeader('From', 'fromEmail'),
+                $this->getHeader('Date', $strDate),
+                $this->getHeader('Received', 'by server to email; ' . str_replace('59:', '58:', $strDate)),
+                $this->getHeader('InternalDate', str_replace('59:', '57:', $strDate)),
+                $this->getHeader('Message-ID', 'MessageId'),
+                $this->getHeader('X-GM-MSG-ID', 'XMsgId'),
+                $this->getHeader('X-GM-THR-ID', 'XThrId'),
+                $toAddressList,
+                $ccAddressList,
+                $bccAddressList,
+                $this->getHeader('References', 'References'),
+                $this->getHeader('Accept-Language', 'Accept-Language'),
             ]
         );
 
         $msg->expects($this->exactly(2))
             ->method('getFlags')
-            ->will($this->returnValue(['test1', 'test2']));
+            ->willReturn(['test1', 'test2']);
 
+        $query = $this->createMock(SearchQuery::class);
 
-        $query = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\Search\SearchQuery')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $imap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Imap')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $imap->expects($this->any())->method('getMessage')->will($this->returnValue($msg));
+        $imap = $this->createMock(Imap::class);
+        $imap->expects($this->any())
+            ->method('getMessage')
+            ->willReturn($msg);
         $messageIterator = new ImapMessageIterator($imap, [1]);
         $this->connector->expects($this->once())
             ->method('findItems')
             ->with($this->identicalTo($query))
-            ->will($this->returnValue($messageIterator));
+            ->willReturn($messageIterator);
 
         $this->manager->selectFolder('Test Folder');
         $emails = $this->manager->getEmails($query);
@@ -137,15 +164,15 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Subject', $email->getSubject());
         $this->assertEquals('fromEmail', $email->getFrom());
         $this->assertEquals(
-            new \DateTime('2011-06-30 23:59:59', new \DateTimeZone('UTC')),
+            new DateTime('2011-06-30 23:59:59', new \DateTimeZone('UTC')),
             $email->getSentAt()
         );
         $this->assertEquals(
-            new \DateTime('2011-06-30 23:58:59', new \DateTimeZone('UTC')),
+            new DateTime('2011-06-30 23:58:59', new \DateTimeZone('UTC')),
             $email->getReceivedAt()
         );
         $this->assertEquals(
-            new \DateTime('2011-06-30 23:57:59', new \DateTimeZone('UTC')),
+            new DateTime('2011-06-30 23:57:59', new \DateTimeZone('UTC')),
             $email->getInternalDate()
         );
         $this->assertEquals(0, $email->getImportance());
@@ -163,88 +190,74 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bccEmail', $bccRecipients[0]);
     }
 
-    public function testGetUnseenEmailUIDs()
+    public function testGetUnseenEmailUIDs(): void
     {
-        $startDate = new \DateTime('29-05-2015');
+        $startDate = new DateTime('29-05-2015');
 
-        $this->connector->expects($this->at(0))
+        $this->connector->expects($this->once())
             ->method('findUIDs')
             ->with('UNSEEN SINCE 29-May-2015');
 
         $this->manager->getUnseenEmailUIDs($startDate);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot parse email message. Subject: Subject. Error: It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned. Values: "XThrId1", "XThrId2".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testConvertToEmailWithUnexpectedMultiValueHeader()
+    public function testConvertToEmailWithUnexpectedMultiValueHeader(): void
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse email message. Subject: Subject. Error:'
+            . ' It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned.'
+            . ' Values: "XThrId1", "XThrId2".'
+        );
+
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getHeader('Subject')],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
-                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
-                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
-                ['Importance', false],
-                ['References', $this->getHeader('References')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getMultiValueHeader(['XThrId1', 'XThrId2'])],
-                ['X-GM-LABELS', false]
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Subject', 'Subject'),
+                $this->getHeader('From', 'fromEmail'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getHeader('InternalDate', 'Fri, 31 Jun 2011 10:57:57 +1100'),
+                $this->getHeader('References', 'References'),
+                $this->getHeader('X-GM-MSG-ID', 'XMsgId'),
+                $this->getHeader('X-GM-THR-ID', 'XThrId1'),
+                $this->getHeader('X-GM-THR-ID', 'XThrId2'),
             ]
         );
 
         $this->manager->convertToEmail($msg);
     }
 
-    public function testConvertToEmailWithMultiValueMessageId()
+    public function testConvertToEmailWithMultiValueMessageId(): void
     {
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getHeader('Subject')],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
-                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
-                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
-                ['Importance', false],
-                ['Message-ID', $this->getMultiValueHeaderMessageId(['MessageId1', 'MessageId2'])],
-                ['References', $this->getHeader('References')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getHeader('XThrId1')],
-                ['X-GM-LABELS', false],
-                ['Accept-Language', $this->getHeader('Accept-Language')],
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Subject', str_pad('Subject', 1000, '!')),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getMultiValueHeaderMessageId('Message-ID', 'Message-ID'),
+                $this->getMultiValueHeaderMessageId('Message-ID', 'MessageId'),
             ]
         );
 
         $email = $this->manager->convertToEmail($msg);
 
         $this->assertNotEmpty($email->getMessageId());
-        $this->assertInternalType('array', $email->getMultiMessageId());
+        $this->assertIsArray($email->getMultiMessageId());
         $this->assertCount(2, $email->getMultiMessageId());
     }
 
-    public function testConvertToEmailWithMultiValueAcceptLanguage()
+    public function testConvertToEmailWithMultiValueAcceptLanguage(): void
     {
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getHeader('Subject')],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
-                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
-                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
-                ['Message-ID', $this->getHeader('MessageId')],
-                ['Importance', false],
-                ['References', $this->getHeader('References')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getHeader('XThrId1')],
-                ['X-GM-LABELS', false],
-                ['Accept-Language', $this->getMultiValueHeader(['en-US', 'en-US'])],
+                $this->getHeader('UID', '123'),
+                $this->getMultiValueHeader('Accept-Language', 'en-US'),
+                $this->getMultiValueHeader('Accept-Language', 'en-US'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getHeader('Message-ID', 'MessageId')
             ]
         );
 
@@ -254,23 +267,15 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('en-US', $email->getAcceptLanguageHeader());
     }
 
-    public function testConvertToEmailWithLongSubject()
+    public function testConvertToEmailWithLongSubject(): void
     {
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getHeader(str_pad('Subject', 1000, '!'))],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
-                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
-                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
-                ['Message-ID', $this->getHeader('MessageId')],
-                ['Importance', false],
-                ['References', $this->getHeader('References')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getHeader('XThrId1')],
-                ['X-GM-LABELS', false],
-                ['Accept-Language', $this->getMultiValueHeader(['en-US', 'en-US'])],
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Subject', str_pad('Subject', 1000, '!')),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getHeader('Message-ID', 'MessageId')
             ]
         );
 
@@ -278,23 +283,16 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(998, mb_strlen($email->getSubject()));
     }
 
-    public function testConvertToEmailWithSeveralSubjects()
+    public function testConvertToEmailWithSeveralSubjects(): void
     {
         $msg = $this->getMessageMock(
             [
-                ['UID', $this->getHeader('123')],
-                ['Subject', $this->getMultiValueHeader(['Subject1', 'Subject2'])],
-                ['From', $this->getHeader('fromEmail')],
-                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
-                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
-                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
-                ['Message-ID', $this->getHeader('MessageId')],
-                ['Importance', false],
-                ['References', $this->getHeader('References')],
-                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
-                ['X-GM-THR-ID', $this->getHeader('XThrId1')],
-                ['X-GM-LABELS', false],
-                ['Accept-Language', $this->getMultiValueHeader(['en-US', 'en-US'])],
+                $this->getHeader('UID', '123'),
+                $this->getMultiValueHeader('Subject', 'Subject1'),
+                $this->getMultiValueHeader('Subject', 'Subject2'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getHeader('Message-ID', 'MessageId')
             ]
         );
 
@@ -302,92 +300,123 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Subject1', $email->getSubject());
     }
 
-    public function getEmailsProvider()
+    public function getEmailsDataProvider(): array
     {
         return [
             ['Fri, 31 Jun 2011 10:59:59 +1100'],
+            ['Thu, 30 Jun 2011 23:59:59 0000'],
             ['Fri, 31 Jun 2011 10:59:59 +11:00 (GMT+11:00)'],
             ['Fri, 31 06 2011 10:59:59 +1100']
         ];
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return HeaderInterface
-     */
-    protected function getHeader($value)
+    public function testConvertToEmailWithReceivedHeader(): void
     {
-        $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
-        $header->expects($this->once())
+        $msg = $this->getMessageMock(
+            [
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Received', 'by server to email; Fri, 31 Jun 2011 10:58:58 +1100'),
+                $this->getHeader('Message-ID', 'MessageId'),
+            ]
+        );
+
+        $email = $this->manager->convertToEmail($msg);
+        $this->assertEquals(
+            new DateTime('Fri, 31 Jun 2011 10:58:58 +1100', new \DateTimeZone('UTC')),
+            $email->getReceivedAt()
+        );
+    }
+
+    public function testConvertToEmailWithoutReceivedHeader(): void
+    {
+        $msg = $this->getMessageMock(
+            [
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('Message-ID', 'MessageId')
+            ]
+        );
+
+        $email = $this->manager->convertToEmail($msg);
+        $this->assertEquals(
+            new DateTime('Fri, 31 Jun 2011 10:59:59 +1100', new \DateTimeZone('UTC')),
+            $email->getReceivedAt()
+        );
+    }
+
+    public function testConvertToEmailWithoutReceivedAndMessageIDHeadersAndWithInternalDateHeader(): void
+    {
+        $msg = $this->getMessageMock(
+            [
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('InternalDate', 'Fri, 25 Jun 2011 10:59:59 +1100')
+            ]
+        );
+
+        $email = $this->manager->convertToEmail($msg);
+        $this->assertEquals(
+            md5('Fri, 25 Jun 2011 10:59:59 +1100'),
+            $email->getMessageId()
+        );
+    }
+
+    private function getHeader(string $name, $value): HeaderInterface
+    {
+        $header = $this->createMock(HeaderInterface::class);
+        $header->expects($this->atLeastOnce())
+            ->method('getFieldName')
+            ->willReturn($name);
+        $header->expects($this->atLeastOnce())
             ->method('getFieldValue')
-            ->will($this->returnValue($value));
+            ->willReturn($value);
 
         return $header;
     }
 
-    /**
-     * @param array $values
-     *
-     * @return \ArrayIterator|HeaderInterface[]
-     */
-    protected function getMultiValueHeader(array $values)
+    private function getMultiValueHeader(string $name, $value): MultipleHeadersInterface
     {
-        $headers = [];
-        foreach ($values as $value) {
-            $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
-            $header->expects($this->any())
-                ->method('getFieldValue')
-                ->will($this->returnValue($value));
-            $headers[] = $header;
-        }
+        $header = $this->createMock(MultipleHeadersInterface::class);
+        $header->expects($this->any())
+            ->method('getFieldName')
+            ->willReturn($name);
+        $header->expects($this->any())
+            ->method('getFieldValue')
+            ->willReturn($value);
 
-        return new \ArrayIterator($headers);
+        return $header;
     }
 
-    /**
-     * @param array $values
-     * @return \ArrayIterator
-     */
-    protected function getMultiValueHeaderMessageId(array $values)
+    private function getMultiValueHeaderMessageId(string $name, $value): MultipleHeadersInterface
     {
-        $headers = [];
-        foreach ($values as $value) {
-            $exactly = 1;
-            if (count($headers) === 0) {
-                $exactly = 2;
-            }
+        $header = $this->createMock(MultipleHeadersInterface::class);
+        $header->expects($this->atLeastOnce())
+            ->method('getFieldName')
+            ->willReturn($name);
+        $header->expects($this->atLeastOnce())
+            ->method('getFieldValue')
+            ->willReturn($value);
 
-            $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
-            $header->expects($this->exactly($exactly))
-                ->method('getFieldValue')
-                ->will($this->returnValue($value));
-            $headers[] = $header;
-        }
-
-        return new \ArrayIterator($headers);
+        return $header;
     }
 
     /**
      * Returns mock of Message object with injected headers
      *
      * @param array $headers headers array which will be injected into message mock
-     * @return Message
+     *
+     * @return Message|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getMessageMock(array $headers)
     {
-        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $messageHeaders = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $messageHeaders = new Headers();
+        $messageHeaders->addHeaders($headers);
+
+        $msg = $this->createMock(Message::class);
         $msg->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($messageHeaders));
-        $messageHeaders->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap($headers));
+            ->willReturn($messageHeaders);
 
         return $msg;
     }

@@ -2,33 +2,37 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 
+/**
+ * Check if required tables exists in database
+ */
 class DatabaseChecker
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    protected ManagerRegistry $doctrine;
 
     /** @var string[] */
-    private $requiredTables;
+    private array $requiredTables;
 
-    /** @var bool */
-    private $installed;
+    private bool $installed;
 
-    /** @var bool */
-    private $dbCheck;
+    private ?bool $dbCheck = null;
 
     /**
-     * @param ManagerRegistry $doctrine       The instance of Doctrine ManagerRegistry object
-     * @param string[]        $requiredTables The list of tables that should exist in the database
-     * @param mixed           $installed      The flag indicates that the application is already installed
+     * @param ManagerRegistry $doctrine The instance of Doctrine ManagerRegistry object
+     * @param string[] $requiredTables The list of tables that should exist in the database
+     * @param ApplicationState $applicationState The flag indicates that the application is already installed
      */
-    public function __construct(ManagerRegistry $doctrine, array $requiredTables, $installed)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        array  $requiredTables,
+        ApplicationState $applicationState
+    ) {
         $this->doctrine = $doctrine;
         $this->requiredTables = $requiredTables;
-        $this->installed = (bool)$installed;
+        $this->installed = $applicationState->isInstalled();
     }
 
     /**
@@ -70,6 +74,7 @@ class DatabaseChecker
         if ($this->installed) {
             return true;
         }
+
         if (null !== $this->dbCheck) {
             return $this->dbCheck;
         }

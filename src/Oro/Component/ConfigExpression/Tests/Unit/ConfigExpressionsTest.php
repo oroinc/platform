@@ -2,14 +2,19 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
+use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\ConfigExpression\ConfigExpressions;
+use Oro\Component\ConfigExpression\ContextAccessorInterface;
+use Oro\Component\ConfigExpression\ExpressionFactory;
+use Oro\Component\ConfigExpression\ExpressionFactoryInterface;
+use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
 class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigExpressions */
-    protected $language;
+    private $language;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->language = new ConfigExpressions();
     }
@@ -27,7 +32,7 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
     public function testEvaluateByConfiguration()
     {
         $context = ['foo' => ' '];
-        $expr    = [
+        $expr = [
             '@empty' => [
                 ['@trim' => '$foo']
             ]
@@ -39,7 +44,7 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
     public function testEvaluateByExpression()
     {
         $context = ['foo' => ' '];
-        $expr    = [
+        $expr = [
             '@empty' => [
                 ['@trim' => '$foo']
             ]
@@ -50,33 +55,31 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
 
     public function testSetAssembler()
     {
-        $assembler = $this->createMock('Oro\Component\ConfigExpression\AssemblerInterface');
+        $assembler = $this->createMock(AssemblerInterface::class);
         $this->language->setAssembler($assembler);
         $this->assertSame($assembler, $this->language->getAssembler());
     }
 
     public function testSetFactory()
     {
-        $factory = $this->createMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
+        $factory = $this->createMock(ExpressionFactoryInterface::class);
         $this->language->setFactory($factory);
         $this->assertSame($factory, $this->language->getFactory());
     }
 
     public function testSetContextAccessor()
     {
-        $contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
+        $contextAccessor = $this->createMock(ContextAccessorInterface::class);
         $this->language->setContextAccessor($contextAccessor);
         $this->assertSame($contextAccessor, $this->language->getContextAccessor());
     }
 
     public function testAddExtension()
     {
-        $factory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $factory = $this->createMock(ExpressionFactory::class);
         $this->language->setFactory($factory);
 
-        $extension = $this->createMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
+        $extension = $this->createMock(ExtensionInterface::class);
 
         $factory->expects($this->once())
             ->method('addExtension')

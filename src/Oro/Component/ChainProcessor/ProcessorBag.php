@@ -10,8 +10,8 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ProcessorBagConfigProviderInterface */
     protected $configProvider;
 
-    /** @var ProcessorFactoryInterface */
-    protected $processorFactory;
+    /** @var ProcessorRegistryInterface */
+    protected $processorRegistry;
 
     /** @var ProcessorIteratorFactoryInterface */
     protected $processorIteratorFactory;
@@ -28,22 +28,15 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ChainApplicableChecker */
     protected $processorApplicableChecker;
 
-    /**
-     * @param ProcessorBagConfigProviderInterface             $configProvider
-     * @param ProcessorFactoryInterface                       $processorFactory
-     * @param bool                                            $debug
-     * @param ProcessorApplicableCheckerFactoryInterface|null $applicableCheckerFactory
-     * @param ProcessorIteratorFactoryInterface|null          $processorIteratorFactory
-     */
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
-        ProcessorFactoryInterface $processorFactory,
-        $debug = false,
+        ProcessorRegistryInterface $processorRegistry,
+        bool $debug = false,
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory = null,
         ProcessorIteratorFactoryInterface $processorIteratorFactory = null
     ) {
         $this->configProvider = $configProvider;
-        $this->processorFactory = $processorFactory;
+        $this->processorRegistry = $processorRegistry;
         $this->debug = $debug;
         $this->applicableCheckerFactory = $applicableCheckerFactory ?: new ProcessorApplicableCheckerFactory();
         $this->processorIteratorFactory = $processorIteratorFactory ?: new ProcessorIteratorFactory();
@@ -55,7 +48,7 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function addApplicableChecker(ApplicableCheckerInterface $checker, $priority = 0)
+    public function addApplicableChecker(ApplicableCheckerInterface $checker, int $priority = 0): void
     {
         $this->additionalApplicableCheckers[$priority][] = $checker;
         $this->processorApplicableChecker = null;
@@ -64,7 +57,7 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getProcessors(ContextInterface $context)
+    public function getProcessors(ContextInterface $context): ProcessorIterator
     {
         $this->ensureProcessorApplicableCheckerInitialized();
 
@@ -74,47 +67,43 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getActions()
+    public function getActions(): array
     {
-        return \array_keys($this->configProvider->getProcessors());
+        return $this->configProvider->getActions();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActionGroups($action)
+    public function getActionGroups(string $action): array
     {
-        $groups = $this->configProvider->getGroups();
+        return $this->configProvider->getGroups($action);
+    }
 
-        return $groups[$action] ?? [];
+    protected function createProcessorIterator(ContextInterface $context): ProcessorIterator
+    {
+        return $this->processorIteratorFactory->createProcessorIterator(
+            $this->getActionProcessors($context->getAction()),
+            $context,
+            $this->processorApplicableChecker,
+            $this->processorRegistry
+        );
     }
 
     /**
-     * @param ContextInterface $context
+     * @param string $action
      *
-     * @return ProcessorIterator
+     * @return array [[processor id, [attribute name => attribute value, ...]]
      */
-    protected function createProcessorIterator(ContextInterface $context)
+    protected function getActionProcessors(string $action): array
     {
-        $action = $context->getAction();
-        $actionProcessors = [];
-        $processors = $this->configProvider->getProcessors();
-        if (!empty($processors[$action])) {
-            $actionProcessors = $processors[$action];
-        }
-
-        return $this->processorIteratorFactory->createProcessorIterator(
-            $actionProcessors,
-            $context,
-            $this->processorApplicableChecker,
-            $this->processorFactory
-        );
+        return $this->configProvider->getProcessors($action);
     }
 
     /**
      * Makes sure that the processor applicable checker is initialized
      */
-    protected function ensureProcessorApplicableCheckerInitialized()
+    protected function ensureProcessorApplicableCheckerInitialized(): void
     {
         if (null === $this->processorApplicableChecker) {
             $this->initializeProcessorApplicableChecker();
@@ -124,7 +113,7 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * Initializes $this->processorApplicableChecker
      */
-    protected function initializeProcessorApplicableChecker()
+    protected function initializeProcessorApplicableChecker(): void
     {
         $this->processorApplicableChecker = $this->applicableCheckerFactory->createApplicableChecker();
         $this->initializeApplicableChecker($this->processorApplicableChecker);
@@ -132,15 +121,13 @@ class ProcessorBag implements ProcessorBagInterface
 
     /**
      * Initializes the given applicable checker
-     *
-     * @param ChainApplicableChecker $applicableChecker
      */
-    protected function initializeApplicableChecker(ChainApplicableChecker $applicableChecker)
+    protected function initializeApplicableChecker(ChainApplicableChecker $applicableChecker): void
     {
         if (!empty($this->additionalApplicableCheckers)) {
             $checkers = $this->additionalApplicableCheckers;
-            \krsort($checkers);
-            $checkers = \array_merge(...$checkers);
+            krsort($checkers);
+            $checkers = array_merge(...array_values($checkers));
             foreach ($checkers as $checker) {
                 $applicableChecker->addChecker($checker);
             }

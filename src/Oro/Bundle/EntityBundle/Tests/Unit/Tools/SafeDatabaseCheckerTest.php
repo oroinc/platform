@@ -2,33 +2,36 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider tablesExistProvider
      */
-    public function testTablesExist($tables, $tablesExistResult = true, $expectedResult = true)
+    public function testTablesExist($tables, bool $tablesExistResult = true, bool $expectedResult = true)
     {
-        $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['tablesExist'])
-            ->getMockForAbstractClass();
+        $connection = $this->createMock(Connection::class);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
 
         $connection->expects($this->once())
             ->method('connect');
-        $connection
-            ->expects($this->once())
+        $connection->expects($this->once())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
-        $schemaManager
-            ->expects($this->once())
+        $schemaManager->expects($this->once())
             ->method('tablesExist')
             ->with($tables)
             ->willReturn($tablesExistResult);
@@ -39,7 +42,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function tablesExistProvider()
+    public function tablesExistProvider(): array
     {
         return [
             ['table1'],
@@ -54,10 +57,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTablesExistWithEmptyTablesParam($tables)
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->never())
             ->method('connect');
 
@@ -66,7 +66,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function tablesExistWithEmptyTablesParamProvider()
+    public function tablesExistWithEmptyTablesParamProvider(): array
     {
         return [
             [null],
@@ -78,12 +78,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForTablesExist
      */
-    public function testTablesExistShouldHandleExpectedExceptions($exception)
+    public function testTablesExistShouldHandleExpectedExceptions(\Exception $exception)
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
             ->method('connect')
             ->willThrowException($exception);
@@ -93,7 +90,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function expectedExceptionsForTablesExist()
+    public function expectedExceptionsForTablesExist(): array
     {
         return [
             [new \PDOException()],
@@ -101,16 +98,12 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testTablesExistShouldRethrowUnexpectedException()
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
 
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
             ->method('connect')
             ->willThrowException(new \Exception('unexpected'));
@@ -120,11 +113,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTableName()
     {
-        $doctrine      = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $em            = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $classMetadata = $this->createMock(\Doctrine\ORM\Mapping\ClassMetadata::class);
 
         $entityName = 'Test\Entity';
         $tableName  = 'test_table';
@@ -149,8 +140,8 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTableNameForNotOrmEntity()
     {
-        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $om       = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $om       = $this->createMock(ObjectManager::class);
 
         $entityName = 'Test\Entity';
 
@@ -169,9 +160,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTableNameWithEmptyEntityNameParamProvider
      */
-    public function testGetTableNameWithEmptyEntityNameParam($entityName)
+    public function testGetTableNameWithEmptyEntityNameParam(?string $entityName)
     {
-        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $doctrine->expects($this->never())
             ->method('getManagerForClass');
@@ -181,7 +172,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getTableNameWithEmptyEntityNameParamProvider()
+    public function getTableNameWithEmptyEntityNameParamProvider(): array
     {
         return [
             [null],
@@ -192,9 +183,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForGetTableName
      */
-    public function testGetTableNameShouldHandleExpectedExceptions($exception)
+    public function testGetTableNameShouldHandleExpectedExceptions(\Exception $exception)
     {
-        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -205,7 +196,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function expectedExceptionsForGetTableName()
+    public function expectedExceptionsForGetTableName(): array
     {
         return [
             [new \PDOException()],
@@ -215,13 +206,12 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testGetTableNameShouldRethrowUnexpectedException()
     {
-        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -232,10 +222,10 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllMetadata()
     {
-        $om              = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $om              = $this->createMock(ObjectManager::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
 
-        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
         $allMetadata = [$classMetadata];
 
@@ -255,9 +245,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForGetAllMetadata
      */
-    public function testGetAllMetadataShouldHandleExpectedExceptions($exception)
+    public function testGetAllMetadataShouldHandleExpectedExceptions(\Exception $exception)
     {
-        $om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $om = $this->createMock(ObjectManager::class);
 
         $om->expects($this->once())
             ->method('getMetadataFactory')
@@ -269,7 +259,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function expectedExceptionsForGetAllMetadata()
+    public function expectedExceptionsForGetAllMetadata(): array
     {
         return [
             [new \PDOException()],
@@ -279,13 +269,12 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testGetAllMetadataShouldRethrowUnexpectedException()
     {
-        $om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
+
+        $om = $this->createMock(ObjectManager::class);
 
         $om->expects($this->once())
             ->method('getMetadataFactory')

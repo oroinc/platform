@@ -1,41 +1,35 @@
 parameters:
-    oro_layout.theme_factory.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
-    oro_layout.theme_manager.class:                    Oro\Component\Layout\Extension\Theme\Model\ThemeManager
-    oro_layout.theme_extension.class:                  Oro\Component\Layout\Extension\Theme\ThemeExtension
-    oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
-
-    oro_layout.default_active_theme:    ~
-    oro_layout.debug:    ~
-    oro_layout.cache_dir:               '%kernel.cache_dir%/layouts'
+    oro_layout.default_active_theme: ~
+    oro_layout.debug: ~
+    oro_layout.cache_dir: '%kernel.cache_dir%/oro/layouts'
+    oro_layout.expression_language_cache_file: '%kernel.cache_dir%/oro/layout_expressions.php'
 
 services:
     oro_layout.dependency_initializer:
         class:  Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer
-        public: false
         arguments:
             - '@service_container'
 
     oro_layout.theme_factory:
-        class:  '%oro_layout.theme_factory.class%'
-        public: false
+        class: Oro\Component\Layout\Extension\Theme\Model\ThemeFactory
+        arguments:
+            - '@property_accessor'
 
     oro_layout.theme_manager:
-        class:  '%oro_layout.theme_manager.class%'
-        public: false
+        class: Oro\Component\Layout\Extension\Theme\Model\ThemeManager
         arguments:
             - '@oro_layout.theme_factory'
-            - []
+            - '@oro_layout.theme_extension.configuration.provider'
+            - '%oro_layout.enabled_themes%'
 
     oro_layout.loader:
         class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
-        public: false
         calls:
             - [addDriver, [yml, '@oro_layout.loader.yaml_driver']]
             - [addDriver, [php, '@oro_layout.loader.php_driver']]
 
     oro_layout.loader.php_driver:
         class:  Oro\Component\Layout\Loader\Driver\PhpDriver
-        public: false
         arguments:
             - '@oro_layout.layout_update_generator.php'
             - '%kernel.debug%'
@@ -43,7 +37,6 @@ services:
 
     oro_layout.loader.yaml_driver:
         class:  Oro\Component\Layout\Loader\Driver\YamlDriver
-        public: false
         arguments:
             - '@oro_layout.layout_update_generator.config'
             - '%kernel.debug%'
@@ -51,11 +44,9 @@ services:
 
     oro_layout.loader.path_provider:
         class:  Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider
-        public: false
 
     oro_layout.loader.theme_path_provider:
         class: Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider
-        public: false
         arguments:
             - '@oro_layout.theme_manager'
         tags:
@@ -68,8 +59,16 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
+    oro_layout.layout_context_configurator.rtl_mode:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\RtlModeContextConfigurator
+        arguments:
+            - '@oro_layout.theme_manager'
+            - '@oro_locale.provider.current_localization'
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.theme_extension:
-        class: '%oro_layout.theme_extension.class%'
+        class: Oro\Component\Layout\Extension\Theme\ThemeExtension
         arguments:
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
@@ -80,22 +79,43 @@ services:
 
     oro_layout.theme_extension.resource_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
+        parent: oro.static_config_provider.abstract
         arguments:
+            - '%kernel.cache_dir%/oro/layout_resources.php'
+            - '%kernel.debug%'
+            - '@oro_layout.theme_extension.resource_provider.last_modification_date'
             - '@oro_layout.loader'
             - '@oro_layout.cache.block_view_cache'
-            - []
-        calls:
-            - [setCache, ['@oro_layout.theme_extension.resource_provider.cache']]
+            - [] # exclude patterns; they are set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
+            - ['../templates/layouts']
 
-    oro_layout.theme_extension.resource_provider.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [setNamespace, ['oro_layout_resources']]
+    oro_layout.theme_extension.resource_provider.theme.warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        arguments:
+            - '@oro_layout.theme_extension.resource_provider.theme'
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_layout.theme_extension.resource_provider.last_modification_date:
+        class: Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider
+        arguments:
+            - '%kernel.cache_dir%/oro/layout_last_modification_date.php'
+            - '%kernel.debug%'
+
+    oro_layout.theme_extension.configuration.provider:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/layout_themes.php'
+            - '%kernel.debug%'
+            - '@oro_layout.theme_extension.configuration'
+            - '' # folder pattern; it is set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
+
+    oro_layout.theme_extension.configuration:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration
 
     oro_layout.theme_extension.visitor.import:
         class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor
-        public: false
         arguments:
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
@@ -106,12 +126,23 @@ services:
         class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider
         arguments:
             - '@oro_layout.theme_manager'
+            - '@oro_locale.provider.current_localization'
         tags:
             - { name: layout.data_provider, alias: theme }
 
+    oro_layout.expression_language.compiled_cache_warmer:
+        class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer
+        arguments:
+            - '@oro_layout.expression_language'
+            - '@filesystem'
+            - '%oro_layout.expression_language_cache_file%'
+            - '@logger'
+
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
-        public: false
+        arguments:
+            - '@validator'
+            - '@oro_layout.expression_language.compiled_cache_warmer'
         calls:
             - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.add_tree']]
@@ -120,28 +151,25 @@ services:
 
     oro_layout.layout_update_generator.extension.config_imports:
         class:  Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension
-        public: false
 
     oro_layout.layout_update_generator.extension.config_conditions:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension
-        public: false
         arguments:
             - '@oro_layout.expression_language'
 
     oro_layout.layout_update_generator.extension.add_tree:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension
-        public: false
 
     oro_layout.layout_update_generator.extension.theme_relative_path:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ThemesRelativePathGeneratorExtension
-        public: false
+        arguments:
+            - '%kernel.project_dir%'
 
     oro_layout.layout_update_generator.php:
         class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator
-        public: false
 
     oro_layout.request.listener.theme:
-        class: '%oro_layout.request.listener.theme.class%'
+        class: Oro\Bundle\LayoutBundle\EventListener\ThemeListener
         arguments:
             - '%oro_layout.default_active_theme%'
         calls:
@@ -150,10 +178,9 @@ services:
             - { name: kernel.event_subscriber }
 
     oro_layout.layout_block_view.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, ['oro_layout_block_view'] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_layout_block_view' }
 
     oro_layout.cache.block_view_cache:
         class: Oro\Component\Layout\BlockViewCache
@@ -163,6 +190,6 @@ services:
 
     oro_layout.page_templates_manager:
         class:  'Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager'
-        public: false
         arguments:
             - '@oro_layout.theme_manager'
+            - '@translator'

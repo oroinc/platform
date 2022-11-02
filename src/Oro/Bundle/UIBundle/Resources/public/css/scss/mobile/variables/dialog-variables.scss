@@ -4,7 +4,7 @@ $dialog-mobile-max-width: 100vw !default;
 $dialog-mobile-min-width: initial !default;
 $dialog-mobile-width: 100% !default;
 $dialog-mobile-height: auto !default;
-$dialog-mobile-min-height: 100vh !default;
+$dialog-mobile-min-height: 100% !default;
 $dialog-mobile-box-sizing: border-box !default;
 $dialog-mobile-position: inherit !default;
 $dialog-mobile-top: 0 !default;
@@ -30,7 +30,7 @@ $dialog-mobile-content-min-height: 0 !default;
 $dialog-mobile-content-max-height: none !default;
 $dialog-mobile-content-height: auto !default;
 $dialog-mobile-content-outer-offset: 0 !default;
-$dialog-mobile-content-inner-offset: 54px 16px !default;
+$dialog-mobile-content-inner-offset: 64px 16px 16px !default;
 
 $dialog-mobile-titlebar-icons-display: none !default;
 $dialog-mobile-dialog-on-background-display: none !default;
@@ -45,7 +45,10 @@ $dialog-mobile-actions-btn-border-radius: 20px !default;
 $dialog-mobile-actions-btn-border: none !default;
 $dialog-mobile-actions-btn-outer-offset: 8px !default;
 
+$dialog-mobile-inner-grid-min-width: 0 !default;
+
 $dialog-resizable-handle-mobile-display: none !default;
 
 $dialog-actions-mobile-text-align: center !default;
 $dialog-actions-mobile-float: none !default;
+$dialog-actions-mobile-inner-offset: 14px 16px;

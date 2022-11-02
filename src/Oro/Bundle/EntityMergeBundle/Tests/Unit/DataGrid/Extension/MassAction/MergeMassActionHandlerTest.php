@@ -2,276 +2,178 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeMassActionHandler $target
-     */
-    private $target;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    private $args;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    private $options;
+    /** @var MassActionHandlerArgs|\PHPUnit\Framework\MockObject\MockObject */
+    private $args;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $optionsArray;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var IterableResultInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $iteratedResult;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ResultRecord|\PHPUnit\Framework\MockObject\MockObject */
     private $firstResultRecord;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ResultRecord|\PHPUnit\Framework\MockObject\MockObject */
     private $secondResultRecord;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityStub */
     private $firstEntity;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityStub */
     private $secondEntity;
 
-    /**
-     * @var int
-     */
-    private $firstResultRecordId;
+    /** @var MergeMassActionHandler */
+    private $handler;
 
-    /**
-     * @var int
-     */
-    private $secondResultRecordId;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initMockObjects();
-        $this->setUpMockObjects();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->args = $this->createMock(MassActionHandlerArgs::class);
+        $this->iteratedResult = $this->createMock(IterableResultInterface::class);
+        $this->firstResultRecord = $this->createMock(ResultRecord::class);
+        $this->secondResultRecord = $this->createMock(ResultRecord::class);
 
-        $this->target = new MergeMassActionHandler($this->doctrineHelper);
-    }
+        $this->firstEntity = new EntityStub(1);
+        $this->secondEntity = new EntityStub(2);
 
-    private function initMockObjects()
-    {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->iteratedResult = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->firstResultRecord = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\ResultRecord')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->secondResultRecord = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\ResultRecord')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->args = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->options = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return mixed
-     */
-    private function setUpMockObjects()
-    {
-        $this->firstEntity = $this->createPartialMock(\stdClass::class, array('getId'));
-        $this->secondEntity = $this->createPartialMock(\stdClass::class, array('getId'));
-        $this->firstResultRecordId = rand();
-        $this->secondResultRecordId = rand();
-
-        $this->firstEntity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($this->firstResultRecordId));
-
-        $this->secondEntity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($this->secondResultRecordId));
-
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->withAnyParameters()
-            ->will($this->returnValue('id'));
-
+            ->willReturn('id');
         $this->doctrineHelper->expects($this->any())
             ->method('getEntitiesByIds')
             ->withAnyParameters()
-            ->will($this->returnValue(array($this->firstEntity, $this->secondEntity)));
+            ->willReturn([$this->firstEntity, $this->secondEntity]);
 
-        $options = & $this->optionsArray;
-        $this->options->expects($this->any())
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $options = &$this->optionsArray;
+        $actionConfig->expects($this->any())
             ->method('toArray')
             ->withAnyParameters()
-            ->will(
-                $this->returnCallback(
-                    function () use (&$options) {
-                        return $options;
-                    }
-                )
-            );
-
-        $this->optionsArray = array(
+            ->willReturnCallback(function () use (&$options) {
+                return $options;
+            });
+        $this->optionsArray = [
             'entity_name'       => 'test_entity',
             'max_element_count' => 5
-        );
+        ];
 
-        $fakeMassAction = $this->getMockBuilder(
-            'Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $fakeMassAction = $this->createMock(MassActionInterface::class);
         $fakeMassAction->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($this->options));
+            ->willReturn($actionConfig);
 
         $this->args->expects($this->any())
             ->method('getMassAction')
             ->withAnyParameters()
-            ->will($this->returnValue($fakeMassAction));
-
+            ->willReturn($fakeMassAction);
         $this->args->expects($this->any())
             ->method('getResults')
             ->withAnyParameters()
-            ->will($this->returnValue($this->iteratedResult));
+            ->willReturn($this->iteratedResult);
+
+        $this->handler = new MergeMassActionHandler($this->doctrineHelper);
     }
 
     public function testMethodDoesNotThrowAnExceptionIfAllDataIsCorrect()
     {
         $this->setIteratedResultMock();
 
-        $result = $this->target->handle($this->args);
+        $result = $this->handler->handle($this->args);
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse',
-            $result
-        );
+        $this->assertInstanceOf(MassActionResponse::class, $result);
 
         $result = $result->getOptions();
 
         $this->assertArrayHasKey('entities', $result);
-        $this->assertEquals(2, count($result['entities']));
+        $this->assertCount(2, $result['entities']);
         $this->assertArrayHasKey('options', $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Entity name is missing.
-     */
     public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entity name is missing.');
+
         $this->optionsArray['entity_name'] = '';
 
-        $this->target->handle($this->args);
+        $this->handler->handle($this->args);
     }
 
     public function testHandleMustReturnRequestedEntitiesForMerge()
     {
         $this->setIteratedResultMock();
-        $result = $this->target->handle($this->args);
+        $result = $this->handler->handle($this->args);
         $actual = $result->getOption('entities');
 
-        $firstActual = $actual[0];
-        $secondActual = $actual[1];
+        [$firstActual, $secondActual] = $actual;
 
-        $this->assertEquals($this->firstResultRecordId, $firstActual->getId());
-        $this->assertEquals($this->secondResultRecordId, $secondActual->getId());
+        $this->assertEquals($this->firstEntity->getId(), $firstActual->getId());
+        $this->assertEquals($this->secondEntity->getId(), $secondActual->getId());
     }
 
     public function testHandleShouldCallDoctrineHelperMethodGetEntitiesByIdsWithCorrectData()
     {
-        $expectedIdFirst = rand();
-        $expectedIdSecond = rand();
+        $expectedIdFirst = 100;
+        $expectedIdSecond = 200;
 
         $this->firstResultRecord->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($expectedIdFirst));
+            ->willReturn($expectedIdFirst);
 
         $this->secondResultRecord->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($expectedIdSecond));
+            ->willReturn($expectedIdSecond);
 
         $this->setIteratedResultMock();
         $this->optionsArray['entity_name'] = 'AccountTestEntityName';
-        $callback = function ($param) use ($expectedIdFirst, $expectedIdSecond) {
-            return $param[0] == $expectedIdFirst && $param[1] == $expectedIdSecond;
-        };
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntitiesByIds')
             ->with(
-                $this->equalTo('AccountTestEntityName'),
-                $this->callback($callback)
+                'AccountTestEntityName',
+                $this->callback(function ($param) use ($expectedIdFirst, $expectedIdSecond) {
+                    return $param[0] === $expectedIdFirst && $param[1] === $expectedIdSecond;
+                })
             );
 
-        $this->target->handle($this->args);
+        $this->handler->handle($this->args);
     }
 
-    private function setIteratedResultMock()
+    private function setIteratedResultMock(): void
     {
-        $this->iteratedResult->expects($this->at(0))
-            ->method('rewind');
-
         $this->firstResultRecord->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($this->firstResultRecordId));
+            ->willReturn($this->firstEntity->getId());
 
         $this->secondResultRecord->expects($this->any())
             ->method('getValue')
-            ->will(
-                $this->returnValue($this->secondResultRecordId)
-            );
+            ->willReturn($this->secondEntity->getId());
 
-        $this->iteratedResult->expects($this->at(1))
+        $this->iteratedResult->expects($this->once())
+            ->method('rewind');
+        $this->iteratedResult->expects($this->exactly(3))
             ->method('valid')
-            ->will($this->returnValue(true));
-
-        $this->iteratedResult->expects($this->at(2))
+            ->willReturnOnConsecutiveCalls(true, true, false);
+        $this->iteratedResult->expects($this->exactly(2))
             ->method('current')
-            ->will($this->returnValue($this->firstResultRecord));
-
-        $this->iteratedResult->expects($this->at(3))
-            ->method('next');
-
-        $this->iteratedResult->expects($this->at(4))
-            ->method('valid')
-            ->will($this->returnValue(true));
-
-        $this->iteratedResult->expects($this->at(5))
-            ->method('current')
-            ->will($this->returnValue($this->secondResultRecord));
+            ->willReturn($this->firstResultRecord, $this->secondResultRecord);
     }
 }

@@ -4,23 +4,23 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension for filters:
- *  1) sort_enum - Sorts the given enum value identifiers according priorities specified for an enum values
- *  2) trans_enum - Translates the given enum value
+ * Provides Twig filters to sort and translate enum values:
+ *   - sort_enum - sorts the given enum value identifiers according to the priorities specified for this enum.
+ *   - trans_enum - translates the given enum value.
  */
-class EnumExtension extends \Twig_Extension
+class EnumExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var EnumValueProvider */
-    protected $enumValueProvider;
+    private ContainerInterface $container;
 
-    /**
-     * @param EnumValueProvider $enumValueProvider
-     */
-    public function __construct(EnumValueProvider $enumValueProvider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->enumValueProvider = $enumValueProvider;
+        $this->container = $container;
     }
 
     /**
@@ -29,8 +29,8 @@ class EnumExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('sort_enum', [$this, 'sortEnum']),
-            new \Twig_SimpleFilter('trans_enum', [$this, 'transEnum']),
+            new TwigFilter('sort_enum', [$this, 'sortEnum']),
+            new TwigFilter('trans_enum', [$this, 'transEnum']),
         ];
     }
 
@@ -49,7 +49,7 @@ class EnumExtension extends \Twig_Extension
         $ids = $enumValueIds;
         if ($ids === null) {
             $ids = [];
-        } elseif (is_string($ids)) {
+        } elseif (\is_string($ids)) {
             $ids = explode(',', $ids);
         }
 
@@ -57,7 +57,7 @@ class EnumExtension extends \Twig_Extension
             return $ids;
         }
 
-        $ids    = array_fill_keys($ids, true);
+        $ids = array_fill_keys($ids, true);
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
         $result = [];
@@ -81,32 +81,37 @@ class EnumExtension extends \Twig_Extension
     public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
-        $label = array_search($enumValueId, $values);
+        $label = array_search($enumValueId, $values, true);
 
         return $label !== false ? $label : $enumValueId;
     }
 
     /**
-     * @param $enumValueEntityClassOrEnumCode
+     * @param string $enumValueEntityClassOrEnumCode
      *
-     * @return array sorted by value priority
-     *      key   => enum value id
-     *      value => enum value name
+     * @return array [enum value id => enum value name, ...] sorted by value priority
      */
-    protected function getEnumValues($enumValueEntityClassOrEnumCode)
+    private function getEnumValues($enumValueEntityClassOrEnumCode)
     {
-        if (strpos($enumValueEntityClassOrEnumCode, '\\') === false) {
+        if (!str_contains($enumValueEntityClassOrEnumCode, '\\')) {
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
-        return $this->enumValueProvider->getEnumChoices($enumValueEntityClassOrEnumCode);
+        return $this->getEnumValueProvider()->getEnumChoices($enumValueEntityClassOrEnumCode);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_enum';
+        return [
+            'oro_entity_extend.enum_value_provider' => EnumValueProvider::class,
+        ];
+    }
+
+    private function getEnumValueProvider(): EnumValueProvider
+    {
+        return $this->container->get('oro_entity_extend.enum_value_provider');
     }
 }

@@ -5,13 +5,14 @@ namespace Oro\Bundle\EntityExtendBundle\Cache;
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as SymfonyCacheWarmerAggregate;
 
 /**
- * @TODO CacheWarmerAggregate extends CacheWarmer only for compatibility with CacheWarmupCommand in Symfony 3.4
+ * Replaces Symfony's CacheWarmerAggregate to not warmup caches if extend caches are not up to date.
+ * This class extends {@see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate} for compatibility with
+ * {@see \Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand::__construct}.
  */
-class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
+class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
 {
     /** @var ServiceLink */
     private $cacheWarmerLink;
@@ -20,13 +21,11 @@ class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
     private $extendCacheWarmerLink;
 
     /** @var bool */
-    protected $optionalsEnabled = false;
+    private $optionalsEnabled = false;
 
-    /**
-     * @param ServiceLink               $cacheWarmerLink
-     * @param ServiceLink               $extendCacheWarmerLink
-     * @param CheckDatabaseStateManager $checkDatabaseStateManager
-     */
+    /** @var bool */
+    private $onlyOptionalsEnabled = false;
+
     public function __construct(
         ServiceLink $cacheWarmerLink,
         ServiceLink $extendCacheWarmerLink,
@@ -38,7 +37,7 @@ class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * Requests the execution of optional warmers during the warming up the cache.
+     * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOptionalWarmers
      */
     public function enableOptionalWarmers()
     {
@@ -46,47 +45,42 @@ class CacheWarmerAggregate extends CacheWarmer implements CacheWarmerInterface
     }
 
     /**
+     * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOnlyOptionalWarmers
+     */
+    public function enableOnlyOptionalWarmers()
+    {
+        $this->optionalsEnabled = true;
+        $this->onlyOptionalsEnabled = true;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * Do not warmup caches if extend caches are not up to date
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             || CommandExecutor::isCurrentCommand('oro:install', true)
-            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
+            || CommandExecutor::isCurrentCommand('oro:assets:install', true)
         ) {
             $cacheWarmerLink = $this->extendCacheWarmerLink;
         }
-        /** @var CacheWarmer $cacheWarmer */
+        /** @var SymfonyCacheWarmerAggregate $cacheWarmer */
         $cacheWarmer = $cacheWarmerLink->getService();
-        if ($this->optionalsEnabled) {
+        if ($this->onlyOptionalsEnabled) {
+            $cacheWarmer->enableOnlyOptionalWarmers();
+        } elseif ($this->optionalsEnabled) {
             $cacheWarmer->enableOptionalWarmers();
         }
-        $cacheWarmer->warmUp($cacheDir);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setWarmers(array $warmers)
-    {
-        throw new \LogicException(sprintf("%s not support method setWarmers", self::class));
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public function add(CacheWarmerInterface $warmer)
-    {
-        throw new \LogicException(sprintf("%s not support method add", self::class));
+        return $cacheWarmer->warmUp($cacheDir);
     }
 }

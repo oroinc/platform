@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\LocaleBundle\Form\Type\QuarterType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class QuarterTypeTest extends FormIntegrationTestCase
 {
@@ -33,12 +34,13 @@ class QuarterTypeTest extends FormIntegrationTestCase
         $this->assertFalse($form->has('year'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "input" with value "timestamp" is invalid. Accepted values are: "array".
-     */
     public function testBuildFormTryingToChangeInputType()
     {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage(
+            'The option "input" with value "timestamp" is invalid. Accepted values are: "array".'
+        );
+
         $this->factory->create(QuarterType::class, null, ['input' => 'timestamp']);
     }
 }

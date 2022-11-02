@@ -7,6 +7,10 @@ use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
 
+/**
+ * Processor responsible for importing a workflow with replacements.
+ * Merges the config of the workflow currently being imported onto the existing workflow config.
+ */
 class WorkflowImportProcessor implements ConfigImportProcessorInterface
 {
     use WorkflowImportTrait;
@@ -23,10 +27,6 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
     /** @var \SplFileInfo */
     protected $inProgress;
 
-    /**
-     * @param ConfigFileReaderInterface $reader
-     * @param WorkflowConfigFinderBuilder $configFinderBuilder
-     */
     public function __construct(ConfigFileReaderInterface $reader, WorkflowConfigFinderBuilder $configFinderBuilder)
     {
         $this->reader = $reader;
@@ -39,17 +39,11 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         $this->parent = $parentProcessor;
     }
 
-    /**
-     * @return bool
-     */
     public function inProgress(): bool
     {
         return null !== $this->inProgress;
     }
 
-    /**
-     * @return \SplFileInfo
-     */
     public function getProgressFile(): \SplFileInfo
     {
         return $this->inProgress;
@@ -62,11 +56,7 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
 
         try {
             $content = $this->processParent($content, $contentSource);
-            if ($this->isResourcePresent($content)) {
-                $resourceData = $this->getResourceData($content);
-            } else {
-                $resourceData = $this->findResourceData($contentSource);
-            }
+            $resourceData = $this->findResourceData();
         } catch (WorkflowConfigurationImportException $exception) {
             if ($exception->getPrevious()) {
                 //deep import exception should have `previous` already defined throwing as is
@@ -85,28 +75,16 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
 
         $resourceData = $this->applyReplacements($resourceData);
 
-        $content = $this->mergeConfigs($resourceData, $content);
+        $content = $this->mergeImports($content, $resourceData);
 
         $this->inProgress = null;
 
         return $content;
     }
 
-    /**
-     * @param \SplFileInfo $contentSource
-     * @return array
-     */
-    private function findResourceData(\SplFileInfo $contentSource): array
+    private function findResourceData(): array
     {
-        $finder = $this->configFinderBuilder->create();
-        $finder->filter(
-            function (\SplFileInfo $searchFile) use ($contentSource) {
-                //skip current file
-                return $contentSource->getRealPath() !== $searchFile->getRealPath();
-            }
-        );
-
-        foreach ($finder as $fileInfo) {
+        foreach ($this->configFinderBuilder->create() as $fileInfo) {
             $content = $this->processParent($this->reader->read($fileInfo), $fileInfo);
             if ($this->isResourcePresent($content)) {
                 return $this->getResourceData($content);
@@ -118,11 +96,6 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         );
     }
 
-    /**
-     * @param array $content
-     * @param \SplFileInfo $contentSource
-     * @return array
-     */
     private function processParent(array $content, \SplFileInfo $contentSource): array
     {
         if ($this->parent) {

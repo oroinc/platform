@@ -1,16 +1,18 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var DatagridModuleManagerView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var Backgrid = require('backgrid');
-    var DatagridSettingsListFilterModel = require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model');
-    var DatagridSettingsListFilterView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-filter-view');
-    var DatagridSettingsListCollectionView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-collection-view');
-    var DatagridSettingsListView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-view');
-    var module = require('module');
-    var config = module.config();
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const DatagridSettingsListFilterModel =
+        require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model');
+    const DatagridSettingsListFilterView =
+        require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-filter-view');
+    const DatagridSettingsListCollectionView =
+        require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-collection-view');
+    const DatagridSettingsListView =
+        require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-view');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         enableFilters: true
@@ -20,7 +22,7 @@ define(function(require) {
      * @class DatagridModuleManagerView
      * @extends BaseView
      */
-    DatagridModuleManagerView = BaseView.extend({
+    const DatagridModuleManagerView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'columns', 'grid', 'collection', 'addSorting', 'enableFilters', 'datagridSettingsListView'
         ]),
@@ -77,14 +79,14 @@ define(function(require) {
         _defaultState: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DatagridModuleManagerView() {
-            DatagridModuleManagerView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridModuleManagerView(options) {
+            DatagridModuleManagerView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!(options.columns instanceof Backgrid.Columns)) {
@@ -99,13 +101,13 @@ define(function(require) {
 
             this.collectionFilterModel = new DatagridSettingsListFilterModel();
 
-            this.render = _.bind(this.render, this, options);
+            this.render = this.render.bind(this, options);
 
-            DatagridModuleManagerView.__super__.initialize.apply(this, arguments);
+            DatagridModuleManagerView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -115,15 +117,15 @@ define(function(require) {
             // remove properties to prevent disposing them with the columns manager
             delete this.columns;
             delete this.grid;
-            DatagridModuleManagerView.__super__.dispose.apply(this, arguments);
+            DatagridModuleManagerView.__super__.dispose.call(this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function(options) {
             // index of first manageable column
-            var orderShift = this.collection[0] ? this.collection[0].get('order') : 0;
+            const orderShift = this.collection[0] ? this.collection[0].get('order') : 0;
             this.subview('datagridSettingsListView', new this.datagridSettingsListView({
                 el: options._sourceElement,
                 collection: this.collection,

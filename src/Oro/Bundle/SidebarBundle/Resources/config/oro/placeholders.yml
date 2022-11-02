@@ -11,5 +11,5 @@ placeholders:
 
     items:
         sidebar:
-            template: OroSidebarBundle::sidebar.html.twig
+            template: '@@OroSidebar/sidebar.html.twig'
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"

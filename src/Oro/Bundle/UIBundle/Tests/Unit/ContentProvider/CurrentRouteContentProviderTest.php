@@ -7,22 +7,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var RequestStack */
+    private $requestStack;
 
-    /**
-     * @var CurrentRouteContentProvider
-     */
-    protected $provider;
+    /** @var CurrentRouteContentProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
         $this->requestStack = new RequestStack();
@@ -39,10 +33,5 @@ class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetContentNoRequest()
     {
         $this->assertNull($this->provider->getContent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('currentRoute', $this->provider->getName());
     }
 }

@@ -1,0 +1,8 @@
+placeholders:
+    placeholders:
+        import_validate_export_messages:
+            items:
+                import_additional_notices: ~
+    items:
+        import_additional_notices:
+            template: '@@OroImportExport/ImportExport/additionalNotices.html.twig'

@@ -5,6 +5,8 @@ namespace Oro\Bundle\LoggerBundle\Async\Extension;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,10 +29,6 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     /** @var string|null */
     private $lastProcessorClassName;
 
-    /**
-     * @param ContainerInterface            $container
-     * @param MessageProcessorClassProvider $messageProcessorClassProvider
-     */
     public function __construct(
         ContainerInterface $container,
         MessageProcessorClassProvider $messageProcessorClassProvider
@@ -45,15 +43,11 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     public function onPostReceived(Context $context)
     {
         // remember the current processor
-        $this->lastProcessorClassName = $this->messageProcessorClassProvider->getMessageProcessorClass(
-            $context->getMessageProcessor(),
-            $context->getMessage()
+        $this->lastProcessorClassName = $this->messageProcessorClassProvider->getMessageProcessorClassByName(
+            $context->getMessageProcessorName()
         );
     }
 
-    /**
-     * @param Context $context
-     */
     public function onIdle(Context $context)
     {
         // reset the extension state if no messages to process
@@ -67,8 +61,8 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     {
         if ($this->lastProcessorClassName) {
             // reset caches to make sure that log level is up-to-date
-            $this->container->set('oro_logger.cache', null);
-            $this->container->set('oro_config.user', null);
+            $this->resetService('oro_logger.cache');
+            $this->resetService('oro_config.user');
 
             // write the processor executed just before interrupt of consuming to the log
             $context->getLogger()->info(
@@ -81,5 +75,35 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
             // reset the extension state
             $this->lastProcessorClassName = null;
         }
+    }
+
+    private function resetService(string $name): void
+    {
+        $service = $this->container->get($name);
+        if (!$service instanceof LazyLoadingInterface) {
+            $msg = interface_exists(LazyLoadingInterface::class)
+                ? sprintf('Declare the "%s" service as lazy.', $name)
+                : 'Try running "composer require symfony/proxy-manager-bridge".';
+
+            throw new \LogicException('Resetting a non-lazy manager service is not supported. ' . $msg);
+        }
+
+        $service->setProxyInitializer(
+            \Closure::bind(
+                function (&$wrappedInstance, LazyLoadingInterface $manager) use ($name) {
+                    $name = $this->aliases[$name] ?? $name;
+
+                    $wrappedInstance = isset($this->fileMap[$name])
+                        ? $this->load($this->fileMap[$name])
+                        : $this->{$this->methodMap[$name]}(false);
+
+                    $manager->setProxyInitializer(null);
+
+                    return true;
+                },
+                $this->container,
+                Container::class
+            )
+        );
     }
 }

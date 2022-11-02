@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroEmailBundle::actions.html.twig' as EmailActions %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroEmail/actions.html.twig' as EmailActions %}
 
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name }}) %}
@@ -7,6 +7,7 @@
 {# grid params #}
 {% set params = {'userId': app.user.id} %}
 {% set gridName = 'user-email-grid' %}
+
 {% if isMobileVersion() %}
     {% set renderParams = {
         'themeOptions': {
@@ -23,35 +24,40 @@
         }
     }
     %}
-    {% block content_datagrid %}
-        {{ parent() }}
-    <script id="template-user-email-grid-row" type="text/template">
-        <div class="user-emails-row">
-            <div class="user-emails-row__top clearfix">
-                <div class="user-emails-row__select-row">
-                    <input type="checkbox" data-role="select-row">
-                </div>
-                <div class="user-emails-row__contacts">
-                    <%= model.contacts %>
-                </div>
-                <div class="user-emails-row__date">
-                    <%= model.sentAt %>
-                </div>
-                <div class="user-emails-row__attachments">
-                    <%= model.attachments %>
-                </div>
-            </div>
-            <div class="user-emails-row__subject">
-                <%= model.subject %>
-            </div>
-        </div>
-    </script>
-    {% endblock content_datagrid %}
 {% endif %}
+
+{% block content_datagrid %}
+    {{ parent() }}
+    {% if isMobileVersion() %}
+        <script id="template-user-email-grid-row" type="text/template">
+            <div class="user-emails-row">
+                <div class="user-emails-row__top clearfix">
+                    <div class="user-emails-row__select-row">
+                        <input type="checkbox" data-role="select-row">
+                    </div>
+                    <div class="user-emails-row__contacts">
+                        <%= model.contacts %>
+                    </div>
+                    <div class="user-emails-row__date">
+                        <%= model.sentAt %>
+                    </div>
+                    <div class="user-emails-row__attachments">
+                        <%= model.attachments %>
+                    </div>
+                </div>
+                <div class="user-emails-row__subject">
+                    <%= model.subject %>
+                </div>
+            </div>
+        </script>
+    {% endif %}
+{% endblock content_datagrid %}
 
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import '@OroEmail/actions.html.twig' as EmailActions %}
+
     {% if is_granted('oro_email_email_create') %}
         <div class="btn-group">
             {{ EmailActions.createEmailButton({
@@ -74,7 +80,7 @@
         'oro.email.action.processing'|trans ~
         '&nbsp;<span class="loading-dots"></span>'
     %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="btn-group" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-sync-view',
@@ -96,5 +102,5 @@
     {% set breadcrumbs = [{
         'label': 'oro.email.menu.user_emails'|trans
     }] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}

@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Navigation title helper.
@@ -61,31 +60,25 @@ class TitleService implements TitleServiceInterface
     private $titleTranslator;
 
     /**
-     * @var ServiceLink
+     * @var BreadcrumbManagerInterface
      */
-    protected $breadcrumbManagerLink;
+    protected $breadcrumbManager;
 
     /**
      * @var ConfigManager
      */
     protected $userConfigManager;
 
-    /**
-     * @param TitleReaderRegistry $titleReaderRegistry
-     * @param TitleTranslator     $titleTranslator
-     * @param ConfigManager       $userConfigManager
-     * @param ServiceLink         $breadcrumbManagerLink
-     */
     public function __construct(
         TitleReaderRegistry $titleReaderRegistry,
         TitleTranslator $titleTranslator,
         ConfigManager $userConfigManager,
-        ServiceLink $breadcrumbManagerLink
+        BreadcrumbManagerInterface $breadcrumbManager
     ) {
         $this->titleReaderRegistry = $titleReaderRegistry;
         $this->titleTranslator = $titleTranslator;
         $this->userConfigManager = $userConfigManager;
-        $this->breadcrumbManagerLink = $breadcrumbManagerLink;
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -278,7 +271,10 @@ class TitleService implements TitleServiceInterface
      */
     public function loadByRoute($route, $menuName = null)
     {
-        $title = $this->titleReaderRegistry->getTitleByRoute($route);
+        $title = null;
+        if ($route) {
+            $title = $this->titleReaderRegistry->getTitleByRoute($route);
+        }
 
         $this->setTemplate($this->createTitle($route, $title, $menuName));
         $this->setShortTemplate($this->getShortTitle($route, $title, $menuName));
@@ -289,15 +285,19 @@ class TitleService implements TitleServiceInterface
     /**
      * Create title template for current route and menu name
      *
-     * @param string      $route
-     * @param string      $title
+     * @param string|null $route
+     * @param string|null $title
      * @param string|null $menuName
      *
      * @return string
      */
     public function createTitle($route, $title, $menuName = null)
     {
-        $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
+        if ($route) {
+            $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
+        } else {
+            $titleData = [];
+        }
 
         $globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix');
         if ($globalTitleSuffix) {
@@ -340,9 +340,7 @@ class TitleService implements TitleServiceInterface
             $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
         }
 
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-        return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
+        return $this->breadcrumbManager->getBreadcrumbLabels($menuName, $route);
     }
 
     /**
@@ -358,30 +356,28 @@ class TitleService implements TitleServiceInterface
             $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
         }
 
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-        return $breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
+        return $this->breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
     }
 
     /**
      * Get short title
      *
-     * @param string      $route
-     * @param string      $title
+     * @param string|null $route
+     * @param string|null $title
      * @param string|null $menuName
      *
      * @return string
      */
     private function getShortTitle($route, $title, $menuName = null)
     {
-        if (!$title) {
+        if (!$title && $route) {
             $breadcrumbs = $this->getBreadcrumbLabels($route, $menuName);
             if (count($breadcrumbs)) {
                 $title = $breadcrumbs[0];
             }
         }
 
-        return $title;
+        return $title ?? '';
     }
 
     /**
@@ -479,7 +475,6 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * @param array $params
      * @throws \InvalidArgumentException
      */
     private function validateParams(array $params)

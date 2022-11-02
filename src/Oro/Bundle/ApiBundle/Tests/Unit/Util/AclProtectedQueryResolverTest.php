@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\ORM\Query;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -20,7 +21,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
     /** @var AclProtectedQueryResolver */
     private $queryResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +42,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
 
         $this->aclHelper->expects(self::once())
             ->method('apply')
-            ->with(self::identicalTo($query), 'VIEW', []);
+            ->with(self::identicalTo($query), 'VIEW', [AclAccessRule::CHECK_OWNER => true]);
         $this->queryHintResolver->expects(self::once())
             ->method('resolveHints')
             ->with(self::identicalTo($query), $config->getHints());
@@ -59,7 +60,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
 
         $this->aclHelper->expects(self::once())
             ->method('apply')
-            ->with(self::identicalTo($query), 'VIEW', ['checkRootEntity' => false]);
+            ->with(self::identicalTo($query), 'VIEW', [AclAccessRule::CHECK_OWNER => true, 'checkRootEntity' => false]);
         $this->queryHintResolver->expects(self::once())
             ->method('resolveHints')
             ->with(self::identicalTo($query), $config->getHints());

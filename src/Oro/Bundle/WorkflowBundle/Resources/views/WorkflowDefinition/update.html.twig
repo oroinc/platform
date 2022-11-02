@@ -1,6 +1,6 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
-{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroQueryDesigner/macros.html.twig' as QD %}
+{% import '@OroWorkflow/macros.html.twig' as workflowMacros %}
 
     {% set pageComponent = {
             module: 'oroworkflow/js/app/components/workflow-editor-component',
@@ -31,7 +31,7 @@
 {% macro render_label(label, required, tooltip, tooltip_placement) %}
     <label class="control-label {% if required %}required{% endif %}">
         {% if tooltip is defined and tooltip %}
-            {% import 'OroUIBundle::macros.html.twig' as ui %}
+            {% import '@OroUI/macros.html.twig' as ui %}
             {{ ui.tooltip(tooltip, {}, tooltip_placement) }}
         {% endif %}
 
@@ -58,6 +58,8 @@
 {% set gridUrl = path('oro_workflow_definition_index') %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if entity.name and delete_allowed and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
@@ -86,7 +88,7 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.workflow.workflowdefinition.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
@@ -96,32 +98,14 @@
 {% endblock stats %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% import _self as workflowDefinitionUpdate %}
+
     {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
 
     {% set requiredConstraint = {
-    "NotBlank": null
+        "NotBlank": null
     } %}
-    <style type="text/css">
-        .tab-data {
-            padding: 20px;
-        }
-
-        .transition-list .action-column {
-            width: 90px;
-        }
-
-        .steps-list .action-column {
-            width: 110px;
-        }
-
-        .transitions-list-short {
-            margin-left: 0;
-        }
-
-        .transitions-list-short li {
-            list-style: none;
-        }
-    </style>
 
     <script type="text/template" id="workflow-translate-link-template">
         <% if (translateLink) { %>{{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLink %>', true) }}<% } %>
@@ -142,7 +126,7 @@
                             <div class="form-container">
                                 <form action="#" class="form-horizontal">
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
@@ -155,7 +139,7 @@
                                     var stepFromName = stepFrom ? stepFrom.get('name') : '';
                                     %>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.from_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.from_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
                                         <div class="controls">
                                             <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
                                             <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
@@ -174,7 +158,7 @@
                                     </div>
                                     <% } %>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.to_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.to_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
                                         <div class="controls">
                                             <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
                                                 <option value=""></option>
@@ -191,7 +175,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.view_form.label"|trans, true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.view_form.label"|trans, true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
                                         <div class="controls">
                                             <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
                                                 <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
@@ -201,7 +185,7 @@
                                     </div>
 
                                     <div class="control-group destination-page-controls">
-                                        {{ _self.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
                                         <div class="controls">
                                             <select name="destination_page">
                                                 {% for destination in availableDestinations %}
@@ -212,7 +196,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                         <div class="controls">
                                             <textarea name="message"><%= message %></textarea>
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.message) { %>
@@ -222,7 +206,7 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="button_label" value="<%- button_label %>">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_label) { %>
@@ -231,7 +215,7 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="button_title" value="<%- button_title %>">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_title) { %>
@@ -241,15 +225,14 @@
                                     </div>
 
                                     {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
-
                                     <% print('<sc' + 'ript>'); %>
-                                    require(['jquery'], function($) {
+                                    loadModules(['jquery'], function($) {
                                     $('#{{ form.transition_prototype_icon.vars.id }}').inputWidget('val', '<%- buttonIcon %>');
                                     });
                                     <% print('</sc' + 'ript>'); %>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.button_style.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_style.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
                                         <div class="controls">
                                             <select name="button_color">
                                                 <% _.each(allowedButtonStyles, function (style) { %>
@@ -262,7 +245,7 @@
                                     </div>
 
                                     <div class="control-group transition-example-container">
-                                        {{ _self.render_label("oro.workflow.form.button_preview.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.button_preview.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
                                         <div class="controls">
                                             <div class="transition-btn-example"></div>
                                         </div>
@@ -314,7 +297,7 @@
                             <div class="tab-data">
                                 <form action="#" class="form-horizontal">
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
@@ -324,14 +307,14 @@
                                     </div>
 
                                     <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
                                         <div class="controls">
                                             <input type="text" name="order" value="<%- order %>" data-validation="{{ orderConstraints|json_encode }}">
                                         </div>
                                     </div>
 
-                                    <div class="control-group">
-                                        {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
+                                    <div class="control-group control-group-checkbox">
+                                        {{ workflowDefinitionUpdate.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
                                         <div class="controls">
                                             <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
                                         </div>
@@ -362,12 +345,12 @@
         <div class="grid-container steps-list">
             <input name="oro_workflow_definition_form[steps]" type="hidden" value=''>
             <input name="oro_workflow_definition_form[transitions]" type="hidden" value=''>
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
                         <th class="label-column"><span>{{ "Step"|trans }}</span></th>
                         <th><span>{{ "Transitions"|trans }}</span></th>
-                        <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">{{ "Position"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">{{ "Position"|trans }}</span></th>
                         <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                     </tr>
                 </thead>
@@ -382,21 +365,21 @@
             <%- label %>
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%- label %></a>
-            <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">({{ "Final"|trans }})</strong><% } %>
+            <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans }}">({{ "Final"|trans }})</strong><% } %>
                 <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                     {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
                 <% } %>
             <% } %>
         </td>
         <td class="step-transitions"></td>
-        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}"><%- order %></span></td>
         <td class="step-actions">
-            <div class="pull-right">
-                <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="fa-plus-circle hide-text"/></a>
+            <div class="btn-group pull-right">
+                <a href="#" class="btn btn-icon btn-lighter add-step-transition action" title="{{ 'Add transition to this step'|trans}}"><i class="fa-plus-circle hide-text"></i></a>
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step action" title="{{ 'Update this step'|trans}}"><i class="fa-pencil-square-o hide-text"/></a>
-                    <a href="#" class="clone-step action" title="{{ 'Clone this step'|trans}}"><i class="fa-files-o hide-text"/></a>
-                    <a href="#" class="delete-step action" title="{{ 'Delete this step'|trans}}"><i class="fa-trash-o hide-text"/></a>
+                <a href="#" class="btn btn-icon btn-lighter edit-step action" title="{{ 'Update this step'|trans}}"><i class="fa-pencil-square-o hide-text"></i></a>
+                <a href="#" class="btn btn-icon btn-lighter clone-step action" title="{{ 'Clone this step'|trans}}"><i class="fa-files-o hide-text"></i></a>
+                <a href="#" class="btn btn-icon btn-lighter delete-step action" title="{{ 'Delete this step'|trans}}"><i class="fa-trash-o hide-text"></i></a>
                 <% } %>
             </div>
         </td>
@@ -409,7 +392,7 @@
             <% } %>
         <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="fa-files-o hide-text"></i></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="fa-trash-o hide-text"></i></a>
-        <i class="fa-long-arrow-right"/>
+        <i class="fa-long-arrow-right"></i>
         <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%- stepToLabel %></span>
     </script>
 
@@ -418,21 +401,21 @@
             <div class="form-horizontal" style="width: 436px;">
                 <input type="hidden" name="itemId" value="">
                 <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
                     <div class="controls">
                         <input type="hidden" name="property_path" data-validation="{{ requiredConstraint|json_encode }}"/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
                     <div class="controls">
                         <input type="text" name="label" value="<%- label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    {{ _self.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
+                <div class="control-group control-group-checkbox">
+                    {{ workflowDefinitionUpdate.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
                     <div class="controls">
                         <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>
                     </div>
@@ -450,7 +433,7 @@
 
     <script type="text/template" id="attribute-form-option-list-template">
         <div class="grid-container form-options-list">
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
                         <th><span>{{ "Entity field"|trans }}</span></th>
@@ -488,19 +471,19 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (is_entity_attribute) { %>
-                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="fa-pencil-square-o hide-text"/></a>
+                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="fa-pencil-square-o hide-text"></i></a>
                 <% } %>
-                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="fa-trash-o hide-text"/></a>
+                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="fa-trash-o hide-text"></i></a>
             </div>
         </td>
     </script>
 
     <script type="text/template" id="transition-list-template">
         <div class="grid-container transition-list">
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
-                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}">{{ "Transition name"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}">{{ "Transition name"|trans }}</span></th>
                         <th><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ "To step"|trans }}</span></th>
                         <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                     </tr>
@@ -520,12 +503,12 @@
 
     <script type="text/template" id="transition-row-template">
         <td class="transition-name">
-            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}"><%- label %></span>
+            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}"><%- label %></span>
         </td>
         <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%- stepToLabel %></span></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="fa-trash-o hide-text"/></a>
+                <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="fa-trash-o hide-text"></i></a>
             </div>
         </td>
     </script>
@@ -533,7 +516,7 @@
     {% set startStepSelector %}
         {% set startStep = entity.startStep ? entity.startStep.name : '' %}
         <div class="control-group">
-            {{ _self.render_label("oro.workflow.workflowdefinition.start_step.label"|trans, false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
+            {{ workflowDefinitionUpdate.render_label("oro.workflow.workflowdefinition.start_step.label"|trans, false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
             <div class="controls">
                 <input type="hidden" name="start_step" value="{{ startStep }}"/>
             </div>
@@ -557,54 +540,61 @@
     }] %}
 
     {% set stepsListWidget %}
-
     <div class="workflow-definition-buttons">
-        <div class="workflow-history-container pull-left"></div>
-        <div class="pull-left">
-            <button type="button" class="btn btn-secondary refresh-btn">
-                <span class="fa-refresh" aria-hidden="true"></span>
-                {{ 'Auto sort'|trans }}
-            </button>
-        </div>
         <div class="pull-right">
             <button type="button" class="btn btn-primary add-transition-btn">{{ 'Add transition'|trans }}</button>
             <button type="button" class="btn btn-primary add-step-btn">{{ 'Add step'|trans }}</button>
         </div>
     </div>
-
-    <div class="workflow-step-editor row-fluid clearfix">
-        <div class="{% if isMobileVersion() %}span12{% else %}span5{% endif %}">
-            <div class="workflow-table-container">
-                <div class="workflow-definition-steps-list-container clearfix"></div>
-            </div>
+    <div class="row-fluid clearfix">
+        <div class="workflow-table-container">
+            <div class="workflow-definition-steps-list-container clearfix"></div>
         </div>
-        {% if not isMobileVersion() %}
-        <div class="span7">
-            <div class="workflow-flowchart-container">
-                <div class="workflow-flowchart-controls clearfix"></div>
-                <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
-                    'module': 'oroui/js/app/components/view-component',
-                    'options': {
-                        'view': 'oroui/js/app/views/zoomable-area-view',
-                        'autozoom': true,
-                        'minZoom': 0.05,
-                        'maxZoom': 5
-                    }
-                }) }}><div class="workflow-flowchart clearfix"></div></div>
-            </div>
-        </div>
-        {% endif %}
     </div>
     {% endset %}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'Designer'|trans,
-        'subblocks': [
+    {% set dataBlocks = dataBlocks|merge([
+        {
+            'title': 'oro.workflow.block.title.steps_and_transitions'|trans,
+            'subblocks': [
+                {
+                    'data':  [stepsListWidget]
+                },
+            ]
+        },
+    ]) %}
+
+    {% if not isMobileVersion() %}
+        {% set workflowDiagram %}
+            <div class="workflow-definition-buttons">
+                <div class="workflow-history-container pull-left"></div>
+                <div class="pull-left">
+                    <button type="button" class="btn btn-secondary refresh-btn">
+                        <span class="fa-refresh" aria-hidden="true"></span>
+                        {{ 'Auto sort'|trans }}
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary add-transition-btn">{{ 'Add transition'|trans }}</button>
+                    <button type="button" class="btn btn-primary add-step-btn">{{ 'Add step'|trans }}</button>
+                </div>
+            </div>
+            <div class="workflow-step-editor" {{ UI.renderPageComponentAttributes({
+                'view': 'oroworkflow/js/app/views/flowchart/flowchart-container-view',
+                'name': 'flowchart-container'
+            }) }}></div>
+        {% endset %}
+        {% set dataBlocks = dataBlocks|merge([
             {
-                'data': [stepsListWidget]
-            }
-        ]
-    }] ) %}
+                'title': 'oro.workflow.block.title.workflow_diagrams'|trans,
+                'subblocks': [
+                    {
+                        'data':  [workflowDiagram]
+                    },
+                ]
+            },
+        ])%}
+    {% endif %}
 
     {% set id = 'workflow-designer' %}
     {% set data = {

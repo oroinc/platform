@@ -3,14 +3,19 @@
 namespace Oro\Bundle\UIBundle\Event;
 
 use Oro\Bundle\UIBundle\View\ScrollData;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
-use Twig_Environment;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
+/**
+ * BeforeViewRenderEvent event is triggered by oro_ui_scroll_data_before Twig function
+ * to collect data for a scroll block. See the scrollData macro for the data format.
+ * @see platform/src/Oro/Bundle/UIBundle/Resources/views/macros.html.twig
+ */
 class BeforeListRenderEvent extends Event
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $environment;
 
@@ -30,13 +35,13 @@ class BeforeListRenderEvent extends Event
     protected $formView;
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param ScrollData        $scrollData
      * @param object            $entity
      * @param FormView|null     $formView
      */
     public function __construct(
-        Twig_Environment $environment,
+        Environment $environment,
         ScrollData $scrollData,
         $entity,
         FormView $formView = null
@@ -48,7 +53,7 @@ class BeforeListRenderEvent extends Event
     }
 
     /**
-     * @return \Twig_Environment
+     * @return Environment
      */
     public function getEnvironment()
     {

@@ -10,8 +10,6 @@ class FilterHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider handleProvider
-     * @param array $config
-     * @param array $expected
      */
     public function testHandle(array $config, array $expected)
     {
@@ -22,10 +20,8 @@ class FilterHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function handleProvider()
+    public function handleProvider(): array
     {
         return [
             [

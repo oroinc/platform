@@ -9,17 +9,11 @@ class WorkflowColumnListener
 {
     const COLUMN_NAME = 'workflow';
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $this->processFilters($event->getConfig());
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     protected function processFilters(DatagridConfiguration $config)
     {
         $filters = $config->offsetGetByPath('[filters][columns]', []);

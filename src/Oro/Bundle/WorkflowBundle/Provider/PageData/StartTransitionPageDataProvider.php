@@ -30,13 +30,6 @@ class StartTransitionPageDataProvider
     /** @var RouterInterface */
     private $router;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param ContextHelper $contextHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param RouteProviderInterface $routeProvider
-     * @param RouterInterface $router
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         ContextHelper $contextHelper,
@@ -79,18 +72,11 @@ class StartTransitionPageDataProvider
         );
     }
 
-    /**
-     * @param Workflow $workflow
-     * @param Transition $transition
-     * @param $entityId
-     *
-     * @return StartTransitionEvent
-     */
     private function dispatch(Workflow $workflow, Transition $transition, $entityId): StartTransitionEvent
     {
         $event = $this->createEvent($workflow, $transition, $entityId);
 
-        $this->eventDispatcher->dispatch(StartTransitionEvents::HANDLE_BEFORE_RENDER, $event);
+        $this->eventDispatcher->dispatch($event, StartTransitionEvents::HANDLE_BEFORE_RENDER);
 
         return $event;
     }
@@ -117,10 +103,6 @@ class StartTransitionPageDataProvider
         return new StartTransitionEvent($workflow, $transition, $routeParams);
     }
 
-    /**
-     * @param array $parameters
-     * @return array
-     */
     protected function getUrls(array $parameters): array
     {
         return [

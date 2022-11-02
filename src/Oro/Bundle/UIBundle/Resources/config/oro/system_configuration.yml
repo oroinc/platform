@@ -19,6 +19,8 @@ system_configuration:
             options:
                 default_protocol: 'http'
                 label: oro.ui.system_configuration.fields.application_url.label
+                resettable: false
+                required: true
                 constraints:
                     - Url: ~
                     - NotBlank: ~
@@ -28,6 +30,9 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.ui.system_configuration.fields.navbar_position.label
+                required: true
+                constraints:
+                    - NotBlank: ~
                 choices:
                     oro.ui.system_configuration.fields.navbar_position.choices.top: top
                     oro.ui.system_configuration.fields.navbar_position.choices.left: left

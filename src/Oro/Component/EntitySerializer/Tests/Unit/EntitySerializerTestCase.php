@@ -3,22 +3,23 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
 use Oro\Component\EntitySerializer\DataNormalizer;
+use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
-use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
+use Oro\Component\EntitySerializer\FieldFilterInterface;
 use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
-use Oro\Component\EntitySerializer\ValueTransformer;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,53 +38,43 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     /** @var EntitySerializer */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
-        $doctrine->expects($this->any())
-            ->method('getAliasNamespace')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity']
-                    ]
-                )
-            );
+            ->willReturn($this->em);
 
         $this->entityFieldFilter = $this->createMock(EntityFieldFilterInterface::class);
         $this->entityFieldFilter->expects($this->any())
             ->method('isApplicableField')
             ->willReturn(true);
 
-        $this->container = $this->createMock(ContainerInterface::class);
-
         $queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
+        $queryHintResolver->expects($this->any())
+            ->method('resolveHints')
+            ->willReturnCallback(function (Query $query, array $hints = []) {
+                if (!empty($hints)) {
+                    foreach ($hints as $hint) {
+                        if (is_array($hint)) {
+                            $query->setHint($hint['name'], $hint['value']);
+                        } elseif (is_string($hint)) {
+                            $query->setHint($hint, true);
+                        }
+                    }
+                }
+            });
 
-        $doctrineHelper   = new DoctrineHelper($doctrine);
-        $dataAccessor     = new EntityDataAccessor();
-        $fieldAccessor    = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
+        $this->container = $this->createMock(ContainerInterface::class);
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $dataAccessor = new EntityDataAccessor();
+        $fieldAccessor = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
             $doctrineHelper,
-            new SerializationHelper(
-                new EntityDataTransformer($this->container, new ValueTransformer())
-            ),
+            new SerializationHelper(new DataTransformer($this->container)),
             $dataAccessor,
             new QueryFactory($doctrineHelper, new QueryResolver($queryHintResolver)),
             $fieldAccessor,
@@ -93,33 +84,19 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         );
     }
 
-    /**
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message
-     */
-    protected function assertArrayEquals(array $expected, array $actual, $message = '')
+    protected function assertArrayEquals(array $expected, array $actual, string $message = ''): void
     {
         $this->sortByKeyRecursive($expected);
         $this->sortByKeyRecursive($actual);
         $this->assertSame($expected, $actual, $message);
     }
 
-    /**
-     * @param string $expected
-     * @param string $actual
-     * @param string $message
-     */
-    protected function assertDqlEquals($expected, $actual, $message = '')
+    protected function assertDqlEquals(string $expected, string $actual, string $message = ''): void
     {
-        $expected = str_replace('Test:', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\\', $expected);
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * @param array $array
-     */
-    protected function sortByKeyRecursive(array &$array)
+    protected function sortByKeyRecursive(array &$array): void
     {
         ksort($array);
         foreach ($array as &$val) {
@@ -127,5 +104,17 @@ abstract class EntitySerializerTestCase extends OrmTestCase
                 $this->sortByKeyRecursive($val);
             }
         }
+    }
+
+    protected function getFieldFilter(array $checkRules): FieldFilterInterface
+    {
+        $filter = $this->createMock(FieldFilterInterface::class);
+        $filter->expects(self::any())
+            ->method('checkField')
+            ->willReturnCallback(function ($entity, $entityClass, $field) use ($checkRules) {
+                return $checkRules[$field] ?? null;
+            });
+
+        return $filter;
     }
 }

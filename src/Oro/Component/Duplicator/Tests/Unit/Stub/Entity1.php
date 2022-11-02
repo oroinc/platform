@@ -83,9 +83,6 @@ class Entity1
         return $this->entity;
     }
 
-    /**
-     * @param Entity2 $entity
-     */
     public function setEntity(Entity2 $entity)
     {
         $this->entity = $entity;
@@ -99,9 +96,6 @@ class Entity1
         return $this->items;
     }
 
-    /**
-     * @param EntityItem1 $item
-     */
     public function addItem(EntityItem1 $item)
     {
         $this->items->add($item);

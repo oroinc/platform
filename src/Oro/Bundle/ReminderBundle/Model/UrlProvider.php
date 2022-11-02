@@ -18,10 +18,6 @@ class UrlProvider
      */
     protected $router;
 
-    /**
-     * @param ConfigManager   $manager
-     * @param RouterInterface $router
-     */
     public function __construct(ConfigManager $manager, RouterInterface $router)
     {
         $this->manager = $manager;

@@ -4,9 +4,17 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 
+/**
+ * Table Row element representation
+ */
 class TableRow extends Element
 {
     const HEADER_ELEMENT = 'TableHeader';
+
+    /**
+     * @var Table
+     */
+    protected $owner;
 
     /**
      * @param int $number Row index number starting from 0
@@ -15,7 +23,7 @@ class TableRow extends Element
     public function getCellByNumber($number)
     {
         $number = (int) $number;
-        $columns = $this->findAll('xpath', 'child::td');
+        $columns = $this->findAll('xpath', 'child::td|child::th');
         self::assertArrayHasKey($number, $columns);
 
         return $columns[$number];
@@ -40,15 +48,11 @@ class TableRow extends Element
     {
         $columnNumber = $this->getColumnNumberByHeader($header);
 
-        return $this->normalizeValueByGuessingType(
+        return self::normalizeValueByGuessingType(
             $this->getCellElementValue($columnNumber)
         );
     }
 
-    /**
-     * @param array $headers
-     * @return array
-     */
     public function getCellValues(array $headers): array
     {
         $values = [];
@@ -59,12 +63,25 @@ class TableRow extends Element
         return $values;
     }
 
+    public function setOwner(Table $owner)
+    {
+        $this->owner = $owner;
+    }
+
+    /**
+     * @return Table
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
     /**
      * Try to guess type of value and return that data in that type
      * @param string $value
      * @return \DateTime|int|string
      */
-    protected function normalizeValueByGuessingType($value)
+    public static function normalizeValueByGuessingType($value)
     {
         $value = trim($value);
 
@@ -74,9 +91,9 @@ class TableRow extends Element
 
         if (preg_match('/^-?[0-9]+$/', $value)) {
             return (int) $value;
-        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {
+        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/u', $value, $matches)) {
             return (int) $matches['amount'];
-        } elseif (($date = date_create($value)) &&
+        } elseif (($date = date_create($value, new \DateTimeZone('UTC'))) &&
             (
                 preg_match(
                     '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s([1-3])?[0-9]\,\s[1-2][0-9]{3}/',
@@ -123,8 +140,13 @@ class TableRow extends Element
      */
     private function getColumnNumberByHeader($header)
     {
-        /** @var TableHeader $tableHeader */
-        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+        if ($this->owner) {
+            $tableHeader = $this->owner->getHeader();
+        } else {
+            /** @var TableHeader $tableHeader */
+            $tableHeader = $this->elementFactory
+                ->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+        }
 
         return $tableHeader->getColumnNumber($header);
     }

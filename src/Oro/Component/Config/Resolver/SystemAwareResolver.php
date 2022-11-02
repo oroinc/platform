@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
+ * Responsible for resolving system specific data in the configuration tree
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
@@ -53,9 +55,6 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         return $config;
     }
 
-    /**
-     * @param array $config
-     */
     protected function doResolve(array &$config)
     {
         foreach ($config as $key => &$val) {
@@ -84,16 +83,20 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
             return $val;
         }
 
-        if (strpos($val, '%') !== false) {
+        if (preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)(::(.+)Action)?$#', $val)) {
+            return $val;
+        }
+
+        if (str_contains($val, '%')) {
             $val = $this->resolveParameter($val);
         }
 
-        if (is_string($val) && strpos($val, '::') !== false) {
+        if (\is_string($val) && str_contains($val, '::')) {
             $val = $this->resolveStatic($val);
         }
 
-        if (is_string($val) && strpos($val, '@') !== false) {
-            $val = $this->resolveService($val);
+        if (\is_string($val) && str_contains($val, '@')) {
+            $val = str_starts_with($val, '@@') ? substr($val, 1) : $this->resolveService($val);
         }
 
         return $val;
@@ -124,7 +127,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         foreach ($items as $item) {
             $item = trim($item, ' ');
 
-            if ($this->startsWith($item, '$') && $this->endsWith($item, '$')) {
+            if (str_starts_with($item, '$') && str_ends_with($item, '$')) {
                 $name = substr($item, 1, -1);
                 $dot = strpos($name, '.');
                 $objectName = $dot ? substr($name, 0, $dot) : $name;
@@ -134,7 +137,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
                     $propertyPath = substr($name, $dot + 1);
                     $item = $this->getPropertyAccessor()->getValue($item, $propertyPath);
                 }
-            } elseif ($this->startsWith($item, '%') && $this->endsWith($item, '%')) {
+            } elseif (str_starts_with($item, '%') && str_ends_with($item, '%')) {
                 $name = substr($item, 1, -1);
                 $item = $this->getParameter($name);
             }
@@ -199,32 +202,6 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     }
 
     /**
-     * Checks if a string starts with a given string.
-     *
-     * @param  string $haystack A string
-     * @param  string $needle   A string to check against
-     *
-     * @return bool TRUE if $haystack starts with $needle
-     */
-    protected function startsWith($haystack, $needle)
-    {
-        return strpos($haystack, $needle) === 0;
-    }
-
-    /**
-     * Checks if a string ends with a given string.
-     *
-     * @param  string $haystack A string
-     * @param  string $needle   A string to check against
-     *
-     * @return bool TRUE if $haystack ends with $needle
-     */
-    protected function endsWith($haystack, $needle)
-    {
-        return substr($haystack, -strlen($needle)) === $needle;
-    }
-
-    /**
      * Replace %parameter% with it's value.
      *
      * @param string $val
@@ -251,7 +228,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function resolveStatic($val)
     {
-        if (preg_match_all('#([^\(\'"%:\s]+)::([\w\._]+)(\([^\)]*\))?#', $val, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('#([^\(\'\"\%\:\s]+)::([\w\._]+)(\([^\)]*\))?#', $val, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 if (!is_scalar($val)) {
                     break;
@@ -285,7 +262,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function resolveService($val)
     {
-        if (strpos($val, '->') === false && preg_match('#@([\w\.]+)#', $val, $match)) {
+        if (!str_contains($val, '->') && preg_match('#@([\w\.]+)#', $val, $match)) {
             $val = $this->getService($match[1]);
         } elseif (preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match)) {
             $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];

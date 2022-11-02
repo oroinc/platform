@@ -5,8 +5,8 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
@@ -85,10 +85,6 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param array         $entities
-     */
     protected function saveEntities(ObjectManager $manager, array $entities)
     {
         foreach ($entities as $email) {

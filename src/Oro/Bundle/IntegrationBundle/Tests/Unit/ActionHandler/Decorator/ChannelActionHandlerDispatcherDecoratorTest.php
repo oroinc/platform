@@ -13,36 +13,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dispatcher;
 
-    /**
-     * @var ChannelActionEventFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ChannelActionEventFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventFactory;
 
-    /**
-     * @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $actionHandler;
 
-    /**
-     * @var ChannelActionErrorHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ChannelActionErrorHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $errorHandler;
 
-    /**
-     * @var ChannelActionHandlerDispatcherDecorator
-     */
+    /** @var ChannelActionHandlerDispatcherDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->dispatcher->expects(static::once())->method('dispatch');
-
         $this->eventFactory = $this->createMock(ChannelActionEventFactoryInterface::class);
         $this->actionHandler = $this->createMock(ChannelActionHandlerInterface::class);
         $this->errorHandler = $this->createMock(ChannelActionErrorHandlerInterface::class);
@@ -57,31 +45,62 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\Tes
 
     public function testHandleActionWithErrors()
     {
-        $event = $this->createMock(ChannelActionEvent::class);
-        $event->expects(static::any())
-            ->method('getErrors')
-            ->willReturn(new ArrayCollection(['error1']));
+        $channel = new Channel();
+        $errors = new ArrayCollection(['error1']);
 
-        $this->eventFactory->expects(static::once())
+        $event = $this->createMock(ChannelActionEvent::class);
+        $event->expects(self::any())
+            ->method('getName')
+            ->willReturn('test_event');
+        $event->expects(self::any())
+            ->method('getErrors')
+            ->willReturn($errors);
+
+        $this->eventFactory->expects(self::once())
             ->method('create')
+            ->with(self::identicalTo($channel))
             ->willReturn($event);
 
-        $this->actionHandler->expects(static::never())->method('handleAction');
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::identicalTo($event), $event->getName());
 
-        static::assertFalse($this->decorator->handleAction(new Channel()));
+        $this->actionHandler->expects(self::never())
+            ->method('handleAction');
+        $this->errorHandler->expects(self::once())
+            ->method('handleErrors')
+            ->with(self::identicalTo($errors));
+
+        self::assertFalse($this->decorator->handleAction($channel));
     }
 
     public function testHandleActionWithNoErrors()
     {
+        $channel = new Channel();
+
         $event = $this->createMock(ChannelActionEvent::class);
-        $event->expects(static::any())
+        $event->expects(self::any())
+            ->method('getName')
+            ->willReturn('test_event');
+        $event->expects(self::any())
             ->method('getErrors')
             ->willReturn(new ArrayCollection());
 
-        $this->eventFactory->expects(static::once())
+        $this->eventFactory->expects(self::once())
             ->method('create')
+            ->with(self::identicalTo($channel))
             ->willReturn($event);
 
-        static::assertTrue($this->decorator->handleAction(new Channel()));
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::identicalTo($event), $event->getName());
+
+        $this->actionHandler->expects(self::once())
+            ->method('handleAction')
+            ->with(self::identicalTo($channel));
+        $this->errorHandler->expects(self::never())
+            ->method('handleErrors');
+
+        self::assertTrue($this->decorator->handleAction($channel));
     }
 }

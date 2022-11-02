@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\ActivityBundle\Controller\AutocompleteController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\ActivityBundle\Controller\ActivityController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

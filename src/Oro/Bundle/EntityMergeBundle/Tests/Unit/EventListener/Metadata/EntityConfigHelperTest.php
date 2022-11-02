@@ -2,35 +2,29 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityConfigHelper
-     */
-    protected $helper;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $extendConfigProvider;
+    /** @var EntityConfigHelper */
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $this->extendConfigProvider = $this->createConfigProvider();
-
-        $this->helper = new EntityConfigHelper($this->configManager, $this->extendConfigProvider);
+        $this->helper = new EntityConfigHelper($this->configManager);
     }
 
     public function testGetConfigForExtendField()
@@ -39,24 +33,24 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $className = 'Namespace\Entity';
         $fieldName = 'test';
 
-        $mergeConfigProvider = $this->createConfigProvider();
+        $mergeConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
-            ->will($this->returnValue($mergeConfigProvider));
+            ->willReturn($mergeConfigProvider);
 
         $mergeConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $mergeConfig = $this->createConfig();
+        $mergeConfig = $this->createMock(ConfigInterface::class);
 
         $mergeConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($mergeConfig));
+            ->willReturn($mergeConfig);
 
         $this->assertSame($mergeConfig, $this->helper->getConfig($scope, $className, $fieldName));
     }
@@ -67,32 +61,32 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $className = 'Namespace\Entity';
         $fieldName = 'test';
 
-        $fieldMetadata = $this->createFieldMetadata();
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
         $fieldMetadata->expects($this->once())
             ->method('getSourceClassName')
-            ->will($this->returnValue($className));
+            ->willReturn($className);
         $fieldMetadata->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
-        $mergeConfigProvider = $this->createConfigProvider();
+        $mergeConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
-            ->will($this->returnValue($mergeConfigProvider));
+            ->willReturn($mergeConfigProvider);
 
         $mergeConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $mergeConfig = $this->createConfig();
+        $mergeConfig = $this->createMock(ConfigInterface::class);
 
         $mergeConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($mergeConfig));
+            ->willReturn($mergeConfig);
 
         $this->assertSame($mergeConfig, $this->helper->getConfigByFieldMetadata($scope, $fieldMetadata));
     }
@@ -105,32 +99,32 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
+            ->willReturn($this->extendConfigProvider);
 
-        $fieldMetadata = $this->createFieldMetadata();
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
         $fieldMetadata->expects($this->once())
             ->method('getSourceClassName')
-            ->will($this->returnValue($className));
+            ->willReturn($className);
         $fieldMetadata->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $extendConfig = $this->createConfig();
+        $extendConfig = $this->createMock(ConfigInterface::class);
 
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
 
         $extendConfig->expects($this->any())
             ->method('is')
             ->with('is_extend')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $fieldMetadata->expects($this->exactly(2))
             ->method('set')
@@ -150,42 +144,24 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
+            ->willReturn($this->extendConfigProvider);
 
-        $fieldMetadata = $this->createFieldMetadata();
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
         $fieldMetadata->expects($this->once())
             ->method('getSourceClassName')
-            ->will($this->returnValue($className));
+            ->willReturn($className);
         $fieldMetadata->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $fieldMetadata->expects($this->never())->method('set');
+        $fieldMetadata->expects($this->never())
+            ->method('set');
 
         $this->helper->prepareFieldMetadataPropertyPath($fieldMetadata);
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createConfig()
-    {
-        return $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-    }
-
-    protected function createConfigProvider()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

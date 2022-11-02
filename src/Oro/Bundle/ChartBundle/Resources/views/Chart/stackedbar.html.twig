@@ -1,4 +1,4 @@
-{% import 'OroChartBundle::macros.html.twig' as chart %}
+{% import '@OroChart/macros.html.twig' as chart %}
 
 {# Chart variables format:
 
@@ -38,7 +38,7 @@
         <p class="chart-hint">{{ 'oro.chart.stackedbar_chart.hint'|trans }} </p>
     </div>
 {% else %}
-    <div class="clearfix no-data">
-        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    <div class="no-data">
+        {{ 'oro.dashboard.no_data_found'|trans }}
     </div>
 {% endif %}

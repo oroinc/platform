@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Config\AssociationConfigUtil;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -12,33 +17,44 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
+ * The base class for processors that add "title" meta property value the result.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class LoadTitleMetaProperty implements ProcessorInterface
 {
-    const OPERATION_NAME = 'loadTitleMetaProperty';
+    public const OPERATION_NAME = 'load_title_meta_property';
 
-    const TITLE_META_PROPERTY_NAME = 'title';
+    public const TITLE_META_PROPERTY_NAME = 'title';
 
-    /** @internal Used for composite keys comparison */
-    const COMPOSITE_KEYS = 'composite_keys';
+    /** Used for composite keys comparison */
+    private const COMPOSITE_KEYS = 'composite_keys';
 
     /** @var EntityTitleProvider */
-    protected $entityTitleProvider;
+    private $entityTitleProvider;
 
     /** @var ExpandedAssociationExtractor */
-    protected $expandedAssociationExtractor;
+    private $expandedAssociationExtractor;
 
-    /**
-     * @param EntityTitleProvider          $entityTitleProvider
-     * @param ExpandedAssociationExtractor $expandedAssociationExtractor
-     */
+    /** @var ConfigProvider */
+    private $configProvider;
+
+    /** @var string */
+    private $titleFieldName;
+
+    /** @var ExpandRelatedEntitiesConfigExtra|null */
+    private $expandConfigExtra;
+
+    /** @var Context */
+    private $context;
+
     public function __construct(
         EntityTitleProvider $entityTitleProvider,
-        ExpandedAssociationExtractor $expandedAssociationExtractor
+        ExpandedAssociationExtractor $expandedAssociationExtractor,
+        ConfigProvider $configProvider
     ) {
         $this->entityTitleProvider = $entityTitleProvider;
         $this->expandedAssociationExtractor = $expandedAssociationExtractor;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -54,7 +70,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         }
 
         $data = $context->getResult();
-        if (!is_array($data) || empty($data)) {
+        if (!\is_array($data) || empty($data)) {
             // empty or not supported result data
             return;
         }
@@ -65,175 +81,82 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
             return;
         }
 
-        $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(self::TITLE_META_PROPERTY_NAME, $config);
-        if (!$titlePropertyPath) {
+        $titleFieldName = ConfigUtil::getPropertyPathOfMetaProperty(self::TITLE_META_PROPERTY_NAME, $config);
+        if (!$titleFieldName) {
             // the "title" meta property was not requested
             return;
         }
 
-        $context->setResult(
-            $this->updateData($data, $context->getClassName(), $config, $titlePropertyPath)
-        );
+        $entityClass = $context->getClassName();
+        $parentResourceClass = $config->getParentResourceClass();
+        if ($parentResourceClass) {
+            $entityClass = $parentResourceClass;
+        }
+
+        $this->titleFieldName = $titleFieldName;
+        $this->expandConfigExtra = $context->getConfigExtra(ExpandRelatedEntitiesConfigExtra::NAME);
+        $this->context = $context;
+        try {
+            $context->setResult($this->updateData($data, $entityClass, $config));
+        } finally {
+            $this->titleFieldName = null;
+            $this->expandConfigExtra = null;
+            $this->context = null;
+        }
     }
 
-    /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param string                 $titleFieldName
-     *
-     * @return array
-     */
-    abstract protected function updateData(
-        array $data,
-        $entityClass,
-        EntityDefinitionConfig $config,
-        $titleFieldName
-    );
+    abstract protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array;
 
-    /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param string                 $titleFieldName
-     *
-     * @return array
-     */
-    protected function addTitles(
-        array $data,
-        $entityClass,
-        EntityDefinitionConfig $config,
-        $titleFieldName
-    ) {
-        $idFieldName = $this->getEntityIdentifierFieldName($config);
+    protected function addTitles(array $data, string $entityClass, EntityDefinitionConfig $config): array
+    {
+        $idFieldName = AssociationConfigUtil::getEntityIdentifierFieldName($config);
         if ($idFieldName) {
-            $parentResourceClass = $config->getParentResourceClass();
-            if ($parentResourceClass) {
-                $entityClass = $parentResourceClass;
+            list($associationMap, $entityIdMap) = $this->getIdentifierMap(
+                $data,
+                $entityClass,
+                $idFieldName,
+                $config
+            );
+            if ($entityIdMap) {
+                $titles = $this->getTitles($entityIdMap);
+                if ($titles) {
+                    $this->setTitles($data, $associationMap, $titles);
+                }
             }
-            $titles = $this->getTitles($data, $entityClass, $idFieldName, $config);
-            $this->setTitles($data, $entityClass, $idFieldName, $config, $titles, $titleFieldName);
         }
 
         return $data;
     }
 
     /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param string|string[]        $idFieldName
-     * @param EntityDefinitionConfig $config
-     * @param array                  $titles
-     * @param string                 $titleFieldName
+     * @param array $data
+     * @param array $associationMap [data item key => [entity key, association map], ...]
+     * @param array $titles         [entity key => entity title, ...]
      */
-    protected function setTitles(
-        array &$data,
-        $entityClass,
-        $idFieldName,
-        EntityDefinitionConfig $config,
-        array $titles,
-        $titleFieldName
-    ) {
-        $expandedAssociations = $this->expandedAssociationExtractor->getExpandedAssociations($config);
-        if (is_array($idFieldName)) {
-            $idMap = [];
-            foreach ($idFieldName as $fieldName) {
-                $idMap[$fieldName] = $config->getField($fieldName)->getPropertyPath($fieldName);
+    private function setTitles(array &$data, array $associationMap, array $titles): void
+    {
+        foreach ($associationMap as $itemKey => list($entityKey, $childAssociationMap)) {
+            if ($entityKey && \array_key_exists($entityKey, $titles)) {
+                $data[$itemKey][$this->titleFieldName] = $titles[$entityKey];
             }
-            foreach ($data as &$item) {
-                $entityId = [];
-                foreach ($idMap as $fieldName => $propertyPath) {
-                    if (array_key_exists($fieldName, $item)) {
-                        $entityId[$propertyPath] = $item[$fieldName];
-                    }
-                }
-                $entityKey = $this->buildEntityKey($entityClass, $entityId);
-                if (array_key_exists($entityKey, $titles)) {
-                    $item[$titleFieldName] = $titles[$entityKey];
-                }
-                if (!empty($expandedAssociations)) {
-                    $this->setTitlesForAssociations(
-                        $item,
-                        $expandedAssociations,
-                        $titles,
-                        $titleFieldName
-                    );
-                }
-            }
-        } else {
-            foreach ($data as &$item) {
-                if (isset($item[$idFieldName])) {
-                    $entityKey = $this->buildEntityKey($entityClass, $item[$idFieldName]);
-                    if (array_key_exists($entityKey, $titles)) {
-                        $item[$titleFieldName] = $titles[$entityKey];
-                    }
-                }
-                if (!empty($expandedAssociations)) {
-                    $this->setTitlesForAssociations(
-                        $item,
-                        $expandedAssociations,
-                        $titles,
-                        $titleFieldName
-                    );
-                }
+            if ($childAssociationMap && isset($data[$itemKey]) && \is_array($data[$itemKey])) {
+                $this->setTitles($data[$itemKey], $childAssociationMap, $titles);
             }
         }
     }
 
     /**
-     * @param array                         $data
-     * @param EntityDefinitionFieldConfig[] $expandedAssociations
-     * @param array                         $titles
-     * @param string                        $titleFieldName
-     */
-    protected function setTitlesForAssociations(
-        array &$data,
-        array $expandedAssociations,
-        array $titles,
-        $titleFieldName
-    ) {
-        foreach ($expandedAssociations as $associationName => $association) {
-            if (!array_key_exists($associationName, $data)) {
-                continue;
-            }
-            $value = &$data[$associationName];
-            if (!is_array($value) || empty($value)) {
-                continue;
-            }
-
-            $config = $association->getTargetEntity();
-            $idFieldName = $this->getEntityIdentifierFieldName($config);
-            if ($idFieldName) {
-                $entityClass = $association->getTargetClass();
-                if ($association->isCollectionValuedAssociation()) {
-                    $this->setTitles($value, $entityClass, $idFieldName, $config, $titles, $titleFieldName);
-                } else {
-                    $collection = [$value];
-                    $this->setTitles($collection, $entityClass, $idFieldName, $config, $titles, $titleFieldName);
-                    $value = reset($collection);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param string|string[]        $idFieldName
-     * @param EntityDefinitionConfig $config
+     * @param array $entityIdMap [entity class => [id field name, [id, ...]], ...]
      *
      * @return array [entity key => entity title, ...]
      */
-    protected function getTitles(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
+    private function getTitles(array $entityIdMap): array
     {
         $result = [];
-        $identifierMap = $this->getIdentifierMap($data, $entityClass, $idFieldName, $config);
-        if (!empty($identifierMap)) {
-            $rows = $this->entityTitleProvider->getTitles($identifierMap);
-            foreach ($rows as $row) {
-                $entityKey = $this->buildEntityKey($row['entity'], $row['id']);
-                $result[$entityKey] = $row['title'];
-            }
+        $rows = $this->entityTitleProvider->getTitles($entityIdMap);
+        foreach ($rows as $row) {
+            $entityKey = $this->buildEntityKey($row['entity'], $row['id']);
+            $result[$entityKey] = $row['title'];
         }
 
         return $result;
@@ -245,169 +168,264 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string|string[]        $idFieldName
      * @param EntityDefinitionConfig $config
      *
-     * @return array [entity class => [entity id field name, [entity id, ...]], ...]
+     * @return array [
+     *                  [data item key => [entity key, association map], ...],
+     *                  [entity class => [id field name, [id, ...]], ...]
+     *               ]
      */
-    protected function getIdentifierMap(array $data, $entityClass, $idFieldName, EntityDefinitionConfig $config)
-    {
+    private function getIdentifierMap(
+        array $data,
+        string $entityClass,
+        $idFieldName,
+        EntityDefinitionConfig $config
+    ): array {
         // the COMPOSITE_KEYS element is internal and used as a temporary storage for
         // a string representations of composite keys
         // they are used to compare composite keys, rather that compare them as arrays
         // it is required because the identifier map should contains unique entity identifiers
-        $map = [self::COMPOSITE_KEYS => []];
-        if (is_array($idFieldName)) {
-            $this->collectIdentifiersForCompositeId($map, $data, $entityClass, $idFieldName, $config);
+        $entityIdMap = [self::COMPOSITE_KEYS => []];
+        if (\is_array($idFieldName)) {
+            $associationMap = $this->collectIdentifiersForCompositeId(
+                $entityIdMap,
+                $data,
+                $entityClass,
+                $idFieldName,
+                $config
+            );
         } else {
-            $this->collectIdentifiers($map, $data, $entityClass, $idFieldName, $config);
+            $associationMap = $this->collectIdentifiers(
+                $entityIdMap,
+                $data,
+                $entityClass,
+                $idFieldName,
+                $config
+            );
         }
-        unset($map[self::COMPOSITE_KEYS]);
+        unset($entityIdMap[self::COMPOSITE_KEYS]);
 
-        return $map;
+        return [$associationMap, $entityIdMap];
     }
 
     /**
-     * @param array                  $map
+     * @param array                  $entityIdMap [entity class => [id field name, [id, ...]], ...]
      * @param array                  $data
      * @param string                 $entityClass
      * @param string                 $idFieldName
      * @param EntityDefinitionConfig $config
+     * @param string|null            $associationPath
+     *
+     * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function collectIdentifiers(
-        array &$map,
+    private function collectIdentifiers(
+        array &$entityIdMap,
         array $data,
-        $entityClass,
-        $idFieldName,
-        EntityDefinitionConfig $config
-    ) {
-        $expandedAssociations = $this->expandedAssociationExtractor->getExpandedAssociations($config);
+        string $entityClass,
+        string $idFieldName,
+        EntityDefinitionConfig $config,
+        string $associationPath = null
+    ): array {
+        $associationMap = [];
+        $isMultiTargetAssociation = \is_a($entityClass, EntityIdentifier::class, true);
+        $expandedAssociations = $this->getExpandedAssociations($config, $associationPath);
         $idPropertyPath = $this->getFieldPropertyPath($config, $idFieldName);
-        foreach ($data as $item) {
+        foreach ($data as $itemKey => $item) {
+            $itemExpandedAssociations = $expandedAssociations;
             if (isset($item[$idFieldName])) {
-                if (!isset($map[$entityClass])) {
-                    $map[$entityClass] = [$idPropertyPath, []];
+                $itemEntityClass = $item[ConfigUtil::CLASS_NAME] ?? $entityClass;
+                if (!isset($entityIdMap[$itemEntityClass])) {
+                    $entityIdMap[$itemEntityClass] = [$idPropertyPath, []];
                 }
                 $id = $item[$idFieldName];
-                if (!in_array($id, $map[$entityClass][1], true)) {
-                    $map[$entityClass][1][] = $id;
+                if (!\in_array($id, $entityIdMap[$itemEntityClass][1], true)) {
+                    $entityIdMap[$itemEntityClass][1][] = $id;
+                }
+                $associationMap[$itemKey] = [$this->buildEntityKey($itemEntityClass, $id), null];
+                if ($isMultiTargetAssociation && !$itemExpandedAssociations) {
+                    $itemExpandedAssociations = $this->getExpandedAssociationsByEntityClass(
+                        $itemEntityClass,
+                        $associationPath
+                    );
                 }
             }
-            if (!empty($expandedAssociations)) {
-                $this->collectIdentifiersForAssociations($map, $item, $expandedAssociations);
+            if ($itemExpandedAssociations) {
+                $childAssociationMap = $this->collectIdentifiersForAssociations(
+                    $entityIdMap,
+                    $item,
+                    $itemExpandedAssociations,
+                    $associationPath
+                );
+                if ($childAssociationMap) {
+                    if (isset($associationMap[$itemKey])) {
+                        $associationMap[$itemKey][1] = $childAssociationMap;
+                    } else {
+                        $associationMap[$itemKey] = [null, $childAssociationMap];
+                    }
+                }
             }
         }
+
+        return $associationMap;
     }
 
     /**
-     * @param array                  $map
+     * @param array                  $entityIdMap [entity class => [id field name, [id, ...]], ...]
      * @param array                  $data
      * @param string                 $entityClass
      * @param string[]               $idFieldName
      * @param EntityDefinitionConfig $config
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @param string|null            $associationPath
+     *
+     * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function collectIdentifiersForCompositeId(
-        array &$map,
+    private function collectIdentifiersForCompositeId(
+        array &$entityIdMap,
         array $data,
-        $entityClass,
-        $idFieldName,
-        EntityDefinitionConfig $config
-    ) {
-        $expandedAssociations = $this->expandedAssociationExtractor->getExpandedAssociations($config);
-        $idPropertyPath = [];
-        foreach ($idFieldName as $fieldName) {
-            $idPropertyPath[] = $this->getFieldPropertyPath($config, $fieldName);
-        }
-        foreach ($data as $item) {
-            $hasId = true;
-            foreach ($idFieldName as $fieldName) {
-                if (!array_key_exists($fieldName, $item)) {
-                    $hasId = false;
-                    break;
+        string $entityClass,
+        array $idFieldName,
+        EntityDefinitionConfig $config,
+        string $associationPath = null
+    ): array {
+        $associationMap = [];
+        $isMultiTargetAssociation = \is_a($entityClass, EntityIdentifier::class, true);
+        $expandedAssociations = $this->getExpandedAssociations($config, $associationPath);
+        $idPropertyPath = $this->getFieldPropertyPaths($config, $idFieldName);
+        foreach ($data as $itemKey => $item) {
+            $itemExpandedAssociations = $expandedAssociations;
+            if ($this->hasAllIdentifierFields($item, $idFieldName)) {
+                $itemEntityClass = $item[ConfigUtil::CLASS_NAME] ?? $entityClass;
+                if (!isset($entityIdMap[$itemEntityClass])) {
+                    $entityIdMap[$itemEntityClass] = [$idPropertyPath, []];
                 }
-            }
-            if ($hasId) {
-                if (!isset($map[$entityClass])) {
-                    $map[$entityClass] = [$idPropertyPath, []];
-                }
-                if (!isset($map[self::COMPOSITE_KEYS][$entityClass])) {
-                    $map[self::COMPOSITE_KEYS][$entityClass] = [];
+                if (!isset($entityIdMap[self::COMPOSITE_KEYS][$itemEntityClass])) {
+                    $entityIdMap[self::COMPOSITE_KEYS][$itemEntityClass] = [];
                 }
                 $id = [];
+                $idWithFieldNames = [];
                 $key = [];
-                foreach ($idFieldName as $fieldName) {
+                foreach ($idFieldName as $fieldKey => $fieldName) {
                     $val = $item[$fieldName];
                     $id[] = $val;
-                    $key[] = sprintf('%s=%s', $fieldName, $val);
+                    $idWithFieldNames[$idPropertyPath[$fieldKey]] = $val;
+                    $key[] = \sprintf('%s=%s', $fieldName, $val);
                 }
-                $key = implode(',', $key);
-                if (!in_array($key, $map[self::COMPOSITE_KEYS][$entityClass], true)) {
-                    $map[$entityClass][1][] = $id;
-                    $map[self::COMPOSITE_KEYS][$entityClass][] = $key;
+                $key = \implode(',', $key);
+                if (!\in_array($key, $entityIdMap[self::COMPOSITE_KEYS][$itemEntityClass], true)) {
+                    $entityIdMap[$itemEntityClass][1][] = $id;
+                    $entityIdMap[self::COMPOSITE_KEYS][$itemEntityClass][] = $key;
+                }
+                $associationMap[$itemKey] = [$this->buildEntityKey($itemEntityClass, $idWithFieldNames), null];
+                if ($isMultiTargetAssociation && !$itemExpandedAssociations) {
+                    $itemExpandedAssociations = $this->getExpandedAssociationsByEntityClass(
+                        $itemEntityClass,
+                        $associationPath
+                    );
                 }
             }
-            if (!empty($expandedAssociations)) {
-                $this->collectIdentifiersForAssociations($map, $item, $expandedAssociations);
+            if ($itemExpandedAssociations) {
+                $childAssociationMap = $this->collectIdentifiersForAssociations(
+                    $entityIdMap,
+                    $item,
+                    $itemExpandedAssociations,
+                    $associationPath
+                );
+                if ($childAssociationMap) {
+                    if (isset($associationMap[$itemKey])) {
+                        $associationMap[$itemKey][1] = $childAssociationMap;
+                    } else {
+                        $associationMap[$itemKey] = [null, $childAssociationMap];
+                    }
+                }
             }
         }
+
+        return $associationMap;
     }
 
     /**
-     * @param array                         $map
+     * @param array                         $entityIdMap [entity class => [id field name, [id, ...]], ...]
      * @param array                         $item
      * @param EntityDefinitionFieldConfig[] $expandedAssociations
+     * @param string|null                   $associationPath
+     *
+     * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function collectIdentifiersForAssociations(array &$map, array $item, array $expandedAssociations)
-    {
+    private function collectIdentifiersForAssociations(
+        array &$entityIdMap,
+        array $item,
+        array $expandedAssociations,
+        ?string $associationPath
+    ): array {
+        $associationMap = [];
         foreach ($expandedAssociations as $associationName => $association) {
-            if (!array_key_exists($associationName, $item)) {
+            if (!\array_key_exists($associationName, $item)) {
                 continue;
             }
             $value = $item[$associationName];
-            if (!is_array($value) || empty($value)) {
+            if (!\is_array($value) || empty($value)) {
                 continue;
             }
 
             $config = $association->getTargetEntity();
-            $idFieldName = $this->getEntityIdentifierFieldName($config);
+            $idFieldName = AssociationConfigUtil::getEntityIdentifierFieldName($config);
             if ($idFieldName) {
-                if (!$association->isCollectionValuedAssociation()) {
+                $isCollection = $association->isCollectionValuedAssociation();
+                if (!$isCollection) {
                     $value = [$value];
                 }
                 $targetEntityClass = $association->getTargetClass();
-                if (is_array($idFieldName)) {
-                    $this->collectIdentifiersForCompositeId($map, $value, $targetEntityClass, $idFieldName, $config);
+                $targetAssociationPath = $associationPath
+                    ? $associationPath . ConfigUtil::PATH_DELIMITER . $associationName
+                    : $associationName;
+                if (\is_array($idFieldName)) {
+                    $childAssociationMap = $this->collectIdentifiersForCompositeId(
+                        $entityIdMap,
+                        $value,
+                        $targetEntityClass,
+                        $idFieldName,
+                        $config,
+                        $targetAssociationPath
+                    );
                 } else {
-                    $this->collectIdentifiers($map, $value, $targetEntityClass, $idFieldName, $config);
+                    $childAssociationMap = $this->collectIdentifiers(
+                        $entityIdMap,
+                        $value,
+                        $targetEntityClass,
+                        $idFieldName,
+                        $config,
+                        $targetAssociationPath
+                    );
+                }
+                if ($childAssociationMap) {
+                    $associationMap[$associationName] = $isCollection
+                        ? [null, $childAssociationMap]
+                        : \reset($childAssociationMap);
                 }
             }
         }
+
+        return $associationMap;
     }
 
     /**
      * @param EntityDefinitionConfig $config
+     * @param string[]               $fieldNames
      *
-     * @return string|string[]|null
+     * @return string[]
      */
-    protected function getEntityIdentifierFieldName(EntityDefinitionConfig $config)
+    private function getFieldPropertyPaths(EntityDefinitionConfig $config, array $fieldNames): array
     {
-        $fieldNames = $config->getIdentifierFieldNames();
-        $numberOfFields = count($fieldNames);
-        if (0 === $numberOfFields) {
-            return null;
-        }
-        if (1 === $numberOfFields) {
-            return reset($fieldNames);
+        $result = [];
+        foreach ($fieldNames as $fieldName) {
+            $result[] = $this->getFieldPropertyPath($config, $fieldName);
         }
 
-        return $fieldNames;
+        return $result;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     *
-     * @return string
-     */
-    protected function getFieldPropertyPath(EntityDefinitionConfig $config, $fieldName)
+    private function getFieldPropertyPath(EntityDefinitionConfig $config, string $fieldName): string
     {
         $field = $config->findField($fieldName);
         if (null === $field) {
@@ -418,21 +436,88 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     }
 
     /**
+     * @param array    $item
+     * @param string[] $idFieldNames
+     *
+     * @return bool
+     */
+    private function hasAllIdentifierFields(array $item, array $idFieldNames): bool
+    {
+        foreach ($idFieldNames as $fieldName) {
+            if (!\array_key_exists($fieldName, $item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param string $entityClass
      * @param mixed  $entityId
      *
      * @return string
      */
-    protected function buildEntityKey($entityClass, $entityId)
+    private function buildEntityKey(string $entityClass, $entityId): string
     {
-        if (is_array($entityId)) {
+        if (\is_array($entityId)) {
             $id = [];
             foreach ($entityId as $key => $val) {
-                $id[] = sprintf('%s=%s', $key, $val);
+                $id[] = \sprintf('%s=%s', $key, $val);
             }
-            $entityId = implode(';', $id);
+            $entityId = \implode(';', $id);
         }
 
         return $entityClass . '::' . $entityId;
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     * @param string|null            $associationPath
+     *
+     * @return EntityDefinitionFieldConfig[]|null [association name => EntityDefinitionFieldConfig, ...]
+     */
+    private function getExpandedAssociations(EntityDefinitionConfig $config, ?string $associationPath): ?array
+    {
+        if (null === $this->expandConfigExtra) {
+            return null;
+        }
+
+        return $this->expandedAssociationExtractor->getExpandedAssociations(
+            $config,
+            $this->expandConfigExtra,
+            $associationPath
+        );
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string|null $associationPath
+     *
+     * @return EntityDefinitionFieldConfig[]|null [association name => EntityDefinitionFieldConfig, ...]
+     */
+    private function getExpandedAssociationsByEntityClass(string $entityClass, ?string $associationPath): ?array
+    {
+        if (null === $this->expandConfigExtra) {
+            return null;
+        }
+
+        $config = $this->configProvider
+            ->getConfig(
+                $entityClass,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                TargetConfigExtraBuilder::buildConfigExtras($this->context->getConfigExtras(), $associationPath)
+            )
+            ->getDefinition();
+        if (null === $config) {
+            return null;
+        }
+
+        return $this->expandedAssociationExtractor->getExpandedAssociations(
+            $config,
+            $this->expandConfigExtra,
+            $associationPath
+        );
     }
 }

@@ -15,36 +15,27 @@ use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
+use Oro\Bundle\MigrationBundle\Event\PostUpMigrationLifeCycleEvent;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Migrations query executor
+ */
 class MigrationExecutor
 {
     /**
      * @var MigrationQueryExecutor
      */
     protected $queryExecutor;
+    protected OroDataCacheManager $cacheManager;
+    protected LoggerInterface $logger;
+    protected ?MigrationExtensionManager $extensionManager = null;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
-    /**
-     * @var OroDataCacheManager
-     */
-    protected $cacheManager;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var MigrationExtensionManager
-     */
-    protected $extensionManager;
-
-    /**
-     * @param MigrationQueryExecutor $queryExecutor
-     * @param OroDataCacheManager $cacheManager
-     */
-    public function __construct(MigrationQueryExecutor $queryExecutor, OroDataCacheManager $cacheManager)
+    public function __construct(MigrationQueryExecutorInterface $queryExecutor, OroDataCacheManager $cacheManager)
     {
         $this->queryExecutor = $queryExecutor;
         $this->cacheManager = $cacheManager;
@@ -52,8 +43,6 @@ class MigrationExecutor
 
     /**
      * Sets a logger
-     *
-     * @param LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -72,8 +61,6 @@ class MigrationExecutor
 
     /**
      * Sets extension manager
-     *
-     * @param MigrationExtensionManager $extensionManager
      */
     public function setExtensionManager(MigrationExtensionManager $extensionManager)
     {
@@ -81,6 +68,11 @@ class MigrationExecutor
         $connection = $this->queryExecutor->getConnection();
         $this->extensionManager->setConnection($connection);
         $this->extensionManager->setDatabasePlatform($connection->getDatabasePlatform());
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -110,6 +102,8 @@ class MigrationExecutor
                 $item->setFailed();
                 $failedMigrations[] = get_class($migration);
             }
+
+            $this->onPostUp($item);
         }
 
         if (!empty($failedMigrations)) {
@@ -194,8 +188,6 @@ class MigrationExecutor
 
     /**
      * Sets extensions for the given migration
-     *
-     * @param Migration $migration
      */
     protected function setExtensions(Migration $migration)
     {
@@ -206,9 +198,6 @@ class MigrationExecutor
 
     /**
      * Validates the given tables from SchemaDiff
-     *
-     * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
      *
      * @throws InvalidNameException if invalid table or column name is detected
      */
@@ -269,10 +258,6 @@ class MigrationExecutor
     {
     }
 
-    /**
-     * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
-     */
     protected function checkIndexes(SchemaDiff $schemaDiff, Migration $migration)
     {
         foreach ($schemaDiff->newTables as $table) {
@@ -293,10 +278,6 @@ class MigrationExecutor
     }
 
     /**
-     * @param Table     $table
-     * @param Index     $index
-     * @param Migration $migration
-     *
      * @throws InvalidNameException
      */
     protected function checkIndex(Table $table, Index $index, Migration $migration)
@@ -353,5 +334,15 @@ class MigrationExecutor
             $platform->supportsSequences() ? $sm->listSequences() : [],
             $sm->createSchemaConfig()
         );
+    }
+
+    protected function onPostUp(MigrationState $state): void
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(
+                new PostUpMigrationLifeCycleEvent($state),
+                MigrationEvents::MIGRATION_POST_UP
+            );
+        }
     }
 }

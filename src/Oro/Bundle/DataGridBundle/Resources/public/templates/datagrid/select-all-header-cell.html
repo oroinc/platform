@@ -1,11 +1,11 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
-<div class="btn-group dropdown dropdown--with-arrow">
-    <button class="dropdown-toggle dropdown-toggle--no-caret" id="<%- togglerId %>" data-toggle="dropdown"
+<div class="btn-group dropdown">
+    <a href="#" role="button" class="dropdown-toggle dropdown-toggle--no-caret" id="<%- togglerId %>" data-toggle="dropdown"
             data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"
             aria-haspopup="true" aria-expanded="false"
-            aria-label="<%- _.__('oro.datagrid.headerCell.selectAll.label') %>"><input type="checkbox" data-select/>
-        <span class="fa-caret-down icon" aria-hidden="true"></span>
-    </button>
+            aria-label="<%- _.__('oro.datagrid.headerCell.selectAll.label') %>"><input type="checkbox" data-select>
+        <span class="icon" aria-hidden="true"></span>
+    </a>
     <ul class="dropdown-menu dropdown-menu__select-all-header-cell" aria-labelledby="<%- togglerId %>">
         <li><a class="dropdown-item" href="#" data-select-all><%- _.__('oro.datagrid.headerCell.selectAll.all') %></a></li>
         <li class="all-visible"><a class="dropdown-item" href="#" data-select-all-visible><%- _.__('oro.datagrid.headerCell.selectAll.allVisible') %></a></li>

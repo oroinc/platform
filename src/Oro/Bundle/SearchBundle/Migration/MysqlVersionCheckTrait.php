@@ -2,44 +2,23 @@
 
 namespace Oro\Bundle\SearchBundle\Migration;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql\MysqlVersionCheckTrait as BaseMysqlVersionCheckTrait;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Check MySQL Full Text compatibility compatible with ContainerAwareTrait
+ *
+ * @property ContainerInterface $container
+ */
 trait MysqlVersionCheckTrait
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use BaseMysqlVersionCheckTrait;
 
     /**
-     * @var AbstractPlatform
+     * @return ContainerInterface
      */
-    protected $platform;
-
-    /**
-     * @return bool
-     */
-    protected function isMysqlPlatform()
+    protected function getContainer()
     {
-        return $this->platform->getName() === DatabasePlatformInterface::DATABASE_MYSQL;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function isInnoDBFulltextIndexSupported()
-    {
-        if (!$this->isMysqlPlatform()) {
-            throw new \LogicException('InnoDB engine is supported only by MySQL');
-        }
-
-        /** @var Connection $connection */
-        $connection = $this->container->get('doctrine.dbal.default_connection');
-        $version = $connection->fetchColumn('select version()');
-
-        return version_compare($version, '5.6.0', '>=');
+        return $this->container;
     }
 }

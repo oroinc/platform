@@ -1,20 +1,18 @@
 <?php
 
-namespace Oro\Bundle\UI\Tests\Unit\Event;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Event;
 
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 class BeforeFormRenderEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {
-        $env = $this->getMockBuilder('Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $formView = $this->getMockBuilder('Symfony\Component\Form\FormView')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $formData = array('test');
+        $env = $this->createMock(Environment::class);
+        $formView = $this->createMock(FormView::class);
+        $formData = ['test'];
         $entity = new \stdClass();
 
         $event = new BeforeFormRenderEvent($formView, $formData, $env, $entity);
@@ -22,7 +20,7 @@ class BeforeFormRenderEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formView, $event->getForm());
         $this->assertEquals($formData, $event->getFormData());
         $this->assertEquals($env, $event->getTwigEnvironment());
-        $formDataNew = array('test_new');
+        $formDataNew = ['test_new'];
         $event->setFormData($formDataNew);
         $this->assertEquals($formDataNew, $event->getFormData());
         $this->assertEquals($entity, $event->getEntity());

@@ -16,9 +16,6 @@ class StubScope extends Scope
      */
     protected $scopeField;
 
-    /**
-     * @param array $attributes
-     */
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
@@ -47,16 +44,20 @@ class StubScope extends Scope
      */
     public function __call($name, $args)
     {
-        if (strpos($name, 'get') === 0) {
+        if (str_starts_with($name, 'get')) {
             $name = lcfirst(substr($name, 3));
 
             return $this->attributes[$name];
         }
-        if (strpos($name, 'set') === 0) {
+
+        if (str_starts_with($name, 'set')) {
             $name = lcfirst(substr($name, 3));
 
             $this->attributes[$name] = $args[0];
+
+            return $this;
         }
+
         throw new \InvalidArgumentException();
     }
 }

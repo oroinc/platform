@@ -1,5 +1,7 @@
 Feature: Check that all entity schema is updated after application install
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+  As an Administrator
+  I want to be sure that all entity schema is updated after application install
+  So I sort grid by Schema status
 
   Scenario: Sort Entity Management grid by Schema Status
     Given I login as administrator

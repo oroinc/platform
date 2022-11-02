@@ -21,9 +21,6 @@ abstract class AbstractFieldsChangesAction extends AbstractAction
      */
     protected $fieldsChangesManager;
 
-    /**
-     * @param FieldsChangesManager $fieldsChangesManager
-     */
     public function setFieldsChangesManager(FieldsChangesManager $fieldsChangesManager)
     {
         $this->fieldsChangesManager = $fieldsChangesManager;

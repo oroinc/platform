@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
 /**
+ * Represents an entry point to manage ACLs.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -32,34 +34,20 @@ class AclManager extends AbstractAclManager
     const CLASS_ACE = 'Class';
     const OBJECT_ACE = 'Object';
 
-    /**
-     * @var ObjectIdentityFactory
-     */
+    /** @var ObjectIdentityFactory */
     protected $objectIdentityFactory;
 
-    /**
-     * @var AclExtensionSelector
-     */
+    /** @var AclExtensionSelector */
     protected $extensionSelector;
 
-    /**
-     * @var MutableAclProvider
-     */
+    /** @var MutableAclProvider */
     private $aclProvider;
 
-    /**
-     * @var AceManipulationHelper
-     */
+    /** @var AceManipulationHelper */
     protected $aceProvider;
 
-    /**
-     * This array contains all requested ACLs and flags indicate which changes are queued
-     * key = a string unique for each OID
-     * value = BatchItem
-     *
-     * @var BatchItem[]
-     */
-    protected $items = array();
+    /** @var BatchItem[] [oid => batch item, ...] all requested ACLs and flags indicate which changes are queued */
+    protected $items = [];
 
     /**
      * Constructor
@@ -78,9 +66,7 @@ class AclManager extends AbstractAclManager
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->extensionSelector = $extensionSelector;
         $this->aclProvider = $aclProvider;
-        $this->aceProvider = $aceProvider !== null
-            ? $aceProvider
-            : new AceManipulationHelper();
+        $this->aceProvider = $aceProvider ?? new AceManipulationHelper();
     }
 
     /**
@@ -160,6 +146,21 @@ class AclManager extends AbstractAclManager
     }
 
     /**
+     * Gets all mask builders which can be used to build permission bitmasks
+     * for an object with the given object identity.
+     *
+     * @param OID $oid
+     *
+     * @return MaskBuilder[]
+     */
+    public function getAllMaskBuilders(OID $oid)
+    {
+        return $this->extensionSelector
+            ->select($oid)
+            ->getAllMaskBuilders();
+    }
+
+    /**
      * Gets a provider responsible for manipulation of ACEs
      *
      * @return AceManipulationHelper
@@ -172,6 +173,7 @@ class AclManager extends AbstractAclManager
     /**
      * Flushes all changes to ACLs that have been queued up to now to the database.
      * This synchronizes the in-memory state of managed ACLs with the database.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function flush()
     {
@@ -239,9 +241,9 @@ class AclManager extends AbstractAclManager
      *
      * Examples:
      *     getOid($object)
-     *     getOid('Entity:AcmeBundle\SomeClass')
-     *     getOid('Entity:AcmeBundle:SomeEntity')
-     *     getOid('Action:Some Action')
+     *     getOid('entity:AcmeBundle\SomeClass')
+     *     getOid('entity:AcmeBundle:SomeEntity')
+     *     getOid('action:some_action')
      *
      * @param mixed $val An domain object, object identity descriptor (id:type) or ACL annotation
      * @return OID
@@ -280,21 +282,14 @@ class AclManager extends AbstractAclManager
             return $this->doFindAcls($oids, array($sid));
         } catch (AclNotFoundException $ex) {
             if ($ex instanceof NotAllAclsFoundException) {
-                $partialResultException = $ex;
-            } else {
-                $partialResultException = new NotAllAclsFoundException(
-                    'The provider could not find ACLs for all object identities.'
-                );
-                $partialResultException->setPartialResult(new \SplObjectStorage());
+                throw $ex;
             }
-            throw $partialResultException;
+            throw $this->createNotAllAclsFoundException(new \SplObjectStorage());
         }
     }
 
     /**
      * Deletes an ACL for the given ObjectIdentity.
-     *
-     * @param OID $oid
      */
     public function deleteAcl(OID $oid)
     {
@@ -443,8 +438,6 @@ class AclManager extends AbstractAclManager
      * otherwise, class-based ACEs are deleted.
      * If the given object identity represents a "root" ACL the object-based ACEs are deleted.
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     public function deleteAllPermissions(SID $sid, OID $oid)
@@ -770,8 +763,6 @@ class AclManager extends AbstractAclManager
     /**
      * Deletes all class-based ACEs for the given security identity
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     protected function deleteAllClassPermissions(SID $sid, OID $oid)
@@ -782,8 +773,6 @@ class AclManager extends AbstractAclManager
     /**
      * Deletes all object-based ACEs for the given security identity
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     protected function deleteAllObjectPermissions(SID $sid, OID $oid)
@@ -885,6 +874,7 @@ class AclManager extends AbstractAclManager
      * @return \SplObjectStorage mapping the passed object identities to ACLs
      * @throws AclNotFoundException
      * @throws NotAllAclsFoundException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doFindAcls(array $oids, array $sids)
     {
@@ -940,13 +930,7 @@ class AclManager extends AbstractAclManager
                 if (1 === count($oids)) {
                     throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
                 }
-
-                $partialResultEx = new NotAllAclsFoundException(
-                    'The provider could not find ACLs for all object identities.'
-                );
-                $partialResultEx->setPartialResult($result);
-
-                throw $partialResultEx;
+                throw $this->createNotAllAclsFoundException($result);
             }
         }
 
@@ -985,6 +969,14 @@ class AclManager extends AbstractAclManager
             // non valid empty ACL is cached by MutableAclProvider::cacheEmptyAcl() method
             $this->aclProvider->clearOidCache($oid);
             $acl = $this->aclProvider->findAcl($oid);
+
+            // Force return null if MutableAclProvider::cacheEmptyAcl worked before this method.
+            // We don't have possibility to correct clear in-memory acl cache in aclProvider,
+            // because he may already have children
+            if ($acl->getId() === 0) {
+                $acl = null;
+                throw new AclNotFoundException();
+            }
         } catch (AclNotFoundException $ex) {
             if ($ifNotExist === true) {
                 $state = BatchItem::STATE_CREATE;
@@ -1021,5 +1013,15 @@ class AclManager extends AbstractAclManager
                 'Seems that ACL is not enabled. Please check "security/acl" parameter in "config/security.yml"'
             );
         }
+    }
+
+    private function createNotAllAclsFoundException(\SplObjectStorage $partialResult): NotAllAclsFoundException
+    {
+        $exception = new NotAllAclsFoundException(
+            'The provider could not find ACLs for all object identities.'
+        );
+        $exception->setPartialResult($partialResult);
+
+        return $exception;
     }
 }

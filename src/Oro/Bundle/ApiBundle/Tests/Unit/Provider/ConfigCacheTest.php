@@ -4,33 +4,39 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
+use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
-use Symfony\Component\Config\ConfigCacheInterface;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
+use Oro\Component\Testing\TempDirExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var string */
     private $configKey;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheFactory */
     private $configCacheFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheWarmer */
-    private $configCacheWarmer;
-
-    /** @var ConfigCache */
-    private $configCache;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configKey = 'test';
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
-        $this->configCacheWarmer = $this->createMock(ConfigCacheWarmer::class);
+    }
 
-        $this->configCache = new ConfigCache(
+    public function getConfigCache(bool $debug = false): ConfigCache
+    {
+        return new ConfigCache(
             $this->configKey,
-            $this->configCacheFactory,
-            $this->configCacheWarmer
+            $debug,
+            $this->configCacheFactory
         );
     }
 
@@ -40,36 +46,36 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedConfig = [
             'entities'  => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+                User::class => [
                     'fields' => [
                         'groups' => [
                             'exclude' => true
                         ]
                     ]
                 ]
-            ],
-            'relations' => []
+            ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
         // test that data is cached in memory
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
     public function testGetConfigWhenCacheIsFresh()
@@ -78,33 +84,34 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedConfig = [
             'entities'  => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+                User::class => [
                     'fields' => [
                         'groups' => [
                             'exclude' => true
                         ]
                     ]
                 ]
-            ],
-            'relations' => []
+            ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedConfig, $this->configCache->getConfig($configFile));
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
     public function testGetConfigWhenCacheDataIsInvalid()
@@ -112,25 +119,27 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configFile = 'api_test.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getConfig($configFile);
+        $configCache = $this->getConfigCache();
+
+        $configCache->getConfig($configFile);
     }
 
     public function testGetConfigWhenCacheDoesNotHaveConfigForGivenConfigFile()
@@ -138,267 +147,284 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configFile = 'api_test1.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown config "%s".', $configFile));
 
-        $this->configCache->getConfig($configFile);
+        $configCache = $this->getConfigCache();
+
+        $configCache->getConfig($configFile);
     }
 
     public function testGetAliases()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+            User::class => [
                 'alias'        => 'user',
                 'plural_alias' => 'users'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedAliases, $configCache->getAliases());
         // test that data is cached in memory
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
     public function testGetAliasesWhenCacheIsFresh()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+            User::class => [
                 'alias'        => 'user',
                 'plural_alias' => 'users'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedAliases, $this->configCache->getAliases());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
     public function testGetAliasesWhenCacheDataIsInvalid()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getAliases();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getAliases();
     }
 
     public function testGetExcludedEntities()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'
+            User::class
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
         // test that data is cached in memory
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
     public function testGetExcludedEntitiesWhenCacheIsFresh()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'
+            User::class
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedExcludedEntities, $this->configCache->getExcludedEntities());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
     public function testGetExcludedEntitiesWhenCacheDataIsInvalid()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getExcludedEntities();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getExcludedEntities();
     }
 
     public function testGetSubstitutions()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' =>
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile'
+            User::class =>
+                UserProfile::class
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
         // test that data is cached in memory
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
     public function testGetSubstitutionsWhenCacheIsFresh()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' =>
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile'
+            User::class =>
+                UserProfile::class
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedSubstitutions, $this->configCache->getSubstitutions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
     public function testGetSubstitutionsWhenCacheDataIsInvalid()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getSubstitutions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getSubstitutions();
     }
 
     public function testGetExclusions()
@@ -406,30 +432,31 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'name'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
         // test that data is cached in memory
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
     public function testGetExclusionsWhenCacheIsFresh()
@@ -437,52 +464,56 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'name'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedExclusions, $this->configCache->getExclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
     public function testGetExclusionsWhenCacheDataIsInvalid()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getExclusions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getExclusions();
     }
 
     public function testGetInclusions()
@@ -490,30 +521,31 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'category'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(false);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::once())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp')
-            ->with($this->configKey);
 
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
         // test that data is cached in memory
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
     public function testGetInclusionsWhenCacheIsFresh()
@@ -521,51 +553,173 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'category'
             ]
         ];
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
         $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
-        self::assertEquals($expectedInclusions, $this->configCache->getInclusions());
+        $configCache = $this->getConfigCache();
+
+        self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
     public function testGetInclusionsWhenCacheDataIsInvalid()
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('isFresh')
             ->willReturn(true);
-        $cache->expects(self::exactly(2))
+        $cache->expects(self::once())
             ->method('getPath')
             ->willReturn($cachePath);
+        $cache->expects(self::never())
+            ->method('warmUpCache');
 
         $this->configCacheFactory->expects(self::once())
             ->method('getCache')
             ->with($this->configKey)
             ->willReturn($cache);
-        $this->configCacheWarmer->expects(self::never())
-            ->method('warmUp');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The "%s" must return an array.', $cachePath));
 
-        $this->configCache->getInclusions();
+        $configCache = $this->getConfigCache();
+
+        $configCache->getInclusions();
+    }
+
+    public function testIsCacheFreshForNullTimestamp()
+    {
+        $this->configCacheFactory->expects(self::never())
+            ->method('getCache');
+
+        $configCache = $this->getConfigCache();
+
+        self::assertTrue($configCache->isCacheFresh(null));
+    }
+
+    public function testIsCacheFreshWhenNoCachedData()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, false, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        $timestamp = time() - 1;
+        self::assertFalse($configCache->isCacheFresh($timestamp));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExist()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, false, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp));
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub(__FUNCTION__);
+        file_put_contents($cacheFile . '.meta', serialize([$resource]));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, true, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp));
+        self::assertTrue($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, sprintf('<?php return %s;', \var_export(['test'], true)));
+        $resource = new ResourceStub(__FUNCTION__);
+        $resource->setFresh(false);
+        file_put_contents($cacheFile . '.meta', serialize([$resource]));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, true, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        $cacheTimestamp = filemtime($cacheFile);
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp + 1));
+        self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
+    }
+
+    public function testGetCacheTimestampWhenNoCachedData()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, false, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        self::assertNull($configCache->getCacheTimestamp());
+    }
+
+    public function testGetCacheTimestampWhenCachedDataExist()
+    {
+        $cacheFile = $this->getTempFile('ApiConfigCache');
+
+        file_put_contents($cacheFile, sprintf('<?php return %s;', \var_export(['test'], true)));
+
+        $this->configCacheFactory->expects(self::once())
+            ->method('getCache')
+            ->with($this->configKey)
+            ->willReturn(new ConfigCacheFile($cacheFile, false, 'key', $this->createMock(ConfigCacheWarmer::class)));
+
+        $configCache = $this->getConfigCache();
+
+        self::assertIsInt($configCache->getCacheTimestamp());
+        self::assertSame(filemtime($cacheFile), $configCache->getCacheTimestamp());
     }
 }

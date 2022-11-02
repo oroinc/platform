@@ -10,10 +10,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class OroExposeLoader extends AbstractLoader
 {
-    /**
-     * @param KernelInterface               $kernel
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
-     */
     public function __construct(
         KernelInterface $kernel,
         RouteOptionsResolverInterface $routeOptionsResolver

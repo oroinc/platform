@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var moment = require('moment');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var defaultParam = {
+    const moment = require('moment');
+    const __ = require('orotranslation/js/translator');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const defaultParam = {
         message: 'oro.form.datetime.invalid',
         maxMessage: 'oro.form.datetime.max',
         minMessage: 'oro.form.datetime.min'
@@ -23,15 +22,15 @@ define(function(require) {
      * @returns {boolean|number}
      */
     function between(valueMoment, min, max) {
-        var format = datetimeFormatter.getBackendDateTimeFormat();
-        var result = true;
-        if (!_.isUndefined(min) && min === max) {
+        const format = datetimeFormatter.getBackendDateTimeFormat();
+        let result = true;
+        if (min !== void 0 && min === max) {
             result = moment(min, format).diff(valueMoment) === 0 || 0;
         } else {
-            if (!_.isUndefined(min) && min !== null) {
+            if (min !== void 0 && min !== null) {
                 result = moment(min, format).diff(valueMoment) <= 0 || -1;
             }
-            if (result === true && !_.isUndefined(max) && max !== null) {
+            if (result === true && max !== void 0 && max !== null) {
                 result = moment(max, format).diff(valueMoment) >= 0 || 1;
             }
         }
@@ -44,21 +43,21 @@ define(function(require) {
     return [
         'DateTime',
         function(value, element, param) {
-            var format = element.getAttribute('data-format') === 'backend'
+            const format = element.getAttribute('data-format') === 'backend'
                 ? datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
-            var valueMoment = moment(String(value), format, true);
+            const valueMoment = moment(String(value), format, true);
             return this.optional(element) ||
                 valueMoment.isValid() && between(valueMoment, param.min, param.max) === true;
         },
         function(param, element) {
-            var message;
-            var datetime;
-            var value = this.elementValue(element);
-            var format = element.getAttribute('data-format') === 'backend'
+            let message;
+            let datetime;
+            const value = this.elementValue(element);
+            const format = element.getAttribute('data-format') === 'backend'
                 ? datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
-            var valueMoment = moment(String(value), format, true);
-            var placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            const valueMoment = moment(String(value), format, true);
+            const placeholders = {};
+            param = Object.assign({}, defaultParam, param);
             placeholders.value = value;
 
             if (!valueMoment.isValid()) {

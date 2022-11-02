@@ -3,60 +3,61 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\LayoutRenderer;
 
 class LayoutRendererTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $innerRenderer;
+    /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerRenderer;
+
+    /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formRenderer;
 
     /** @var LayoutRenderer */
-    protected $renderer;
+    private $renderer;
 
-    /** @var FormRendererEngineInterface */
-    protected $formRenderer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->innerRenderer = $this->createMock('Oro\Component\Layout\Form\FormRendererInterface');
-        $this->formRenderer = $this->createMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
+        $this->innerRenderer = $this->createMock(FormRendererInterface::class);
+        $this->formRenderer = $this->createMock(FormRendererEngineInterface::class);
         $this->renderer      = new LayoutRenderer($this->innerRenderer, $this->formRenderer);
     }
 
-    public function testRenderBlock()
+    public function testRenderBlock(): void
     {
         $expected = 'some rendered string';
 
         $view = new BlockView();
 
-        $this->innerRenderer->expects($this->once())
+        $this->innerRenderer->expects(self::once())
             ->method('searchAndRenderBlock')
             ->with($this->identicalTo($view), 'widget')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $result = $this->renderer->renderBlock($view);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testSetBlockTheme()
+    public function testSetBlockTheme(): void
     {
-        $theme = 'MyBungle::blocks.html.twig';
+        $theme = '@My/blocks.html.twig';
 
         $view = new BlockView();
 
-        $this->innerRenderer->expects($this->once())
+        $this->innerRenderer->expects(self::once())
             ->method('setTheme')
             ->with($this->identicalTo($view), $theme);
 
         $this->renderer->setBlockTheme($view, $theme);
     }
 
-    public function testSetFormTheme()
+    public function testSetFormTheme(): void
     {
-        $theme = 'MyBundle::forms.html.twig';
+        $theme = '@My/forms.html.twig';
 
-        $this->formRenderer->expects($this->once())
+        $this->formRenderer->expects(self::once())
             ->method('addDefaultThemes')
             ->with($theme);
 

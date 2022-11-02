@@ -20,4 +20,13 @@ oro:
     entity_extend:
         enum:
             options_error.message: Invalid enum options provided
-        change_type_not_allowed.message: Changing type of existing field {{ field }} is not allowed.
+            options_duplicates.message: The option {{ value }} is duplicated.|The options {{ value }} are duplicated.
+        change_type_not_allowed.message: Changing name or type of existing field {{ field }} is not allowed.
+        attribute_field.message: Existing field "{{ field }}" is not an attribute.
+        validator:
+            attribute_configuration:
+                error_configuration: Attribute with {{ type }} type cannot be {{ option }}.
+            not_less_than_original: The value should not be less than the original value {{ originalValue }}.
+            scale:
+                range:
+                    not_in_range: This value should be between "{{ min }}" and {{ max }}.

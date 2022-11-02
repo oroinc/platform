@@ -1,13 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var AddressRegionView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var RegionCollection = require('oroaddress/js/region/collection');
-    var Backbone = require('backbone');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const RegionCollection = require('oroaddress/js/region/collection');
+    const Backbone = require('backbone');
+    let config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         switchState: false
     });
     require('jquery.select2');
@@ -19,18 +18,19 @@ define(function(require) {
      * @class   oro.region.View
      * @extends Backbone.View
      */
-    AddressRegionView = Backbone.View.extend({
+    const AddressRegionView = Backbone.View.extend({
         events: {
-            change: 'selectionChanged'
+            change: 'selectionChanged',
+            redraw: 'redraw'
         },
 
         switchState: config.switchState,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AddressRegionView() {
-            AddressRegionView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressRegionView(options) {
+            AddressRegionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -53,9 +53,14 @@ define(function(require) {
             this.template = _.template($('#region-chooser-template').html());
 
             this.displaySelect2(this.showSelect);
-            this.target.on('input-widget:init', _.bind(function() {
+            this.target.on('input-widget:init', () => {
                 this.displaySelect2(this.showSelect);
-            }, this));
+            });
+            this.target.on('input-widget:refresh', () => {
+                const toShow = (this.collection && this.collection.models.length > 0) || this.target.val();
+
+                this.displaySelect2(toShow);
+            });
 
             if (options.collectionRoute && !this.collection) {
                 this.collection = new RegionCollection([], {
@@ -82,14 +87,11 @@ define(function(require) {
                 if (this.regionRequired) {
                     this.removeRequiredFlag();
                 }
-                if (this.target.closest('form').data('validator')) {
-                    this.target.validate().hideElementErrors(this.target);
-                }
             }
         },
 
         addRequiredFlag: function() {
-            var label = this.getInputLabel(this.target);
+            const label = this.getInputLabel(this.target);
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
@@ -98,7 +100,7 @@ define(function(require) {
         },
 
         removeRequiredFlag: function() {
-            var label = this.getInputLabel(this.target);
+            const label = this.getInputLabel(this.target);
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
@@ -107,9 +109,9 @@ define(function(require) {
         },
 
         getInputLabel: function(el) {
-            var label;
-            var input = _.result(el.data('select2'), 'focusser') || el;
-            var id = input.attr('id');
+            let label;
+            const input = _.result(el.data('select2'), 'focusser') || el;
+            const id = input.attr('id');
 
             if (id) {
                 label = $('label[for="' + id + '"]');
@@ -129,13 +131,23 @@ define(function(require) {
 
         /**
          * onChange event listener
-         *
-         * @param e {Object}
          */
-        selectionChanged: function(e) {
+        selectionChanged: function() {
             this.$el.trigger('value:changing');
-            if ($(e.currentTarget).val()) {
-                var countryId = $(e.currentTarget).val();
+            const validator = this.target.closest('form').data('validator');
+            if (validator) {
+                validator.hideElementErrors(this.target[0]);
+            }
+            this.redraw();
+            this.$el.trigger('value:changed');
+        },
+
+        redraw: function() {
+            if (this.$simpleEl) {
+                this.$simpleEl.hide();
+            }
+            const countryId = this.$el.val();
+            if (countryId) {
                 this.collection.setCountryId(countryId);
                 this.collection.fetch({reset: true});
             } else {
@@ -149,7 +161,8 @@ define(function(require) {
                 this.displaySelect2(true);
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
-                this.target.val(this.target.data('selected-data') || '').trigger('change');
+                const value = this.target.data('selected-data') || '';
+                this.target.select2('val', value);
 
                 if (this.$simpleEl) {
                     this.$simpleEl.hide().val('');
@@ -163,7 +176,6 @@ define(function(require) {
                     this.$simpleEl.show();
                 }
             }
-            this.$el.trigger('value:changed');
         },
 
         switchInputWidget: function(display) {

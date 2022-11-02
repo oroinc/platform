@@ -1,0 +1,13 @@
+Oro\Bundle\TagBundle\Entity\Tag:
+    tag1:
+        name: 'Wholesale'
+        organization: '@organization'
+        owner: '@admin'
+    tag2:
+        name: 'Service'
+        organization: '@organization'
+        owner: '@admin'
+    tag3:
+        name: 'Premium'
+        organization: '@organization'
+        owner: '@admin'

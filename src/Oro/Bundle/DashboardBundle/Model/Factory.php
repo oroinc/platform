@@ -16,11 +16,6 @@ class Factory
     /** @var WidgetConfigs */
     protected $widgetConfigs;
 
-    /**
-     * @param ConfigProvider    $configProvider
-     * @param StateManager      $stateManager
-     * @param WidgetConfigs     $widgetConfigs
-     */
     public function __construct(
         ConfigProvider $configProvider,
         StateManager $stateManager,

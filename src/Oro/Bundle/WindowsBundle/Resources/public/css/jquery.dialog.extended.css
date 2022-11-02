@@ -1,3 +1,5 @@
+/* stylelint-disable */
+
 .ui-dialog-titlebar-buttonpane {
     position: absolute;
     top: 50%;
@@ -29,6 +31,11 @@
 
 .ui-dialog-minimized .ui-dialog-title {
     overflow: hidden;
+}
+
+.ui-dialog-maximized .ui-dialog-content {
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 .ui-dialog-collapsed .ui-dialog-content,
@@ -74,10 +81,12 @@
 #dialog-extend-fixed-container {
     display: flex;
     flex-wrap: wrap-reverse;
+    height: 0;
+    overflow: visible;
 }
 
 .ui-dialog-minimized {
-    margin: 4px 2px 0 2px !important;
+    margin: 4px 2px 0 !important;
 }
 
 .loading .ui-widget-overlay,
@@ -94,4 +103,8 @@
 .dialog-single-iframe-container .widget-content iframe {
     width: 100%;
     height: 100%;
+}
+
+.dialog-single-iframe-container .widget-content {
+    margin: 0;
 }

@@ -8,41 +8,51 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $elementTransformer;
 
-    /** @var CollectionToArrayTransformer */
-    private $transformer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->elementTransformer = $this->createMock(DataTransformerInterface::class);
-
-        $this->transformer = new CollectionToArrayTransformer($this->elementTransformer);
     }
 
     public function testTransform()
     {
-        self::assertNull($this->transformer->transform(new ArrayCollection()));
+        $transformer = new CollectionToArrayTransformer($this->elementTransformer);
+        self::assertNull($transformer->transform(new ArrayCollection()));
     }
 
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($value, $expected)
+    public function testReverseTransform(array|string|null $value, ArrayCollection $expected)
     {
         $this->elementTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($element) {
-                    return 'transformed_' . $element;
-                }
-            );
+            ->willReturnCallback(function ($element) {
+                return 'transformed_' . $element;
+            });
 
-        self::assertEquals($expected, $this->transformer->reverseTransform($value));
+        $transformer = new CollectionToArrayTransformer($this->elementTransformer);
+        self::assertEquals($expected, $transformer->reverseTransform($value));
     }
 
-    public function reverseTransformDataProvider()
+    /**
+     * @dataProvider reverseTransformDataProvider
+     */
+    public function testReverseTransformWhenUseCollectionFalse(array|string|null $value, ArrayCollection $expected)
+    {
+        $this->elementTransformer->expects(self::any())
+            ->method('reverseTransform')
+            ->willReturnCallback(function ($element) {
+                return 'transformed_' . $element;
+            });
+
+        $transformer = new CollectionToArrayTransformer($this->elementTransformer, false);
+        self::assertSame($expected->toArray(), $transformer->reverseTransform($value));
+    }
+
+    public function reverseTransformDataProvider(): array
     {
         return [
             [null, new ArrayCollection()],

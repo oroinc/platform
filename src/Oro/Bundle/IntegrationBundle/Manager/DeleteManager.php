@@ -13,9 +13,6 @@ class DeleteManager
     /** @var DeleteProviderInterface[] */
     protected $deleteProviders = [];
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
@@ -23,8 +20,6 @@ class DeleteManager
 
     /**
      * Add delete integration provider
-     *
-     * @param DeleteProviderInterface $deleteProvider
      */
     public function addProvider(DeleteProviderInterface $deleteProvider)
     {

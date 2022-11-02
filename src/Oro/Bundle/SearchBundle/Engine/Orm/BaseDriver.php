@@ -7,9 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
@@ -23,23 +24,20 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  * Abstract DB driver used to run search queries for ORM search engine
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class BaseDriver implements DBALPersisterInterface
 {
     const EXPRESSION_TYPE_OR  = 'OR';
     const EXPRESSION_TYPE_AND = 'AND';
+    const SPECIAL_SEPARATOR = '__SEPARATOR__';
 
     /**
      * @var string
      */
     protected $entityName;
-
-    /**
-     * @deprecated Please use the entityManager property instead
-     *
-     * @var EntityManagerInterface
-     */
-    protected $em;
 
     /**
      * @var EntityManagerInterface
@@ -61,7 +59,6 @@ abstract class BaseDriver implements DBALPersisterInterface
      *         'entity'     => class of the entity,
      *         'alias'      => alias of the entity,
      *         'record_id'  => id of the entity,
-     *         'title'      => title of the entity,
      *         'changed'    => changed attribute,
      *         'created_at' => when the Item was created,
      *         'updated_at' => when the Item was updated,
@@ -135,8 +132,11 @@ abstract class BaseDriver implements DBALPersisterInterface
     private $indexUpdateData = [];
 
     /**
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata $class
+     * @var array
+     */
+    private $indexDeleteData = [];
+
+    /**
      * @throws \InvalidArgumentException
      */
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
@@ -148,9 +148,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         }
 
         $this->associationMappings = $class->associationMappings;
-        $this->entityName          = $class->name;
-        $this->em                  = $em;
-        $this->entityManager       = $em;
+        $this->entityName = $class->name;
+        $this->entityManager = $em;
     }
 
     /**
@@ -212,6 +211,42 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * @param Query $query
+     *
+     * @return array
+     * [
+     *      <entityFQCN> => <documentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        $qb = $this->getRequestQB($query, false);
+
+        /**
+         * Prepare query builder for getting aggregation data
+         */
+        $qb->resetDQLPart('select');
+        $qb->resetDQLPart('groupBy');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
+
+        $qb->select([
+            'search.entity',
+            sprintf('%s as count', $qb->expr()->count('search.entity'))
+        ]);
+        $qb->groupBy('search.entity');
+
+        $result = $qb->getQuery()->getArrayResult();
+
+        return \array_combine(
+            \array_column($result, 'entity'),
+            \array_column($result, 'count')
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @param Query $query
      * @return array
      */
     public function getAggregatedData(Query $query)
@@ -220,7 +255,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
-            $fieldName = Criteria::explodeFieldTypeName($field)[1];
+            [$fieldType, $fieldName] = Criteria::explodeFieldTypeName($field);
+            $fieldName = str_replace('.', self::SPECIAL_SEPARATOR, $fieldName);
             QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping
@@ -244,7 +280,10 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $key = $row[$fieldName];
                         // skip null values to maintain similar behaviour cross all engines
                         if (null !== $key) {
-                            $aggregatedData[$name][(string)$key] = (int)$row['countValue'];
+                            if ($key instanceof \DateTimeInterface) {
+                                $key = $key->getTimestamp();
+                            }
+                            $aggregatedData[$name][$key] = (int)$row['countValue'];
                         }
                     }
                     break;
@@ -255,7 +294,14 @@ abstract class BaseDriver implements DBALPersisterInterface
                 case Query::AGGREGATE_FUNCTION_SUM:
                     $fieldSelect = explode(' as ', $fieldSelect)[0];
                     $queryBuilder->select(sprintf('%s(%s)', $function, $fieldSelect));
-                    $aggregatedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
+                    $value = $queryBuilder->getQuery()->getSingleScalarResult();
+                    if (null !== $value) {
+                        if (Query::TYPE_DATETIME === $fieldType) {
+                            $value = (new \DateTime($value, new \DateTimeZone('UTC')))->getTimestamp();
+                        }
+                        $value = (float)$value;
+                    }
+                    $aggregatedData[$name] = $value;
                     break;
 
                 default:
@@ -335,6 +381,8 @@ abstract class BaseDriver implements DBALPersisterInterface
             $fieldName = implode('_', $fieldName);
         }
 
+        $fieldName = str_replace('.', '_', $fieldName);
+
         $i = 0;
         do {
             $i++;
@@ -345,10 +393,6 @@ abstract class BaseDriver implements DBALPersisterInterface
         return [$joinAlias, $index, $i];
     }
 
-    /**
-     * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
-     */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
         $this->truncateTable($dbPlatform, $connection, $this->entityName);
@@ -370,7 +414,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         /** @var ClassMetadata $metadata */
         $metadata = $this->entityManager->getClassMetadata($entityName);
         $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
-        $connection->executeUpdate($query);
+        $connection->executeStatement($query);
     }
 
     /**
@@ -392,13 +436,13 @@ abstract class BaseDriver implements DBALPersisterInterface
     protected function filterTextFieldValue($fieldName, $fieldValue)
     {
         // BB-7272: do not clear fields other than `all_text_*`
-        if (strpos($fieldName, 'all_text') !== 0) {
+        if (!str_starts_with($fieldName, 'all_text')) {
             return $fieldValue;
         }
 
-        if (is_string($fieldValue)) {
+        if (\is_string($fieldValue)) {
             $fieldValue = Query::clearString($fieldValue);
-        } elseif (is_array($fieldValue)) {
+        } elseif (\is_array($fieldValue)) {
             foreach ($fieldValue as $key => $value) {
                 $fieldValue[$key] = Query::clearString($value);
             }
@@ -540,9 +584,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Parses and applies the SELECT's columns (if selected)
      * from the casual query into the search index query.
-     *
-     * @param Query        $query
-     * @param QueryBuilder $qb
      */
     protected function applySelectToQB(Query $query, QueryBuilder $qb)
     {
@@ -553,12 +594,13 @@ abstract class BaseDriver implements DBALPersisterInterface
         }
 
         foreach ($selects as $select) {
-            list($type, $name) = Criteria::explodeFieldTypeName($select);
-            QueryBuilderUtil::checkIdentifier($name);
+            [$type, $name] = Criteria::explodeFieldTypeName($select);
+            [$fieldName,] = explode('.', $name);
+            QueryBuilderUtil::checkIdentifier($fieldName);
             QueryBuilderUtil::checkIdentifier($type);
 
             $joinField = $this->getJoinField($type);
-            list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
+            [$joinAlias, $uniqIndex] = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
             QueryBuilderUtil::checkIdentifier($joinAlias);
             QueryBuilderUtil::checkIdentifier($uniqIndex);
 
@@ -568,16 +610,19 @@ abstract class BaseDriver implements DBALPersisterInterface
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
                 ->setParameter($param, $name);
 
-            $qb->addSelect($joinAlias . '.value as ' . $name);
+            $qb->addSelect(
+                QueryBuilderUtil::sprintf(
+                    '%s.value as %s',
+                    $joinAlias,
+                    str_replace('.', self::SPECIAL_SEPARATOR, $name)
+                )
+            );
         }
     }
 
     /**
      * Parses and applies the FROM part to the search engine's
      * query.
-     *
-     * @param Query $query
-     * @param QueryBuilder $qb
      */
     protected function applyFromToQB(Query $query, QueryBuilder $qb)
     {
@@ -617,9 +662,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Applies the ORDER BY part from the Query to the
      * search engine's query.
-     *
-     * @param Query $query
-     * @param QueryBuilder $qb
      */
     protected function applyOrderByToQB(Query $query, QueryBuilder $qb)
     {
@@ -627,17 +669,21 @@ abstract class BaseDriver implements DBALPersisterInterface
 
         if ($orderBy) {
             $direction = reset($orderBy);
-            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            [$fieldType, $fieldName] = Criteria::explodeFieldTypeName(key($orderBy));
             QueryBuilderUtil::checkIdentifier($fieldType);
             $orderRelation = $fieldType . 'Fields';
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
                 ->orderBy('orderTable.value', QueryBuilderUtil::getSortOrder($direction))
                 ->setParameter('orderField', $fieldName);
             $qb->addSelect('orderTable.value');
-        } else {
-            $qb->orderBy('search.weight', Criteria::DESC)
-                ->addOrderBy('search.id', Criteria::DESC);
         }
+
+        if (!$qb->getDQLPart('orderBy')) {
+            $qb->orderBy('search.weight', Criteria::DESC);
+        }
+
+        $qb->addOrderBy('search.recordId', Criteria::DESC)
+            ->addOrderBy('search.id', Criteria::DESC);
     }
 
     /**
@@ -686,6 +732,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         $multiInsertQueryData = [];
         $this->fillQueryData($connection, $multiInsertQueryData);
 
+        $this->runDeletes($connection, $this->indexDeleteData);
         $this->runMultiInserts($connection, $multiInsertQueryData);
         $this->runUpdates($connection, $this->indexUpdateData);
 
@@ -697,8 +744,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Adds AbstractItem of which data will be stored when 'flushWrites' method is called
-     *
-     * @param AbstractItem $item
      */
     public function writeItem(AbstractItem $item)
     {
@@ -711,9 +756,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Prepares index data for queries to be stored
-     *
-     * @param Connection $connection
-     * @param array $multiInsertQueryData
      */
     private function fillQueryData(Connection $connection, array &$multiInsertQueryData)
     {
@@ -756,9 +798,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Runs multi inserts taken from $multiInsertQueryData argument
-     *
-     * @param Connection $connection
-     * @param array $multiInsertQueryData
      */
     private function runMultiInserts(Connection $connection, array $multiInsertQueryData)
     {
@@ -769,9 +808,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Runs updates taken from $updateQueryData argument
-     *
-     * @param Connection $connection
-     * @param array $updateQueryData
      */
     private function runUpdates(Connection $connection, array $updateQueryData)
     {
@@ -788,9 +824,21 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
+     * Runs deletes taken from $deletes argument
+     */
+    private function runDeletes(Connection $connection, array $deletes): void
+    {
+        foreach ($deletes as $table => $ids) {
+            $connection->executeQuery(
+                sprintf('DELETE FROM %s WHERE id IN(:ids)', $connection->quoteIdentifier($table)),
+                ['ids' => $ids],
+                ['ids' => Connection::PARAM_INT_ARRAY]
+            );
+        }
+    }
+
+    /**
      * Stores items from $this->writeableItemData and updates their ids
-     *
-     * @param Connection $connection
      */
     private function processItems(Connection $connection)
     {
@@ -828,8 +876,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Converts $item into array and stores the result in the object
-     *
-     * @param AbstractItem $item
      */
     private function populateItem(AbstractItem $item)
     {
@@ -838,25 +884,23 @@ abstract class BaseDriver implements DBALPersisterInterface
         if (!$this->writeableItemTypes) {
             $this->writeableItemTypes = [
                 'insert' => [
-                    Type::STRING,
-                    Type::STRING,
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::DECIMAL,
-                    Type::BOOLEAN,
-                    Type::DATETIME,
-                    Type::DATETIME,
+                    Types::STRING,
+                    Types::STRING,
+                    Types::INTEGER,
+                    Types::DECIMAL,
+                    Types::BOOLEAN,
+                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_MUTABLE,
                 ],
                 'update' => [
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::STRING,
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::DECIMAL,
-                    Type::BOOLEAN,
-                    Type::DATETIME,
-                    Type::DATETIME,
+                    Types::INTEGER,
+                    Types::STRING,
+                    Types::STRING,
+                    Types::INTEGER,
+                    Types::DECIMAL,
+                    Types::BOOLEAN,
+                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_MUTABLE,
                 ],
             ];
         }
@@ -867,7 +911,6 @@ abstract class BaseDriver implements DBALPersisterInterface
                 'entity' => $item->getEntity(),
                 'alias' => $item->getAlias(),
                 'record_id' => $item->getRecordId(),
-                'title' => $item->getTitle(),
                 'weight' => $item->getWeight(),
                 'changed' => $item->getChanged(),
                 'created_at' => $item->getCreatedAt(),
@@ -878,7 +921,6 @@ abstract class BaseDriver implements DBALPersisterInterface
                 'entity' => $item->getEntity(),
                 'alias' => $item->getAlias(),
                 'record_id' => $item->getRecordId(),
-                'title' => $item->getTitle(),
                 'weight' => $item->getWeight(),
                 'changed' => $item->getChanged(),
                 'created_at' => $item->getCreatedAt(),
@@ -896,20 +938,24 @@ abstract class BaseDriver implements DBALPersisterInterface
      */
     private function populateIndexByType(Collection $fields, AbstractItem $item, $type)
     {
+        $table = $this->getIndexTable($item, $type);
+        if ($fields instanceof PersistentCollection) {
+            foreach ($fields->getDeleteDiff() as $removedField) {
+                $this->indexDeleteData[$table][] = $removedField->getId();
+            }
+        }
         if ($fields->isEmpty()) {
             return;
         }
-
-        $table = $this->getIndexTable($item, $type);
 
         if (!isset($this->indexUpdateData[$table])) {
             $this->indexUpdateData[$table] = [
                 'data'  => [],
                 'types' => [
-                    Type::INTEGER,
-                    Type::STRING,
+                    Types::INTEGER,
+                    Types::STRING,
                     $type,
-                    Type::INTEGER,
+                    Types::INTEGER,
                 ],
             ];
             $this->indexInsertData[$table] = [
@@ -942,9 +988,9 @@ abstract class BaseDriver implements DBALPersisterInterface
 
                 array_push(
                     $this->indexInsertData[$table]['types'],
-                    Type::STRING,
+                    Types::STRING,
                     $type,
-                    Type::INTEGER
+                    Types::INTEGER
                 );
             }
         }

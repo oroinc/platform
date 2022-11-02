@@ -1,24 +1,24 @@
 /* @theme: admin.oro; */
 
 .left-panel-container {
-    background-color: #fff;
+    background-color: $primary-inverse;
 
-    & > .placeholder {
+    > .placeholder {
         margin-left: 334px;
-        background-color: #f1f1f1;
-        border-left: 1px solid #e2e2e2;
+        background-color: $primary-900;
+        border-left: 1px solid $primary-800;
 
-        & > * {
+        > * {
             margin-left: -335px;
 
-            & > .left-panel {
+            > .left-panel {
                 float: left;
                 width: 334px;
-                border-top: 1px solid #f2f2f2;
+                border-top: 1px solid $primary-860;
                 margin: 0;
             }
 
-            & > .content {
+            > .content {
                 margin-left: 335px;
                 padding: $content-padding-medium $content-padding-medium 0;
                 box-sizing: border-box;
@@ -29,47 +29,126 @@
 
 .system-configuration-container {
     padding: 0 $content-padding;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow: hidden;
 
-    .controls.control-subgroup {
-        width: auto;
-        margin: side-values( 0 $content-padding-medium 0 0);
-        float: #{$start};
-
-        input,
-        textarea {
-            min-width: 294px;
-        }
-    }
-
-    .controls .parent-scope-checkbox {
-        color: #777;
-
-        label, .checkbox-view__text {
+    .controls {
+        &.control-subgroup {
+            width: auto;
+            margin: 0 $content-padding-medium 0 0;
             float: left;
-            margin: 0 4px;
-        }
 
-        input[type="checkbox"] {
-            margin: -4px 10px 0 0;
+            input,
+            textarea {
+                min-width: $field-width;
+            }
         }
     }
 
-    .container-fluid:after {
+    .control-subgroup {
+        &:not(.parent-scope-checkbox) {
+            input[type='checkbox'] {
+                margin-top: $content-padding-small;
+            }
+
+            td input[type='checkbox'],
+            .fallback-container input[type='checkbox'] {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .control-subgroup.parent-scope-checkbox {
+        margin-top: ($content-padding-small * .5);
+        margin-right: $content-padding-small;
+
+        label {
+            margin: 0 $content-padding-small 0 0;
+            line-height: 1.75;
+            white-space: nowrap;
+        }
+
+        .parent-scope-checkbox__wrapper {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+        }
+    }
+
+    .control-subgroup.value-hint-container {
+        margin-top: ($content-padding-small * .5);
+        margin-right: $content-padding-small;
+    }
+
+    .container-fluid::after {
         clear: none;
     }
 
+    .control-group {
+        .controls,
+        &.controls {
+            .control-subgroup {
+                margin-right: $content-padding-medium;
+            }
+        }
+    }
+
+    .ping-holder {
+        margin-top: -7px;
+        width: $field-width;
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    .form-text {
+        margin-top: $content-padding-small;
+    }
+
+    .control-subgroup-container {
+        min-width: $field-width;
+        max-width: $field-width;
+    }
+}
+
+.system-configuration-content-inner {
+    padding: $content-padding $content-padding $content-padding-medium;
+    width: 100%;
+    overflow-y: auto;
+    flex-grow: 1;
+
+    .form-horizontal {
+        margin-bottom: 26px;
+    }
+
+    .control-group-oro_warehouse_system_config {
+        .add-list-item {
+            margin-top: $content-padding-small;
+        }
+    }
+
+    .warning {
+        position: relative;
+        padding: $content-padding-small;
+        margin: 0 0 $content-padding-medium;
+        border: 1px solid $primary-860;
+        background: $danger-lighten;
+        border-radius: 4px;
+    }
 }
 
 .system-configuration-content {
-    &-wrapper {
-        padding-#{$start}: $content-padding-medium;
-        margin-bottom: 15px;
-    }
+    height: 100%;
 
-    &-inner {
-        padding: $content-padding $content-padding $content-padding-medium;
-        width: 100%;
-        overflow-y: auto;
+    &-wrapper {
+        padding-left: $content-padding-medium;
+        padding-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     &-header {
@@ -77,37 +156,11 @@
         justify-content: space-between;
         background: $primary-900;
         border-radius: 4px;
-        padding: 8px 12px;
+        padding: 6px 16px 5px;
     }
 
     &-title {
         font-size: 14px;
-        font-weight: bold;
-    }
-}
-
-.scrollable-container .container-fluid.configuration-header {
-    background-color: #fff;
-
-    @include clearfix();
-
-    h1 {
-        font-size: 20px;
-        margin-top: 12px;
-        line-height: 28px;
-        float: left;
-    }
-
-    > .pull-right {
-        margin: 10px 0;
-    }
-
-    > .pull-left {
-        margin: 10px 0 0;
-    }
-
-    .sub-title,
-    .separator {
-        line-height: 28px;
+        font-weight: font-weight('bold');
     }
 }

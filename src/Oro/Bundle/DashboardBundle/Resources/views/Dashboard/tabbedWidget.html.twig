@@ -1,12 +1,17 @@
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
 
 {% block content %}
-    <div class="tab-container">
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div class="tab-container"
+        {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/tabs-component'
+        }) }}
+    >
         <ul class="nav nav-tabs" role="tablist">
             {% set tabTabId = 'tab-'|uniqid %}
             {% set tabContentId = 'tab-content-'|uniqid %}
             {% for tab in tabs %}
-                <li class="nav-item">
+                <li class="nav-item tab">
                     <a id="{{ (loop.index == 0) ? tabTabId : tabTabId ~ loop.index }}"
                        href="#{{ tabContentId }}"
                        role="tab"
@@ -34,7 +39,7 @@
         </div>
     </div>
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: 'orodashboard/js/app/views/widget-tabs-view',

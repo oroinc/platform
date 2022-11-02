@@ -6,12 +6,10 @@ use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 
 class DataFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DataFixture
-     */
-    protected $dataFixtureEntity;
+    /** @var DataFixture */
+    private $dataFixtureEntity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataFixtureEntity = new DataFixture();
     }

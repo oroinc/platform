@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var PermissionView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
 
-    PermissionView = BaseView.extend({
+    const PermissionView = BaseView.extend({
         tagName: 'li',
 
         className: 'action-permissions__item dropdown',
 
-        template: require('tpl!orouser/templates/datagrid/permission/permission-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/permission/permission-view.html'),
 
         events: {
             'shown.bs.dropdown': 'onDropdownOpen',
@@ -23,10 +22,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PermissionView() {
-            PermissionView.__super__.constructor.apply(this, arguments);
+        constructor: function PermissionView(options) {
+            PermissionView.__super__.constructor.call(this, options);
         },
 
         id: function() {
@@ -34,14 +33,14 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = PermissionView.__super__.getTemplateData.call(this);
+            const data = PermissionView.__super__.getTemplateData.call(this);
             data.dropdownTarget = '#' + _.result(this, 'id');
             data.isAccessLevelChanged = this.model.isAccessLevelChanged();
             return data;
         },
 
         render: function() {
-            var dropdown = this.subview('dropdown');
+            const dropdown = this.subview('dropdown');
             this.$el.trigger('tohide.bs.dropdown');
             if (dropdown) {
                 this.$('[data-toggle="dropdown"]').dropdown('dispose');
@@ -49,16 +48,16 @@ define(function(require) {
             }
             PermissionView.__super__.render.call(this);
             if (dropdown) {
-                this.$('.dropdown-menu').replaceWith(dropdown.$el);
+                this.$('[data-role="dropdown-menu-content"]').replaceWith(dropdown.$el);
             }
         },
 
         onDropdownOpen: function(e) {
-            var dropdown = this.subview('dropdown');
-            var accessLevels = this.model.accessLevels;
+            let dropdown = this.subview('dropdown');
+            const accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    el: this.$('.dropdown-menu'),
+                    el: this.$('[data-role="dropdown-menu-content"]'),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',

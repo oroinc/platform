@@ -1,6 +1,7 @@
-{% import "OroEmailBundle::actions.html.twig" as Actions %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% import "@OroEmail/actions.html.twig" as Actions %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEmail/macros.html.twig' as EA %}
+{% import "@OroActivity/macros.html.twig" as AC %}
 
 {#
   variables:
@@ -12,20 +13,22 @@
 <div class="email-info{{ emailCollapsed ? '': ' in'}}" data-layout="separate">
     <div class="email-short">
         <div class="email-view-toggle">
-            <div class="pull-right">
-                <span class="email-sent-date">
-                    <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
-                        <span class="fa-comment" aria-hidden="true"></span><span class="count" aria-hidden="true"></span>
+            <div class="email-sent-date">
+                <div class="comment-date">
+                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
+                        <span class="count" aria-hidden="true"></span>
                     </span>
                     {% if email.emailBody and email.emailBody.hasAttachments %}
-                        <span class="fa-paperclip email-has-attachment" aria-hidden="true"></span>
+                        <span class="email-has-attachment" aria-hidden="true"></span>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}
-                </span>
-            </div>
-            <div class="email-participants">
-                <span class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</span>
-                <span class="email-recipients">{{ 'To'|trans|lower }} {{ EA.email_participants_name(email.recipients, true, false) }}</span>
+                </div>
+
+
+                <div class="email-participants">
+                    <span class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</span>
+                    <span class="email-recipients">{{ 'To'|trans|lower }} {{ EA.email_participants_name(email.recipients, true, false) }}</span>
+                </div>
             </div>
             <div class="email-body">
                 {% if email.emailBody %}
@@ -37,56 +40,83 @@
         </div>
     </div>
     <div class="email-full">
-        <div class="email-view-toggle">
-            {% set actionParameters = routeParameters is defined ? {
-            routeParameters: routeParameters
-            } : {} %}
-            {% set buttonsHtml %}
-                {% if defaultReplyButton is not defined or defaultReplyButton == 1 %}
-                    {{ Actions.replyButton(email, actionParameters) }}
-                    {{ Actions.replyAllButton(email, actionParameters) }}
-                {% else %}
-                    {{ Actions.replyAllButton(email, actionParameters) }}
-                    {{ Actions.replyButton(email, actionParameters) }}
-                {% endif %}
-                {{ Actions.forwardButton(email, actionParameters ) }}
-            {% endset %}
-            <div class="pull-right">
-                {% if isDesktopVersion() %}
-                    {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
-                {% endif %}
-                <div class="email-sent-date">
-                    <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
-                        <span class="fa-comment" aria-hidden="true"></span><span class="count" aria-hidden="true"></span>
-                    </span>
-                    {% if email.emailBody and email.emailBody.hasAttachments %}
-                        <span class="fa-paperclip email-has-attachment" aria-hidden="true"></span>
-                    {% endif %}
-                    {{ EA.date_smart_format(email.sentAt) }}<br />
-                </div>
-            </div>
-            <div class="email-participants">
-                <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
-                <span class="email-recipients">{{ 'To'|trans }}: {{ EA.email_participants_name(email.recipients, true) }}</span>
-                <div class="email-detailed-info-table dropdown">
-                    {% set togglerId = 'dropdown-'|uniqid %}
-                    <span id="{{ togglerId }}" role="button" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
-                          aria-haspopup="true" aria-expanded="false"
-                          aria-label="{{ 'oro.email.show_details.label'|trans }}"
-                          title="{{ 'oro.email.show_details.tooltip'|trans }}">
-                        <span class="fa fa-caret-square-o-down" aria-hidden="true"></span>
-                    </span>
-                    <div class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
-                        {{ EA.email_detailed_info_table(email) }}
+        <header class="email-header">
+            {# Display contexts targets in the activity list item view #}
+            {% if renderContexts is defined and renderContexts and thread|length > 0 %}
+                <div class="email-contexts-targets">
+                    <div class="activity-context-activity-list">
+                        {% set checkTarget = target ? true : false %}
+                        {{ AC.activity_contexts(thread|first, target, checkTarget) }}
                     </div>
                 </div>
-            </div>
-            {% if isMobileVersion() %}
-                <div class="email-actions clearfix">{{ buttonsHtml }}</div>
             {% endif %}
-        </div>
-        <div class="email-content clearfix">
+
+            <div class="email-actions">
+                <div class="email-sent-date">
+                    <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
+                        <span class="count" aria-hidden="true"></span>
+                    </span>
+                    {% if email.emailBody and email.emailBody.hasAttachments %}
+                        <span class="email-has-attachment" aria-hidden="true"></span>
+                    {% endif %}
+                    {{ EA.date_smart_format(email.sentAt) }}
+                </div>
+
+                {% set actionParameters = {
+                    'routeParameters': routeParameters is defined ? routeParameters : {},
+                    'aCss': ' btn-sm'
+                } %}
+
+                {% set buttonsHtml %}
+                    {% if defaultReplyButton is not defined or defaultReplyButton == 1 %}
+                        {{ Actions.replyButton(email, actionParameters) }}
+                        {{ Actions.replyAllButton(email, actionParameters) }}
+                    {% else %}
+                        {{ Actions.replyAllButton(email, actionParameters) }}
+                        {{ Actions.replyButton(email, actionParameters) }}
+                    {% endif %}
+                    {{ Actions.forwardButton(email, actionParameters ) }}
+                {% endset %}
+
+                {% if isDesktopVersion() %}
+                    {{ UI.pinnedDropdownButton({
+                        'html': buttonsHtml,
+                        'options': {
+                            'moreButtonAttrs': {
+                                'class': ' btn-sm'
+                            }
+                        }
+                    }) }}
+                {% endif %}
+
+                {% if isMobileVersion() %}
+                    <div class="email-actions-items">
+                        {{ buttonsHtml }}
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+        <div class="email-content">
             <div class="email-body responsive-cell">
+                <div class="email-view-toggle">
+                    <div class="email-participants">
+                        <div class="email-author">{{ EA.email_participant_name_or_me(email.fromEmailAddress, email.fromName, true) }}</div>
+                        <span class="email-recipients">{{ 'To'|trans }}: {{ EA.email_participants_name(email.recipients, true) }}</span>
+                        <div class="email-detailed-info-table dropdown">
+                            {% set togglerId = 'dropdown-'|uniqid %}
+                            <span id="{{ togglerId }}" role="button" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
+                                  aria-haspopup="true" aria-expanded="false"
+                                  aria-label="{{ 'oro.email.show_details.label'|trans }}"
+                                  title="{{ 'oro.email.show_details.tooltip'|trans }}">
+                                <span class="email-detailed-info-table__icon" aria-hidden="true"></span>
+                            </span>
+                            <div class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
+                                {{ EA.email_detailed_info_table(email) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {% if email.emailBody %}
                     {% if email.emailBody.bodyIsText %}
                         {{ email.emailBody.bodyContent|nl2br }}
@@ -96,7 +126,7 @@
                             view: 'oroemail/js/app/views/email-body-view',
                             bodyContent: email.emailBody.bodyContent|oro_html_sanitize,
                             styles: [
-                                asset('bundles/oroform/css/wysiwyg-editor.css'),
+                                asset('build/admin/tinymce/wysiwyg-editor.css'),
                                 asset('bundles/oroemail/css/email-body.css')
                             ]
                         } %}
@@ -111,8 +141,8 @@
                     {% set previewLimit = oro_config_value('oro_email.attachment_preview_limit') %}
                     {% if aCount %}
                         <div class="email-attachments-list-cont">
-                            <h6 class="pull-left">{{ aCount }} {{ aCount > 1 ? 'oro.attachment.entity_plural_label'|trans : 'oro.attachment.entity_label'|trans }}</h6>
-                            <a class="pull-left no-hash" href="{{ path('oro_email_body_attachments', {id: email.emailBody.id}) }}">{{ 'oro.email.attachment.download_all'|trans }}</a>
+                            <h6>{{ aCount }} {{ aCount > 1 ? 'oro.attachment.entity_plural_label'|trans : 'oro.attachment.entity_label'|trans }}</h6>
+                            <a class="no-hash" href="{{ path('oro_email_body_attachments', {id: email.emailBody.id}) }}">{{ 'oro.email.attachment.download_all'|trans }}</a>
                             <ul class="email-attachments-list thumbnails {{ aCount > previewLimit ? 'name-only' : ''  }}">
                                 {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
                             </ul>

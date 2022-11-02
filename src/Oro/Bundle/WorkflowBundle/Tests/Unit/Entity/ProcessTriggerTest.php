@@ -5,25 +5,19 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessTrigger
-     */
-    protected $entity;
+    /** @var ProcessTrigger */
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new ProcessTrigger();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGetId()
@@ -31,11 +25,8 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
 
         $testValue = 1;
-        $reflectionProperty = new \ReflectionProperty('\Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->entity, $testValue);
-
-        $this->assertEquals($testValue, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $testValue);
+        $this->assertSame($testValue, $this->entity->getId());
     }
 
     /**
@@ -54,10 +45,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testValue, $this->entity->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'event' => ['event', 'update'],
@@ -72,8 +60,6 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateInterval $interval
-     * @param $seconds
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
     public function testConvertDateIntervalToSeconds(\DateInterval $interval, $seconds)
@@ -82,8 +68,6 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateInterval $interval
-     * @param $seconds
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
     public function testConvertSecondsToDateInterval(\DateInterval $interval, $seconds)
@@ -96,10 +80,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function dateIntervalAndSecondsDataProvider()
+    public function dateIntervalAndSecondsDataProvider(): array
     {
         return [
             [
@@ -174,7 +155,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
      * @param ProcessTrigger $actualEntity
      * @param bool $isEquals
      */
-    protected function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
+    private function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
     {
         $method = $isEquals ? 'assertEquals' : 'assertNotEquals';
         $this->$method($expectedEntity->getEvent(), $actualEntity->getEvent());

@@ -1,4 +1,7 @@
-assets:
-    css:
-        'orodashboard':
-            - 'bundles/orodashboard/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/orodashboard/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orodashboard/css/scss/main.scss'

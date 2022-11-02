@@ -2,48 +2,35 @@
 
 namespace Oro\Bundle\EntityBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @todo this processor should be replaced with a validator in BAP-15805
+ * Validates EntityFieldFallbackValue included entities.
  */
 class ValidateEntityFallback implements ProcessorInterface
 {
-    /**
-     * @var EntityFallbackResolver
-     */
+    /** @var EntityFallbackResolver */
     private $fallbackResolver;
 
-    /**
-     * @var null|string
-     */
-    private $entityIncludedType;
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
 
-    /**
-     * @param EntityFallbackResolver $fallbackResolver
-     * @param ValueNormalizer $valueNormalizer
-     */
-    public function __construct(EntityFallbackResolver $fallbackResolver, ValueNormalizer $valueNormalizer)
-    {
+    public function __construct(
+        EntityFallbackResolver $fallbackResolver,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
         $this->fallbackResolver = $fallbackResolver;
-        $this->entityIncludedType = ValueNormalizerUtil::convertToEntityType(
-            $valueNormalizer,
-            EntityFieldFallbackValue::class,
-            new RequestType([RequestType::JSON_API]),
-            false
-        );
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -51,191 +38,190 @@ class ValidateEntityFallback implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context|FormContext $context */
+        /** @var CustomizeFormDataContext $context */
 
-        $mainClass = $context->get(Context::CLASS_NAME);
-        $requestData = $context->getRequestData();
-        if (!array_key_exists(JsonApiDoc::INCLUDED, $requestData)) {
+        $form = $context->getForm();
+        if (!FormUtil::isSubmittedAndValid($form)) {
+            return;
+        }
+        $fallbackValue = $context->getData();
+        if (!$fallbackValue instanceof EntityFieldFallbackValue) {
             return;
         }
 
-        $includedData = $this->getCompatibleIncludedRelations($requestData, $this->entityIncludedType, $context);
-        if (empty($includedData)) {
-            return;
+        $includedEntities = $context->getIncludedEntities();
+        if (!$this->hasExactlyOneAttribute($fallbackValue)) {
+            FormUtil::addNamedFormError(
+                $form,
+                EntityFieldFallbackValue::class,
+                sprintf(
+                    'Either "%s", "%s" or "%s" property should be specified.',
+                    $this->getFormFieldName($form, 'fallback'),
+                    $this->getFormFieldName($form, 'scalarValue'),
+                    $this->getFormFieldName($form, 'arrayValue')
+                )
+            );
+        } elseif (null !== $includedEntities) {
+            list($ownerEntity, $associationName) = $this->findAssociation($fallbackValue, $includedEntities);
+            if (null !== $ownerEntity && $associationName) {
+                $this->validateValidFallback($form, $fallbackValue, $ownerEntity, $associationName);
+            }
+        }
+    }
+
+    /**
+     * @param EntityFieldFallbackValue $fallbackValue
+     *
+     * @return bool
+     */
+    private function hasExactlyOneAttribute(EntityFieldFallbackValue $fallbackValue)
+    {
+        $filledAttributes = 0;
+        if (null !== $fallbackValue->getScalarValue()) {
+            $filledAttributes++;
+        }
+        if ($fallbackValue->getArrayValue()) {
+            $filledAttributes++;
+        }
+        if ($fallbackValue->getFallback()) {
+            $filledAttributes++;
         }
 
-        $relations = $this->getCompatibleRelations($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS]);
+        return 1 === $filledAttributes;
+    }
 
-        // match included data with relationships section, and validate entity fallback values provided
-        foreach ($includedData as $includedItem) {
-            // parse relationships section to get the included item's (fallback compatible) entity field name
-            foreach ($relations as $relationName => $relationItem) {
-                if ($includedItem[JsonApiDoc::ID] === $relationItem[JsonApiDoc::DATA][JsonApiDoc::ID]) {
-                    if (false === $this->isFallbackRequestItemValid($relationName, $includedItem, $mainClass)) {
-                        $this->addError(
-                            $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
-                            $this->getInvalidIncludedFallbackItemMessage($includedItem[JsonApiDoc::ID]),
-                            $context
-                        );
-                        break;
-                    }
+    /**
+     * @param FormInterface            $form
+     * @param EntityFieldFallbackValue $fallbackValue
+     * @param object                   $entity
+     * @param string                   $associationName
+     */
+    private function validateValidFallback(
+        FormInterface $form,
+        EntityFieldFallbackValue $fallbackValue,
+        $entity,
+        string $associationName
+    ): void {
+        $fallbackConfig = $this->fallbackResolver->getFallbackConfig(
+            $entity,
+            $associationName,
+            EntityFieldFallbackValue::FALLBACK_LIST
+        );
+
+        if ($fallbackValue->getFallback()) {
+            if (!array_key_exists($fallbackValue->getFallback(), $fallbackConfig)) {
+                FormUtil::addNamedFormError(
+                    $form,
+                    Assert\Choice::class,
+                    sprintf(
+                        'The value is not valid. Acceptable values: %s.',
+                        implode(',', array_keys($fallbackConfig))
+                    ),
+                    $this->getFormFieldName($form, 'fallback')
+                );
+            }
+        } else {
+            $requiredValueField = $this->fallbackResolver->getRequiredFallbackFieldByType(
+                $this->fallbackResolver->getType($entity, $associationName)
+            );
+            if (EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD === $requiredValueField) {
+                if (null === $fallbackValue->getScalarValue()) {
+                    FormUtil::addNamedFormError(
+                        $form,
+                        Assert\NotNull::class,
+                        'The value should not be null.',
+                        $this->getFormFieldName($form, 'scalarValue')
+                    );
+                }
+            } elseif (!$fallbackValue->getArrayValue()) {
+                FormUtil::addNamedFormError(
+                    $form,
+                    Assert\NotBlank::class,
+                    'The value should not be blank.',
+                    $this->getFormFieldName($form, 'arrayValue')
+                );
+            }
+        }
+    }
+
+    /**
+     * @param EntityFieldFallbackValue $fallbackValue
+     * @param IncludedEntityCollection $includedEntities
+     *
+     * @return array [owner entity, association name]
+     */
+    private function findAssociation(
+        EntityFieldFallbackValue $fallbackValue,
+        IncludedEntityCollection $includedEntities
+    ): array {
+        $ownerEntity = null;
+        $associationName = null;
+        $primaryEntity = $includedEntities->getPrimaryEntity();
+        if (null !== $primaryEntity) {
+            $associationName = $this->findAssociationName(
+                $fallbackValue,
+                $primaryEntity,
+                $includedEntities->getPrimaryEntityMetadata()
+            );
+        }
+        if ($associationName) {
+            $ownerEntity = $primaryEntity;
+        } else {
+            foreach ($includedEntities as $entity) {
+                if ($entity === $fallbackValue || $entity instanceof EntityFieldFallbackValue) {
+                    continue;
+                }
+                $associationName = $this->findAssociationName(
+                    $fallbackValue,
+                    $entity,
+                    $includedEntities->getData($entity)->getMetadata()
+                );
+                if ($associationName) {
+                    $ownerEntity = $entity;
+                    break;
                 }
             }
         }
+
+        return [$ownerEntity, $associationName];
     }
 
     /**
-     * @param array $relations
-     * @return array
+     * @param EntityFieldFallbackValue $fallbackValue
+     * @param object                   $entity
+     * @param EntityMetadata|null      $metadata
+     *
+     * @return string|null
      */
-    private function getCompatibleRelations(array $relations)
-    {
-        return array_filter(
-            $relations,
-            function ($relation) {
-                return (isset($relation[JsonApiDoc::DATA][JsonApiDoc::TYPE])
-                    && $relation[JsonApiDoc::DATA][JsonApiDoc::TYPE] === $this->entityIncludedType);
-            }
-        );
-    }
-
-    /**
-     * @param string $relationName
-     * @param array $fallbackRequestData
-     * @param string $mainEntityClass
-     * @return bool
-     */
-    private function isFallbackRequestItemValid($relationName, $fallbackRequestData, $mainEntityClass)
-    {
-        $fallbackFiltered = array_filter(
-            $fallbackRequestData[JsonApiDoc::ATTRIBUTES],
-            function ($value) {
-                return !is_null($value);
-            }
-        );
-
-        // only one supplied value is valid
-        if (1 !== count($fallbackFiltered)) {
-            return false;
+    private function findAssociationName(
+        EntityFieldFallbackValue $fallbackValue,
+        $entity,
+        ?EntityMetadata $metadata
+    ): ?string {
+        if (null === $metadata) {
+            return null;
         }
 
-        $fallbackConfig = $this->fallbackResolver->getFallbackConfig(
-            new $mainEntityClass(),
-            $relationName,
-            EntityFieldFallbackValue::FALLBACK_LIST
-        );
-        $attributes = $fallbackRequestData[JsonApiDoc::ATTRIBUTES];
-
-        // check if correct fallback type provided
-        if (isset($attributes[EntityFieldFallbackValue::FALLBACK_PARENT_FIELD])) {
-            return in_array(
-                $attributes[EntityFieldFallbackValue::FALLBACK_PARENT_FIELD],
-                array_keys($fallbackConfig)
-            );
-        }
-
-        // Get required fallback value type
-        $valueType = $this->fallbackResolver->getType(new $mainEntityClass(), $relationName);
-        // Choose which field of a fallback definition is required
-        $requiredValueField = $this->fallbackResolver->getRequiredFallbackFieldByType($valueType);
-        //we have special cases when the required field is scalar value but the value type is array
-        //check pageTemplate, we have data transformer that converts the scalar value to array value
-        if (in_array($relationName, EntityFieldFallbackValue::$specialRelations)) {
-            $requiredValueField = EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD;
-        }
-
-        // Check if valid scalar data provided
-        if ($requiredValueField === EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD) {
-            return (
-                isset($attributes[EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD])
-                && is_scalar($attributes[EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD])
-            );
-        }
-
-        // Check if valid array data provided
-        if ($requiredValueField === EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD) {
-            return (
-                isset($attributes[EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD])
-                && is_array($attributes[EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD])
-            );
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array $requestData
-     * @param string $entityIncludedType
-     * @param Context $context
-     * @return array
-     */
-    private function getCompatibleIncludedRelations(array $requestData, $entityIncludedType, Context $context)
-    {
-        $result = [];
-
-        foreach ($requestData[JsonApiDoc::INCLUDED] as $includedItemIndex => $includedItem) {
-            if (!isset($includedItem[JsonApiDoc::TYPE])
-                || $entityIncludedType !== $includedItem[JsonApiDoc::TYPE]
+        $associationName = null;
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $name => $associationMetadata) {
+            $propertyPath = $associationMetadata->getPropertyPath();
+            if ($propertyPath
+                && is_a($associationMetadata->getTargetClassName(), EntityFieldFallbackValue::class, true)
+                && $this->propertyAccessor->getValue($entity, $propertyPath) === $fallbackValue
             ) {
-                continue;
-            }
-
-            if (!isset($includedItem[JsonApiDoc::ATTRIBUTES])) {
-                $this->addError(
-                    $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
-                    $this->getInvalidIncludedFallbackItemMessage($includedItemIndex),
-                    $context
-                );
-                $result = [];
+                $associationName = $name;
                 break;
             }
-
-            $result[$includedItem[JsonApiDoc::ID]] = $includedItem;
         }
 
-        return $result;
+        return $associationName;
     }
 
-    /**
-     * @param string $itemId
-     *
-     * @return string
-     */
-    private function getInvalidIncludedFallbackItemMessage($itemId)
+    private function getFormFieldName(FormInterface $form, string $propertyPath): string
     {
-        return sprintf(
-            "Invalid entity fallback value provided for the included value with id '%s'." .
-            " Please provide a correct id, and an attribute section with either a '%s' identifier, an '%s' or '%s'",
-            $itemId,
-            EntityFieldFallbackValue::FALLBACK_PARENT_FIELD,
-            EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD,
-            EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD
-        );
-    }
+        $field = FormUtil::findFormFieldByPropertyPath($form, $propertyPath);
 
-    /**
-     * @param string $pointer
-     * @param string $message
-     * @param Context $context
-     */
-    private function addError($pointer, $message, Context $context)
-    {
-        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
-            ->setSource(ErrorSource::createByPointer($pointer));
-
-        $context->addError($error);
-    }
-
-    /**
-     * @param array $properties
-     * @param string|null $parentPointer
-     * @return string
-     *
-     */
-    private function buildPointer(array $properties, $parentPointer = null)
-    {
-        array_unshift($properties, $parentPointer);
-
-        return implode('/', $properties);
+        return null !== $field ? $field->getName() : $propertyPath;
     }
 }

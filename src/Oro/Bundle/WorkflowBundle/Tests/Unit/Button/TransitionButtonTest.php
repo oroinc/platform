@@ -9,61 +9,48 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TransitionButtonTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflow;
+    private $workflow;
 
     /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definition;
+    private $definition;
 
     /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
-    protected $transition;
+    private $transition;
 
     /** @var ButtonContext|\PHPUnit\Framework\MockObject\MockObject */
-    protected $buttonContext;
+    private $buttonContext;
 
     /** @var TransitionButton */
-    protected $button;
+    private $button;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->transition = $this->getMockBuilder(Transition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->transition = $this->createMock(Transition::class);
+        $this->definition = $this->createMock(WorkflowDefinition::class);
+        $this->workflow = $this->createMock(Workflow::class);
+        $this->buttonContext = $this->createMock(ButtonContext::class);
 
-        $this->definition = $this->getMockBuilder(WorkflowDefinition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow->expects($this->any())->method('getDefinition')->willReturn($this->definition);
-
-        $this->buttonContext = $this->getMockBuilder(ButtonContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($this->definition);
 
         $this->button = new TransitionButton($this->transition, $this->workflow, $this->buttonContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->workflow, $this->definition, $this->button, $this->buttonContext, $this->transition);
-    }
-
     public function testGetName()
     {
-        $this->workflow->expects($this->once())->method('getName')->willReturn('test_workflow_name');
-        $this->transition->expects($this->once())->method('getName')->willReturn('test_transition_name');
+        $this->workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_workflow_name');
+        $this->transition->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_transition_name');
 
         $this->assertEquals('test_workflow_name_test_transition_name', $this->button->getName());
     }
@@ -71,7 +58,9 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $this->transition->expects($this->once())->method('getButtonLabel')->willReturn($label);
+        $this->transition->expects($this->once())
+            ->method('getButtonLabel')
+            ->willReturn($label);
 
         $this->assertEquals($label, $this->button->getLabel());
     }
@@ -81,14 +70,18 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->button->getIcon());
 
         $icon = 'test-icon';
-        $this->transition->expects($this->once())->method('getFrontendOptions')->willReturn(['icon' => $icon]);
+        $this->transition->expects($this->once())
+            ->method('getFrontendOptions')
+            ->willReturn(['icon' => $icon]);
 
         $this->assertEquals($icon, $this->button->getIcon());
     }
 
     public function testGetOrder()
     {
-        $this->definition->expects($this->once())->method('getPriority')->willReturn(1);
+        $this->definition->expects($this->once())
+            ->method('getPriority')
+            ->willReturn(1);
         $this->assertEquals(1, $this->button->getOrder());
     }
 
@@ -99,8 +92,6 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTemplateDataDataProvider
-     *
-     * @param array $customData
      */
     public function testGetTemplateData(array $customData = [])
     {
@@ -120,6 +111,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
                 'workflowItemId' => null
             ],
             'executionRoute' => $this->buttonContext->getExecutionRoute(),
+            'requestMethod' => 'POST',
             'dialogRoute' => null,
             'additionalData' => [],
             'jsDialogWidget' => TransitionButton::TRANSITION_JS_DIALOG_WIDGET,
@@ -128,10 +120,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplateDataDataProvider()
+    public function getTemplateDataDataProvider(): array
     {
         return [
             'no custom data' => [],

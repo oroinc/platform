@@ -1,0 +1,48 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener:
+            prepareQueryToFilter:
+                rFilter: true
+            removeJoinByRootAndAliases:
+                root: true
+                rJoins: true
+        Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository:
+            findUnseenUserEmail:
+                uoCheck: true
+            applyFolderFilter:
+                expr: true
+        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider:
+            getThreadEmails:
+                criteria: true
+        Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory:
+            getOwningExpression:
+                tableAlias: true
+        Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper:
+            bindEmailAddressOwners:
+                emailAddressAlias: true
+        Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository:
+            findBySettingsClassAndEmail:
+                settingsClass: true
+            findForEmail:
+                emailUsersDql: true
+        Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository:
+            getOwnerIdsWithEmailsQb:
+                ownerClassName: true
+        Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter:
+            applyInboxFilter:
+                dql: true
+            applySentFilter:
+                dql: true
+    safe_methods:
+        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager:
+            getEmailAddressProxyClass: true
+        Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter:
+            getUserOwnerFieldName: true
+        Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage:
+            getEmailOwnerFieldName: true
+        Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository:
+            getAclWhereCondition: true
+        Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory:
+            getOwningExpression: true
+            prepareSearchFilters: true

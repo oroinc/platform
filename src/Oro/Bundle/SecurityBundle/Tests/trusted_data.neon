@@ -1,0 +1,71 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\SecurityBundle\Acl\Dbal\AclProvider:
+            findChildren:
+                sql: true
+            retrieveObjectIdentityPrimaryKey:
+                sql: true
+            getAncestorIds:
+                sql: true
+            lookupObjectIdentities:
+                sql: true
+        Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider:
+            updateSecurityIdentity:
+                sql: true
+            deleteAclClass:
+                sql: true
+            createAcl:
+                sql: true
+            deleteSecurityIdentity:
+                sql: true
+            updateAcl:
+                sql: true
+            updateUserSecurityIdentity:
+                sql: true
+            createObjectIdentity:
+                sql: true
+            createOrRetrieveClassId:
+                sql: true
+                insertSql: true
+            createOrRetrieveSecurityIdentityId:
+                sql: true
+                insertSql: true
+            deleteAccessControlEntries:
+                sql: true
+            deleteObjectIdentity:
+                sql: true
+            deleteObjectIdentityRelations:
+                sql: true
+            regenerateAncestorRelations:
+                sql: true
+            updateNewFieldAceProperty:
+                sql: true
+            updateOldFieldAceProperty:
+                sql: true
+            updateNewAceProperty:
+                sql: true
+            updateOldAceProperty:
+                sql: true
+            updateAce:
+                sql: true
+        Oro\Bundle\SecurityBundle\Search\AclHelper:
+            apply:
+                orExpression: true
+        Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider:
+            executeQuery:
+                query: true
+        Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper:
+            addOwnershipField:
+                fieldExpr: true
+    safe_methods:
+        Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata:
+            getOwnerColumnName: true
+            getOwnerFieldName: true
+            getOrganizationFieldName: true
+            getOrganizationColumnName: true
+        Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface:
+            getOwnerColumnName: true
+            getOwnerFieldName: true
+            getOrganizationFieldName: true
+            getOrganizationColumnName: true

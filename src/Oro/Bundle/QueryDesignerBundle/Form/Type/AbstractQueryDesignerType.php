@@ -11,8 +11,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Used for form with query designer
+ */
 abstract class AbstractQueryDesignerType extends AbstractType
 {
     const DATE_GROUPING_FORM_NAME = 'dateGrouping';
@@ -64,6 +68,8 @@ abstract class AbstractQueryDesignerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['query_type']);
+        $resolver->setDefault('field_condition_options', []);
+        $resolver->setAllowedTypes('field_condition_options', 'array');
     }
 
     /**
@@ -163,5 +169,13 @@ abstract class AbstractQueryDesignerType extends AbstractType
                 )
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['field_condition_options'] = $options['field_condition_options'];
     }
 }

@@ -3,21 +3,21 @@
 namespace Oro\Bundle\CacheBundle\Provider;
 
 /**
- * Allows to change a file cache directory.
+ * Allows changing and retrieve a file cache directory.
  *
- * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
+ * This trait can be used in a cache implementation based on Symfony\Component\Cache\Adapter\FilesystemAdapter
  *
- * @property string directory
+ * @property string $directory
  */
 trait DirectoryAwareFileCacheTrait
 {
-    /**
-     * Sets the cache directory.
-     *
-     * @param string $directory
-     */
-    public function setDirectory($directory)
+    public function setDirectory(string $directory): void
     {
         $this->directory = $directory;
+    }
+
+    public function getDirectory(): string
+    {
+        return $this->directory;
     }
 }

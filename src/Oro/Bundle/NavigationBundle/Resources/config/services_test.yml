@@ -1,0 +1,11 @@
+services:
+    oro_navigation.tests.navigation_history_logger:
+        alias: oro_navigation.navigation_history_logger
+        public: true
+
+    oro_navigation.tests.skipped_file_systems:
+        class: Oro\Bundle\GaufretteBundle\Tests\Functional\Environment\SkippedGaufretteFileSystemProvider
+        decorates: oro_gaufrette.tests.skipped_file_systems
+        arguments:
+            - '@.inner'
+            - ['public_js']

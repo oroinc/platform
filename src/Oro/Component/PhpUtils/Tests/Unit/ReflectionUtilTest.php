@@ -8,7 +8,7 @@ use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject2;
 
 class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAMESPACE = 'Oro\Component\PhpUtils\Tests\Unit\Stubs\\';
+    private const TEST_NAMESPACE = 'Oro\Component\PhpUtils\Tests\Unit\Stubs\\';
 
     /**
      * @dataProvider getPropertyDataProvider
@@ -26,7 +26,7 @@ class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function getPropertyDataProvider()
+    public function getPropertyDataProvider(): array
     {
         return [
             [new TestObject1(), 'undefinedProperty', null],

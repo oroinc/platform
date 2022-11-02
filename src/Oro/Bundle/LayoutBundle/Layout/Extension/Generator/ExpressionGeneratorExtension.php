@@ -15,9 +15,6 @@ class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensi
     /** @var ExpressionLanguage */
     protected $expressionLanguage;
 
-    /**
-     * @param ExpressionLanguage $expressionLanguage
-     */
     public function __construct(ExpressionLanguage $expressionLanguage)
     {
         $this->expressionLanguage = $expressionLanguage;

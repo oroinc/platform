@@ -4,40 +4,23 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $configManager;
 
     /** @var EnumVirtualFieldProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
-
-        $this->provider = new EnumVirtualFieldProvider(
-            $this->extendConfigProvider,
-            $doctrine
-        );
+        $this->provider = new EnumVirtualFieldProvider($this->configManager);
     }
 
     public function testGetVirtualFields()
@@ -109,52 +92,24 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function initialize($className)
+    private function initialize($className)
     {
-        $metadata = $this->getClassMetadata(['enumField', 'multiEnumField', 'nonConfigurableField']);
-
         $enumFieldConfig = new Config(new FieldConfigId('extend', $className, 'enumField', 'enum'));
         $enumFieldConfig->set('target_field', 'targetField');
-        $multiEnumFieldConfigId = new FieldConfigId('extend', $className, 'multiEnumField', 'multiEnum');
+        $multiEnumFieldConfig = new Config(new FieldConfigId('extend', $className, 'multiEnumField', 'multiEnum'));
 
-        $this->em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($className)
-            ->willReturn($metadata);
-
-        $this->extendConfigProvider->expects($this->exactly(3))
-            ->method('hasConfig')
-            ->willReturnMap([
-                [$className, 'enumField', true],
-                [$className, 'multiEnumField', true],
-                [$className, 'nonConfigurableField', false]
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->with('extend', $className)
+            ->willReturn([
+                $enumFieldConfig->getId(),
+                $multiEnumFieldConfig->getId()
             ]);
-        $this->extendConfigProvider->expects($this->exactly(2))
-            ->method('getId')
+        $this->configManager->expects($this->exactly(2))
+            ->method('getFieldConfig')
             ->willReturnMap([
-                [$className, 'enumField', null, $enumFieldConfig->getId()],
-                [$className, 'multiEnumField', null, $multiEnumFieldConfigId]
+                ['extend', $className, 'enumField', $enumFieldConfig],
+                ['extend', $className, 'multiEnumField', $multiEnumFieldConfig]
             ]);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className, 'enumField')
-            ->willReturn($enumFieldConfig);
-    }
-
-    /**
-     * @param string[] $associationNames
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getClassMetadata($associationNames = [])
-    {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->any())
-            ->method('getAssociationNames')
-            ->will($this->returnValue($associationNames));
-
-        return $metadata;
     }
 }

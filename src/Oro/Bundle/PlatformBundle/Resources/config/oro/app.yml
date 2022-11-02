@@ -10,7 +10,8 @@ doctrine:
                 user:     '%database_user%'
                 password: '%database_password%'
                 options:  '%database_driver_options%'
-                charset:  UTF8
+                charset:  '%database_charset%'
+                server_version: '%database_server_version%'
             session:
                 driver:   '%database_driver%'
                 host:     '%database_host%'
@@ -19,7 +20,8 @@ doctrine:
                 user:     '%database_user%'
                 password: '%database_password%'
                 options:  '%database_driver_options%'
-                charset:  UTF8
+                charset:  '%database_charset%'
+                server_version: '%database_server_version%'
             config:
                 driver:   '%database_driver%'
                 host:     '%database_host%'
@@ -28,7 +30,8 @@ doctrine:
                 user:     '%database_user%'
                 password: '%database_password%'
                 options:  '%database_driver_options%'
-                charset:  UTF8
+                charset:  '%database_charset%'
+                server_version: '%database_server_version%'
     orm:
         default_entity_manager:      default
         auto_generate_proxy_classes: '%kernel.debug%'
@@ -58,3 +61,17 @@ doctrine:
                 query_cache_driver:
                     type: service
                     id:   doctrine.query.cache.config
+
+fos_rest:
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+    view:
+        failed_validation: HTTP_BAD_REQUEST
+        formats:
+            json: true
+            xml: false
+    format_listener:
+        rules:
+            - { path: '^/api/rest', priorities: [ json ], fallback_format: json, prefer_extension: false }
+            - { path: '^/', stop: true }

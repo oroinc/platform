@@ -2,45 +2,36 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Loader;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Kernel;
 
 class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MigrationsLoader */
-    protected $loader;
+    private MigrationsLoader $loader;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $kernel;
+    private Kernel|\PHPUnit\Framework\MockObject\MockObject $kernel;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $connection;
+    private Connection|\PHPUnit\Framework\MockObject\MockObject $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->kernel          = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->container       = $this->getMockForAbstractClass(
-            'Symfony\Component\DependencyInjection\ContainerInterface'
-        );
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->kernel          = $this->createMock(Kernel::class);
+        $this->container       = $this->getMockForAbstractClass(ContainerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connection = $this->createMock(Connection::class);
 
         $this->loader = new MigrationsLoader(
             $this->kernel,
@@ -53,7 +44,7 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMigrationsProvider
      */
-    public function testGetMigrations($bundles, $installed, $expectedMigrationClasses)
+    public function testGetMigrations($bundles, $installed, $expectedMigrationClasses): void
     {
         $bundlesList = [];
         /** @var \Symfony\Component\HttpKernel\Bundle\Bundle $bundle */
@@ -63,23 +54,21 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
 
         $this->kernel->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue($bundlesList));
+            ->willReturn($bundlesList);
 
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->will(
-                $this->returnCallback(
-                    function ($eventName, $event) use (&$installed) {
-                        if ($eventName === MigrationEvents::PRE_UP) {
-                            if (null !== $installed) {
-                                foreach ($installed as $val) {
-                                    /** @var PreMigrationEvent $event */
-                                    $event->setLoadedVersion($val['bundle'], $val['version']);
-                                }
-                            }
+            ->willReturnCallback(
+                function ($event, $eventName) use (&$installed) {
+                    if ($eventName === MigrationEvents::PRE_UP && null !== $installed) {
+                        foreach ($installed as $val) {
+                            /** @var PreMigrationEvent $event */
+                            $event->setLoadedVersion($val['bundle'], $val['version']);
                         }
                     }
-                )
+
+                    return $event;
+                }
             );
 
         $migrations       = $this->loader->getMigrations();
@@ -92,7 +81,7 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
      *
      * @return string[]
      */
-    protected function getMigrationClasses(array $migrations)
+    protected function getMigrationClasses(array $migrations): array
     {
         return array_map(
             function ($migration) {
@@ -105,7 +94,7 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getMigrationsProvider()
+    public function getMigrationsProvider(): array
     {
         $testPackage = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\';
         $test1Bundle = $testPackage . 'Test1Bundle\\Migrations\\Schema';

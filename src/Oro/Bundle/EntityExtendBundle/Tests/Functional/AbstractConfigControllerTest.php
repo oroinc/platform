@@ -16,12 +16,12 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected static $warmupCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(false);
 
-        self::warmUpEntityCache();
+        $this->warmUpEntityCache();
     }
 
     protected function warmUpEntityCache()
@@ -37,7 +37,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         };
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 
@@ -62,7 +62,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createSelectOneToMany($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_grid][]"' .
             ' id="oro_entity_config_type_extend_relation_target_grid" >' .
@@ -90,10 +90,10 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         $form->set($field);
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(2));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = User::class;
-        $form["oro_entity_config_type[extend][relation][target_detailed][0]"] = 'username';
-        $form["oro_entity_config_type[extend][relation][target_grid][0]"] = 'username';
-        $form["oro_entity_config_type[extend][relation][target_title][0]"] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = User::class;
+        $form['oro_entity_config_type[extend][relation][target_detailed][0]'] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_grid][0]'] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_title][0]'] = 'username';
     }
 
     /**
@@ -101,7 +101,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createSelectManyToOne($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_field]"' .
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
@@ -113,8 +113,8 @@ abstract class AbstractConfigControllerTest extends WebTestCase
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = User::class;
-        $form["oro_entity_config_type[extend][relation][target_field]"] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = User::class;
+        $form['oro_entity_config_type[extend][relation][target_field]'] = 'username';
     }
 
     /**
@@ -122,20 +122,20 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createManyToOneNonExtendableEntitySelect($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_field]"' .
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
             '<option value="" selected="selected"></option> ' .
             '<option value="id">' .
-            'Entity fallback value' .
+            'Entity Fallback Value' .
             '</option> </select> '
         );
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = EntityFieldFallbackValue::class;
-        $form["oro_entity_config_type[extend][relation][target_field]"] = 'id';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = EntityFieldFallbackValue::class;
+        $form['oro_entity_config_type[extend][relation][target_field]'] = 'id';
     }
 
     /**
@@ -143,7 +143,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createBidirectionalSelect($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][bidirectional]"' .
             ' id="oro_entity_config_type_extend_relation_bidirectional" >' .

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for User Organization ACL select.
+ */
 class OrganizationUserAclSelectType extends AbstractType
 {
     /**
@@ -17,8 +19,8 @@ class OrganizationUserAclSelectType extends AbstractType
             [
                 'configs'            => [
                     'placeholder'             => 'oro.user.form.choose_user',
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/selection.html.twig',
                     'component'               => 'acl-user-autocomplete',
                     'permission'              => 'VIEW',
                     'entity_name'             => 'Oro\Bundle\UserBundle\Entity\User',

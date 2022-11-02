@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 /**
  * The storage for entity aliases.
  */
-class EntityAliasStorage implements \Serializable
+class EntityAliasStorage
 {
     /** @var EntityAlias[] */
     private $aliases = [];
@@ -97,30 +97,23 @@ class EntityAliasStorage implements \Serializable
         return $this->pluralAliasToClass[$pluralAlias] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $data = [];
         foreach ($this->aliases as $entityClass => $entityAlias) {
             $data[$entityClass] = [$entityAlias->getAlias(), $entityAlias->getPluralAlias()];
         }
 
-        return serialize($data);
+        return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         $this->aliases = [];
         $this->aliasToClass = [];
         $this->pluralAliasToClass = [];
 
-        $data = unserialize($serialized);
-        foreach ($data as $entityClass => $item) {
+        foreach ($serialized as $entityClass => $item) {
             $this->aliases[$entityClass] = new EntityAlias($item[0], $item[1]);
             $this->aliasToClass[$item[0]] = $entityClass;
             $this->pluralAliasToClass[$item[1]] = $entityClass;
@@ -173,7 +166,7 @@ class EntityAliasStorage implements \Serializable
      */
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {
-        if (!preg_match('/^[a-z][a-z0-9_]*$/D', $value)) {
+        if (!preg_match('/^[a-z][a-z0-9\_]*$/D', $value)) {
             throw new InvalidEntityAliasException(sprintf(
                 'The string "%s" cannot be used as %s for the "%s" entity '
                 . 'because it contains illegal characters. '

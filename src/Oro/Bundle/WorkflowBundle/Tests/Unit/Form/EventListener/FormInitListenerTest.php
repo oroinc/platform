@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
+use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Component\Form\FormEvents;
 
 class FormInitListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormInitListener
-     */
-    protected $listener;
+    /** @var FormInitListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new FormInitListener();
     }
@@ -26,11 +26,8 @@ class FormInitListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteInitAction()
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())
             ->method('execute')
             ->with($workflowItem);

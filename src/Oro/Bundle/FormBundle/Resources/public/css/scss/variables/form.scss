@@ -1,71 +1,47 @@
 /* @theme: admin.oro; */
 
-$mce-tinymce-panel-background: $primary-900 !default;
-$mce-tinymce-panel-border: none !default;
+$entities-list-flex-direction: row !default;
+$entities-list-flex-wrap: wrap !default;
+$entities-list-offset-top: 16px !default;
 
-$mce-panel-border: 2px solid $primary-750 !default;
-$mce-panel-border-radius: 2px !default;
-$mce-panel-inner-offset: 0 !default;
-$mce-panel-box-sizing: border-box !default;
+$entities-list-group-item-inner-offset: 12px $content-padding-medium !default;
+$entities-list-group-item-offset-bottom: 8px !default;
+$entities-list-group-item-offset-start: 8px !default;
+$entities-list-group-item-offset-end: 0 !default;
+$entities-list-group-item-width: 295px !default;
+$entities-list-group-item-border: none !default;
+$entities-list-group-item-background-color: $primary-900 !default;
+$entities-list-group-item-position: relative !default;
+$entities-list-group-item-border-radius: 4px !default;
+$entities-list-group-item-close-button-size: 16px !default;
 
-$mce-tinymce-fullscreen-width: auto !default;
-$mce-tinymce-fullscreen-max-width: none !default;
-$mce-tinymce-fullscreen-bottom: 0 !default;
+$entities-list-group-item-header-offset-bottom: $content-padding-small !default;
+$entities-list-group-item-header-inner-offset-end: $content-padding-medium !default;
 
-$mce-tinymce-toolbar-grp-border-top-left-radius: 0 !default;
-$mce-tinymce-toolbar-grp-border-top-right-radius: 0 !default;
+$entities-list-group-item-title-offset: 0 !default;
+$entities-list-group-item-title-font-size: $base-font-size !default;
+$entities-list-group-item-title-font-weight: font-weight('bold') !default;
+$entities-list-group-item-title-align-self: center !default;
+$entities-list-group-item-title-overflow: hidden !default;
 
-$mce-tinymce-edit-area-border-bottom-left-radius: 0 !default;
-$mce-tinymce-edit-area-border-bottom-right-radius: 0 !default;
-$mce-tinymce-edit-area-overflow: hidden !default;
+$entities-list-group-item-link-overflow: hidden !default;
+$entities-list-group-item-link-text-overflow: ellipsis !default;
 
-$mce-fullscreen-overlay-display: block !default;
-$mce-fullscreen-overlay-content: '' !default;
-$mce-fullscreen-overlay-position: fixed !default;
-$mce-fullscreen-overlay-top: 0 !default;
-$mce-fullscreen-overlay-left: 0 !default;
-$mce-fullscreen-overlay-right: 0 !default;
-$mce-fullscreen-overlay-bottom: 0 !default;
-$mce-fullscreen-overlay-z-index: 9 !default;
-$mce-fullscreen-overlay-background-color: #000 !default;
-$mce-fullscreen-overlay-opacity: .2 !default;
+$entities-list-group-default-offset-end: $content-padding-small !default;
 
-$mce-bdesk-font-size: 14px !default;
-$mce-bdesk-inner-offset: 35px 30px 0 !default;
-$mce-bdesk-line-height: inherit !default;
+$entities-list-item-extra-info-line-height: 1.4 !default;
 
-$mce-bdesk-image-width: 225px !default;
-$mce-bdesk-image-line-height: inherit !default;
+$entities-list-group-checkbox-view-offset-end: $content-padding-small !default;
 
-$mce-window-head-mce-ico-display: inline-block !default;
-$mce-window-head-mce-ico-border-right: 1px solid #272e36 !default;
-$mce-window-head-mce-ico-width: 24px !default;
-$mce-window-head-mce-ico-height: 22px !default;
-$mce-window-head-mce-ico-color: #fff !default;
-$mce-window-head-mce-ico-font: 14px FontAwesome !default;
-$mce-window-head-mce-ico-text-align: center !default;
-$mce-window-head-mce-ico-line-height: 22px !default;
-$mce-window-head-mce-ico-text-shadow: 0 1px 0 #45505c !default;
-
-$mce-window-head-mce-ico-remove-content: $fa-var-remove !default;
-
-$mce-window-line-height: normal !default;
-$mce-window-color: #fff !default;
-$mce-window-width: 61px !default;
-
-$entities-list-group-item-inner-offset: 5px 7px !default;
-$entities-list-group-item-offset-left: 0 !default;
-$entities-list-group-item-offset-right: 1 !default;
-$entities-list-group-item-width: 297px !default;
-$entities-list-group-item-border-top-style: none !default;
-
-$entities-list-group-item-h-offset: 3px 0 !default;
-$entities-list-group-default-selector-offset-right: 10px !default;
+$entities-list-group-item-remove-btn-position: absolute !default;
+$entities-list-group-item-remove-btn-top: 0 !default;
+$entities-list-group-item-remove-btn-end: 0 !default;
 
 $controls-list-group-width: 297px !default;
 $controls-list-group-inner-offset-top: 0 !default;
 $controls-list-group-inner-offset-bottom: 0 !default;
-$controls-list-group-vertical-align: middle !default;
+
+$controls-list-group-float-holder-label-inner-offset: 0 $content-padding-small !default;
 
 $controls-list-group-label-bottom-offset: 0 !default;
 
@@ -75,14 +51,14 @@ $control-group-collapsible-display: inline-block !default;
 
 $control-group-collapsible-collapse-action-color: #727272 !default;
 $control-group-collapsible-collapse-action-font-size: 13px !default;
-$control-group-collapsible-collapse-action-font-family: Helvetica !default;
-$control-group-collapsible-collapse-action-font-weight: bold !default;
+$control-group-collapsible-collapse-action-font-family: $font-family-sans-serif !default;
+$control-group-collapsible-collapse-action-font-weight: font-weight('bold') !default;
 
 $control-group-collapsible-collapse-action-icon-content: '−' !default;
 $control-group-collapsible-collapse-action-icon-display: inline-block !default;
 $control-group-collapsible-collapse-action-icon-width: 13px !default;
 $control-group-collapsible-collapse-action-icon-height: 13px !default;
-$control-group-collapsible-collapse-action-icon-font-weight: normal !default;
+$control-group-collapsible-collapse-action-icon-font-weight: font-weight('normal') !default;
 $control-group-collapsible-collapse-action-icon-border: 1px solid #c3c3c3 !default;
 $control-group-collapsible-collapse-action-icon-offset-right: 8px !default;
 $control-group-collapsible-collapse-action-icon-font-size: 12px !default;
@@ -97,13 +73,15 @@ $control-group-collapsible-collapse-action-icon-collapsed-content: '+' !default;
 $control-group-collapsible-controls-overflow: hidden !default;
 $control-group-collapsible-collapsed-content: '+' !default;
 
-$oro-hint-background-color: #fcf8e3 !default;
-$oro-hint-border-radius: 4px !default;
-$oro-hint-border: 1px solid #fbeed5 !default;
-$oro-hint-color: #c09853 !default;
+$oro-hint-background-color: $extra-300 !default;
+$oro-hint-border-radius: 2px !default;
+$oro-hint-border: 0 none !default;
+$oro-hint-color: $warning-darken !default;
+$oro-hint-font-size: $base-font-size--sm !default;
+$oro-hint-line-height: 1.23 !default;
 $oro-hint-offset: 10px 0 0 0 !default;
-$oro-hint-inner-offset: 8px 14px 8px 14px !default;
-$oro-hint-text-shadow: 0 1px 0 rgba(255, 255, 255, .5) !default;
+$oro-hint-inner-offset: 4px 8px !default;
+$oro-hint-text-shadow: none !default;
 $oro-hint-control-group-max-width: 465px !default;
 $oro-hint-controls-width: 294px !default;
 
@@ -122,5 +100,9 @@ $multi-checkbox-control-item-offset: 0 4px 0 0 !default;
 $multi-checkbox-control-input-offset-top: -2px !default;
 
 $section-content-offset-top: -20px !default;
-$section-content-inner-offset-top: 20px !default;
+$section-content-inner-offset-top: 28px !default;
 $section-content-inner-offset-bottom: 20px !default;
+
+$row-fluid-inner-offset: 4px 0 12px !default;
+
+$floating-error-message-line-height: 1.2 !default;

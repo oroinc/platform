@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Handles a grid view REST API request.
+ */
 class GridViewApiHandler
 {
     /** @var FormInterface */
@@ -17,7 +20,7 @@ class GridViewApiHandler
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var GridViewManager */
@@ -26,17 +29,10 @@ class GridViewApiHandler
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param FormInterface         $form
-     * @param RequestStack          $requestStack
-     * @param Registry              $registry
-     * @param GridViewManager       $gridViewManager
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
-        Registry $registry,
+        ManagerRegistry $registry,
         GridViewManager $gridViewManager,
         TokenStorageInterface $tokenStorage
     ) {
@@ -78,9 +74,6 @@ class GridViewApiHandler
         return false;
     }
 
-    /**
-     * @param AbstractGridView $entity
-     */
     protected function onSuccess(AbstractGridView $entity)
     {
         $default = $this->form->get('is_default')->getData();
@@ -103,12 +96,10 @@ class GridViewApiHandler
     }
 
     /**
-     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed.
+     * Remove once https://github.com/symfony/symfony/issues/5906 is fixed.
      *       After removing this method PLEASE CHECK saving filters in grid view
      *       look in CollectionFiltersManager._onChangeFilterSelect()
      *       Added fix for dictionary filters also.
-     *
-     * @param AbstractGridView $gridView
      */
     protected function fixFilters(AbstractGridView $gridView)
     {

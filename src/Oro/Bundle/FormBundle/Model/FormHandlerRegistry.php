@@ -2,48 +2,35 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
-use Oro\Bundle\FormBundle\Exception\UnknownFormHandlerException;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
-use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
-use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
-use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait;
+use Psr\Container\ContainerInterface;
 
 /**
- * Registry of form handler services by their aliases.
- *
- * Has late construction (instantiation) mechanism (internal resolving from service links registry),
- * as all instances of handlers not needed in a single request runtime.
+ * The container for form handlers.
  */
-class FormHandlerRegistry implements ServiceLinkRegistryAwareInterface
+class FormHandlerRegistry
 {
-    const DEFAULT_HANDLER_NAME = 'default';
+    public const DEFAULT_HANDLER_NAME = 'default';
 
-    use ServiceLinkRegistryAwareTrait;
+    /** @var ContainerInterface */
+    private $handlers;
 
-    /**
-     * @param string $alias
-     *
-     * @return FormHandlerInterface
-     */
-    public function get($alias)
+    public function __construct(ContainerInterface $handlers)
     {
-        try {
-            $handler = $this->serviceLinkRegistry->get($alias);
-        } catch (UnknownAliasException $parent) {
-            throw new UnknownFormHandlerException($alias, $parent);
+        $this->handlers = $handlers;
+    }
+
+    public function has(string $alias): bool
+    {
+        return $this->handlers->has($alias);
+    }
+
+    public function get(string $alias): FormHandlerInterface
+    {
+        if (!$this->handlers->has($alias)) {
+            throw new \LogicException(sprintf('Unknown form handler with alias "%s".', $alias));
         }
 
-        if (!$handler instanceof FormHandlerInterface) {
-            throw new \DomainException(
-                sprintf(
-                    'Form data provider `%s` with `%s` alias must implement %s.',
-                    get_class($handler),
-                    $alias,
-                    FormHandlerInterface::class
-                )
-            );
-        }
-
-        return $handler;
+        return $this->handlers->get($alias);
     }
 }

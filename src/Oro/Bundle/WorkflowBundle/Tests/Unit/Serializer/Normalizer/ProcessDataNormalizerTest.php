@@ -2,49 +2,38 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    /**
-     * @var ProcessDataNormalizer
-     */
-    protected $normalizer;
+    /** @var ProcessDataNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new ProcessDataNormalizer($this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
     }
 
     /**
-     * @param ProcessData $object
-     * @param array $context
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize($object, array $context)
+    public function testNormalize(ProcessData $object, array $context)
     {
         $entity = $object['data'];
         $entityId = 1;
@@ -53,96 +42,93 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $processJob = $context['processJob'];
         $triggerEvent = $processJob->getProcessTrigger()->getEvent();
 
-        $normalizedData = array('serialized', 'data');
+        $normalizedData = ['serialized', 'data'];
 
-        if (!$entity || $triggerEvent == ProcessTrigger::EVENT_DELETE) {
-            $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
+        if (!$entity || $triggerEvent === ProcessTrigger::EVENT_DELETE) {
+            $this->doctrineHelper->expects($this->never())
+                ->method('getSingleEntityIdentifier');
         } else {
-            $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity)
-                ->will($this->returnValue($entityId));
+            $this->doctrineHelper->expects($this->once())
+                ->method('getSingleEntityIdentifier')
+                ->with($entity)
+                ->willReturn($entityId);
         }
 
-        $this->serializer->expects($this->once())->method('normalize')
-            ->with($object->getValues(), $format, $context)->will($this->returnValue($normalizedData));
+        $this->serializer->expects($this->once())
+            ->method('normalize')
+            ->with($object->getValues(), $format, $context)
+            ->willReturn($normalizedData);
 
         $this->assertEquals($normalizedData, $this->normalizer->normalize($object, $format, $context));
-        if (!$entity || $triggerEvent == ProcessTrigger::EVENT_DELETE) {
+        if (!$entity || $triggerEvent === ProcessTrigger::EVENT_DELETE) {
             $this->assertNull($processJob->getEntityId());
         } else {
             $this->assertEquals($entityId, $processJob->getEntityId());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
-        return array(
-            'create' => array(
-                'object' => new ProcessData(array('data' => new \stdClass())),
-                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE)),
-            ),
-            'update' => array(
-                'object' => new ProcessData(array('data' => new \stdClass(), 'old' => 1, 'new' => 2)),
-                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_UPDATE)),
-            ),
-            'delete' => array(
-                'object' => new ProcessData(array('data' => new \stdClass())),
-                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)),
-            ),
-            'cron' => array(
+        return [
+            'create' => [
+                'object' => new ProcessData(['data' => new \stdClass()]),
+                'context' => ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE)],
+            ],
+            'update' => [
+                'object' => new ProcessData(['data' => new \stdClass(), 'old' => 1, 'new' => 2]),
+                'context' => ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_UPDATE)],
+            ],
+            'delete' => [
+                'object' => new ProcessData(['data' => new \stdClass()]),
+                'context' => ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)],
+            ],
+            'cron' => [
                 'object' => new ProcessData(),
-                'context' => array('processJob' => $this->createProcessJob()),
-            ),
-        );
+                'context' => ['processJob' => $this->createProcessJob()],
+            ],
+        ];
     }
 
     /**
-     * @param ProcessData $object
-     * @param array $context
-     * @param string $exception
-     * @param string $message
      * @dataProvider normalizeExceptionDataProvider
      */
-    public function testNormalizeException($object, array $context, $exception, $message)
+    public function testNormalizeException(ProcessData $object, array $context, string $exception, string $message)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
         $this->normalizer->normalize($object, 'json', $context);
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeExceptionDataProvider()
+    public function normalizeExceptionDataProvider(): array
     {
-        return array(
-            'no process job' => array(
-                'object'    => new ProcessData(array('data' => new \stdClass())),
-                'context'   => array(),
-                'exception' => '\LogicException',
+        return [
+            'no process job' => [
+                'object'    => new ProcessData(['data' => new \stdClass()]),
+                'context'   => [],
+                'exception' => \LogicException::class,
                 'message'   => 'Process job is not defined',
-            ),
-            'invalid process job' => array(
-                'object'    => new ProcessData(array('data' => new \stdClass())),
-                'context'   => array('processJob' => new \stdClass()),
-                'exception' => '\LogicException',
+            ],
+            'invalid process job' => [
+                'object'    => new ProcessData(['data' => new \stdClass()]),
+                'context'   => ['processJob' => new \stdClass()],
+                'exception' => \LogicException::class,
                 'message'   => 'Invalid process job entity',
-            ),
-        );
+            ],
+        ];
     }
 
     public function testDenormalize()
     {
-        $data = array('data' => new \stdClass(), 'old' => 1, 'new' => 2);
-        $class = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
+        $data = ['data' => new \stdClass(), 'old' => 1, 'new' => 2];
+        $class = ProcessData::class;
         $format = 'json';
-        $context = array('processJob' => new ProcessJob());
-        $denormalizedData = array('denormalized', 'data');
+        $context = ['processJob' => new ProcessJob()];
+        $denormalizedData = ['denormalized', 'data'];
 
-        $this->serializer->expects($this->once())->method('denormalize')->with($data, null, $format, $context)
-            ->will($this->returnValue($denormalizedData));
+        $this->serializer->expects($this->once())
+            ->method('denormalize')
+            ->with($data, null, $format, $context)
+            ->willReturn($denormalizedData);
 
         /** @var ProcessData $processData */
         $processData = $this->normalizer->denormalize($data, $class, $format, $context);
@@ -153,46 +139,42 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
-        return array(
-            'null'        => array(null, false),
-            'scalar'      => array('scalar', false),
-            'datetime'    => array(new \DateTime(), false),
-            'processData' => array(new ProcessData(), true),
-            'stdClass'    => array(new \stdClass(), false),
-        );
+        return [
+            'null'        => [null, false],
+            'scalar'      => ['scalar', false],
+            'datetime'    => [new \DateTime(), false],
+            'processData' => [new ProcessData(), true],
+            'stdClass'    => [new \stdClass(), false],
+        ];
     }
 
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($type, $expected)
+    public function testSupportsDenormalization(string $type, bool $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization(array(), $type));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization([], $type));
     }
 
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
-        return array(
-            'null'        => array(null, false),
-            'string'      => array('string', false),
-            'dateTime'    => array('DateTime', false),
-            'processData' => array('Oro\Bundle\WorkflowBundle\Model\ProcessData', true),
-            'stdClass'    => array('stdClass', false),
-        );
+        return [
+            'null'        => ['', false],
+            'string'      => ['string', false],
+            'dateTime'    => ['DateTime', false],
+            'processData' => [ProcessData::class, true],
+            'stdClass'    => ['stdClass', false],
+        ];
     }
 
-    /**
-     * @param string $event
-     * @return ProcessJob
-     */
-    protected function createProcessJob($event = null)
+    private function createProcessJob(string $event = null): ProcessJob
     {
         $definition = new ProcessDefinition();
         $definition->setRelatedEntity('Test\Entity');

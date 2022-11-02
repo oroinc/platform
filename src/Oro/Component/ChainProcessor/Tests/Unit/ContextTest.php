@@ -71,6 +71,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $context->setFirstGroup('test');
         $this->assertEquals('test', $context->getFirstGroup());
+
+        $context->setFirstGroup(null);
+        $this->assertNull($context->getFirstGroup());
     }
 
     public function testLastGroup()
@@ -81,6 +84,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $context->setLastGroup('test');
         $this->assertEquals('test', $context->getLastGroup());
+
+        $context->setLastGroup(null);
+        $this->assertNull($context->getLastGroup());
     }
 
     public function testSkippedGroups()
@@ -92,21 +98,27 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $context->skipGroup('test');
         $this->assertTrue($context->hasSkippedGroups());
-        $this->assertEquals(['test'], $context->getSkippedGroups());
+        $this->assertSame(['test'], $context->getSkippedGroups());
 
         $context->skipGroup('test1');
         $this->assertTrue($context->hasSkippedGroups());
-        $this->assertEquals(['test', 'test1'], $context->getSkippedGroups());
+        $this->assertSame(['test', 'test1'], $context->getSkippedGroups());
 
         $context->skipGroup('test');
         $this->assertTrue($context->hasSkippedGroups());
-        $this->assertEquals(['test', 'test1'], $context->getSkippedGroups());
+        $this->assertSame(['test', 'test1'], $context->getSkippedGroups());
 
         $context->undoGroupSkipping('test');
         $this->assertTrue($context->hasSkippedGroups());
-        $this->assertEquals(['test1'], $context->getSkippedGroups());
+        $this->assertSame(['test1'], $context->getSkippedGroups());
 
         $context->undoGroupSkipping('test1');
+        $this->assertFalse($context->hasSkippedGroups());
+        $this->assertSame([], $context->getSkippedGroups());
+
+        $context->skipGroup('test');
+        $this->assertTrue($context->hasSkippedGroups());
+        $context->resetSkippedGroups();
         $this->assertFalse($context->hasSkippedGroups());
         $this->assertSame([], $context->getSkippedGroups());
     }
@@ -121,12 +133,13 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $context->setResult('test');
         $this->assertTrue($context->hasResult());
         $this->assertEquals('test', $context->getResult());
-        $this->assertEquals('test', $context->get(Context::RESULT));
 
         $context->setResult(null);
         $this->assertTrue($context->hasResult());
+        $this->assertNull($context->getResult());
 
         $context->removeResult();
         $this->assertFalse($context->hasResult());
+        $this->assertNull($context->getResult());
     }
 }

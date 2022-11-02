@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var SecurityAccessLevelsComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var routing = require('routing');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const routing = require('routing');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
     require('jquery.select2');
 
-    SecurityAccessLevelsComponent = BaseComponent.extend({
+    const SecurityAccessLevelsComponent = BaseComponent.extend({
         element: null,
 
         defaultOptions: {
@@ -29,29 +28,29 @@ define(function(require) {
         options: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SecurityAccessLevelsComponent() {
-            SecurityAccessLevelsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function SecurityAccessLevelsComponent(options) {
+            SecurityAccessLevelsComponent.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            var self = this;
+            const self = this;
             this.dataCache = {};
             this.options = _.extend({}, this.defaultOptions, options);
             this.element = options._sourceElement;
             this.element.find(this.options.accessLevelFieldSelector).each(function() {
-                var $field = $(this);
-                var $input = $field.find('input');
-                var permissionName = $field.siblings('input').val();
-                var oid = $field.attr(self.options.objectIdentityAttribute);
-                var url = routing.generate(self.options.accessLevelRoute, {oid: oid.replace(/\\/g, '_'), permission: permissionName});
+                const $field = $(this);
+                const $input = $field.find('input');
+                const permissionName = $field.siblings('input').val();
+                const oid = $field.attr(self.options.objectIdentityAttribute);
+                const url = routing.generate(self.options.accessLevelRoute, {oid: oid.replace(/\\/g, '_'), permission: permissionName});
                 $input.inputWidget('create', 'select2', {
                     initializeOptions: {
                         initSelection: function(element, callback) {
                             callback({id: $input.val(), text: $input.data('valueText')});
                         },
-                        query: _.bind(self._select2Query, self, url),
+                        query: self._select2Query.bind(self, url),
                         minimumResultsForSearch: -1
                     }
                 }).on('change.' + self.cid, function(e) {
@@ -65,14 +64,14 @@ define(function(require) {
         },
 
         _select2Query: function(url, query) {
-            var self = this;
+            const self = this;
             if (url in this.dataCache) {
                 query.callback({results: this.dataCache[url]});
             } else {
                 $.ajax({
                     url: url,
                     success: function(data) {
-                        var options = [];
+                        const options = [];
                         _.each(_.omit(data, 'template_name'), function(val, key) {
                             options.push({id: key, text: val});
                         });
@@ -84,7 +83,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

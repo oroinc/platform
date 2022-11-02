@@ -6,15 +6,10 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 class AddressCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddressCollectionType
-     */
-    protected $type;
+    /** @var AddressCollectionType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new AddressCollectionType();
     }

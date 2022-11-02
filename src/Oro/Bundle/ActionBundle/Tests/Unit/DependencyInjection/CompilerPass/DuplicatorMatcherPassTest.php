@@ -3,28 +3,45 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DuplicatorMatcherPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
-class DuplicatorMatcherPassTest extends AbstractDuplicatorPassTest
+class DuplicatorMatcherPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    private const FACTORY_SERVICE_ID = 'oro_action.factory.duplicator_matcher_factory';
+    private const TAG_NAME = 'oro_action.duplicate.matcher_type';
+
+    /** @var DuplicatorMatcherPass */
+    private $compiler;
+
+    protected function setUp(): void
     {
-        $this->compilerPass = new DuplicatorMatcherPass();
-        parent::setUp();
+        $this->compiler = new DuplicatorMatcherPass();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getServiceId()
+    public function testProcessWithoutFactoryService()
     {
-        return DuplicatorMatcherPass::FACTORY_SERVICE_ID;
+        $this->compiler->process(new ContainerBuilder());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTag()
+    public function testProcess()
     {
-        return DuplicatorMatcherPass::TAG_NAME;
+        $container = new ContainerBuilder();
+        $container->register(self::FACTORY_SERVICE_ID)
+            ->setArguments([null, []]);
+        $container->register('matcher_service_1')
+            ->addTag(self::TAG_NAME);
+        $container->register('matcher_service_2')
+            ->addTag(self::TAG_NAME);
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addObjectType', [new Reference('matcher_service_1')]],
+                ['addObjectType', [new Reference('matcher_service_2')]]
+            ],
+            $container->getDefinition(self::FACTORY_SERVICE_ID)->getMethodCalls()
+        );
     }
 }

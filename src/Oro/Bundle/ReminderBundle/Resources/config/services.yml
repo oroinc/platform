@@ -1,60 +1,49 @@
-parameters:
-    oro_reminder.entity.class:                    Oro\Bundle\ReminderBundle\Entity\Reminder
-    oro_reminder.entity.manager.class:            Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager
-    oro_reminder.sender.class:                    Oro\Bundle\ReminderBundle\Model\ReminderSender
-    oro_reminder.send_processor_registry.class:   Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
-    oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
-    oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
-    oro_reminder.web_socket.message_params_provider.class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
-    oro_reminder.url_provider.class:              Oro\Bundle\ReminderBundle\Model\UrlProvider
-
 services:
     oro_reminder.entity.manager:
-        class: '%oro_reminder.entity.manager.class%'
+        class: Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager
         arguments:
             - '@oro_entity.doctrine_helper'
 
     oro_reminder.reminder_entity_listener:
         class: Oro\Bundle\ReminderBundle\EventListener\ReminderListener
-        public: false
         arguments:
-            - '@oro_reminder.entity.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: doctrine.event_listener, event: postLoad, lazy: false }
-            - { name: doctrine.event_listener, event: postPersist, lazy: false }
+            - { name: doctrine.event_subscriber }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     oro_reminder.sender:
-        class: '%oro_reminder.sender.class%'
+        class: Oro\Bundle\ReminderBundle\Model\ReminderSender
         arguments:
             - '@oro_reminder.send_processor_registry'
-        lazy: true
 
     oro_reminder.send_processor_registry:
-        class: '%oro_reminder.send_processor_registry.class%'
+        class: Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
         arguments:
-            - []
+            - [] # send methods
+            - ~ # service locator for processors
 
     oro_reminder.send_processor.email:
-        class: '%oro_reminder.send_processor.email.class%'
+        class: Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_reminder.model.template_email_notification'
             - '@event_dispatcher'
         tags:
-            - { name: oro_reminder.send_processor }
+            - { name: oro_reminder.send_processor, method: email }
 
     oro_reminder.send_processor.web_socket:
-        class: '%oro_reminder.send_processor.web_socket.class%'
+        class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
         arguments:
             - '@oro_sync.websocket_client'
             - '@oro_sync.client.connection_checker'
             - '@oro_reminder.web_socket.message_params_provider'
         tags:
-            - { name: oro_reminder.send_processor }
+            - { name: oro_reminder.send_processor, method: web_socket }
 
     #Message params providers
     oro_reminder.web_socket.message_params_provider:
-        class: '%oro_reminder.web_socket.message_params_provider.class%'
+        class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
         arguments:
             - '@translator'
             - '@oro_locale.formatter.date_time'
@@ -62,7 +51,7 @@ services:
             - '@oro_entity_config.provider.reminder'
 
     oro_reminder.url_provider:
-        class: '%oro_reminder.url_provider.class%'
+        class: Oro\Bundle\ReminderBundle\Model\UrlProvider
         arguments:
             - '@oro_entity_config.config_manager'
             - '@router'
@@ -71,7 +60,7 @@ services:
         class: Oro\Bundle\ReminderBundle\Twig\ReminderExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -79,7 +68,7 @@ services:
         class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
         arguments:
             - 'oro_reminder.remind'
-            - '@gos_web_socket.websocket.client_manipulator'
+            - '@gos_web_socket.client.manipulator'
         tags:
             - { name: gos_web_socket.topic }
 
@@ -89,3 +78,7 @@ services:
              - '@doctrine.orm.entity_manager'
              - '@oro_entity_config.provider.reminder'
              - '@oro_entity.entity_name_resolver'
+
+    Oro\Bundle\ReminderBundle\EntityConfig\ReminderEntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config

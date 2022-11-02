@@ -1,29 +1,23 @@
 <?php
 
-namespace Oro\Bundle\WindowsBundle\Tests\Entity;
+namespace Oro\Bundle\WindowsBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WindowsState
-     */
-    protected $windowState;
+    private WindowsState $windowState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->windowState = new WindowsState();
     }
 
     /**
-     * Test getters and setters
-     *
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testGetSet($property, $value)
+    public function testGetSet(string $property, mixed $value)
     {
         $setMethod = 'set' . ucfirst($property);
         $getMethod = 'get' . ucfirst($property);
@@ -38,14 +32,10 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->windowState->isRenderedSuccessfully());
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userMock = $this->createMock(UserInterface::class);
+
         return [
             'user' => ['user', $userMock],
             'data' => ['data', ['test' => true]],
@@ -54,11 +44,10 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetJsonData()
+    public function testGetData()
     {
         $data = ['test' => true];
         $this->windowState->setData($data);
         $this->assertEquals($data, $this->windowState->getData());
-        $this->assertEquals(json_encode($data), $this->windowState->getJsonData());
     }
 }

@@ -1,0 +1,20 @@
+services:
+    oro_api.async_operation.compute_summary:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\AsyncOperation\ComputeOperationSummary
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Entity\AsyncOperation }
+
+    oro_api.async_operation_errors.load_errors:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\AsyncOperation\LoadErrors
+        arguments:
+            - '@oro_api.batch.error_manager'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, association: errors, parentClass: Oro\Bundle\ApiBundle\Entity\AsyncOperation }
+
+    oro_api.async_operation_errors.compute_error_source:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\AsyncOperation\ComputeErrorSource
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Batch\Model\BatchError }

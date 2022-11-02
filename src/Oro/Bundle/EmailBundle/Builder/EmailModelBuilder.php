@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -15,13 +15,12 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class EmailModelBuilder
- *
- * @package Oro\Bundle\EmailBundle\Builder
+ * Builds an email model base on the current request.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -70,14 +69,15 @@ class EmailModelBuilder
     protected $factory;
 
     /**
-     * @param EmailModelBuilderHelper   $emailModelBuilderHelper
-     * @param EntityManager             $entityManager
-     * @param ConfigManager             $configManager
-     * @param EmailActivityListProvider $activityListProvider
-     * @param EmailAttachmentProvider   $emailAttachmentProvider
-     * @param Factory                   $factory
-     * @param RequestStack              $requestStack
+     * @var HtmlTagHelper
      */
+    private $htmlTagHelper;
+
+    /**
+     * @var FileConstraintsProvider
+     */
+    private $fileConstraintsProvider;
+
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         EntityManager $entityManager,
@@ -85,15 +85,19 @@ class EmailModelBuilder
         EmailActivityListProvider $activityListProvider,
         EmailAttachmentProvider $emailAttachmentProvider,
         Factory $factory,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        HtmlTagHelper $htmlTagHelper,
+        FileConstraintsProvider $fileConstraintsProvider
     ) {
-        $this->helper               = $emailModelBuilderHelper;
-        $this->entityManager        = $entityManager;
-        $this->configManager        = $configManager;
+        $this->helper = $emailModelBuilderHelper;
+        $this->entityManager = $entityManager;
+        $this->configManager = $configManager;
         $this->activityListProvider = $activityListProvider;
         $this->emailAttachmentProvider = $emailAttachmentProvider;
         $this->factory = $factory;
         $this->requestStack = $requestStack;
+        $this->htmlTagHelper = $htmlTagHelper;
+        $this->fileConstraintsProvider = $fileConstraintsProvider;
     }
 
     /**
@@ -109,7 +113,7 @@ class EmailModelBuilder
         }
 
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request && $request->isMethod('GET')) {
+        if ($request) {
             $this->applyRequest($emailModel);
             if (!count($emailModel->getContexts())) {
                 $entityClass = $request->get('entityClass');
@@ -117,8 +121,8 @@ class EmailModelBuilder
                 if ($entityClass && $entityId) {
                     $emailModel->setContexts([
                         $this->helper->getTargetEntity(
-                            $request->get('entityClass'),
-                            $request->get('entityId')
+                            $entityClass,
+                            $entityId
                         )
                     ]);
                 }
@@ -156,7 +160,7 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Reply/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
@@ -189,7 +193,6 @@ class EmailModelBuilder
                 $ccList[] = $toEmail;
             }
 
-
             $emailModel->setTo($toList);
             $emailModel->setCc($ccList);
             $emailModel->setFrom($fromAddress->getEmail());
@@ -202,7 +205,7 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Reply/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
@@ -221,7 +224,7 @@ class EmailModelBuilder
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Forward/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         // link attachments of forwarded email to current email instance
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
@@ -240,10 +243,6 @@ class EmailModelBuilder
         $this->request = $request;
     }
 
-    /**
-     * @param EmailModel  $emailModel
-     * @param EmailEntity $parentEmailEntity
-     */
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $user = $this->helper->getUser();
@@ -272,10 +271,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel  $emailModel
-     * @param EmailEntity $parentEmailEntity
-     */
     protected function initReplyAllFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $userEmails = $this->helper->getUser()->getEmails();
@@ -302,9 +297,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyRequest(EmailModel $emailModel)
     {
         $this->applyEntityData($emailModel);
@@ -313,19 +305,20 @@ class EmailModelBuilder
         $this->applyRecipients($emailModel);
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyEntityData(EmailModel $emailModel)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has('entityClass')) {
+
+        $entityClass = $request->get('entityClass');
+        if ($entityClass) {
             $emailModel->setEntityClass(
-                $this->helper->decodeClassName($request->query->get('entityClass'))
+                $this->helper->decodeClassName($entityClass)
             );
         }
-        if ($request->query->has('entityId')) {
-            $emailModel->setEntityId($request->query->get('entityId'));
+
+        $entityId = $request->get('entityId');
+        if ($entityId) {
+            $emailModel->setEntityId($entityId);
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
             if ($emailModel->getParentEmailId()) {
@@ -336,31 +329,25 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyFrom(EmailModel $emailModel)
     {
         if (!$emailModel->getFrom()) {
             $request = $this->request ?? $this->requestStack->getCurrentRequest();
-            if ($request->query->has('from')) {
-                $from = $request->query->get('from');
-                if (!empty($from)) {
-                    $this->helper->preciseFullEmailAddress($from);
-                }
-                $emailModel->setFrom($from);
+
+            $from = $request->get('from');
+            if ($from) {
+                $this->helper->preciseFullEmailAddress($from);
             } else {
                 $user = $this->helper->getUser();
                 if ($user) {
-                    $emailModel->setFrom($this->helper->buildFullEmailAddress($user));
+                    $from = $this->helper->buildFullEmailAddress($user);
                 }
             }
+
+            $emailModel->setFrom($from);
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyRecipients(EmailModel $emailModel)
     {
         $emailModel->setTo(
@@ -379,41 +366,30 @@ class EmailModelBuilder
      */
     protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
-        $addresses = [];
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has($type)) {
-            $address = trim($request->query->get($type));
-            if (!empty($address)) {
-                $this->helper->preciseFullEmailAddress(
-                    $address,
-                    $emailModel->getEntityClass(),
-                    $emailModel->getEntityId(),
-                    $excludeCurrentUser
-                );
-            }
-            if ($address) {
-                $addresses = [$address];
-            }
+        $address = trim((string)$request->get($type, ''));
+        if ($address) {
+            $this->helper->preciseFullEmailAddress(
+                $address,
+                $emailModel->getEntityClass(),
+                $emailModel->getEntityId(),
+                $excludeCurrentUser
+            );
         }
-        return $addresses;
+
+        return $address ? [$address] : [];
     }
 
-    /**
-     * @param EmailModel $model
-     */
     protected function applySubject(EmailModel $model)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-        if ($request->query->has('subject')) {
-            $subject = trim($request->query->get('subject'));
+        $subject = $request->get('subject');
+        $subject = $subject ? trim($subject) : '';
+        if ($subject) {
             $model->setSubject($subject);
         }
     }
 
-    /**
-     * @param EmailModel  $emailModel
-     * @param EmailEntity $emailEntity
-     */
     protected function applyEntityDataFromEmail(EmailModel $emailModel, EmailEntity $emailEntity)
     {
         $entities = $emailEntity->getActivityTargets();
@@ -427,21 +403,14 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applySignature(EmailModel $emailModel)
     {
-        $signature = $this->configManager->get('oro_email.signature');
+        $signature = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
         if ($signature) {
             $emailModel->setSignature($signature);
         }
     }
 
-    /**
-     * @param EmailModel  $emailModel
-     * @param EmailEntity $emailEntity
-     */
     protected function applyAttachments(EmailModel $emailModel, EmailEntity $emailEntity)
     {
         try {
@@ -460,19 +429,16 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function initAvailableAttachments(EmailModel $emailModel)
     {
         $attachments = [];
 
         if ($emailModel->getParentEmailId()) {
-            $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+            $parentEmail = $this->entityManager->getRepository(EmailEntity::class)
                 ->find($emailModel->getParentEmailId());
             $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
             $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
-            $attachments = array_merge($attachments, $threadAttachments);
+            $attachments = $threadAttachments;
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
@@ -485,6 +451,9 @@ class EmailModelBuilder
             }
         }
 
+        $attachments = $this->filterAttachmentsByEmailMaxFileSize($attachments);
+        $attachments = $this->filterAttachmentsByMimeTypes($attachments);
+
         $emailModel->setAttachmentsAvailable($attachments);
     }
 
@@ -495,20 +464,46 @@ class EmailModelBuilder
      */
     protected function filterAttachmentsByName($attachments)
     {
-        $collection = new ArrayCollection($attachments);
         $fileNames = [];
 
-        $filtered = $collection->filter(function ($entry) use (&$fileNames) {
-            /** @var EmailAttachment $entry */
-            if (in_array($entry->getFileName(), $fileNames)) {
-                return false;
-            } else {
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use (&$fileNames) {
+                if (\in_array($entry->getFileName(), $fileNames, true)) {
+                    return false;
+                }
+
                 $fileNames[] = $entry->getFileName();
 
                 return true;
             }
-        });
+        );
+    }
 
-        return $filtered->toArray();
+    private function filterAttachmentsByEmailMaxFileSize(array $attachments): array
+    {
+        $maxFileSize = (float)$this->fileConstraintsProvider->getMaxSizeByConfigPath('oro_email.attachment_max_size');
+        if ($maxFileSize === 0.0) {
+            return $attachments;
+        }
+
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use ($maxFileSize) {
+                return $entry->getFileSize() <= $maxFileSize;
+            }
+        );
+    }
+
+    private function filterAttachmentsByMimeTypes(array $attachments): array
+    {
+        $mimeTypes = $this->fileConstraintsProvider->getMimeTypes();
+
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use ($mimeTypes) {
+                return \in_array($entry->getMimeType(), $mimeTypes, true);
+            }
+        );
     }
 }

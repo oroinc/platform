@@ -1,18 +1,15 @@
-parameters:
-    oro_entity_merge.twig.renderer.class: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer
-
 services:
     oro_entity_merge.twig.extension:
         class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_entity_merge.twig.renderer:
-        class: '%oro_entity_merge.twig.renderer.class%'
+        class: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer
         arguments:
             - '@twig'
             - '@event_dispatcher'
-            - 'OroEntityMergeBundle:Form:mergeValue.html.twig'
+            - '@@OroEntityMerge/Form/mergeValue.html.twig'

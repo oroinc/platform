@@ -1,4 +1,4 @@
-"Invalid credentials.": "Invalid user name or password."
+"Invalid credentials.": "Invalid username or password."
 "Password has been changed.": "Your password was updated by administrator. You should have received an email with your new password."
 "You don't have active organization assigned.": "You don't have active organization assigned."
 
@@ -6,3 +6,4 @@ oro_user:
     login:
         errors:
             bad_credentials: 'Your login was unsuccessful. Please check your e-mail address and password before trying again. If you have forgotten your password, follow "Forgot your password?" link.'
+            empty_owner: 'There was an issue with your authentication, please contact the system administrator.'

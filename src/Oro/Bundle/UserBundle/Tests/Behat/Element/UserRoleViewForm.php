@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Behat\Element;
 
-use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class UserRoleViewForm extends Form
@@ -29,21 +28,27 @@ class UserRoleViewForm extends Form
     /**
      * Fetch permissions to array from role view page form
      *
+     * @param array $permissionNames
      * @return array
      */
-    public function getPermissions()
+    public function getPermissionsByNames(array $permissionNames)
     {
-        $entityPermissions = $this->findAll('css', 'table .entity-permission-container');
         $permissionArray = [];
 
-        /** @var NodeElement $permission */
-        foreach ($entityPermissions as $permission) {
-            $name = $permission->find('css', '.entity-name')->getText();
-            $items = $permission->findAll('css', '.action-permissions__item');
+        foreach ($permissionNames as $name) {
+            $permission = $this->find(
+                'xpath',
+                sprintf(
+                    '//div[contains(@class, "entity-permission-container")'.
+                    ' and descendant::div[@class="entity-name" and text()="%s"]]',
+                    $name
+                )
+            );
+            $items = $permission->findAll('xpath', '//li[contains(@class,"action-permissions__item")]');
 
             foreach ($items as $item) {
-                $action = $item->find('css', '.action-permissions__label')->getText();
-                $value = $item->find('css', '.action-permissions__value')->getText();
+                $action = $item->find('xpath', '//span[@class="action-permissions__label"]')->getText();
+                $value = $item->find('xpath', '//span[@class="action-permissions__value"]')->getText();
 
                 if (!empty($action) && !empty($value)) {
                     $permissionArray[$name][$action] = $value;

@@ -11,7 +11,7 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
     /** @var ValidateRequestDataExist */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new ValidateRequestDataExist();

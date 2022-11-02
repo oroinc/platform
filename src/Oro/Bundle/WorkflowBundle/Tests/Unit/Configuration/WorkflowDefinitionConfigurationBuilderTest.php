@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionIn
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -21,25 +22,25 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowAssembler;
+    private $workflowAssembler;
 
-    /** @var WorkflowDefinitionConfigurationBuilder */
-    protected $builder;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->builder = new WorkflowDefinitionConfigurationBuilder($this->workflowAssembler);
+        $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     * @return array
+     * @param WorkflowDefinitionBuilderExtensionInterface[] $extensions
+     *
+     * @return WorkflowDefinitionConfigurationBuilder
      */
-    protected function getDataAsArray(WorkflowDefinition $definition)
+    private function getWorkflowDefinitionConfigurationBuilder(
+        array $extensions = []
+    ): WorkflowDefinitionConfigurationBuilder {
+        return new WorkflowDefinitionConfigurationBuilder($this->workflowAssembler, $extensions);
+    }
+
+    private function getDataAsArray(WorkflowDefinition $definition): array
     {
         $data = [
             'name' => $definition->getName(),
@@ -58,9 +59,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     * @param array $expectedAcls
      * @dataProvider buildFromConfigurationDataProvider
      */
     public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = [])
@@ -95,31 +93,28 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
             );
         }
 
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getStepManager', 'getAttributeManager', 'getRestrictions', 'getTransitionManager'])
-            ->getMock();
+        $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->any())
             ->method('getStepManager')
-            ->will($this->returnValue($stepManager));
+            ->willReturn($stepManager);
         $workflow->expects($this->any())
             ->method('getAttributeManager')
-            ->will($this->returnValue($attributeManager));
+            ->willReturn($attributeManager);
         $workflow->expects($this->once())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
         $workflow->expects($this->any())
             ->method('getRestrictions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $workflow->setDefinition($definition);
 
         $this->workflowAssembler->expects($this->once())
             ->method('assemble')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
+            ->with($this->isInstanceOf(WorkflowDefinition::class), false)
             ->willReturn($workflow);
 
-        $workflowDefinitions = $this->builder->buildFromConfiguration($inputData);
+        $builder = $this->getWorkflowDefinitionConfigurationBuilder();
+        $workflowDefinitions = $builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);
 
         /** @var WorkflowDefinition $workflowDefinition */
@@ -142,11 +137,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function buildFromConfigurationDataProvider()
+    public function buildFromConfigurationDataProvider(): array
     {
         $minimumConfiguration = [
             'label' => 'Test Workflow',
@@ -274,11 +267,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         ];
     }
 
-    /**
-     * @param array $configuration
-     * @return array
-     */
-    protected function filterConfiguration(array $configuration)
+    private function filterConfiguration(array $configuration): array
     {
         $configurationKeys = [
             WorkflowDefinition::CONFIG_SCOPES,
@@ -294,44 +283,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 
-    /**
-     * @param string $expectedException
-     * @param string $expectedMessage
-     * @param array $inputData
-     * @dataProvider buildFromConfigurationExceptionDataProvider
-     */
-    public function testBuildFromConfigurationException($expectedException, $expectedMessage, array $inputData)
+    public function testBuildFromConfigurationWhenNoEntityInConfiguration()
     {
-        $this->expectException($expectedException);
-        $this->expectExceptionMessage($expectedMessage);
+        $this->expectException(MissedRequiredOptionException::class);
+        $this->expectExceptionMessage('The "entity" configuration option is required.');
 
-        $this->builder->buildFromConfiguration($inputData);
+        $builder = $this->getWorkflowDefinitionConfigurationBuilder();
+        $builder->buildFromConfiguration(['test_workflow' => ['label' => 'My Entity']]);
     }
 
-    /**
-     * @return array
-     */
-    public function buildFromConfigurationExceptionDataProvider()
-    {
-        return [
-            'no entity' => [
-                'expectedException' => '\Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException',
-                'expectedMessage' => 'Configuration option "entity" is required',
-                'inputData' => [
-                    'test_workflow' => [
-                        'label' => 'My Entity'
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    public function testAddExtension()
+    public function testWithExtensions()
     {
         $firstExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
         $interruptionExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
-        $this->builder->addExtension($firstExtension);
-        $this->builder->addExtension($interruptionExtension);
+
+        $builder = $this->getWorkflowDefinitionConfigurationBuilder([
+            $firstExtension,
+            $interruptionExtension
+        ]);
 
         $name = 'workflow_name';
         $configuration = ['label' => 'Label'];
@@ -350,7 +319,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('interrupted by extension');
-        $this->builder->buildOneFromConfiguration($name, $configuration);
+        $builder->buildOneFromConfiguration($name, $configuration);
     }
 
     /**
@@ -358,7 +327,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
      *
      * @return Step[]
      */
-    private function getSteps(array $configuration)
+    private function getSteps(array $configuration): array
     {
         $steps = [];
         if (!empty($configuration[WorkflowConfiguration::NODE_STEPS])) {
@@ -388,7 +357,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
      *
      * @return Attribute[]
      */
-    private function getAttributes(array $configuration)
+    private function getAttributes(array $configuration): array
     {
         $attributes = [];
         if (!empty($configuration[WorkflowConfiguration::NODE_ATTRIBUTES])) {
@@ -411,39 +380,25 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
      *
      * @return Transition[]
      */
-    private function getTransitions(array $configuration)
+    private function getTransitions(array $configuration): array
     {
         $transitions = [];
         if (!empty($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionData) {
                 $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
                 $transition
-                    ->setStart($this->getOption($transitionData, 'is_start', false))
+                    ->setStart($transitionData['is_start'] ?? false)
                     ->setName($transitionData['name'])
-                    ->setInitEntities($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
-                    ->setInitRoutes($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ROUTES, []))
-                    ->setInitDatagrids(
-                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_DATAGRIDS, [])
-                    )
+                    ->setInitEntities($transitionData[WorkflowConfiguration::NODE_INIT_ENTITIES] ?? [])
+                    ->setInitRoutes($transitionData[WorkflowConfiguration::NODE_INIT_ROUTES] ?? [])
+                    ->setInitDatagrids($transitionData[WorkflowConfiguration::NODE_INIT_DATAGRIDS] ?? [])
                     ->setInitContextAttribute(
-                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, '')
+                        $transitionData[WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE] ?? ''
                     );
                 $transitions[] = $transition;
             }
         }
 
         return $transitions;
-    }
-
-    /**
-     * @param array $data
-     * @param string $option
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    private function getOption(array $data, $option, $default = null)
-    {
-        return isset($data[$option]) ? $data[$option] : $default;
     }
 }

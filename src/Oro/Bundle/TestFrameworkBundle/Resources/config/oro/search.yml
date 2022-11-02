@@ -2,7 +2,7 @@ search:
     Oro\Bundle\TestFrameworkBundle\Entity\Item:
         label:           Test Search Bundle Item
         alias:           oro_test_item
-        search_template: OroSearchBundle:Test:searchResult.html.twig
+        search_template: '@OroSearch/Test/searchResult.html.twig'
         route:
             name: oro_search_results
         fields:
@@ -42,6 +42,17 @@ search:
     Oro\Bundle\TestFrameworkBundle\Entity\Item2:
         label:           Test Search Bundle Item2
         alias:           oro_test_item2
-        search_template: OroSearchBundle:Test:searchResult.html.twig
+        search_template: '@OroSearch/Test/searchResult.html.twig'
         route:
             name: oro_search_results2
+
+    Oro\Bundle\TestFrameworkBundle\Entity\Product:
+        label: Test Search Bundle Product
+        alias: oro_product_test
+        search_template: '@OroSearch/Test/searchResult.html.twig'
+        route:
+            name: oro_search_results
+        fields:
+            -
+                name: name
+                target_type: text

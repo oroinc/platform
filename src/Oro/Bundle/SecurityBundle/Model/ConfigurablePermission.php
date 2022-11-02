@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Model;
 
-use Doctrine\ORM\Mapping as ORM;
-
 class ConfigurablePermission
 {
     /** @var string */

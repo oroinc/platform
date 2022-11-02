@@ -1,22 +1,12 @@
 oro_behat_extension:
-  elements:
-    LanguageSettingsSystemConfigForm:
-      selector: "div[id^='configuration-options-block']"
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
-      options:
-        mapping:
-          Use Default Language: 'language_settings[oro_locale___language][use_parent_scope_value]'
-
-    Use Organization:
-      selector: 'language_settings[oro_locale___language][use_parent_scope_value]'
-
   suites:
     OroTranslationBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroTranslationBundle::FeatureContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
-        - OroDataGridBundle::GridContext
+        - Oro\Bundle\TranslationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
       paths:
         - '@OroTranslationBundle/Tests/Behat/Features'

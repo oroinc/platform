@@ -1,12 +1,15 @@
 services:
-    Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand
+
+    Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand:
+        arguments:
+            - '@oro_imap.email_synchronizer'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ImapBundle\Command\Cron\SendCredentialNotificationsCommand:
-        public: false
-        class: Oro\Bundle\ImapBundle\Command\Cron\SendCredentialNotificationsCommand
+        arguments:
+            - '@oro_imap.origin_credentials.issue_manager'
         tags:
             - { name: console.command }

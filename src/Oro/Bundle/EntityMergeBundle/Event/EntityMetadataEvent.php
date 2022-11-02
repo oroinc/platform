@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityMetadataEvent extends Event
 {
@@ -12,9 +12,6 @@ class EntityMetadataEvent extends Event
      */
     protected $entityMetadata;
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     */
     public function __construct(EntityMetadata $entityMetadata)
     {
         $this->entityMetadata = $entityMetadata;

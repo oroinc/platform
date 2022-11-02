@@ -9,10 +9,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StubType extends AbstractType
 {
-    const FIELD_1 = 'field1';
-    const FIELD_2 = 'field2';
-    const REQUIRED_OPTION = 'required_option';
-    const NAME = 'stub_form_type';
+    public const FIELD_1 = 'field1';
+    public const FIELD_2 = 'field2';
+    public const REQUIRED_OPTION = 'required_option';
+    public const NAME = 'stub_form_type';
 
     /**
      * {@inheritdoc}
@@ -23,9 +23,6 @@ class StubType extends AbstractType
             ->add(self::FIELD_2, TextType::class);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

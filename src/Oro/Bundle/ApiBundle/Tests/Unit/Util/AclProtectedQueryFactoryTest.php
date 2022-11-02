@@ -24,7 +24,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
     /** @var AclProtectedQueryFactory */
     private $queryFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,6 +37,18 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             $this->queryResolver,
             $this->queryModifier
         );
+    }
+
+    public function testRequestTypeGetterAndSetter()
+    {
+        self::assertNull($this->queryFactory->getRequestType());
+
+        $requestType = new RequestType([]);
+        $this->queryFactory->setRequestType($requestType);
+        self::assertSame($requestType, $this->queryFactory->getRequestType());
+
+        $this->queryFactory->setRequestType();
+        self::assertNull($this->queryFactory->getRequestType());
     }
 
     public function testGetQuery()
@@ -69,26 +81,12 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 
     public function testGetQueryWhenRequestTypeIsNotSet()
     {
-        $qb = $this->createMock(QueryBuilder::class);
-        $query = new Query($this->em);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The query factory was not initialized.');
 
-        $config = new EntityConfig();
-
-        $qb->expects(self::never())
-            ->method('getRootAliases');
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($query);
-        $this->queryModifier->expects(self::never())
-            ->method('modifyQuery');
-
-        $this->queryResolver->expects(self::once())
-            ->method('resolveQuery')
-            ->with(self::identicalTo($query), self::identicalTo($config));
-
-        self::assertSame(
-            $query,
-            $this->queryFactory->getQuery($qb, $config)
+        $this->queryFactory->getQuery(
+            $this->createMock(QueryBuilder::class),
+            new EntityConfig()
         );
     }
 

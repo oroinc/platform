@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Processor\Tests\Unit\Transition;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
@@ -11,12 +11,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\StartInitDataProcessor;
 class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $buttonContextProvider;
+    private $buttonContextProvider;
 
     /** @var StartInitDataProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->buttonContextProvider = $this->createMock(ButtonSearchContextProvider::class);
 
@@ -25,10 +25,12 @@ class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSkipContextWithoutInitOptions()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(true);
-        $transition->expects($this->never())->method('getInitContextAttribute');
+        $transition->expects($this->once())
+            ->method('isEmptyInitOptions')
+            ->willReturn(true);
+        $transition->expects($this->never())
+            ->method('getInitContextAttribute');
 
         $context = new TransitionContext();
         $context->setTransition($transition);
@@ -38,16 +40,18 @@ class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function addInitContextAttributeToInitData()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(false);
-        $transition->expects($this->once())->method('getInitContextAttribute')->willReturn('attribute');
+        $transition->expects($this->once())
+            ->method('isEmptyInitOptions')
+            ->willReturn(false);
+        $transition->expects($this->once())
+            ->method('getInitContextAttribute')
+            ->willReturn('attribute');
 
         $context = new TransitionContext();
         $context->setTransition($transition);
         $context->set(TransitionContext::INIT_DATA, ['other data' => 42, 'attribute' => 'will be another']);
 
-        /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject $buttonSearchContext */
         $buttonSearchContext = $this->createMock(ButtonSearchContext::class);
 
         $this->buttonContextProvider->expects($this->once())

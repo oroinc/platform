@@ -1,0 +1,14 @@
+hwi_oauth:
+    resource_owners:
+        google:
+            type: google
+            client_id: changeMe
+            client_secret: changeMe
+            scope: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+
+security:
+    firewalls:
+        main:
+            oauth:
+                resource_owners:
+                    google: /login/check-google

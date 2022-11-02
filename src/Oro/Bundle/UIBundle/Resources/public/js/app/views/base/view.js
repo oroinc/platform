@@ -1,33 +1,26 @@
-define([
-    'jquery',
-    'underscore',
-    'chaplin',
-    '../../models/base/collection'
-], function($, _, Chaplin, BaseCollection) {
+define(function(require) {
     'use strict';
 
-    var BaseView;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const BaseCollection = require('../../models/base/collection');
 
-    /**
-     * @export  oroui/js/app/views/base/view
-     * @class   BaseView
-     * @extends Chaplin.View
-     */
-    BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
+    const BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BaseView() {
-            BaseView.__super__.constructor.apply(this, arguments);
+        constructor: function BaseView(options) {
+            BaseView.__super__.constructor.call(this, options);
         },
 
         getTemplateFunction: function(templateKey) {
             templateKey = templateKey || 'template';
-            var template = this[templateKey];
-            var templateFunc = null;
+            const template = this[templateKey];
+            let templateFunc = null;
 
             // If templateSelector is set in a extended view
-            if (this[templateKey + 'Selector']) {
+            if (this[templateKey + 'Selector'] && $(this[templateKey + 'Selector']).length) {
                 templateFunc = _.template($(this[templateKey + 'Selector']).html());
             } else if (typeof template === 'string') {
                 templateFunc = _.template(template);
@@ -37,12 +30,15 @@ define([
                 templateFunc = template;
             }
 
+            if (typeof templateFunc === 'function') {
+                return data => templateFunc(data).trim();
+            }
+
             return templateFunc;
         },
 
         getTemplateData: function() {
-            var data;
-            data = BaseView.__super__.getTemplateData.apply(this, arguments);
+            const data = BaseView.__super__.getTemplateData.call(this);
             if (!this.model && this.collection && this.collection instanceof BaseCollection) {
                 _.extend(data, this.collection.serializeExtraData());
             }
@@ -56,8 +52,8 @@ define([
          * @override
          */
         _ensureElement: function() {
-            var $el;
-            var el = this.el;
+            let $el;
+            const el = this.el;
 
             if (el && typeof el === 'string' && el.substr(0, 7) === 'region:') {
                 $el = this._findRegionElem(el.substr(7));
@@ -78,10 +74,10 @@ define([
          * @private
          */
         _findRegionElem: function(name) {
-            var $el;
-            var region = Chaplin.mediator.execute('region:find', name);
+            let $el;
+            const region = Chaplin.mediator.execute('region:find', name);
             if (region) {
-                var instance = region.instance;
+                const instance = region.instance;
                 if (instance.container) {
                     $el = instance.region ? $(instance.container).find(region.selector) : instance.container;
                 } else {
@@ -104,7 +100,7 @@ define([
          * @return {jQuery}
          */
         resolveElOption: function(el) {
-            var $el;
+            let $el;
             if (typeof el === 'string' && el.substr(0, 7) === 'region:') {
                 $el = BaseView.prototype._findRegionElem(el.substr(7));
             } else {

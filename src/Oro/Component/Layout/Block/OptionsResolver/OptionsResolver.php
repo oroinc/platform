@@ -2,25 +2,20 @@
 
 namespace Oro\Component\Layout\Block\OptionsResolver;
 
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
 
 /**
  * Decorator class of `Symfony\Component\OptionsResolver\OptionsResolver` with removed methods, that not allowed for
  * using with expressions, like `setAllowedTypes` etc.
- * @see Symfony\Component\OptionsResolver\OptionsResolver
+ * @see \Symfony\Component\OptionsResolver\OptionsResolver
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OptionsResolver implements Options
 {
-    /**
-     * @var BaseOptionsResolver $optionsResolver
-     */
-    protected $optionsResolver;
+    private BaseOptionsResolver $optionsResolver;
 
-    /**
-     * Instantiate Symfony option resolver.
-     */
     public function __construct()
     {
         $this->optionsResolver = new BaseOptionsResolver();
@@ -56,6 +51,24 @@ class OptionsResolver implements Options
     public function hasDefault($option)
     {
         return $this->optionsResolver->hasDefault($option);
+    }
+
+    /**
+     * @return array [name => value, ...]
+     */
+    public function getDefaults(): array
+    {
+        $reflClass = new \ReflectionClass($this->optionsResolver);
+        $defaultsProperty = ReflectionUtil::getProperty($reflClass, 'defaults');
+        if (null === $defaultsProperty) {
+            throw new \RuntimeException(sprintf(
+                'The class "%s" does not have property "defaults".',
+                $reflClass->name
+            ));
+        }
+        $defaultsProperty->setAccessible(true);
+
+        return $defaultsProperty->getValue($this->optionsResolver);
     }
 
     /**
@@ -166,7 +179,7 @@ class OptionsResolver implements Options
      * @return mixed
      * @throws \Exception
      */
-    public function offsetGet($option)
+    public function offsetGet($option): mixed
     {
         return $this->optionsResolver->offsetGet($option);
     }
@@ -175,24 +188,17 @@ class OptionsResolver implements Options
      * @param $option
      * @return bool
      */
-    public function offsetExists($option)
+    public function offsetExists($option): bool
     {
         return $this->optionsResolver->offsetExists($option);
     }
 
-    /**
-     * @param $option
-     * @param $value
-     */
-    public function offsetSet($option, $value)
+    public function offsetSet($option, $value): void
     {
         $this->optionsResolver->offsetSet($option, $value);
     }
 
-    /**
-     * @param $option
-     */
-    public function offsetUnset($option)
+    public function offsetUnset($option): void
     {
         $this->optionsResolver->offsetUnset($option);
     }
@@ -200,7 +206,7 @@ class OptionsResolver implements Options
     /**
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->optionsResolver->count();
     }

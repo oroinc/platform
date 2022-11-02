@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * This handler is setting updated date for notes
+ */
 class NoteHandler
 {
     use RequestHandlerTrait;
@@ -34,12 +37,6 @@ class NoteHandler
      */
     protected $activityManager;
 
-    /**
-     * @param FormInterface   $form
-     * @param RequestStack    $requestStack
-     * @param ManagerRegistry $managerRegistry
-     * @param ActivityManager $activityManager
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -77,16 +74,9 @@ class NoteHandler
         return false;
     }
 
-    /**
-     * @param Note $entity
-     */
     protected function onSuccess(Note $entity)
     {
         $em = $this->getEntityManager();
-        if ($this->form->has('contexts')) {
-            $contexts = $this->form->get('contexts')->getData();
-            $this->activityManager->setActivityTargets($entity, $contexts);
-        }
         $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
 
         $em->persist($entity);

@@ -1,28 +1,72 @@
 /* @theme: admin.oro; */
 
 .tags-container {
-    line-height: 25px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-top: -$tag-item-offset-vertical;
+
+    &__icon {
+        margin-right: $tag-item-icon-offset-end;
+    }
+
+    &.grid-body-cell-tags {
+        padding: $tag-cell-container-inner-offset;
+    }
+
+    .grid-body-cell-tags & {
+        display: block;
+    }
 
     &__tag-entry {
         color: $tag-item-color;
         background-color: $tag-item-background;
-        border-radius: 10px;
-        font-size: 12px;
-        line-height: 12px;
-        padding: 5px 8px;
-        margin: 1px 0 2px;
-        display: inline-block;
+        border-radius: $tag-item-border-radius;
+        font-size: $tag-item-font-size;
+        padding: $tag-item-inner-offset;
+        margin: $tag-item-offset;
+        display: inline-flex;
+        align-items: center;
         vertical-align: top;
+        line-height: $tag-item-line-height;
+        transition: $hover-transition;
 
         &:hover,
         &:focus {
             color: $tag-item-color;
             outline-style: none;
+
+            &.tags-container__tag-entry--custom-color {
+                filter: brightness(105%);
+            }
+        }
+
+        .inline-actions-element:hover &,
+        .editable:hover & {
+            background-color: $tag-item-editable-hover-background;
+            color: $tag-item-editable-hover-color;
+
+            &.tags-container__tag-entry--custom-color {
+                filter: brightness(92%);
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $tag-item-edit-hover-alt-background;
+
+                &.tags-container__tag-entry--custom-color {
+                    filter: brightness(105%);
+                }
+            }
         }
     }
 
     &__tag-entry_is-my {
         background-color: $tag-item-background;
+    }
+
+    &__na {
+        display: inline-block;
+        padding: $tag-item-na-inner-offset;
     }
 }
 
@@ -53,13 +97,15 @@
             .select2-search-choice-close {
                 top: 6px;
 
-                &:before {
+                &::before {
                     color: $tag-item-color;
                 }
             }
 
             &.select2-locked {
+                /* stylelint-disable declaration-no-important */
                 padding: 4px 5px 3px 6px !important;
+                /* stylelint-enable declaration-no-important */
             }
         }
     }

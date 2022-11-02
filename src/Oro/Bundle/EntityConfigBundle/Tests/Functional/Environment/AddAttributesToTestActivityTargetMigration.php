@@ -15,12 +15,10 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddAttributesToTestActivityTargetMigration implements Migration
 {
-    const SYSTEM_ATTRIBUTE_1        = 'system_attribute_1';
-    const SYSTEM_ATTRIBUTE_2        = 'system_attribute_2';
-    const DELETED_SYSTEM_ATTRIBUTE  = 'deleted_system_attribute';
-    const REGULAR_ATTRIBUTE_1       = 'regular_attribute_1';
-    const REGULAR_ATTRIBUTE_2       = 'regular_attribute_2';
-    const DELETED_REGULAR_ATTRIBUTE = 'deleted_regular_attribute';
+    public const SYSTEM_ATTRIBUTE_1 = 'system_attribute_1';
+    public const SYSTEM_ATTRIBUTE_2 = 'system_attribute_2';
+    public const REGULAR_ATTRIBUTE_1 = 'regular_attribute_1';
+    public const REGULAR_ATTRIBUTE_2 = 'regular_attribute_2';
 
     /**
      * {@inheritdoc}
@@ -32,18 +30,9 @@ class AddAttributesToTestActivityTargetMigration implements Migration
         $this->addAttribute($table, self::SYSTEM_ATTRIBUTE_2, ExtendScope::OWNER_SYSTEM);
         $this->addAttribute($table, self::REGULAR_ATTRIBUTE_1, ExtendScope::OWNER_CUSTOM);
         $this->addAttribute($table, self::REGULAR_ATTRIBUTE_2, ExtendScope::OWNER_CUSTOM);
-
-        // these attributes will be marked as to be deleted in UpdateAttributesForTestActivityTargetMigration
-        $this->addAttribute($table, self::DELETED_SYSTEM_ATTRIBUTE, ExtendScope::OWNER_SYSTEM);
-        $this->addAttribute($table, self::DELETED_REGULAR_ATTRIBUTE, ExtendScope::OWNER_CUSTOM);
     }
 
-    /**
-     * @param Table  $table
-     * @param string $attributeName
-     * @param string $owner
-     */
-    private function addAttribute(Table $table, $attributeName, $owner)
+    private function addAttribute(Table $table, string $attributeName, string $owner): void
     {
         if ($table->hasColumn($attributeName)) {
             return;

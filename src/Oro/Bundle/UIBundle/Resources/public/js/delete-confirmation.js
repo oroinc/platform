@@ -1,10 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ModalView = require('oroui/js/modal');
-    var DeleteConfirmationView;
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ModalView = require('oroui/js/modal');
+    let config = require('module-config').default(module.id);
+
+    config = Object.assign({}, {
+        className: 'modal oro-modal-danger',
+        okText: __('Yes, Delete'),
+        title: __('Delete Confirmation'),
+        cancelText: __('Cancel'),
+        okButtonClass: 'btn btn-danger'
+    }, config);
 
     /**
      * Delete confirmation dialog
@@ -13,33 +21,37 @@ define(function(require) {
      * @class   oroui.DeleteConfirmationView
      * @extends oroui.ModalView
      */
-    DeleteConfirmationView = ModalView.extend({
+    const DeleteConfirmationView = ModalView.extend({
         /** @property {String} */
-        className: 'modal oro-modal-danger',
+        className: config.className,
 
         /** @property {String} */
-        okText: __('Yes, Delete'),
+        okText: config.okText,
 
         /** @property {String} */
-        title: __('Delete Confirmation'),
+        title: config.title,
 
         /** @property {String} */
-        cancelText: __('Cancel'),
+        cancelText: config.cancelText,
 
-        okButtonClass: 'btn btn-danger',
+        okButtonClass: config.okButtonClass,
+
+        _attributes: {
+            role: 'alertdialog'
+        },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DeleteConfirmationView() {
-            DeleteConfirmationView.__super__.constructor.apply(this, arguments);
+        constructor: function DeleteConfirmationView(options) {
+            DeleteConfirmationView.__super__.constructor.call(this, options);
         },
 
         /**
          * @param {Object} options
          */
         initialize: function(options) {
-            var fields = ['title', 'okText', 'okButtonClass', 'cancelText'];
+            const fields = ['title', 'okText', 'okButtonClass', 'cancelText'];
 
             _.defaults(options, _.pick(DeleteConfirmationView.prototype, fields));
             DeleteConfirmationView.__super__.initialize.call(this, options);

@@ -8,6 +8,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by a multi-enum entity.
+ */
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'multi_enum';
@@ -15,11 +18,6 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     /** @var ManyRelationBuilder */
     protected $manyRelationBuilder;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManyRelationBuilder  $manyRelationBuilder
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -35,7 +33,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -66,6 +64,14 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function buildComparisonExpr(
@@ -79,7 +85,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
             $fieldName,
             $parameterName,
             $this->getName(),
-            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], true)
+            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], false)
         );
     }
 

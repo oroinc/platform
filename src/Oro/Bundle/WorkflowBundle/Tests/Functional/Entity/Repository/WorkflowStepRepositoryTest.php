@@ -9,17 +9,15 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowSteps;
 
 class WorkflowStepRepositoryTest extends WebTestCase
 {
-    /**
-     * @var WorkflowStepRepository
-     */
-    private $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowSteps::class]);
+    }
 
-        $this->repository = self::getContainer()->get('doctrine')->getRepository(WorkflowStep::class);
+    private function getRepository(): WorkflowStepRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(WorkflowStep::class);
     }
 
     public function testFindByIds()
@@ -31,7 +29,7 @@ class WorkflowStepRepositoryTest extends WebTestCase
         $firstStep = $this->getReference(LoadWorkflowSteps::STEP_1);
         $secondStep = $this->getReference(LoadWorkflowSteps::STEP_2);
 
-        $result = $this->repository->findByIds([$firstStep->getId(), $secondStep->getId(), 0]);
+        $result = $this->getRepository()->findByIds([$firstStep->getId(), $secondStep->getId(), 0]);
         $expectedResult = [
             $firstStep->getId() => $firstStep,
             $secondStep->getId() => $secondStep,

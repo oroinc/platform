@@ -12,18 +12,14 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 class Config implements ConfigInterface
 {
     /** @var ConfigIdInterface */
-    protected $id;
+    private $id;
 
     /** @var array */
-    protected $values;
+    private $values;
 
-    /**
-     * @param ConfigIdInterface $id
-     * @param array             $values
-     */
     public function __construct(ConfigIdInterface $id, array $values = [])
     {
-        $this->id     = $id;
+        $this->id = $id;
         $this->values = $values;
     }
 
@@ -40,12 +36,12 @@ class Config implements ConfigInterface
      */
     public function get($code, $strict = false, $default = null)
     {
-        if (array_key_exists($code, $this->values)) {
+        if (\array_key_exists($code, $this->values)) {
             return $this->values[$code];
         }
 
         if ($strict) {
-            throw new RuntimeException(sprintf('Value "%s" for %s', $code, $this->getId()->toString()));
+            throw new RuntimeException(\sprintf('Value "%s" for %s', $code, $this->getId()->toString()));
         }
 
         return $default;
@@ -76,7 +72,7 @@ class Config implements ConfigInterface
      */
     public function has($code)
     {
-        return array_key_exists($code, $this->values);
+        return \array_key_exists($code, $this->values);
     }
 
     /**
@@ -84,15 +80,16 @@ class Config implements ConfigInterface
      */
     public function is($code, $value = true)
     {
-        if (!array_key_exists($code, $this->values)) {
+        if (!\array_key_exists($code, $this->values)) {
             return false;
         }
 
         $existingValue = $this->values[$code];
+        if (null === $existingValue) {
+            return false;
+        }
 
-        return $existingValue === null
-            ? false
-            : $existingValue == $value;
+        return $existingValue == $value;
     }
 
     /**
@@ -100,7 +97,7 @@ class Config implements ConfigInterface
      */
     public function in($code, array $values, $strict = false)
     {
-        return in_array($this->get($code), $values, $strict);
+        return \in_array($this->get($code), $values, $strict);
     }
 
     /**
@@ -108,9 +105,11 @@ class Config implements ConfigInterface
      */
     public function all(\Closure $filter = null)
     {
-        return $filter
-            ? array_filter($this->values, $filter)
-            : $this->values;
+        if (null === $filter) {
+            return $this->values;
+        }
+
+        return \array_filter($this->values, $filter);
     }
 
     /**
@@ -131,26 +130,19 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->id, $this->values]);
+        return [$this->id, $this->values];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [$this->id, $this->values] = $serialized;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list($this->id, $this->values) = unserialize($serialized);
-    }
-
-    /**
-     * The __set_state handler
-     *
      * @param array $data Initialization array
+     *
      * @return Config A new instance of a Config object
      */
     // @codingStandardsIgnoreStart
@@ -165,12 +157,11 @@ class Config implements ConfigInterface
      */
     public function __clone()
     {
-        $this->id     = clone $this->id;
-        $this->values = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->values
-        );
+        $this->id = clone $this->id;
+        foreach ($this->values as $key => $value) {
+            if (\is_object($value)) {
+                $this->values[$key] = clone $value;
+            }
+        }
     }
 }

@@ -15,6 +15,9 @@ class MenuUpdateStub implements MenuUpdateInterface
     /** @var array */
     protected $extras = [];
 
+    /** @var array */
+    private $linkAttributes = [];
+
     /**
      * MenuUpdateStub constructor.
      */
@@ -92,5 +95,20 @@ class MenuUpdateStub implements MenuUpdateInterface
     public function getDefaultDescription()
     {
         return $this->getDefaultFallbackValue($this->descriptions);
+    }
+
+    public function setLinkAttributes(array $linkAttributes): self
+    {
+        $this->linkAttributes = $linkAttributes;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLinkAttributes(): array
+    {
+        return $this->linkAttributes;
     }
 }

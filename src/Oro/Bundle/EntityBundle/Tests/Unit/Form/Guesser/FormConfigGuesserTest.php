@@ -2,34 +2,35 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormConfigGuesser */
-    protected $guesser;
+    private $guesser;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formConfigProvider;
+    private $formConfigProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
@@ -39,19 +40,6 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
             $this->managerRegistry,
             $this->entityConfigProvider,
             $this->formConfigProvider
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->managerRegistry,
-            $this->entityConfigProvider,
-            $this->formConfigProvider,
-            $this->guesser
         );
     }
 
@@ -208,30 +196,30 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $associationEntityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($associationClass)
-            ->willReturn($this->getMockForAbstractClass(ClassMetadata::class));
+            ->willReturn($this->createMock(ClassMetadata::class));
 
-        $this->managerRegistry->method('getManagerForClass')
+        $this->managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
             ->withConsecutive([$class], [$associationClass])
             ->willReturnOnConsecutiveCalls($sourceEntityManager, $associationEntityManager);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $sourceEntityConfig */
-        $sourceEntityConfig = $this->createPartialMock(Config::class, []);
-        $sourceEntityConfig->setValues([]);
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $associationEntityConfig */
-        $associationEntityConfig = $this->createPartialMock(Config::class, []);
-        $associationEntityConfig->setValues([
+        $sourceEntityConfig = new Config($this->createMock(ConfigIdInterface::class), []);
+        $associationEntityConfig = new Config($this->createMock(ConfigIdInterface::class), [
             'form_type' => $associationFormType,
             'form_options' => $associationFormOptions
         ]);
 
-        $this->formConfigProvider->method('hasConfig')
+        $this->formConfigProvider->expects($this->any())
+            ->method('hasConfig')
             ->withConsecutive([$class, $property], [$associationClass, null])
             ->willReturnOnConsecutiveCalls(true, true);
-        $this->formConfigProvider->method('getConfig')
+        $this->formConfigProvider->expects($this->any())
+            ->method('getConfig')
             ->withConsecutive([$class, $property], [$associationClass, null])
             ->willReturnOnConsecutiveCalls($sourceEntityConfig, $associationEntityConfig);
 
-        $this->entityConfigProvider->method('getConfig')
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfig')
             ->with($class, $property)
             ->willReturn($sourceEntityConfig);
 
@@ -240,11 +228,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertTypeGuess($guess, $associationFormType, $associationFormOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
-    /**
-     * @param string $class
-     * @param mixed  $metadata
-     */
-    protected function setEntityMetadata($class, $metadata)
+    private function setEntityMetadata(string $class, ?ClassMetadata $metadata): void
     {
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())
@@ -258,16 +242,9 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityManager);
     }
 
-    /**
-     * @param string $class
-     * @param string $property
-     * @param array  $parameters
-     */
-    protected function setFormConfig($class, $property, array $parameters)
+    private function setFormConfig(string $class, string $property, array $parameters): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $config */
-        $config = $this->createPartialMock(Config::class, []);
-        $config->setValues($parameters);
+        $config = new Config($this->createMock(ConfigIdInterface::class), $parameters);
 
         $this->formConfigProvider->expects($this->any())
             ->method('hasConfig')
@@ -279,16 +256,9 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
     }
 
-    /**
-     * @param string $class
-     * @param string $property
-     * @param array  $parameters
-     */
-    protected function setEntityConfig($class, $property, array $parameters)
+    private function setEntityConfig(string $class, string $property, array $parameters): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $config */
-        $config = $this->createPartialMock(Config::class, []);
-        $config->setValues($parameters);
+        $config = new Config($this->createMock(ConfigIdInterface::class), $parameters);
 
         $this->entityConfigProvider->expects($this->any())
             ->method('hasConfig')
@@ -300,36 +270,22 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
     }
 
-    /**
-     * @param TypeGuess $guess
-     * @param string    $type
-     * @param array     $options
-     * @param           $confidence
-     */
-    protected function assertTypeGuess($guess, $type, array $options, $confidence)
+    private function assertTypeGuess(TypeGuess $guess, string $type, array $options, int $confidence): void
     {
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $guess);
+        $this->assertInstanceOf(TypeGuess::class, $guess);
         $this->assertEquals($type, $guess->getType());
         $this->assertEquals($options, $guess->getOptions());
         $this->assertEquals($confidence, $guess->getConfidence());
     }
 
-    /**
-     * @param TypeGuess $guess
-     */
-    protected function assertDefaultTypeGuess($guess)
+    private function assertDefaultTypeGuess(TypeGuess $guess): void
     {
         $this->assertTypeGuess($guess, TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
 
-    /**
-     * @param ValueGuess $guess
-     * @param mixed      $value
-     * @param            $confidence
-     */
-    protected function assertValueGuess($guess, $value, $confidence)
+    private function assertValueGuess(ValueGuess $guess, $value, int $confidence): void
     {
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $guess);
+        $this->assertInstanceOf(ValueGuess::class, $guess);
         $this->assertEquals($value, $guess->getValue());
         $this->assertEquals($confidence, $guess->getConfidence());
     }

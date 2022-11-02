@@ -268,7 +268,7 @@ class UnionQueryBuilder
      *
      * @return SqlQueryBuilder
      */
-    protected function createQueryBuilder(EntityManager $em, Query\ResultSetMapping $rsm)
+    private function createQueryBuilder(EntityManager $em, Query\ResultSetMapping $rsm)
     {
         return new SqlQueryBuilder($em, $rsm);
     }

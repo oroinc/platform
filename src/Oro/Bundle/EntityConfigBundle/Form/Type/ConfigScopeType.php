@@ -8,8 +8,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -17,260 +23,270 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ConfigScopeType extends AbstractType
 {
-    /** @var ConfigInterface */
-    private $config;
+    private ConfigManager $entityConfigManager;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var ConfigModel */
-    private $configModel;
+    public function __construct(ConfigManager $entityConfigManager)
+    {
+        $this->entityConfigManager = $entityConfigManager;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(['items', 'config', 'config_model', 'config_manager']);
+        $resolver->setRequired(['items', 'config', 'config_model']);
         $resolver->setAllowedTypes('items', 'array');
         $resolver->setAllowedTypes('config', ConfigInterface::class);
         $resolver->setAllowedTypes('config_model', ConfigModel::class);
-        $resolver->setAllowedTypes('config_manager', ConfigManager::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->config = $options['config'];
-        $this->configModel = $options['config_model'];
-        $this->configManager = $options['config_manager'];
+        /** @var ConfigIdInterface $scopeConfigId */
+        $scopeConfigId = $options['config']->getId();
+        /** @var ConfigModel $scopeConfigModel */
+        $scopeConfigModel = $options['config_model'];
 
-        foreach ($options['items'] as $code => $config) {
-            if (!isset($config['form']['type'])) {
+        foreach ($options['items'] as $itemCode => $itemConfig) {
+            if (!isset($itemConfig['form']['type'])) {
                 continue;
             }
 
-            $options = $config['form']['options'] ?? [];
-            $options['config_id'] = $this->config->getId();
-            $options['config_is_new'] = !$this->configModel->getId();
+            // Skips applying required properties restrictions because the config is new.
+            if ($scopeConfigModel->getId()) {
+                $requiredProperties = $this->getRequiredProperties($itemConfig);
+                foreach ($requiredProperties as $property) {
+                    $propertyConfigId = $this->createConfigId($property, $scopeConfigId);
+                    $propertyCurrentValue = $this->entityConfigManager
+                        ->getConfig($propertyConfigId)
+                        ->get($property['code']);
 
-            if ($this->isDisabledItem($config)) {
-                $options['disabled'] = true;
-                $this->appendClassAttr($options, 'disabled-' . $config['form']['type']);
-            }
-
-            $propertyOnForm = false;
-            $properties = $this->getRequiredProperties($config);
-            if (!empty($properties)) {
-                foreach ($properties as $property) {
-                    if (isset($property['config_id'])) {
-                        $configId = $this->createConfigId($property['config_id']);
-                        // check if requirement property is set in this form
-                        if ($this->isPropertyOnForm($configId)) {
-                            $propertyOnForm = true;
-                        }
-                    } else {
-                        $propertyOnForm = true;
-                        $configId = $this->config->getId();
-                    }
-
-                    $requireConfig = $this->configManager->getConfig($configId);
-                    if ($requireConfig->get($property['code']) != $property['value']) {
-                        if ($propertyOnForm) {
-                            $this->appendClassAttr($options, 'hide');
-                        } else {
-                            continue;
-                        }
+                    // Non-identical comparison is used on purpose.
+                    if ($propertyCurrentValue != $property['value']) {
+                        // Skips adding $itemCode to form as the required property value condition is not satisfied.
+                        continue 2;
                     }
                 }
+            }
 
-                if ($propertyOnForm) {
-                    $this->setAttr($options, 'data-requireProperty', $configId->toString() . $property['code']);
-                    $this->setAttr($options, 'data-requireValue', $property['value']);
+            $builder->add($itemCode, $itemConfig['form']['type'], $this->getItemOptions($itemCode, $options));
+        }
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+    }
+
+    private function getItemOptions(string $itemCode, array $options): array
+    {
+        /** @var ConfigIdInterface $scopeConfigId */
+        $scopeConfigId = $options['config']->getId();
+        /** @var ConfigModel $scopeConfigModel */
+        $scopeConfigModel = $options['config_model'];
+
+        $itemConfig = $options['items'][$itemCode];
+        $itemOptions = array_merge_recursive($itemConfig['form']['options'] ?? [], [
+            'config_id' => $scopeConfigId,
+            'config_is_new' => !$scopeConfigModel->getId(),
+        ]);
+
+        $itemOptions['disabled'] = $this->isDisabledItem($itemConfig, $itemOptions);
+
+        if (isset($itemConfig['constraints'])) {
+            $itemOptions['constraints'] = ConfigModelConstraintsHelper::configureConstraintsWithConfigModel(
+                $itemConfig['constraints'],
+                $scopeConfigModel
+            );
+        }
+
+        return $itemOptions;
+    }
+
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        /** @var ConfigIdInterface $scopeConfigId */
+        $scopeConfigId = $options['config']->getId();
+
+        foreach ($options['items'] as $itemCode => $itemConfig) {
+            if ($form->has($itemCode)) {
+                $child = $form->get($itemCode);
+                if ($child->isDisabled()) {
+                    FormUtils::appendClass($view[$itemCode], 'disabled');
+                }
+
+                $itemConfigId = $child->getConfig()->getOption('config_id');
+                $view[$itemCode]->vars['attr']['data-property_id'] = $itemConfigId->toString() . $itemCode;
+            } else {
+                $itemConfigId = $scopeConfigId;
+            }
+
+            $requiredProperties = $this->getRequiredProperties($options['items'][$itemCode]);
+            foreach ($requiredProperties as $property) {
+                $propertyConfigId = $this->createConfigId($property, $itemConfigId);
+
+                // Adds required-property-view component if required property exists in the same scope.
+                if ($propertyConfigId === $itemConfigId && isset($view[$property['code']])) {
+                    $view[$property['code']]->vars['attr'] = array_merge(
+                        $view[$property['code']]->vars['attr'] ?? [],
+                        [
+                            'data-page-component-module' => 'oroui/js/app/components/view-component',
+                            'data-page-component-options' => json_encode([
+                                'view' => 'oroentityconfig/js/views/required-property-view',
+                            ]),
+                        ]
+                    );
+                }
+
+                if (isset($view[$itemCode]) && $this->isPropertyExists($propertyConfigId, $itemConfigId)) {
+                    $view[$itemCode]->vars['attr'] = array_merge($view[$itemCode]->vars['attr'], [
+                        'data-requireProperty' => $propertyConfigId->toString() . $property['code'],
+                        'data-requireValue' => $property['value'],
+                    ]);
                 }
             }
-
-            if (isset($config['constraints'])) {
-                $options['constraints'] = $config['constraints'];
-            }
-
-            $this->setAttr($options, 'data-property_id', $this->config->getId()->toString() . $code);
-
-            $builder->add($code, $config['form']['type'], $options);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function onPreSubmit(PreSubmitEvent $event): void
     {
-        return $this->getBlockPrefix();
+        $submittedData = $event->getData();
+        $form = $event->getForm();
+        $options = $form->getConfig()->getOptions();
+        /** @var ConfigIdInterface $scopeConfigId */
+        $scopeConfigId = $options['config']->getId();
+
+        foreach ($options['items'] as $itemCode => $itemConfig) {
+            if ($form->has($itemCode)) {
+                $itemConfigId = $form->get($itemCode)->getConfig()->getOption('config_id');
+                $itemPresent = true;
+            } else {
+                $itemConfigId = $scopeConfigId;
+                $itemPresent = false;
+            }
+
+            $requiredProperties = $this->getRequiredProperties($itemConfig);
+            $isSatisfied = false;
+            foreach ($requiredProperties as $property) {
+                $propertyConfigId = $this->createConfigId($property, $itemConfigId);
+
+                // If the required property exists in the same scope and the required property value condition
+                // is not satisfied.
+                if ($propertyConfigId === $itemConfigId) {
+                    $requiredPropertyValue = $this->getRequiredPropertyValue($property['code'], $submittedData, $form);
+                    // Non-identical comparison is used on purpose.
+                    if ($requiredPropertyValue != $property['value']) {
+                        // Removes $itemCode as the required property value condition is not satisfied.
+                        $form->remove($itemCode);
+                        unset($submittedData[$itemCode]);
+                        $isSatisfied = false;
+                        break;
+                    }
+                    $isSatisfied = !$itemPresent;
+                }
+            }
+
+            if ($isSatisfied) {
+                $form->add($itemCode, $itemConfig['form']['type'], $this->getItemOptions($itemCode, $options));
+            }
+        }
+
+        $event->setData($submittedData);
+    }
+
+    private function getRequiredPropertyValue(string $name, ?array $submittedData, FormInterface $form): mixed
+    {
+        if ($form->has($name) && !$form->get($name)->isDisabled()) {
+            return $submittedData[$name] ?? null;
+        }
+
+        return $form->getData()[$name] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_config_scope_type';
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
-    private function isDisabledItem(array $config)
+    private function isDisabledItem(array $itemConfig, array $itemOptions): bool
     {
-        $createOnly = isset($config['options']['create_only']) && $config['options']['create_only'];
+        $createOnly = !empty($itemConfig['options']['create_only']);
 
         // disable config attribute if its value cannot be changed
-        if ($createOnly && $this->configModel->getId()) {
+        if ($createOnly && !$itemOptions['config_is_new']) {
             return true;
         }
-
-        $configId = $this->config->getId();
 
         // disable field config attribute if its value cannot be changed for some field types
         // an attribute marked as create only should not be disabled on create field page
         return
-            $configId instanceof FieldConfigId
-            && !empty($config['options']['immutable_type'])
-            && in_array($configId->getFieldType(), $config['options']['immutable_type'], true)
-            && (!$createOnly || $this->configModel->getId());
+            $itemOptions['config_id'] instanceof FieldConfigId
+            && !empty($itemConfig['immutable_type'])
+            && in_array($itemOptions['config_id']->getFieldType(), $itemConfig['immutable_type'], true)
+            && (!$createOnly || !$itemOptions['config_is_new']);
     }
 
-    /**
-     * @param array  $options
-     * @param string $cssClass
-     */
-    private function appendClassAttr(array &$options, $cssClass)
-    {
-        if (isset($options['attr']['class'])) {
-            $options['attr']['class'] .= ' ' . $cssClass;
-        } else {
-            $this->setAttr($options, 'class', $cssClass);
-        }
-    }
-
-    /**
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $value
-     */
-    private function setAttr(array &$options, $name, $value)
-    {
-        if (!isset($options['attr'])) {
-            $options['attr'] = [];
-        }
-        $options['attr'][$name] = $value;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    private function getRequiredProperties(array $config)
+    private function getRequiredProperties(array $itemConfig): array
     {
         $properties = [];
-        if (isset($config['options']['required_property'])) {
-            $properties[] = $config['options']['required_property'];
+        if (isset($itemConfig['options']['required_property'])) {
+            $properties[] = $itemConfig['options']['required_property'];
         }
-        if (isset($config['options']['required_properties'])) {
-            $properties = array_merge($properties, $config['options']['required_properties']);
+        if (isset($itemConfig['options']['required_properties'])) {
+            $properties = array_merge($properties, $itemConfig['options']['required_properties']);
         }
 
         return $properties;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function getScope(array $config)
+    private function createConfigId(array $requiredPropertyConfig, ConfigIdInterface $configId): ConfigIdInterface
     {
-        return $config['scope'] ?? $this->config->getId()->getScope();
-    }
+        if (isset($requiredPropertyConfig['config_id'])) {
+            $requiredPropertyConfig['config_id'] += [
+                'scope' => $configId->getScope(),
+                'class_name' => $configId->getClassName(),
+                'field_name' => $configId instanceof FieldConfigId ? $configId->getFieldName() : null,
+            ];
 
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    private function getClassName(array $config)
-    {
-        return $config['class_name'] ?? $this->config->getId()->getClassName();
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string|null
-     */
-    private function getFieldName(array $config)
-    {
-        $fieldName = array_key_exists('field_name', $config) ? $config['field_name'] : false;
-        if (false === $fieldName) {
-            $configId = $this->config->getId();
-            if ($configId instanceof FieldConfigId) {
-                $fieldName = $configId->getFieldName();
-            } else {
-                $fieldName = null;
+            if ($requiredPropertyConfig['config_id']['field_name']) {
+                return new FieldConfigId(
+                    $requiredPropertyConfig['config_id']['scope'],
+                    $requiredPropertyConfig['config_id']['class_name'],
+                    $requiredPropertyConfig['config_id']['field_name'],
+                    $configId->getFieldType()
+                );
             }
-        }
 
-        return $fieldName;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return ConfigIdInterface
-     */
-    private function createConfigId(array $config)
-    {
-        $scope = $this->getScope($config);
-        $className = $this->getClassName($config);
-        $fieldName = $this->getFieldName($config);
-
-        if ($fieldName) {
-            return new FieldConfigId(
-                $scope,
-                $className,
-                $fieldName,
-                $this->config->getId()->getFieldType()
+            return new EntityConfigId(
+                $requiredPropertyConfig['config_id']['scope'],
+                $requiredPropertyConfig['config_id']['class_name']
             );
         }
 
-        return new EntityConfigId($scope, $className);
+        return $configId;
     }
 
-    /**
-     * @param ConfigIdInterface $configId
-     *
-     * @return bool
-     */
-    private function isPropertyOnForm(ConfigIdInterface $configId)
-    {
-        $propertyOnForm = false;
-        $configuredConfigId = $this->config->getId();
-        if ($configId->getClassName() === $configuredConfigId->getClassName()) {
-            if ($configId instanceof FieldConfigId) {
-                if ($configuredConfigId instanceof FieldConfigId
-                    && $configuredConfigId->getFieldName() === $configId->getFieldName()
+    private function isPropertyExists(
+        ConfigIdInterface $requiredPropertyConfigId,
+        ConfigIdInterface $itemConfigId
+    ): bool {
+        $exists = false;
+        if ($requiredPropertyConfigId->getClassName() === $itemConfigId->getClassName()) {
+            if ($requiredPropertyConfigId instanceof FieldConfigId) {
+                if ($itemConfigId instanceof FieldConfigId
+                    && $itemConfigId->getFieldName() === $requiredPropertyConfigId->getFieldName()
                 ) {
-                    $propertyOnForm = true;
+                    $exists = true;
                 }
             } else {
-                $propertyOnForm = true;
+                $exists = true;
             }
         }
 
-        return $propertyOnForm;
+        return $exists;
     }
 }

@@ -24,6 +24,17 @@ oro_entity:
                         left:
                             - { join: entity.category, alias: target }
 
+    virtual_relations:
+        Test\Entity\Contact:
+            primaryAddr:
+                relation_type: oneToOne
+                related_entity_name: Test\Entity\ContactAddress
+                label: test.primary_addr.label
+                query:
+                    join:
+                        left:
+                            - { join: entity.addresses, alias: addresses, conditionType: WITH, condition: 'addresses.primary = true' }
+
     entity_aliases:
         Test\Entity\Product:
             alias:        testproduct

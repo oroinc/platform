@@ -1,30 +1,31 @@
-define([
-    'jquery',
-    'underscore',
-    'tpl!oroui/templates/message-item.html',
-    'oroui/js/tools',
-    'oroui/js/tools/multi-use-resource-manager',
-    'cryptojs/sha256',
-    'oroui/js/mediator',
-    'oroui/js/error',
-    'bootstrap'
-], function($, _, template, tools, MultiUseResourceManager, SHA256, mediator, error) {
+define(function(require) {
     'use strict';
 
-    var defaults = {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const template = require('tpl-loader!oroui/templates/message-item.html');
+    const MultiUseResourceManager = require('oroui/js/tools/multi-use-resource-manager');
+    const cyrb53 = require('oroui/js/tools/cyrb53').default;
+    const mediator = require('oroui/js/mediator');
+    const error = require('oroui/js/error');
+    require('bootstrap');
+    const config = require('module-config').default(module.id);
+
+    const defaults = Object.assign({
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
         template: template,
         insertMethod: 'appendTo',
-        style: 'default'
-    };
-    var queue = [];
-    var groupedMessages = {};
-    var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
-    var noFlashTags = ['a'];
+        style: 'default',
+        storageKey: 'oroAfterReloadMessages'
+    }, config);
+    let queue = [];
+    const groupedMessages = {};
+    const notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    const noFlashTags = ['a'];
 
-    var resolveContainer = function(options) {
+    const resolveContainer = function(options) {
         if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
             options.container = defaults.temporaryContainer;
         }
@@ -33,26 +34,32 @@ define([
     /**
      * Same arguments as for Oro.NotificationMessage
      */
-    function showMessage(type, message, options) {
-        var opt = _.extend({}, defaults, options || {});
+    function showMessage(type, message, options = {}) {
+        const opt = Object.assign({}, defaults, options);
         resolveContainer(opt);
-        var $el = $(opt.template({
+
+        messenger.clear(opt.namespace, opt);
+
+        const $el = $(opt.template({
             type: type,
             message: message,
             style: opt.style
         }))[opt.insertMethod](opt.container);
+
+        $el.data('_message', {type, message, options});
+
         if (opt.onClose) {
-            $el.find('button.close').click(opt.onClose);
+            $el.on('close.bs.alert', opt.onClose);
         }
 
         if (opt.hideCloseButton) {
             $el.find('[data-dismiss="alert"]').remove();
         }
 
-        var delay = opt.delay || (opt.flash && 5000);
-        var actions = {
+        const delay = opt.delay || (opt.flash && 5000);
+        const actions = {
             close: function() {
-                var result = $el.alert('close');
+                const result = $el.alert('close');
                 mediator.trigger('layout:adjustHeight');
                 return result;
             },
@@ -72,7 +79,7 @@ define([
      * @export oroui/js/messenger
      * @name   oro.messenger
      */
-    return {
+    const messenger = {
         /**
          * Shows notification message.
          * By default, the message is displayed until an user close it.
@@ -83,32 +90,38 @@ define([
          * @param {string} message text of message
          * @param {Object=} options
          *
-         * @param {(string|jQuery)} options.container selector of jQuery with container element
-         * @param {(number|boolean)} options.delay time in ms to auto close message
+         * @param {(string|jQuery)=} options.container selector of jQuery with container element
+         * @param {(number|boolean)?} options.delay time in ms to auto close message
          *      or false - means to not close automatically
-         * @param {Function} options.template template function
-         * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
-         * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {Function=} options.template template function
+         * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {string=} options.namespace slot for a massage,
+         *     other existing message with the same namespace will be removed
+         * @param {Function?} options.onClose handler that is executed once user close the alert
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
          */
-        notificationMessage: function(type, message, options) {
-            var container = (options || {}).container || defaults.container;
-            var afterReload = (options || {}).afterReload || false;
-            var afterReloadQueue = [];
-            var args = Array.prototype.slice.call(arguments);
-            var actions = {close: $.noop};
+        notificationMessage: function(type, message, options = {}) {
+            const container = options.container || defaults.container;
+            const afterReload = options.afterReload || false;
+            let afterReloadQueue = [];
+            let actions = {close: $.noop};
+
+            if (!options.namespace) {
+                options.namespace = cyrb53(message + this.type).toString();
+            }
 
             if (afterReload && window.localStorage) {
-                afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
-                afterReloadQueue.push(args);
-                localStorage.setItem('oroAfterReloadMessages', JSON.stringify(afterReloadQueue));
+                afterReloadQueue = JSON.parse(localStorage.getItem(defaults.storageKey) || '[]');
+                afterReloadQueue.push([type, message, options]);
+                localStorage.setItem(defaults.storageKey, JSON.stringify(afterReloadQueue));
             } else if (container && $(container).length) {
-                actions = showMessage.apply(null, args);
+                actions = showMessage(type, message, options);
             } else {
                 // if container is not ready then save message for later
-                queue.push(args);
+                queue.push([type, message, options]);
             }
             return actions;
         },
@@ -122,34 +135,25 @@ define([
          * @param {string} message text of message
          * @param {Object=} options
          *
-         * @param {(string|jQuery)} options.container selector of jQuery with container element
-         * @param {(number|boolean)} options.delay time in ms to auto close message
+         * @param {(string|jQuery)=} options.container selector of jQuery with container element
+         * @param {(number|boolean)?} options.delay time in ms to auto close message
          *      or false - means to not close automatically
-         * @param {Function} options.template template function
-         * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
-         * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {Function=} options.template template function
+         * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {string=} options.namespace slot for a massage,
+         *     other existing message with the same namespace will be removed
+         * @param {Function?} options.onClose handler that is executed once user close the alert
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
          */
-        notificationFlashMessage: function(type, message, options) {
-            var isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
-            var namespace = (options || {}).namespace;
-
-            if (!namespace) {
-                // eslint-disable-next-line new-cap
-                namespace = SHA256(message + this.type).toString();
-
-                if (!options) {
-                    options = {
-                        namespace: null
-                    };
-                }
-                options.namespace = namespace;
+        notificationFlashMessage: function(type, message, options = {}) {
+            if (!('flash' in options)) {
+                options.flash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
             }
 
-            this.clear(namespace, options);
-            return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
+            return this.notificationMessage(type, message, options);
         },
 
         /**
@@ -162,7 +166,7 @@ define([
          *      at the moment there's only one method 'close', allows to close the message
          */
         showErrorMessage: function(message, err) {
-            var msg = message;
+            const msg = message;
             if (!_.isUndefined(err) && !_.isNull(err)) {
                 error.showErrorInConsole(err);
             }
@@ -176,12 +180,12 @@ define([
 
         flushStoredMessages: function() {
             if (window.localStorage) {
-                queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
-                localStorage.removeItem('oroAfterReloadMessages');
+                queue = queue.concat(JSON.parse(localStorage.getItem(defaults.storageKey) || '[]'));
+                localStorage.removeItem(defaults.storageKey);
             }
 
             while (queue.length) {
-                showMessage.apply(null, queue.shift());
+                showMessage(...queue.shift());
             }
         },
 
@@ -193,12 +197,12 @@ define([
             if (!type) {
                 type = 'process';
             }
-            var _this = this;
+            const messenger = this;
             if (!groupedMessages[message]) {
                 groupedMessages[message] = new MultiUseResourceManager({
                     listen: {
                         constructResource: function() {
-                            this.alert = _this.notificationMessage(type, message, {flash: false});
+                            this.alert = messenger.notificationMessage(type, message, {flash: false});
                         },
                         disposeResource: function() {
                             this.alert.close();
@@ -208,26 +212,38 @@ define([
                     }
                 });
             }
-            var holderId = groupedMessages[message].hold();
+            const holderId = groupedMessages[message].hold();
             promise.always(function() {
                 groupedMessages[message].release(holderId);
             });
         },
 
         /**
-         * Clears all messages within namespace
+         * Clears all messages within namespace or by selector
          *
-         * @param {string} namespace
+         * @param {string?} namespace
          * @param {Object=} options
+         * @param {string} options.clearSelector selector for messages to remove
          */
-        clear: function(namespace, options) {
-            var opt = _.extend({}, defaults, options || {});
-            $(opt.container).add(opt.temporaryContainer)
-                .find('[data-messenger-namespace=' + namespace + ']').remove();
+        clear: function(namespace, options = {}) {
+            const opt = _.extend({}, defaults, options);
+            const selectors = [];
+            if (namespace) {
+                selectors.push(`[data-messenger-namespace="${namespace}"]`);
+            }
+            if (options.clearSelector) {
+                selectors.push(options.clearSelector);
+            }
+            $(opt.container).add(opt.temporaryContainer).find(selectors.join(',')).remove();
         },
 
         removeTemporaryContainer: function() {
-            $(defaults.container).append($(this).children());
+            $(this).children().each((i, el) => {
+                const {type, message, options} = $(el).data('_message');
+                const {container, insertMethod, ...restOptions} = options;
+                // re-publish messages with original options into default messages container
+                _.delay(() => messenger.notificationMessage(type, message, restOptions));
+            });
         },
 
         /**
@@ -242,4 +258,6 @@ define([
             });
         }
     };
+
+    return messenger;
 });

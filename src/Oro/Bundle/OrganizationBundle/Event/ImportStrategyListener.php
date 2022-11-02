@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -13,7 +13,10 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class ImportStrategyListener
+/**
+ * Populates imported entities with organization if entity supports it.
+ */
+class ImportStrategyListener implements ImportStrategyListenerInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -33,11 +36,6 @@ class ImportStrategyListener
     /** @var array */
     protected $organizationFieldByEntity = [];
 
-    /**
-     * @param ManagerRegistry        $registry
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ServiceLink            $metadataProviderLink
-     */
     public function __construct(
         ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,
@@ -49,7 +47,8 @@ class ImportStrategyListener
     }
 
     /**
-     * @param StrategyEvent $event
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onProcessAfter(StrategyEvent $event)
     {
@@ -101,7 +100,7 @@ class ImportStrategyListener
     }
 
     /**
-     * Clear default organization on doctrine entity manager clear
+     * {@inheritdoc}
      */
     public function onClear()
     {

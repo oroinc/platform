@@ -10,7 +10,11 @@ use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 use Oro\Bundle\ChartBundle\Model\Data\MappedData;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Twig\Environment;
 
+/**
+ * Builder is used to create a chart view instance - view representation that can be used to render a chart.
+ */
 class ChartViewBuilder
 {
     /**
@@ -24,7 +28,7 @@ class ChartViewBuilder
     protected $transformerFactory;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twig;
 
@@ -66,15 +70,10 @@ class ChartViewBuilder
      */
     protected $options;
 
-    /**
-     * @param ConfigProvider $configProvider
-     * @param TransformerFactory $transformerFactory
-     * @param \Twig_Environment $twig
-     */
     public function __construct(
         ConfigProvider $configProvider,
         TransformerFactory $transformerFactory,
-        \Twig_Environment $twig
+        Environment $twig
     ) {
         $this->configProvider = $configProvider;
         $this->transformerFactory = $transformerFactory;

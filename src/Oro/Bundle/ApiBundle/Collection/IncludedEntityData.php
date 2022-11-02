@@ -5,6 +5,10 @@ namespace Oro\Bundle\ApiBundle\Collection;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * A storage for detailed information about an additional entity included into API request
+ * for such actions as "create", "update", "update_subresource", etc.
+ */
 class IncludedEntityData
 {
     /** @var string */
@@ -100,8 +104,6 @@ class IncludedEntityData
 
     /**
      * Sets metadata of the entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
     public function setMetadata(EntityMetadata $metadata = null)
     {
@@ -120,8 +122,6 @@ class IncludedEntityData
 
     /**
      * Sets the form that is used to transform entity data.
-     *
-     * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null)
     {

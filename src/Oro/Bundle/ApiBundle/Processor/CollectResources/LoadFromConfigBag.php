@@ -15,9 +15,6 @@ class LoadFromConfigBag implements ProcessorInterface
     /** @var ConfigBagRegistry */
     protected $configBagRegistry;
 
-    /**
-     * @param ConfigBagRegistry $configBagRegistry
-     */
     public function __construct(ConfigBagRegistry $configBagRegistry)
     {
         $this->configBagRegistry = $configBagRegistry;

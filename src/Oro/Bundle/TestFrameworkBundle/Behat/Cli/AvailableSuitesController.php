@@ -22,10 +22,6 @@ class AvailableSuitesController implements Controller
      */
     private $specificationFinder;
 
-    /**
-     * @param SuiteRepository $suiteRepository
-     * @param SpecificationFinder $specificationFinder
-     */
     public function __construct(SuiteRepository $suiteRepository, SpecificationFinder $specificationFinder)
     {
         $this->suiteRepository = $suiteRepository;

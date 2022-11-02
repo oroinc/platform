@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("taxonomy")
- * @NamePrefix("oro_api_")
+ * REST API controller for Taxonomy entity.
  */
-class TaxonomyController extends RestController implements ClassResourceInterface
+class TaxonomyController extends RestController
 {
     /**
      * REST DELETE
@@ -33,13 +29,13 @@ class TaxonomyController extends RestController implements ClassResourceInterfac
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -47,15 +43,15 @@ class TaxonomyController extends RestController implements ClassResourceInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
-        return $this->get('oro_tag.form.taxonomy.api');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {

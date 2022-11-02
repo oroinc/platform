@@ -2,65 +2,59 @@ parameters:
     doctrine.orm.entity_manager.class: Oro\Bundle\EntityBundle\ORM\OroEntityManager
     doctrine.orm.configuration.class:  Oro\Bundle\EntityBundle\ORM\OrmConfiguration
 
-    oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
-    oro_entity.repository.factory.class:                       Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory
-    oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
-    oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
-    oro_entity.orm.native_query_executor_helper.class:         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
-    oro_entity.orm.insert_from_select_query_executor.class:    Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
-    oro_entity.query_hint_resolver.class:                      Oro\Component\DoctrineUtils\ORM\QueryHintResolver
-
 services:
     oro_entity.doctrine_helper:
-        class: '%oro_entity.doctrine_helper.class%'
+        class: Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+        public: true
         arguments:
             - '@doctrine'
 
-    oro_entity.database_exception_helper:
-        class: Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper
-        arguments:
-            - '@doctrine'
+    Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
+        alias: 'oro_entity.doctrine_helper'
 
     oro_entity.abstract_repository:
-        class: Doctrine\ORM\EntityRepository
-        factory: ['@oro_entity.repository.factory', 'getDefaultRepository']
+        class: Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository
+        arguments:
+            - '@doctrine'
         abstract: true
-
-    oro_entity.abstract_entity_manager:
-        class: Doctrine\ORM\EntityManager
-        factory: ['@oro_entity.doctrine_helper', getEntityManagerForClass]
-        abstract: true
-        lazy: true
 
     oro_entity.entity_identifier_accessor:
-        class: '%oro_entity.entity_identifier_accessor.class%'
+        class: Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    Oro\Bundle\EntityBundle\ORM\EntityIdAccessor:
+        alias: oro_entity.entity_identifier_accessor
+
     oro_entity.orm.entity_class_resolver:
-        class: '%oro_entity.orm.entity_class_resolver.class%'
+        class: Oro\Bundle\EntityBundle\ORM\EntityClassResolver
         arguments:
             - '@doctrine'
 
     oro_entity.query_hint_resolver:
-        class: '%oro_entity.query_hint_resolver.class%'
+        class: Oro\Component\DoctrineUtils\ORM\QueryHintResolver
+        arguments:
+            - !abstract '$walkers defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
+            - !abstract '$walkerHintProviders defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
+            - !abstract '$aliases defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
 
     oro_entity.orm.native_query_executor_helper:
-        class: '%oro_entity.orm.native_query_executor_helper.class%'
+        class: Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
         arguments:
             - '@doctrine'
 
     oro_entity.orm.insert_from_select_query_executor:
-        class: '%oro_entity.orm.insert_from_select_query_executor.class%'
+        class: Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
         arguments:
             - '@oro_entity.orm.native_query_executor_helper'
+        public: true
 
-    oro_entity.repository.factory:
-        class: '%oro_entity.repository.factory.class%'
-        public: false
+    oro_entity.orm.multi_insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor
         arguments:
-            - '@service_container'
-            - [] # will be replaced with repository services array
+            - '@oro_entity.orm.native_query_executor_helper'
+        public: true
+        shared: false
 
     oro_entity.query_hint.precise_order_by:
         public: false

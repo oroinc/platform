@@ -2,27 +2,35 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 
-use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * The authentication provider to retrieve the user and the organization for a UsernamePasswordOrganizationToken.
+ */
 class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticationProvider
 {
-    /**
-     * @var UsernamePasswordOrganizationTokenFactoryInterface
-     */
-    protected $tokenFactory;
+    /** @var UsernamePasswordOrganizationTokenFactoryInterface */
+    private $tokenFactory;
 
-    /**
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     */
+    /** @var OrganizationGuesserInterface */
+    private $organizationGuesser;
+
     public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
+    }
+
+    public function setOrganizationGuesser(OrganizationGuesserInterface $organizationGuesser)
+    {
+        $this->organizationGuesser = $organizationGuesser;
     }
 
     /**
@@ -35,29 +43,41 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
                 'Token Factory is not set in UsernamePasswordOrganizationAuthenticationProvider.'
             );
         }
-
-        $guesser = new UserOrganizationGuesser();
-        /**  @var TokenInterface $token */
-        $authenticatedToken = parent::authenticate($token);
-
-        /** @var User $user */
-        $user         = $authenticatedToken->getUser();
-        $organization = $guesser->guess($user, $token);
-
-        if ($organization && !$user->getOrganizations(true)->contains($organization)) {
-            throw new BadCredentialsException(
-                sprintf("You don't have access to organization '%s'", $organization->getName())
+        if (null === $this->organizationGuesser) {
+            throw new AuthenticationException(
+                'Organization Guesser is not set in UsernamePasswordOrganizationAuthenticationProvider.'
             );
         }
 
-        $authenticatedToken = $this->tokenFactory->create(
+        /** @var TokenInterface $token */
+        $authenticatedToken = parent::authenticate($token);
+
+        /** @var User $user */
+        $user = $authenticatedToken->getUser();
+        $organization = $this->guessOrganization($user, $token);
+
+        return $this->tokenFactory->create(
             $authenticatedToken->getUser(),
             $authenticatedToken->getCredentials(),
             $authenticatedToken->getProviderKey(),
             $organization,
-            $authenticatedToken->getRoles()
+            $user->getUserRoles()
         );
+    }
 
-        return $authenticatedToken;
+    private function guessOrganization(AbstractUser $user, TokenInterface $token): Organization
+    {
+        $organization = $this->organizationGuesser->guess($user, $token);
+        if (null === $organization) {
+            throw new BadUserOrganizationException('The user does not have active organization assigned to it.');
+        }
+        if (!$user->isBelongToOrganization($organization, true)) {
+            throw new BadUserOrganizationException(sprintf(
+                'The user does not have access to organization "%s".',
+                $organization->getName()
+            ));
+        }
+
+        return $organization;
     }
 }

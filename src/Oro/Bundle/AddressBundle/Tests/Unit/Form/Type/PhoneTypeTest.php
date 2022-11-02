@@ -5,44 +5,30 @@ use Oro\Bundle\AddressBundle\Form\Type\PhoneType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
 
 class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PhoneType
-     */
-    protected $type;
+    /** @var PhoneType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new PhoneType();
     }
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))
             ->method('add')
-            ->will($this->returnSelf());
+            ->withConsecutive(
+                ['id', HiddenType::class],
+                ['phone', TextType::class],
+                ['primary', RadioType::class]
+            )
+            ->willReturnSelf();
 
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with('id', HiddenType::class);
-
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('phone', TextType::class);
-
-        $builder->expects($this->at(2))
-            ->method('add')
-            ->with('primary', RadioType::class);
-
-        $this->type->buildForm($builder, array());
+        $this->type->buildForm($builder, []);
     }
 }

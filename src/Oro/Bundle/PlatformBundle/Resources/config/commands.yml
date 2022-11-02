@@ -1,12 +1,16 @@
+parameters:
+    oro_platform.materialized_view.orphans_days_old_default: 7
+
 services:
-    Oro\Bundle\PlatformBundle\Command\HelpCommand:
-        public: false
-        class: Oro\Bundle\PlatformBundle\Command\HelpCommand
+    Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand:
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
         tags:
             - { name: console.command }
 
-    Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand:
-        public: false
-        class: Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand
+    Oro\Bundle\PlatformBundle\Command\Cron\RemoveOrphanedMaterializedViewsCronCommand:
+        arguments:
+            - '@oro_platform.materialized_view.remover'
+            - '%oro_platform.materialized_view.orphans_days_old_default%'
         tags:
             - { name: console.command }

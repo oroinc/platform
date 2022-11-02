@@ -2,112 +2,88 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
-use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
-class RootJobStatusCalculator
+/**
+ * Calculate root job status and progress.
+ * Sent message with topic `oro.message_queue.job.root_job_stopped` if job status was changed and job is stopped.
+ */
+class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
 {
-    /** @var JobStorage */
-    private $jobStorage;
+    private JobManagerInterface $jobManager;
+    private JobStatusChecker $jobStatusChecker;
+    private StatusCalculatorResolver $statusCalculatorResolver;
+    private MessageProducerInterface $messageProducer;
+    private ManagerRegistry $doctrine;
 
-    /** @var JobStatusChecker */
-    private $jobStatusChecker;
-
-    /** @var StatusCalculatorResolver */
-    private $statusCalculatorResolver;
-
-    /**
-     * @param JobStorage               $jobStorage
-     * @param JobStatusChecker         $jobStatusChecker
-     * @param StatusCalculatorResolver $statusCalculatorResolver
-     */
     public function __construct(
-        JobStorage $jobStorage,
+        JobManagerInterface $jobManager,
         JobStatusChecker $jobStatusChecker,
-        StatusCalculatorResolver $statusCalculatorResolver
+        StatusCalculatorResolver $statusCalculatorResolver,
+        MessageProducerInterface $messageProducer,
+        ManagerRegistry $doctrine
     ) {
-        $this->jobStorage = $jobStorage;
+        $this->jobManager = $jobManager;
         $this->jobStatusChecker = $jobStatusChecker;
         $this->statusCalculatorResolver = $statusCalculatorResolver;
+        $this->messageProducer = $messageProducer;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param Job  $job
-     * @param bool $calculateProgress
-     *
-     * @return bool true in the case when the status of "root" job changed on stop status by this method
-     */
-    public function calculate(Job $job, $calculateProgress = false)
+    public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);
-        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
-            return false;
-        }
-
-        $rootStopped = false;
-        $statusAndProgressCalculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
-        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use (
-            &$rootStopped,
-            $calculateProgress,
-            $statusAndProgressCalculator
-        ) {
+        $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
+            $rootJob = $this->refreshJob($rootJob);
             if (!$this->jobStatusChecker->isJobStopped($rootJob)) {
-                $rootStopped = $this->updateRootJob($rootJob, $statusAndProgressCalculator, $calculateProgress);
+                $this->updateRootJob($rootJob);
             }
         });
+    }
+
+    private function updateRootJob(Job $rootJob): void
+    {
+        $rootJob->setLastActiveAt(new \DateTime());
+
+        $statusAndProgressCalculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
+        $rootJobStatus = $statusAndProgressCalculator->calculateRootJobStatus();
+        $rootJob->setStatus($rootJobStatus);
+
+        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
+            $rootJob->setStoppedAt(new \DateTime());
+        }
+
+        $progress = $statusAndProgressCalculator->calculateRootJobProgress();
+        if ($rootJob->getJobProgress() !== $progress) {
+            $rootJob->setJobProgress($progress);
+        }
 
         $statusAndProgressCalculator->clean();
 
-        return $rootStopped;
-    }
-
-    /**
-     * @param Job                      $rootJob
-     * @param AbstractStatusCalculator $statusAndProgressCalculator
-     * @param bool                     $calculateProgress
-     *
-     * @return bool
-     */
-    private function updateRootJob(
-        Job $rootJob,
-        AbstractStatusCalculator $statusAndProgressCalculator,
-        $calculateProgress
-    ) {
-        $rootStopped = false;
-        $rootJob->setLastActiveAt(new \DateTime());
-
-        $rootJobStatus = $statusAndProgressCalculator->calculateRootJobStatus();
-        $rootJob->setStatus($rootJobStatus);
         if ($this->jobStatusChecker->isJobStopped($rootJob)) {
-            $rootStopped = true;
-            $calculateProgress = true;
-            if (!$rootJob->getStoppedAt()) {
-                $rootJob->setStoppedAt(new \DateTime());
-            }
+            $message = new Message(['jobId' => $rootJob->getId()], MessagePriority::HIGH);
+            $this->messageProducer->send(RootJobStoppedTopic::getName(), $message);
         }
-
-        if ($calculateProgress) {
-            $progress = $statusAndProgressCalculator->calculateRootJobProgress();
-            if ($rootJob->getJobProgress() !== $progress) {
-                $rootJob->setJobProgress($progress);
-            }
-        }
-
-        return $rootStopped;
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return Job
-     */
-    private function getRootJob(Job $job)
+    private function getRootJob(Job $job): Job
     {
-        if ($job->isRoot()) {
-            return $job;
+        return $job->isRoot() ? $job : $job->getRootJob();
+    }
+
+    private function refreshJob(Job $job): Job
+    {
+        $em = $this->doctrine->getManager();
+        if ($em->contains($job)) {
+            $em->refresh($job);
         }
 
-        return $job->getRootJob();
+        return $job;
     }
 }

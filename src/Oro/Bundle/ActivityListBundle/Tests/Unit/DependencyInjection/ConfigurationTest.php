@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ActivityListBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,6 +11,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         $configuration = new Configuration();
         $builder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
+        $this->assertInstanceOf(TreeBuilder::class, $builder);
     }
 }

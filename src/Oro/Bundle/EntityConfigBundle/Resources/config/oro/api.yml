@@ -1,8 +1,10 @@
 api:
     entities:
         Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
-        Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
             documentation_resource: '@OroEntityConfigBundle/Resources/doc/api/attribute_family.md'
+            fields:
+                entityClass:
+                    exclude: true
             actions:
                 create: false
                 delete: false

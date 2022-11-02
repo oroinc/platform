@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Form\ChoiceList\TranslationChoiceLoader;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
@@ -30,11 +30,6 @@ class TranslatableEntityType extends AbstractType
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ChoiceListFactoryInterface $choiceListFactory
-     * @param AclHelper $aclHelper
-     */
     public function __construct(
         ManagerRegistry $registry,
         ChoiceListFactoryInterface $choiceListFactory,
@@ -69,10 +64,6 @@ class TranslatableEntityType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
@@ -81,9 +72,6 @@ class TranslatableEntityType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

@@ -25,6 +25,7 @@ oro:
         integration:
             entity_label:        Integration
             entity_plural_label: Integrations
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Represent integration
             id.label:         Id
             type.label:       Type
@@ -58,6 +59,7 @@ oro:
         channel:
             entity_label:                   Integration
             entity_plural_label:            Integrations
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:             Represent integration
             id.label:                       Id
             type:
@@ -100,6 +102,11 @@ oro:
         delete_sync_integration:
             content: "Warning: Removing the integration will delete all related data"
             success: Integration and all related data were deleted
+
+        feature:
+            manage:
+                label: Integration Management
+                description: Enables creating and managing payment, shipping, and other integrations with third-party applications.
 
         form:
             no_available_integrations: No integrations available

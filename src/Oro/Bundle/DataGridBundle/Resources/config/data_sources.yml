@@ -1,25 +1,26 @@
-parameters:
-    oro_datagrid.datasource.orm.class:                  Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource
-    oro_datagrid.datasource.orm.parameter_binder.class: Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder
-
 services:
     oro_datagrid.datasource.orm:
-        class: '%oro_datagrid.datasource.orm.class%'
+        class: Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource
         arguments:
             - '@oro_datagrid.datasource.orm.configs.yaml_processor'
             - '@oro_datagrid.event.dispatcher'
             - '@oro_datagrid.datasource.orm.parameter_binder'
             - '@oro_entity.query_hint_resolver'
+            - '@oro_datagrid.orm.query_executor'
         tags:
             - { name: oro_datagrid.datasource, type: orm }
 
     oro_datagrid.datasource.array:
-        class: 'Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource'
+        class: Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource
         tags:
             - { name: oro_datagrid.datasource, type: array }
 
+    oro_datagrid.orm.query_executor:
+        class: Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutor
+        public: false
+
     oro_datagrid.datasource.orm.parameter_binder:
-        class: '%oro_datagrid.datasource.orm.parameter_binder.class%'
+        class: Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder
 
     oro_datagrid.datasource.orm.configs.yaml_processor:
         class: Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor

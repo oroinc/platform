@@ -1,50 +1,35 @@
-define(function(require) {
-    'use strict';
+import Node from './node';
 
-    var Node = require('oroexpressionlanguage/js/library/node/node');
-
+class FunctionNode extends Node {
     /**
      * @param {string} name a name of function
      * @param {Node} args arguments of function
      * @constructor
      */
-    function FunctionNode(name, args) {
-        FunctionNode.__super__.constructor.call(this, [args], {name: name});
+    constructor(name, args) {
+        super([args], {name: name});
     }
 
-    FunctionNode.prototype = Object.create(Node.prototype);
-    FunctionNode.__super__ = Node.prototype;
+    /**
+     * @inheritDoc
+     */
+    compile(compiler) {
+        const args = this.nodes[0].nodes.map(node => compiler.subcompile(node));
+        const func = compiler.getFunction(this.attrs.name);
+        compiler.raw(func.compiler(...args));
+    }
 
-    Object.assign(FunctionNode.prototype, {
-        constructor: FunctionNode,
+    /**
+     * @inheritDoc
+     */
+    evaluate(functions, values) {
+        const args = this.nodes[0].nodes.map(node => node.evaluate(functions, values));
+        args.unshift([values]);
 
-        /**
-         * @inheritDoc
-         */
-        compile: function(compiler) {
-            var args = this.nodes[0].nodes.map(function(node) {
-                return compiler.subcompile(node);
-            });
+        const func = functions[this.attrs.name];
 
-            var func = compiler.getFunction(this.attrs.name);
+        return func.evaluator(...args);
+    }
+}
 
-            compiler.raw(func.compiler.apply(null, args));
-        },
-
-        /**
-         * @inheritDoc
-         */
-        evaluate: function(functions, values) {
-            var args = this.nodes[0].nodes.map(function(node) {
-                return node.evaluate(functions, values);
-            });
-            args.unshift([values]);
-
-            var func = functions[this.attrs.name];
-
-            return func.evaluator.apply(null, args);
-        }
-    });
-
-    return FunctionNode;
-});
+export default FunctionNode;

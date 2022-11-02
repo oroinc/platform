@@ -1,0 +1,41 @@
+namespace Test;
+
+class Entity
+{
+    private function resetTestTargets()
+    {
+    }
+
+    /**
+     * Checks if this entity can be associated with the given target entity type
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTestTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
+     * Gets the entity this entity is associated with
+     *
+     * @return object|null Any configurable entity
+     */
+    public function getTestTarget()
+    {
+        return null;
+    }
+
+    /**
+     * Sets the entity this entity is associated with
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function setTestTarget($target)
+    {
+        if (null === $target) { $this->resetTestTargets(); return $this; }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+}

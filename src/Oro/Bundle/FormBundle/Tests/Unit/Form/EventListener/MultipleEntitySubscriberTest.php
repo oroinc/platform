@@ -4,14 +4,18 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 
 class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,48 +32,47 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider postSetDataProvider
-     *
-     * @param Collection $data
-     * @param array      $expectedAddedData
-     * @param array      $expectedRemovedData
      */
-    public function testPostSetData($data, $expectedAddedData, $expectedRemovedData)
+    public function testPostSetData(?Collection $data, array $expectedAddedData, array $expectedRemovedData)
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
-        $form  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $event = new FormEvent($form, null);
 
-        $formAdded = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formAdded->expects($this->once())->method('setData')->with($expectedAddedData);
-        $formRemoved = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formRemoved->expects($this->once())->method('setData')->with($expectedRemovedData);
+        $formAdded = $this->createMock(FormInterface::class);
+        $formAdded->expects($this->once())
+            ->method('setData')
+            ->with($expectedAddedData);
+        $formRemoved = $this->createMock(FormInterface::class);
+        $formRemoved->expects($this->once())
+            ->method('setData')
+            ->with($expectedRemovedData);
 
         $map = [['added', $formAdded], ['removed', $formRemoved]];
-        $form->expects($this->any())->method('get')->willReturnMap($map);
-        $form->expects($this->any())->method('getData')->willReturn($data);
+        $form->expects($this->any())
+            ->method('get')
+            ->willReturnMap($map);
+        $form->expects($this->any())
+            ->method('getData')
+            ->willReturn($data);
 
         $subscriber->postSet($event);
     }
 
-    /**
-     * @return array
-     */
-    public function postSetDataProvider()
+    public function postSetDataProvider(): array
     {
         $uow = new UnitOfWork();
-        $em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $meta = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $meta = $this->createMock(ClassMetadata::class);
 
         $existing = (object)['$existing' => true];
-        $removed  = (object)['$removed' => true];
-        $added    = (object)['$added' => true];
+        $removed = (object)['$removed' => true];
+        $added = (object)['$added' => true];
 
         $collectionWithElements = new ArrayCollection([$added]);
 
@@ -121,9 +124,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->willReturn(null);
@@ -155,9 +156,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $parentMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parentMetadata = $this->createMock(ClassMetadata::class);
         $parentMetadata->expects($this->any())
             ->method('hasAssociation')
             ->with($fieldName)
@@ -172,16 +171,15 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->with(get_class($parent))
             ->willReturn($parentMetadata);
         $subscriber = new MultipleEntitySubscriber($doctrineHelper);
 
-        $form = $this->getPostSubmitForm($parent, $children, [$added], [$removed]);
+        // Adding $existing and $added entities
+        $form = $this->getPostSubmitForm($parent, $children, [$existing, $added], [$removed]);
         $form->expects($this->once())
             ->method('getName')
             ->willReturn($fieldName);
@@ -193,6 +191,32 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($parent, $existing->getParent());
         $this->assertNull($added->getParent());
         $this->assertSame($parent, $removed->getParent());
+    }
+
+    public function testPostSubmitForManyToManyWithoutParentData()
+    {
+        $fieldName = 'children';
+
+        $existing = new ChildEntity('existing');
+        $added = new ChildEntity('added');
+        $removed = new ChildEntity('removed');
+        $children = new ArrayCollection([$existing, $removed]);
+
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->never())
+            ->method('getEntityMetadata');
+        $subscriber = new MultipleEntitySubscriber($doctrineHelper);
+
+        $form = $this->getPostSubmitForm(null, $children, [$added], [$removed]);
+        $form->expects($this->once())
+            ->method('getName')
+            ->willReturn($fieldName);
+
+        $event = new FormEvent($form, null);
+        $subscriber->postSubmit($event);
+
+        $this->assertEquals([$existing, $added], array_values($children->toArray()));
+        $this->assertNull($added->getParent());
     }
 
     public function testPostSubmitForOneToMany()
@@ -207,9 +231,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $removed->setParent($parent);
         $children = new ArrayCollection([$existing, $removed]);
 
-        $parentMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parentMetadata = $this->createMock(ClassMetadata::class);
         $parentMetadata->expects($this->any())
             ->method('hasAssociation')
             ->with($fieldName)
@@ -225,9 +247,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->with(get_class($parent))
@@ -249,44 +269,37 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object     $parent
-     * @param Collection $children
-     * @param object[]   $added
-     * @param object[]   $removed
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\Form\Test\FormInterface
+     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getPostSubmitForm(
-        $parent,
+    private function getPostSubmitForm(
+        ?object $parent,
         Collection $children,
         array $added,
         array $removed
     ) {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $parentForm = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $parentForm = $this->createMock(FormInterface::class);
 
         $form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formAdded = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formAdded = $this->createMock(FormInterface::class);
         $formAdded->expects($this->once())
             ->method('getData')
             ->willReturn($added);
-        $formRemoved = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formRemoved = $this->createMock(FormInterface::class);
         $formRemoved->expects($this->once())
             ->method('getData')
             ->willReturn($removed);
 
         $form->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['added', $formAdded],
-                    ['removed', $formRemoved]
-                ]
-            );
+            ->willReturnMap([
+                ['added', $formAdded],
+                ['removed', $formRemoved]
+            ]);
         $form->expects($this->any())
             ->method('getData')
             ->willReturn($children);

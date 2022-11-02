@@ -2,34 +2,25 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Model;
 
+/**
+ * Represents a system configuration section.
+ */
 class ConfigurationSection
 {
-    /** @var string */
-    protected $id;
+    private string $id;
+    private array $options = [];
 
-    /** @var ConfigurationOption[] */
-    protected $options = [];
-
-    /**
-     * @param string $id
-     */
-    public function __construct($id)
+    public function __construct(string $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -37,7 +28,7 @@ class ConfigurationSection
     /**
      * @return ConfigurationOption[]
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -45,7 +36,7 @@ class ConfigurationSection
     /**
      * @param ConfigurationOption[] $options
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = $options;
     }

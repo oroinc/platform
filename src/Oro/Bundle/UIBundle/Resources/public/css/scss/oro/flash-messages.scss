@@ -1,15 +1,19 @@
 /* @theme: admin.oro; */
 
-.flash-messages {
-    position: relative;
+#flash-messages {
+    position: $flash-messages-container-position;
 }
 
-.flash-messages-frame {
-    position: absolute;
-    left: 25%;
-    z-index: 900;
-    width: 50%;
-    box-sizing: border-box;
-    padding: 0 10px;
-    opacity: .9;
+.flash-messages {
+    &-frame {
+        position: $flash-messages-frame-position;
+        left: $flash-messages-frame-left;
+        width: $flash-messages-frame-width;
+        padding: $flash-messages-frame-offset;
+        z-index: $flash-messages-frame-z-index;
+
+        .alert {
+            margin-top: $flash-messages-alert-offset-top;
+        }
+    }
 }

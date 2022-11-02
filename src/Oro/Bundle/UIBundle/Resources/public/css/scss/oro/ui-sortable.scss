@@ -2,8 +2,6 @@
 
 .ui-sortable {
     &-handle {
-        cursor: -webkit-grab;
-        cursor: -moz-grab;
         cursor: move;
 
         &.disabled {

@@ -1,0 +1,256 @@
+/* @theme: view-switcher; */
+
+/* stylelint-disable no-descending-specificity, no-duplicate-selectors */
+
+.help-carousel {
+    &:not(.shown) {
+        display: none;
+    }
+
+    &__popup {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        width: $help-carousel-popup-width;
+        min-width: 288px;
+        margin: 100px 0 0 (-$help-carousel-popup-width * .5);
+
+        color: $primary-200;
+        background-color: $primary-inverse;
+
+        border-radius: 4px;
+
+        @include media-breakpoint-down(xs) {
+            width: auto;
+            left: $content-padding-medium;
+            right: $content-padding-medium;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+
+    &__body {
+        padding: 20px 0;
+    }
+
+    &__title {
+        padding: $content-padding-small;
+
+        font-size: $base-font-size--l;
+        text-align: center;
+    }
+
+    &__content {
+        position: relative;
+        margin-top: 2px;
+
+        line-height: 1.4;
+
+        overflow: hidden;
+    }
+
+    &__slides {
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    &__close {
+        position: absolute;
+        top: $content-padding-small;
+        right: $content-padding-small;
+        width: 16px;
+        height: 16px;
+
+        color: $primary-750;
+        text-decoration: none;
+        text-align: center;
+
+        @include hover-focus-active() {
+            color: $primary-700;
+        }
+
+        @include fa-icon($fa-var-times, before, true) {
+            font-size: 16px;
+        }
+    }
+
+    &__backdrop {
+        position: absolute;
+        top: 100%;
+        bottom: -100vh;
+        left: 0;
+        right: 0;
+        background-color: rgba($primary, .4);
+    }
+}
+
+@media only screen and (max-height: 750px) {
+    .help-carousel {
+        &__popup {
+            margin-top: 26px;
+        }
+    }
+}
+
+.help-slide {
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+
+    &__image {
+        width: 140px;
+        height: 140px;
+        max-width: 100%;
+    }
+
+    img {
+        display: inline;
+    }
+
+    &__block:not(:first-child) {
+        margin-top: 32px;
+    }
+
+    &__row {
+        display: flex;
+        padding: 0 20px;
+    }
+
+    &__row:not(:first-child) {
+        margin-top: 20px;
+    }
+
+    &__subtitle {
+        font-size: 16px;
+        font-weight: font-weight('bold');
+        margin: 8px 0;
+    }
+
+    &__small-text {
+        font-size: 12px;
+    }
+
+    &__cell {
+        padding: 0 20px;
+    }
+
+    &__cell &__image {
+        width: 100px;
+        height: 100px;
+    }
+
+    &__btn {
+        display: inline-block;
+        padding: 14px 12px;
+
+        font-size: 15px;
+        color: $primary-inverse;
+        background-color: $help-slide-btn-background-color;
+        text-decoration: none;
+        outline: none;
+
+        border-radius: 5px;
+        transition: color .1s, background .1s, box-shadow .1s;
+
+        @include hover-focus-active() {
+            background: $help-slide-btn--hover-background-color;
+        }
+    }
+}
+
+/* slick in help-carousel */
+.help-carousel {
+    .slick-slider {
+        padding-bottom: 22px;
+    }
+
+    .slick-prev,
+    .slick-next,
+    .slick-dots {
+        position: absolute;
+        bottom: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        outline: none;
+        cursor: pointer;
+        font-size: $base-font-size;
+        color: $head-panel-link-color;
+    }
+
+    .slick-prev {
+        left: 24px;
+    }
+
+    .slick-next {
+        right: 24px;
+    }
+
+    .slick-prev,
+    .slick-next {
+        @include hover-focus-active() {
+            color: $head-panel-link-hover-color;
+            outline: none;
+        }
+    }
+
+    .slick-disabled {
+        cursor: default;
+        color: $primary-700;
+
+        @include hover-focus-active() {
+            color: $primary-700;
+        }
+    }
+
+    .slick-dots {
+        list-style: none;
+        width: 40%;
+        margin: 3px 30%;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+
+        li {
+            position: relative;
+            display: block;
+            margin: 0 5px;
+            padding: 0;
+        }
+
+        button {
+            font-size: 0;
+            line-height: 0;
+            padding: 0;
+            display: block;
+            width: 10px;
+            height: 10px;
+            cursor: pointer;
+            color: transparent;
+            outline: none;
+            background: transparent;
+            border: 1px solid $extra;
+            border-radius: 50%;
+
+            @include hover() {
+                border-color: $extra-100;
+                background: $extra-100;
+            }
+        }
+
+        .slick-active {
+            button {
+                background: $extra;
+
+                @include hover() {
+                    background: $extra;
+                    cursor: default;
+                }
+            }
+        }
+    }
+}

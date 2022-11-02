@@ -1,0 +1,22 @@
+services:
+    oro_api.unhandled_error.processor:
+        class: Oro\Bundle\ApiBundle\Processor\UnhandledErrorProcessor
+        arguments:
+            - '@oro_api.processor_bag'
+            - unhandled_error
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    oro_api.unhandled_error.convert_exception_to_error:
+        class: Oro\Bundle\ApiBundle\Processor\UnhandledError\ConvertExceptionToError
+        tags:
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: -255 }
+
+    oro_api.unhandled_error.build_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\UnhandledError\BuildResultDocument
+        arguments:
+            - '@oro_api.error_completer_registry'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -50 }

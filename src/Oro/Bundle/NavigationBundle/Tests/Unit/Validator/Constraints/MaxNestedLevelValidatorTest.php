@@ -9,45 +9,36 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
+class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
 {
     use MenuItemTestTrait;
 
-    /** @var MaxNestedLevelValidator */
-    protected $validator;
-
     /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $builderChainProvider;
+    private $builderChainProvider;
 
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizationHelper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
         $this->builderChainProvider = $this->createMock(BuilderChainProvider::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
+        parent::setUp();
+    }
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
-        $localizationHelper = $this->createMock(LocalizationHelper::class);
-
-        $this->validator = new MaxNestedLevelValidator($this->builderChainProvider, $localizationHelper);
-        $this->validator->initialize($this->context);
+    protected function createValidator()
+    {
+        return new MaxNestedLevelValidator($this->builderChainProvider, $this->localizationHelper);
     }
 
     public function testValidateNotValid()
     {
-        $constraint = new MaxNestedLevel();
-
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 2);
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createMock(Scope::class);
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -56,25 +47,16 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
         $update->setParentKey('item-1-1');
         $update->setUri('#');
 
-        $this->builderChainProvider
-            ->expects($this->once())
+        $this->builderChainProvider->expects($this->once())
             ->method('get')
-            ->with(
-                'menu',
-                [
-                    'ignoreCache' => true,
-                    'scopeContext' => $scope
-                ]
-            )
-            ->will($this->returnValue($menu));
+            ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
+            ->willReturn($menu);
 
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with("Item \"item-1-1-1\" can't be saved. Max nesting level is reached.");
-
-
+        $constraint = new MaxNestedLevel();
         $this->validator->validate($update, $constraint);
+
+        $this->buildViolation('Item "item-1-1-1" can\'t be saved. Max nesting level is reached.')
+            ->assertRaised();
 
         $item = $menu->getChild('item-1')
             ->getChild('item-1-1')
@@ -85,12 +67,10 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateNotValidNew()
     {
-        $constraint = new MaxNestedLevel();
-
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createMock(Scope::class);
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -100,24 +80,16 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
         $update->setUri('#');
         $update->setCustom(true);
 
-        $this->builderChainProvider
-            ->expects($this->once())
+        $this->builderChainProvider->expects($this->once())
             ->method('get')
-            ->with(
-                'menu',
-                [
-                    'ignoreCache' => true,
-                    'scopeContext' => $scope
-                ]
-            )
-            ->will($this->returnValue($menu));
+            ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
+            ->willReturn($menu);
 
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with("Item \"item-1-1-1-1\" can't be saved. Max nesting level is reached.");
-
+        $constraint = new MaxNestedLevel();
         $this->validator->validate($update, $constraint);
+
+        $this->buildViolation('Item "item-1-1-1-1" can\'t be saved. Max nesting level is reached.')
+            ->assertRaised();
 
         $item = $menu->getChild('item-1')
             ->getChild('item-1-1')
@@ -129,14 +101,12 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateIsValid()
     {
-        $constraint = new MaxNestedLevel();
-
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 4);
 
         $update = new MenuUpdateStub();
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createMock(Scope::class);
 
         $update->setScope($scope);
         $update->setMenu('menu');
@@ -144,18 +114,14 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
         $update->setParentKey('item-1-1-1');
         $update->setUri('#');
 
-        $this->builderChainProvider
-            ->expects($this->once())
+        $this->builderChainProvider->expects($this->once())
             ->method('get')
-            ->with(
-                'menu',
-                [
-                    'ignoreCache' => true,
-                    'scopeContext' => $scope
-                ]
-            )
-            ->will($this->returnValue($menu));
+            ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
+            ->willReturn($menu);
 
+        $constraint = new MaxNestedLevel();
         $this->validator->validate($update, $constraint);
+
+        $this->assertNoViolation();
     }
 }

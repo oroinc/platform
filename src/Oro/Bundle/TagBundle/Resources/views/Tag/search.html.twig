@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% set gridName = 'tag-results-grid' %}
 {% oro_title_set({ params: { '%tag.name%': tag.name } }) %}
@@ -41,10 +41,10 @@
                     {% endif %}
 
                     <li{% if selected %} class="selected"{% endif %}>
-                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}" {% if selected %}aria-selected="true"{% endif %}>
-                            {% if selected %}<span class="fa-chevron-right pull-right" aria-hidden="true"></span>{% endif %}
+                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}" {% if selected %}aria-selected="true"{% endif %} title="{{ label|trans }}">
                             <span class="{{ iconClass }}" aria-hidden="true"></span>
-                            {{ label|trans }} ({{ type.count }})
+                            <span class="search-label">{{ label|trans }}</span>
+                            <span>&nbsp;({{ type.count }})</span>
                         </a>
                     </li>
                 {% endfor %}
@@ -57,7 +57,7 @@
             </div>
         </div>
     {% else %}
-    <div class="search-no-results">
+    <div class="no-data">
         {% trans %}No results were found.{% endtrans %}
         <br />
         {% trans %}Try modifying your search criteria{% endtrans %}

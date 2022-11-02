@@ -2,37 +2,80 @@
 
 namespace Oro\Bundle\ReportBundle\Controller;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
+use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
+use Oro\Bundle\ReportBundle\Form\Handler\ReportHandler;
+use Oro\Bundle\ReportBundle\Form\Type\ReportType as ReportFormType;
+use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportController extends Controller
+/**
+ * Covers the CRUD functionality and the additional operation clone for the Report entity.
+ */
+class ReportController extends AbstractController
 {
     /**
-     * @Route("/view/{id}", name="oro_report_view", requirements={"id"="\d+"}, defaults={"id"=0})
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'oro_report.entity_provider' => EntityProvider::class,
+            ConfigManager::class,
+            EntityNameProvider::class,
+            QueryDesignerManager::class,
+            Manager::class,
+            ReportDatagridConfigurationProvider::class,
+            ChartViewBuilder::class,
+            ChartOptionsBuilder::class,
+            TranslatorInterface::class,
+            ReportHandler::class,
+            Router::class,
+            FeatureChecker::class,
+            DateHelper::class,
+        ]);
+    }
+
+    /**
+     * @Route("/view/{id}", name="oro_report_view", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_report_view",
      *      type="entity",
      *      permission="VIEW",
      *      class="OroReportBundle:Report"
      * )
+     *
+     * @param Report $entity
+     * @return Response
      */
     public function viewAction(Report $entity)
     {
         $this->checkReport($entity);
-        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+        $this->get(EntityNameProvider::class)->setCurrentItem($entity);
 
-        $reportGroup = $this->get('oro_entity_config.provider.entity')
-            ->getConfig($entity->getEntity())
+        $reportGroup = $this->get(ConfigManager::class)
+            ->getEntityConfig('entity', $entity->getEntity())
             ->get('plural_label');
         $parameters  = [
             'entity'      => $entity,
@@ -43,15 +86,15 @@ class ReportController extends Controller
         if ($reportType === ReportType::TYPE_TABLE) {
             $gridName = $entity::GRID_PREFIX . $entity->getId();
 
-            if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
+            if ($this->get(ReportDatagridConfigurationProvider::class)->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
 
-                $datagrid = $this->get('oro_datagrid.datagrid.manager')->getDatagrid(
+                $datagrid = $this->get(Manager::class)->getDatagrid(
                     $gridName,
                     [PagerInterface::PAGER_ROOT_PARAM => [PagerInterface::DISABLED_PARAM => true]]
                 );
 
-                $chartOptions = $this->get('oro_chart.options_builder')->buildOptions(
+                $chartOptions = $this->get(ChartOptionsBuilder::class)->buildOptions(
                     $entity->getChartOptions(),
                     $datagrid->getConfig()->toArray()
                 );
@@ -59,7 +102,7 @@ class ReportController extends Controller
                 if (!empty($chartOptions)) {
                     $chartOptions = $this->processChartOptions($datagrid, $chartOptions);
 
-                    $parameters['chartView'] = $this->get('oro_chart.view_builder')
+                    $parameters['chartView'] = $this->get(ChartViewBuilder::class)
                         ->setDataGrid($datagrid)
                         ->setOptions($chartOptions)
                         ->getView();
@@ -68,7 +111,7 @@ class ReportController extends Controller
         }
 
         return $this->render(
-            sprintf('OroReportBundle:Report:%s/view.html.twig', strtolower($reportType)),
+            sprintf('@OroReport/Report/%s/view.html.twig', strtolower($reportType)),
             $parameters
         );
     }
@@ -89,18 +132,18 @@ class ReportController extends Controller
      */
     public function viewFromGridAction($gridName)
     {
-        $configuration = $this->get('oro_datagrid.datagrid.manager')->getConfigurationForGrid($gridName);
+        $configuration = $this->get(Manager::class)->getConfigurationForGrid($gridName);
         $pageTitle = isset($configuration['pageTitle']) ? $configuration['pageTitle'] : $gridName;
 
         return [
-            'pageTitle' => $this->get('translator')->trans($pageTitle),
+            'pageTitle' => $this->get(TranslatorInterface::class)->trans($pageTitle),
             'gridName'  => $gridName,
         ];
     }
 
     /**
      * @Route("/create", name="oro_report_create")
-     * @Template("OroReportBundle:Report:update.html.twig")
+     * @Template("@OroReport/Report/update.html.twig")
      * @Acl(
      *      id="oro_report_create",
      *      type="entity",
@@ -108,13 +151,13 @@ class ReportController extends Controller
      *      class="OroReportBundle:Report"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Report());
+        return $this->update(new Report(), $request);
     }
 
     /**
-     * @Route("/update/{id}", name="oro_report_update", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/update/{id}", name="oro_report_update", requirements={"id"="\d+"})
      *
      * @Template
      * @Acl(
@@ -123,12 +166,41 @@ class ReportController extends Controller
      *      permission="EDIT",
      *      class="OroReportBundle:Report"
      * )
+     *
+     * @param Report $entity
+     * @param Request $request
+     * @return array
      */
-    public function updateAction(Report $entity)
+    public function updateAction(Report $entity, Request $request)
     {
         $this->checkReport($entity);
 
-        return $this->update($entity);
+        return $this->update($entity, $request);
+    }
+
+    /**
+     * @Route("/clone/{id}", name="oro_report_clone", requirements={"id"="\d+"})
+     * @Template("@OroReport/Report/update.html.twig")
+     * @AclAncestor("oro_report_create")
+     *
+     * @param Report $entity
+     * @return array
+     */
+    public function cloneAction(Report $entity, Request $request)
+    {
+        $this->checkReport($entity);
+
+        $clonedEntity = clone $entity;
+        $clonedEntity->setName(
+            $this->get(TranslatorInterface::class)->trans(
+                'oro.report.action.clone.name_format',
+                [
+                    '{name}' => $clonedEntity->getName()
+                ]
+            )
+        );
+
+        return $this->update($clonedEntity, $request);
     }
 
     /**
@@ -149,25 +221,31 @@ class ReportController extends Controller
 
     /**
      * @param Report $entity
-     * @return array
+     * @param Request $request
+     * @return array|RedirectResponse
      */
-    protected function update(Report $entity)
+    protected function update(Report $entity, Request $request)
     {
-        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
-        if ($this->get('oro_report.form.handler.report')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        $reportForm = $this->get('form.factory')->createNamed(
+            'oro_report_form',
+            ReportFormType::class,
+            $entity
+        );
+        $this->get(EntityNameProvider::class)->setCurrentItem($entity);
+        if ($this->get(ReportHandler::class)->process($entity, $reportForm)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('Report saved')
+                $this->get(TranslatorInterface::class)->trans('Report saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'   => $entity,
-            'form'     => $this->get('oro_report.form.report')->createView(),
+            'form'     => $reportForm->createView(),
             'entities' => $this->get('oro_report.entity_provider')->getEntities(),
-            'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('report')
+            'metadata' => $this->get(QueryDesignerManager::class)->getMetadata('report')
         ];
     }
 
@@ -191,8 +269,8 @@ class ReportController extends Controller
         );
 
         /** @var DateHelper $dateTimeHelper */
-        $dateTimeHelper = $this->get('oro_dashboard.datetime.helper');
-        $dateTypes      = [Type::DATETIME, Type::DATE, Type::DATETIMETZ];
+        $dateTimeHelper = $this->get(DateHelper::class);
+        $dateTypes      = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
 
         if (in_array($labelFieldType, $dateTypes)) {
             $data  = $datagrid->getData()->offsetGet('data');
@@ -217,21 +295,11 @@ class ReportController extends Controller
         return $chartOptions;
     }
 
-    /**
-     * @param Report $report
-     */
     protected function checkReport(Report $report)
     {
-        if ($report->getEntity() && !$this->getFeatureChecker()->isResourceEnabled($report->getEntity(), 'entities')) {
+        if ($report->getEntity() &&
+            !$this->get(FeatureChecker::class)->isResourceEnabled($report->getEntity(), 'entities')) {
             throw $this->createNotFoundException();
         }
-    }
-
-    /**
-     * @return FeatureChecker
-     */
-    protected function getFeatureChecker()
-    {
-        return $this->get('oro_featuretoggle.checker.feature_checker');
     }
 }

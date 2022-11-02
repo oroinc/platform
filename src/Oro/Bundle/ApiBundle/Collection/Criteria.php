@@ -21,9 +21,6 @@ class Criteria extends BaseCriteria
     /** @var Join[] */
     private $joins = [];
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(EntityClassResolver $entityClassResolver)
     {
         parent::__construct();
@@ -33,7 +30,7 @@ class Criteria extends BaseCriteria
     /**
      * Determines whether a join for a given path exists.
      *
-     * @param string $propertyPath The path for which a join should be applied.
+     * @param string $propertyPath The path to which a join should be applied.
      *
      * @return bool
      */
@@ -45,7 +42,7 @@ class Criteria extends BaseCriteria
     /**
      * Gets a join for a given path.
      *
-     * @param string $propertyPath The path for which a join should be applied.
+     * @param string $propertyPath The path to which a join should be applied.
      *
      * @return Join|null
      */
@@ -71,7 +68,7 @@ class Criteria extends BaseCriteria
      * * '{entity}' for a current joined entity
      * * '{property path}' for another join
      *
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.
      * @param string|null $condition     The condition for the join.
@@ -96,7 +93,7 @@ class Criteria extends BaseCriteria
      * * '{entity}' for a current joined entity
      * * '{property path}' for another join
      *
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.
      * @param string|null $condition     The condition for the join.
@@ -115,7 +112,7 @@ class Criteria extends BaseCriteria
     }
 
     /**
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $joinType      The condition type constant. Either Join::INNER_JOIN or Join::LEFT_JOIN.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.
@@ -124,6 +121,7 @@ class Criteria extends BaseCriteria
      *
      * @return Join
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function addJoin(
         string $propertyPath,
@@ -142,7 +140,7 @@ class Criteria extends BaseCriteria
                 $propertyPath
             ));
         }
-        if (false === \strpos($join, '.')) {
+        if (!str_contains($join, '.')) {
             $entityClass = $this->resolveEntityClass($join);
             if (!$entityClass) {
                 throw new \InvalidArgumentException(\sprintf(
@@ -185,11 +183,6 @@ class Criteria extends BaseCriteria
         return $joinObject;
     }
 
-    /**
-     * @param string $entityName
-     *
-     * @return string|null
-     */
     private function resolveEntityClass(string $entityName): ?string
     {
         try {

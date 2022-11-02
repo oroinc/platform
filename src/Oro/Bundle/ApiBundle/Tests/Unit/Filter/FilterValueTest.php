@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 
 class FilterValueTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSetPath()
+    public function testPath()
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -15,7 +15,7 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame('path2', $filterValue->getPath());
     }
 
-    public function testGetSetValue()
+    public function testValue()
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -28,7 +28,7 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['value1', 'value2'], $filterValue->getValue());
     }
 
-    public function testGetSetOperator()
+    public function testOperator()
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -44,12 +44,25 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertNull($filterValue->getOperator());
     }
 
-    public function testGetSetSourceKey()
+    public function testFilterValueCreatedWithSourceKeyAndValue()
+    {
+        $filterValue = FilterValue::createFromSource('src_key', 'path', 'value', 'operator');
+
+        self::assertSame('src_key', $filterValue->getSourceKey());
+        self::assertSame('value', $filterValue->getSourceValue());
+        self::assertSame('path', $filterValue->getPath());
+        self::assertSame('value', $filterValue->getValue());
+        self::assertSame('operator', $filterValue->getOperator());
+    }
+
+    public function testFilterValueCreatedWithoutSourceKeyAndValue()
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
         self::assertNull($filterValue->getSourceKey());
-        $filterValue->setSourceKey('key');
-        self::assertSame('key', $filterValue->getSourceKey());
+        self::assertNull($filterValue->getSourceValue());
+        self::assertSame('path', $filterValue->getPath());
+        self::assertSame('value', $filterValue->getValue());
+        self::assertSame('operator', $filterValue->getOperator());
     }
 }

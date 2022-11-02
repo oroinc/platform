@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -12,35 +11,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
+
     /** @var WorkflowVariablesHandler */
-    protected $handler;
+    private $handler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $entityManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $managerRegistry */
-    protected $managerRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
-    protected $entityRepository;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->entityRepository);
 
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
@@ -51,23 +38,21 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider updateWorkflowVariablesDataProvider
-     *
-     * @param WorkflowDefinition $definition
-     * @param WorkflowData       $data
-     * @param WorkflowDefinition $expectedDefinition
      */
-    public function testUpdateWorkflowVariables($definition, $data, $expectedDefinition)
-    {
-        $this->entityManager->expects($this->once())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
+    public function testUpdateWorkflowVariables(
+        WorkflowDefinition $definition,
+        WorkflowData $data,
+        WorkflowDefinition $expectedDefinition
+    ) {
+        $this->entityManager->expects($this->once())
+            ->method('persist');
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
         $this->assertEquals($this->handler->updateWorkflowVariables($definition, $data), $expectedDefinition);
     }
 
-    /**
-     * @return array
-     */
-    public function updateWorkflowVariablesDataProvider()
+    public function updateWorkflowVariablesDataProvider(): array
     {
         $definition = new WorkflowDefinition();
         $definition->setConfiguration([
@@ -108,7 +93,6 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
             ],
             'other_fields' => [],
         ]);
-
 
         return [
             [$definition, $data, $expected],

@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\CommentBundle\Tools;
 
+use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides a method to check whether comments are enabled for a specific entity type.
+ */
 class CommentAssociationHelper
 {
-    const COMMENT_ENTITY = 'Oro\Bundle\CommentBundle\Entity\Comment';
+    private ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -30,7 +28,7 @@ class CommentAssociationHelper
      *
      * @return bool
      */
-    public function isCommentAssociationEnabled($entityClass, $accessible = true)
+    public function isCommentAssociationEnabled(string $entityClass, bool $accessible = true): bool
     {
         if (!$this->configManager->hasConfig($entityClass)) {
             return false;
@@ -47,20 +45,16 @@ class CommentAssociationHelper
     /**
      * Check if an association between a given entity type and comments is ready to be used in a business logic.
      * It means that the association should exist and should not be marked as deleted.
-     *
-     * @param string $entityClass The target entity class
-     *
-     * @return bool
      */
-    protected function isCommentAssociationAccessible($entityClass)
+    private function isCommentAssociationAccessible(string $entityClass): bool
     {
         $associationName = ExtendHelper::buildAssociationName($entityClass);
-        if (!$this->configManager->hasConfig(self::COMMENT_ENTITY, $associationName)) {
+        if (!$this->configManager->hasConfig(Comment::class, $associationName)) {
             return false;
         }
 
         return ExtendHelper::isFieldAccessible(
-            $this->configManager->getFieldConfig('extend', self::COMMENT_ENTITY, $associationName)
+            $this->configManager->getFieldConfig('extend', Comment::class, $associationName)
         );
     }
 }

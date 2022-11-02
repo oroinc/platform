@@ -5,17 +5,19 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprItem;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprOperator;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprValue;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryValueBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider simpleProvider
      */
-    public function testFrom($value, $match)
+    public function testFrom(string $value, int $match)
     {
         $this->simpleFieldTesting('from', $value, $match);
     }
@@ -28,7 +30,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testTo($value, $match)
+    public function testTo(string $value, int $match)
     {
         $this->simpleFieldTesting('to', $value, $match);
     }
@@ -41,7 +43,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testCc($value, $match)
+    public function testCc(string $value, int $match)
     {
         $this->simpleFieldTesting('cc', $value, $match);
     }
@@ -54,7 +56,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testBcc($value, $match)
+    public function testBcc(string $value, int $match)
     {
         $this->simpleFieldTesting('bcc', $value, $match);
     }
@@ -67,7 +69,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testParticipants($value, $match)
+    public function testParticipants(string $value, int $match)
     {
         $this->simpleFieldTesting('participants', $value, $match);
     }
@@ -80,7 +82,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testSubject($value, $match)
+    public function testSubject(string $value, int $match)
     {
         $this->simpleFieldTesting('subject', $value, $match);
     }
@@ -93,7 +95,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testBody($value, $match)
+    public function testBody(string $value, int $match)
     {
         $this->simpleFieldTesting('body', $value, $match);
     }
@@ -106,7 +108,7 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testAttachment($value, $match)
+    public function testAttachment(string $value, int $match)
     {
         $this->simpleFieldTesting('attachment', $value, $match);
     }
@@ -126,25 +128,25 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
         $this->rangeFieldTesting('received');
     }
 
-    public static function simpleProvider()
+    public static function simpleProvider(): array
     {
-        return array(
-            'default match' => array('product', SearchQueryMatch::DEFAULT_MATCH),
-            'substring match' => array('product', SearchQueryMatch::SUBSTRING_MATCH),
-            'exact match' => array('product', SearchQueryMatch::EXACT_MATCH),
-        );
+        return [
+            'default match' => ['product', SearchQueryMatch::DEFAULT_MATCH],
+            'substring match' => ['product', SearchQueryMatch::SUBSTRING_MATCH],
+            'exact match' => ['product', SearchQueryMatch::EXACT_MATCH],
+        ];
     }
 
-    private function simpleFieldTesting($name, $value, $match)
+    private function simpleFieldTesting(string $name, string $value, int $match)
     {
         $expr = $this->createSearchQueryBuilder()->$name($value, $match)->get()->getExpression();
 
-        $expected = array(new SearchQueryExprItem($name, $value, $match));
+        $expected = [new SearchQueryExprItem($name, $value, $match)];
 
         $this->assertEquals($expected, $expr->getItems());
     }
 
-    private function simpleFieldTestingWithClosure($name)
+    private function simpleFieldTestingWithClosure(string $name)
     {
         /** @var SearchQuery $query */
         $query = $this->createSearchQueryBuilder()
@@ -164,64 +166,59 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
         $subQuery->andOperator();
         $subQuery->value('val2');
 
-        $expected = array(
+        $expected = [
             new SearchQueryExprItem(
                 $name,
                 $subQuery->getExpression(),
                 SearchQueryMatch::DEFAULT_MATCH
             )
-        );
+        ];
 
         $this->assertEquals($expected, $expr->getItems());
     }
 
-    private function rangeFieldTesting($name)
+    private function rangeFieldTesting(string $name)
     {
         $expr = $this->createSearchQueryBuilder()
             ->$name('val')
             ->get()
             ->getExpression();
-        $expected = array(new SearchQueryExprItem($name . ':after', 'val', SearchQueryMatch::DEFAULT_MATCH));
+        $expected = [new SearchQueryExprItem($name . ':after', 'val', SearchQueryMatch::DEFAULT_MATCH)];
         $this->assertEquals($expected, $expr->getItems());
 
         $expr = $this->createSearchQueryBuilder()
             ->$name('val', null)
             ->get()
             ->getExpression();
-        $expected = array(new SearchQueryExprItem($name . ':after', 'val', SearchQueryMatch::DEFAULT_MATCH));
+        $expected = [new SearchQueryExprItem($name . ':after', 'val', SearchQueryMatch::DEFAULT_MATCH)];
         $this->assertEquals($expected, $expr->getItems());
 
         $expr = $this->createSearchQueryBuilder()
             ->$name(null, 'val')
             ->get()
             ->getExpression();
-        $expected = array(new SearchQueryExprItem($name . ':before', 'val', SearchQueryMatch::DEFAULT_MATCH));
+        $expected = [new SearchQueryExprItem($name . ':before', 'val', SearchQueryMatch::DEFAULT_MATCH)];
         $this->assertEquals($expected, $expr->getItems());
 
         $expr = $this->createSearchQueryBuilder()
             ->$name('val1', 'val2')
             ->get()
             ->getExpression();
-        $expected = array(
+        $expected = [
             new SearchQueryExprItem($name . ':after', 'val1', SearchQueryMatch::DEFAULT_MATCH),
             new SearchQueryExprOperator('AND'),
             new SearchQueryExprItem($name . ':before', 'val2', SearchQueryMatch::DEFAULT_MATCH)
-        );
+        ];
         $this->assertEquals($expected, $expr->getItems());
     }
 
-    /**
-     * @return SearchQueryBuilder
-     */
-    private function createSearchQueryBuilder()
+    private function createSearchQueryBuilder(): SearchQueryBuilder
     {
-        $searchStringManager = $this->createMock('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface');
-        $searchStringManager
-            ->expects($this->any())
+        $searchStringManager = $this->createMock(SearchStringManagerInterface::class);
+        $searchStringManager->expects($this->any())
             ->method('isAcceptableItem')
-            ->will($this->returnValue(true));
-        $searchStringManager
-            ->expects($this->never())
+            ->willReturn(true);
+        $searchStringManager->expects($this->never())
             ->method('buildSearchString');
 
         return new SearchQueryBuilder(new SearchQuery($searchStringManager));

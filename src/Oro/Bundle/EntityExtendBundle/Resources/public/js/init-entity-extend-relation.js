@@ -5,13 +5,13 @@ require([
 
     $(function() {
         $(document).on('change', '[data-ftid=oro_entity_config_type_extend_relation_target_entity]', function(e) {
-            var el = $(this);
-            var target = el.find('option:selected').attr('value').replace(/\\/g, '_');
-            var query = routing.generate('oro_entityconfig_field_search', {id: target});
-            var fields = $('form select.extend-rel-target-field');
+            const el = $(this);
+            const target = el.find('option:selected').attr('value').replace(/\\/g, '_');
+            const query = routing.generate('oro_entityconfig_field_search', {id: target});
+            const fields = $('form select.extend-rel-target-field');
 
             $(fields).each(function(index, el) {
-                var isMultiple = typeof $(el).attr('multiple') !== 'undefined' && $(el).attr('multiple') !== false;
+                const isMultiple = typeof $(el).attr('multiple') !== 'undefined' && $(el).attr('multiple') !== false;
                 if (isMultiple) {
                     $(el).empty().append('<option value="">' + __('Loading...') + '</option>');
                 } else {
@@ -21,7 +21,7 @@ require([
 
             $.getJSON(query, function(response) {
                 $(fields).each(function(index, el) {
-                    var items = [];
+                    const items = [];
 
                     $.each(response, function(key, val) {
                         items.push('<option value="' + key + '">' + val + '</option>');

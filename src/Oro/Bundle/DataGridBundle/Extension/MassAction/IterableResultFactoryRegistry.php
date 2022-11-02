@@ -10,21 +10,22 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 
 /**
- * Registry for IterableResultFactory services.
+ * The registry of iterable result factories.
  */
 class IterableResultFactoryRegistry
 {
-    /**
-     * @var IterableResultFactory[]
-     */
-    private $factories = [];
+    /** @var iterable|IterableResultFactory[] */
+    private $factories;
 
     /**
-     * @param DatasourceInterface $dataSource
-     * @param ActionConfiguration $actionConfiguration
-     * @param DatagridConfiguration $gridConfiguration
-     * @param SelectedItems $selectedItems
-     * @return IterableResultInterface
+     * @param iterable|IterableResultFactory[] $factories
+     */
+    public function __construct(iterable $factories)
+    {
+        $this->factories = $factories;
+    }
+
+    /**
      * @throws LogicException
      */
     public function createIterableResult(
@@ -43,13 +44,5 @@ class IterableResultFactoryRegistry
         throw new LogicException(
             sprintf('No IterableResultFactory found for "%s" datasource type', get_class($dataSource))
         );
-    }
-
-    /**
-     * @param IterableResultFactoryInterface $factory
-     */
-    public function addFactory(IterableResultFactoryInterface $factory)
-    {
-        $this->factories[] = $factory;
     }
 }

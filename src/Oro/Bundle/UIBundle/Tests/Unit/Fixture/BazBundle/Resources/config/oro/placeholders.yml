@@ -1,0 +1,26 @@
+placeholders:
+    placeholders:
+        test_block:
+            items:
+                item1:
+                    remove: true
+                item4:
+                    order: 15
+                item7:
+                    order: -5
+                new_empty_item:
+                    order: 100
+                new_item:
+                    order: 5
+
+    items:
+        new_item:
+            template: test_template
+        new_applicable_string_item:
+            template: test_template
+            applicable: test_condition
+        new_applicable_array_item:
+            template: test_template
+            applicable:
+                - test_condition1
+                - test_condition2

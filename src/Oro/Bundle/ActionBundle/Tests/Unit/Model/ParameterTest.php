@@ -10,22 +10,17 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var Parameter */
-    protected $parameter;
+    private $parameter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parameter = new Parameter('test');
-    }
-
-    protected function tearDown()
-    {
-        unset($this->actionGroupDefinition);
     }
 
     public function testSimpleGettersAndSetters()
     {
         $this->assertEquals('test', $this->parameter->getName());
-        static::assertPropertyAccessors(
+        self::assertPropertyAccessors(
             $this->parameter,
             [
                 ['type', 'TestType'],
@@ -48,7 +43,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->parameter->hasDefault());
         $this->assertFalse($this->parameter->hasTypeHint());
 
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'Parameter `test` has no default value set. ' .
             'Please check `hasDefault() === true` or `isRequired() === false` before default value retrieval'
@@ -59,9 +54,8 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider defaultValueProvider
-     * @param mixed $value
      */
-    public function testGetDefaultValue($value)
+    public function testGetDefaultValue(mixed $value)
     {
         $this->parameter->setDefault($value);
 
@@ -70,10 +64,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->parameter->getDefault());
     }
 
-    /**
-     * @return array
-     */
-    public function defaultValueProvider()
+    public function defaultValueProvider(): array
     {
         return [
             [''],

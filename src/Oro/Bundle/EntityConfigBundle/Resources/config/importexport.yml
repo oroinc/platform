@@ -1,72 +1,77 @@
-parameters:
-    oro_entity_config.importexport.data_converter.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldDataConverter
-    oro_entity_config.importexport.normalizer.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer
-    oro_entity_config.importexport.strategy.entity_field.add_or_replace.class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy
-
 services:
-    # Converter
     oro_entity_config.importexport.data_converter.entity_field:
-        class: '%oro_entity_config.importexport.data_converter.entity_field.class%'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldDataConverter
 
     oro_entity_config.importexport.template_data_converter.abstract_field:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AbstractFieldTemplateDataConverter'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AbstractFieldTemplateDataConverter
         abstract: true
         arguments:
             - '@oro_entity_extend.field_type_provider'
 
     oro_entity_config.importexport.template_data_converter.entity_field:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldTemplateDataConverter'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldTemplateDataConverter
         parent: oro_entity_config.importexport.template_data_converter.abstract_field
 
     oro_entity_config.importexport.template_data_converter.attribute:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AttributeTemplateDataConverter'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AttributeTemplateDataConverter
         parent: oro_entity_config.importexport.template_data_converter.abstract_field
 
-    # Strategy
     oro_entity_config.importexport.strategy.entity_field.add_or_replace:
-        class: '%oro_entity_config.importexport.strategy.entity_field.add_or_replace.class%'
-        parent: oro_importexport.strategy.configurable_add_or_replace
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy
+        parent: oro_importexport.strategy.abstract_import_strategy
         calls:
             - [setTranslator, ['@translator']]
             - [setConstraintFactory, ['@oro_form.validator.constraint_factory']]
             - [setFieldTypeProvider, ['@oro_entity_extend.field_type_provider']]
             - [setFieldValidationHelper, ['@oro_entity_extend.extend.field_name_validation_helper']]
 
-    # Template Fixture
+    oro_entity_config.importexport.strategy.attribute.add_or_replace:
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\AttributeImportStrategy
+        parent: oro_entity_config.importexport.strategy.entity_field.add_or_replace
+        calls:
+            - [setConfigHelper, ['@oro_entity_config.config.config_helper']]
+
     oro_entity_config.importexport.template_fixture.entity_field:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture
         arguments:
             - '@oro_entity_extend.field_type_provider'
+            - '@oro_entity_config.registry.attribute_type'
         tags:
             - { name: oro_importexport.template_fixture }
 
-    # Import processor
     oro_entity_config.importexport.processor.import.entity_field:
         parent: oro_importexport.processor.import_abstract
         calls:
              - [setDataConverter, ['@oro_entity_config.importexport.data_converter.entity_field']]
              - [setStrategy, ['@oro_entity_config.importexport.strategy.entity_field.add_or_replace']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
-            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
+            - { name: oro_importexport.processor, type: import, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.add_or_replace }
 
-    # Export template
+    oro_entity_config.importexport.processor.import.attribute:
+        parent: oro_importexport.processor.import_abstract
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Processor\AttributeImportProcessor
+        calls:
+             - [setDataConverter, ['@oro_entity_config.importexport.data_converter.entity_field']]
+             - [setStrategy, ['@oro_entity_config.importexport.strategy.attribute.add_or_replace']]
+             - [setContextRegistry, ['@oro_importexport.context_registry']]
+
     oro_entity_config.importexport.processor.export_template.entity_field:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.entity_field']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.export_template }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.export_template }
 
     oro_entity_config.importexport.processor.export_template.attribute:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.attribute']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_attribute.export_template }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_attribute.export_template }
 
     oro_entity_config.importexport.normalizer.entityfield:
-        class: '%oro_entity_config.importexport.normalizer.entity_field.class%'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer
         arguments:
             - '@doctrine'
             - '@oro_entity_config.config_manager'
@@ -75,7 +80,7 @@ services:
             - { name: oro_importexport.normalizer, priority: 20 }
 
     oro_entity_config.importexport.writer.entity_field:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_config.translation.helper'
@@ -83,25 +88,37 @@ services:
             - '@oro_entity_config.provider.entity_field_state_checker'
 
     oro_entity_config.importexport.writer.attribute:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Writer\AttributeWriter'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Writer\AttributeWriter
         parent: oro_entity_config.importexport.writer.entity_field
         calls:
             - [setSerializedFieldProvider, ['@oro_entity_config.provider.serialized_field_provider']]
 
     oro_entity_config.import_strategy.listener:
-        class: 'Oro\Bundle\EntityConfigBundle\EventListener\ImportStrategyListener'
+        class: Oro\Bundle\EntityConfigBundle\EventListener\ImportStrategyListener
         arguments:
             - '@translator'
             - '@oro_importexport.strategy.import.helper'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
 
     oro_entity_config.importexport.configuration_provider.field_config_model:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\FieldConfigModelImportExportConfigurationProvider'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\FieldConfigModelImportExportConfigurationProvider
         tags:
             - { name: oro_importexport.configuration, alias: oro_field_config_model }
 
     oro_entity_config.importexport.configuration_provider.field_config_model_attribute:
-        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider'
+        class: Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider
         tags:
             - { name: oro_importexport.configuration, alias: oro_field_config_model_attribute }
+
+    oro_entity_config.provider.export_query_tuple_length:
+        class: Oro\Bundle\EntityConfigBundle\Provider\ExportQueryTupleLengthProvider
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.provider.export_query'
+
+    oro_entity_config.provider.export_query:
+        class: Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider
+        arguments:
+            - '@oro_entity_config.config_manager'

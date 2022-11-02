@@ -2,25 +2,42 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
+use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RestDocumentBuilderTest extends DocumentBuilderTestCase
 {
     /** @var RestDocumentBuilder */
     private $documentBuilder;
 
-    /** @var RequestType */
-    private $requestType;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);
+        $valueNormalizer = $this->getValueNormalizer();
+        $entityIdTransformer = $this->getEntityIdTransformer();
+        $entityIdTransformerRegistry = $this->getEntityIdTransformerRegistry($entityIdTransformer);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->documentBuilder = new RestDocumentBuilder();
+        $this->documentBuilder = new RestDocumentBuilder(
+            $valueNormalizer,
+            $entityIdTransformerRegistry,
+            $this->logger
+        );
     }
 
     public function testSetDataObjectWithoutMetadata()
@@ -220,6 +237,104 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testSetDataObjectWithLinks()
+    {
+        $object = [
+            'code' => 123,
+            'name' => 'Name'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addLink(
+            'self',
+            new ExternalLinkMetadata('/api/{__type__}/{id}', ['__type__' => null, 'id' => '__id__'])
+        );
+        $linkWithMeta = $metadata->addLink(
+            'with_meta',
+            new ExternalLinkMetadata('/api/{type}/{id}/meta', ['type' => '__type__', 'id' => '__id__'])
+        );
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta1', 'string', 'name'));
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta2', 'string'));
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta3', 'string', '__class__'));
+        $metadata->addLink(
+            'unresolved',
+            new ExternalLinkMetadata('/api/{unknown}', ['unknown' => null])
+        );
+
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->with('Cannot build URL for a link. Missing Parameters: unknown.');
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'code'  => 123,
+                'name'  => 'Name',
+                'links' => [
+                    'self'      => '/api/test_entity/Test\Entity::123',
+                    'with_meta' => [
+                        'href'  => '/api/test_entity/Test\Entity::123/meta',
+                        'meta1' => 'Name',
+                        'meta3' => 'Test\Entity'
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testSetDataCollectionWithLinks()
+    {
+        $object = [
+            'code' => 123,
+            'name' => 'Name'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addLink(
+            'self',
+            new ExternalLinkMetadata('/api/{__type__}/{id}', ['__type__' => null, 'id' => '__id__'])
+        );
+        $linkWithMeta = $metadata->addLink(
+            'with_meta',
+            new ExternalLinkMetadata('/api/{type}/{id}/meta', ['type' => '__type__', 'id' => '__id__'])
+        );
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta1', 'string', 'name'));
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta2', 'string'));
+        $linkWithMeta->addMetaProperty(new MetaAttributeMetadata('meta3', 'string', '__class__'));
+        $metadata->addLink(
+            'unresolved',
+            new ExternalLinkMetadata('/api/{unknown}', ['unknown' => null])
+        );
+
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->with('Cannot build URL for a link. Missing Parameters: unknown.');
+
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                [
+                    'code'  => 123,
+                    'name'  => 'Name',
+                    'links' => [
+                        'self'      => '/api/test_entity/Test\Entity::123',
+                        'with_meta' => [
+                            'href'  => '/api/test_entity/Test\Entity::123/meta',
+                            'meta1' => 'Name',
+                            'meta3' => 'Test\Entity'
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetDataCollectionOfScalarsWithMetadata()
     {
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -251,9 +366,9 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $categoriesMetadata->getTargetMetadata()->setInheritedType(true);
         $categoriesMetadata->setAcceptableTargetClassNames(['Test\Category1', 'Test\Category2']);
         $categoriesMetadata->getTargetMetadata()->addField($this->createFieldMetadata('name'));
-        $categoriesMetadata->getTargetMetadata()->addMetaProperty(
-            $this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME)
-        );
+        $categoriesMetadata->getTargetMetadata()
+            ->addMetaProperty($this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME))
+            ->setResultName('meta_class');
 
         $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
         self::assertEquals(
@@ -294,9 +409,9 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $categoriesMetadata->getTargetMetadata()->setInheritedType(true);
         $categoriesMetadata->setAcceptableTargetClassNames(['Test\Category1', 'Test\Category2WithoutAlias']);
         $categoriesMetadata->getTargetMetadata()->addField($this->createFieldMetadata('name'));
-        $categoriesMetadata->getTargetMetadata()->addMetaProperty(
-            $this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME)
-        );
+        $categoriesMetadata->getTargetMetadata()
+            ->addMetaProperty($this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME))
+            ->setResultName('meta_class');
 
         $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
         self::assertEquals(
@@ -347,7 +462,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldProvider
      */
-    public function testToOneAssociationAsField($value, $expected)
+    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected)
     {
         $object = [
             'id'       => 123,
@@ -372,7 +487,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneAssociationAsFieldProvider()
+    public function toOneAssociationAsFieldProvider(): array
     {
         return [
             [null, null],
@@ -395,7 +510,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldProvider
      */
-    public function testToManyAssociationAsField($value, $expected)
+    public function testToManyAssociationAsField(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -420,7 +535,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyAssociationAsFieldProvider()
+    public function toManyAssociationAsFieldProvider(): array
     {
         return [
             [null, []],
@@ -447,7 +562,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToOneAssociationAsFieldForIdFieldsOnly($value, $expected)
+    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected)
     {
         $object = [
             'id'       => 123,
@@ -471,7 +586,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneAssociationAsFieldForIdFieldsOnlyProvider()
+    public function toOneAssociationAsFieldForIdFieldsOnlyProvider(): array
     {
         return [
             [null, null],
@@ -484,7 +599,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToManyAssociationAsFieldForIdFieldsOnly($value, $expected)
+    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -508,7 +623,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyAssociationAsFieldForIdFieldsOnlyProvider()
+    public function toManyAssociationAsFieldForIdFieldsOnlyProvider(): array
     {
         return [
             [null, []],
@@ -528,7 +643,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneCollapsedAssociationAsFieldProvider
      */
-    public function testToOneCollapsedAssociationAsField($value, $expected)
+    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected)
     {
         $object = [
             'id'       => 123,
@@ -541,7 +656,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('category', 'Test\Category')
         );
         $association->setDataType('scalar');
-        $association->setCollapsed(true);
+        $association->setCollapsed();
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -555,7 +670,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneCollapsedAssociationAsFieldProvider()
+    public function toOneCollapsedAssociationAsFieldProvider(): array
     {
         return [
             [null, null],
@@ -574,7 +689,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyCollapsedAssociationAsFieldProvider
      */
-    public function testToManyCollapsedAssociationAsField($value, $expected)
+    public function testToManyCollapsedAssociationAsField(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -587,7 +702,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('categories', 'Test\Category', true)
         );
         $association->setDataType('array');
-        $association->setCollapsed(true);
+        $association->setCollapsed();
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -601,7 +716,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyCollapsedAssociationAsFieldProvider()
+    public function toManyCollapsedAssociationAsFieldProvider(): array
     {
         return [
             [null, []],
@@ -624,6 +739,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     public function testNestedAssociationAsArrayAttribute()
     {
         $object = [
+            'id'          => 1,
             'association' => [
                 'id'         => 123,
                 'name'       => 'Name',
@@ -691,6 +807,36 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testNestedObject()
+    {
+        $object = [
+            'id'     => 1,
+            'nested' => [
+                'name' => 'Name'
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $nestedObject = $metadata->addAssociation(
+            $this->createAssociationMetadata('nested', 'Test\NestedWithoutAlias', false, [])
+        );
+        $nestedObject->setDataType(DataType::NESTED_OBJECT);
+        $nestedObject->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $nestedObject->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id'     => 1,
+                'nested' => [
+                    'name' => 'Name'
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetErrorObject()
     {
         $error = new Error();
@@ -750,6 +896,27 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'id'          => '123',
                 'resultMeta1' => 'Meta1'
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testMetaPropertyThatNotMappedToAnyField()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id' => '123'
             ],
             $this->documentBuilder->getDocument()
         );
@@ -895,6 +1062,115 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
         self::assertEquals(
             [],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAddLinksToCollectionValuedResult()
+    {
+        $object = [
+            'id'    => 1,
+            'role'  => ['id' => 21, 'name' => 'Role1', 'users' => [211, 212]],
+            'roles' => [
+                ['id' => 21, 'name' => 'Role1', 'users' => [211, 212]],
+                ['id' => 22, 'name' => 'Role2', 'users' => [213, 214]]
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $roleMetadata = $this->getEntityMetadata('Test\Role', ['id']);
+        $roleMetadata->addField($this->createFieldMetadata('name'));
+        $roleMetadata->addAssociation($this->createAssociationMetadata('users', 'Test\User', true));
+        $metadata->getAssociation('role')->setTargetMetadata($roleMetadata);
+        $metadata->getAssociation('roles')->setTargetMetadata($roleMetadata);
+
+        $this->documentBuilder->addLinkMetadata('link10', new ExternalLinkMetadata('/api/test'));
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+        $this->documentBuilder->addLink('link1', 'link1_url');
+        $this->documentBuilder->addLink('link2', 'link2_url', ['key' => 'value']);
+
+        self::assertEquals(
+            [
+                [
+                    'id'    => 1,
+                    'role'  => ['name' => 'Role1', 'users' => [211, 212]],
+                    'roles' => [
+                        ['name' => 'Role1', 'users' => [211, 212]],
+                        ['name' => 'Role2', 'users' => [213, 214]]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAddLinksToSingleValuedResult()
+    {
+        $object = [
+            'id'    => 1,
+            'role'  => ['id' => 21, 'name' => 'Role1', 'users' => [211, 212]],
+            'roles' => [
+                ['id' => 21, 'name' => 'Role1', 'users' => [211, 212]],
+                ['id' => 22, 'name' => 'Role2', 'users' => [213, 214]]
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
+        $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
+        $roleMetadata = $this->getEntityMetadata('Test\Role', ['id']);
+        $roleMetadata->addField($this->createFieldMetadata('name'));
+        $roleMetadata->addAssociation($this->createAssociationMetadata('users', 'Test\User', true));
+        $metadata->getAssociation('role')->setTargetMetadata($roleMetadata);
+        $metadata->getAssociation('roles')->setTargetMetadata($roleMetadata);
+
+        $this->documentBuilder->addLinkMetadata('link10', new ExternalLinkMetadata('/api/test'));
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        $this->documentBuilder->addLink('link1', 'link1_url');
+        $this->documentBuilder->addLink('link2', 'link2_url', ['key' => 'value']);
+
+        self::assertEquals(
+            [
+                'id'    => 1,
+                'role'  => ['name' => 'Role1', 'users' => [211, 212]],
+                'roles' => [
+                    ['name' => 'Role1', 'users' => [211, 212]],
+                    ['name' => 'Role2', 'users' => [213, 214]]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testMetadataForCollectionValuedResult()
+    {
+        $object = [
+            'id'   => 1,
+            'name' => 'test'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setMetadata([
+            ''        => ['has_more' => true],
+            '0.userRoles' => ['has_more' => true],
+            'meta1'   => 'some value'
+        ]);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+
+        self::assertEquals(
+            [
+                [
+                    'id'   => 1,
+                    'name' => 'test'
+                ]
+            ],
             $this->documentBuilder->getDocument()
         );
     }

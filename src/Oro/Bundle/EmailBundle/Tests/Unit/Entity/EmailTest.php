@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -16,6 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,30 +31,30 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testFromEmailAddressGetterAndSetter()
     {
-        $emailAddress = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddress = $this->createMock(EmailAddress::class);
 
         $entity = new Email();
         $entity->setFromEmailAddress($emailAddress);
 
-        $this->assertTrue($emailAddress === $entity->getFromEmailAddress());
+        $this->assertSame($emailAddress, $entity->getFromEmailAddress());
     }
 
     public function testRecipientGetterAndSetter()
     {
-        $toRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $toRecipient = $this->createMock(EmailRecipient::class);
         $toRecipient->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('to'));
+            ->willReturn('to');
 
-        $ccRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $ccRecipient = $this->createMock(EmailRecipient::class);
         $ccRecipient->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('cc'));
+            ->willReturn('cc');
 
-        $bccRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $bccRecipient = $this->createMock(EmailRecipient::class);
         $bccRecipient->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('bcc'));
+            ->willReturn('bcc');
 
         $entity = new Email();
         $entity->addRecipient($toRecipient);
@@ -60,37 +63,37 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $recipients = $entity->getRecipients();
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $recipients);
+        $this->assertInstanceOf(ArrayCollection::class, $recipients);
         $this->assertCount(3, $recipients);
-        $this->assertTrue($toRecipient === $recipients[0]);
-        $this->assertTrue($ccRecipient === $recipients[1]);
-        $this->assertTrue($bccRecipient === $recipients[2]);
+        $this->assertSame($toRecipient, $recipients[0]);
+        $this->assertSame($ccRecipient, $recipients[1]);
+        $this->assertSame($bccRecipient, $recipients[2]);
 
         /** @var GroupNodeDefinition $recipients */
         $recipients = $entity->getRecipients('to');
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $recipients);
+        $this->assertInstanceOf(ArrayCollection::class, $recipients);
         $this->assertCount(1, $recipients);
-        $this->assertTrue($toRecipient === $recipients->first());
+        $this->assertSame($toRecipient, $recipients->first());
 
         $recipients = $entity->getRecipients('cc');
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $recipients);
+        $this->assertInstanceOf(ArrayCollection::class, $recipients);
         $this->assertCount(1, $recipients);
-        $this->assertTrue($ccRecipient === $recipients->first());
+        $this->assertSame($ccRecipient, $recipients->first());
 
         $recipients = $entity->getRecipients('bcc');
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $recipients);
+        $this->assertInstanceOf(ArrayCollection::class, $recipients);
         $this->assertCount(1, $recipients);
-        $this->assertTrue($bccRecipient === $recipients->first());
+        $this->assertSame($bccRecipient, $recipients->first());
     }
 
     public function testEmailBodyGetterAndSetter()
     {
-        $emailBody = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody = $this->createMock(EmailBody::class);
 
         $entity = new Email();
         $entity->setEmailBody($emailBody);
 
-        $this->assertTrue($emailBody === $entity->getEmailBody());
+        $this->assertSame($emailBody, $entity->getEmailBody());
     }
 
     public function testBeforeSave()
@@ -138,10 +141,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['subject', 'testSubject'],
@@ -157,7 +157,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function refsDataProvider()
+    public function refsDataProvider(): array
     {
         return [
             [null, []],

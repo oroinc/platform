@@ -26,23 +26,23 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"usergroups",
-      "attributes":{  
-         "name":"HQ Administrators"
+{
+   "data": {
+      "type": "usergroups",
+      "attributes": {
+         "name": "HQ Administrators"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -55,30 +55,32 @@ Example:
 
 Edit a specific user group record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"usergroups",
-      "id":"10",
-      "attributes":{  
-         "name":"HQ Administrators"
+{
+   "data": {
+      "type": "usergroups",
+      "id": "10",
+      "attributes": {
+         "name": "HQ Administrators"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -101,29 +103,19 @@ Delete a collection of user group records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### name
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 

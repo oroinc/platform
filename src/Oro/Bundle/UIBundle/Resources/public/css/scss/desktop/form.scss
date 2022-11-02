@@ -1,23 +1,25 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 .oro-item-collection {
-    &input[type="email"],
-    &input[type="text"] {
+    &input[type='email'],
+    &input[type='text'] {
         width: $form-item-collection-field-width;
     }
 
     .input-append,
     .input-prepend {
-        input[type="email"],
-        input[type="text"] {
+        input[type='email'],
+        input[type='text'] {
             width: $form-item-collection-field-append-width;
         }
     }
 
     .input-append-sortable,
     .input-prepend-sortable {
-        input[type="email"],
-        input[type="text"] {
+        input[type='email'],
+        input[type='text'] {
             width: $form-item-collection-field-append-sortable-width;
         }
     }
@@ -41,77 +43,76 @@
             width: $form-item-collection-select2-width;
         }
     }
+
+    .action-cell {
+        text-align: center;
+    }
 }
 
 .oro-item-collection.not-removable {
-    input[type="email"],
-    input[type="text"] {
+    input[type='email'],
+    input[type='text'] {
         width: $form-item-collection-removable-field-width;
     }
 
     .input-append,
     .input-prepend {
-        input[type="email"],
-        input[type="text"] {
+        input[type='email'],
+        input[type='text'] {
             width: $form-item-collection-removable-append-field-width;
         }
     }
 
     .input-append-sortable,
     .input-prepend-sortable {
-        input[type="email"],
-        input[type="text"] {
+        input[type='email'],
+        input[type='text'] {
             width: $form-item-collection-removable-append-sortable-field-width;
         }
     }
 }
 
-input[type="text"].hasDatepicker {
+input[type='text'].hasDatepicker {
     min-width: $form-item-collection-datepicker-field-min-width;
 }
 
-.form-horizontal {
-    .controls {
-        padding-top: 7px;
+.clearable-input {
+    &__container--clear .clearable-input__placeholder-icon {
+        font-size: $icon-font-size;
+        top: 0;
+        width: $field-size;
+        height: $field-size;
+        line-height: $field-size;
+    }
 
-        .controls {
-            padding-top: 0;
+    &__clear {
+        top: 0;
+    }
+
+    &__container > input {
+        padding-right: $field-size;
+    }
+}
+
+.form-flex {
+    display: flex;
+    width: 100%;
+    margin-bottom: 28px;
+
+    > .control-group {
+        padding: 0 8px;
+
+        &:first-child {
+            padding-left: 0;
         }
 
-        >,
-        .oro-clearfix,
-        .fallback-container {
-            input:not([type=checkbox]):not([type=radio]),
-            textarea,
-            .selector,
-            .select2-container,
-            .input-append {
-                margin-top: -7px; //  input padding + border
-
-                + .fallback-status,
-                + .btn:not(.add-on),
-                > .btn:not(.add-on) {
-                    margin-top: -7px;
-                }
-
-            }
-
-            .selector,
-            .select2-container,
-            .input-append,
-            td {
-                input:not([type=checkbox]):not([type=radio]),
-                textarea,
-                .selector,
-                .select2-container {
-                    margin-top: 0;
-                }
-            }
+        &:last-child {
+            padding-right: 0;
         }
+    }
 
-        .jstree-wrapper {
-            padding-top: 0;
-            min-width: $field-width;
-        }
+    .form-buttons {
+        padding-top: 21px;
+        white-space: nowrap;
     }
 }

@@ -17,8 +17,6 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addAttachmentRelation(Schema $schema)

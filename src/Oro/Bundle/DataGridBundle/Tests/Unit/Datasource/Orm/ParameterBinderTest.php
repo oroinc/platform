@@ -3,80 +3,65 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 
 class ParameterBinderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datagrid;
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagrid;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datasource;
+    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
+    private $datasource;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $queryBuilder;
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryBuilder;
 
-    /**
-     * @var ParameterBinder
-     */
-    protected $parameterBinder;
+    /** @var ParameterBinder */
+    private $parameterBinder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->datagrid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
-
-        $this->datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->queryBuilder = $this->getMockBuilder('Doctrine\\ORM\\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->datagrid = $this->createMock(DatagridInterface::class);
+        $this->datasource = $this->createMock(OrmDatasource::class);
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
 
         $this->parameterBinder = new ParameterBinder();
     }
 
     /**
      * @dataProvider bindParametersDataProvider
-     * @param array $bindParameters
-     * @param array $datagridParameters
-     * @param array $oldQueryParameters
-     * @param array $expectedQueryParameters
-     * @param bool $append
      */
     public function testBindParametersWorks(
         array $bindParameters,
         array $datagridParameters,
         array $oldQueryParameters,
         array $expectedQueryParameters,
-        $append = true
+        bool $append = true
     ) {
         $queryParameters = new ArrayCollection($oldQueryParameters);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datasource->expects($this->once())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($queryParameters));
+            ->willReturn($queryParameters);
 
         $this->datagrid->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag($datagridParameters)));
+            ->willReturn(new ParameterBag($datagridParameters));
 
         $this->parameterBinder->bindParameters($this->datagrid, $bindParameters, $append);
 
@@ -88,9 +73,8 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function bindParametersDataProvider()
+    public function bindParametersDataProvider(): array
     {
         return [
             'short format' => [
@@ -104,8 +88,8 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'key format' => [
@@ -119,8 +103,8 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'full format' => [
@@ -131,7 +115,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                     [
                         'name' => 'entity_name',
                         'path' => 'entityName',
-                        'type' => Type::STRING
+                        'type' => Types::STRING
                     ]
                 ],
                 'datagridParameters' => [
@@ -140,8 +124,8 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test', Type::STRING),
+                    new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test', Types::STRING),
                 ]
             ],
             'default value' => [
@@ -153,7 +137,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 'datagridParameters' => [],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'default empty array' => [
@@ -167,7 +151,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_name', [0]),
+                    new Parameter('entity_name', [0]),
                 ]
             ],
             'default array with empty string' => [
@@ -181,7 +165,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_name', [0]),
+                    new Parameter('entity_name', [0]),
                 ]
             ],
             'default catch exception' => [
@@ -196,7 +180,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'parameter path' => [
@@ -212,34 +196,34 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'append' => [
                 'bindParameters' => ['entity_name'],
                 'datagridParameters' => ['entity_name' => 'test'],
-                'oldQueryParameters' => [$this->createQueryParameter('entity_id', 1)],
+                'oldQueryParameters' => [new Parameter('entity_id', 1)],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'replace' => [
                 'bindParameters' => ['entity_id', 'entity_name'],
                 'datagridParameters' => ['entity_id' => 1, 'entity_name' => 'test'],
-                'oldQueryParameters' => [$this->createQueryParameter('entity_name', 'old')],
+                'oldQueryParameters' => [new Parameter('entity_name', 'old')],
                 'expectedQueryParameters' => [
-                    1 => $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test'),
+                    1 => new Parameter('entity_id', 1),
+                    new Parameter('entity_name', 'test'),
                 ]
             ],
             'clear' => [
                 'bindParameters' => ['entity_name'],
                 'datagridParameters' => ['entity_name' => 'test'],
-                'oldQueryParameters' => [$this->createQueryParameter('entity_id', 1)],
+                'oldQueryParameters' => [new Parameter('entity_id', 1)],
                 'expectedQueryParameters' => [
-                    $this->createQueryParameter('entity_name', 'test'),
+                    new Parameter('entity_name', 'test'),
                 ],
                 'append' => false,
             ],
@@ -248,13 +232,13 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
 
     public function testBindParametersFailsWithInvalidPath()
     {
-        $datasource = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $datasource = $this->createMock(DatagridInterface::class);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($datasource));
+            ->willReturn($datasource);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Datagrid datasource has unexpected type "' . get_class($datasource) . '", ' .
             '"Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource" is expected.'
@@ -263,39 +247,39 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         $this->parameterBinder->bindParameters($this->datagrid, ['foo']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".
-     */
-    // @codingStandardsIgnoreEnd
     public function testBindParametersFailsWithInvalidDatasource()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".'
+        );
+
         $datagridParameters = ['foo' => new \stdClass];
         $queryParameters = new ArrayCollection();
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datasource->expects($this->once())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($queryParameters));
+            ->willReturn($queryParameters);
 
         $this->datagrid->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag($datagridParameters)));
+            ->willReturn(new ParameterBag($datagridParameters));
 
         $this->parameterBinder->bindParameters($this->datagrid, ['bar' => 'foo.bar']);
     }
 
     public function testBindParametersWorksWithEmptyParameters()
     {
-        $this->datagrid->expects($this->never())->method($this->anything());
+        $this->datagrid->expects($this->never())
+            ->method($this->anything());
 
         $this->parameterBinder->bindParameters($this->datagrid, []);
     }
@@ -306,37 +290,26 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datasource->expects($this->once())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($queryParameters));
+            ->willReturn($queryParameters);
 
         $this->datagrid->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag()));
+            ->willReturn(new ParameterBag());
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Cannot bind parameter to data source, expected bind parameter format is a string or array with ' .
             'required "name" key, actual array keys are "foo"'
         );
 
         $this->parameterBinder->bindParameters($this->datagrid, [['foo' => 'bar']]);
-    }
-
-    /**
-     * @param string $name
-     * @param string $value
-     * @param string  $type
-     * @return Parameter
-     */
-    protected function createQueryParameter($name, $value, $type = null)
-    {
-        return new Parameter($name, $value, $type);
     }
 }

@@ -4,10 +4,15 @@ namespace Oro\Bundle\MigrationBundle\Tools;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
+use Twig\Environment;
 
+/**
+ * Generates a schema dump using the predefined template.
+ * Used by "oro:migration:dump" command.
+ */
 class SchemaDumper extends AbstractVisitor
 {
-    const SCHEMA_TEMPLATE = 'OroMigrationBundle::schema-template.php.twig';
+    const SCHEMA_TEMPLATE = '@OroMigration/schema-template.php.twig';
     const DEFAULT_CLASS_NAME = 'AllMigration';
     const DEFAULT_VERSION = 'v1_0';
 
@@ -17,14 +22,11 @@ class SchemaDumper extends AbstractVisitor
     protected $schema;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twig;
 
-    /**
-     * @param \Twig_Environment $twig
-     */
-    public function __construct(\Twig_Environment $twig)
+    public function __construct(Environment $twig)
     {
         $this->twig = $twig;
     }

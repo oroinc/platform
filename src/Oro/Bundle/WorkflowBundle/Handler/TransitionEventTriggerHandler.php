@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
+/**
+ * This handler performs the actual processing of transition trigger messages produced by transition event triggers
+ */
 class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
 {
     /** @var WorkflowManager */
@@ -23,11 +26,6 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
      */
     private $featureChecker;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param ManagerRegistry $registry
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         ManagerRegistry $registry,

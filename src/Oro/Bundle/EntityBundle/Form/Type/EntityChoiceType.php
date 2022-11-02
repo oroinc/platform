@@ -8,6 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for entity choice.
+ */
 class EntityChoiceType extends AbstractType
 {
     const NAME = 'oro_entity_choice';
@@ -18,9 +21,6 @@ class EntityChoiceType extends AbstractType
     /** @var array */
     protected $itemsCache;
 
-    /**
-     * @param EntityProvider $provider
-     */
     public function __construct(EntityProvider $provider)
     {
         $this->provider = $provider;
@@ -33,8 +33,8 @@ class EntityChoiceType extends AbstractType
     {
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity',
-            'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
-            'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
+            'result_template_twig'    => '@OroEntity/Choice/entity/result.html.twig',
+            'selection_template_twig' => '@OroEntity/Choice/entity/selection.html.twig',
         ];
 
         $resolver->setDefaults(

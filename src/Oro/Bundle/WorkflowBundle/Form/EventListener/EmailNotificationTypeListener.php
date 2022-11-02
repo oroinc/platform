@@ -2,34 +2,30 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Add workflow name and workflow transition name fields to the email notification form
+ */
 class EmailNotificationTypeListener
 {
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         $data = $event->getData();
@@ -43,9 +39,6 @@ class EmailNotificationTypeListener
         $this->addWorkflowFields($form, $data);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -58,10 +51,6 @@ class EmailNotificationTypeListener
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param EmailNotification $data
-     */
     private function updateEventField(FormInterface $form, EmailNotification $data)
     {
         $entityName = $data->getEntityName();
@@ -70,26 +59,20 @@ class EmailNotificationTypeListener
             return;
         }
 
-        $event = $data->getEvent();
-        if ($event instanceof Event && $event->getName() === LoadWorkflowNotificationEvents::TRANSIT_EVENT) {
-            $form->getData()->setEvent(null);
+        if ($data->getEventName() === WorkflowEvents::NOTIFICATION_TRANSIT_EVENT) {
+            $form->getData()->setEventName(null);
         }
 
-        /** @var QueryBuilder $qb */
-        $qb = $form->get('event')->getConfig()->getOption('query_builder');
-        $qb->andWhere($qb->expr()->neq('c.name', ':event'))
-            ->setParameter('event', LoadWorkflowNotificationEvents::TRANSIT_EVENT);
+        $choices = $form->get('eventName')->getConfig()->getOption('choices');
+        unset($choices[WorkflowEvents::NOTIFICATION_TRANSIT_EVENT]);
+        FormUtils::replaceField($form, 'eventName', ['choices' => $choices]);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param EmailNotification $data
-     */
     private function addWorkflowFields(FormInterface $form, EmailNotification $data)
     {
         if (!$data->getEntityName() ||
-            !$data->getEvent() ||
-            $data->getEvent()->getName() !== LoadWorkflowNotificationEvents::TRANSIT_EVENT
+            !$data->getEventName() ||
+            $data->getEventName() !== WorkflowEvents::NOTIFICATION_TRANSIT_EVENT
         ) {
             return;
         }
@@ -99,9 +82,6 @@ class EmailNotificationTypeListener
         $this->updateTemplateField($form);
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function updateTemplateField(FormInterface $form)
     {
         $template = $form->get('template');

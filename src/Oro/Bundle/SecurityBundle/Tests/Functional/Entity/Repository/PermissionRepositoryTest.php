@@ -4,45 +4,35 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
+use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadPermissionData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class PermissionRepositoryTest extends WebTestCase
 {
-    /**
-     * @var PermissionRepository
-     */
-    protected $repository;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
-        $this->loadFixtures([
-            'Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadPermissionData'
-        ]);
-
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroSecurityBundle:Permission');
+        $this->loadFixtures([LoadPermissionData::class]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
+        $this->getContainer()->get('oro_security.cache.provider.permission')->clear();
 
         parent::tearDown();
     }
 
+    private function getRepository(): PermissionRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Permission::class);
+    }
+
     /**
-     * @param mixed $inputData
-     * @param mixed $expectedData
-     *
      * @dataProvider findByEntityClassAndIdsProvider
      */
-    public function testFindByEntityClassAndIds($inputData, $expectedData)
+    public function testFindByEntityClassAndIds(array $inputData, array $expectedData)
     {
-        $permissions = $this->repository->findByEntityClassAndIds(
+        $permissions = $this->getRepository()->findByEntityClassAndIds(
             $inputData['class'],
             $this->getPermissionsIds($inputData['ids'])
         );
@@ -52,9 +42,8 @@ class PermissionRepositoryTest extends WebTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function findByEntityClassAndIdsProvider()
+    public function findByEntityClassAndIdsProvider(): array
     {
         $permissions = ['TEST_PERMISSION1', 'TEST_PERMISSION2', 'TEST_PERMISSION3', 'TEST_PERMISSION4'];
 
@@ -163,9 +152,10 @@ class PermissionRepositoryTest extends WebTestCase
     /**
      * @param Permission[] $permissions
      * @param array $validNames
-     * @return array
+     *
+     * @return string[]
      */
-    protected function getPermissionsNames(array $permissions, array $validNames)
+    private function getPermissionsNames(array $permissions, array $validNames): array
     {
         $result = [];
         foreach ($permissions as $permission) {
@@ -181,10 +171,11 @@ class PermissionRepositoryTest extends WebTestCase
     }
 
     /**
-     * @param array $names
-     * @return array|null
+     * @param string[] $names
+     *
+     * @return int[]|null
      */
-    protected function getPermissionsIds(array $names = null)
+    private function getPermissionsIds(array $names = null): ?array
     {
         if (null === $names) {
             return null;

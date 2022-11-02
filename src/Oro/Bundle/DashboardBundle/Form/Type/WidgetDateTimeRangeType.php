@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Date time range form for dashboard widget.
+ */
 class WidgetDateTimeRangeType extends AbstractType
 {
     const NAME = 'oro_type_widget_datetime_range';
@@ -58,7 +61,7 @@ class WidgetDateTimeRangeType extends AbstractType
         $resolver->setDefaults(
             [
                 'compile_date' => false,
-                'field_type'   => WidgetDateRangeValueType::class,
+                'field_type'   => WidgetDateRangeValueType::class
             ]
         );
     }

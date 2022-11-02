@@ -3,44 +3,24 @@
 namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Form\Model\EmailFolderModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Zend\Mail\Storage\Exception as MailException;
 
 /**
- * Class ImapEmailFolderManager
- *
- * @package Oro\Bundle\ImapBundle\Manager
- *
+ * Allows to fetch and manipulate IMAP email folders.
  */
 class ImapEmailFolderManager
 {
-    /**
-     * @var ImapConnector
-     */
-    protected $connector;
+    private ImapConnector $connector;
+    private EntityManagerInterface $em;
+    private EmailOrigin $origin;
 
-    /**
-     * @var EmailOrigin
-     */
-    protected $origin;
-
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @param ImapConnector $connector
-     * @param EntityManager $em
-     * @param EmailOrigin $origin
-     */
-    public function __construct(ImapConnector $connector, EntityManager $em, EmailOrigin $origin)
+    public function __construct(ImapConnector $connector, EntityManagerInterface $em, EmailOrigin $origin)
     {
         $this->connector = $connector;
         $this->em = $em;
@@ -48,9 +28,9 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @return EmailFolder[]
+     * @return ArrayCollection|EmailFolder[]
      */
-    public function getFolders()
+    public function getFolders(): ArrayCollection
     {
         // retrieve folders from imap
         $folders = $this->connector->findFolders();
@@ -75,6 +55,30 @@ class ImapEmailFolderManager
     }
 
     /**
+     * Refresh folders. Sets the UID Validity value to folders without UID Validity and
+     * merge the local saved folders with the current folders state at remote server.
+     */
+    public function refreshFolders()
+    {
+        // set the UID Validity value to folders without UID Validity
+        $foldersWithoutUidValidity = $this->getFoldersWithoutUidValidity();
+        if (count($foldersWithoutUidValidity)) {
+            foreach ($foldersWithoutUidValidity as $folder) {
+                $uidValidity = $this->getUidValidity($folder->getFolder());
+                if (null !== $uidValidity) {
+                    $folder->setUidValidity($uidValidity);
+                    $this->em->persist($folder);
+                }
+            }
+            $this->em->flush();
+        }
+
+        // merge the local saved folders with the current folders state at remote server
+        $this->mergeFolders($this->processFolders($this->connector->findFolders()), $this->getExistingFolders());
+        $this->em->flush();
+    }
+
+    /**
      * Gets UIDVALIDITY of the given folder
      *
      * @param EmailFolder|Folder|string $folder
@@ -92,7 +96,7 @@ class ImapEmailFolderManager
         }
 
         if (!isset($folderName)) {
-            throw new \RuntimeException('Invalid argument passed to getUidValidity method');
+            throw new \RuntimeException('Invalid argument passed to getUidValidity method.');
         }
 
         try {
@@ -107,10 +111,9 @@ class ImapEmailFolderManager
     /**
      * @param ArrayCollection|ImapEmailFolder[] $existingFolders
      */
-    protected function markAsOutdated($existingFolders)
+    private function markAsOutdated(ArrayCollection $existingFolders): void
     {
         $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        /** @var ImapEmailFolder $existingFolder */
         foreach ($existingFolders as $existingFolder) {
             $emailFolder = $existingFolder->getFolder();
             $emailFolder->setOutdatedAt($outdatedAt);
@@ -119,21 +122,16 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @param Folder[]|ArrayCollection $srcFolders
+     * @param Folder[] $srcFolders
      *
-     * @return EmailFolderModel[]
+     * @return ArrayCollection|EmailFolderModel[]
      */
-    protected function processFolders(array $srcFolders)
+    private function processFolders(array $srcFolders): ArrayCollection
     {
         $emailFolderModels = new ArrayCollection();
         foreach ($srcFolders as $srcFolder) {
-            $emailFolderModel = null;
-            $uidValidity = $this->getUidValidity($srcFolder);
-
-            if ($uidValidity !== null) {
-                $emailFolderModel = $this->createEmailFolderModel($srcFolder, $uidValidity);
-                $emailFolderModels->add($emailFolderModel);
-            }
+            $emailFolderModel = $this->createEmailFolderModel($srcFolder, 0);
+            $emailFolderModels->add($emailFolderModel);
 
             $childSrcFolders = [];
             foreach ($srcFolder as $childSrcFolder) {
@@ -156,33 +154,60 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @param EmailFolderModel[]|ArrayCollection $syncedFolderModels
-     * @param ImapEmailFolder[]|ArrayCollection $existingImapFolders
+     * @param ArrayCollection|EmailFolderModel[] $syncedFolderModels
+     * @param ArrayCollection|ImapEmailFolder[]  $existingImapFolders
      *
-     * @return EmailFolderModel[]
+     * @return ArrayCollection|EmailFolderModel[]
      */
-    protected function mergeFolders($syncedFolderModels, &$existingImapFolders)
-    {
+    private function mergeFolders(
+        ArrayCollection $syncedFolderModels,
+        ArrayCollection $existingImapFolders
+    ): ArrayCollection {
         foreach ($syncedFolderModels as $syncedFolderModel) {
-            $f = $existingImapFolders->filter(function (ImapEmailFolder $imapEmailFolder) use ($syncedFolderModel) {
-                return $imapEmailFolder->getUidValidity() === $syncedFolderModel->getUidValidity();
-            });
+            $foundItemsByFolderName = $existingImapFolders->filter(
+                function (ImapEmailFolder $imapEmailFolder) use ($syncedFolderModel) {
+                    return (string) $syncedFolderModel->getEmailFolder()->getFullName()
+                        === (string) $imapEmailFolder->getFolder()->getFullName();
+                }
+            );
 
-            if ($f->isEmpty()) {
-                // there is a new folder on server, create it
-                $imapEmailFolder = $this->createImapEmailFolder($syncedFolderModel);
+            if ($foundItemsByFolderName->isEmpty()) {
+                $uidValidity = $this->getUidValidity($syncedFolderModel->getEmailFolder());
+                if (null === $uidValidity) {
+                    continue;
+                }
 
-                // persist ImapEmailFolder and (by cascade) EmailFolder
-                $this->em->persist($imapEmailFolder);
+                // additional chance to find the folder by UID Validity
+                $foundItemsByUidValidity = $existingImapFolders->filter(
+                    function (ImapEmailFolder $imapEmailFolder) use ($uidValidity) {
+                        return $imapEmailFolder->getUidValidity() === $uidValidity;
+                    }
+                );
+
+                if ($foundItemsByUidValidity->isEmpty()) {
+                    $existing = false;
+                    // there is a new folder on server, create it
+                    $syncedFolderModel->setUidValidity($uidValidity);
+                    $imapEmailFolder = $this->createImapEmailFolder($syncedFolderModel);
+
+                    // persist ImapEmailFolder and (by cascade) EmailFolder
+                    $this->em->persist($imapEmailFolder);
+                } else {
+                    $existing = true;
+                    $existingImapFolder = $foundItemsByUidValidity->first();
+                }
             } else {
+                $existing = true;
+                $existingImapFolder = $foundItemsByFolderName->first();
+            }
+
+            if ($existing) {
                 /** @var ImapEmailFolder $existingImapFolder */
-                $existingImapFolder = $f->first();
                 $emailFolder = $existingImapFolder->getFolder();
                 $this->em->refresh($emailFolder);
                 $emailFolder->setName($syncedFolderModel->getEmailFolder()->getName());
                 $emailFolder->setFullName($syncedFolderModel->getEmailFolder()->getFullName());
                 $emailFolder->setType($syncedFolderModel->getEmailFolder()->getType());
-                $emailFolder->setSynchronizedAt($syncedFolderModel->getEmailFolder()->getSynchronizedAt());
                 $syncedFolderModel->setEmailFolder($emailFolder);
 
                 $existingImapFolders->removeElement($existingImapFolder);
@@ -202,11 +227,12 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @param Folder $srcFolder
+     * @param Folder          $srcFolder
+     * @param int|string|null $uidValidity
      *
      * @return EmailFolderModel
      */
-    protected function createEmailFolderModel(Folder $srcFolder, $uidValidity)
+    private function createEmailFolderModel(Folder $srcFolder, $uidValidity): EmailFolderModel
     {
         $folder = new EmailFolder();
         $folder
@@ -222,12 +248,7 @@ class ImapEmailFolderManager
         return $emailFolderModel;
     }
 
-    /**
-     * @param EmailFolderModel $emailFolderModel
-     *
-     * @return ImapEmailFolder
-     */
-    protected function createImapEmailFolder(EmailFolderModel $emailFolderModel)
+    private function createImapEmailFolder(EmailFolderModel $emailFolderModel): ImapEmailFolder
     {
         $imapEmailFolder = new ImapEmailFolder();
         $emailFolder = $emailFolderModel->getEmailFolder();
@@ -242,14 +263,13 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @param EmailFolderModel[]|ArrayCollection $emailFolderModels
+     * @param ArrayCollection|EmailFolderModel[] $emailFolderModels
      *
-     * @return EmailFolder[]|ArrayCollection
+     * @return ArrayCollection|EmailFolder[]
      */
-    protected function extractEmailFolders($emailFolderModels)
+    private function extractEmailFolders(ArrayCollection $emailFolderModels): ArrayCollection
     {
         $emailFolders = new ArrayCollection();
-        /** @var EmailFolderModel $emailFolderModel */
         foreach ($emailFolderModels as $emailFolderModel) {
             $emailFolder = $emailFolderModel->getEmailFolder();
             if ($emailFolderModel->hasSubFolderModels()) {
@@ -264,17 +284,36 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @return ImapEmailFolder[]|ArrayCollection
+     * @return ArrayCollection|ImapEmailFolder[]
      */
-    protected function getExistingFolders()
+    private function getExistingFolders(): ArrayCollection
     {
         $qb = $this->em->createQueryBuilder()
             ->select('ief')
-            ->from('OroImapBundle:ImapEmailFolder', 'ief')
+            ->from(ImapEmailFolder::class, 'ief')
             ->leftJoin('ief.folder', 'ef')
             ->where('ef.origin = :origin')
             ->setParameter('origin', $this->origin);
 
         return new ArrayCollection($qb->getQuery()->getResult());
+    }
+
+    /**
+     * Get the first 100 folders that have no UID validity.
+     *
+     * @return array|ImapEmailFolder[]
+     */
+    private function getFoldersWithoutUidValidity(): array
+    {
+        $qb = $this->em->createQueryBuilder()
+           ->select('ief')
+           ->from(ImapEmailFolder::class, 'ief')
+           ->leftJoin('ief.folder', 'ef')
+           ->where('ef.origin = :origin')
+           ->andWhere('ief.uidValidity = 0')
+           ->setParameter('origin', $this->origin)
+           ->setMaxResults(100);
+
+        return $qb->getQuery()->getResult();
     }
 }

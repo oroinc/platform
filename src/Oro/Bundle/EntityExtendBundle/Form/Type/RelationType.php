@@ -18,12 +18,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * A form type for relations entity configuration
+ */
 class RelationType extends AbstractType
 {
-    const ALLOWED_BIDIRECTIONAL_RELATIONS = [
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_ONE,
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_MANY,
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::ONE_TO_MANY,
+    public const ALLOWED_BIDIRECTIONAL_RELATIONS = [
+        RelationTypeBase::MANY_TO_ONE,
+        RelationTypeBase::MANY_TO_MANY,
+        RelationTypeBase::ONE_TO_MANY,
     ];
 
     /** @var ConfigManager */
@@ -35,12 +38,9 @@ class RelationType extends AbstractType
     /** @var FormFactory */
     protected $formFactory;
 
-    /**
-     * @param ConfigManager   $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
-        $this->configManager   = $configManager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -74,6 +74,10 @@ class RelationType extends AbstractType
 
         if ($this->config->get('owner') === ExtendScope::OWNER_CUSTOM) {
             $this->addBidirectionalField($form, $data);
+            if (isset($data['bidirectional'])) {
+                $data['bidirectional'] = (bool)$data['bidirectional'];
+                $event->setData($data);
+            }
 
             $targetEntity = $this->getArrayValue($data, 'target_entity');
             $relationType = $this->config->getId()->getFieldType();
@@ -191,17 +195,11 @@ class RelationType extends AbstractType
      * @param mixed  $defaultValue
      * @return mixed
      */
-    protected function getArrayValue(array &$data, $key, $defaultValue = null)
+    protected function getArrayValue(array $data, $key, $defaultValue = null)
     {
-        return isset($data[$key])
-            ? $data[$key]
-            : $defaultValue;
+        return $data[$key] ?? $defaultValue;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     private function addTargetEntityField(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -214,10 +212,6 @@ class RelationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param array|null $data
-     */
     private function addBidirectionalField(FormInterface $form, array $data = null)
     {
         /** @var FieldConfigId $fieldConfigId */
@@ -243,8 +237,8 @@ class RelationType extends AbstractType
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
                 'choices' => [
-                    'No' => 0,
-                    'Yes' => 1,
+                    'No' => false,
+                    'Yes' => true,
                 ],
                 'placeholder' => false,
                 'block' => 'general',

@@ -4,10 +4,16 @@ namespace Oro\Bundle\EntityBundle\Fallback\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * Abstract class for the provider which provides entity fallback.
+ */
 abstract class AbstractEntityFallbackProvider implements EntityFallbackProviderInterface
 {
     /** @var ConfigProvider */
     protected $configProvider;
+
+    /** @var array */
+    protected $entityConfigs = [];
 
     /**
      * {@inheritdoc}
@@ -17,9 +23,6 @@ abstract class AbstractEntityFallbackProvider implements EntityFallbackProviderI
         return true;
     }
 
-    /**
-     * @param ConfigProvider $provider
-     */
     public function setConfigProvider(ConfigProvider $provider)
     {
         $this->configProvider = $provider;
@@ -32,8 +35,13 @@ abstract class AbstractEntityFallbackProvider implements EntityFallbackProviderI
      */
     public function getEntityConfig($object, $objectFieldName)
     {
-        return $this->configProvider
-            ->getConfig(get_class($object), $objectFieldName)
-            ->getValues();
+        $class = get_class($object);
+        if (!isset($this->entityConfigs[$class][$objectFieldName])) {
+            $this->entityConfigs[$class][$objectFieldName] = $this->configProvider
+                ->getConfig($class, $objectFieldName)
+                ->getValues();
+        }
+
+        return $this->entityConfigs[$class][$objectFieldName];
     }
 }

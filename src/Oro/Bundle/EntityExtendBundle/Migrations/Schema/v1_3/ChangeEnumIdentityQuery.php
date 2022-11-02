@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -112,6 +111,7 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param array $entities
      * @param bool $dryRun
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processChange(LoggerInterface $logger, array $entities, $dryRun = false)
     {
@@ -138,7 +138,7 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
                     $this->logQuery($logger, $sql, $params, $types);
 
                     if (!$dryRun) {
-                        $this->connection->executeUpdate($sql, $params, $types);
+                        $this->connection->executeStatement($sql, $params, $types);
                     }
                 }
             }

@@ -2,13 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
 use Oro\Bundle\ActivityBundle\Exception\InvalidArgumentException;
@@ -18,8 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("activity_relation")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for activity entities.
  */
 class ActivityEntityController extends RestController
 {
@@ -29,8 +22,6 @@ class ActivityEntityController extends RestController
      * @param Request $request
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
-     *
-     * @Get("/activities/{activity}/{id}/relations")
      *
      * @QueryParam(
      *      name="page",
@@ -52,7 +43,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function cgetAction(Request $request, $activity, $id)
+    public function cgetAction(Request $request, $activity, int $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
@@ -71,8 +62,6 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Post("/activities/{activity}/{id}/relations")
-     *
      * @ApiDoc(
      *      description="Adds an association between an activity and a target entity",
      *      resource=true
@@ -80,7 +69,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function postAction($activity, $id)
+    public function postAction($activity, int $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
@@ -96,8 +85,6 @@ class ActivityEntityController extends RestController
      * @param string $entity   The type of the target entity.
      * @param mixed  $entityId The id of the target entity.
      *
-     * @Delete("/activities/{activity}/{id}/{entity}/{entityId}")
-     *
      * @ApiDoc(
      *      description="Deletes an association between an activity and a target entity",
      *      resource=true
@@ -105,7 +92,7 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function deleteAction($activity, $id, $entity, $entityId)
+    public function deleteAction($activity, int $id, $entity, $entityId)
     {
         $manager       = $this->getManager();
         $activityClass = $manager->resolveEntityClass($activity, true);
@@ -121,9 +108,9 @@ class ActivityEntityController extends RestController
         try {
             return $this->handleDeleteRequest($id);
         } catch (InvalidArgumentException $exception) {
-            return $this->handleDeleteError($exception->getMessage(), Codes::HTTP_BAD_REQUEST, $id);
+            return $this->handleDeleteError($exception->getMessage(), Response::HTTP_BAD_REQUEST, $id);
         } catch (\Exception $e) {
-            return $this->handleDeleteError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR, $id);
+            return $this->handleDeleteError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, $id);
         }
     }
 
@@ -173,6 +160,6 @@ class ActivityEntityController extends RestController
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_activity.handler.delete.activity_entity_proxy');
+        return $this->get('oro_activity.activity_entity_delete_handler.proxy');
     }
 }

@@ -20,10 +20,6 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
     /** @var array The list of excluded actions */
     protected $excludedActions;
 
-    /**
-     * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param array                            $excludedActions
-     */
     public function __construct(ChainDictionaryValueListProvider $dictionaryProvider, array $excludedActions)
     {
         $this->dictionaryProvider = $dictionaryProvider;

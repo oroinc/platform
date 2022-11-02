@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForSingleItem;
@@ -10,6 +13,9 @@ use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
@@ -21,7 +27,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
     /** @var LoadTitleMetaPropertyForCollection */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,8 +36,27 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->processor = new LoadTitleMetaPropertyForSingleItem(
             $this->entityTitleProvider,
-            $this->expandedAssociationExtractor
+            $this->expandedAssociationExtractor,
+            $this->configProvider
         );
+    }
+
+    private function getConfig(array $identifierFieldNames = ['id']): EntityDefinitionConfig
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames($identifierFieldNames);
+        foreach ($identifierFieldNames as $fieldName) {
+            $config->addField($fieldName)->setDataType('integer');
+        }
+
+        return $config;
+    }
+
+    private function addTitleMetaProperty(EntityDefinitionConfig $config)
+    {
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
     }
 
     public function testProcessForNullData()
@@ -53,10 +78,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessWhenTitleMetaPropertyWasNotRequested()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $idField = $config->addField('id');
-        $idField->setDataType('integer');
+        $config = $this->getConfig();
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
@@ -66,13 +88,8 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessWhenTitlesAreAlreadyProcessed()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $idField = $config->addField('id');
-        $idField->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
 
         $this->context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
         $this->context->setClassName('Test\Entity');
@@ -83,17 +100,10 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForPrimaryEntityOnly()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $idField = $config->addField('id');
-        $idField->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
 
         $data = ['id' => 123];
-
-        $expandedAssociations = [];
 
         $titles = [
             ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123']
@@ -103,10 +113,8 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\Entity' => ['id', [123]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(2))
-            ->method('getExpandedAssociations')
-            ->with(self::identicalTo($config))
-            ->willReturn($expandedAssociations);
+        $this->expandedAssociationExtractor->expects(self::never())
+            ->method('getExpandedAssociations');
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -125,19 +133,18 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForExpandedEntities()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $idField = $config->addField('id');
-        $idField->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
         $associationField = $config->addField('association');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
         $associationTargetConfig->setIdentifierFieldNames(['id']);
         $associationTargetConfig->addField('id')->setDataType('integer');
         $associationTargetConfig->addField('name')->setDataType('string');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = [
             'id'          => 123,
@@ -161,14 +168,17 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\TargetEntity1' => ['id', [1]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(4))
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
             ->method('getExpandedAssociations')
-            ->willReturnMap(
-                [
-                    [$config, $expandedAssociations],
-                    [$associationTargetConfig, []]
-                ]
-            );
+            ->willReturnCallback(function ($conf) use ($config, $associationTargetConfig, $expandedAssociations) {
+                if ($conf == $config) {
+                    return $expandedAssociations;
+                }
+                if ($conf == $associationTargetConfig) {
+                    return [];
+                }
+                throw new \LogicException('Unexpected config');
+            });
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -176,6 +186,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -195,14 +206,13 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForResourceBasedOnAnotherResource()
     {
-        $config = new EntityDefinitionConfig();
+        $config = $this->getConfig();
         $config->setParentResourceClass('Test\ParentEntity');
-        $config->setIdentifierFieldNames(['id']);
-        $idField = $config->addField('id');
-        $idField->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $this->addTitleMetaProperty($config);
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = ['id' => 123];
 
@@ -216,7 +226,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\ParentEntity' => ['id', [123]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(2))
+        $this->expandedAssociationExtractor->expects(self::once())
             ->method('getExpandedAssociations')
             ->with(self::identicalTo($config))
             ->willReturn($expandedAssociations);
@@ -227,6 +237,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -238,14 +249,9 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForEntitiesWithRenamedIdentifierFields()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['renamedId']);
-        $idField = $config->addField('renamedId');
-        $idField->setDataType('integer');
-        $idField->setPropertyPath('realId');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig(['renamedId']);
+        $config->getField('renamedId')->setPropertyPath('realId');
+        $this->addTitleMetaProperty($config);
         $associationField = $config->addField('association');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
@@ -254,6 +260,10 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $associationIdField->setPropertyPath('associationRealId');
         $associationIdField->setDataType('integer');
         $associationTargetConfig->addField('name')->setDataType('string');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = [
             'renamedId'   => 123,
@@ -277,14 +287,17 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\TargetEntity1' => ['associationRealId', [1]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(4))
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
             ->method('getExpandedAssociations')
-            ->willReturnMap(
-                [
-                    [$config, $expandedAssociations],
-                    [$associationTargetConfig, []]
-                ]
-            );
+            ->willReturnCallback(function ($conf) use ($config, $associationTargetConfig, $expandedAssociations) {
+                if ($conf == $config) {
+                    return $expandedAssociations;
+                }
+                if ($conf == $associationTargetConfig) {
+                    return [];
+                }
+                throw new \LogicException('Unexpected config');
+            });
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -292,6 +305,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -311,16 +325,16 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForAssociationWithoutConfiguredIdentifierField()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $config->addField('id')->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
         $associationField = $config->addField('association');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
         $associationTargetConfig->setIdentifierFieldNames(['associationId']);
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = [
             'id'          => 123,
@@ -344,14 +358,17 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\TargetEntity1' => ['associationId', [1]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(4))
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
             ->method('getExpandedAssociations')
-            ->willReturnMap(
-                [
-                    [$config, $expandedAssociations],
-                    [$associationTargetConfig, []]
-                ]
-            );
+            ->willReturnCallback(function ($conf) use ($config, $associationTargetConfig, $expandedAssociations) {
+                if ($conf == $config) {
+                    return $expandedAssociations;
+                }
+                if ($conf == $associationTargetConfig) {
+                    return [];
+                }
+                throw new \LogicException('Unexpected config');
+            });
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -359,6 +376,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -378,17 +396,17 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForAssociationWithoutConfiguredIdentifierFieldNames()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
-        $config->addField('id')->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
         $associationField = $config->addField('association');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
         $associationTargetConfig->addField('associationId')->setDataType('integer');
         $associationTargetConfig->addField('name')->setDataType('string');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = [
             'id'          => 123,
@@ -410,14 +428,10 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\Entity' => ['id', [123]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(2))
+        $this->expandedAssociationExtractor->expects(self::once())
             ->method('getExpandedAssociations')
-            ->willReturnMap(
-                [
-                    [$config, $expandedAssociations],
-                    [$associationTargetConfig, []]
-                ]
-            );
+            ->with(self::identicalTo($config))
+            ->willReturn($expandedAssociations);
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -425,6 +439,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -443,16 +458,9 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     public function testProcessForEntitiesWithCompositeIdentifier()
     {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['renamedId1', 'id2']);
-        $id1Field = $config->addField('renamedId1');
-        $id1Field->setDataType('integer');
-        $id1Field->setPropertyPath('id1');
-        $id2Field = $config->addField('id2');
-        $id2Field->setDataType('integer');
-        $titleField = $config->addField('__title__');
-        $titleField->setMetaProperty(true);
-        $titleField->setMetaPropertyResultName('title');
+        $config = $this->getConfig(['renamedId1', 'id2']);
+        $config->getField('renamedId1')->setPropertyPath('id1');
+        $this->addTitleMetaProperty($config);
         $associationField = $config->addField('association');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
@@ -463,6 +471,10 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $associationId2Field = $associationTargetConfig->addField('associationId2');
         $associationId2Field->setDataType('integer');
         $associationTargetConfig->addField('name')->setDataType('string');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
 
         $data = [
             'renamedId1'  => 1,
@@ -496,14 +508,17 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             'Test\TargetEntity1' => [['associationId1', 'associationId2'], [[11, 22]]]
         ];
 
-        $this->expandedAssociationExtractor->expects(self::exactly(4))
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
             ->method('getExpandedAssociations')
-            ->willReturnMap(
-                [
-                    [$config, $expandedAssociations],
-                    [$associationTargetConfig, []]
-                ]
-            );
+            ->willReturnCallback(function ($conf) use ($config, $associationTargetConfig, $expandedAssociations) {
+                if ($conf == $config) {
+                    return $expandedAssociations;
+                }
+                if ($conf == $associationTargetConfig) {
+                    return [];
+                }
+                throw new \LogicException('Unexpected config');
+            });
         $this->entityTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with($identifierMap)
@@ -511,6 +526,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
         $this->context->setResult($data);
         $this->processor->process($this->context);
 
@@ -524,6 +540,108 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
                     'associationId2'        => 22,
                     'name'                  => 'association 1',
                     '__title__'             => 'association title 1'
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForMultiTargetAssociation()
+    {
+        $config = $this->getConfig();
+        $this->addTitleMetaProperty($config);
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass(EntityIdentifier::class);
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->setIdentifierFieldNames(['id']);
+        $associationTargetConfig->addField('id')->setDataType('string');
+
+        $multiTargetAssociationConfig = $this->getConfig();
+        $multiTargetAssociationConfig->addField('name')->setDataType('string');
+        $nestedAssociationField = $multiTargetAssociationConfig->addField('nestedAssociation');
+        $nestedAssociationField->setTargetClass('Test\TargetEntity2');
+        $nestedAssociationTargetConfig = $nestedAssociationField->createAndSetTargetEntity();
+        $nestedAssociationTargetConfig->setIdentifierFieldNames(['id']);
+        $nestedAssociationTargetConfig->addField('id')->setDataType('integer');
+        $nestedAssociationTargetConfig->addField('name')->setDataType('string');
+
+        $expandConfigExtra = new ExpandRelatedEntitiesConfigExtra([
+            'association'
+        ]);
+
+        $data = [
+            'id'          => 123,
+            'association' => [
+                'id'                => 1,
+                '__class__'         => 'Test\TargetEntity1',
+                'name'              => 'association 1',
+                'nestedAssociation' => [
+                    'id'   => 11,
+                    'name' => 'nested association 1'
+                ]
+            ]
+        ];
+
+        $expandedAssociations = [
+            'association' => $config->getField('association')
+        ];
+        $expandedAssociationsForMultiTargetAssociation = [
+            'nestedAssociation' => $multiTargetAssociationConfig->getField('nestedAssociation')
+        ];
+
+        $titles = [
+            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+            ['entity' => 'Test\TargetEntity2', 'id' => 11, 'title' => 'nested association title 1']
+        ];
+
+        $identifierMap = [
+            'Test\Entity'        => ['id', [123]],
+            'Test\TargetEntity1' => ['id', [1]],
+            'Test\TargetEntity2' => ['id', [11]]
+        ];
+
+        $configContainer = new Config();
+        $configContainer->setDefinition($multiTargetAssociationConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($configContainer);
+        $this->expandedAssociationExtractor->expects(self::exactly(4))
+            ->method('getExpandedAssociations')
+            ->willReturnOnConsecutiveCalls(
+                $expandedAssociations,
+                [],
+                $expandedAssociationsForMultiTargetAssociation,
+                []
+            );
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->addConfigExtra($expandConfigExtra);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                'id'          => 123,
+                '__title__'   => 'title 123',
+                'association' => [
+                    'id'                => 1,
+                    '__class__'         => 'Test\TargetEntity1',
+                    'name'              => 'association 1',
+                    '__title__'         => 'association title 1',
+                    'nestedAssociation' => [
+                        'id'        => 11,
+                        'name'      => 'nested association 1',
+                        '__title__' => 'nested association title 1'
+                    ]
                 ]
             ],
             $this->context->getResult()

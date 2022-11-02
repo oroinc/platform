@@ -2,127 +2,70 @@
 
 namespace Oro\Bundle\BatchBundle\Step;
 
-use Akeneo\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
+use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
+/**
+ * Executor for the import/export step
+ */
 class StepExecutor
 {
-    /**
-     * @var int
-     */
-    protected $batchSize = 100;
+    protected int $batchSize = 100;
 
-    /**
-     * @var ItemReaderInterface
-     */
-    protected $reader = null;
+    protected ?ItemReaderInterface $reader = null;
 
-    /**
-     * @var ItemWriterInterface
-     */
-    protected $writer = null;
+    protected ?ItemWriterInterface $writer = null;
 
-    /**
-     * @var ItemProcessorInterface
-     */
-    protected $processor = null;
+    protected ?ItemProcessorInterface $processor = null;
 
-    /**
-     * Set the batch size
-     *
-     * @param integer $batchSize
-     *
-     * @return StepExecutor
-     */
-    public function setBatchSize($batchSize)
+    public function setBatchSize(int $batchSize): self
     {
         $this->batchSize = $batchSize;
 
         return $this;
     }
 
-    /**
-     * Get the batch size
-     *
-     * @return integer
-     */
-    public function getBatchSize()
+    public function getBatchSize(): int
     {
-        return $this->batchSize;
+        return (int)$this->batchSize;
     }
 
-    /**
-     * Set reader
-     *
-     * @param ItemReaderInterface $reader
-     *
-     * @return StepExecutor
-     */
-    public function setReader(ItemReaderInterface $reader)
+    public function setReader(ItemReaderInterface $reader): self
     {
         $this->reader = $reader;
 
         return $this;
     }
 
-    /**
-     * Get reader
-     *
-     * @return ItemReaderInterface|null
-     */
-    public function getReader()
+    public function getReader(): ?ItemReaderInterface
     {
         return $this->reader;
     }
 
-    /**
-     * Set writer
-     *
-     * @param ItemWriterInterface $writer
-     *
-     * @return StepExecutor
-     */
-    public function setWriter(ItemWriterInterface $writer)
+    public function setWriter(ItemWriterInterface $writer): self
     {
         $this->writer = $writer;
 
         return $this;
     }
 
-    /**
-     * Get writer
-     *
-     * @return ItemWriterInterface|null
-     */
-    public function getWriter()
+    public function getWriter(): ?ItemWriterInterface
     {
         return $this->writer;
     }
 
-    /**
-     * Set processor
-     *
-     * @param ItemProcessorInterface $processor
-     *
-     * @return StepExecutor
-     */
-    public function setProcessor(ItemProcessorInterface $processor)
+    public function setProcessor(ItemProcessorInterface $processor): self
     {
         $this->processor = $processor;
 
         return $this;
     }
 
-    /**
-     * Get processor
-     *
-     * @return ItemProcessorInterface|null
-     */
-    public function getProcessor()
+    public function getProcessor(): ?ItemProcessorInterface
     {
         return $this->processor;
     }
@@ -130,14 +73,12 @@ class StepExecutor
     /**
      * Executes a step
      *
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
-     *
-     * @throws \Exception If any critical error occurs
+     * @throws \InvalidItemException If any critical error occurs
      */
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
+    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
-        $itemsToWrite = array();
-        $writeCount   = 0;
+        $itemsToWrite = [];
+        $writeCount = 0;
 
         try {
             $stopExecution = false;
@@ -160,7 +101,7 @@ class StepExecutor
                     $writeCount++;
                     if (0 === $writeCount % $this->batchSize) {
                         $this->write($itemsToWrite, $warningHandler);
-                        $itemsToWrite = array();
+                        $itemsToWrite = [];
                     }
                 }
             }
@@ -177,10 +118,10 @@ class StepExecutor
     }
 
     /**
-     * @param mixed                                     $readItem
+     * @param mixed|null $readItem
      * @param StepExecutionWarningHandlerInterface|null $warningHandler
      *
-     * @return mixed processed item
+     * @return mixed|null processed item
      */
     protected function process($readItem, StepExecutionWarningHandlerInterface $warningHandler = null)
     {
@@ -194,12 +135,10 @@ class StepExecutor
     }
 
     /**
-     * @param array                                     $processedItems
+     * @param array $processedItems
      * @param StepExecutionWarningHandlerInterface|null $warningHandler
-     *
-     * @return null
      */
-    protected function write($processedItems, StepExecutionWarningHandlerInterface $warningHandler = null)
+    protected function write($processedItems, StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         try {
             $this->writer->write($processedItems);
@@ -210,10 +149,8 @@ class StepExecutor
 
     /**
      * Makes sure that all step elements are properly closed
-     *
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
-    protected function ensureResourcesReleased(StepExecutionWarningHandlerInterface $warningHandler = null)
+    protected function ensureResourcesReleased(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $this->ensureElementClosed($this->reader, $warningHandler);
         $this->ensureElementClosed($this->processor, $warningHandler);
@@ -222,14 +159,11 @@ class StepExecutor
 
     /**
      * Makes sure that the given step element is properly closed
-     *
-     * @param                                           $element
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
     protected function ensureElementClosed(
-        $element,
+        object $element,
         StepExecutionWarningHandlerInterface $warningHandler = null
-    ) {
+    ): void {
         try {
             if ($element instanceof ClosableInterface) {
                 $element->close();
@@ -241,25 +175,25 @@ class StepExecutor
 
     /**
      * Handle step execution warning
-     *
-     * @param object                                    $element
-     * @param \Exception                                $e
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
     protected function handleStepExecutionWarning(
-        $element,
+        object $element,
         \Exception $e,
         StepExecutionWarningHandlerInterface $warningHandler = null
-    ) {
+    ): void {
         if (null !== $warningHandler) {
             $warningName = $element instanceof AbstractConfigurableStepElement
                 ? $element->getName()
                 : get_class($element);
-            $item = $e instanceof InvalidItemException
-                ? $e->getItem()
-                : null;
 
-            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $e->getMessageParameters(), $item);
+            $item = [];
+            $reasonParameters = [];
+            if ($e instanceof InvalidItemException) {
+                $item = $e->getItem();
+                $reasonParameters = $e->getMessageParameters();
+            }
+
+            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $reasonParameters, $item);
         }
     }
 }

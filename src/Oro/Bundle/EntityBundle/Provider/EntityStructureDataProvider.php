@@ -7,6 +7,8 @@ use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about entities
@@ -14,67 +16,55 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EntityStructureDataProvider
 {
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
+    private EntityWithFieldsProvider $entityWithFieldsProvider;
+    private EntityClassNameHelper $classNameHelper;
+    private TranslatorInterface $translator;
+    private CacheInterface $cache;
 
-    /** @var EntityWithFieldsProvider */
-    protected $entityWithFieldsProvider;
-
-    /** @var EntityClassNameHelper */
-    protected $classNameHelper;
-
-    /** @var array */
-    protected $entityPropertyMappings = [
-        'name' => 'setClassName',
-        'label' => 'setLabel',
+    private const ENTITY_PROPERTY_MAPPINGS = [
+        'name'         => 'setClassName',
+        'label'        => 'setLabel',
         'plural_label' => 'setPluralLabel',
-        'icon' => 'setIcon',
-        'routes' => 'setRoutes',
+        'icon'         => 'setIcon',
+        'routes'       => 'setRoutes'
     ];
 
-    /** @var array */
-    protected $fieldPropertyMappings = [
-        'name' => 'setName',
-        'type' => 'setType',
-        'label' => 'setLabel',
-        'relation_type' => 'setRelationType',
-        'related_entity_name' => 'setRelatedEntityName',
+    private const FIELD_PROPERTY_MAPPINGS = [
+        'name'                => 'setName',
+        'type'                => 'setType',
+        'label'               => 'setLabel',
+        'relation_type'       => 'setRelationType',
+        'related_entity_name' => 'setRelatedEntityName'
     ];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param EntityWithFieldsProvider $entityWithFieldsProvider
-     * @param EntityClassNameHelper    $classNameHelper
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         EntityWithFieldsProvider $entityWithFieldsProvider,
-        EntityClassNameHelper $classNameHelper
+        EntityClassNameHelper $classNameHelper,
+        TranslatorInterface $translator,
+        CacheInterface $cache
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->entityWithFieldsProvider = $entityWithFieldsProvider;
         $this->classNameHelper = $classNameHelper;
+        $this->translator = $translator;
+        $this->cache = $cache;
     }
 
-    /**
-     * @return EntityStructure[]
-     */
-    public function getEntities()
+    public function getEntities(): array
     {
-        $entityStructures = $this->processEntities();
-
-        $event = new EntityStructureOptionsEvent();
-        $event->setData($entityStructures);
-
-        return $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event)->getData();
+        $cacheKey = $this->getCacheKey();
+        return $this->cache->get($cacheKey, function () {
+            $entityStructures = $this->processEntities();
+            $event = new EntityStructureOptionsEvent();
+            $event->setData($entityStructures);
+            $this->eventDispatcher->dispatch($event, EntityStructureOptionsEvent::EVENT_NAME);
+            return $event->getData();
+        });
     }
 
-    /**
-     * @param string $entityName The class name or url-safe class name of the entity
-     *
-     * @return EntityStructure
-     */
-    public function getEntity($entityName)
+    public function getEntity(string $entityName): EntityStructure
     {
         $entityClass = $this->classNameHelper->resolveEntityClass($entityName);
         $entity = $this->entityWithFieldsProvider
@@ -83,36 +73,27 @@ class EntityStructureDataProvider
 
         $event = new EntityStructureOptionsEvent();
         $event->setData([$model]);
-        $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, EntityStructureOptionsEvent::EVENT_NAME);
 
         return $model;
     }
 
-    /**
-     * @return EntityStructure[]
-     */
-    protected function processEntities()
+    private function processEntities(): array
     {
         $result = [];
 
         $data = $this->entityWithFieldsProvider->getFields(true, true, true, false, true, true);
         foreach ($data as $item) {
-            $model = $this->processEntity($item);
-            $result[$model->getClassName()] = $model;
+            $result[] = $this->processEntity($item);
         }
 
         return $result;
     }
 
-    /**
-     * @param array $entity
-     *
-     * @return EntityStructure
-     */
-    protected function processEntity(array $entity)
+    private function processEntity(array $entity): EntityStructure
     {
         $model = new EntityStructure();
-        foreach ($this->entityPropertyMappings as $name => $method) {
+        foreach (self::ENTITY_PROPERTY_MAPPINGS as $name => $method) {
             if (isset($entity[$name])) {
                 $model->{$method}($entity[$name]);
             }
@@ -127,20 +108,21 @@ class EntityStructureDataProvider
         return $model;
     }
 
-    /**
-     * @param EntityStructure $structure
-     * @param array           $fields
-     */
-    protected function processFields(EntityStructure $structure, array $fields)
+    private function processFields(EntityStructure $structure, array $fields): void
     {
         foreach ($fields as $field) {
             $model = new EntityFieldStructure();
-            foreach ($this->fieldPropertyMappings as $name => $method) {
+            foreach (self::FIELD_PROPERTY_MAPPINGS as $name => $method) {
                 if (isset($field[$name])) {
                     $model->{$method}($field[$name]);
                 }
             }
             $structure->addField($model);
         }
+    }
+
+    protected function getCacheKey(): string
+    {
+        return sprintf('data.%s', $this->translator->getLocale());
     }
 }

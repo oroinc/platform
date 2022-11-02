@@ -2,6 +2,7 @@
 
 .datagrid-settings {
     a.action.btn.dropdown-toggle {
+        // stylelint-disable-next-line declaration-no-important
         display: inline-block !important;
         line-height: 30px;
         margin-right: 0;
@@ -9,6 +10,16 @@
 
     label {
         line-height: 1;
+    }
+
+    &-dialog {
+        .close {
+            display: none;
+        }
+
+        .ui-dialog-content {
+            padding-bottom: 17px;
+        }
     }
 
     .dropdown-menu {
@@ -23,17 +34,8 @@
         }
     }
 
-    &-dialog {
-        .close {
-            display: none;
-        }
-
-        .ui-dialog-content {
-            padding-bottom: 17px;
-        }
-    }
-
     &__wrapper {
+        width: 100%;
 
         .datagrid-settings-right-flap {
             display: none;
@@ -60,11 +62,11 @@
                 height: 28px;
                 width: 28px;
 
-                [class^="fa-"],
-                [class*=" fa-"] {
+                [class^='fa-'],
+                [class*=' fa-'] {
                     vertical-align: top;
 
-                    &:before {
+                    &::before {
                         line-height: 22px;
                         font-size: 15px;
                     }
@@ -74,6 +76,14 @@
 
         td.visibility-cell {
             width: 40px;
+            text-align: center;
+        }
+
+        .table-wrapper {
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
         }
     }
 }

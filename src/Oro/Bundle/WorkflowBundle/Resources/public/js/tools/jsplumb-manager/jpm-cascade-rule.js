@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var CascadeRule;
-    var _ = require('underscore');
-    var Rule = require('./jpm-base-rule');
+    const _ = require('underscore');
+    const Rule = require('./jpm-base-rule');
 
-    CascadeRule = Rule.extend({
+    const CascadeRule = Rule.extend({
         name: 'Cascade',
         match: function(cell) {
-            var child1 = _.find(cell.children, function(child) {
+            const child1 = _.find(cell.children, function(child) {
                 return child.y === cell.y + 1;
             });
-            var child2 = _.find(cell.children, function(child) {
+            const child2 = _.find(cell.children, function(child) {
                 return child.y === cell.y + 2;
             });
-            var child3 = _.find(cell.children, function(child) {
+            const child3 = _.find(cell.children, function(child) {
                 return child.y === cell.y + 3;
             });
-            var child4 = _.find(cell.children, function(child) {
+            const child4 = _.find(cell.children, function(child) {
                 return child.y === cell.y + 4;
             });
 
@@ -36,8 +35,8 @@ define(function(require) {
             }
         },
         apply: function() {
-            var context = this.context;
-            var changed = false;
+            const context = this.context;
+            let changed = false;
             if (this.root !== null) {
                 changed = context.move(this.items[0], this.root.x + 2) || changed;
                 changed = context.move(this.items[1], this.root.x + 1) || changed;

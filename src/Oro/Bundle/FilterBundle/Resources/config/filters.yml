@@ -1,198 +1,196 @@
-parameters:
-    oro_filter.filter_utility.class:              Oro\Bundle\FilterBundle\Filter\FilterUtility
-    oro_filter.string_filter.class:               Oro\Bundle\FilterBundle\Filter\StringFilter
-    oro_filter.select_row_filter.class:           Oro\Bundle\FilterBundle\Filter\SelectRowFilter
-    oro_filter.number_filter.class:               Oro\Bundle\FilterBundle\Filter\NumberFilter
-    oro_filter.number_range_filter.class:         Oro\Bundle\FilterBundle\Filter\NumberRangeFilter
-    oro_filter.percent_filter.class:              Oro\Bundle\FilterBundle\Filter\PercentFilter
-    oro_filter.currency_filter.class:             Oro\Bundle\FilterBundle\Filter\CurrencyFilter
-    oro_filter.choice_filter.class:               Oro\Bundle\FilterBundle\Filter\ChoiceFilter
-    oro_filter.single_choice_filter.class:        Oro\Bundle\FilterBundle\Filter\SingleChoiceFilter
-    oro_filter.entity_filter.class:               Oro\Bundle\FilterBundle\Filter\EntityFilter
-    oro_filter.boolean_filter.class:              Oro\Bundle\FilterBundle\Filter\BooleanFilter
-    oro_filter.date_filter_utility.class:         Oro\Bundle\FilterBundle\Filter\DateFilterUtility
-    oro_filter.date_range_filter.class:           Oro\Bundle\FilterBundle\Filter\DateRangeFilter
-    oro_filter.datetime_range_filter.class:       Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
-    oro_filter.many_to_many_filter.class:         Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
-    oro_filter.choice_tree_filter.class:          Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter
-    oro_filter.dictionary_filter.class:           Oro\Bundle\FilterBundle\Filter\DictionaryFilter
-    oro_filter.enum_filter.class:                 Oro\Bundle\FilterBundle\Filter\EnumFilter
-    oro_filter.multi_enum_filter.class:           Oro\Bundle\FilterBundle\Filter\MultiEnumFilter
-
 services:
     oro_filter.filter_utility:
-        class: '%oro_filter.filter_utility.class%'
+        class: Oro\Bundle\FilterBundle\Filter\FilterUtility
+        public: false
 
     oro_filter.string_filter:
-        class: '%oro_filter.string_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\StringFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: string, datasource: orm }
-
-    oro_filter.select_row_filter:
-        class: '%oro_filter.select_row_filter.class%'
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: selectrow, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: string }
 
     oro_filter.number_filter:
-        class: '%oro_filter.number_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\NumberFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: number, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: number }
 
     oro_filter.number_range_filter:
-        class: '%oro_filter.number_range_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\NumberRangeFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: number-range, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: number-range }
 
     oro_filter.percent_filter:
-        class: '%oro_filter.percent_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\PercentFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: percent, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: percent }
 
     oro_filter.currency_filter:
-        class: '%oro_filter.currency_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\CurrencyFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: currency, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: currency }
 
     oro_filter.choice_filter:
-        class: '%oro_filter.choice_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\ChoiceFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: choice, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: choice }
 
     oro_filter.single_choice_filter:
-        class: '%oro_filter.single_choice_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\SingleChoiceFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: single_choice, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: single_choice }
+
+    oro_filter.json_array_choice_filter:
+        class: Oro\Bundle\FilterBundle\Filter\JsonArrayChoiceFilter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: json_array_choice }
 
     oro_filter.entity_filter:
-        class: '%oro_filter.entity_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\EntityFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@doctrine'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: entity, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: entity }
 
     oro_filter.boolean_filter:
-        class: '%oro_filter.boolean_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\BooleanFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-        calls:
-            - [setTranslator, ['@translator']]
+            - '@translator'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: boolean, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: boolean }
 
     oro_filter.duplicate_filter:
         class: Oro\Bundle\FilterBundle\Filter\DuplicateFilter
-        parent: oro_filter.boolean_filter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@translator'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: duplicate, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: duplicate }
 
     oro_filter.date_filter_utility:
-        class: '%oro_filter.date_filter_utility.class%'
+        class: Oro\Bundle\FilterBundle\Filter\DateFilterUtility
+        public: false
         arguments:
             - '@oro_locale.settings'
             - '@oro_filter.expression.date.compiler'
 
     oro_filter.date_range_filter:
-        class: '%oro_filter.date_range_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\DateRangeFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
+            - '@oro_locale.settings'
+            - '@oro_filter.utils.date_filter_modifier'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: date, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: date }
 
     oro_filter.datetime_range_filter:
-        class: '%oro_filter.datetime_range_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
+            - '@oro_locale.settings'
+            - '@oro_filter.utils.date_filter_modifier'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: datetime, datasource: orm }
-
-    oro_filter.many_to_many_filter:
-        class: '%oro_filter.many_to_many_filter.class%'
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: many-to-many, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 
     oro_filter.choice_tree_filter:
-        class: '%oro_filter.choice_tree_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@doctrine'
             - '@router'
             - '@event_dispatcher'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: choice-tree, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: choice-tree }
 
     oro_filter.dictionary_filter:
-        class: '%oro_filter.dictionary_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\DictionaryFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: dictionary, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: dictionary }
 
     oro_filter.enum_filter:
-        class: '%oro_filter.enum_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\EnumFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_entity.manager.dictionary.api'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: enum, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: enum }
 
     oro_filter.multi_enum_filter:
-        class: '%oro_filter.multi_enum_filter.class%'
+        class: Oro\Bundle\FilterBundle\Filter\MultiEnumFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.builder.many_relation'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: multi_enum, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }
 
     oro_filter.date_grouping_filter:
         class: Oro\Bundle\FilterBundle\Filter\DateGroupingFilter
+        public: true
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@doctrine'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: date_grouping, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: date_grouping }
 
     oro_filter.skip_empty_periods_filter:
         class: Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: skip_empty_periods, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: skip_empty_periods }

@@ -1,9 +1,11 @@
 /* @theme: admin.oro; */
 
 .ui-dialog {
+    /* stylelint-disable declaration-no-important */
     width: $dialog-mobile-width !important;
     height: $dialog-mobile-height !important;
     min-height: $dialog-mobile-min-height !important;
+    /* stylelint-enable declaration-no-important */
     max-width: $dialog-mobile-max-width;
     min-width: $dialog-mobile-min-width;
     box-sizing: $dialog-mobile-box-sizing;
@@ -16,21 +18,42 @@
     box-shadow: $dialog-mobile-box-shadow;
     overflow: $dialog-mobile-overflow;
 
+    .widget-content {
+        margin: 0;
+    }
+
     .form-dialog {
         min-width: $dialog-form-mobile-min-width;
     }
 
+    .ui-widget-header {
+        position: $dialog-mobile-header-position;
+        width: $dialog-mobile-header-width;
+        top: $dialog-mobile-header-top;
+        left: $dialog-mobile-header-left;
+        z-index: $dialog-mobile-header-z-index;
+        border-radius: $dialog-mobile-header-border-radius;
+
+        @include safe-area-offset(padding, $dialog-mobile-header-inner-offset, 60px 12px 12px);
+
+        margin: $dialog-mobile-header-outer-offset;
+    }
+
     &.ui-dialog-minimized {
+        /* stylelint-disable declaration-no-important */
         width: auto !important;
         min-height: 0 !important;
+        /* stylelint-enable declaration-no-important */
         flex-grow: 1;
 
         .ui-widget-header {
             padding: 3px 11px 3px 12px;
+            // stylelint-disable-next-line declaration-no-important
             position: static !important;
         }
 
         .loading-bar {
+            // stylelint-disable-next-line declaration-no-important
             display: none !important;
         }
     }
@@ -46,22 +69,9 @@
     }
 
     &.ui-resizable:not(.ui-dialog-buttons) {
-        &:after {
+        &::after {
             display: $dialog-mobile-dialog-not-buttons-display;
         }
-    }
-
-    .ui-widget-header {
-        position: $dialog-mobile-header-position;
-        width: $dialog-mobile-header-width;
-        top: $dialog-mobile-header-top;
-        left: $dialog-mobile-header-left;
-        z-index: $dialog-mobile-header-z-index;
-        border-radius: $dialog-mobile-header-border-radius;
-
-        @include safe-area-offset(padding, $dialog-mobile-header-inner-offset, 60px, 12px, 12px);
-
-        margin: $dialog-mobile-header-outer-offset;
     }
 
     .ui-dialog-content {
@@ -72,22 +82,24 @@
         margin: $dialog-mobile-content-outer-offset;
         background: $primary-inverse;
 
-        @include safe-area-offset(padding, $dialog-mobile-content-inner-offset, 10px, 0, 10px);
+        @include safe-area-offset(padding, $dialog-mobile-content-inner-offset, 10px 0 10px);
     }
 
     .ui-resizable-handle {
+        // stylelint-disable-next-line declaration-no-important
         display: $dialog-resizable-handle-mobile-display !important;
     }
 
     .form-actions.widget-actions {
         text-align: $dialog-actions-mobile-text-align;
+        padding: $dialog-actions-mobile-inner-offset;
 
         .pull-right {
             float: $dialog-actions-mobile-float;
         }
 
         .action-wrapper {
-            & + .action-wrapper {
+            + .action-wrapper {
                 margin-left: $dialog-mobile-actions-btn-outer-offset;
             }
         }
@@ -100,6 +112,15 @@
             border-radius: $dialog-mobile-actions-btn-border-radius;
             border: $dialog-mobile-actions-btn-border;
         }
+    }
+
+    .inner-grid {
+        min-width: $dialog-mobile-inner-grid-min-width;
+    }
+
+    .ui-dialog-titlebar-maximize {
+        // stylelint-disable-next-line declaration-no-important
+        display: none !important;
     }
 }
 

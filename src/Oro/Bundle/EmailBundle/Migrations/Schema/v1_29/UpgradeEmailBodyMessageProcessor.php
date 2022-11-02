@@ -3,18 +3,23 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailBodyTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
+/**
+ * Updates email body with plain text representation.
+ */
+class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const TOPIC_NAME = 'oro_email.migrate_email_body';
     const BATCH_SIZE = 500;
 
     /** @var MessageProducerInterface */
@@ -26,10 +31,6 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param MessageProducerInterface  $messageProducer
-     * @param NativeQueryExecutorHelper $queryHelper
-     */
     public function __construct(
         MessageProducerInterface $messageProducer,
         NativeQueryExecutorHelper $queryHelper,
@@ -41,13 +42,22 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedTopics()
+    {
+        return [UpdateEmailBodyTopic::getName()];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if ($message->getBody() !== '') {
+        $body = JSON::decode($message->getBody());
+        if ($body !== []) {
             // we have page number we should process, so now process this page
-            $this->processBatch((int)$message->getBody());
+            $this->processBatch($body['pageNumber']);
         } else {
             // we have no page number we should process, so now split work to batches
             $this->scheduleMigrateProcesses();
@@ -72,7 +82,7 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
             );
         $jobsCount = floor((int)$maxItemNumber / self::BATCH_SIZE);
         for ($i = 0; $i <= $jobsCount; $i++) {
-            $this->messageProducer->send(self::TOPIC_NAME, $i);
+            $this->messageProducer->send(UpdateEmailBodyTopic::getName(), ['pageNumber' => $i]);
         }
     }
 

@@ -1,14 +1,20 @@
 <% if (!tabs.length) { %>
-    <div id="calendar<%= suffix %>"></div>
+    <div id="calendar<%- suffix %>"></div>
 <% } else { %>
-    <ul class="nav nav-tabs nav-tabs-oro">
-        <% _.each(tabs, function (tab, i) { %>
-        <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
-        <% }); %>
-    </ul>
-    <div class="tab-content">
-        <% _.each(tabs, function (tab, i) { %>
-        <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
-        <% }); %>
+    <div class="tab-container">
+        <ul class="nav nav-tabs" role="tablist">
+            <% _.each(tabs, function (tab, i) { %>
+            <li class="nav-item">
+                <a class="<%- tab.name %> no-hash tab-button nav-link<% if (i === 0) { %> active show<% } %>"
+                   href="#<%- tab.name %><%- suffix %>"><% if (tab.icon) { %><span class="fa-<%- tab.icon %>"></span><% } %>
+                    <%- tab.label %></a>
+            </li>
+            <% }); %>
+        </ul>
+        <div class="tab-content">
+            <% _.each(tabs, function (tab, i) { %>
+            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%- tab.name %><%- suffix %>"></div>
+            <% }); %>
+        </div>
     </div>
 <% } %>

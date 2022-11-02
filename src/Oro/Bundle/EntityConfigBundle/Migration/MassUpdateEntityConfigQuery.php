@@ -3,11 +3,14 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Update multiple entity configuration values and entity configuration index values.
+ */
 class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**
@@ -75,9 +78,6 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $this->updateEntityConfig($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger)
     {
         $entityConfigRecordData = $this->getEntityConfigRecordData();
@@ -138,16 +138,13 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         return (string)$convertedValue;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfig(LoggerInterface $logger)
     {
         $entityConfigRecordData = $this->getEntityConfigRecordData();
 
         $entityConfigData = empty($entityConfigRecordData['data'])
             ? []
-            : $this->connection->convertToPHPValue($entityConfigRecordData['data'], Type::TARRAY);
+            : $this->connection->convertToPHPValue($entityConfigRecordData['data'], Types::ARRAY);
 
         foreach ($this->valuesForRemove as $scope => $codes) {
             foreach ($codes as $code) {
@@ -161,7 +158,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
             $entityConfigData[$scope] = array_replace($currentScopeConfigurationValues, $newScopeConfigurationValues);
         }
 
-        $entityConfigData = $this->connection->convertToDatabaseValue($entityConfigData, Type::TARRAY);
+        $entityConfigData = $this->connection->convertToDatabaseValue($entityConfigData, Types::ARRAY);
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [$entityConfigData, $entityConfigRecordData['id']];
         $statement = $this->connection->prepare($sql);

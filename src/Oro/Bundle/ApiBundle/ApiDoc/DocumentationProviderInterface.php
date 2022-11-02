@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * An interface for the different kind of providers that get the request type depended Data API documentation.
+ * An interface for the different kind of providers that get the request type depended API documentation.
  */
 interface DocumentationProviderInterface
 {
@@ -14,7 +14,7 @@ interface DocumentationProviderInterface
      *
      * @param RequestType $requestType
      *
-     * @return string|null
+     * @return string|null A string contains the documentation in Markdown format
      */
     public function getDocumentation(RequestType $requestType): ?string;
 }

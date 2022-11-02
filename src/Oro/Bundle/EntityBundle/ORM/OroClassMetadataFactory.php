@@ -5,19 +5,27 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
 
+/**
+ * Adds the following features to the Doctrine's ClassMetadataFactory:
+ * * a possibility to mark the factory disconnected to be able to to memory usage optimization
+ *   of the message queue consumer
+ * * a memory cache for the result value of isTransient() method
+ * * a possibility to profile ORM metadata related methods
+ */
 class OroClassMetadataFactory extends ClassMetadataFactory
 {
     const ALL_METADATA_KEY = 'oro_entity.all_metadata';
 
     /** @var EntityManagerInterface|null */
-    protected $entityManager;
+    private $entityManager;
 
     /** @var bool[] */
-    protected $isTransientCache = [];
+    private $isTransientCache = [];
 
     /** @var OrmLogger */
-    protected $logger;
+    private $logger;
 
     /** @var bool */
     private $disconnected = false;
@@ -25,7 +33,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /**
      * Indicates whether this metadata factory is in the disconnected state.
      *
-     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
+     * @internal this method is intended to be used only to memory usage optimization of the message queue consumer
      *
      * @return bool
      */
@@ -37,9 +45,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /**
      * Switches this metadata factory to the disconnected or connected state.
      *
-     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
-     *
-     * @param $disconnected
+     * @internal this method is intended to be used only to memory usage optimization of the message queue consumer
      */
     public function setDisconnected($disconnected)
     {
@@ -49,7 +55,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /**
      * Gets an instance of EntityManager connected to this this metadata factory.
      *
-     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
+     * @internal this method is intended to be used only to memory usage optimization of the message queue consumer
      *
      * @return EntityManagerInterface|null
      */
@@ -76,17 +82,18 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     {
         $logger = $this->getProfilingLogger();
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->startGetAllMetadata();
         }
 
-        $cacheDriver = $this->getCacheDriver();
+        $cacheDriver = $this->getCache();
         if ($cacheDriver) {
-            $result = $cacheDriver->fetch(static::ALL_METADATA_KEY);
-            if (false === $result) {
+            $cacheItem = $cacheDriver->getItem(static::ALL_METADATA_KEY);
+            if (!$cacheItem->isHit()) {
                 $result = parent::getAllMetadata();
-                $cacheDriver->save(static::ALL_METADATA_KEY, $result);
+                $cacheDriver->save($cacheItem->set($result));
             } else {
+                $result = $cacheItem->get();
                 $reflectionService = $this->getReflectionService();
                 foreach ($result as $metadata) {
                     $this->wakeupReflection($metadata, $reflectionService);
@@ -96,7 +103,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
             $result = parent::getAllMetadata();
         }
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->stopGetAllMetadata();
         }
 
@@ -110,13 +117,21 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     {
         $logger = $this->getProfilingLogger();
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->startGetMetadataFor();
         }
 
-        $result = parent::getMetadataFor($className);
+        try {
+            $result = parent::getMetadataFor($className);
+        } catch (\ReflectionException $e) {
+            if (ExtendReflectionErrorHandler::isSupported($e)) {
+                throw ExtendReflectionErrorHandler::createException($className, $e);
+            } else {
+                throw $e;
+            }
+        }
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->stopGetMetadataFor();
         }
 
@@ -130,18 +145,18 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     {
         $logger = $this->getProfilingLogger();
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->startIsTransient();
         }
 
-        if (array_key_exists($class, $this->isTransientCache)) {
+        if (isset($this->isTransientCache[$class])) {
             $result = $this->isTransientCache[$class];
         } else {
             $result = parent::isTransient($class);
             $this->isTransientCache[$class] = $result;
         }
 
-        if ($logger) {
+        if (null !== $logger) {
             $logger->stopIsTransient();
         }
 
@@ -153,14 +168,14 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      *
      * @return OrmLogger|null
      */
-    protected function getProfilingLogger()
+    private function getProfilingLogger()
     {
-        if ($this->logger) {
-            return $this->logger;
-        }
-
         if (false === $this->logger) {
             return null;
+        }
+
+        if (null !== $this->logger) {
+            return $this->logger;
         }
 
         if (null === $this->entityManager) {
@@ -168,11 +183,19 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
 
         $config = $this->entityManager->getConfiguration();
-
         $this->logger = $config instanceof OrmConfiguration
             ? $config->getAttribute('OrmProfilingLogger', false)
             : false;
 
+        if (false === $this->logger) {
+            return null;
+        }
+
         return $this->logger;
+    }
+
+    public function clearCache(): void
+    {
+        $this->getCache()?->clear();
     }
 }

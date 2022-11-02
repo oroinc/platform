@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -42,10 +42,6 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param Entity\User $adminUser
-     */
     protected function addAvatarToUser(ObjectManager $manager, Entity\User $adminUser)
     {
         try {

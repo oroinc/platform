@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
@@ -18,6 +19,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class AclGranted extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
+    use AuthorizationCheckerTrait;
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
@@ -34,11 +36,6 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
     /** @var mixed */
     protected $object;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param ManagerRegistry               $doctrine
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -91,7 +88,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
      * @acl: ['contact_view']
      * @acl: ['EDIT', 'Acme\DemoBundle\Entity\Contact']
      *
-     * {@see Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
+     * {@see \Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
      */
     public function initialize(array $options)
     {
@@ -138,6 +135,10 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
             }
         }
 
-        return $this->authorizationChecker->isGranted($attributes, $object);
+        return $this->isAttributesGranted(
+            $this->authorizationChecker,
+            $attributes,
+            $object
+        );
     }
 }

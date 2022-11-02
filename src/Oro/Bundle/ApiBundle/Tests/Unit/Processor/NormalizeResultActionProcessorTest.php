@@ -9,15 +9,13 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\ChainProcessor\SimpleProcessorFactory;
-use Symfony\Component\Debug\BufferingLogger;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use Oro\Component\Testing\Logger\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -26,55 +24,37 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_ACTION = 'test';
 
-    /** @var SimpleProcessorFactory */
-    private $processorFactory;
+    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
 
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var ProcessorBag */
-    private $processorBag;
-
     /** @var NormalizeResultActionProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processorFactory = new SimpleProcessorFactory();
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorFactory);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
-        $this->processorBagConfigBuilder->addGroup(
-            NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP,
-            self::TEST_ACTION,
-            -3
-        );
-
-        $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, self::TEST_ACTION, -3);
 
         $this->processor = new NormalizeResultActionProcessor(
-            $this->processorBag,
+            new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry),
             self::TEST_ACTION
         );
     }
 
-    /**
-     * @return NormalizeResultContext
-     */
-    private function getContext()
+    private function getContext(): NormalizeResultContext
     {
         $context = new NormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
@@ -85,10 +65,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @return BufferingLogger
-     */
-    private function setLogger()
+    private function setLogger(): BufferingLogger
     {
         $logger = new BufferingLogger();
         $this->processor->setLogger($logger);
@@ -97,29 +74,33 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $processorId
-     * @param string $groupName
+     * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface
+     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessor($processorId, $groupName)
+    private function addProcessors(array $processors): array
     {
-        $processor = $this->createMock(ProcessorInterface::class);
-        $this->processorFactory->addProcessor($processorId, $processor);
-        $this->processorBagConfigBuilder->addProcessor(
-            $processorId,
-            [],
-            self::TEST_ACTION,
-            $groupName
-        );
+        $createdProcessors = [];
+        $processorRegistryMap = [];
+        foreach ($processors as $processorId => $groupName) {
+            $this->processorBagConfigBuilder->addProcessor(
+                $processorId,
+                [],
+                self::TEST_ACTION,
+                $groupName
+            );
+            $processor = $this->createMock(ProcessorInterface::class);
+            $createdProcessors[] = $processor;
+            $processorRegistryMap[] = [$processorId, $processor];
+        }
+        $this->processorRegistry->expects(self::any())
+            ->method('getProcessor')
+            ->willReturnMap($processorRegistryMap);
 
-        return $processor;
+        return $createdProcessors;
     }
 
-    /**
-     * @return array
-     */
-    public function loggerProvider()
+    public function loggerProvider(): array
     {
         return [
             [false],
@@ -137,8 +118,10 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $context = $this->getContext();
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -151,11 +134,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccurs($withLogger)
+    public function testWhenExceptionOccurs(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -168,10 +149,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -208,11 +191,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -226,10 +207,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -250,7 +233,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             self::assertEquals(
                 [
                     [
-                        'info',
+                        'error',
                         'An exception occurred in "processor1" processor.',
                         [
                             'exception'   => $exception,
@@ -266,11 +249,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccurs($withLogger)
+    public function testWhenErrorOccurs(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -281,19 +262,19 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -325,11 +306,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessor($withLogger)
+    public function testWhenErrorOccursInLastProcessor(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -340,9 +319,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -350,11 +331,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor2->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -382,11 +361,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -398,19 +375,19 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -442,11 +419,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -458,9 +433,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -468,11 +445,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor2->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -500,11 +475,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled($withLogger)
+    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -517,10 +490,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('test exception');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -558,11 +533,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -578,10 +551,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -601,7 +576,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             self::assertEquals(
                 [
                     [
-                        'info',
+                        'error',
                         'An exception occurred in "processor1" processor.',
                         [
                             'exception'   => $exception,
@@ -617,11 +592,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled($withLogger)
+    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -634,19 +607,19 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -692,11 +665,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -710,19 +681,19 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -753,11 +724,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroup($withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -768,9 +737,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('test exception');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -807,11 +778,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -825,9 +794,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -846,7 +817,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             self::assertEquals(
                 [
                     [
-                        'info',
+                        'error',
                         'An exception occurred in "processor10" processor.',
                         [
                             'exception'   => $exception,
@@ -862,11 +833,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup($withLogger)
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -877,9 +846,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -897,16 +868,29 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         } catch (AuthenticationException $e) {
             self::assertEquals($authenticationException->getMessage(), $e->getMessage());
             if (null !== $logger) {
-                self::assertEquals([], $logger->cleanLogs());
+                self::assertEquals(
+                    [
+                        [
+                            'info',
+                            'An exception occurred in "processor10" processor.',
+                            [
+                                'exception'   => $authenticationException,
+                                'action'      => self::TEST_ACTION,
+                                'requestType' => 'rest,json_api',
+                                'version'     => '1.2'
+                            ]
+                        ]
+                    ],
+                    $logger->cleanLogs()
+                );
             }
         }
     }
 
     /**
-     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionAndThenAuthenticationExceptionOccursInNormalizeResultGroup($withLogger)
+    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -918,9 +902,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception('test exception');
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -958,10 +944,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
-    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr($withLogger)
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -973,9 +958,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1004,10 +991,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionAndThenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr($withLogger)
+    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1020,9 +1006,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception('test exception');
         $authenticationException = new AuthenticationException('Access Denied');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1048,7 +1036,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
                 unset($logs[0][2]);
                 self::assertEquals(
                     [
-                        ['info', 'An exception occurred in "processor1" processor.']
+                        ['error', 'An exception occurred in "processor1" processor.']
                     ],
                     $logs
                 );
@@ -1065,10 +1053,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroup($withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1079,9 +1066,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1089,11 +1078,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor11->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -1107,11 +1094,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1123,9 +1108,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::create('some error');
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
-        $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT,
+            'processor11' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1133,11 +1120,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor11->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -1151,11 +1136,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $withLogger
-     *
      * @dataProvider loggerProvider
      */
-    public function testWhenInternalPhpErrorOccurs($withLogger)
+    public function testWhenInternalPhpErrorOccurs(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1166,15 +1149,17 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $internalPhpError = new \Error('test error', 1);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->will(new \PHPUnit\Framework\MockObject\Stub\Exception($internalPhpError));
+            ->willThrowException($internalPhpError);
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -1211,8 +1196,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider safeExceptionProvider
      */
     public function testWhenSafeExceptionOccurs(\Exception $exception)
@@ -1223,10 +1206,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1260,23 +1245,18 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function safeExceptionProvider()
+    public function safeExceptionProvider(): array
     {
         return [
             [new HttpException(Response::HTTP_BAD_REQUEST)],
             [new HttpException(Response::HTTP_METHOD_NOT_ALLOWED)],
             [new AccessDeniedException()],
-            [new ForbiddenException('some reason')],
+            [new AccessDeniedException('some reason')],
             [new NotSupportedConfigOperationException('Test\Class', 'test_operation')]
         ];
     }
 
     /**
-     * @param HttpException $exception
-     *
      * @dataProvider httpInternalServerErrorExceptionProvider
      */
     public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
@@ -1287,10 +1267,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $error = Error::createByException($exception);
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
-        $processor2 = $this->addProcessor('processor2', 'group1');
-        $processor3 = $this->addProcessor('processor3', 'group2');
-        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
 
         $processor1->expects(self::once())
             ->method('process')
@@ -1324,10 +1306,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function httpInternalServerErrorExceptionProvider()
+    public function httpInternalServerErrorExceptionProvider(): array
     {
         return [
             [new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR)],
@@ -1336,9 +1315,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Error $error
-     * @param array $loggedError
-     *
      * @dataProvider errorForLogConversionProvider
      */
     public function testErrorForLogConversion(Error $error, array $loggedError)
@@ -1346,15 +1322,16 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $logger = $this->setLogger();
         $context = $this->getContext();
 
-        $processor1 = $this->addProcessor('processor1', 'group1');
+        [$processor1] = $this->addProcessors([
+            'processor1' => 'group1'
+        ]);
+
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
 
         $this->processor->process($context);
 
@@ -1378,10 +1355,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function errorForLogConversionProvider()
+    public function errorForLogConversionProvider(): array
     {
         return [
             [

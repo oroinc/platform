@@ -6,11 +6,16 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Manages dashboards.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class Manager
 {
     /**
@@ -30,11 +35,6 @@ class Manager
 
     /**
      * Constructor
-     *
-     * @param Factory               $factory
-     * @param EntityManager         $entityManager
-     * @param AclHelper             $aclHelper
-     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         Factory $factory,
@@ -154,8 +154,8 @@ class Manager
     {
         $dashboard = new Dashboard();
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $dashboard->setOrganization($token->getOrganizationContext());
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $dashboard->setOrganization($token->getOrganization());
         }
 
         return $this->getDashboardModel($dashboard);
@@ -195,9 +195,6 @@ class Manager
         }
     }
 
-    /**
-     * @param EntityModelInterface $entityModel
-     */
     public function remove(EntityModelInterface $entityModel)
     {
         $this->entityManager->remove($entityModel->getEntity());
@@ -225,9 +222,9 @@ class Manager
      */
     public function findUserActiveDashboard(User $user)
     {
-        /** @var OrganizationContextTokenInterface $token */
+        /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user, 'organization' => $organization));
 
@@ -245,9 +242,9 @@ class Manager
      */
     public function findDefaultDashboard()
     {
-        /** @var OrganizationContextTokenInterface $token */
+        /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
             ->findDefaultDashboard($organization);
 
@@ -303,9 +300,9 @@ class Manager
      */
     public function setUserActiveDashboard(DashboardModel $dashboard, User $user, $flush = false)
     {
-        /** @var OrganizationContextTokenInterface $token */
+        /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
-        $organization = $token->getOrganizationContext();
+        $organization = $token->getOrganization();
         $activeDashboard = $this->entityManager
             ->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user, 'organization' => $organization));
@@ -328,9 +325,6 @@ class Manager
 
     /**
      * Copy widgets from source entity to dashboard model
-     *
-     * @param DashboardModel $target
-     * @param Dashboard      $source
      */
     protected function copyWidgets(DashboardModel $target, Dashboard $source)
     {

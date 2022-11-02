@@ -12,65 +12,54 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class DynamicAttributesExtension extends AbstractTypeExtension
+/**
+ * Adds attributes to a form based on the configuration for an entity.
+ */
+class DynamicAttributesExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
-    
-    /**
-     * @var ConfigManager
-     */
+
+    /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @var AttributeManager
-     */
-    private $attributeManager;
+    /** @var ContainerInterface */
+    private $container;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $fields = [];
 
-    /**
-     * @var AttributeConfigHelper
-     */
-    private $attributeConfigHelper;
-
-    /**
-     * @var DynamicFieldsHelper
-     */
-    private $dynamicFieldsHelper;
-
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param AttributeManager $attributeManager
-     * @param AttributeConfigHelper $attributeConfigHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        AttributeManager $attributeManager,
-        AttributeConfigHelper $attributeConfigHelper,
-        DynamicFieldsHelper $dynamicFieldsHelper
+        ContainerInterface $container
     ) {
         $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->attributeManager = $attributeManager;
-        $this->attributeConfigHelper = $attributeConfigHelper;
-        $this->dynamicFieldsHelper = $dynamicFieldsHelper;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_config.manager.attribute_manager' => AttributeManager::class,
+            'oro_entity_config.config.attributes_config_helper' => AttributeConfigHelper::class,
+            'oro_entity_extend.form.extension.dynamic_fields_helper' => DynamicFieldsHelper::class
+        ];
     }
 
     /**
@@ -127,19 +116,16 @@ class DynamicAttributesExtension extends AbstractTypeExtension
                 continue;
             }
 
-            if (!$this->dynamicFieldsHelper->shouldBeInitialized($className, $formConfig, $view)) {
+            if (!$this->getDynamicFieldsHelper()->shouldBeInitialized($className, $formConfig, $view)) {
                 continue;
             }
 
             $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
 
-            $this->dynamicFieldsHelper->addInitialElements($view, $form, $extendConfig);
+            $this->getDynamicFieldsHelper()->addInitialElements($view, $form, $extendConfig);
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSetData(FormEvent $event)
     {
         $data = $event->getData();
@@ -153,9 +139,6 @@ class DynamicAttributesExtension extends AbstractTypeExtension
         $this->addAttributes($form, $dataClass, $data->getAttributeFamily());
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -190,7 +173,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension
             $fieldConfigId = $formConfig->getId();
             $fieldName = $fieldConfigId->getFieldName();
 
-            if ($this->attributeConfigHelper->isFieldAttribute($class, $fieldName)) {
+            if ($this->getAttributeConfigHelper()->isFieldAttribute($class, $fieldName)) {
                 $fieldNames[] = $fieldName;
             }
         }
@@ -208,12 +191,12 @@ class DynamicAttributesExtension extends AbstractTypeExtension
         if (empty($options['data_class'])) {
             return false;
         }
-        
+
         if (empty($options['enable_attributes'])) {
             return false;
         }
 
-        if (!$this->attributeConfigHelper->isEntityWithAttributes($options['data_class'])) {
+        if (!$this->getAttributeConfigHelper()->isEntityWithAttributes($options['data_class'])) {
             return false;
         }
 
@@ -231,7 +214,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension
             return;
         }
 
-        $attributes = $this->attributeManager->getAttributesByFamily($attributeFamily);
+        $attributes = $this->getAttributeManager()->getAttributesByFamily($attributeFamily);
         foreach ($this->fields[$dataClass] as $fieldName => $priority) {
             foreach ($attributes as $attribute) {
                 if ($fieldName === $attribute->getFieldName() && !$form->has($fieldName)) {
@@ -240,5 +223,20 @@ class DynamicAttributesExtension extends AbstractTypeExtension
                 }
             }
         }
+    }
+
+    private function getAttributeManager(): AttributeManager
+    {
+        return $this->container->get('oro_entity_config.manager.attribute_manager');
+    }
+
+    private function getAttributeConfigHelper(): AttributeConfigHelper
+    {
+        return $this->container->get('oro_entity_config.config.attributes_config_helper');
+    }
+
+    private function getDynamicFieldsHelper(): DynamicFieldsHelper
+    {
+        return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');
     }
 }

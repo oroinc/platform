@@ -7,6 +7,7 @@ services:
 
     oro_datagrid.mass_action.forced_password_reset.handler:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler
+        public: true
         arguments:
             - '@oro_user.handler.reset_password_handler'
             - '@translator'
@@ -26,6 +27,7 @@ services:
 
     oro_datagrid.mass_action.users_enable_switch.handler.disable:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        public: true
         shared: false
         arguments:
             - '@oro_security.acl_helper'
@@ -37,6 +39,7 @@ services:
 
     oro_datagrid.mass_action.users_enable_switch.handler.enable:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        public: true
         shared: false
         arguments:
             - '@oro_security.acl_helper'

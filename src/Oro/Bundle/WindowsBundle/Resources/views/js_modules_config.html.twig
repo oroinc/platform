@@ -1,0 +1,6 @@
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'orowindows/js/dialog/state/model': {
+        urlRoot: path('oro_api_get_windows')
+    }
+}) }}

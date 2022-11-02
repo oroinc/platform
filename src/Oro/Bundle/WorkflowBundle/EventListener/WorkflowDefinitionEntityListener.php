@@ -8,33 +8,30 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
+/**
+ * Invalidate workflow cache on change workflow definition
+ */
 class WorkflowDefinitionEntityListener
 {
-    /** @var ContainerInterface */
-    private $container;
+    private WorkflowRegistry $workflowRegistry;
+    private CacheInterface $cache;
 
-    /** @var WorkflowRegistry */
-    private $workflowRegistry;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(CacheInterface $cache, WorkflowRegistry $workflowRegistry)
     {
-        $this->container = $container;
+        $this->cache = $cache;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
-     * @param WorkflowDefinition $definition
      * @throws WorkflowActivationException
      */
-    public function prePersist(WorkflowDefinition $definition)
+    public function prePersist(WorkflowDefinition $definition): void
     {
         if ($definition->isActive()) {
             if ($definition->hasExclusiveActiveGroups()) {
-                $workflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
+                $workflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
                     $definition->getExclusiveActiveGroups()
                 );
 
@@ -48,15 +45,13 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     * @param PreUpdateEventArgs $event
      * @throws WorkflowActivationException
      */
-    public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event)
+    public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event): void
     {
         $isActivated = $event->hasChangedField('active') && $event->getNewValue('active') === true;
         if ($isActivated) {
-            $storedWorkflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
+            $storedWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
                 $definition->getExclusiveActiveGroups()
             );
 
@@ -75,11 +70,9 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     *
      * @throws WorkflowRemoveException
      */
-    public function preRemove(WorkflowDefinition $definition)
+    public function preRemove(WorkflowDefinition $definition): void
     {
         if ($definition->isSystem()) {
             throw new WorkflowRemoveException($definition->getName());
@@ -88,12 +81,7 @@ class WorkflowDefinitionEntityListener
         $this->clearEntitiesCache();
     }
 
-    /**
-     * @param WorkflowDefinition $definition
-     * @param array|Workflow[] $workflows
-     * @return WorkflowActivationException
-     */
-    private function generateException(WorkflowDefinition $definition, array $workflows)
+    private function generateException(WorkflowDefinition $definition, array $workflows): WorkflowActivationException
     {
         $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -118,20 +106,8 @@ class WorkflowDefinitionEntityListener
         ));
     }
 
-    /**
-     * @return WorkflowRegistry
-     */
-    private function getWorkflowRegistry()
+    private function clearEntitiesCache(): void
     {
-        if (null === $this->workflowRegistry) {
-            $this->workflowRegistry = $this->container->get('oro_workflow.registry.system');
-        }
-
-        return $this->workflowRegistry;
-    }
-
-    private function clearEntitiesCache()
-    {
-        $this->container->get('oro_workflow.cache.entities_with_workflow')->deleteAll();
+        $this->cache->clear();
     }
 }

@@ -95,11 +95,6 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_definition }
 
-    oro_workflow.form.workflow_definition:
-        class: 'Symfony\Component\Form\Form'
-        factory: ['@form.factory', 'createNamed']
-        arguments: ["oro_workflow_definition_form", Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType, null]
-
     oro_workflow.form.extension.restriction:
         class: 'Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension'
         arguments:

@@ -1,9 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins";
-
-@import "variables";
-
-@import "form";
-@import "multi-currency-editor";
-@import "opportunity-view-rate-row";
+@import 'currency-select-enabled';
+@import 'multi-currency-editor';
+@import 'opportunity-view-rate-row';
+@import 'mobile/main';

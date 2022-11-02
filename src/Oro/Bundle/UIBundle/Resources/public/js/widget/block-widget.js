@@ -1,16 +1,17 @@
-define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-], function(_, Backbone, AbstractWidgetView) {
+define(function(require) {
     'use strict';
 
-    var $ = Backbone.$;
-    var BlockWidgetView;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const AbstractWidgetView = require('oroui/js/widget/abstract-widget');
+    const $ = Backbone.$;
 
     /**
      * @export  oro/block-widget
      * @class   oro.BlockWidgetView
      * @extends oroui.widget.AbstractWidgetView
      */
-    BlockWidgetView = AbstractWidgetView.extend({
+    const BlockWidgetView = AbstractWidgetView.extend({
         options: _.extend({}, AbstractWidgetView.prototype.options, {
             type: 'block',
             cssClass: '',
@@ -31,10 +32,10 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BlockWidgetView() {
-            BlockWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function BlockWidgetView(options) {
+            BlockWidgetView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -44,7 +45,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);
             }
-            var params = _.extend({
+            const params = _.extend({
                 title: this.options.title,
                 contentClasses: this.options.contentClasses
             }, this.options.templateParams);
@@ -81,7 +82,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
          * Remove widget
          */
         remove: function() {
-            AbstractWidgetView.prototype.remove.call(this);
+            BlockWidgetView.__super__.remove.call(this);
             this.widget.remove();
         },
 
@@ -94,12 +95,12 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 }
             }
             this.loadingElement = this.widgetContentContainer.parent();
-            AbstractWidgetView.prototype.show.apply(this);
+            BlockWidgetView.__super__.show.call(this);
         },
 
         _showStatic: function() {
-            var anchorId = '_widget_anchor-' + this.getWid();
-            var anchorDiv = $('<div id="' + anchorId + '"/>');
+            const anchorId = '_widget_anchor-' + this.getWid();
+            const anchorDiv = $('<div id="' + anchorId + '"/>');
             anchorDiv.insertAfter(this.$el);
             this.widgetContentContainer.append(this.$el);
             $('#' + anchorId).replaceWith($(this.widget));
@@ -111,31 +112,31 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         },
 
         delegateEvents: function(events) {
-            AbstractWidgetView.prototype.delegateEvents.apply(this, arguments);
+            BlockWidgetView.__super__.delegateEvents.call(this, events);
             if (this.widget) {
                 this._delegateWidgetEvents(events);
             }
         },
 
         _delegateWidgetEvents: function(events) {
-            var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+            const delegateEventSplitter = /^(\S+)\s*(.*)$/;
             if (!(events || (events = _.result(this, 'widgetEvents')))) {
                 return;
             }
             this._undelegateWidgetEvents();
-            for (var key in events) {
+            for (const key in events) {
                 if (events.hasOwnProperty(key)) {
-                    var method = events[key];
+                    let method = events[key];
                     if (!_.isFunction(method)) {
                         method = this[events[key]];
                     }
                     if (!method) {
                         throw new Error('Method "' + events[key] + '" does not exist');
                     }
-                    var match = key.match(delegateEventSplitter);
-                    var eventName = match[1];
-                    var selector = match[2];
-                    method = _.bind(method, this);
+                    const match = key.match(delegateEventSplitter);
+                    let eventName = match[1];
+                    const selector = match[2];
+                    method = method.bind(this);
                     eventName += '.delegateWidgetEvents' + this.cid;
                     if (selector === '') {
                         this.widget.on(eventName, method);

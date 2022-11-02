@@ -4,16 +4,13 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
-use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Address
+ * The base class for address entities.
  *
  * @ORM\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
@@ -290,20 +287,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-     * Set id
-     *
-     * @param int $id
-     * @return $this
-     * @deprecated since 1.10, to be removed in 2.0
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * Set label
      *
      * @param string $label
@@ -470,9 +453,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     {
         if (!empty($this->regionText)) {
             return $this->regionText;
-        } else {
-            return $this->region;
         }
+        return $this->region;
     }
 
     /**
@@ -575,7 +557,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set name prefix
      *
      * @param string $namePrefix
@@ -599,7 +580,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set first name
      *
      * @param string $firstName
@@ -623,7 +603,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set middle name
      *
      * @param string $middleName
@@ -759,19 +738,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @param ExecutionContextInterface $context
-     * @deprecated since 1.9  Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
-     */
-    public function isRegionValid(ExecutionContextInterface $context)
-    {
-        // Use validator instead of duplicate code
-        $constraint = new ValidRegion();
-        $validator = new ValidRegionValidator();
-        $validator->initialize($context);
-        $validator->validate($this, $constraint);
-    }
-
     public function __clone()
     {
         if ($this->id) {
@@ -783,7 +749,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     /**
      * Convert address to string
-     * @todo: Address format must be used here
      *
      * @return string
      */

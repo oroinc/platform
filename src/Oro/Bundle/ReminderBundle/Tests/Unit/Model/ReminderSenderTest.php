@@ -4,24 +4,20 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderSender;
+use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
+use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 
 class ReminderSenderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var SendProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var ReminderSender
-     */
-    protected $sender;
+    /** @var ReminderSender */
+    private $sender;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(SendProcessorRegistry::class);
 
         $this->sender = new ReminderSender($this->registry);
     }
@@ -30,19 +26,16 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
     {
         $method = 'foo_method';
 
-        $reminder = $this->createMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
-
-        $reminder->expects($this->at(0))
+        $reminder = $this->createMock(Reminder::class);
+        $reminder->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($method));
+            ->willReturn($method);
 
-        $processor = $this->createMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
-
+        $processor = $this->createMock(SendProcessorInterface::class);
         $this->registry->expects($this->once())
             ->method('getProcessor')
             ->with($method)
-            ->will($this->returnValue($processor));
-
+            ->willReturn($processor);
         $processor->expects($this->once())
             ->method('push')
             ->with($reminder);
@@ -52,12 +45,12 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSend()
     {
-        $fooProcessor = $this->createMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
-        $barProcessor = $this->createMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
+        $fooProcessor = $this->createMock(SendProcessorInterface::class);
+        $barProcessor = $this->createMock(SendProcessorInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getProcessors')
-            ->will($this->returnValue(array($fooProcessor, $barProcessor)));
+            ->willReturn([$fooProcessor, $barProcessor]);
 
         $fooProcessor->expects($this->once())
             ->method('process');

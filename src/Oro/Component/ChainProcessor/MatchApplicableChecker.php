@@ -28,11 +28,12 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
      */
     public function addIgnoredAttribute($attribute)
     {
-        $this->ignoredAttributes[] = $attribute;
+        $this->ignoredAttributes[$attribute] = true;
     }
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isApplicable(ContextInterface $context, array $processorAttributes)
     {
@@ -41,9 +42,23 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
             if (isset($this->ignoredAttributes[$name])) {
                 continue;
             }
-            if (!$context->has($name)) {
+            $contextValue = $context->get($name);
+            if (null === $contextValue) {
+                if (null === $value) {
+                    // "!exists" operator
+                    if ($context->has($name)) {
+                        $result = self::NOT_APPLICABLE;
+                        break;
+                    }
+                } elseif (\is_array($value) && \key($value) === self::OPERATOR_NOT && \current($value) === null) {
+                    // "exists" operator
+                    $result = self::NOT_APPLICABLE;
+                    break;
+                }
                 $result = self::ABSTAIN;
-            } elseif (!$this->isMatch($value, $context->get($name), $name)) {
+            } elseif (!$context->has($name)) {
+                $result = self::ABSTAIN;
+            } elseif (!$this->isMatch($value, $contextValue, $name)) {
                 $result = self::NOT_APPLICABLE;
                 break;
             }

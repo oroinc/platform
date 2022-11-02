@@ -1,8 +1,7 @@
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
     'oroui/js/mediator', 'oroui/js/layout',
-    'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-    'bootstrap', 'jquery-ui'
-], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
+    'oroui/js/delete-confirmation', 'oroui/js/scrollspy', 'oroui/js/tools/scroll-helper'
+], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy, scrollHelper) {
     'use strict';
 
     /**
@@ -20,7 +19,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * from layout.js
      * ============================================================ */
     $(function() {
-        var $pageTitle = $('#page-title');
+        const $pageTitle = $('#page-title');
         if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
         }
@@ -33,12 +32,33 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             }
         });
 
-        var mainMenu = $('#main-menu');
-        var sideMainMenu = $('#side-menu');
+        $(document).on('keydown', 'a[role=button], [data-emulate-btn-press]', function(e) {
+            if (
+                (e.keyCode === 32 || e.keyCode === 13) &&
+                !e.isDefaultPrevented()
+            ) {
+                $(e.target).click();
+                e.preventDefault();
+            }
+        });
+
+        $(document).on('keydown click', 'textarea[data-autoresize]', e => {
+            const el = e.target;
+            setTimeout(() => {
+                if (el.scrollHeight > el.offsetHeight) {
+                    el.style.cssText = 'height:auto; padding:0';
+                    el.style.cssText = '-moz-box-sizing:content-box';
+                    el.style.cssText = 'height:' + el.scrollHeight + 'px';
+                }
+            }, 0);
+        });
+
+        const mainMenu = $('#main-menu');
+        const sideMainMenu = $('#side-menu');
 
         // trigger refresh of current page if active menu-item is clicked, despite the Backbone router limitations
         (sideMainMenu.length ? sideMainMenu : mainMenu).on('click', 'li.active a', function(e) {
-            var $target = $(e.target).closest('a');
+            const $target = $(e.target).closest('a');
             if (!$target.hasClass('unclickable') && $target[0] !== undefined && $target[0].pathname !== undefined) {
                 if (mediator.execute('compareUrl', $target[0].pathname)) {
                     mediator.execute('refreshPage');
@@ -65,13 +85,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     // handle only events triggered with proper NS (omit just any shown events)
                     return;
                 }
-                var $html = $('html');
-                var $dropdownMenu = $('>.dropdown-menu', this);
+                const $html = $('html');
+                const $dropdownMenu = $('>.dropdown-menu', this);
 
                 if ($dropdownMenu.css('position') === 'fixed' && $dropdownMenu.outerWidth() === $html.width()) {
-                    $html.addClass('modal-dropdown-shown');
+                    scrollHelper.disableBodyTouchScroll();
                     $(this).one('hide.bs.dropdown', function() {
-                        $html.removeClass('modal-dropdown-shown');
+                        scrollHelper.enableBodyTouchScroll();
                     });
                 }
             });
@@ -79,15 +99,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function(e) {
-            var $elem = $(e.target);
-            var action = $elem.data('action').slice(10);
-            var method = {'expand-all': 'show', 'collapse-all': 'hide'}[action];
-            var $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
+            const $elem = $(e.target);
+            const action = $elem.data('action').slice(10);
+            const method = {'expand-all': 'show', 'collapse-all': 'hide'}[action];
+            const $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
             $target.find('.collapse').collapse({toggle: false}).collapse(method);
         });
         $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function(e) {
             if (e.target === e.currentTarget) { // prevent processing if an event comes from child element
-                var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
+                const $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
                 $toggle.toggleClass('collapsed', e.type !== 'shown');
             }
         });
@@ -98,88 +118,35 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * ============================================================ */
     // @TODO should be refactored in BAP-4020
     $(function() {
-        var adjustHeight;
-        var anchor = $('#bottom-anchor');
-        if (!anchor.length) {
-            anchor = $('<div id="bottom-anchor"/>')
-                .css({
-                    position: 'fixed',
-                    bottom: '0',
-                    left: '0',
-                    width: '1px',
-                    height: '1px'
-                })
-                .appendTo($(document.body));
-        }
+        let adjustHeight;
 
+        const determineContext = context => {
+            if (context instanceof $.Event || context instanceof Event) {
+                context = context.target;
+            }
+            if (context instanceof HTMLElement) {
+                return context;
+            }
+        };
         if (tools.isMobile()) {
-            adjustHeight = function() {
-                layout.updateResponsiveLayout();
-                mediator.trigger('layout:reposition');
+            adjustHeight = context => {
+                mediator.execute({name: 'responsive-layout:update', silent: true});
+                mediator.trigger('layout:reposition', determineContext(context));
             };
         } else {
-            /* dynamic height for central column */
-            var content = false;
-
-            var initializeContent = function() {
-                if (!content) {
-                    content = $('.scrollable-container').filter(':parents(.ui-widget)').add('.app-page__main');
-                    if (!tools.isMobile()) {
-                        content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
-                        content.filter('.overflow-y').css('overflow-y', 'auto');
-                    } else {
-                        content.css('overflow', 'hidden');
-                        content.last().css('overflow-y', 'auto');
-                    }
-                }
-            };
-            adjustHeight = function() {
-                initializeContent();
-
-                layout.updateResponsiveLayout();
-
-                var sfToolbar = $('.sf-toolbarreset');
-                var debugBarHeight = sfToolbar.is(':visible') ? sfToolbar.outerHeight() : 0;
-                var anchorTop = anchor.position().top;
-                var footerHeight = $('#footer:visible').height() || 0;
-                var fixContent = 1;
-
-                $(content.get().reverse()).each(function(pos, el) {
-                    el = $(el);
-                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
-                });
-
+            adjustHeight = context => {
+                mediator.execute({name: 'responsive-layout:update', silent: true});
                 scrollspy.adjust();
-
-                var fixDialog = 2;
-                var footersHeight = ($('.sf-toolbar').height() || 0) + $('#footer').height();
-
-                $('#dialog-extend-fixed-container').css({
-                    position: 'fixed',
-                    bottom: footersHeight + fixDialog,
-                    zIndex: 9999
-                });
-
-                $('#page').css({
-                    'padding-bottom': debugBarHeight
-                });
-
-                mediator.trigger('layout:reposition');
+                mediator.trigger('layout:reposition', determineContext(context));
             };
         }
-
-        var adjustReloaded = function() {
-            content = false;
-            adjustHeight();
-        };
 
         layout.onPageRendered(adjustHeight);
 
         $(window).on('resize', _.debounce(adjustHeight, 40));
 
-        mediator.on('page:afterChange', adjustReloaded);
+        mediator.on('page:afterChange', adjustHeight);
 
-        mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);
         mediator.on('datagrid:rendered datagrid_filters:rendered widget_remove', scrollspy.adjust);
 
@@ -190,7 +157,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * from form_buttons.js
      * ============================================================ */
     $(document).on('click', '.action-button', function() {
-        var actionInput = $('input[name = "input_action"]');
+        const actionInput = $('input[name = "input_action"]');
         actionInput.val($(this).attr('data-action'));
     });
 
@@ -199,26 +166,28 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * ============================================================ */
     $(function() {
         $(document).on('click', '.remove-button', function(e) {
-            var el = $(this);
+            const el = $(this);
             if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
-                var data = {content: el.data('message')};
+                const data = {
+                    content: el.data('message')
+                };
 
-                var okText = el.data('ok-text');
+                const okText = el.data('ok-text');
                 if (okText) {
                     data.okText = okText;
                 }
 
-                var title = el.data('title');
+                const title = el.data('title');
                 if (title) {
                     data.title = title;
                 }
 
-                var cancelText = el.data('cancel-text');
+                const cancelText = el.data('cancel-text');
                 if (cancelText) {
                     data.cancelText = cancelText;
                 }
 
-                var confirm = new DeleteConfirmation(data);
+                const confirm = new DeleteConfirmation(data);
 
                 confirm.on('ok', function() {
                     mediator.execute('showLoading');
@@ -228,7 +197,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                         type: 'DELETE',
                         success: function(data) {
                             el.trigger('removesuccess');
-                            var redirectTo = el.data('redirect');
+                            const redirectTo = el.data('redirect');
                             if (redirectTo) {
                                 mediator.execute('addMessage', 'success', el.data('success-message'));
 
@@ -250,6 +219,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                         }
                     });
                 });
+
                 confirm.open();
             }
 
@@ -257,60 +227,83 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         });
     });
 
-    /* ============================================================
-     * from form/collection.js'
-     * ============================================================ */
+    /**
+     * Gererates HTML for new rows to oro collection
+     *
+     * @param {jQuery} $listContainer
+     * @param {number} [rowsCount]
+     * @return {string}
+     */
 
-    var getOroCollectionInfo = function($listContainer) {
-        var index = $listContainer.data('last-index') || $listContainer.children().length;
-        var prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
-        var html = $listContainer.attr('data-prototype');
+    const generateOroCollectionRows = function($listContainer, rowsCount) {
+        rowsCount = rowsCount || 1;
 
-        return {
-            nextIndex: index,
-            prototypeHtml: html,
-            prototypeName: prototypeName
-        };
+        let lastIndex = -1;
+        const $items = $listContainer.children('[data-content]');
+
+        if ($items.length > 0) {
+            const indexes = $items.toArray().map(function(item) {
+                const selector = '[data-content]:not([data-content=""])';
+                const content = $(item).find(selector).addBack(selector).attr('data-content');
+
+                if (_.isEmpty(content)) {
+                    return -1;
+                }
+
+                // Since `data-content` attribute can contain as full field name with index
+                // as plain index it needs to cover both cases
+                const matches = content.match(/\[(\d+)\]$/) || content.match(/^(\d+)$/);
+
+                return matches ? Number(matches[1]) : -1;
+            });
+
+            lastIndex = _.max(indexes);
+        }
+
+        let rowsHTML = '';
+        const prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
+        const prototypeHtml = $listContainer.attr('data-prototype');
+
+        for (let i = 1; i <= rowsCount; i++) {
+            rowsHTML += prototypeHtml.replace(new RegExp(prototypeName, 'g'), lastIndex + i);
+        }
+
+        return rowsHTML;
     };
-    var getOroCollectionNextItemHtml = function(collectionInfo) {
-        return collectionInfo.prototypeHtml
-            .replace(new RegExp(collectionInfo.prototypeName, 'g'), collectionInfo.nextIndex);
-    };
 
-    var validateContainer = function($container) {
-        var $validationField = $container.find('[data-name="collection-validation"]:first');
-        var $form = $validationField.closest('form');
+    const validateContainer = function($container) {
+        const $validationField = $container.find('[data-name="collection-validation"]:first');
+        const $form = $validationField.closest('form');
         if ($form.data('validator')) {
             $form.validate().element($validationField.get(0));
         }
     };
 
-    $(document).on('click', '.add-list-item', function(e) {
+    $(document).on('click add-rows', '.add-list-item', function(e) {
         e.preventDefault();
         if ($(this).attr('disabled')) {
             return;
         }
-        var containerSelector = $(this).data('container') || '.collection-fields-list';
-        var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var rowCountAdd = 1;
+        const containerSelector = $(this).data('container') || '.collection-fields-list';
+        const $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
+        let rowCountAdd = 1;
         if ($(this).data('row-add-only-one')) {
             $(this).removeData('row-add-only-one');
         } else {
-            rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+            rowCountAdd = e.count || $(containerSelector).data('row-count-add') || 1;
         }
 
-        var collectionInfo = getOroCollectionInfo($listContainer);
-        for (var i = 1; i <= rowCountAdd; i++) {
-            var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
-            collectionInfo.nextIndex++;
-            $listContainer.append(nextItemHtml)
-                .trigger('content:changed')
-                .data('last-index', collectionInfo.nextIndex);
-        }
+        const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
+
+        $listContainer.append(rowsHtml).trigger('content:changed');
+
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
-        validateContainer($listContainer);
+
+        if ($(this).data('validate-collection') !== false) {
+            validateContainer($listContainer);
+        }
     });
 
     // TODO: implement clone row
@@ -320,13 +313,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         if ($(this).attr('disabled')) {
             return;
         }
-        var $item = $(this).closest('.row-oro').parent();
-        var $listContainer = $item.parent();
-        var collectionInfo = getOroCollectionInfo($listContainer);
-        var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
+        const $item = $(this).closest('.row-oro').parent();
+        const $listContainer = $item.parent();
+        const nextItemHtml = generateOroCollectionRows($listContainer, 1);
+
         $item.after(nextItemHtml);
-        $listContainer.trigger('content:changed')
-            .data('last-index', collectionInfo.nextIndex + 1);
+        $listContainer.trigger('content:changed');
 
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
@@ -339,13 +331,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             return;
         }
 
-        var item;
-        var closest = '*[data-content]';
+        let closest = '*[data-content]';
         if ($(this).data('closest')) {
             closest = $(this).data('closest');
         }
 
-        item = $(this).closest(closest);
+        const item = $(this).closest(closest);
         item.trigger('content:remove')
             .remove();
     });
@@ -354,8 +345,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
      * Support for [data-focusable] attribute
      */
     $(document).on('click', 'label[for]', function(e) {
-        var forAttribute = $(e.target).attr('for');
-        var labelForElement = $('#' + forAttribute + ':first');
+        const forAttribute = $(e.target).attr('for');
+        const labelForElement = $('#' + forAttribute + ':first');
         if (labelForElement.is('[data-focusable]')) {
             e.preventDefault();
             labelForElement.trigger('set-focus');

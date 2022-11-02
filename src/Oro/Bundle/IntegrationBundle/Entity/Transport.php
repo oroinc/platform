@@ -27,7 +27,7 @@ abstract class Transport
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    
+
     /**
      * @var Channel
      *

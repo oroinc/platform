@@ -22,8 +22,6 @@ class SetOwnerForEmail implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws SchemaException
      */
     public static function addOwnerToOroEmail(Schema $schema)

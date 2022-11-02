@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ThemeBundle\Model;
 
+/**
+ * Stores theme information
+ */
 class Theme
 {
     /**
@@ -13,11 +16,6 @@ class Theme
      * @var string
      */
     protected $label;
-
-    /**
-     * @var array
-     */
-    protected $styles = array();
 
     /**
      * @var string
@@ -33,6 +31,11 @@ class Theme
      * @var string
      */
     protected $screenshot;
+
+    /**
+     * @var bool
+     */
+    protected $rtlSupport = false;
 
     /**
      * @param string $name
@@ -64,22 +67,6 @@ class Theme
     public function setLabel($label)
     {
         $this->label = $label;
-    }
-
-    /**
-     * @return array
-     */
-    public function getStyles()
-    {
-        return $this->styles;
-    }
-
-    /**
-     * @param array $styles
-     */
-    public function setStyles(array $styles)
-    {
-        $this->styles = $styles;
     }
 
     /**
@@ -128,5 +115,15 @@ class Theme
     public function setScreenshot($screenshot)
     {
         $this->screenshot = $screenshot;
+    }
+
+    public function isRtlSupport(): bool
+    {
+        return $this->rtlSupport;
+    }
+
+    public function setRtlSupport(bool $rtlSupport): void
+    {
+        $this->rtlSupport = $rtlSupport;
     }
 }

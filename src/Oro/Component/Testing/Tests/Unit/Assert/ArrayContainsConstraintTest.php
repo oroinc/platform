@@ -4,6 +4,10 @@ namespace Oro\Component\Testing\Tests\Unit\Assert;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ArrayContainsConstraintTest extends \PHPUnit\Framework\TestCase
 {
     public function testNullActualData()

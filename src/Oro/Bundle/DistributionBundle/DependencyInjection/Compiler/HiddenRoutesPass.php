@@ -2,39 +2,33 @@
 
 namespace Oro\Bundle\DistributionBundle\DependencyInjection\Compiler;
 
+use Oro\Component\Routing\Matcher\PhpMatcherDumper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 
+/**
+ * Replaces `router.default` service options with PhpMatcherDumper instead of CompiledUrlMatcherDumper
+ */
 class HiddenRoutesPass implements CompilerPassInterface
 {
-    const MATCHER_DUMPER_CLASS_PARAM    = 'router.options.matcher_dumper_class';
-    const EXPECTED_MATCHER_DUMPER_CLASS = 'Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper';
-    const NEW_MATCHER_DUMPER_CLASS      = 'Oro\Component\Routing\Matcher\PhpMatcherDumper';
-
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if ($container->hasParameter(self::MATCHER_DUMPER_CLASS_PARAM)) {
-            $newClass = $this->getNewRoutingMatcherDumperClass(
-                $container->getParameter(self::MATCHER_DUMPER_CLASS_PARAM)
-            );
-            if ($newClass) {
-                $container->setParameter(self::MATCHER_DUMPER_CLASS_PARAM, $newClass);
-            }
+        $definition = $container->getDefinition('router.default');
+        $options = $definition->getArgument(2);
+
+        $newClass = $this->getNewRoutingMatcherDumperClass($options['matcher_dumper_class'] ?? null);
+        if ($newClass) {
+            $options['matcher_dumper_class'] = $newClass;
+            $definition->setArgument(2, $options);
         }
     }
 
-    /**
-     * @param string $currentClass
-     *
-     * @return string|null
-     */
-    protected function getNewRoutingMatcherDumperClass($currentClass)
+    private function getNewRoutingMatcherDumperClass(?string $currentClass): ?string
     {
-        return self::EXPECTED_MATCHER_DUMPER_CLASS === $currentClass
-            ? self::NEW_MATCHER_DUMPER_CLASS
-            : null;
+        return CompiledUrlMatcherDumper::class === $currentClass ? PhpMatcherDumper::class : null;
     }
 }

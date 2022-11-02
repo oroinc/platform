@@ -8,13 +8,18 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
+/**
+ * This can be used to build various mailbox email listeners (e.g. auto-responders).
+ * @see AutoResponseListener
+ * @see MailboxProcessTriggerListener
+ */
 abstract class MailboxEmailListener
 {
     /** @var EmailBody[] */
     protected $emailBodies = [];
 
     /**
-     * @param OnFlushEventArgs $args
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onFlush(OnFlushEventArgs $args)
     {

@@ -4,6 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
 use Behat\Mink\Mink;
 
+/**
+ * Provides possibility to work with multiple sessions in one behat feature.
+ */
 class SessionAliasProvider implements MultiSessionAwareInterface
 {
     /**
@@ -59,7 +62,14 @@ class SessionAliasProvider implements MultiSessionAwareInterface
     public function switchSession(Mink $mink, $sessionName)
     {
         $mink->setDefaultSessionName($sessionName);
-        $mink->getSession($sessionName)->switchToWindow(0);
+
+        $session = $mink->getSession($sessionName);
+        // start session if needed
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        $session->switchToWindow(0);
     }
 
     /**

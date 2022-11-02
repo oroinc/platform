@@ -5,27 +5,23 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
+use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 
 class AcceptorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
-    protected $config;
+    private $config;
 
     /** @var Acceptor */
-    protected $acceptor;
+    private $acceptor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->config   = DatagridConfiguration::create([]);
+        $this->config = DatagridConfiguration::create([]);
         $this->acceptor = new Acceptor();
         $this->acceptor->setConfig($this->config);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->config);
-        unset($this->acceptor);
     }
 
     /**
@@ -33,11 +29,15 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
      */
     public function testExtension()
     {
-        $extMock1 = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extMock2 = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
+        $extMock1 = $this->createMock(ExtensionVisitorInterface::class);
+        $extMock2 = $this->createMock(ExtensionVisitorInterface::class);
 
-        $extMock1->expects($this->any())->method('getPriority')->will($this->returnValue(-100));
-        $extMock2->expects($this->any())->method('getPriority')->will($this->returnValue(250));
+        $extMock1->expects($this->any())
+            ->method('getPriority')
+            ->willReturn(-100);
+        $extMock2->expects($this->any())
+            ->method('getPriority')
+            ->willReturn(250);
 
         $this->acceptor
             ->addExtension($extMock1)
@@ -73,10 +73,12 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
      */
     public function testAcceptDatasource()
     {
-        $datasourceMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $datasourceMock = $this->createMock(DatasourceInterface::class);
 
-        $extMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extMock->expects($this->once())->method('visitDatasource')->with($this->config, $datasourceMock);
+        $extMock = $this->createMock(ExtensionVisitorInterface::class);
+        $extMock->expects($this->once())
+            ->method('visitDatasource')
+            ->with($this->config, $datasourceMock);
         $this->acceptor->addExtension($extMock);
 
         $this->acceptor->acceptDatasource($datasourceMock);
@@ -89,8 +91,10 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     {
         $result = ResultsObject::create([]);
 
-        $extMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extMock->expects($this->once())->method('visitResult')->with($this->config, $result);
+        $extMock = $this->createMock(ExtensionVisitorInterface::class);
+        $extMock->expects($this->once())
+            ->method('visitResult')
+            ->with($this->config, $result);
         $this->acceptor->addExtension($extMock);
 
         $this->acceptor->acceptResult($result);
@@ -103,8 +107,10 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     {
         $data = MetadataObject::create([]);
 
-        $extMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extMock->expects($this->once())->method('visitMetadata')->with($this->config, $data);
+        $extMock = $this->createMock(ExtensionVisitorInterface::class);
+        $extMock->expects($this->once())
+            ->method('visitMetadata')
+            ->with($this->config, $data);
         $this->acceptor->addExtension($extMock);
 
         $this->acceptor->acceptMetadata($data);

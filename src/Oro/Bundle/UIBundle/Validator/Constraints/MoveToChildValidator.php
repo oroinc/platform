@@ -4,18 +4,18 @@ namespace Oro\Bundle\UIBundle\Validator\Constraints;
 
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Validates that a node can be moved to another node.
+ */
 class MoveToChildValidator extends ConstraintValidator
 {
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -36,8 +36,8 @@ class MoveToChildValidator extends ConstraintValidator
         foreach ($collection->source as $source) {
             $item = $this->findChildRecursive($source, $collection->target->getKey());
             if ($item) {
-                $itemLabel = $this->translator->trans($source->getLabel());
-                $targetLabel = $this->translator->trans($collection->target->getLabel());
+                $itemLabel = $this->translator->trans((string) $source->getLabel());
+                $targetLabel = $this->translator->trans((string) $collection->target->getLabel());
                 $this->context->addViolation(sprintf(
                     'Can\'t move node "%s" to "%s". Node "%s" is a child of "%s" already.',
                     $itemLabel,

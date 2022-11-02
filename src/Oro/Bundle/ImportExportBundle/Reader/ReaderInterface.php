@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
+/**
+ * Batch jobs reader interface extended with StepExecutionAwareInterface.
+ */
 interface ReaderInterface extends ItemReaderInterface, StepExecutionAwareInterface
 {
 }

@@ -1,10 +1,11 @@
 <?php
+
 namespace Oro\Component\Testing\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\TransactionIsolationLevel;
 
 /**
  * Connection wrapper sharing the same db handle across multiple requests
@@ -32,14 +33,13 @@ class PersistentConnection extends Connection
         }
         if ($this->hasPersistentConnection()) {
             $this->_conn = $this->getPersistentConnection();
-            $this->setConnected(true);
         } else {
             parent::connect();
 
             $this->setPersistentConnection($this->_conn);
 
-            if ($this->getTransactionIsolation() !== Connection::TRANSACTION_READ_COMMITTED) {
-                $this->setTransactionIsolation(Connection::TRANSACTION_READ_COMMITTED);
+            if ($this->getTransactionIsolation() !== TransactionIsolationLevel::READ_COMMITTED) {
+                $this->setTransactionIsolation(TransactionIsolationLevel::READ_COMMITTED);
             }
 
             if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
@@ -83,7 +83,17 @@ class PersistentConnection extends Connection
      */
     public function rollBack()
     {
-        $this->wrapTransactionNestingLevel('rollBack');
+        try {
+            $this->wrapTransactionNestingLevel('rollBack');
+        } catch (\PDOException $exception) {
+            if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
+                // For MySql transactions with DDL are committed automatically and rollBack throws \PDOException,
+                // that is ignored to make DB isolation work the same for all supported DB platforms.
+                $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
+            } else {
+                throw $exception;
+            }
+        }
     }
 
     /**
@@ -92,6 +102,7 @@ class PersistentConnection extends Connection
     public function isTransactionActive()
     {
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
+
         return parent::isTransactionActive();
     }
 
@@ -102,7 +113,7 @@ class PersistentConnection extends Connection
     {
         static $rp = null;
         if (false == $rp) {
-            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', '_transactionNestingLevel');
+            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', 'transactionNestingLevel');
             $rp->setAccessible(true);
         }
 
@@ -117,22 +128,8 @@ class PersistentConnection extends Connection
     private function wrapTransactionNestingLevel($method)
     {
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
-        call_user_func(array('parent', $method));
+        parent::$method();
         $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
-    }
-
-    /**
-     * @param bool $connected
-     */
-    protected function setConnected($connected)
-    {
-        static $rp = null;
-        if (false == $rp) {
-            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', '_isConnected');
-            $rp->setAccessible(true);
-        }
-
-        $rp->setValue($this, $connected);
     }
 
     /**
@@ -143,6 +140,7 @@ class PersistentConnection extends Connection
         if (isset(static::$persistentTransactionNestingLevels[$this->getConnectionId()])) {
             return static::$persistentTransactionNestingLevels[$this->getConnectionId()];
         }
+
         return 0;
     }
 
@@ -154,9 +152,6 @@ class PersistentConnection extends Connection
         static::$persistentTransactionNestingLevels[$this->getConnectionId()] = $level;
     }
 
-    /**
-     * @param DriverConnection $connection
-     */
     protected function setPersistentConnection(DriverConnection $connection)
     {
         static::$persistentConnections[$this->getConnectionId()] = $connection;
@@ -178,9 +173,6 @@ class PersistentConnection extends Connection
         return static::$persistentConnections[$this->getConnectionId()];
     }
 
-    /**
-     * @return DriverConnection
-     */
     protected function unsetPersistentConnection()
     {
         unset(static::$persistentConnections[$this->getConnectionId()]);
@@ -192,6 +184,9 @@ class PersistentConnection extends Connection
      */
     protected function getConnectionId()
     {
-        return md5(serialize($this->getParams()));
+        $params = $this->getParams();
+        unset($params['wrapperClass']);
+
+        return $params['driverOptions']['ConnectionId'] ?? md5(serialize($params));
     }
 }

@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class EntityCreateSelectFormExtension extends AbstractExtension
 {
-    protected $registry;
+    private ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -20,10 +19,10 @@ class EntityCreateSelectFormExtension extends AbstractExtension
 
     protected function loadTypes()
     {
-        return array(
+        return [
             new TextType(),
             new TestEntityType(),
             new EntityIdentifierType($this->registry),
-        );
+        ];
     }
 }

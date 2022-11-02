@@ -11,9 +11,6 @@ class DiscriminatorValue
     /** @var string */
     private $value;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         $this->value = $data['value'];

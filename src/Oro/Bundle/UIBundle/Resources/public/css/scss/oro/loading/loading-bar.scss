@@ -13,7 +13,7 @@
     animation: $loading-bar-animation;
     overflow: $loading-bar-overflow;
 
-    &:before {
+    &::before {
         content: '';
         background: $loading-bar-point-background;
         width: $loading-bar-point-width;
@@ -23,17 +23,10 @@
         top: $loading-bar-point-top;
         animation: $loading-bar-point-animation;
     }
-}
 
-@-webkit-keyframes line-point {
-    0% {
-        left: 0;
-        transform: translateX(-100%);
-    }
-
-    100% {
-        left: 100%;
-        transform: translateX(0);
+    &__actual-progress {
+        position: $loading-bar-block-process-position;
+        animation: none;
     }
 }
 
@@ -46,40 +39,6 @@
     100% {
         left: 100%;
         transform: translateX(0);
-    }
-}
-
-@-webkit-keyframes line-loader {
-    0% {
-        width: 1%;
-    }
-
-    5% {
-        width: 5%;
-    }
-
-    10% {
-        width: 15%;
-    }
-
-    15% {
-        width: 25%;
-    }
-
-    25% {
-        width: 35%;
-    }
-
-    50% {
-        width: 50%;
-    }
-
-    80% {
-        width: 75%;
-    }
-
-    100% {
-        width: 85%;
     }
 }
 

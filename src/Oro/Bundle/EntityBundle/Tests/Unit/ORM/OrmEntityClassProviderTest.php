@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\ManagerBagInterface;
 use Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider;
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 
@@ -9,11 +12,9 @@ class OrmEntityClassProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetClassNames()
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $managerBag = $this->createMock('Oro\Bundle\EntityBundle\ORM\ManagerBagInterface');
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $em = $this->createMock(ObjectManager::class);
+        $managerBag = $this->createMock(ManagerBagInterface::class);
         $managerBag->expects($this->any())
             ->method('getManagers')
             ->willReturn([$em]);

@@ -1,0 +1,88 @@
+data:
+    type: users
+    id: new
+    attributes:
+        googleId: null
+        title: null
+        phone: null
+        username: test_user_2
+        email: test_user_2@example.com
+        namePrefix: null
+        firstName: 'Test First Name'
+        middleName: null
+        lastName: 'Test Last Name'
+        nameSuffix: null
+        birthday: null
+        enabled: false
+        lastLogin: null
+    relationships:
+        groups:
+            data: []
+        owner:
+            data:
+                type: businessunits
+                id: '<toString(@business_unit->id)>'
+        businessUnits:
+            data:
+                -
+                    type: businessunits
+                    id: new
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+included:
+    -
+        type: businessunits
+        id: new
+        meta:
+            includeId: BU2
+        attributes:
+            extend_description: null
+            name: 'Business Unit 2'
+            phone: null
+            website: null
+            email: null
+            fax: null
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            users:
+                data:
+                    -
+                        type: users
+                        id: new
+            owner:
+                data: null
+    -
+        type: users
+        id: new
+        meta:
+            includeId: nested_user
+        attributes:
+            googleId: null
+            title: null
+            phone: null
+            username: test_user_21
+            email: test_user_21@example.com
+            namePrefix: null
+            firstName: 'Test Second Name'
+            middleName: null
+            lastName: 'Test Last Name'
+            nameSuffix: null
+            birthday: null
+            enabled: false
+            lastLogin: null
+        relationships:
+            groups:
+                data: []
+            owner:
+                data:
+                    type: businessunits
+                    id: '<toString(@business_unit->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'

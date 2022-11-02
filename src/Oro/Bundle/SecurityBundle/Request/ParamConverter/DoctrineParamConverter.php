@@ -2,29 +2,52 @@
 
 namespace Oro\Bundle\SecurityBundle\Request\ParamConverter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Check access to entity
+ */
 class DoctrineParamConverter extends BaseParamConverter
 {
+    /** @var ManagerRegistry */
+    private $registry;
+
     /** @var RequestAuthorizationChecker */
     protected $requestAuthorizationChecker;
 
-    /**
-     * @param ManagerRegistry             $registry
-     * @param RequestAuthorizationChecker $requestAuthorizationChecker
-     */
+    /** @var array */
+    private $defaultOptions;
+
     public function __construct(
         ManagerRegistry $registry = null,
-        RequestAuthorizationChecker $requestAuthorizationChecker = null
+        ExpressionLanguage $expressionLanguage = null,
+        RequestAuthorizationChecker $requestAuthorizationChecker = null,
+        array $options = []
     ) {
-        parent::__construct($registry);
+        parent::__construct($registry, $expressionLanguage, $options);
 
+        $this->registry = $registry;
         $this->requestAuthorizationChecker = $requestAuthorizationChecker;
+
+        $defaultValues = [
+            'entity_manager' => null,
+            'exclude' => [],
+            'mapping' => [],
+            'strip_null' => false,
+            'expr' => null,
+            'id' => null,
+            'repository_method' => null,
+            'map_method_signature' => false,
+            'evict_cache' => false,
+        ];
+
+        $this->defaultOptions = array_merge($defaultValues, $options);
     }
 
     /**
@@ -79,7 +102,7 @@ class DoctrineParamConverter extends BaseParamConverter
             return false;
         }
 
-        $options = $this->getOptions($configuration);
+        $options = array_replace($this->defaultOptions, $configuration->getOptions());
         $emName = $options['entity_manager'];
         if (null === $emName) {
             return null !== $this->registry->getManagerForClass($className);

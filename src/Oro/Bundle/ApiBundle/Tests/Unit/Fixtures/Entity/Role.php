@@ -122,9 +122,6 @@ class Role
         return $this->users;
     }
 
-    /**
-     * @param User $user
-     */
     public function addUser(User $user)
     {
         if (!$this->users->contains($user)) {
@@ -132,9 +129,6 @@ class Role
         }
     }
 
-    /**
-     * @param User $user
-     */
     public function removeUser(User $user)
     {
         if ($this->users->contains($user)) {

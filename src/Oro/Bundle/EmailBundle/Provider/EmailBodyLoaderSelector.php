@@ -4,28 +4,29 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
+/**
+ * Provides a way to find an email body loader for an email origin.
+ */
 class EmailBodyLoaderSelector
 {
-    /**
-     * @var EmailBodyLoaderInterface[]
-     */
-    private $loaders = array();
+    /** @var iterable|EmailBodyLoaderInterface[] */
+    private $loaders;
 
     /**
-     * Adds implementation of EmailBodyLoaderInterface
-     *
-     * @param EmailBodyLoaderInterface $loader
+     * @param iterable|EmailBodyLoaderInterface[] $loaders
      */
-    public function addLoader(EmailBodyLoaderInterface $loader)
+    public function __construct(iterable $loaders)
     {
-        $this->loaders[] = $loader;
+        $this->loaders = $loaders;
     }
 
     /**
-     * Gets implementation of EmailBodyLoaderInterface for the given email origin
+     * Gets an email body loader for the given email origin.
      *
      * @param EmailOrigin $origin
+     *
      * @return EmailBodyLoaderInterface
+     *
      * @throws \RuntimeException
      */
     public function select(EmailOrigin $origin)

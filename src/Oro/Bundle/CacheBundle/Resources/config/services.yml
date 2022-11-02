@@ -1,49 +1,27 @@
 parameters:
-    oro_cache.oro_data_cache_manager.class:                    Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
+    oro_cache.array_cache_lifetime: 0
+    oro_cache.array_cache_store_serialized: false
+
+    oro_cache.data_adapter_namespace: ''
+    oro_cache.data_adapter_lifetime: 0
+    oro_cache.data_adapter_directory: '%kernel.cache_dir%/oro_data'
 
 services:
+    oro.cache.adapter.persistent:
+        public: false
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+        arguments:
+            - '%oro_cache.data_adapter_namespace%'
+            - '%oro_cache.data_adapter_lifetime%'
+            - '%oro_cache.data_adapter_directory%'
+
     oro_cache.oro_data_cache_manager:
-        class: '%oro_cache.oro_data_cache_manager.class%'
-
-    oro_cache.provider.validation:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'validation' ] ]
-
-    oro_cache.validation_cache.doctrine:
-        public: false
-        class: Symfony\Component\Validator\Mapping\Cache\DoctrineCache
-        arguments:
-            - '@oro_cache.provider.validation'
-
-    oro_cache.annotations:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_annotations_cache' ] ]
-
-    oro_cache.serializer:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_serializer_cache' ] ]
-
-    oro_cache.jms_serializer:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'jms_serializer_cache' ] ]
-
-    oro_cache.jms_serializer_adapter:
-        public: false
-        class: 'Metadata\Cache\DoctrineCacheAdapter'
-        arguments:
-            - 'jms_serializer_cache'
-            - '@oro_cache.jms_serializer'
+        class: Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
+        public: true
 
     oro_cache.action.handler.invalidate_scheduled:
         class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler'
+        public: true
         arguments:
             - '@oro_cron.deferred_scheduler'
             - '@oro_cache.action.handler.schedule_arguments_builder'
@@ -55,6 +33,7 @@ services:
 
     oro_cache.action.provider.invalidate_cache_time:
         class: 'Oro\Bundle\CacheBundle\Action\Provider\InvalidateCacheTimeProvider'
+        public: true
         arguments:
             - '@oro_cache.action.handler.schedule_arguments_builder'
             - '@oro_cron.schedule_manager'
@@ -64,11 +43,76 @@ services:
         public: false
         class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'
 
-    oro.cache.memory_cache_chain:
-        public: false
-        class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
+    oro.static_config_provider.abstract:
+        abstract: true
 
-    oro.cache.configuration_loader:
-        class: Oro\Bundle\CacheBundle\Loader\ConfigurationLoader
-        calls:
-            - [ setParameterBag, ['@=service("kernel").getContainer().getParameterBag()']]
+    oro.cache.generator.object_cache_key:
+        class: Oro\Bundle\CacheBundle\Generator\ObjectCacheKeyGenerator
+        arguments:
+            - '@oro.cache.generator.object_cache_data_serializer'
+
+    oro.cache.generator.object_cache_data_serializer:
+        class: Oro\Bundle\CacheBundle\Generator\ObjectCacheDataSerializer
+        arguments:
+            - '@oro.cache.serializer'
+
+    oro.cache.serializer:
+        class: Oro\Bundle\CacheBundle\Serializer\Serializer
+        arguments:
+            - !tagged_iterator oro_cache_generator_normalizer
+            -
+                json: '@serializer.encoder.json'
+
+    oro.cache.serializer.mapping.cache_warmer:
+        class: Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer
+        arguments:
+            - [] # Loaders injected by the OroCacheExtension
+            - '%kernel.cache_dir%/oro/cache_serializers.php'
+        tags:
+            - kernel.cache_warmer
+
+    oro.cache.serializer_pool:
+        parent: cache.system
+        tags:
+            - cache.pool
+
+    oro.cache.serializer.mapping.cache:
+        class: Psr\Cache\CacheItemPoolInterface
+        factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
+        arguments:
+            - '%kernel.cache_dir%/oro/cache_serializers.php'
+            - "@oro.cache.serializer_pool"
+
+    oro.cache.serializer.mapping.factory.cache_class_metadata:
+        decorates: oro.cache.serializer.mapping.factory.class_metadata
+        class: Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory
+        arguments:
+            - "@.inner"
+            - "@oro.cache.serializer.mapping.cache"
+
+    oro.cache.serializer.normalizer:
+        class: Oro\Bundle\CacheBundle\Serializer\Normalizer\GetSetMethodNormalizer
+        arguments:
+            - '@oro.cache.serializer.mapping.factory.class_metadata' # Loaded by OroCacheExtension
+        tags:
+            - { name: 'oro_cache_generator_normalizer' }
+
+    oro.cache.generator.universal_cache_key:
+        class: Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator
+        arguments:
+            - '@oro.cache.generator.object_cache_key'
+
+    oro.cache.adapter.array:
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
+        shared: false
+        arguments:
+            - '%oro_cache.array_cache_lifetime%' # $defaultLifetime
+            - '%oro_cache.array_cache_store_serialized%' # $storeSerialized
+
+    oro.cache.provider.memory_cache:
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCacheProvider
+        abstract: true
+        arguments:
+            - '@oro.cache.generator.universal_cache_key'
+            - '@oro.cache.adapter.array'
+

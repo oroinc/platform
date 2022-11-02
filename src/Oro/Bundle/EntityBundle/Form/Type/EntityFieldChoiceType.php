@@ -8,8 +8,11 @@ use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for entity field choice.
+ */
 class EntityFieldChoiceType extends AbstractType
 {
     const NAME = 'oro_entity_field_choice';
@@ -26,11 +29,6 @@ class EntityFieldChoiceType extends AbstractType
     /** @var array */
     protected $itemsCache;
 
-    /**
-     * @param EntityProvider      $entityProvider
-     * @param EntityFieldProvider $entityFieldProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityProvider $entityProvider,
         EntityFieldProvider $entityFieldProvider,
@@ -48,8 +46,8 @@ class EntityFieldChoiceType extends AbstractType
     {
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
-            'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
-            'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
+            'result_template_twig'    => '@OroEntity/Choice/entity_field/result.html.twig',
+            'selection_template_twig' => '@OroEntity/Choice/entity_field/selection.html.twig',
             'component'               => 'entity-field-choice'
         ];
 
@@ -143,12 +141,12 @@ class EntityFieldChoiceType extends AbstractType
         if (null === $this->itemsCache) {
             $this->itemsCache = [];
 
-            $fields = $this->entityFieldProvider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                true
-            );
+            $options = EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+                | EntityFieldProvider::OPTION_TRANSLATE
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS;
+            $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+            $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+            $fields = $this->entityFieldProvider->getEntityFields($entityName, $options);
             foreach ($fields as $field) {
                 $fieldName = $field['name'];
                 unset($field['name']);

@@ -2,121 +2,102 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider\Filter;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider;
 
 class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
+
     /** @var ChoiceTreeUserProvider */
-    protected $choiceTreeUserProvider;
+    private $choiceTreeUserProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
 
         $this->choiceTreeUserProvider = new ChoiceTreeUserProvider(
-            $this->registry,
+            $this->doctrine,
             $this->aclHelper,
-            $dqlNameFormatter
+            $this->createMock(DQLNameFormatter::class)
         );
     }
 
     public function testGetList()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(['getArrayResult'])
+        $query = $this->createMock(AbstractQuery::class);
+        $qb = $this->getMockBuilder(QueryBuilder::class)
+            ->onlyMethods(['getQuery'])
             ->disableOriginalConstructor()
             ->getMock();
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(UserRepository::class);
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
-
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $manager->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
 
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->willReturn($manager);
-
-        $qb->expects($this->any())
+        $query->expects($this->any())
             ->method('getArrayResult')
             ->willReturn($this->getExpectedData());
         $this->aclHelper->expects($this->any())
             ->method('apply')
-            ->willReturn($qb);
+            ->willReturn($query);
 
         $result = $this->choiceTreeUserProvider->getList();
-        $this->assertEquals($this->getExpectedData(), $result);
+        $this->assertSame($this->getExpectedData(), $result);
     }
 
     public function testGetEmptyList()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(['getArrayResult'])
+        $query = $this->createMock(AbstractQuery::class);
+        $qb = $this->getMockBuilder(QueryBuilder::class)
+            ->onlyMethods(['getQuery'])
             ->disableOriginalConstructor()
             ->getMock();
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(UserRepository::class);
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
-
-        $manager->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->willReturn($manager);
 
-        $qb->expects($this->any())
+        $query->expects($this->any())
             ->method('getArrayResult')
             ->willReturn([]);
         $this->aclHelper->expects($this->any())
             ->method('apply')
-            ->willReturn($qb);
+            ->willReturn($query);
 
         $result = $this->choiceTreeUserProvider->getList();
         $this->assertEquals([], $result);
     }
 
-    protected function getExpectedData()
+    private function getExpectedData(): array
     {
         return [
-            [
-                'name' => 'user 1',
-                'id' => 1,
-            ],
-            [
-                'name' => 'user 2',
-                'id' => '2',
-            ]
+            ['id' => 1, 'name' => 'user 1'],
+            ['id' => '2', 'name' => 'user 2']
         ];
     }
 }

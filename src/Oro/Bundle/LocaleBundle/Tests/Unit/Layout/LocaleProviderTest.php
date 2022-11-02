@@ -10,19 +10,14 @@ use Oro\Bundle\LocaleBundle\Layout\LocaleProvider;
 class LocaleProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var LocaleProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->provider = new LocaleProvider($this->localizationHelper);
     }

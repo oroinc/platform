@@ -2,42 +2,46 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Provider;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 use Oro\Bundle\AddressBundle\Provider\CountryProvider;
 
 class CountryProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CountryRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var CountryProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->repository = $this->createMock(CountryRepository::class);
-        $this->provider = new CountryProvider($this->repository);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
+        $this->provider = new CountryProvider($this->doctrine);
     }
 
-    public function testGetCountriesNames()
+    public function testGetCountryChoices()
     {
-        $this->repository->expects($this->once())
+        $countryRepository = $this->createMock(CountryRepository::class);
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(Country::class)
+            ->willReturn($countryRepository);
+        $countryRepository->expects(self::once())
             ->method('getCountries')
             ->willReturn([
                 (new Country('iso2Code1'))->setName('name1'),
                 (new Country('iso2Code2'))->setName('name2'),
             ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name1' => 'iso2Code1',
                 'name2' => 'iso2Code2',
             ],
-            $this->provider->getCountriesNames()
+            $this->provider->getCountryChoices()
         );
     }
 }

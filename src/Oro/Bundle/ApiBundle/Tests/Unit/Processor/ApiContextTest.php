@@ -10,7 +10,7 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
     /** @var ApiContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new ApiContextStub();
     }

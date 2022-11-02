@@ -2,91 +2,67 @@
 
 namespace Oro\Bundle\UIBundle\Formatter;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\UIBundle\Exception\InvalidFormatterException;
+use Psr\Container\ContainerInterface;
 
+/**
+ * The manager that delegates formatting of a value to child formatters
+ * and allows to guess formatters by data type.
+ */
 class FormatterManager
 {
-    /**
-     * @var array|FormatterInterface[]
-     *   - key: formatter name
-     *   - value: FormatterInterface formatter service
-     */
-    protected $formatters;
+    /** @var ContainerInterface */
+    private $formatters;
+
+    /** @var array [data type => formatter name, ...] */
+    private $typesMap;
 
     /**
-     * @param string             $formatterName
-     * @param FormatterInterface $formatterProvider
+     * @param ContainerInterface $formatters
+     * @param array              $typesMap [data type => formatter name, ...]
      */
-    public function addFormatter($formatterName, FormatterInterface $formatterProvider)
+    public function __construct(ContainerInterface $formatters, array $typesMap)
     {
-        $this->formatters[$formatterName] = $formatterProvider;
+        $this->formatters = $formatters;
+        $this->typesMap = $typesMap;
     }
 
     /**
-     * Apply formatter to the parameter
+     * Applies the given formatter to the given parameter.
      *
      * @param mixed  $parameter
      * @param string $formatterName
      * @param array  $formatterArguments
      *
      * @return mixed
-     * @throws InvalidFormatterException
+     *
+     * @throws InvalidFormatterException if the requested formatter does not exist
      */
-    public function format($parameter, $formatterName, array $formatterArguments = [])
+    public function format($parameter, string $formatterName, array $formatterArguments = [])
     {
-        if (!array_key_exists($formatterName, $this->formatters)) {
-            throw new InvalidFormatterException(
-                sprintf(
-                    'Formatter %s not found',
-                    $formatterName
-                )
-            );
+        if (!$this->formatters->has($formatterName)) {
+            throw new InvalidFormatterException(sprintf('The formatter "%s" does not exist.', $formatterName));
         }
-        $formatter = $this->formatters[$formatterName];
 
-        if (null !== $parameter) {
-            return $formatter->format($parameter, $formatterArguments);
-        } else {
+        /** @var FormatterInterface $formatter */
+        $formatter = $this->formatters->get($formatterName);
+
+        if (null === $parameter) {
             return $formatter->getDefaultValue();
         }
+
+        return $formatter->format($parameter, $formatterArguments);
     }
 
     /**
-     * Guess formatters for given fieldConfigId
-     * Returns array with data:
-     *   - formatters: array with supported formatters for given field
-     *   - default_formatter: default formatter for given field
+     * Guesses formatter for given data type.
      *
-     * @param FieldConfigId $configId
+     * @param string $type The data type
      *
-     * @return array|null
+     * @return string|null The formatter name or NULL if there is no suitable formatter
      */
-    public function guessFormatters(FieldConfigId $configId)
+    public function guessFormatter(string $type): ?string
     {
-        $fieldType        = $configId->getFieldType();
-        $formatters       = [];
-        $defaultFormatter = null;
-        $found            = false;
-
-        foreach ($this->formatters as $formatterName => $formatter) {
-            $isSupport = in_array($fieldType, $formatter->getSupportedTypes());
-            if ($isSupport) {
-                $found        = true;
-                $formatters[] = $formatterName;
-                if ($formatter->isDefaultFormatter()) {
-                    $defaultFormatter = $formatterName;
-                }
-            }
-        }
-
-        if ($found) {
-            return [
-                'formatters'        => $formatters,
-                'default_formatter' => $defaultFormatter
-            ];
-        }
-
-        return null;
+        return $this->typesMap[$type] ?? null;
     }
 }

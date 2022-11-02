@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var LocalizationSelectView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
 
-    LocalizationSelectView = BaseView.extend({
+    const LocalizationSelectView = BaseView.extend({
         /**
          * @property {Object}
          */
         options: {
-            selectSelector: 'select'
+            selectSelector: 'select',
+            useParentSelector: 'input[type="checkbox"]'
         },
 
         /**
@@ -21,40 +21,50 @@ define(function(require) {
         $select: null,
 
         /**
-         * @inheritDoc
+         * @property {jQuery.Element}
          */
-        constructor: function LocalizationSelectView() {
-            LocalizationSelectView.__super__.constructor.apply(this, arguments);
+        $useParent: null,
+
+        /**
+         * @inheritdoc
+         */
+        constructor: function LocalizationSelectView(options) {
+            LocalizationSelectView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.extend({}, this.options, options);
 
             this.$select = this.$el.find(this.options.selectSelector);
+            this.$useParent = this.$el.find(this.options.useParentSelector);
+            this.$useParent.on('change' + this.eventNamespace(), this.onUseParentChange.bind(this));
 
             mediator.on('enabled_localizations:changed', this.onEnabledLocalizationsChanged, this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function(options) {
             if (this.disposed) {
                 return;
             }
 
+            this.$useParent.off('change' + this.eventNamespace());
             mediator.off(null, null, this);
+
+            LocalizationSelectView.__super__.dispose.call(this);
         },
 
         /**
          * @param {Object} data
          */
         onEnabledLocalizationsChanged: function(data) {
-            var select = this.$select;
-            var selected = select.val();
+            const select = this.$select;
+            const selected = select.val();
 
             select.find('option[value!=""]').remove().val('').change();
 
@@ -71,6 +81,10 @@ define(function(require) {
             }
 
             select.change();
+        },
+
+        onUseParentChange: function() {
+            mediator.trigger('default_localization:use_parent_scope', this.$useParent.is(':checked'));
         }
     });
 

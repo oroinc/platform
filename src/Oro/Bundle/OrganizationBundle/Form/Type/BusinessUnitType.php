@@ -25,10 +25,6 @@ class BusinessUnitType extends AbstractType
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param BusinessUnitManager    $businessUnitManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         BusinessUnitManager $businessUnitManager,
         TokenAccessorInterface $tokenAccessor
@@ -62,7 +58,6 @@ class BusinessUnitType extends AbstractType
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'tree-autocomplete',
-                        'width'       => '400px',
                         'placeholder' => 'oro.dashboard.form.choose_business_unit',
                         'allowClear'  => true
                     ]
@@ -127,8 +122,6 @@ class BusinessUnitType extends AbstractType
      * Change the autocomplete handler to "parent-business-units" for parentBusinessUnit field in case of
      * edit Business Unit page. The "parent-business-units" handler returns a list of Business units excluding
      * the given Business unit and its children.
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
@@ -148,7 +141,6 @@ class BusinessUnitType extends AbstractType
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'parent-business-units-autocomplete',
-                        'width'       => '400px',
                         'placeholder' => 'oro.dashboard.form.choose_business_unit',
                         'allowClear'  => true,
                         'entity_id' => $entity->getId()

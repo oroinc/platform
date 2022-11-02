@@ -2,86 +2,43 @@
 
 namespace Oro\Bundle\SoapBundle\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
-use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * A class encapsulates a business logic responsible to delete entity
+ * The handler that is used by the old REST API to delete entities.
  */
-class DeleteHandler implements DeleteHandlerInterface
+class DeleteHandler
 {
-    /**
-     * @var OwnerDeletionManager
-     */
-    protected $ownerDeletionManager;
+    /** @var EntityDeleteHandlerRegistry */
+    private $deleteHandlerRegistry;
 
-    /**
-     * Sets an owner deletion manager
-     *
-     * @param OwnerDeletionManager $ownerDeletionManager
-     */
-    public function setOwnerDeletionManager(OwnerDeletionManager $ownerDeletionManager)
+    public function __construct(EntityDeleteHandlerRegistry $deleteHandlerRegistry)
     {
-        $this->ownerDeletionManager = $ownerDeletionManager;
+        $this->deleteHandlerRegistry = $deleteHandlerRegistry;
     }
 
     /**
-     * Handle delete entity object.
+     * Deletes an entity with the given ID.
      *
      * @param mixed            $id
      * @param ApiEntityManager $manager
+     * @param array            $options
+     *
      * @throws EntityNotFoundException if an entity with the given id does not exist
-     * @throws ForbiddenException if a delete operation is forbidden
+     * @throws AccessDeniedException if the delete operation is forbidden
      */
-    public function handleDelete($id, ApiEntityManager $manager)
+    public function handleDelete($id, ApiEntityManager $manager, array $options = []): void
     {
         $entity = $manager->find($id);
         if (!$entity) {
             throw new EntityNotFoundException();
         }
 
-        $em = $manager->getObjectManager();
-        $this->processDelete($entity, $em);
-    }
-
-    /**
-     * Deletes given entity object.
-     *
-     * @param object        $entity
-     * @param ObjectManager $em
-     */
-    public function processDelete($entity, ObjectManager $em)
-    {
-        $this->checkPermissions($entity, $em);
-        $this->deleteEntity($entity, $em);
-        $em->flush();
-    }
-
-    /**
-     * Checks if a delete operation is allowed
-     *
-     * @param object        $entity
-     * @param ObjectManager $em
-     * @throws ForbiddenException if a delete operation is forbidden
-     */
-    protected function checkPermissions($entity, ObjectManager $em)
-    {
-        if ($this->ownerDeletionManager->isOwner($entity) && $this->ownerDeletionManager->hasAssignments($entity)) {
-            throw new ForbiddenException('has assignments');
-        }
-    }
-
-    /**
-     * Deletes the given entity
-     *
-     * @param object        $entity
-     * @param ObjectManager $em
-     */
-    protected function deleteEntity($entity, ObjectManager $em)
-    {
-        $em->remove($entity);
+        $this->deleteHandlerRegistry
+            ->getHandler($manager->getClass())
+            ->delete($entity, true, $options);
     }
 }

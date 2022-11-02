@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,10 +12,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Displays available initiated references.
+ */
 class AvailableReferencesController implements Controller
 {
     /**
-     * @var OroAliceLoader
+     * @var AliceFixtureLoader
      */
     protected $aliceLoader;
 
@@ -29,13 +32,8 @@ class AvailableReferencesController implements Controller
      */
     protected $kernel;
 
-    /**
-     * @param OroAliceLoader $aliceLoader
-     * @param DoctrineIsolator $doctrineIsolator
-     * @param KernelInterface $kernel
-     */
     public function __construct(
-        OroAliceLoader $aliceLoader,
+        AliceFixtureLoader $aliceLoader,
         DoctrineIsolator $doctrineIsolator,
         KernelInterface $kernel
     ) {
@@ -74,7 +72,7 @@ class AvailableReferencesController implements Controller
         $table = new Table($output);
         $table->setHeaders(['ID', 'Object class']);
 
-        foreach ($this->aliceLoader->getReferences() as $key => $object) {
+        foreach ($this->aliceLoader->getReferenceRepository()->toArray() as $key => $object) {
             $table->addRow(['@'.$key, get_class($object)]);
         }
 

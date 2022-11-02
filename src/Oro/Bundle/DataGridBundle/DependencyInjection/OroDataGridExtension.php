@@ -14,8 +14,7 @@ class OroDataGridExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('block_types.yml');
@@ -28,9 +27,12 @@ class OroDataGridExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('layouts.yml');
         $loader->load('datagrid_state.yml');
+        $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.yml');
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
         }
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));

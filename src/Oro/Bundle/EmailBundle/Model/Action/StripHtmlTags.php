@@ -29,10 +29,6 @@ class StripHtmlTags extends AbstractAction
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param HtmlTagHelper   $htmlTagHelper
-     */
     public function __construct(ContextAccessor $contextAccessor, HtmlTagHelper $htmlTagHelper)
     {
         parent::__construct($contextAccessor);

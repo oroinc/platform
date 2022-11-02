@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\AccessRule;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
@@ -11,7 +9,6 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 
 /**
@@ -32,10 +29,6 @@ class ActivityListAccessRule implements AccessRuleInterface
     /** @var ActivityListChainProvider */
     private $activityListProvider;
 
-    /**
-     * @param AclConditionDataBuilderInterface $builder
-     * @param ActivityListChainProvider $activityListProvider
-     */
     public function __construct(
         AclConditionDataBuilderInterface $builder,
         ActivityListChainProvider $activityListProvider
@@ -49,11 +42,8 @@ class ActivityListAccessRule implements AccessRuleInterface
      */
     public function isApplicable(Criteria $criteria): bool
     {
-        return
-            $criteria->getType() === AccessRuleWalker::ORM_RULES_TYPE
-            && $criteria->getEntityClass() === ActivityList::class
-            // This check should be deleted in BAP-17679
-            && $criteria->hasOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
+        // This check should be deleted in BAP-17679
+        return $criteria->hasOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
     }
 
     /**
@@ -71,12 +61,10 @@ class ActivityListAccessRule implements AccessRuleInterface
         $activityOwnerAlias = $criteria->getOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
         $expressions = [];
 
-        $providers = $this->activityListProvider->getProviders();
-        /** @var ActivityListProviderInterface $provider */
-        foreach ($providers as $provider) {
+        $activityClasses = $this->activityListProvider->getSupportedActivities();
+        foreach ($activityClasses as $activityClass) {
             $providerExpressions = [];
-            $activityClass = $provider->getActivityClass();
-            $aclClass = $provider->getAclClass();
+            $aclClass = $this->activityListProvider->getSupportedOwnerActivity($activityClass);
             $conditionData = $this->builder->getAclConditionData($aclClass, $criteria->getPermission());
 
             if (!empty($conditionData)) {

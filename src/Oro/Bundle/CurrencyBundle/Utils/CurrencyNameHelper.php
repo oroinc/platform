@@ -7,36 +7,35 @@ use Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 
+/**
+ * Contains handy methods for working with currencies.
+ */
 class CurrencyNameHelper
 {
-    /** @var ViewTypeProviderInterface  */
-    protected $viewTypeProvider;
-
-    /** @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface  */
-    protected $intlCurrencyBundle;
+    /** @var $localeSettings */
+    protected $localeSettings;
 
     /** @var NumberFormatter */
     protected $formatter;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param NumberFormatter $formatter
-     * @param ViewTypeProviderInterface $viewTypeProvider
-     * @param CurrencyListProviderInterface $currencyListProvider
-     */
+    /** @var ViewTypeProviderInterface */
+    protected $viewTypeProvider;
+
+    /** @var CurrencyListProviderInterface */
+    protected $currencyProvider;
+
     public function __construct(
         LocaleSettings $localeSettings,
         NumberFormatter $formatter,
         ViewTypeProviderInterface $viewTypeProvider,
         CurrencyListProviderInterface $currencyListProvider
     ) {
-        $this->viewTypeProvider = $viewTypeProvider;
         $this->localeSettings = $localeSettings;
         $this->formatter = $formatter;
+        $this->viewTypeProvider = $viewTypeProvider;
         $this->currencyProvider = $currencyListProvider;
-        $this->intlCurrencyBundle = Intl::getCurrencyBundle();
     }
 
     /**
@@ -73,21 +72,18 @@ class CurrencyNameHelper
 
         switch ($nameViewStyle) {
             case ViewTypeProviderInterface::VIEW_TYPE_SYMBOL:
-                $currencyName = $this->intlCurrencyBundle->getCurrencySymbol($currencyIsoCode, $locale);
-                if ($currencyName === $currencyIsoCode) {
-                    $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode);
-                }
+                $currencyName = $this->localeSettings->getCurrencySymbolByCurrency($currencyIsoCode, $locale);
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME:
-                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
+                $currencyName = Currencies::getName($currencyIsoCode, $locale);
                 $currencyName = sprintf(
-                    "%s (%s)",
+                    '%s (%s)',
                     $currencyName,
                     $this->getCurrencyName($currencyIsoCode, $this->viewTypeProvider->getViewType())
                 );
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_NAME:
-                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
+                $currencyName = Currencies::getName($currencyIsoCode, $locale);
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE:
             default:
@@ -105,7 +101,7 @@ class CurrencyNameHelper
      */
     public function getCurrencyFilteredList()
     {
-        $collection = $this->intlCurrencyBundle->getCurrencyNames();
+        $collection = Currencies::getNames();
 
         return array_filter($collection, function ($value) {
             return (false === stripos($value, '('));

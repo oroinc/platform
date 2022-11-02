@@ -1,0 +1,16 @@
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+{% set pageTitle = 'oro.digitalasset.entity_plural_label'|trans %}
+{% set gridName = 'digital-asset-grid' %}
+
+{% block navButtons %}
+    {% if is_granted('oro_digital_asset_create') %}
+        <div class="btn-group">
+            {{ UI.addButton({
+                'path': path('oro_digital_asset_create'),
+                'entity_label': 'oro.digitalasset.entity_label'|trans
+            }) }}
+        </div>
+    {% endif %}
+{% endblock %}

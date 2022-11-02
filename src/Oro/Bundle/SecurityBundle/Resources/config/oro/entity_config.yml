@@ -1,5 +1,6 @@
 entity_config:
     security:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#security
         entity:
             items:
                 type:
@@ -7,18 +8,14 @@ entity_config:
                         auditable: false
                 permissions: ~
                 group_name: ~
-                field_acl_supported:
-                    options:
-                        default_value: false
                 field_acl_enabled:
                     options:
-                        default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
@@ -28,13 +25,12 @@ entity_config:
                             tooltip:        oro.security.field_acl.is_enabled.tooltip
                 show_restricted_fields:
                     options:
-                        default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
@@ -42,6 +38,7 @@ entity_config:
                             required:       false
                             label:          oro.security.field_acl.show_restricted_fields.label
                             tooltip:        oro.security.field_acl.show_restricted_fields.tooltip
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#security
         field:
             items:
                 permissions: ~

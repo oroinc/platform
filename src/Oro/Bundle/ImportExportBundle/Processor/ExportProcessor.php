@@ -9,58 +9,53 @@ use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
-use Symfony\Component\Serializer\SerializerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 
+/**
+ * Basic export processor.
+ */
 class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
+    protected ?ContextInterface $context = null;
+
+    protected ?SerializerInterface $serializer = null;
 
     /**
-     * @var SerializerInterface
+     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|QueryBuilderAwareInterface|null
      */
-    protected $serializer;
+    protected ?DataConverterInterface $dataConverter = null;
 
-    /**
-     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|QueryBuilderAwareInterface
-     */
-    protected $dataConverter;
-
-    /**
-     * @var string
-     */
-    protected $entityName;
+    protected string $entityName = '';
 
     /**
      * Processes entity to export format
      *
-     * @param mixed $object
-     * @return array
+     * {@inheritdoc}
+     *
      * @throws RuntimeException
      */
-    public function process($object)
+    public function process($item)
     {
-        if (! $this->serializer) {
+        if (!$this->serializer) {
             throw new RuntimeException('Serializer must be injected.');
         }
-        $data = $this->serializer->serialize(
-            $object,
-            null,
-            $this->context->getConfiguration()
-        );
+
+        $format = '';
+        $context = $this->context->getConfiguration();
+
+        $data = $this->serializer->normalize($item, $format, $context);
+
         if ($this->dataConverter) {
             $data = $this->dataConverter->convertToExportFormat($data);
         }
+
         return $data;
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setImportExportContext(ContextInterface $context): void
     {
         $this->context = $context;
 
@@ -83,18 +78,12 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         }
     }
 
-    /**
-     * @param SerializerInterface $serializer
-     */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
 
-    /**
-     * @param DataConverterInterface $dataConverter
-     */
-    public function setDataConverter(DataConverterInterface $dataConverter)
+    public function setDataConverter(DataConverterInterface $dataConverter): void
     {
         $this->dataConverter = $dataConverter;
     }
@@ -102,7 +91,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
     /**
      * {@inheritdoc}
      */
-    public function setEntityName($entityName)
+    public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
 

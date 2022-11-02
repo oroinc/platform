@@ -3,9 +3,9 @@ oro_behat_extension:
     OroDataAuditBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroSecurityBundle::ACLContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
       paths:
         - '@OroDataAuditBundle/Tests/Behat/Features'
 
@@ -16,11 +16,15 @@ oro_behat_extension:
       options:
         mapping:
           RoleForTest Role:
-            locator: '//label[contains(.,"RoleForTest")]/../span/input'
+            locator: '//label[contains(.,"RoleForTest")]/../input[@type="checkbox"]'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
+          Birthday:
+            locator: 'input[id^="oro_user_user_form_birthday-uid"]'
+            type: css
+            element: DateTimePicker
 
     Audit History Grid:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid

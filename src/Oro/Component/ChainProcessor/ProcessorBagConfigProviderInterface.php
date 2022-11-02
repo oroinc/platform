@@ -9,17 +9,28 @@ namespace Oro\Component\ChainProcessor;
 interface ProcessorBagConfigProviderInterface
 {
     /**
-     * Gets groups registered for all actions and have at least one processor.
-     * The returned groups are sorted by its priority.
+     * Gets names of all actions that have at least one processor.
      *
-     * @return array [action => [group, ...], ...]
+     * @return string[]
      */
-    public function getGroups();
+    public function getActions(): array;
 
     /**
-     * Gets processors registered for all actions in the order they should be executed.
+     * Gets groups registered for the given action and have at least one processor.
+     * The returned groups are sorted by its priority.
      *
-     * @return array [action => [[processor id, [attribute name => attribute value, ...]], ...], ...]
+     * @param string $action
+     *
+     * @return string[]
      */
-    public function getProcessors();
+    public function getGroups(string $action): array;
+
+    /**
+     * Gets processors registered for the given action in the order they should be executed.
+     *
+     * @param string $action
+     *
+     * @return array [[processor id, [attribute name => attribute value, ...]], ...]
+     */
+    public function getProcessors(string $action): array;
 }

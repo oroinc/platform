@@ -4,32 +4,32 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileListener  */
-    protected $listener;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
-    protected $fileManager;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
-    protected $tokenAccessor;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
-    protected $em;
+    /** @var FileListener */
+    private $listener;
 
-    /**
-     * @var File
-     */
-    protected $attachment;
-
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -38,236 +38,182 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new FileListener($this->fileManager, $this->tokenAccessor);
     }
 
-    public function testPrePersistWithoutFileObject()
-    {
-        $entity = new File();
-
-        $this->fileManager->expects($this->once())
-            ->method('preUpload')
-            ->with($entity);
-
-        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
-    }
-
-    public function testPrePersistWithFileObject()
-    {
-        $entity = new File();
-        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
-        $entity->setFile($file);
-        $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fileManager->expects($this->once())
-            ->method('preUpload')
-            ->with($entity);
-        $this->tokenAccessor->expects($this->once())
-            ->method('getUser')
-            ->willReturn($loggedUser);
-
-        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertSame($loggedUser, $entity->getOwner());
-    }
-
-    public function testPreUpdateWithoutFileObject()
-    {
-        $entity = new File();
-
-        $this->fileManager->expects($this->once())
-            ->method('preUpload')
-            ->with($entity);
-
-        $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
-    }
-
-    public function testPreUpdateWithFileObject()
-    {
-        $entity = new File();
-        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
-        $entity->setFile($file);
-        $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fileManager->expects($this->once())
-            ->method('preUpload')
-            ->with($entity);
-        $this->tokenAccessor->expects($this->once())
-            ->method('getUser')
-            ->willReturn($loggedUser);
-
-        $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertSame($loggedUser, $entity->getOwner());
-    }
-
-    public function testPostPersistWhenFileObjectIsRemoved()
+    public function testPrePersistWhenManagedAndIsEmptyFile(): void
     {
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
+            ->method('contains')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->em->expects(self::once())
             ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
+            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $this->fileManager->expects($this->once())
-            ->method('upload')
-            ->with($entity);
-        $this->em->expects($this->once())
-            ->method('remove')
-            ->with($entity);
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
+        $unitOfWork->expects(self::once())
+            ->method('clearEntityChangeSet')
+            ->with(spl_object_hash($entity));
 
-        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->em->expects(self::once())
+            ->method('refresh')
+            ->with($entity);
+
+        $this->fileManager->expects(self::never())
+            ->method('preUpload');
+
+        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
+        self::assertNull($entity->getOwner());
     }
 
-    public function testPostPersistWithoutFileObject()
+    public function testPrePersistWithoutFileObject(): void
     {
         $entity = new File();
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
-        $this->fileManager->expects($this->once())
-            ->method('upload')
+        $this->fileManager->expects(self::once())
+            ->method('preUpload')
             ->with($entity);
-        $this->em->expects($this->never())
-            ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
-        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUser');
+
+        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
+        self::assertNull($entity->getOwner());
     }
 
-    public function testPostPersistWithFileObject()
+    public function testPrePersistWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
+        $loggedUser = $this->createMock(User::class);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test1.txt', 'test2.txt']]);
-
-        $this->fileManager->expects($this->once())
-            ->method('upload')
+        $this->fileManager->expects(self::once())
+            ->method('preUpload')
             ->with($entity);
-        $this->em->expects($this->never())
-            ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test1.txt');
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($loggedUser);
 
-        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
+        self::assertSame($loggedUser, $entity->getOwner());
     }
 
-    public function testPostUpdateWhenFileObjectIsRemoved()
+    public function testPreUpdateWithoutFileObject(): void
+    {
+        $entity = new File();
+
+        $this->fileManager->expects(self::once())
+            ->method('preUpload')
+            ->with($entity);
+
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUser');
+
+        $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+        self::assertNull($entity->getOwner());
+    }
+
+    public function testPreUpdateWithFileObject(): void
+    {
+        $entity = new File();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $entity->setFile($file);
+        $loggedUser = $this->createMock(User::class);
+
+        $this->fileManager->expects(self::once())
+            ->method('preUpload')
+            ->with($entity);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($loggedUser);
+
+        $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+        self::assertSame($loggedUser, $entity->getOwner());
+    }
+
+    public function testPostPersistWhenFileObjectIsRemoved(): void
     {
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
-        $this->fileManager->expects($this->once())
-            ->method('upload')
-            ->with($entity);
-        $this->em->expects($this->once())
+        $this->fileManager->expects(self::never())
+            ->method('upload');
+        $this->em->expects(self::once())
             ->method('remove')
             ->with($entity);
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
-        $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostUpdateWithoutFileObject()
+    public function testPostPersistWithoutFileObject(): void
     {
         $entity = new File();
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test.txt', null]]);
-
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test.txt');
 
-        $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostUpdateWithFileObject()
+    public function testPostPersistWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $uow->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['filename' => ['test1.txt', 'test2.txt']]);
-
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
-        $this->fileManager->expects($this->once())
-            ->method('deleteFile')
-            ->with('test1.txt');
+
+        $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
+    }
+
+    public function testPostUpdateWhenFileObjectIsRemoved(): void
+    {
+        $entity = new File();
+        $entity->setEmptyFile(true);
+
+        $this->fileManager->expects(self::never())
+            ->method('upload')
+            ->with($entity);
+        $this->em->expects(self::once())
+            ->method('remove')
+            ->with($entity);
+
+        $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+    }
+
+    public function testPostUpdateWithoutFileObject(): void
+    {
+        $entity = new File();
+
+        $this->fileManager->expects(self::once())
+            ->method('upload')
+            ->with($entity);
+        $this->em->expects(self::never())
+            ->method('remove');
+
+        $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
+    }
+
+    public function testPostUpdateWithFileObject(): void
+    {
+        $entity = new File();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $entity->setFile($file);
+
+        $this->fileManager->expects(self::once())
+            ->method('upload')
+            ->with($entity);
+        $this->em->expects(self::never())
+            ->method('remove');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }

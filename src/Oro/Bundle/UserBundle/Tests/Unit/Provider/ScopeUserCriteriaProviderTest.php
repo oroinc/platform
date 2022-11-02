@@ -9,105 +9,81 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ScopeUserCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ScopeUserCriteriaProvider */
-    private $provider;
-
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    protected function setUp()
+    /** @var ScopeUserCriteriaProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+
         $this->provider = new ScopeUserCriteriaProvider($this->tokenStorage);
     }
 
-    public function testGetCriteriaForCurrentScope()
+    public function testGetCriteriaField()
+    {
+        $this->assertEquals(ScopeUserCriteriaProvider::USER, $this->provider->getCriteriaField());
+    }
+
+    public function testGetCriteriaValue()
     {
         $user = new User();
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $actual = $this->provider->getCriteriaForCurrentScope();
-        $this->assertEquals([ScopeUserCriteriaProvider::SCOPE_KEY => $user], $actual);
+        $this->assertSame($user, $this->provider->getCriteriaValue());
     }
 
-    public function testGetCriteriaForCurrentScopeWithoutToken()
-    {
-        $this->tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn(null);
-
-        $actual = $this->provider->getCriteriaForCurrentScope();
-        $this->assertEquals([], $actual);
-    }
-
-    public function testGetCriteriaForCurrentScopeWithoutUser()
+    public function testGetCriteriaValueForNotSupportedUser()
     {
         $user = new \stdClass();
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $actual = $this->provider->getCriteriaForCurrentScope();
-        $this->assertEquals([], $actual);
+        $this->assertNull($this->provider->getCriteriaValue());
     }
 
-    /**
-     * @dataProvider contextDataProvider
-     *
-     * @param mixed $context
-     * @param array $criteria
-     */
-    public function testGetCriteria($context, array $criteria)
+    public function testGetCriteriaValueWithoutToken()
     {
-        $actual = $this->provider->getCriteriaByContext($context);
-        $this->assertEquals($criteria, $actual);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->assertNull($this->provider->getCriteriaValue());
     }
 
-    /**
-     * @return array
-     */
-    public function contextDataProvider()
+    public function testGetCriteriaValueWithoutUser()
     {
-        $user = new User();
-        $userAware = new \stdClass();
-        $userAware->user = $user;
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn(null);
 
-        return [
-            'array_context_with_user_key' => [
-                'context' => ['user' => $user],
-                'criteria' => ['user' => $user],
-            ],
-            'array_context_without_user_key' => [
-                'context' => [],
-                'criteria' => [],
-            ],
-            'object_context_user_aware' => [
-                'context' => $userAware,
-                'criteria' => ['user' => $user],
-            ],
-            'object_context_not_user_aware' => [
-                'context' => new \stdClass(),
-                'criteria' => [],
-            ],
-        ];
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $this->assertNull($this->provider->getCriteriaValue());
+    }
+
+    public function testGetCriteriaValueType()
+    {
+        $this->assertEquals(User::class, $this->provider->getCriteriaValueType());
     }
 }

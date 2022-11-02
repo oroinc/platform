@@ -1,0 +1,9 @@
+aliases:
+    oro/datagrid/cell/multi-currency-cell$: orocurrency/js/datagrid/cell/multi-currency-cell
+dynamic-imports:
+    commons:
+        - orocurrency/js/app/views/editor/multi-currency-editor-view
+        - orocurrency/js/app/views/multicurrency-control-view
+    orodatagrid:
+        - oro/datagrid/cell/multi-currency-cell
+        - orocurrency/js/datagrid/inline-editing/currency-save-api-accessor

@@ -5,41 +5,31 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationControllerTest extends WebTestCase
 {
-    /** @var TranslationManager */
-    protected $manager;
-
-    /** @var TranslationRepository */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-
         $this->loadFixtures([LoadTranslations::class]);
-
-        $this->manager = $this->getContainer()->get('oro_translation.manager.translation');
-
-        $this->repository = $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(Translation::class)
-            ->getRepository(Translation::class);
     }
 
-    public function testGetListWithTotalCount()
+    private function getRepository(): TranslationRepository
     {
-        $this->client->request(
+        return self::getContainer()->get('doctrine')->getRepository(Translation::class);
+    }
+
+    public function testGetListWithTotalCount(): void
+    {
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_translations',
                 ['domain' => 'validators']
             ),
-            [],
             [],
             ['HTTP_X-Include' => 'totalCount']
         );
@@ -55,9 +45,9 @@ class TranslationControllerTest extends WebTestCase
         $this->assertGreaterThan(0, $response->headers->get('X-Include-Total-Count'));
     }
 
-    public function testGetListWithoutTotalCount()
+    public function testGetListWithoutTotalCount(): void
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_translations', ['domain' => 'validators']));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_translations', ['domain' => 'validators']));
 
         $response = $this->client->getResponse();
         $result = $this->getJsonResponseContent($response, 200);
@@ -70,66 +60,102 @@ class TranslationControllerTest extends WebTestCase
     }
 
     /**
-     * @param string $inputValue
-     * @param string $expectedValue
-     * @param int $expectedStatus
-     * @internal param null|string $value
-     *
      * @dataProvider patchActionProvider
      */
-    public function testPatchAction($inputValue, $expectedValue, $expectedStatus)
-    {
-        $this->client->request(
+    public function testPatchAction(
+        string $locale,
+        ?string $inputValue,
+        bool $expectedStatus,
+        ?string $expectedValue,
+        array $expectedFields
+    ): void {
+        $this->client->jsonRequest(
             'PATCH',
             $this->getUrl('oro_api_patch_translation', [
-                'locale' => LoadLanguages::LANGUAGE1,
+                'locale' => $locale,
                 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                'key' => LoadTranslations::TRANSLATION1,
+                'key'    => LoadTranslations::TRANSLATION1
             ]),
-            [],
-            [],
-            [],
-            json_encode(['value' => $inputValue])
+            ['value' => $inputValue]
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $translation = $this->repository->findTranslation(
+        $translation = $this->getRepository()->findTranslation(
             LoadTranslations::TRANSLATION1,
-            LoadLanguages::LANGUAGE1,
+            $locale,
             LoadTranslations::TRANSLATION_KEY_DOMAIN
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
-                'id' => $expectedStatus ? $translation->getId() : '',
-                'value' => $expectedValue,
                 'status' => $expectedStatus,
+                'id'     => $translation?->getId(),
+                'value'  => $expectedValue,
+                'fields' => $expectedFields
             ],
             $result
         );
     }
 
-    /**
-     * @return array
-     */
-    public function patchActionProvider()
+    public function patchActionProvider(): array
     {
         return [
-            'update value' => [
-                'input' => 'value1',
-                'expectedValue' => 'value1',
+            'update value'            => [
+                'locale'         => LoadLanguages::LANGUAGE1,
+                'input'          => 'value1',
                 'expectedStatus' => true,
+                'expectedValue'  => 'value1',
+                'expectedFields' => ['current' => 'value1']
             ],
-            'empty string value' => [
-                'input' => '',
-                'expectedValue' => '',
+            'space value'             => [
+                'locale'         => LoadLanguages::LANGUAGE1,
+                'input'          => ' ',
                 'expectedStatus' => true,
+                'expectedValue'  => ' ',
+                'expectedFields' => ['current' => ' ']
             ],
-            'null value' => [
-                'input' => null,
-                'expectedValue' => null,
+            'empty string value'      => [
+                'locale'         => LoadLanguages::LANGUAGE1,
+                'input'          => '',
                 'expectedStatus' => false,
+                'expectedValue'  => null,
+                'expectedFields' => ['current' => 'translation.trans1']
+            ],
+            'null value'              => [
+                'locale'         => LoadLanguages::LANGUAGE1,
+                'input'          => null,
+                'expectedStatus' => false,
+                'expectedValue'  => null,
+                'expectedFields' => ['current' => 'translation.trans1']
+            ],
+            'update value (EN)'       => [
+                'locale'         => Translator::DEFAULT_LOCALE,
+                'input'          => 'value1',
+                'expectedStatus' => true,
+                'expectedValue'  => 'value1',
+                'expectedFields' => ['current' => 'value1', 'englishValue' => 'value1']
+            ],
+            'space value (EN)'        => [
+                'locale'         => Translator::DEFAULT_LOCALE,
+                'input'          => ' ',
+                'expectedStatus' => true,
+                'expectedValue'  => ' ',
+                'expectedFields' => ['current' => ' ', 'englishValue' => ' ']
+            ],
+            'empty string value (EN)' => [
+                'locale'         => Translator::DEFAULT_LOCALE,
+                'input'          => '',
+                'expectedStatus' => true,
+                'expectedValue'  => '',
+                'expectedFields' => ['current' => '', 'englishValue' => '']
+            ],
+            'null value (EN)'         => [
+                'locale'         => Translator::DEFAULT_LOCALE,
+                'input'          => null,
+                'expectedStatus' => false,
+                'expectedValue'  => null,
+                'expectedFields' => ['current' => 'translation.trans1', 'englishValue' => 'translation.trans1']
             ],
         ];
     }

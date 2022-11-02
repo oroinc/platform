@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class WorkflowAwareEntityController extends Controller
+/**
+ * Workflow aware entity controller.
+ */
+class WorkflowAwareEntityController extends AbstractController
 {
     /**
      * @Route("/", name="oro_test_wfa_index")

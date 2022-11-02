@@ -3,11 +3,16 @@
 namespace Oro\Bundle\ChartBundle\Model;
 
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
+use Twig\Environment;
 
+/**
+ * Represent chart view.
+ * Purifies data to be HTML safe.
+ */
 class ChartView
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twig;
 
@@ -33,12 +38,12 @@ class ChartView
     protected $vars;
 
     /**
-     * @param \Twig_Environment $twig
+     * @param Environment $twig
      * @param DataInterface $data
      * @param string $template
      * @param array $vars Chart view vars
      */
-    public function __construct(\Twig_Environment $twig, $template, DataInterface $data, array $vars)
+    public function __construct(Environment $twig, $template, DataInterface $data, array $vars)
     {
         $this->twig = $twig;
         $this->template = $template;
@@ -54,8 +59,21 @@ class ChartView
     public function render()
     {
         $context = $this->vars;
-        $context['data'] = $this->data->toArray();
+        $context['data'] = $this->getSafeHtmlData($this->data->toArray());
 
         return $this->twig->render($this->template, $context);
+    }
+
+    private function getSafeHtmlData(array $data): array
+    {
+        foreach ($data as &$item) {
+            if (\is_string($item)) {
+                $item = htmlentities($item);
+            } elseif (\is_array($item)) {
+                $item = $this->getSafeHtmlData($item);
+            }
+        }
+
+        return $data;
     }
 }

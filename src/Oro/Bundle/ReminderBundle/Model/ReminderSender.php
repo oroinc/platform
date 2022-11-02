@@ -14,9 +14,6 @@ class ReminderSender implements ReminderSenderInterface
      */
     protected $registry;
 
-    /**
-     * @param SendProcessorRegistry $registry
-     */
     public function __construct(SendProcessorRegistry $registry)
     {
         $this->registry = $registry;
@@ -24,8 +21,6 @@ class ReminderSender implements ReminderSenderInterface
 
     /**
      * Push reminder to processor
-     *
-     * @param Reminder $reminder
      */
     public function push(Reminder $reminder)
     {

@@ -27,9 +27,6 @@ class OroNoteBundle implements Migration
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addOrganizationFields(Schema $schema)
     {
         $table = $schema->getTable('oro_note');

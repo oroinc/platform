@@ -2,36 +2,24 @@
 
 namespace Oro\Bundle\UIBundle\Asset;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Provides routines to work with a version of asset packages that can be changed at runtime.
  */
 class DynamicAssetVersionManager
 {
-    /** @var array */
-    protected $localCache;
+    protected CacheItemPoolInterface $cache;
 
-    /** @var CacheProvider */
-    protected $cache;
-
-    /**
-     * @param CacheProvider $cache
-     */
-    public function __construct(CacheProvider $cache)
+    public function __construct(CacheItemPoolInterface $cache)
     {
-        $this->cache      = $cache;
-        $this->localCache = [];
+        $this->cache = $cache;
     }
 
     /**
      * Gets the current version of a given asset package.
-     *
-     * @param string $packageName
-     *
-     * @return string the current version of the given asset package
      */
-    public function getAssetVersion($packageName)
+    public function getAssetVersion(string $packageName): string
     {
         $versionNumber = $this->getCachedAssetVersion($packageName);
 
@@ -42,32 +30,17 @@ class DynamicAssetVersionManager
 
     /**
      * Increase the number of the current version of a given asset package.
-     *
-     * @param string $packageName
      */
-    public function updateAssetVersion($packageName)
+    public function updateAssetVersion(string $packageName): void
     {
         $versionNumber = $this->getCachedAssetVersion($packageName) + 1;
-
-        $this->localCache[$packageName] = $versionNumber;
-        $this->cache->save($packageName, $versionNumber);
+        $cacheItem = $this->cache->getItem($packageName);
+        $this->cache->save($cacheItem->set($versionNumber));
     }
 
-    /**
-     * @param string $packageName
-     *
-     * @return int
-     */
-    protected function getCachedAssetVersion($packageName)
+    protected function getCachedAssetVersion(string $packageName): int
     {
-        if (!array_key_exists($packageName, $this->localCache)) {
-            $version = $this->cache->fetch($packageName);
-
-            $this->localCache[$packageName] = false !== $version
-                ? $version
-                : 0;
-        }
-
-        return $this->localCache[$packageName];
+        $cacheItem = $this->cache->getItem($packageName);
+        return $cacheItem->isHit() ? $cacheItem->get() : 0;
     }
 }

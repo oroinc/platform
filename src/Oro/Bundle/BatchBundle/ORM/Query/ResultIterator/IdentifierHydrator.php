@@ -15,10 +15,26 @@ class IdentifierHydrator extends AbstractHydrator
     protected function hydrateAllData()
     {
         $result = [];
-        while ($data = $this->_stmt->fetch(\PDO::FETCH_COLUMN)) {
+        while ($data = $this->_stmt->fetchOne()) {
             $result[] = $data;
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hydrateRow()
+    {
+        $column = $this->_stmt->fetchOne();
+
+        if ($column === false || $column === null) {
+            $this->cleanup();
+
+            return false;
+        }
+
+        return [$column];
     }
 }

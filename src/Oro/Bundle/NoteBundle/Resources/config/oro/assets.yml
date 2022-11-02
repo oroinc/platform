@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oronote':
-          - 'bundles/oronote/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oronote/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oronote/css/scss/main.scss'

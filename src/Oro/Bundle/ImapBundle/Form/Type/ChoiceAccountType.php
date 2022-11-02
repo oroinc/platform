@@ -4,18 +4,21 @@ namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Defines dynamic set of choices for OAuth-aware
+ * user email origin account types
+ */
 class ChoiceAccountType extends AbstractType
 {
     const NAME = 'oro_imap_choice_account_type';
@@ -23,13 +26,19 @@ class ChoiceAccountType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var OAuthManagerRegistry */
+    protected $oauthManagerRegistry;
+
     /**
      * @param TranslatorInterface $translator
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->translator = $translator;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -57,25 +66,46 @@ class ChoiceAccountType extends AbstractType
             'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
             'tooltip'  => 'oro.imap.configuration.tooltip',
             'required' => false,
-            'choices' => [
-                $this->translator->trans(
-                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
-                ) => '',
-                $this->translator->trans(
-                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
-                ) => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
-                $this->translator->trans(
-                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
-                ) => AccountTypeModel::ACCOUNT_TYPE_OTHER,
-            ],
+            'choice_loader' => new CallbackChoiceLoader($this->getAccountTypeChoicesCallback())
         ]);
 
         $this->initEvents($builder);
     }
 
     /**
-     * @param FormEvent $formEvent
+     * Returns choices callable for available account types
      */
+    protected function getAccountTypeChoicesCallback(string $additionalType = null): callable
+    {
+        return function () use ($additionalType) {
+            $choices = [
+                $this->translator->trans(
+                    'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
+                ) => ''
+            ];
+
+            foreach ($this->oauthManagerRegistry->getManagers() as $manager) {
+                if ($manager->isOAuthEnabled()) {
+                    $choices[$this->translator->trans(
+                        'oro.imap.configuration.account_type.' . $manager->getType()
+                    )] = $manager->getType();
+                }
+            }
+
+            if ((null !== $additionalType) && !in_array($additionalType, $choices)) {
+                $choices[$this->translator->trans(
+                    'oro.imap.configuration.account_type.' . $additionalType
+                )] = $additionalType;
+            }
+
+            $choices[$this->translator->trans(
+                'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
+            )] = AccountTypeModel::ACCOUNT_TYPE_OTHER;
+
+            return $choices;
+        };
+    }
+
     public function preSubmit(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -87,8 +117,22 @@ class ChoiceAccountType extends AbstractType
         $accountTypeModel = $this->createAccountTypeModelFromData($data);
 
         if ($accountTypeModel === null) {
-            //reset data for avoiding form extra parameters error
+            // reset data for avoiding form extra parameters error
             $formEvent->setData(null);
+            if ($form->has('userEmailOrigin')) {
+                $originForm = $form->get('userEmailOrigin');
+                $form->remove('accountType');
+                // Resets account type to remove disabled OAuth provider from rendering
+                $form->add('accountType', ChoiceType::class, [
+                    'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                    'tooltip'  => 'oro.imap.configuration.tooltip',
+                    'required' => false,
+                    'choice_loader' => new CallbackChoiceLoader(
+                        $this->getAccountTypeChoicesCallback()
+                    )
+                ]);
+                $originForm->setData(null);
+            }
             return;
         } elseif ($form->getData() && $form->getData()->getAccountType() !== $data['accountType']) {
             //set data here, for renew viewData of the form
@@ -100,16 +144,30 @@ class ChoiceAccountType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function preSetData(FormEvent $formEvent)
     {
         $accountTypeModel = $formEvent->getData();
         $form = $formEvent->getForm();
 
         if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->updateChoices($form, $accountTypeModel);
             $this->updateForm($form, $accountTypeModel);
+        }
+    }
+
+    protected function updateChoices(FormInterface $form, AccountTypeModel $accountTypeModel): void
+    {
+        $origin = $accountTypeModel->getUserEmailOrigin();
+        if ((null !== $origin) && !$this->oauthManagerRegistry->isOauthImapEnabled($origin->getAccountType())) {
+            $form->remove('accountType');
+            $form->add('accountType', ChoiceType::class, [
+                'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
+                'tooltip'  => 'oro.imap.configuration.tooltip',
+                'required' => false,
+                'choice_loader' => new CallbackChoiceLoader(
+                    $this->getAccountTypeChoicesCallback($origin->getAccountType())
+                )
+            ]);
         }
     }
 
@@ -118,13 +176,11 @@ class ChoiceAccountType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel']);
+        $resolver->setDefaults(['data_class' => AccountTypeModel::class]);
     }
 
     /**
      * Update form if accountType is changed
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function initEvents(FormBuilderInterface $builder)
     {
@@ -132,20 +188,28 @@ class ChoiceAccountType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param AccountTypeModel $accountTypeModel
-     */
     protected function updateForm(FormInterface $form, AccountTypeModel $accountTypeModel)
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
-            if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER) {
-                $form->add('userEmailOrigin', ConfigurationType::class);
+            $userEmailOriginType = $this->solveUserEmailOriginType($accountTypeModel);
+            if ($userEmailOriginType) {
+                $form->add('userEmailOrigin', $userEmailOriginType);
             }
+        }
+    }
 
-            if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_GMAIL) {
-                $form->add('userEmailOrigin', ConfigurationGmailType::class);
-            }
+    protected function solveUserEmailOriginType(AccountTypeModel $accountTypeModel): ?string
+    {
+        switch (true) {
+            case $accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER:
+                return ConfigurationType::class;
+            case (($type = $accountTypeModel->getAccountType()) && $this->oauthManagerRegistry->hasManager($type)):
+                return $this
+                    ->oauthManagerRegistry
+                    ->getManager($accountTypeModel->getAccountType())
+                    ->getConnectionFormTypeClass();
+            default:
+                return null;
         }
     }
 
@@ -158,26 +222,27 @@ class ChoiceAccountType extends AbstractType
      */
     protected function createAccountTypeModelFromData($data)
     {
-        $imapGmailConfiguration = isset($data['userEmailOrigin']) ? $data['userEmailOrigin'] : [];
+        $imapConfiguration = $data['userEmailOrigin'] ?? [];
 
-        if (empty($imapGmailConfiguration['user'])) {
+        if (empty($imapConfiguration['user'])) {
             return null;
         }
         $accountTypeModel =  new AccountTypeModel();
         $accountTypeModel->setAccountType($data['accountType']);
 
         $userEmailOrigin = new UserEmailOrigin();
-        $userEmailOrigin->setImapHost($imapGmailConfiguration['imapHost']);
-        $userEmailOrigin->setImapPort($imapGmailConfiguration['imapPort']);
-        $userEmailOrigin->setImapEncryption($imapGmailConfiguration['imapEncryption']);
+        $userEmailOrigin->setImapHost($imapConfiguration['imapHost']);
+        $userEmailOrigin->setImapPort($imapConfiguration['imapPort']);
+        $userEmailOrigin->setImapEncryption($imapConfiguration['imapEncryption']);
+        $userEmailOrigin->setAccountType($imapConfiguration['accountType']);
 
-        $userEmailOrigin->setUser($imapGmailConfiguration['user']);
+        $userEmailOrigin->setUser($imapConfiguration['user']);
 
-        if (!empty($imapGmailConfiguration['accessTokenExpiresAt'])) {
-            $newExpireDate = $imapGmailConfiguration['accessTokenExpiresAt'];
+        if (!empty($imapConfiguration['accessTokenExpiresAt'])) {
+            $newExpireDate = $imapConfiguration['accessTokenExpiresAt'];
             if (!$newExpireDate instanceof \Datetime) {
                 $utcTimeZone = new \DateTimeZone('UTC');
-                $accessTokenExpiresAt = $imapGmailConfiguration['accessTokenExpiresAt'];
+                $accessTokenExpiresAt = $imapConfiguration['accessTokenExpiresAt'];
                 $newExpireDate = new \DateTime('+' . $accessTokenExpiresAt . ' seconds', $utcTimeZone);
             }
 

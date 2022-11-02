@@ -30,8 +30,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Schema   $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function changeEmailToEmailBodyRelation(Schema $schema)
@@ -51,8 +49,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function splitEmailEntity(Schema $schema)
@@ -85,9 +81,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     public static function updateEntityConfigs(QueryBag $queries)
     {
         $queries->addQuery(
@@ -108,9 +101,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     public static function addPostQueries(QueryBag $queries)
     {
         $queries->addPostQuery(new UpdateEmailBodyRelationQuery());

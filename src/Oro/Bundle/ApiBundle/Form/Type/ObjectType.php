@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * The form type for an object that properties are built based of Data API metadata
+ * The form type for an object that properties are built based of API metadata
  * and contain all properties classified as fields and associations.
  */
 class ObjectType extends AbstractType
@@ -18,9 +18,6 @@ class ObjectType extends AbstractType
     /** @var FormHelper */
     protected $formHelper;
 
-    /**
-     * @param FormHelper $formHelper
-     */
     public function __construct(FormHelper $formHelper)
     {
         $this->formHelper = $formHelper;

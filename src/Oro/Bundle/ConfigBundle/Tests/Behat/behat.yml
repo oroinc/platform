@@ -25,12 +25,6 @@ oro_behat_extension:
     WYSIWYG editor:
       selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
 
-    WYSIWYG Source code button:
-      selector: 'div.mce-container-body div[aria-label="Source code"] button'
-
-    WYSIWYG textarea:
-      selector: 'textarea.mce-textbox'
-
     Entity pagination:
       selector: '#entity-pagination'
 
@@ -41,7 +35,7 @@ oro_behat_extension:
       selector: 'div.system-configuration-container div[data-role="sidebar"] [data-name="clear-search"]'
 
     Sidebar Last Section:
-      selector: 'div.system-configuration-container div[data-role="sidebar"] [data-role="jstree-container"] > [role="group"] > li[role="treeitem"]:last-child'
+      selector: 'div.system-configuration-container div[data-role="sidebar"] [data-role="jstree-container"] > [role="group"] > li.jstree-node:last-child'
 
     Search Input:
       selector: 'input[type="search"]'
@@ -53,7 +47,7 @@ oro_behat_extension:
       selector: '.highlight-text'
 
     Configuration Menu Item:
-      selector: 'div.system-configuration-container div[data-role="sidebar"] li[role="treeitem"]'
+      selector: 'div.system-configuration-container div[data-role="sidebar"] li.jstree-node'
 
     Configuration Section Label:
       selector: '.user-fieldset'
@@ -77,15 +71,25 @@ oro_behat_extension:
       selector: 'form[name="shopping_list"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
 
+    Add Recent Emails widget:
+      selector:
+        locator: '//em[text()="Recent Emails"]/../../..//button[@data-role="add-action"]'
+        type: xpath
+
+    Close Organization info popup:
+      selector:
+        locator: '//strong[contains(text(),"Logged in to")]/../..//a[@title="Close"]'
+        type: xpath
+
   suites:
     OroConfigBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroConfigBundle::FeatureContext
-        - OroDataGridBundle::GridContext
-        - OroFormBundle::FormContext
-        - OroNavigationBundle::FeatureContext
-        - OroNavigationBundle::PinbarContext
-        - OroActivityListBundle::ActivityContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\PinbarContext
+        - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
       paths:
         - '@OroConfigBundle/Tests/Behat/Features'

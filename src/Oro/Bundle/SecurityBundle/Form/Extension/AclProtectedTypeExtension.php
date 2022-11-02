@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
@@ -24,9 +26,6 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
@@ -35,9 +34,9 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return EntityType::class;
+        return [EntityType::class];
     }
 
     /**
@@ -51,20 +50,21 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
                 return null;
             }
 
+            /** @var EntityManagerInterface $em */
+            $em = $options['em'];
             // create simple QB in order to prevent loading all entities from repo by EntityChoiceList
-            $qb = (null !== $options['query_builder'])
-                ? $options['query_builder']
-                : $options['em']->getRepository($options['class'])->createQueryBuilder('e');
+            /** @var QueryBuilder $qb */
+            $qb = $options['query_builder'] ?? $em->getRepository($options['class'])->createQueryBuilder('e');
 
-            $aclOptions = isset($options['acl_options']) ? $options['acl_options'] : [];
+            $aclOptions = $options['acl_options'] ?? [];
             if (!isset($aclOptions['disable']) || true !== $aclOptions['disable']) {
                 $entityLoader = new AclProtectedQueryBuilderLoader(
                     $aclHelper,
                     $qb,
-                    $options['em'],
+                    $em,
                     $options['class'],
-                    isset($aclOptions['permission']) ? $aclOptions['permission'] : 'VIEW',
-                    isset($aclOptions['options']) ? $aclOptions['options'] : []
+                    $aclOptions['permission'] ?? 'VIEW',
+                    $aclOptions['options'] ?? []
                 );
             } else {
                 $entityLoader = new ORMQueryBuilderLoader(
@@ -73,7 +73,7 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
             }
 
             return new DoctrineChoiceLoader(
-                $options['em'],
+                $em,
                 $options['class'],
                 $options['id_reader'],
                 $entityLoader

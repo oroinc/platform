@@ -1,0 +1,4 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: '@OroUI/layouts/default/block_types.html.twig'

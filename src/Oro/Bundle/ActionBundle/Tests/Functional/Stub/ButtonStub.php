@@ -13,7 +13,10 @@ class ButtonStub implements ButtonInterface
     /** @var array */
     protected $buttonOptions;
 
-    public function __construct(array $buttonOptions = [])
+    /** @var array */
+    protected $datagridOptions;
+
+    public function __construct(array $buttonOptions = [], array $datagridOptions = [])
     {
         $this->buttonOptions = array_replace_recursive(
             [
@@ -24,6 +27,8 @@ class ButtonStub implements ButtonInterface
             ],
             $buttonOptions
         );
+
+        $this->datagridOptions = array_replace(['aria_label' => 'Label'], $datagridOptions);
     }
 
     /**
@@ -39,7 +44,7 @@ class ButtonStub implements ButtonInterface
      */
     public function getTemplate()
     {
-        return '@OroActionBundle/Tests/Functional/Stub/button.html.twig';
+        return '@OroActionStub/button.html.twig';
     }
 
     /**
@@ -80,9 +85,15 @@ class ButtonStub implements ButtonInterface
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->buttonOptions['label'];
+        return (string) $this->buttonOptions['label'];
+    }
+
+    /** {@inheritdoc} */
+    public function getAriaLabel(): ?string
+    {
+        return $this->datagridOptions['aria_label'];
     }
 
     /**

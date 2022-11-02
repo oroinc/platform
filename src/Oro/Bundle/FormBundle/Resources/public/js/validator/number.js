@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
 
-    var defaultParam = {
+    const defaultParam = {
         notNumberMessage: 'oro.form.number.nan',
         exactMessage: 'oro.form.number.exect',
         maxMessage: 'oro.form.number.max',
@@ -24,21 +23,21 @@ define(function(require) {
      * @returns {boolean|number}
      */
     function between(number, min, max) {
-        var result = true;
-        if (!_.isUndefined(min) && min === max) {
+        let result = true;
+        if (min !== void 0 && min === max) {
             result = number === parseInt(min, 10) || 0;
         } else {
-            if (!_.isUndefined(min) && min !== null) {
+            if (min !== void 0 && min !== null) {
                 result = number >= parseInt(min, 10) || -1;
             }
-            if (result === true && !_.isUndefined(max) && max !== null) {
+            if (result === true && max !== void 0 && max !== null) {
                 result = number <= parseInt(max, 10) || 1;
             }
         }
         return result;
     }
     function toNumber(value) {
-        var numberFormats = localeSettings.getNumberFormats('decimal');
+        const numberFormats = localeSettings.getNumberFormats('decimal');
         value = String(value).split(numberFormats.grouping_separator_symbol).join('');
         value = value.replace(numberFormats.decimal_separator_symbol, '.');
         return Number(value);
@@ -54,10 +53,10 @@ define(function(require) {
             return !isNaN(value) && between(value, param.min, param.max) === true;
         },
         function(param, element, value, placeholders) {
-            var message;
-            var number;
-            param = _.extend({}, defaultParam, param);
-            value = _.isUndefined(value) ? this.elementValue(element) : value;
+            let message;
+            let number;
+            param = Object.assign({}, defaultParam, param);
+            value = value === void 0 ? this.elementValue(element) : value;
             value = toNumber(value);
             if (isNaN(value)) {
                 return __(param.notNumberMessage);
@@ -78,11 +77,11 @@ define(function(require) {
                     default:
                         return '';
                 }
-                if (_.isUndefined(placeholders)) {
+                if (placeholders === void 0) {
                     placeholders = {};
                 }
                 placeholders.limit = number;
-                if (_.isUndefined(placeholders.value)) {
+                if (placeholders.value === void 0) {
                     placeholders.value = value;
                 }
                 return __(message, placeholders, number);

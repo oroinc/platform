@@ -2,77 +2,58 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidateStepTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ValidateStep
-     */
-    protected $step;
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $validator;
+    /** @var ValidateStep */
+    private $step;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $constraintViolation;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->validator = $this
-            ->createMock(ValidatorInterface::class);
-
-        $this->constraintViolation = $this
-            ->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->validator
-            ->expects($this->once())
-            ->method('validate')
-            ->will($this->returnValue($this->constraintViolation));
+        $this->validator = $this->createMock(ValidatorInterface::class);
 
         $this->step = new ValidateStep($this->validator);
     }
 
-    public function testRun()
+    public function testRunWhenNoValidationConstraintViolations()
     {
-        $data = $this->createEntityData();
+        $data = $this->createMock(EntityData::class);
 
-        $this->step->run($data);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\ValidationException
-     */
-    public function testFail()
-    {
-        $data = $this->createEntityData();
-
-        $this->constraintViolation
-            ->expects($this->once())
+        $constraintViolations = $this->createMock(ConstraintViolationList::class);
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->identicalTo($data))
+            ->willReturn($constraintViolations);
+        $constraintViolations->expects($this->once())
             ->method('count')
-            ->will($this->returnValue(1));
+            ->willReturn(0);
 
         $this->step->run($data);
     }
 
-    protected function createEntityData()
+    public function testRunWhenHasValidationConstraintViolations()
     {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+        $this->expectException(ValidationException::class);
 
-    protected function createTestEntity($id)
-    {
-        $result     = new \stdClass();
-        $result->id = $id;
-        return $result;
+        $data = $this->createMock(EntityData::class);
+
+        $constraintViolations = $this->createMock(ConstraintViolationList::class);
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->identicalTo($data))
+            ->willReturn($constraintViolations);
+        $constraintViolations->expects($this->once())
+            ->method('count')
+            ->willReturn(1);
+
+        $this->step->run($data);
     }
 }

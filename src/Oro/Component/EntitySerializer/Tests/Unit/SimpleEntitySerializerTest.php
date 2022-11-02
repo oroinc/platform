@@ -2,16 +2,19 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
-use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
     public function testReuseExistingJoin()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -19,20 +22,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -47,7 +45,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -67,7 +65,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testReuseExistingInnerJoin()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->innerJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -75,20 +73,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -103,7 +96,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -123,7 +116,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testReuseExistingJoinWithCondition()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user', 'WITH', 'e.owner = user.id AND user.name LIKE \'a%\'')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -131,20 +124,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id AND (p0_.owner_id = u1_.id AND u1_.name LIKE \'a%\')'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name',
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -159,7 +147,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'    => null,
                     'name'  => null,
                     'owner' => [
-                        'fields' => 'id',
+                        'fields' => 'id'
                     ]
                 ]
             ]
@@ -179,7 +167,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithoutConfig()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -220,7 +208,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithExclusion()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -233,7 +221,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id_0'     => 1,
                     'label_1'  => 'test_label',
-                    'public_2' => 1,
+                    'public_2' => 1
                 ]
             ],
             [1 => 1],
@@ -245,52 +233,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 'fields' => [
                     'name'        => ['exclude' => true],
-                    'isException' => ['exclude' => true],
+                    'isException' => ['exclude' => true]
                 ]
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'public' => true
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithExclusionDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.label AS label_1, g0_.public AS public_2'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'     => 1,
-                    'label_1'  => 'test_label',
-                    'public_2' => 1,
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'excluded_fields' => ['name', 'isException'],
             ]
         );
 
@@ -308,7 +252,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithComputedField()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -320,7 +264,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id_0'   => 1,
-                    'name_1' => 'test_name',
+                    'name_1' => 'test_name'
                 ]
             ],
             [1 => 1],
@@ -334,7 +278,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 'fields'           => [
                     'id'           => null,
                     'name'         => null,
-                    'computedName' => null,
+                    'computedName' => null
                 ]
             ]
         );
@@ -344,7 +288,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'           => 1,
                     'name'         => 'test_name',
-                    'computedName' => 'test_name (COMPUTED)',
+                    'computedName' => 'test_name (COMPUTED)'
                 ]
             ],
             $result
@@ -353,7 +297,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithExclusionAndPartialLoadDisabled()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -403,57 +347,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithExclusionDeprecatedAndPartialLoadDisabled()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
-            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'           => 1,
-                    'name_1'         => 'test_name',
-                    'label_2'        => 'test_label',
-                    'public_3'       => 1,
-                    'is_exception_4' => 0
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'excluded_fields'      => ['name', 'isException'],
-                'disable_partial_load' => true
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'public' => true
-                ]
-            ],
-            $result
-        );
-    }
-
     public function testSimpleEntityWithSpecifiedFieldsButNoExclusionPolicy()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -481,8 +377,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 'fields' => [
                     'id'   => null,
-                    'name' => null,
-                ],
+                    'name' => null
+                ]
             ]
         );
 
@@ -502,7 +398,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithSpecifiedFieldsOnly()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -514,7 +410,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id_0'   => 1,
-                    'name_1' => 'test_name',
+                    'name_1' => 'test_name'
                 ]
             ],
             [1 => 1],
@@ -527,8 +423,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'id'   => null,
-                    'name' => null,
-                ],
+                    'name' => null
+                ]
             ]
         );
 
@@ -536,7 +432,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [
                 [
                     'id'   => 1,
-                    'name' => 'test_name',
+                    'name' => 'test_name'
                 ]
             ],
             $result
@@ -545,7 +441,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithSpecifiedFieldsAndExclusions()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -556,7 +452,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             . ' WHERE g0_.id = ?',
             [
                 [
-                    'id_0' => 1,
+                    'id_0' => 1
                 ]
             ],
             [1 => 1],
@@ -571,330 +467,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                     'id'   => null,
                     'name' => [
                         'exclude' => true
-                    ],
-                ],
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id' => 1,
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     */
-    public function testSimpleEntityWithSpecifiedFieldsAndExclusionsDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0' => 1,
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'excluded_fields'  => ['name'],
-                'fields'           => [
-                    'id'   => null,
-                    'name' => null,
-                ],
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id' => 1,
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testSimpleEntityWithPostActionAsClosure()
-    {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $conn = $this->getDriverConnectionMock($this->em);
-
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' u0_.category_name AS category_name_3'
-            . ' FROM user_table u0_'
-            . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
-            . ' WHERE u0_.id = ?',
-            [
-                [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'name_2'          => 'category_name',
-                    'category_name_3' => 'category_name'
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
-            'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
-            . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
-            . ' WHERE u0_.id = ?',
-            [
-                [
-                    'id_0'   => 1,
-                    'name_1' => 'product_name',
-                    'id_2'   => 10
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'category' => [
-                        'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'name' => null
-                        ],
-                        'post_serialize'   => function (array $result, array $context) {
-                            $result['additional'] = sprintf('%s_additional[%s]', $result['name'], $context['key']);
-
-                            return $result;
-                        }
-                    ],
-                    'products' => [
-                        'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'name' => null
-                        ],
-                        'post_serialize'   => function (array $result, array $context) {
-                            $result['additional'] = sprintf('%s_additional[%s]', $result['name'], $context['key']);
-
-                            return $result;
-                        }
-                    ],
-                ],
-                'post_serialize'   => function (array $result, array $context) {
-                    $result['additional'] = sprintf('%s_additional[%s]', $result['name'], $context['key']);
-
-                    return $result;
-                }
-            ],
-            ['key' => 'context value']
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'         => 1,
-                    'name'       => 'user_name',
-                    'category'   => [
-                        'name'       => 'category_name',
-                        'additional' => 'category_name_additional[context value]'
-                    ],
-                    'products'   => [
-                        [
-                            'name'       => 'product_name',
-                            'additional' => 'product_name_additional[context value]'
-                        ]
-                    ],
-                    'additional' => 'user_name_additional[context value]'
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testSimpleEntityWithPostActionAsCallable()
-    {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $conn = $this->getDriverConnectionMock($this->em);
-
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' u0_.category_name AS category_name_3'
-            . ' FROM user_table u0_'
-            . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
-            . ' WHERE u0_.id = ?',
-            [
-                [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'name_2'          => 'category_name',
-                    'category_name_3' => 'category_name'
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
-            'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
-            . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
-            . ' WHERE u0_.id = ?',
-            [
-                [
-                    'id_0'   => 1,
-                    'name_1' => 'product_name',
-                    'id_2'   => 10
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'category' => [
-                        'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'name' => null
-                        ],
-                        'post_serialize'   => [$this, 'postSerializeCallback']
-                    ],
-                    'products' => [
-                        'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'name' => null
-                        ],
-                        'post_serialize'   => [$this, 'postSerializeCallback']
-                    ],
-                ],
-                'post_serialize'   => [$this, 'postSerializeCallback']
-            ],
-            ['key' => 'context value']
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'         => 1,
-                    'name'       => 'user_name',
-                    'category'   => [
-                        'name'       => 'category_name',
-                        'additional' => 'category_name_additional[context value]'
-                    ],
-                    'products'   => [
-                        [
-                            'name'       => 'product_name',
-                            'additional' => 'product_name_additional[context value]'
-                        ]
-                    ],
-                    'additional' => 'user_name_additional[context value]'
-                ]
-            ],
-            $result
-        );
-    }
-
-    public function postSerializeCallback(array $result, array $context)
-    {
-        $result['additional'] = sprintf('%s_additional[%s]', $result['name'], $context['key']);
-
-        return $result;
-    }
-
-    public function testPostActionForNullChild()
-    {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $conn = $this->getDriverConnectionMock($this->em);
-
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' u0_.category_name AS category_name_3'
-            . ' FROM user_table u0_'
-            . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
-            . ' WHERE u0_.id = ?',
-            [
-                [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'name_2'          => null,
-                    'category_name_3' => null
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'category' => [
-                        'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'name' => null
-                        ],
-                        'post_serialize'   => function (array $result, array $context) {
-                            $result['additional'] = $result['name'] . '_additional';
-
-                            return $result;
-                        }
-                    ],
+                    ]
                 ]
             ]
         );
@@ -902,62 +475,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'       => 1,
-                    'name'     => 'user_name',
-                    'category' => null
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use new signature of 'post_serialize' callback:
-     * function (array $item) : array
-     */
-    public function testSimpleEntityWithPostActionDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2'
-            . ', g0_.public AS public_3, g0_.is_exception AS is_exception_4'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'           => 1,
-                    'name_1'         => 'test_name',
-                    'label_2'        => 'test_label',
-                    'public_3'       => 1,
-                    'is_exception_4' => 0
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'post_serialize' => function (array &$result) {
-                    $result['additional'] = $result['name'] . '_additional';
-                }
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'          => 1,
-                    'name'        => 'test_name',
-                    'label'       => 'test_label',
-                    'public'      => true,
-                    'isException' => false,
-                    'additional'  => 'test_name_additional'
+                    'id' => 1
                 ]
             ],
             $result
@@ -966,7 +484,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithMetadata()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -1010,20 +528,16 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'entity' => Group::class
                 ]
             ],
             $result
         );
     }
 
-    /**
-     * @deprecated since 1.9. Use 'exclude' attribute for a field instead of 'excluded_fields' for an entity
-     * @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-     */
-    public function testSimpleEntityWithMetadataDeprecated()
+    public function testSimpleEntityWithMetadataWithoutPropertyPath()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -1045,10 +559,16 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $result = $this->serializer->serialize(
             $qb,
             [
-                'excluded_fields' => ['name', 'public', 'isException'],
-                'fields'          => [
-                    '__class__' => [
-                        'result_name' => 'entity'
+                'fields' => [
+                    '__class__'   => null,
+                    'name'        => [
+                        'exclude' => true
+                    ],
+                    'public'      => [
+                        'exclude' => true
+                    ],
+                    'isException' => [
+                        'exclude' => true
                     ]
                 ]
             ]
@@ -1057,9 +577,9 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'id'        => 1,
+                    'label'     => 'test_label',
+                    '__class__' => Group::class
                 ]
             ],
             $result
@@ -1068,7 +588,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithMetadataAndExcludeAllPolicy()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -1106,57 +626,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => Entity\Group::class
-                ]
-            ],
-            $result
-        );
-    }
-
-    /**
-     * @deprecated since 1.9. Use `property_path` attribute instead of 'result_name'
-     */
-    public function testSimpleEntityWithMetadataAndExcludeAllPolicyDeprecated()
-    {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', 1);
-
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT g0_.id AS id_0, g0_.label AS label_1'
-            . ' FROM group_table g0_'
-            . ' WHERE g0_.id = ?',
-            [
-                [
-                    'id_0'    => 1,
-                    'label_1' => 'test_label'
-                ]
-            ],
-            [1 => 1],
-            [1 => \PDO::PARAM_INT]
-        );
-
-        $result = $this->serializer->serialize(
-            $qb,
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'        => null,
-                    'label'     => null,
-                    '__class__' => [
-                        'result_name' => 'entity'
-                    ]
-                ]
-            ]
-        );
-
-        $this->assertArrayEquals(
-            [
-                [
-                    'id'     => 1,
-                    'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'entity' => Group::class
                 ]
             ],
             $result
@@ -1169,22 +639,19 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testNotConfiguredRelations()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' p0_.category_name AS category_name_2, p0_.owner_id AS owner_id_3'
+            'SELECT p0_.id AS id_0, p0_.name AS name_1'
             . ' FROM product_table p0_'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'category_name_2' => 'category_name',
-                    'owner_id_3'      => 10,
+                    'id_0'   => 1,
+                    'name_1' => 'product_name'
                 ]
             ],
             [1 => 1],
@@ -1214,40 +681,31 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithRenamedFields()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2, c1_.label AS label_3,'
-            . ' u0_.category_name AS category_name_4'
+            . ' c1_.name AS name_2, c1_.label AS label_3'
             . ' FROM user_table u0_'
             . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'name_2'          => 'category_name',
-                    'label_3'         => 'category_label',
-                    'category_name_4' => 'category_name'
+                    'id_0'    => 1,
+                    'name_1'  => 'user_name',
+                    'name_2'  => 'category_name',
+                    'label_3' => 'category_label'
                 ]
             ],
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, p1_.name AS name_1, p1_.id AS id_2'
             . ' FROM product_table p1_'
-            . ' INNER JOIN user_table u0_ ON (p1_.owner_id = u0_.id)'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
             . ' WHERE u0_.id = ?',
             [
                 [
@@ -1259,6 +717,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -1275,7 +734,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                             'renamedLabel' => [
                                 'property_path' => 'label'
                             ]
-                        ],
+                        ]
                     ],
                     'products'    => [
                         'exclusion_policy' => 'all',
@@ -1283,8 +742,8 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                             'renamedName' => [
                                 'property_path' => 'name'
                             ]
-                        ],
-                    ],
+                        ]
+                    ]
                 ]
             ]
         );
@@ -1292,12 +751,12 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'              => 1,
-                    'renamedName'     => 'user_name',
-                    'category'        => [
+                    'id'          => 1,
+                    'renamedName' => 'user_name',
+                    'category'    => [
                         'renamedLabel' => 'category_label'
                     ],
-                    'products' => [
+                    'products'    => [
                         ['renamedName' => 'product_name']
                     ]
                 ]

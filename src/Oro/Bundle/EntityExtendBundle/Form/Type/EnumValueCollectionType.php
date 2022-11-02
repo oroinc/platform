@@ -12,14 +12,14 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ *  Enum value collection form type
+ */
 class EnumValueCollectionType extends AbstractType
 {
     /** @var EnumTypeHelper */
     protected $typeHelper;
 
-    /**
-     * @param EnumTypeHelper $typeHelper
-     */
     public function __construct(EnumTypeHelper $typeHelper)
     {
         $this->typeHelper = $typeHelper;
@@ -81,6 +81,14 @@ class EnumValueCollectionType extends AbstractType
     {
         $view->vars['multiple'] = $this->isMultipleSelectEnable($options['config_id']);
         $view->vars['show_form_when_empty'] = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['validation_ignore_if_not_changed'] = true;
     }
 
     /**

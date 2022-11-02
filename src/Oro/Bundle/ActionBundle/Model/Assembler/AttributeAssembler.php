@@ -10,6 +10,9 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
+/**
+ * Assembles attributes collection for the specified action configuration.
+ */
 class AttributeAssembler extends AbstractAssembler
 {
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -19,9 +22,6 @@ class AttributeAssembler extends AbstractAssembler
      */
     protected $attributeGuesser;
 
-    /**
-     * @param AttributeGuesser $attributeGuesser
-     */
     public function __construct(AttributeGuesser $attributeGuesser)
     {
         $this->attributeGuesser = $attributeGuesser;
@@ -81,6 +81,7 @@ class AttributeAssembler extends AbstractAssembler
         $attribute->setEntityAcl($this->getOption($options, 'entity_acl', []));
         $attribute->setPropertyPath($this->getOption($options, 'property_path'));
         $attribute->setOptions($this->getOption($options, 'options', []));
+        $attribute->setDefault($this->getOption($options, 'default', null));
 
         $this->validateAttribute($attribute);
 
@@ -121,7 +122,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertAttributeEntityAcl(array $options)
@@ -138,7 +138,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function validateAttribute(Attribute $attribute)
@@ -153,7 +152,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasValidType(Attribute $attribute)
@@ -209,7 +207,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasClassOption(Attribute $attribute)

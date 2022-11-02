@@ -11,7 +11,7 @@ class ExpressionBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionBuilder */
     private $builder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ExpressionBuilder();
     }

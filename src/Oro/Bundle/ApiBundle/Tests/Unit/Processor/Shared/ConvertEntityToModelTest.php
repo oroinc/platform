@@ -13,7 +13,7 @@ class ConvertEntityToModelTest extends FormProcessorTestCase
     /** @var ConvertEntityToModel */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

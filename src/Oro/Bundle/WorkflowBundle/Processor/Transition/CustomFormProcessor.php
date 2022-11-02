@@ -12,9 +12,6 @@ class CustomFormProcessor implements ProcessorInterface
     /** @var FormHandlerRegistry */
     private $formHandlerRegistry;
 
-    /**
-     * @param FormHandlerRegistry $formHandlerRegistry
-     */
     public function __construct(FormHandlerRegistry $formHandlerRegistry)
     {
         $this->formHandlerRegistry = $formHandlerRegistry;

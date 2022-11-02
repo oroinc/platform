@@ -2,26 +2,30 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
+/**
+ * Autocomplete search handler for users.
+ */
 class UserSearchHandler extends FullNameSearchHandler
 {
     const IMAGINE_AVATAR_FILTER = 'avatar_xsmall';
 
-    /**
-     * @var AttachmentManager
-     */
-    protected $attachmentManager;
+    /** @var PictureSourcesProviderInterface */
+    protected $pictureSourcesProvider;
 
     /**
-     * @param AttachmentManager $attachmentManager
+     * @param PictureSourcesProviderInterface $pictureSourcesProvider
      * @param string $userEntityName
      * @param array $properties
      */
-    public function __construct(AttachmentManager $attachmentManager, $userEntityName, array $properties)
-    {
-        $this->attachmentManager = $attachmentManager;
+    public function __construct(
+        PictureSourcesProviderInterface $pictureSourcesProvider,
+        $userEntityName,
+        array $properties
+    ) {
+        $this->pictureSourcesProvider = $pictureSourcesProvider;
         parent::__construct($userEntityName, $properties);
     }
 
@@ -31,15 +35,10 @@ class UserSearchHandler extends FullNameSearchHandler
     public function convertItem($user)
     {
         $result = parent::convertItem($user);
-        $result['avatar'] = null;
-
-        $avatar = $this->getPropertyValue('avatar', $user);
-        if ($avatar) {
-            $result['avatar'] = $this->attachmentManager->getFilteredImageUrl(
-                $avatar,
-                self::IMAGINE_AVATAR_FILTER
-            );
-        }
+        $result['avatar'] = $this->pictureSourcesProvider->getFilteredPictureSources(
+            $this->getPropertyValue('avatar', $user),
+            self::IMAGINE_AVATAR_FILTER
+        );
 
         return $result;
     }

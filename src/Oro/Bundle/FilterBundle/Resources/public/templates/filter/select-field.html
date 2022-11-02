@@ -1,8 +1,8 @@
 <div class="horizontal clearfix">
     <div class="filter-select-oro-wrapper">
-        <select name="<%= name %>" <% if (typeof(dataName) !== "undefined") { %>data-name="<%= dataName %>"<% } %> class="filter-select-oro">
+        <select name="<%- name %>" <% if (typeof(dataName) !== "undefined") { %>data-name="<%- dataName %>"<% } %> class="filter-select-oro">
             <% _.each(choices, function (option) { %>
-            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
+            <option value="<%- option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
         <% }); %>
         </select>
     </div>

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueTransformer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -18,23 +18,22 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * * extended associations
  * * nested objects
  * * nested associations
+ * * percentage value multiplied by 100 (the "percent_100" data type)
  */
 class BuildCustomTypes implements ProcessorInterface
 {
-    /** @var AssociationManager */
-    private $associationManager;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
+    private DoctrineHelper $doctrineHelper;
+    private ValueTransformer $valueTransformer;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /**
-     * @param AssociationManager $associationManager
-     * @param DoctrineHelper     $doctrineHelper
-     */
-    public function __construct(AssociationManager $associationManager, DoctrineHelper $doctrineHelper)
-    {
-        $this->associationManager = $associationManager;
+    public function __construct(
+        ExtendedAssociationProvider $extendedAssociationProvider,
+        DoctrineHelper $doctrineHelper,
+        ValueTransformer $valueTransformer
+    ) {
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
         $this->doctrineHelper = $doctrineHelper;
+        $this->valueTransformer = $valueTransformer;
     }
 
     /**
@@ -44,155 +43,122 @@ class BuildCustomTypes implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!\is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $config = $context->getConfig();
         if (null === $config) {
             return;
         }
 
-        $context->setResult($this->processCustomTypes($data, $config, $context->getClassName()));
+        $context->setData($this->processCustomTypes(
+            $data,
+            $config,
+            $context->getClassName(),
+            $context->getNormalizationContext()
+        ));
     }
 
-    /**
-     * @param array                  $data
-     * @param EntityDefinitionConfig $config
-     * @param string                 $entityClass
-     *
-     * @return array
-     */
-    private function processCustomTypes(array $data, EntityDefinitionConfig $config, string $entityClass): array
-    {
+    private function processCustomTypes(
+        array $data,
+        EntityDefinitionConfig $config,
+        string $entityClass,
+        array $context
+    ): array {
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (\array_key_exists($fieldName, $data)) {
-                continue;
-            }
             $dataType = $field->getDataType();
             if (!$dataType) {
                 continue;
             }
 
-            if ($this->isNestedObject($dataType)) {
-                $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity(), $config);
-            } elseif (DataType::isExtendedAssociation($dataType)) {
-                list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
-                $associationOwnerPath = $this->getAssociationOwnerPath($field);
-                if ($associationOwnerPath) {
-                    $associationOwnerField = $config->findFieldByPath($associationOwnerPath, true);
-                    if ($associationOwnerField && $associationOwnerField->getTargetClass()) {
-                        $data[$fieldName] = $this->buildExtendedAssociation(
-                            $this->getChildData($data, $associationOwnerPath),
-                            $associationOwnerField->getTargetClass(),
-                            $associationType,
-                            $associationKind
-                        );
-                    }
-                } else {
-                    $data[$fieldName] = $this->buildExtendedAssociation(
-                        $data,
-                        $entityClass,
-                        $associationType,
-                        $associationKind
-                    );
+            if (\array_key_exists($fieldName, $data)) {
+                if (DataType::PERCENT_100 === $dataType && null !== $data[$fieldName]) {
+                    $data[$fieldName] /= 100.0;
                 }
+            } elseif ($this->isNestedObject($dataType)) {
+                $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity(), $config, $context);
+            } elseif (DataType::isExtendedAssociation($dataType)) {
+                $data[$fieldName] = $this->buildExtendedAssociation(
+                    $data,
+                    $entityClass,
+                    $dataType,
+                    $field->getDependsOn()
+                );
             }
         }
 
         return $data;
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     *
-     * @return string[]|null
-     */
-    private function getAssociationOwnerPath(EntityDefinitionFieldConfig $field)
-    {
-        $propertyPath = $field->getPropertyPath();
-        if (!$propertyPath) {
-            return null;
-        }
-
-        $lastDelimiter = \strrpos($propertyPath, ConfigUtil::PATH_DELIMITER);
-        if (false === $lastDelimiter) {
-            return null;
-        }
-
-        return \explode(ConfigUtil::PATH_DELIMITER, \substr($propertyPath, 0, $lastDelimiter));
-    }
-
-    /**
-     * @param array       $data
-     * @param string      $entityClass
-     * @param string      $associationType
-     * @param string|null $associationKind
-     *
-     * @return array|null
-     */
-    private function buildExtendedAssociation(array $data, $entityClass, $associationType, $associationKind)
-    {
+    private function buildExtendedAssociation(
+        array $data,
+        string $entityClass,
+        string $dataType,
+        ?array $targetFieldNames
+    ): ?array {
+        [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
         switch ($associationType) {
             case RelationType::MANY_TO_ONE:
                 return $this->buildManyToOneExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             case RelationType::MANY_TO_MANY:
                 return $this->buildManyToManyExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             case RelationType::MULTIPLE_MANY_TO_ONE:
                 return $this->buildMultipleManyToOneExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             default:
-                throw new \LogicException(
-                    sprintf('Unsupported type of extended association: %s.', $associationType)
-                );
+                throw new \LogicException(sprintf(
+                    'Unsupported type of extended association: %s.',
+                    $associationType
+                ));
         }
     }
 
     /**
-     * @param string      $entityClass
-     * @param string      $associationType
-     * @param string|null $associationKind
+     * @param string        $entityClass
+     * @param string        $associationType
+     * @param string|null   $associationKind
+     * @param string[]|null $targetFieldNames
      *
      * @return array [target entity class => target field name, ...]
      */
-    private function getAssociationTargets($entityClass, $associationType, $associationKind)
-    {
+    private function getAssociationTargets(
+        string $entityClass,
+        string $associationType,
+        ?string $associationKind,
+        ?array $targetFieldNames
+    ): array {
+        if (!$targetFieldNames) {
+            return [];
+        }
+
         $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
         if ($resolvedEntityClass) {
             $entityClass = $resolvedEntityClass;
         }
 
-        return $this->associationManager->getAssociationTargets(
+        return $this->extendedAssociationProvider->filterExtendedAssociationTargets(
             $entityClass,
-            null,
             $associationType,
-            $associationKind
+            $associationKind,
+            $targetFieldNames
         );
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array|null
-     */
-    private function buildManyToOneExtendedAssociation(array $data, array $associationTargets)
+    private function buildManyToOneExtendedAssociation(array $data, array $associationTargets): ?array
     {
         $result = null;
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                $result = $data[$fieldName];
-                $result[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                $result = $data[$targetField];
+                $result[ConfigUtil::CLASS_NAME] = $targetClass;
                 break;
             }
         }
@@ -200,19 +166,13 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array
-     */
-    private function buildManyToManyExtendedAssociation(array $data, array $associationTargets)
+    private function buildManyToManyExtendedAssociation(array $data, array $associationTargets): array
     {
         $result = [];
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                foreach ($data[$fieldName] as $item) {
-                    $item[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                foreach ($data[$targetField] as $item) {
+                    $item[ConfigUtil::CLASS_NAME] = $targetClass;
                     $result[] = $item;
                 }
             }
@@ -221,19 +181,13 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array
-     */
-    private function buildMultipleManyToOneExtendedAssociation(array $data, array $associationTargets)
+    private function buildMultipleManyToOneExtendedAssociation(array $data, array $associationTargets): array
     {
         $result = [];
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                $item = $data[$fieldName];
-                $item[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                $item = $data[$targetField];
+                $item[ConfigUtil::CLASS_NAME] = $targetClass;
                 $result[] = $item;
             }
         }
@@ -241,28 +195,20 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string $dataType
-     *
-     * @return bool
-     */
-    private function isNestedObject($dataType)
+    private function isNestedObject(string $dataType): bool
     {
         return DataType::isNestedObject($dataType) || DataType::isNestedAssociation($dataType);
     }
 
     /**
-     * @param array                  $data
-     * @param EntityDefinitionConfig $config
-     * @param EntityDefinitionConfig $parentConfig
-     *
-     * @return array|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function buildNestedObject(
         array $data,
         EntityDefinitionConfig $config,
-        EntityDefinitionConfig $parentConfig
-    ) {
+        EntityDefinitionConfig $parentConfig,
+        array $context
+    ): ?array {
         $result = [];
         $isEmpty = true;
         $fields = $config->getFields();
@@ -273,17 +219,22 @@ class BuildCustomTypes implements ProcessorInterface
 
             $value = null;
             $targetPropertyPath = $field->getPropertyPath($fieldName);
-            if (false !== \strpos($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
-                throw new RuntimeException(
-                    \sprintf('The "%s" property path is not supported.', $targetPropertyPath)
-                );
+            if (str_contains($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
+                throw new RuntimeException(sprintf(
+                    'The "%s" property path is not supported.',
+                    $targetPropertyPath
+                ));
             }
             $targetFieldName = $parentConfig->findFieldNameByPropertyPath($targetPropertyPath);
             if ($targetFieldName && \array_key_exists($targetFieldName, $data)) {
                 $value = $data[$targetFieldName];
             }
+            if (null !== $value && $this->isEmptyValue($value, $field->getDataType())) {
+                $value = null;
+            }
             if (null !== $value) {
                 $isEmpty = false;
+                $value = $this->valueTransformer->transformFieldValue($value, $field->toArray(true), $context);
             }
             $result[$fieldName] = $value;
         }
@@ -291,25 +242,15 @@ class BuildCustomTypes implements ProcessorInterface
         return $isEmpty ? null : $result;
     }
 
-    /**
-     * @param array  $data
-     * @param string $propertyPath
-     *
-     * @return mixed
-     */
-    private function getChildData(array $data, $propertyPath)
+    private function isEmptyValue(mixed $value, ?string $dataType): bool
     {
-        $result = $data;
-        $path = ConfigUtil::explodePropertyPath($propertyPath);
-        foreach ($path as $fieldName) {
-            if (\is_array($result) && \array_key_exists($fieldName, $result)) {
-                $result = $result[$fieldName];
-            } else {
-                $result = null;
-                break;
-            }
+        if (null === $dataType || DataType::STRING === $dataType) {
+            return '' === $value;
+        }
+        if (DataType::OBJECT === $dataType || DataType::isArray($dataType)) {
+            return [] === $value;
         }
 
-        return $result;
+        return false;
     }
 }

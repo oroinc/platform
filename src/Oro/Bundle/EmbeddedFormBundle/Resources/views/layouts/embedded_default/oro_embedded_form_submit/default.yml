@@ -18,6 +18,3 @@ layout:
             blockType: embed_form_end
             options:
                 form_name: embedded_form
-
-    conditions: 'context["embedded_form_custom_layout"]==""'
-

@@ -9,55 +9,43 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SearchStringFilter
-     */
+    /** @var SearchStringFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
         $formFactory = $this->createMock(FormFactoryInterface::class);
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new SearchStringFilter($formFactory, $filterUtility);
+        $this->filter = new SearchStringFilter($formFactory, new FilterUtility());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
-        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
-        $this->filter->apply($ds, ['type' => TextFilterType::TYPE_EQUAL, 'value' => 'bar']);
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->filter->apply(
+            $this->createMock(FilterDatasourceAdapterInterface::class),
+            ['type' => TextFilterType::TYPE_EQUAL, 'value' => 'bar']
+        );
     }
 
     /**
-     * @param string $filterType
-     * @param string $comparisonOperator
-     * @param array  $filterParams
      * @dataProvider applyDataProvider
      */
-    public function testApply($filterType, $comparisonOperator, array $filterParams = [])
+    public function testApply(int $filterType, string $comparisonOperator, array $filterParams = [])
     {
         $fieldName = 'field';
         $fieldValue = 'value';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
         $ds->expects($this->once())
             ->method('addRestriction')
-            ->with($this->isInstanceOf('Doctrine\Common\Collections\Expr\Comparison'), FilterUtility::CONDITION_AND)
+            ->with($this->isInstanceOf(DoctrineComparison::class), FilterUtility::CONDITION_AND)
             ->willReturnCallback(
                 function (DoctrineComparison $comparison) use ($fieldName, $comparisonOperator, $fieldValue) {
                     $this->assertEquals($fieldName, $comparison->getField());
@@ -76,19 +64,16 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $fieldValue
-     * @param array  $filterParams
      * @dataProvider applyWithMinAndMaxLengthViolatedDataProvider
      */
-    public function testApplyWithMinAndMaxLengthViolated($fieldValue, array $filterParams = [])
+    public function testApplyWithMinAndMaxLengthViolated(string $fieldValue, array $filterParams = [])
     {
         $filterType = 'anyCustomFilterType';
         $fieldName = 'field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ds->expects($this->never())->method('addRestriction');
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
+        $ds->expects($this->never())
+            ->method('addRestriction');
 
         $this->filter->init('test', array_merge([
             FilterUtility::FORCE_LIKE_KEY => false,
@@ -99,10 +84,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]);
     }
 
-    /**
-     * @return array
-     */
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             'contains' => [
@@ -156,14 +138,17 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function applyWithMinAndMaxLengthViolatedDataProvider()
+    public function applyWithMinAndMaxLengthViolatedDataProvider(): array
     {
         return [
             ['abc', [FilterUtility::MIN_LENGTH_KEY => 4]],
             ['abcabcabc', [FilterUtility::MAX_LENGTH_KEY => 6]],
         ];
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

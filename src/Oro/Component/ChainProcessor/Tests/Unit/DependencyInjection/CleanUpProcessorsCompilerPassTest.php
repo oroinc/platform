@@ -3,105 +3,123 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
-use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Component\ChainProcessor\SimpleProcessorRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessWithoutSimpleFactory()
+    /** @var CleanUpProcessorsCompilerPass */
+    private $compiler;
+
+    protected function setUp(): void
     {
-        $container = new ContainerBuilder();
-
-        $simpleProcessor = new Definition('Test\SimpleProcessor');
-        $simpleProcessor->addTag('processor');
-
-        $container->addDefinitions([
-            'simple_processor' => $simpleProcessor,
-        ]);
-
-        $compilerPass = new CleanUpProcessorsCompilerPass(
-            'simple_factory',
-            'processor'
-        );
-
-        $compilerPass->process($container);
-
-        self::assertTrue($container->hasDefinition('simple_processor'));
+        $this->compiler = new CleanUpProcessorsCompilerPass('simple_factory', 'processor');
     }
 
-    public function testProcess()
+    public function testProcessForProcessorWithoutArguments()
     {
         $container = new ContainerBuilder();
+        $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
+            ->addArgument([]);
+        $container->register('simple_processor', 'Test\SimpleProcessor')
+            ->addTag('processor');
+        $container->register('abstract_processor')
+            ->setAbstract(true)
+            ->addTag('processor');
+        $container->register('lazy_processor', 'Test\LazyProcessor')
+            ->setLazy(true)
+            ->addTag('processor');
 
-        $simpleFactory = new Definition(SimpleProcessorFactory::class, [[]]);
-
-        $simpleProcessor = new Definition('Test\SimpleProcessor');
-        $simpleProcessor->addTag('processor');
-
-        $abstractProcessor = new Definition();
-        $abstractProcessor->setAbstract(true);
-        $abstractProcessor->addTag('processor');
-
-        $lazyProcessor = new Definition('Test\LazyProcessor');
-        $lazyProcessor->setLazy(true);
-        $lazyProcessor->addTag('processor');
-
-        $withArgumentsProcessor = new Definition('Test\WithArgumentsProcessor', ['test']);
-        $withArgumentsProcessor->addTag('processor');
-
-        $container->addDefinitions([
-            'simple_factory'           => $simpleFactory,
-            'simple_processor'         => $simpleProcessor,
-            'abstract_processor'       => $abstractProcessor,
-            'lazy_processor'           => $lazyProcessor,
-            'with_arguments_processor' => $withArgumentsProcessor,
-        ]);
-
-        $compilerPass = new CleanUpProcessorsCompilerPass(
-            'simple_factory',
-            'processor'
-        );
-
-        $compilerPass->process($container);
+        $this->compiler->process($container);
 
         self::assertFalse($container->hasDefinition('simple_processor'));
         self::assertTrue($container->hasDefinition('abstract_processor'));
         self::assertTrue($container->hasDefinition('lazy_processor'));
-        self::assertTrue($container->hasDefinition('with_arguments_processor'));
 
         self::assertEquals(
             ['simple_processor' => 'Test\SimpleProcessor'],
-            $simpleFactory->getArgument(0)
+            $simpleRegistryDef->getArgument(0)
         );
+    }
+
+    /**
+     * @dataProvider processorWithSimpleArgumentsDataProvider
+     */
+    public function testProcessForProcessorWithSimpleArguments(array $arguments)
+    {
+        $container = new ContainerBuilder();
+        $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
+            ->addArgument([]);
+        $container->register('processor', 'Test\Processor')
+            ->setArguments($arguments)
+            ->addTag('processor');
+
+        $this->compiler->process($container);
+
+        self::assertFalse($container->hasDefinition('processor'));
+        self::assertSame(
+            ['processor' => ['Test\Processor', $arguments]],
+            $simpleRegistryDef->getArgument(0)
+        );
+    }
+
+    public function processorWithSimpleArgumentsDataProvider()
+    {
+        return [
+            ['arguments' => [null]],
+            ['arguments' => ['test']],
+            ['arguments' => [false]],
+            ['arguments' => [true]],
+            ['arguments' => [123]],
+            ['arguments' => [12.3]],
+            ['arguments' => ['test', 123]]
+        ];
+    }
+
+    /**
+     * @dataProvider processorWithNotSimpleArgumentsDataProvider
+     */
+    public function testProcessForProcessorWithNotSimpleArguments(array $arguments)
+    {
+        $container = new ContainerBuilder();
+        $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
+            ->addArgument([]);
+        $container->register('processor', 'Test\Processor')
+            ->setArguments($arguments)
+            ->addTag('processor');
+
+        $this->compiler->process($container);
+
+        self::assertTrue($container->hasDefinition('processor'));
+        self::assertSame([], $simpleRegistryDef->getArgument(0));
+    }
+
+    public function processorWithNotSimpleArgumentsDataProvider()
+    {
+        return [
+            ['arguments' => [['value']]],
+            ['arguments' => [['key' => 'value']]],
+            ['arguments' => [new Reference('test')]],
+            ['arguments' => ['test', new Reference('test')]]
+        ];
     }
 
     public function testProcessForSimpleFactoryWithoutArguments()
     {
         $container = new ContainerBuilder();
+        $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
+            ->addArgument([]);
+        $container->register('simple_processor', 'Test\SimpleProcessor')
+            ->addTag('processor');
 
-        $simpleFactory = new Definition(SimpleProcessorFactory::class, []);
-
-        $simpleProcessor = new Definition('Test\SimpleProcessor');
-        $simpleProcessor->addTag('processor');
-
-        $container->addDefinitions([
-            'simple_factory'   => $simpleFactory,
-            'simple_processor' => $simpleProcessor
-        ]);
-
-        $compilerPass = new CleanUpProcessorsCompilerPass(
-            'simple_factory',
-            'processor'
-        );
-
-        $compilerPass->process($container);
+        $this->compiler->process($container);
 
         self::assertFalse($container->hasDefinition('simple_processor'));
 
         self::assertEquals(
             ['simple_processor' => 'Test\SimpleProcessor'],
-            $simpleFactory->getArgument(0)
+            $simpleRegistryDef->getArgument(0)
         );
     }
 }

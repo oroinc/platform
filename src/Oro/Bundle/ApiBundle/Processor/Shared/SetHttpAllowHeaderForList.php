@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,10 +17,11 @@ class SetHttpAllowHeaderForList extends SetHttpAllowHeader
     protected function getHttpMethodToActionsMap()
     {
         return [
-            Request::METHOD_OPTIONS => ApiActions::OPTIONS,
-            Request::METHOD_GET     => ApiActions::GET_LIST,
-            Request::METHOD_POST    => ApiActions::CREATE,
-            Request::METHOD_DELETE  => ApiActions::DELETE_LIST
+            Request::METHOD_OPTIONS => ApiAction::OPTIONS,
+            Request::METHOD_GET     => ApiAction::GET_LIST,
+            Request::METHOD_PATCH   => ApiAction::UPDATE_LIST,
+            Request::METHOD_POST    => ApiAction::CREATE,
+            Request::METHOD_DELETE  => ApiAction::DELETE_LIST
         ];
     }
 }

@@ -5,41 +5,43 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * This class provides a functionality to find ACL extension
+ * Provides a way to find ACL extension.
  */
-class AclExtensionSelector
+class AclExtensionSelector implements ResetInterface
 {
-    /** @var ObjectIdAccessor */
-    protected $objectIdAccessor;
+    private array $extensionNames;
+    private ContainerInterface $extensionContainer;
+    private ObjectIdAccessor $objectIdAccessor;
 
-    /** @var AclExtensionInterface[] */
-    protected $extensions = [];
+    /** @var AclExtensionInterface[]|null [ACL extension key => ACL extension, ...] */
+    private ?array $extensions = null;
+    /** @var array [cache key => ACL extension or NULL, ...] */
+    private $localCache = [];
 
-    /** @var array [cache key => ACL extension, ...] */
-    protected $localCache = [];
-
-    /**
-     * @param ObjectIdAccessor $objectIdAccessor
-     */
-    public function __construct(ObjectIdAccessor $objectIdAccessor)
-    {
+    public function __construct(
+        array $extensionNames,
+        ContainerInterface $extensionContainer,
+        ObjectIdAccessor $objectIdAccessor
+    ) {
+        $this->extensionNames = $extensionNames;
+        $this->extensionContainer = $extensionContainer;
         $this->objectIdAccessor = $objectIdAccessor;
     }
 
     /**
-     * Adds ACL extension
-     *
-     * @param AclExtensionInterface $extension
+     * {@inheritDoc}
      */
-    public function addAclExtension(AclExtensionInterface $extension)
+    public function reset()
     {
-        $this->extensions[] = $extension;
+        $this->localCache = [];
     }
 
     /**
@@ -51,13 +53,7 @@ class AclExtensionSelector
      */
     public function selectByExtensionKey($extensionKey)
     {
-        foreach ($this->extensions as $extension) {
-            if ($extension->getExtensionKey() === $extensionKey) {
-                return $extension;
-            }
-        }
-
-        return null;
+        return $this->all()[$extensionKey] ?? null;
     }
 
     /**
@@ -71,6 +67,7 @@ class AclExtensionSelector
      *
      * @throws InvalidDomainObjectException if ACL extension was not found for the given domain object
      *                                      and $throwException is requested (default behaviour)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function select($val, $throwException = true)
     {
@@ -79,16 +76,16 @@ class AclExtensionSelector
         }
 
         $type = $id = $fieldName = null;
-        if (is_string($val)) {
-            list($id, $type, $fieldName) = ObjectIdentityHelper::parseIdentityString($val);
-        } elseif (is_object($val)) {
-            list($id, $type, $fieldName) = $this->parseObject($val);
+        if (\is_string($val)) {
+            [$id, $type, $fieldName] = ObjectIdentityHelper::parseIdentityString($val);
+        } elseif (\is_object($val)) {
+            [$id, $type, $fieldName] = $this->parseObject($val);
         }
 
         $result = null;
         if ($type !== null) {
             $cacheKey = ((string)$id) . '!' . $type;
-            if (array_key_exists($cacheKey, $this->localCache)) {
+            if (\array_key_exists($cacheKey, $this->localCache)) {
                 $result = $this->localCache[$cacheKey];
             } else {
                 $result = $this->findExtension($type, $id);
@@ -110,12 +107,21 @@ class AclExtensionSelector
     }
 
     /**
-     * Gets all ACL extension
+     * Gets all ACL extensions.
      *
-     * @return AclExtensionInterface[]
+     * @return AclExtensionInterface[] [ACL extension key => ACL extension, ...]
      */
     public function all()
     {
+        if (null === $this->extensions) {
+            $this->extensions = [];
+            foreach ($this->extensionNames as $name) {
+                /** @var AclExtensionInterface $extension */
+                $extension = $this->extensionContainer->get($name);
+                $this->extensions[$extension->getExtensionKey()] = $extension;
+            }
+        }
+
         return $this->extensions;
     }
 
@@ -124,7 +130,7 @@ class AclExtensionSelector
      *
      * @return array [id, type, field name]
      */
-    protected function parseObject($object)
+    private function parseObject($object)
     {
         $fieldName = null;
         if ($object instanceof FieldVote) {
@@ -147,7 +153,7 @@ class AclExtensionSelector
             try {
                 $id = $this->objectIdAccessor->getId($object);
                 $type = ClassUtils::getRealClass($object);
-            } catch (InvalidDomainObjectException $e) {
+            } catch (\Throwable $e) {
                 $id = null;
                 $type = null;
             }
@@ -162,9 +168,10 @@ class AclExtensionSelector
      *
      * @return AclExtensionInterface|null
      */
-    protected function findExtension($type, $id)
+    private function findExtension($type, $id)
     {
-        foreach ($this->extensions as $extension) {
+        $extensions = $this->all();
+        foreach ($extensions as $extension) {
             if ($extension->supports($type, $id)) {
                 return $extension;
             }
@@ -183,7 +190,7 @@ class AclExtensionSelector
      *
      * @return InvalidDomainObjectException
      */
-    protected function createAclExtensionNotFoundException($val, $type, $id, $fieldName = null)
+    private function createAclExtensionNotFoundException($val, $type, $id, $fieldName = null)
     {
         $objInfo = is_object($val) && !($val instanceof ObjectIdentityInterface)
             ? get_class($val)

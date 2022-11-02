@@ -12,10 +12,6 @@ class TraceableProcessorApplicableCheckerFactory implements ProcessorApplicableC
     /** @var TraceLogger */
     protected $logger;
 
-    /**
-     * @param ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory
-     * @param TraceLogger                                $logger
-     */
     public function __construct(
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory,
         TraceLogger $logger

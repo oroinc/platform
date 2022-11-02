@@ -2,186 +2,96 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Oro\Bundle\UserBundle\Configuration\PrivilegeCategoryConfigurationProvider;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides information about ACL categories for user role.
+ */
 class RolePrivilegeCategoryProvider
 {
+    /** @var PrivilegeCategoryConfigurationProvider */
+    private $configurationProvider;
+
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
-    /**
-     * @var PrivilegeCategoryProviderInterface[]
-     */
-    protected $providers = [];
+    /** @var PrivilegeCategory[]|null */
+    private $categories;
 
-    /**
-     * @var PrivilegeCategory[]
-     */
-    protected $categoryList = [];
-
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
+    public function __construct(
+        PrivilegeCategoryConfigurationProvider $configurationProvider,
+        TranslatorInterface $translator
+    ) {
+        $this->configurationProvider = $configurationProvider;
         $this->translator = $translator;
     }
 
     /**
-     * Add provider to registry
+     * Gets all categories.
      *
-     * @param PrivilegeCategoryProviderInterface $provider
+     * @return PrivilegeCategory[] Categories sorted by priority
      */
-    public function addProvider(PrivilegeCategoryProviderInterface $provider)
+    public function getCategories(): array
     {
-        $this->providers[$provider->getName()] = $provider;
-    }
-
-    /**
-     * Get all providers
-     *
-     * @return PrivilegeCategoryProviderInterface[]
-     */
-    public function getProviders()
-    {
-        return $this->providers;
-    }
-
-    /**
-     * Get provider by name
-     *
-     * @param string $name
-     *
-     * @return null|PrivilegeCategoryProviderInterface
-     */
-    public function getProviderByName($name)
-    {
-        if ($this->hasProvider($name)) {
-            return $this->providers[$name];
+        if (null === $this->categories) {
+            $categories = [];
+            $items = $this->configurationProvider->getCategories();
+            foreach ($items as $id => $item) {
+                $categories[$item['priority']][] = new PrivilegeCategory(
+                    $id,
+                    $item['label'],
+                    $item['tab'],
+                    $item['priority']
+                );
+            }
+            if ($categories) {
+                ksort($categories);
+                $categories = array_merge(...array_values($categories));
+            }
+            $this->categories = $categories;
         }
 
-        return null;
+        return $this->categories;
     }
 
     /**
-     * Check available provider by name
+     * Gets identifiers of all categories marked as tabs.
      *
-     * @param string $name
-     *
-     * @return bool
+     * @return string[] Tab identifiers sorted by priority
      */
-    public function hasProvider($name)
+    public function getTabIds(): array
     {
-        return array_key_exists($name, $this->providers);
-    }
-
-    /**
-     * Get category by name
-     *
-     * @param string $categoryName
-     *
-     * @return PrivilegeCategory|null
-     */
-    public function getCategory($categoryName)
-    {
-        foreach ($this->getAllCategories() as $category) {
-            if ($category->getId() === $categoryName) {
-                return $category;
+        $result = [];
+        $categories = $this->getCategories();
+        foreach ($categories as $category) {
+            if ($category->isTab()) {
+                $result[] = $category->getId();
             }
         }
+
+        return $result;
     }
 
     /**
-     * Get all categories
+     * Gets tab details for all categories marked as tabs.
      *
-     * @return array
+     * @return array [['id' => identifier, 'label' => translated name], ...] Details of tabs sorted by priority
      */
-    public function getAllCategories()
+    public function getTabs(): array
     {
-        if ($this->categoryList) {
-            return $this->categoryList;
-        }
-
-        $categoryList = [];
-        $providers = $this->getProviders();
-        foreach ($providers as $provider) {
-            $categories = $provider->getRolePrivilegeCategory();
-            if (is_object($categories)) {
-                $categories = [$categories];
-            }
-            $categoryList = array_merge(array_values($categoryList), array_values($categories));
-        }
-        $this->categoryList = $categoryList;
-
-        return $this->categoryList;
-    }
-
-    /**
-     * Get all categories
-     *
-     * @return PrivilegeCategory[]
-     */
-    public function getPermissionCategories()
-    {
-        $categoryList = $this->getAllCategories();
-
-        $orderedCategoryList = [];
-        /** @var PrivilegeCategory $category */
-        foreach ($categoryList as $category) {
-            if ($category->isVisible()) {
-                $priority = $category->getPriority();
-                $orderedCategoryList[$priority][] = $category;
-            }
-        }
-        ksort($orderedCategoryList);
-
-        return $orderedCategoryList ? call_user_func_array('array_merge', $orderedCategoryList) : [];
-    }
-
-    /**
-     * Get categories market as tabbed
-     *
-     * @return PrivilegeCategory[]
-     */
-    public function getTabbedCategories()
-    {
-        $tabs = $this->getTabList();
-
-        return array_values(array_filter($this->getPermissionCategories(), function ($category) use ($tabs) {
-            /** @var PrivilegeCategory $category */
-            return in_array($category->getId(), $tabs, true);
-        }));
-    }
-
-    /**
-     * Get list of tabs
-     *
-     * @return array
-     */
-    public function getTabList()
-    {
-        return array_filter(array_map(function ($category) {
-            /** @var PrivilegeCategory $category */
-            return $category->isTab() ? $category->getId() : null;
-        }, $this->getPermissionCategories()));
-    }
-
-    /**
-     * Get tabs
-     *
-     * @return array
-     */
-    public function getTabs()
-    {
-        return array_values(
-            array_map(function ($tab) {
-                /** @var PrivilegeCategory $tab */
-                return [
-                    'id' => $tab->getId(),
-                    'label' => $this->translator->trans($tab->getLabel())
+        $result = [];
+        $categories = $this->getCategories();
+        foreach ($categories as $category) {
+            if ($category->isTab()) {
+                $result[] = [
+                    'id'    => $category->getId(),
+                    'label' => $this->translator->trans($category->getLabel())
                 ];
-            }, $this->getTabbedCategories())
-        );
+            }
+        }
+
+        return $result;
     }
 }

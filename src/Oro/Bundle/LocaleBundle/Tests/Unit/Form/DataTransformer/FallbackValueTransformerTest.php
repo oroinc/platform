@@ -7,30 +7,23 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FallbackValueTransformer
-     */
-    protected $transformer;
+    /** @var FallbackValueTransformer */
+    private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new FallbackValueTransformer();
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider transformDataProvider
      */
-    public function testTransform($input, $expected)
+    public function testTransform(FallbackType|string|null $input, array $expected): void
     {
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             'null' => [
@@ -49,19 +42,14 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($input, $expected)
+    public function testReverseTransform(?array $input, ?string $expected): void
     {
-        $this->assertEquals($expected, $this->transformer->reverseTransform($input));
+        $this->assertSame($expected, $this->transformer->reverseTransform($input));
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'null' => [
@@ -74,15 +62,41 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             'empty values' => [
                 'input'    => ['value' => null, 'fallback' => null],
-                'expected' => null,
+                'expected' => '',
             ],
             'scalar' => [
                 'input'    => ['value' => 'string', 'fallback' => null],
                 'expected' => 'string',
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider reverseTransformWhenFallbackDataProvider
+     */
+    public function testReverseTransformWhenFallback(array $input, FallbackType|string $expected): void
+    {
+        $this->assertEquals($expected, $this->transformer->reverseTransform($input));
+    }
+
+    public function reverseTransformWhenFallbackDataProvider(): array
+    {
+        return [
             'fallback' => [
-                'expected' => ['value' => null, 'fallback' => FallbackType::SYSTEM],
-                'input'    => new FallbackType(FallbackType::SYSTEM),
+                'input' => ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
+                'expected' => new FallbackType(FallbackType::SYSTEM),
+            ],
+            'when not use_fallback than value' => [
+                'input' => ['value' => 'string', 'fallback' => FallbackType::SYSTEM, 'use_fallback' => false],
+                'expected' => 'string',
+            ],
+            'when use_fallback than fallback' => [
+                'input' => ['value' => 'string', 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
+                'expected' => new FallbackType(FallbackType::SYSTEM),
+            ],
+            'use_fallback required fallback' => [
+                'input' => ['value' => 'string', 'use_fallback' => true],
+                'expected' => 'string',
             ],
         ];
     }

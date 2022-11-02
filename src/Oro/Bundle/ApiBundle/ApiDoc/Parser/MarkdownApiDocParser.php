@@ -6,10 +6,10 @@ use Michelf\MarkdownExtra;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
-use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
- * Extracts Data API resources documentation from Markdown files.
+ * Extracts documentation for API resources from Markdown files.
  * This parser supports Markdown Extra syntax.
  * @link https://michelf.ca/projects/php-markdown/extra/
  *
@@ -50,16 +50,13 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      */
     private $loadedData = [];
 
-    /** @var FileLocator */
+    /** @var FileLocatorInterface */
     private $fileLocator;
 
     /** @var string[] */
     private $parsedFiles = [];
 
-    /**
-     * @param FileLocator $fileLocator
-     */
-    public function __construct(FileLocator $fileLocator)
+    public function __construct(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
     }
@@ -135,7 +132,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param array $newData
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function merge(array $newData): void
     {
@@ -171,7 +168,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param string $fileContent
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseDocumentation(string $fileContent): void
     {
@@ -211,11 +208,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         $this->normalizeLoadedData();
     }
 
-    /**
-     * @param string $section
-     *
-     * @return bool
-     */
     private function hasSubElements(string $section): bool
     {
         return ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section;
@@ -232,9 +224,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param \DOMDocument              $doc
-     * @param \DOMNode                  $node
-     * @param MarkdownApiDocParserState $state
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state): void
     {
@@ -276,14 +266,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         }
     }
 
-    /**
-     * @param string      $className
-     * @param string      $section
-     * @param string      $element
-     * @param string|null $subElement
-     *
-     * @return string|null
-     */
     private function getDocumentation(
         string $className,
         string $section,

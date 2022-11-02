@@ -1,0 +1,9 @@
+include:
+    - '@OroLocaleBundle:ZuluLocalization.yml'
+
+Oro\Bundle\TranslationBundle\Entity\Translation:
+    all_grid_view_label_group:
+        translationKey: '@oro_group_all_grid_view_label'
+        value: 'All ZuluGroups'
+        language: '@zulu_lang'
+        scope: 1

@@ -1,0 +1,23 @@
+/* @theme: default; */
+
+[class^='fa-'],
+[class*=' fa-'] {
+    display: inline-block;
+
+    font-family: $fa-font-family;
+    font-weight: font-weight('light');
+    font-style: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+
+    margin-right: $font-icon-offset-end;
+
+    &.hide-text {
+        &::before,
+        &::after {
+            font-family: $fa-font-family;
+        }
+    }
+}

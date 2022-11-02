@@ -2,17 +2,32 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class ChannelRepository extends EntityRepository
+/**
+ * Doctrine repository for Channel entity
+ */
+class ChannelRepository extends ServiceEntityRepository
 {
     const BUFFER_SIZE = 100;
+
+    /**
+     * @var AclHelper
+     */
+    private $aclHelper;
+
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
 
     /**
      * Returns latest status for integration's connector and code if it exists.
@@ -70,7 +85,7 @@ class ChannelRepository extends EntityRepository
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
                 ->setParameter('code', (string)$code);
-        };
+        }
 
         return $queryBuilder;
     }
@@ -89,11 +104,14 @@ class ChannelRepository extends EntityRepository
         $qb = $this->createQueryBuilder('c')
             ->where('c.transport is NOT NULL')
             ->andWhere('c.enabled = :isEnabled')
-            ->setParameter('isEnabled', true);
+            ->setParameter('isEnabled', true, Types::BOOLEAN);
 
         if (null !== $type) {
             $qb->andWhere('c.type = :type')
-                ->setParameter('type', $type);
+                ->setParameter('type', $type, Types::STRING);
+        } else {
+            $qb->andWhere($qb->expr()->neq('c.connectors', ':emptyConnectors'))
+                ->setParameter('emptyConnectors', [], Types::ARRAY);
         }
 
         $integrations = $qb->getQuery()->getResult();
@@ -131,22 +149,6 @@ class ChannelRepository extends EntityRepository
 
     /**
      * Adds status to integration, manual persist of newly created statuses and do flush.
-     *
-     * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
-     *
-     * @param Integration $integration
-     * @param Status      $status
-     */
-    public function addStatus(Integration $integration, Status $status)
-    {
-        $this->addStatusAndFlush($integration, $status);
-    }
-
-    /**
-     * Adds status to integration, manual persist of newly created statuses and do flush.
-     *
-     * @param Integration $integration
-     * @param Status      $status
      */
     public function addStatusAndFlush(Integration $integration, Status $status)
     {
@@ -214,6 +216,6 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('channels', $excludedChannels);
         }
 
-        return $qb->getQuery()->getResult();
+        return $this->aclHelper->apply($qb)->getResult();
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ProcessHandleEvent extends Event
 {
@@ -18,10 +18,6 @@ class ProcessHandleEvent extends Event
      */
     protected $processData;
 
-    /**
-     * @param ProcessTrigger $processTrigger
-     * @param ProcessData $processData
-     */
     public function __construct(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $this->processTrigger = $processTrigger;

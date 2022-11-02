@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -14,23 +16,35 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 class UserEmailOriginRepository extends EntityRepository
 {
     /**
+     * @param string $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithAccessTokens()
+    public function getAllOriginsWithAccessTokens(string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.accessToken'));
+        if (null !== $type) {
+            $queryBuilder
+                ->andWhere('user_email_origin.accountType = :typeName')
+                ->setParameter('typeName', $type);
+        }
 
         return $queryBuilder;
     }
 
     /**
+     * @param string $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithRefreshTokens()
+    public function getAllOriginsWithRefreshTokens(string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.refreshToken'));
+        if (null !== $type) {
+            $queryBuilder
+                ->andWhere('user_email_origin.accountType = :typeName')
+                ->setParameter('typeName', $type);
+        }
 
         return $queryBuilder;
     }
@@ -94,5 +108,27 @@ class UserEmailOriginRepository extends EntityRepository
             )
             ->getQuery()
             ->execute($params);
+    }
+
+    public function getEmailIdsFromDisabledFoldersIterator(EmailOrigin $origin): BufferedQueryResultIterator
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('IDENTITY(ie.email) as id, ie')
+            ->from(ImapEmail::class, 'ie')
+            ->join('ie.imapFolder', 'ief')
+            ->join('ief.folder', 'ef')
+            ->andWhere('ef.origin =:originId')
+            ->setParameter('originId', $origin->getId());
+
+        if ($origin->isActive()) {
+            $qb->andWhere('ef.syncEnabled = :syncEnabled')
+                ->setParameter('syncEnabled', false);
+        }
+
+        $iterator = new BufferedQueryResultIterator($qb);
+        $iterator->setBufferSize(2000);
+
+        return $iterator;
     }
 }

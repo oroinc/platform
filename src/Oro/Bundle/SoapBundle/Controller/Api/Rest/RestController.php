@@ -3,14 +3,16 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
-use FOS\RestBundle\Util\Codes;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The base class for REST API CRUD controllers.
+ */
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
     FormHandlerAwareInterface,
@@ -26,12 +28,12 @@ abstract class RestController extends RestGetController implements
         if ($entity) {
             $entity = $this->processForm($entity);
             if ($entity) {
-                $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+                $view = $this->view(null, Response::HTTP_NO_CONTENT);
             } else {
-                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                $view = $this->view($this->getForm(), Response::HTTP_BAD_REQUEST);
             }
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
         }
 
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
@@ -52,10 +54,10 @@ abstract class RestController extends RestGetController implements
         $entity = $this->processForm($entity);
 
         if ($entity) {
-            $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+            $view = $this->view($this->createResponseData($entity), Response::HTTP_CREATED);
             $isProcessed = true;
         } else {
-            $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            $view = $this->view($this->getForm(), Response::HTTP_BAD_REQUEST);
         }
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
@@ -93,19 +95,19 @@ abstract class RestController extends RestGetController implements
     /**
      * {@inheritdoc}
      */
-    public function handleDeleteRequest($id)
+    public function handleDeleteRequest($id, array $options = [])
     {
         $isProcessed = false;
 
         try {
-            $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+            $this->getDeleteHandler()->handleDelete($id, $this->getManager(), $options);
 
             $isProcessed = true;
-            $view        = $this->view(null, Codes::HTTP_NO_CONTENT);
-        } catch (EntityNotFoundException $notFoundEx) {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
-        } catch (ForbiddenException $forbiddenEx) {
-            $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+            $view        = $this->view(null, Response::HTTP_NO_CONTENT);
+        } catch (EntityNotFoundException $e) {
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
+        } catch (AccessDeniedException $e) {
+            $view = $this->view(['reason' => $e->getMessage()], Response::HTTP_FORBIDDEN);
         }
 
         return $this->buildResponse($view, self::ACTION_DELETE, ['id' => $id, 'success' => $isProcessed]);

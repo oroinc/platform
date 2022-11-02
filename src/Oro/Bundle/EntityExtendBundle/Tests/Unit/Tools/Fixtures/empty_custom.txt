@@ -2,7 +2,7 @@ namespace Test;
 
 class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    protected $id;
+    protected $id = null;
 
     public function getId()
     {

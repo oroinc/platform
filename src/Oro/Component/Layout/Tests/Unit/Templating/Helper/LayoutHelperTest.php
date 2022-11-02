@@ -8,28 +8,28 @@ use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 use Oro\Component\Layout\Templating\TextHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $renderer;
+    private $renderer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TextHelper */
-    protected $textHelper;
-
-    /** @var LayoutHelper */
-    protected $helper;
+    /** @var TextHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $textHelper;
 
     /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formRenderer;
+    private $formRenderer;
 
-    protected function setUp()
+    /** @var LayoutHelper */
+    private $helper;
+
+    protected function setUp(): void
     {
-        $this->renderer   = $this->createMock('Oro\Component\Layout\Form\FormRendererInterface');
-        $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formRenderer = $this->createMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
+        $this->renderer = $this->createMock(FormRendererInterface::class);
+        $this->textHelper = $this->createMock(TextHelper::class);
+        $this->formRenderer = $this->createMock(FormRendererEngineInterface::class);
 
         $this->helper = new LayoutHelper($this->renderer, $this->textHelper, $this->formRenderer);
     }
@@ -41,7 +41,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSetBlockTheme()
     {
-        $view  = new BlockView();
+        $view = new BlockView();
         $theme = 'MyBundle:Layout\php';
 
         $this->renderer->expects($this->once())
@@ -64,7 +64,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWidgetRendering()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -76,7 +76,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testParentBlockWidgetRendering()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -88,7 +88,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testRowRendering()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -100,8 +100,8 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLabelRendering()
     {
-        $view      = new BlockView();
-        $label     = 'test_label';
+        $view = new BlockView();
+        $label = 'test_label';
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -113,8 +113,8 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLabelRenderingWithLabelInVariables()
     {
-        $view      = new BlockView();
-        $label     = 'test_label';
+        $view = new BlockView();
+        $label = 'test_label';
         $variables = ['foo' => 'bar', 'label' => 'original_label'];
 
         $this->renderer->expects($this->once())
@@ -126,7 +126,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLabelRenderingWithNoLabelSpecified()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -138,7 +138,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLabelRenderingWithEmptyLabel()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -150,7 +150,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testBlockRendering()
     {
-        $view      = new BlockView();
+        $view = new BlockView();
         $blockName = 'test';
         $variables = ['foo' => 'bar'];
 
@@ -166,7 +166,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
         $this->textHelper->expects($this->once())
             ->method('processText')
             ->with('test', 'domain')
-            ->will($this->returnValue('processed'));
+            ->willReturn('processed');
 
         $this->assertEquals('processed', $this->helper->text('test', 'domain'));
     }

@@ -2,47 +2,42 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Provider\DoctrineListener;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class DoctrineListenerTest extends TestCase
+class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineListener
-     */
-    protected $listener;
+    /** @var EntityPool|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityPool;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityPool;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var DoctrineListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityPool = $this->createMock('Oro\Bundle\NotificationBundle\Doctrine\EntityPool');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->entityPool = $this->createMock(EntityPool::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->listener = new DoctrineListener($this->entityPool, $this->eventDispatcher);
     }
 
     public function testPostFlush()
     {
-        $args = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $args = $this->createMock(PostFlushEventArgs::class);
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
         $args->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($entityManager));
+            ->willReturn($entityManager);
 
         $this->entityPool->expects($this->once())
             ->method('persistAndFlush')
@@ -52,44 +47,37 @@ class DoctrineListenerTest extends TestCase
     }
 
     /**
-     * @dataProvider eventData
-     * @param $methodName
-     * @param $eventName
+     * @dataProvider eventDataProvider
      */
-    public function testEventDispatchers($methodName, $eventName)
+    public function testEventDispatchers(string $methodName, string $eventName)
     {
-        $args = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue('something'));
+            ->willReturn('something');
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo($eventName), $this->isInstanceOf('Symfony\Component\EventDispatcher\Event'));
+            ->with($this->isInstanceOf(Event::class), $eventName);
 
         $this->listener->$methodName($args);
     }
 
-    /**
-     * data provider
-     */
-    public function eventData()
+    public function eventDataProvider(): array
     {
-        return array(
-            'post update event case'  => array(
+        return [
+            'post update event case'  => [
                 'method name'            => 'postUpdate',
                 'expected event name'    => 'oro.notification.event.entity_post_update'
-            ),
-            'post persist event case' => array(
+            ],
+            'post persist event case' => [
                 'method name'            => 'postPersist',
                 'expected event name'    => 'oro.notification.event.entity_post_persist'
-            ),
-            'post remove event case'  => array(
+            ],
+            'post remove event case'  => [
                 'method name'            => 'postRemove',
                 'expected event name'    => 'oro.notification.event.entity_post_remove'
-            ),
-        );
+            ],
+        ];
     }
 }

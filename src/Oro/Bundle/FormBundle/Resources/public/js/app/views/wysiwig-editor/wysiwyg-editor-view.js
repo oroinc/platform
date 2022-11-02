@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var WysiwygEditorView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var tools = require('oroui/js/tools');
-    var txtHtmlTransformer = require('./txt-html-transformer');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var tinyMCE = require('tinymce/tinymce');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const tools = require('oroui/js/tools');
+    const __ = require('orotranslation/js/translator');
+    const txtHtmlTransformer = require('./txt-html-transformer');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const tinyMCE = require('tinymce/tinymce');
 
-    WysiwygEditorView = BaseView.extend({
+    const WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
 
@@ -24,34 +24,71 @@ define(function(require) {
 
         defaults: {
             enabled: true,
-            plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
+            isHtml: true,
+            width: '100%',
+            min_height: 250,
+            plugins: ['code', 'paste', 'lists', 'advlist', 'image'],
+            pluginsMap: {},
             menubar: false,
-            toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
-            statusbar: false,
+            toolbar: ['undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' +
+            '| alignleft aligncenter alignright alignjustify | image'],
+            toolbar_mode: 'sliding',
+            elementpath: false,
+            branding: false,
             browser_spellcheck: true,
             images_dataimg_filter: function() {
                 return false;
             },
-            paste_data_images: false
+            file_picker_types: 'image',
+            file_picker_callback: function(callback, value, meta) {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.onchange = () => {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        callback(event.target.result, {alt: file.name});
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            },
+            paste_data_images: false,
+            block_formats: [
+                `${__('oro.form.tinymce.paragraph')}=p`,
+                `${__('oro.form.tinymce.h1')}=h1`,
+                `${__('oro.form.tinymce.h2')}=h2`,
+                `${__('oro.form.tinymce.h3')}=h3`,
+                `${__('oro.form.tinymce.h4')}=h4`,
+                `${__('oro.form.tinymce.h5')}=h5`,
+                `${__('oro.form.tinymce.h6')}=h6`
+            ].join(';')
         },
 
         events: {
-            'set-focus': 'setFocus'
+            'set-focus': 'setFocus',
+            'wysiwyg:enable': 'enableEditor',
+            'wysiwyg:disable': 'disableEditor'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WysiwygEditorView() {
-            WysiwygEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function WysiwygEditorView(options) {
+            WysiwygEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
+            this.isHtml = options.isHtml;
+            if (this.firstRender && !this.autoRender) {
+                this.enabled = false;
+            }
             this.options = _.omit(options, 'enabled', 'el');
             if (tools.isIOS()) {
                 this.options.plugins = _.without(this.options.plugins, 'fullscreen');
@@ -59,7 +96,7 @@ define(function(require) {
                     return toolbar.replace(/\s*\|\s?fullscreen/, '');
                 });
             }
-            WysiwygEditorView.__super__.initialize.apply(this, arguments);
+            WysiwygEditorView.__super__.initialize.call(this, options);
         },
 
         render: function() {
@@ -71,13 +108,16 @@ define(function(require) {
                 this.tinymceInstance = null;
 
                 // strip tags when disable HTML editing mode
-                this.htmlValue = this.$el.val();
-                this.strippedValue = txtHtmlTransformer.html2text(this.htmlValue);
-                this.$el.val(this.strippedValue);
+                if (!this.isHtml) {
+                    this.htmlValue = this.$el.val();
+                    this.strippedValue = txtHtmlTransformer.html2text(this.htmlValue);
+                    this.$el.val(this.strippedValue);
+                }
 
                 this.$el.show();
                 this.tinymceConnected = false;
             }
+
             if (this.enabled) {
                 this.connectTinyMCE();
                 this.$el.attr('data-focusable', true);
@@ -85,13 +125,15 @@ define(function(require) {
             } else {
                 this.$el.removeAttr('data-focusable');
             }
+
             this.firstRender = false;
+            this.$el.trigger('rendered', {tinymceConnected: this.tinymceConnected});
             this.trigger('resize');
         },
 
         connectTinyMCE: function() {
-            var self = this;
-            var loadingMaskContainer = this.$el.parents('.ui-dialog');
+            const self = this;
+            let loadingMaskContainer = this.$el.parents('.ui-dialog');
             if (!loadingMaskContainer.length) {
                 loadingMaskContainer = this.$el.parent();
             }
@@ -108,10 +150,23 @@ define(function(require) {
                 }
             }
             this._deferredRender();
-            var options = this.options;
+            const options = this.options;
             if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
             }
+
+            if (options.toolbar_mode && _.isArray(options.toolbar)) {
+                // The toolbar modes are not available when using multiple toolbars or the toolbar(n) option.
+                options.toolbar = options.toolbar.join(' | ');
+            }
+
+            _.each(this.options.pluginsMap, function(url, name) {
+                url = location.origin + '/' + this.options.assets_base_url + url;
+                if (this.options.plugins.indexOf(name) !== -1) {
+                    tinyMCE.PluginManager.load(name, url);
+                }
+            }, this);
+
             tinyMCE.init(_.extend({
                 target: this.el,
                 setup: function(editor) {
@@ -129,34 +184,19 @@ define(function(require) {
                     editor.on('SetContent', function() {
                         editor.save({no_events: true});
                     });
+                    editor.on('focusout', function() {
+                        editor.save();
+                    });
                 },
                 init_instance_callback: function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
-                    if (!tools.isMobile()) {
-                        self.tinymceInstance.on('FullscreenStateChanged', function(e) {
-                            if (e.state) {
-                                var rect = $('#container').get(0).getBoundingClientRect();
-                                var css = {
-                                    top: rect.top + 'px',
-                                    left: rect.left + 'px',
-                                    right: Math.max(window.innerWidth - rect.right, 0) + 'px'
-                                };
-
-                                var rules = _.map(_.pairs(css), function(item) {
-                                    return item.join(': ');
-                                }).join('; ');
-                                tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
-                                self.$el.after($('<div />', {'class': 'mce-fullscreen-overlay'}));
-                                var DOM = editor.target.DOM;
-                                var iframe = editor.iframeElement;
-                                var iframeTop = iframe.getBoundingClientRect().top;
-                                DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
-                            } else {
-                                self.$el.siblings('.mce-fullscreen-overlay').remove();
-                            }
+                    self.tinymceInstance.parser.addNodeFilter('#cdata', function(nodes) {
+                        _.each(nodes, function(node) {
+                            node.value = node.value.replace(/\[CDATA\[([^]*?)\]\]/g, '$1');
                         });
-                    }
+                    });
+
                     self.trigger('TinyMCE:initialized');
                     _.delay(function() {
                         /**
@@ -167,6 +207,7 @@ define(function(require) {
                     }, 20);
                 }
             }, options));
+
             this.tinymceConnected = true;
             this.deferredRender.fail(function() {
                 self.removeSubview('loadingMask');
@@ -184,6 +225,17 @@ define(function(require) {
             this.render();
         },
 
+        /**
+         * @param {boolean} isHtml
+         */
+        setIsHtml: function(isHtml) {
+            if (this.isHtml === isHtml) {
+                return;
+            }
+            this.isHtml = isHtml;
+            this.setEnabled(isHtml);
+        },
+
         setFocus: function(e) {
             if (this.enabled) {
                 this.tinymceInstance.focus();
@@ -195,7 +247,8 @@ define(function(require) {
         },
 
         findFirstQuoteLine: function() {
-            var quote = $('<div>').html(this.$el[0].value).find('.quote').html();
+            const quoteElement = $.parseHTML('<div>' + this.$el[0].value + '</div>');
+            let quote = $(quoteElement).find('.quote').html();
             if (quote) {
                 quote = txtHtmlTransformer.html2text(quote);
                 this.firstQuoteLine = _.find(quote.split(/(\n\r?|\r\n?)/g), function(line) {
@@ -214,10 +267,8 @@ define(function(require) {
         },
 
         setHeight: function(newHeight) {
-            var currentToolbarHeight;
             if (this.tinymceConnected) {
-                currentToolbarHeight = this.$el.parent().find('.mce-toolbar-grp').outerHeight();
-                this.$el.parent().find('iframe').height(newHeight - currentToolbarHeight - this.TINYMCE_UI_HEIGHT);
+                this.tinymceInstance.editorContainer.style.height = `${newHeight}px`;
             } else {
                 this.$el.height(newHeight - this.TEXTAREA_UI_HEIGHT);
             }
@@ -232,6 +283,14 @@ define(function(require) {
                 this.tinymceInstance = null;
             }
             WysiwygEditorView.__super__.dispose.call(this);
+        },
+
+        enableEditor: function() {
+            this.setEnabled(true);
+        },
+
+        disableEditor: function() {
+            this.setEnabled(false);
         }
     });
 

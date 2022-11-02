@@ -5,13 +5,16 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use WebDriver\Exception\ElementNotVisible;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Grid extends Table implements GridInterface
 {
     const TABLE_HEADER_ELEMENT = 'GridHeader';
+    const TABLE_ROW_STRICT_ELEMENT = 'GridRowStrict';
     const TABLE_ROW_ELEMENT = 'GridRow';
     const GRID_TABLE_ELEMENT = 'GridTable';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
@@ -24,7 +27,7 @@ class Grid extends Table implements GridInterface
     {
         /** @var Table $table */
         $table = $this->getElement($this->getMappedChildElementName(static::GRID_TABLE_ELEMENT));
-        $elementName = $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT);
+        $elementName = $this->getMappedChildElementName(static::TABLE_ROW_STRICT_ELEMENT);
 
         return $table->getRowElements($elementName);
     }
@@ -32,12 +35,16 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
-    public function getRowByContent($content)
+    public function getRowByContent($content, $failIfNotFound = true)
     {
         /** @var Table $table */
         $table = $this->getElement($this->getMappedChildElementName(self::GRID_TABLE_ELEMENT));
 
-        return $table->getRowByContentElement($content, $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT));
+        return $table->getRowByContentElement(
+            $content,
+            $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT),
+            $failIfNotFound
+        );
     }
 
     /**
@@ -77,16 +84,18 @@ class Grid extends Table implements GridInterface
      */
     public function hasMassActionLink($title): bool
     {
-        $massActionsButton = $this->elementFactory->createElement(
-            $this->getMappedChildElementName('MassActionButton'),
-            $this
-        );
-
-        if (!$massActionsButton) {
+        try {
+            $massActionsButton = $this->getMassActionButton();
+            $massActionsButton->press();
+        } catch (NoSuchElement | ElementNotVisible $e) {
             return false;
         }
 
-        return $this->getMassActionLink($title) !== null;
+        $hasLink = $this->getMassActionLink($title) !== null;
+        // Hide mass actions menu to not break following steps
+        $massActionsButton->press();
+
+        return $hasLink;
     }
 
     /**
@@ -180,9 +189,6 @@ class Grid extends Table implements GridInterface
         $this->getRowByContent($content)->checkMassActionCheckbox();
     }
 
-    /**
-     * @param $content
-     */
     public function canCheckRecord($content)
     {
         $this->getRowByContent($content)->hasMassActionCheckbox();
@@ -240,12 +246,16 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
-    public function clickActionLink($content, $action)
+    public function clickActionLink($content, $action, $failIfNotFound = true)
     {
         /** @var GridRow $row */
-        $row = $this->getRowByContent($content);
-        $link = $row->getActionLink($action);
-        $link->click();
+        $row = $this->getRowByContent($content, $failIfNotFound);
+        if ($row) {
+            $link = $row->getActionLink($action, $failIfNotFound);
+            if ($link) {
+                $link->click();
+            }
+        }
     }
 
     /**

@@ -8,11 +8,8 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 interface AclConditionDataBuilderInterface
 {
     /**
-     * @param string $entityClassName
-     * @param string $permissions
-     *
      * @return array Returns empty array if entity has full access,
-     *               array with null values if user does't have access to the entity
+     *               array with null values if user doesn't have access to the entity
      *               and array with entity field and field values which user has access to.
      *               Array structure:
      *               0 - owner field name
@@ -22,5 +19,5 @@ interface AclConditionDataBuilderInterface
      *               4 - should owners be checked
      *                  (for example, in case of Organization ownership type, owners should not be checked)
      */
-    public function getAclConditionData($entityClassName, $permissions = 'VIEW');
+    public function getAclConditionData(string $entityClassName, string|array $permissions = 'VIEW'): ?array;
 }

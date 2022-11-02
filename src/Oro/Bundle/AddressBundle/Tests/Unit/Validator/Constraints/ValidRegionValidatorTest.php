@@ -2,129 +2,103 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ValidRegionValidatorTest extends \PHPUnit\Framework\TestCase
+class ValidRegionValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var ValidRegion
-     */
-    protected $constraint;
-
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var ValidRegionValidator
-     */
-    protected $validator;
-
-    public function setUp()
+    protected function createValidator(): ValidRegionValidator
     {
-        $this->constraint = new ValidRegion();
-        $this->context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $this->validator = new ValidRegionValidator();
-        $this->validator->initialize($this->context);
+        return new ValidRegionValidator();
     }
 
-    public function tearDown()
+    public function testGetTargets(): void
     {
-        unset($this->constraint, $this->context);
+        $constraint = new ValidRegion();
+        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
-    public function testConfiguration()
+    public function testAddressWithoutCountry(): void
     {
-        $this->assertEquals(ValidRegionValidator::class, $this->constraint->validatedBy());
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
+        $address->setCountry(null);
+        $address->setRegion(null);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
+        $this->assertNoViolation();
     }
 
-    public function testGetDefaultOption()
+    public function testAddressWithoutRegion(): void
     {
-        $this->assertNull($this->constraint->getDefaultOption());
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
+        $address->setCountry($this->createMock(Country::class));
+        $address->setRegion(null);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
+        $this->assertNoViolation();
     }
 
-    public function testIsRegionValidNoCountry()
+    public function testValidRegion(): void
     {
-        $this->context->expects($this->never())
-            ->method('buildViolation');
+        $country = $this->createMock(Country::class);
+        $region = $this->createMock(Region::class);
+        $regions = $this->createMock(Collection::class);
 
-        $address = $this->createAddress();
-        $this->validator->validate($address, $this->constraint);
-    }
-
-    public function testIsRegionValidNoRegion()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
         $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(false));
+            ->method('getRegions')
+            ->willReturn($regions);
+        $regions->expects($this->once())
+            ->method('contains')
+            ->with($this->identicalTo($region))
+            ->willReturn(true);
 
-        $this->context->expects($this->never())
-            ->method('buildViolation');
-
-        $address = $this->createAddress();
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
-        $this->validator->validate($address, $this->constraint);
+        $address->setRegion($region);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
+        $this->assertNoViolation();
     }
 
-    public function testIsRegionValid()
+    public function testInvalidRegion(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $country = $this->createMock(Country::class);
+        $region = $this->createMock(Region::class);
+        $regions = $this->createMock(Collection::class);
+
         $country->expects($this->once())
-            ->method('hasRegions')
-            ->will($this->returnValue(true));
+            ->method('getRegions')
+            ->willReturn($regions);
+        $regions->expects($this->once())
+            ->method('contains')
+            ->with($this->identicalTo($region))
+            ->willReturn(false);
+
         $country->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('Country'));
+            ->willReturn('Country');
+        $region->expects($this->once())
+            ->method('getName')
+            ->willReturn('Region');
 
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder);
-        $builder->expects($this->once())
-            ->method('atPath')
-            ->with('region')
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('setParameters')
-            ->with(['{{ country }}' => 'Country'])
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('addViolation');
-
-        $address = $this->createAddress();
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
-        $this->validator->validate($address, $this->constraint);
-    }
+        $address->setRegion($region);
 
-    /**
-     * @param int|null $id
-     * @return AbstractAddress|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createAddress($id = null)
-    {
-        /** @var AbstractAddress $result */
-        $result = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
 
-        if (null !== $id) {
-            $result->setId($id);
-        }
-
-        return $result;
+        $this->buildViolation($constraint->message)
+            ->setParameters(['{{ region }}' => 'Region', '{{ country }}' => 'Country'])
+            ->assertRaised();
     }
 }

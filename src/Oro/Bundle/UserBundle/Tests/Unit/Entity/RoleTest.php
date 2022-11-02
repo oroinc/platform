@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\RoleStub;
+use Oro\Component\Testing\ReflectionUtil;
 
 class RoleTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,6 +29,8 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringStartsWith('ROLE_FOO', $role->getRole());
         $this->assertEquals(Role::PREFIX_ROLE, $role->getPrefix());
+        $this->assertStringStartsWith(Role::PREFIX_ROLE, (string)$role);
+        $this->assertMatchesRegularExpression('/_[[:upper:]\d]{13}/', substr($role->getRole(), strrpos($role, '_')));
     }
 
     public function testLabel()
@@ -40,17 +43,13 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $role->setLabel($label);
 
         $this->assertEquals($label, $role->getLabel());
-        $this->assertEquals($label, (string)$role);
+        $this->assertNotEquals($label, (string)$role);
     }
 
     public function testClone()
     {
         $role = new Role();
-
-        $class = new \ReflectionClass($role);
-        $prop  = $class->getProperty('id');
-        $prop->setAccessible(true);
-        $prop->setValue($role, 1);
+        ReflectionUtil::setId($role, 1);
 
         $copy = clone $role;
         $this->assertEmpty($copy->getId());
@@ -69,11 +68,11 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $secondRole = new RoleStub();
 
-        $serializedString = $firstRole->serialize();
-        $secondRole->unserialize($serializedString);
+        $serializedString = $firstRole->__serialize();
+        $secondRole->__unserialize($serializedString);
         /** @var Organization $unserializedOrganization */
         $unserializedOrganization = $secondRole->getOrganization();
-        
+
         $this->assertInstanceOf(Organization::class, $unserializedOrganization);
         $this->assertEquals($isEnabled, $unserializedOrganization->isEnabled());
         $this->assertEquals($name, $unserializedOrganization->getName());
@@ -89,10 +88,10 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $secondRole = new Role();
 
-        $serializedString = $firstRole->serialize();
-        $secondRole->unserialize($serializedString);
+        $serializedString = $firstRole->__serialize();
+        $secondRole->__unserialize($serializedString);
 
-        $this->assertEquals($label, $secondRole->getLabel());
-        $this->assertContains($role, $secondRole->getRole());
+        self::assertEquals($label, $secondRole->getLabel());
+        self::assertStringContainsString($role, $secondRole->getRole());
     }
 }

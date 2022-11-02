@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -24,15 +24,12 @@ class EntityOwnerAccessor
      * @var PropertyAccessor
      */
     protected $propertyAccessor;
+    private Inflector $inflector;
 
-    /**
-     * Constructor
-     *
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     */
-    public function __construct(OwnershipMetadataProviderInterface $metadataProvider)
+    public function __construct(OwnershipMetadataProviderInterface $metadataProvider, Inflector $inflector)
     {
         $this->metadataProvider = $metadataProvider;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -104,7 +101,7 @@ class EntityOwnerAccessor
                 throw new InvalidEntityException(
                     sprintf(
                         '$object must have either "%s" method or "%s" property.',
-                        Inflector::camelize(sprintf('get_%s', $property)),
+                        $this->inflector->camelize(sprintf('get_%s', $property)),
                         $property
                     ),
                     0,

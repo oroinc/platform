@@ -10,7 +10,7 @@ class LayoutsTest extends \PHPUnit\Framework\TestCase
     public function testCoreExtensionIsAdded()
     {
         $this->assertInstanceOf(
-            'Oro\Component\Layout\Block\Type\BaseType',
+            BaseType::class,
             Layouts::createLayoutFactory()->getType(BaseType::NAME)
         );
     }

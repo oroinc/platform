@@ -1,19 +1,15 @@
 oro_behat_extension:
   elements:
     Activity Dropdown Menu:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector: '.dropdown-toggle.activity-item'
 
     Context Entity Dropdown:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
-        locator: '//button[@class="activity-context-current-block dropdown-toggle"]'
+        locator: '//div[@class="activity-context-current-block dropdown-toggle"]'
         type: xpath
 
     View selector:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector: '.data-appearance-selector'
 
     First Activity Item:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector: '.activity-list-widget .list-item:nth-child(1)'

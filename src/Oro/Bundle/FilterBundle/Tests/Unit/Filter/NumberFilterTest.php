@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -9,326 +11,317 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterTypeInterface;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class NumberFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NumberFilter
-     */
-    protected $filter;
-
-    /**
-     * @var string
-     */
-    protected $filterName = 'filter_name';
-
-    /**
-     * @var string
-     */
-    protected $dataName = 'field_name';
-
-    /**
-     * @var string
-     */
-    protected $parameterName = 'parameter_name';
-
-    /**
-     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /**
-     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $filterUtility;
+    /** @var NumberFilter */
+    protected $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $this->filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new NumberFilter($this->formFactory, $this->filterUtility);
-        $this->filter->init($this->filterName, [
-            FilterUtility::DATA_NAME_KEY => $this->dataName,
+        $this->filter = new NumberFilter($this->formFactory, new FilterUtility());
+        $this->filter->init('test-filter', [
+            FilterUtility::DATA_NAME_KEY => 'field_name'
         ]);
+    }
+
+    protected function getFilterDatasource(): OrmFilterDatasourceAdapter
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::any())
+            ->method('getExpressionBuilder')
+            ->willReturn(new Query\Expr());
+        $connection = $this->createMock(Connection::class);
+        $em->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $connection->expects(self::any())
+            ->method('getDatabasePlatform')
+            ->willReturn(new MySqlPlatform());
+
+        return new OrmFilterDatasourceAdapter(new QueryBuilder($em));
+    }
+
+    /**
+     * @param OrmFilterDatasourceAdapter $ds
+     *
+     * @return string
+     */
+    protected function parseQueryCondition(OrmFilterDatasourceAdapter $ds)
+    {
+        $qb = $ds->getQueryBuilder();
+
+        $parameters = [];
+        /* @var Query\Parameter $param */
+        foreach ($qb->getParameters() as $param) {
+            $parameters[':' . $param->getName()] = $param->getValue();
+        }
+
+        $parts = $qb->getDQLParts();
+        if (!$parts['where']) {
+            return '';
+        }
+
+        $parameterValues = array_map(
+            function ($parameterValue) {
+                if (is_array($parameterValue)) {
+                    $parameterValue = implode(',', $parameterValue);
+                }
+
+                return $parameterValue;
+            },
+            array_values($parameters)
+        );
+
+        return str_replace(
+            array_keys($parameters),
+            $parameterValues,
+            (string)$parts['where']
+        );
     }
 
     /**
      * @dataProvider applyProvider
-     *
-     * @param array $inputData
-     * @param array $expectedData
      */
-    public function testApply(array $inputData, array $expectedData)
+    public function testApply(array $data, array $expected)
     {
-        $ds = $this->prepareDatasource();
-
-        $this->filter->apply($ds, $inputData['data']);
+        $ds = $this->getFilterDatasource();
+        $this->filter->apply($ds, $data);
 
         $where = $this->parseQueryCondition($ds);
-
-        $this->assertEquals($expectedData['where'], $where);
+        $this->assertEquals($expected['where'], $where);
     }
 
     /**
      * @dataProvider applyProviderForDivisor
-     *
-     * @param array $inputData
-     * @param array $expectedData
      */
-    public function testApplyForDivisor(array $inputData, array $expectedData)
+    public function testApplyForDivisor(array $data, array $expected)
     {
-        $ds = $this->prepareDatasource();
-
-        $this->filter->init($this->filterName, [
-            FilterUtility::DATA_NAME_KEY => $this->dataName,
-            FilterUtility::DIVISOR_KEY => 100,
+        $this->filter->init('test-filter', [
+            FilterUtility::DATA_NAME_KEY => 'field_name',
+            FilterUtility::DIVISOR_KEY => 100
         ]);
-        $this->filter->apply($ds, $inputData['data']);
+
+        $ds = $this->getFilterDatasource();
+        $this->filter->apply($ds, $data);
 
         $where = $this->parseQueryCondition($ds);
-
-        $this->assertEquals($expectedData['where'], $where);
+        $this->assertEquals($expected['where'], $where);
     }
 
     /**
      * @dataProvider parseDataProvider
-     *
-     * @param mixed $inputData
-     * @param mixed $expectedData
      */
-    public function testParseData($inputData, $expectedData)
+    public function testParseData($data, $expected)
     {
-        $this->assertEquals($expectedData, $this->filter->parseData($inputData));
+        $this->assertEquals(
+            $expected,
+            ReflectionUtil::callMethod($this->filter, 'parseData', [$data])
+        );
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function applyProvider()
+    public function applyProvider(): array
     {
         return [
             'GREATER_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_GREATER_EQUAL,
-                        'value' => 1,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_EQUAL,
+                    'value' => 1
                 ],
                 'expected' => [
-                    'where' => 'field_name >= 1',
-                ],
+                    'where' => 'field_name >= 1'
+                ]
             ],
             'GREATER_THAN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_GREATER_THAN,
-                        'value' => 2,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_THAN,
+                    'value' => 2
                 ],
                 'expected' => [
-                    'where' => 'field_name > 2',
-                ],
+                    'where' => 'field_name > 2'
+                ]
             ],
             'EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_EQUAL,
-                        'value' => 3,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_EQUAL,
+                    'value' => 3
                 ],
                 'expected' => [
-                    'where' => 'field_name = 3',
-                ],
+                    'where' => 'field_name = 3'
+                ]
             ],
             'NOT_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_NOT_EQUAL,
-                        'value' => 4,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_EQUAL,
+                    'value' => 4
                 ],
                 'expected' => [
-                    'where' => 'field_name <> 4',
-                ],
+                    'where' => 'field_name <> 4'
+                ]
             ],
             'LESS_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_LESS_EQUAL,
-                        'value' => 5,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_EQUAL,
+                    'value' => 5
                 ],
                 'expected' => [
-                    'where' => 'field_name <= 5',
-                ],
+                    'where' => 'field_name <= 5'
+                ]
             ],
             'LESS_THAN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_LESS_THAN,
-                        'value' => 6,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_THAN,
+                    'value' => 6
                 ],
                 'expected' => [
-                    'where' => 'field_name < 6',
-                ],
+                    'where' => 'field_name < 6'
+                ]
             ],
             'EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_EMPTY,
-                        'value' => null,
-                    ],
+                'data' => [
+                    'type' => FilterUtility::TYPE_EMPTY,
+                    'value' => null
                 ],
                 'expected' => [
-                    'where' => 'field_name IS NULL',
-                ],
+                    'where' => 'field_name IS NULL'
+                ]
             ],
             'NOT_EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_NOT_EMPTY,
-                        'value' => null,
-                    ],
+                'data' => [
+                    'type' => FilterUtility::TYPE_NOT_EMPTY,
+                    'value' => null
                 ],
                 'expected' => [
-                    'where' => 'field_name IS NOT NULL',
-                ],
+                    'where' => 'field_name IS NOT NULL'
+                ]
             ],
             'IN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_IN,
-                        'value' => '1, 3,a,5',
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_IN,
+                    'value' => '1, 3,4,5'
                 ],
                 'expected' => [
-                    'where' => 'field_name IN(1,3,5)',
-                ],
+                    'where' => 'field_name IN(1,3,4,5)'
+                ]
             ],
             'NOT IN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_NOT_IN,
-                        'value' => '1, 6bc, 3, 5',
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_IN,
+                    'value' => '1, 2, 3, 5'
                 ],
                 'expected' => [
-                    'where' => 'field_name NOT IN(1,3,5)',
-                ],
+                    'where' => 'field_name NOT IN(1,2,3,5)'
+                ]
             ],
         ];
     }
 
-    /**
-     * @return array
-     */
     public function applyProviderForDivisor()
     {
         return [
             'GREATER_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_GREATER_EQUAL,
-                        'value' => 1,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_EQUAL,
+                    'value' => 1
                 ],
                 'expected' => [
-                    'where' => 'field_name >= 100',
-                ],
+                    'where' => 'field_name >= 100'
+                ]
             ],
             'GREATER_THAN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_GREATER_THAN,
-                        'value' => 2,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_THAN,
+                    'value' => 2
                 ],
                 'expected' => [
-                    'where' => 'field_name > 200',
+                    'where' => 'field_name > 200'
+                ]
+            ],
+            'NO_TYPE' => [
+                'data' => [
+                    'value' => 3
                 ],
+                'expected' => [
+                    'where' => 'field_name = 300'
+                ]
             ],
             'EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_EQUAL,
-                        'value' => 3,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_EQUAL,
+                    'value' => 3
                 ],
                 'expected' => [
-                    'where' => 'field_name = 300',
-                ],
+                    'where' => 'field_name = 300'
+                ]
             ],
             'NOT_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_NOT_EQUAL,
-                        'value' => 4,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_EQUAL,
+                    'value' => 4
                 ],
                 'expected' => [
-                    'where' => 'field_name <> 400',
-                ],
+                    'where' => 'field_name <> 400'
+                ]
             ],
             'LESS_EQUAL' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_LESS_EQUAL,
-                        'value' => 5,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_EQUAL,
+                    'value' => 5
                 ],
                 'expected' => [
-                    'where' => 'field_name <= 500',
-                ],
+                    'where' => 'field_name <= 500'
+                ]
             ],
             'LESS_THAN' => [
-                'input' => [
-                    'data' => [
-                        'type' => NumberFilterType::TYPE_LESS_THAN,
-                        'value' => 6,
-                    ],
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_THAN,
+                    'value' => 6
                 ],
                 'expected' => [
-                    'where' => 'field_name < 600',
-                ],
+                    'where' => 'field_name < 600'
+                ]
             ],
             'EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_EMPTY,
-                        'value' => null,
-                    ],
+                'data' => [
+                    'type' => FilterUtility::TYPE_EMPTY,
+                    'value' => null
                 ],
                 'expected' => [
-                    'where' => 'field_name IS NULL',
-                ],
+                    'where' => 'field_name IS NULL'
+                ]
             ],
             'NOT_EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_NOT_EMPTY,
-                        'value' => null,
-                    ],
+                'data' => [
+                    'type' => FilterUtility::TYPE_NOT_EMPTY,
+                    'value' => null
                 ],
                 'expected' => [
-                    'where' => 'field_name IS NOT NULL',
-                ],
+                    'where' => 'field_name IS NOT NULL'
+                ]
             ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function parseDataProvider()
+    public function parseDataProvider(): array
     {
         return [
             'invalid data, no array' => [
@@ -351,21 +344,24 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
                 ['value' => null, 'type' => FilterUtility::TYPE_NOT_EMPTY],
                 ['value' => null, 'type' => FilterUtility::TYPE_NOT_EMPTY],
             ],
+            'invalid data, not numeric value in array' => [
+                ['value' => '1,2a,3', 'type' => NumberFilterType::TYPE_IN],
+                false
+            ],
         ];
     }
 
     public function testGetMetadata()
     {
         $form = $this->createMock(FormInterface::class);
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(FormView::class);
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $typeView */
         $typeView = $this->createMock(FormView::class);
         $typeView->vars['choices'] = [];
         $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];
         $view->vars['array_separator'] = ',';
         $view->vars['array_operators'] = [9, 10];
         $view->vars['data_type'] = 'data_integer';
+        $view->vars['limit_decimals'] = true;
         $view->children['type'] = $typeView;
 
         $this->formFactory->expects($this->any())
@@ -374,16 +370,11 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         $form->expects($this->any())
             ->method('createView')
             ->willReturn($view);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
 
         $expected = [
-            'name' => 'filter_name',
-            'label' => 'Filter_name',
+            'name' => 'test-filter',
+            'label' => 'Test-filter',
             'choices' => [],
-            'data_name' => 'field_name',
-            'options' => [],
             'lazy' => false,
             'formatterOptions' => [
                 'decimals' => 0,
@@ -391,63 +382,179 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
             ],
             'arraySeparator' => ',',
             'arrayOperators' => [9, 10],
-            'dataType' => 'data_integer'
+            'dataType' => 'data_integer',
+            'limitDecimals' => true
         ];
         $this->assertEquals($expected, $this->filter->getMetadata());
     }
 
-    /**
-     * @return OrmFilterDatasourceAdapter
-     */
-    protected function prepareDatasource()
+    public function testPrepareDataWhenNoValue()
     {
-        /* @var $em EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-        $em->expects($this->any())
-            ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr());
-
-        return new OrmFilterDatasourceAdapter(new QueryBuilder($em));
+        self::assertSame(
+            ['value' => null],
+            $this->filter->prepareData([])
+        );
     }
 
-
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     * @return string
-     */
-    protected function parseQueryCondition(OrmFilterDatasourceAdapter $ds)
+    public function testPrepareDataWhenNoValueAndArrayRelatedFilterType()
     {
-        $qb = $ds->getQueryBuilder();
+        self::assertSame(
+            ['type' => (string)NumberFilterTypeInterface::TYPE_IN, 'value' => null],
+            $this->filter->prepareData(['type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
 
-        $parameters = array();
-        foreach ($qb->getParameters() as $param) {
-            /* @var $param Query\Parameter */
-            $parameters[':' . $param->getName()] = $param->getValue();
-        }
+    public function testPrepareDataWithNullValue()
+    {
+        self::assertSame(
+            ['value' => null],
+            $this->filter->prepareData(['value' => null])
+        );
+    }
 
-        $parts = $qb->getDQLParts();
+    public function testPrepareDataWithNullValueAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => null, 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => null, 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
 
-        $where = '';
+    public function testPrepareDataWithEmptyStringValue()
+    {
+        self::assertSame(
+            ['value' => null],
+            $this->filter->prepareData(['value' => ''])
+        );
+    }
 
-        if ($parts['where']) {
-            $parameterValues = array_map(
-                function ($parameterValue) {
-                    if (is_array($parameterValue)) {
-                        $parameterValue = implode(',', $parameterValue);
-                    }
+    public function testPrepareDataWithEmptyStringValueAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => null, 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => '', 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
 
-                    return $parameterValue;
-                },
-                array_values($parameters)
-            );
+    public function testPrepareDataWithZeroValueAsString()
+    {
+        self::assertSame(
+            ['value' => 0.0],
+            $this->filter->prepareData(['value' => '0'])
+        );
+    }
 
-            $where = str_replace(
-                array_keys($parameters),
-                $parameterValues,
-                (string)$parts['where']
-            );
-        }
+    public function testPrepareDataWithZeroValueAsStringAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [0.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => '0', 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
 
-        return $where;
+    public function testPrepareDataWithZeroValueAsInteger()
+    {
+        self::assertSame(
+            ['value' => 0.0],
+            $this->filter->prepareData(['value' => 0])
+        );
+    }
+
+    public function testPrepareDataWithZeroValueAsIntegerAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [0.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => 0, 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
+
+    public function testPrepareDataWithIntegerValue()
+    {
+        self::assertSame(
+            ['value' => 123.0],
+            $this->filter->prepareData(['value' => 123])
+        );
+    }
+
+    public function testPrepareDataWithIntegerValueAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [123.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => 123, 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
+
+    public function testPrepareDataWithIntegerValueAsString()
+    {
+        self::assertSame(
+            ['value' => 123.0],
+            $this->filter->prepareData(['value' => '123'])
+        );
+    }
+
+    public function testPrepareDataWithIntegerValueAsStringAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [123.0, 234.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => '123 , 234', 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
+
+    public function testPrepareDataWithFloatValue()
+    {
+        self::assertSame(
+            ['value' => 123.1],
+            $this->filter->prepareData(['value' => 123.1])
+        );
+    }
+
+    public function testPrepareDataWithFloatValueAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [123.1], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => 123.1, 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
+
+    public function testPrepareDataWithFloatValueAsString()
+    {
+        self::assertSame(
+            ['value' => 123.1],
+            $this->filter->prepareData(['value' => '123.1'])
+        );
+    }
+
+    public function testPrepareDataWithFloatValueAsStringAndArrayRelatedFilterType()
+    {
+        self::assertSame(
+            ['value' => [123.1], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
+            $this->filter->prepareData(['value' => '123.1', 'type' => (string)NumberFilterTypeInterface::TYPE_IN])
+        );
+    }
+
+    public function testPrepareDataWithNotNumericStringValue()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->filter->prepareData(['value' => 'abc']);
+    }
+
+    public function testPrepareDataWithNotNumericStringValueAndArrayRelatedFilterType()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->filter->prepareData(['value' => 'abc', 'type' => (string)NumberFilterTypeInterface::TYPE_IN]);
+    }
+
+    public function testPrepareDataWithArrayValue()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');
+        $this->filter->prepareData(['value' => [123]]);
+    }
+
+    public function testPrepareDataWithArrayValueAndArrayRelatedFilterType()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');
+        $this->filter->prepareData(['value' => [123], 'type' => (string)NumberFilterTypeInterface::TYPE_IN]);
     }
 }

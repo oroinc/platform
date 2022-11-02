@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var BasePlugin = require('./base/plugin');
+    const _ = require('underscore');
+    const BasePlugin = require('./base/plugin');
 
     function PluginManager(main) {
         if (!main) {
@@ -25,8 +25,8 @@ define(function(require) {
          * @returns {Object}
          */
         getInstance: function(Constructor) {
-            var instance;
-            for (var i = 0; i < this._pluginList.length; i++) {
+            let instance;
+            for (let i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance instanceof Constructor) {
                     return instance;
@@ -45,7 +45,7 @@ define(function(require) {
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
-            var instance = this.getInstance(Constructor);
+            let instance = this.getInstance(Constructor);
             if (instance !== null) {
                 throw new Error('Plugin is already instantiated');
             }
@@ -71,7 +71,7 @@ define(function(require) {
          * @param {function(new:BasePlugin)} Constructor Plugin constructor
          */
         remove: function(Constructor) {
-            var instance = this.getInstance(Constructor);
+            const instance = this.getInstance(Constructor);
             if (instance === null) {
                 throw new Error('Plugin is not instantiated yet');
             }
@@ -89,13 +89,13 @@ define(function(require) {
          */
         enable: function(Constructor) {
             if (_.isArray(Constructor)) {
-                _.each(Constructor, _.bind(this.enable, this));
+                _.each(Constructor, this.enable.bind(this));
                 return;
             }
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
-            var instance = this.getInstance(Constructor);
+            let instance = this.getInstance(Constructor);
             if (instance === null) {
                 instance = this.create(Constructor);
             }
@@ -111,10 +111,10 @@ define(function(require) {
          */
         disable: function(Constructor) {
             if (_.isArray(Constructor)) {
-                _.each(Constructor, _.bind(this.disable, this));
+                _.each(Constructor, this.disable.bind(this));
                 return;
             }
-            var instance = this.getInstance(Constructor);
+            const instance = this.getInstance(Constructor);
             if (instance === null) {
                 // nothing to do
                 return;
@@ -128,8 +128,8 @@ define(function(require) {
          * Disables all connected plugins
          */
         disableAll: function() {
-            var instance;
-            for (var i = 0; i < this._pluginList.length; i++) {
+            let instance;
+            for (let i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {
                     instance.disable();
@@ -138,9 +138,9 @@ define(function(require) {
         },
 
         dispose: function() {
-            var instance;
+            let instance;
             this.disposing = true;
-            for (var i = 0; i < this._pluginList.length; i++) {
+            for (let i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {
                     instance.disable();

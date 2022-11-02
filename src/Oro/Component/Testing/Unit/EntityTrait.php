@@ -5,16 +5,24 @@ namespace Oro\Component\Testing\Unit;
 use Oro\Component\Testing\Unit\PropertyAccess\PropertyAccessTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
+/**
+ * Trait that helps developer to work with Entity for the testing purpose without mocking them
+ */
 trait EntityTrait
 {
     use PropertyAccessTrait;
 
     /**
-     * @param string $className
-     * @param array $properties Like ['id' => 1]
-     * @param array $constructorArgs Like ['id' => 1]
+     * Helps to create entity object with specified set of properties.
+     * Uses reflection to set not accessible properties like private/protected
      *
-     * @return object
+     * @template T
+     *
+     * @param class-string<T> $className
+     * @param array           $properties Like ['id' => 1]
+     * @param array           $constructorArgs Like ['id' => 1]
+     *
+     * @return T
      */
     protected function getEntity($className, array $properties = [], array $constructorArgs = null)
     {
@@ -27,7 +35,7 @@ trait EntityTrait
 
         if ($reflectionMethod && $reflectionMethod->isPublic()) {
             if (empty($constructorArgs)) {
-                $entity = $reflectionClass->newInstance($constructorArgs);
+                $entity = $reflectionClass->newInstance();
             } else {
                 $entity = $reflectionClass->newInstanceArgs($constructorArgs);
             }
@@ -43,10 +51,11 @@ trait EntityTrait
     }
 
     /**
+     * Allows to set any property (accessible or not) of the object
+     *
      * @param object $object
      * @param string $property
-     * @param string $value
-     * @return bool true if success, otherwise false
+     * @param mixed $value
      */
     protected function setValue($object, $property, $value)
     {
@@ -54,14 +63,19 @@ trait EntityTrait
             $this->getPropertyAccessor()->setValue($object, $property, $value);
         } catch (NoSuchPropertyException $e) {
             $reflectionClass = new \ReflectionClass($object);
+
+            // Looking for the property in parent classes
+            // because it's impossible to get parent properties from the derived class
+            while (!$reflectionClass->hasProperty($property)
+                && $parentReflectionClass = $reflectionClass->getParentClass()
+            ) {
+                $reflectionClass = $parentReflectionClass;
+            }
+
             $method = $reflectionClass->getProperty($property);
             $method->setAccessible(true);
             $method->setValue($object, $value);
-        } catch (\ReflectionException $e) {
-            return false;
         }
-
-        return true;
     }
 
     /**

@@ -10,13 +10,13 @@ define(function(require) {
      * @param {Object}   options.actions - actions array
      * @param {Object}   options.actions_configuration - additional actions configuration
      */
-    var ActionsView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const tools = require('oroui/js/tools');
 
-    ActionsView = BaseView.extend({
+    const ActionsView = BaseView.extend({
 
         /** @property {Array} */
         actions: undefined,
@@ -36,7 +36,7 @@ define(function(require) {
                 '<div class="dropleft">' +
                     '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
                         'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">' +
-                        '<span class="fa-ellipsis-h" aria-hidden="true"></span>' +
+                        '<span class="icon fa-ellipsis-h" aria-hidden="true"></span>' +
                     '</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
                         'aria-labelledby="<%- togglerId %>"></ul>' +
@@ -60,7 +60,7 @@ define(function(require) {
             '<% if (withIcons) { %>' +
                 '<li><ul class="launchers-list"></ul></li>' +
             '<% } else { %>' +
-                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+                '<li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>' +
             '<% } %>'
         ),
 
@@ -69,7 +69,7 @@ define(function(require) {
             '<% if (withIcons) { %>' +
                 '<ul class="launchers-list"></ul>' +
             '<% } else { %>' +
-                '<ul class="unstyled launchers-list"></ul>' +
+                '<ul class="list-unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
@@ -79,25 +79,32 @@ define(function(require) {
         ),
 
         /** @property */
-        events: {
-            'click': '_showDropdown',
-            'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropleft.show': '_hideDropdown',
-            'click .dropdown-close .fa-close': '_hideDropdown'
+        events: function() {
+            const events = {
+                'click': '_showDropdown',
+                'click .dropdown-close .fa-close': '_hideDropdown'
+            };
+
+            if (!tools.isTouchDevice()) {
+                events['mouseover .dropdown-toggle'] = '_showDropdown';
+                events['mouseleave .dropleft.show'] = '_hideDropdown';
+            }
+
+            return events;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ActionsView() {
-            ActionsView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionsView(options) {
+            ActionsView.__super__.constructor.call(this, options);
         },
 
         /**
          * Initialize cell actions and launchers
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
             this.subviews = [];
 
             if (!_.isEmpty(opts.actionsHideCount)) {
@@ -106,17 +113,17 @@ define(function(require) {
 
             this.showCloseButton = opts.showCloseButton;
 
-            ActionsView.__super__.initialize.apply(this, arguments);
+            ActionsView.__super__.initialize.call(this, options);
             this.actions = this.createActions(opts);
             _.each(this.actions, function(action) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
 
-            this.subviews.push.apply(this.subviews, this.actions);
+            this.subviews.push(...this.actions);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -124,7 +131,7 @@ define(function(require) {
             }
             delete this.actions;
             delete this.column;
-            ActionsView.__super__.dispose.apply(this, arguments);
+            ActionsView.__super__.dispose.call(this);
         },
 
         /**
@@ -142,9 +149,9 @@ define(function(require) {
          * @return {Array}
          */
         createActions: function(opts) {
-            var result = [];
-            var actions = opts.actions;
-            var config = opts.actionConfiguration;
+            const result = [];
+            const actions = opts.actions;
+            const config = opts.actionConfiguration;
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
@@ -188,7 +195,7 @@ define(function(require) {
          * Render cell with actions
          */
         render: function() {
-            var isSimplifiedMarkupApplied = false;
+            let isSimplifiedMarkupApplied = false;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.actions)) {
                 this.$el.empty();
@@ -224,10 +231,10 @@ define(function(require) {
             if (!this.isLauncherListFilled) {
                 this.isLauncherListFilled = true;
 
-                var launcherList = this.createLaunchers();
+                const launcherList = this.createLaunchers();
 
-                var launchers = this.getLaunchersByIcons(launcherList);
-                var $listsContainer = this.$(this.launchersContainerSelector);
+                const launchers = this.getLaunchersByIcons(launcherList);
+                const $listsContainer = this.$(this.launchersContainerSelector);
 
                 if (this.showCloseButton && launcherList.length >= this.actionsHideCount) {
                     $listsContainer.append(this.closeButtonTemplate());
@@ -258,8 +265,8 @@ define(function(require) {
          */
         renderLaunchersList: function(launchers, params) {
             params = params || {};
-            var result = $(this.launchersListTemplate(params));
-            var $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
+            const result = $(this.launchersListTemplate(params));
+            const $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
             _.each(launchers, function(launcher) {
                 $launchersList.append(this.renderLauncherItem(launcher));
             }, this);
@@ -276,10 +283,10 @@ define(function(require) {
          */
         renderLauncherItem: function(launcher, params) {
             params = params || {};
-            var result = $(this.launcherItemTemplate(params));
-            var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
+            const result = $(this.launcherItemTemplate(params));
+            const $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
-            var className = 'mode-' + launcher.launcherMode;
+            const className = 'mode-' + launcher.launcherMode;
             $launcherItem.addClass(className);
             return result;
         },
@@ -291,7 +298,7 @@ define(function(require) {
          * @protected
          */
         getLaunchersByIcons: function(launcherList) {
-            var launchers = {
+            const launchers = {
                 withIcons: [],
                 withoutIcons: []
             };

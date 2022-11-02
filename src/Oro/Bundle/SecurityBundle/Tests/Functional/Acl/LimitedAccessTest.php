@@ -2,53 +2,61 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Acl;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LimitedAccessTest extends WebTestCase
 {
     use RolePermissionExtension;
 
     /** @var TestEntity */
-    protected $testEntity;
+    private $testEntity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $userName = 'test_user';
         $userEmail = 'test_user@example.com';
         $userPwd = 'testUserPwd123';
 
         $this->initClient([], $this->generateBasicAuthHeader($userName, $userPwd));
+        $this->loadFixtures([LoadBusinessUnit::class]);
 
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
+        /** @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(User::class);
 
-        $organization = $em->getRepository('OroOrganizationBundle:Organization')->find(self::AUTH_ORGANIZATION);
+        $organization = $em->getRepository(Organization::class)->find(self::AUTH_ORGANIZATION);
         /** @var User $user */
-        $user = $em->getRepository('OroUserBundle:User')->findOneBy(['email' => $userEmail]);
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $userEmail]);
         if (null === $user) {
             /** @var UserManager $userManager */
             $userManager = $this->getContainer()->get('oro_user.manager');
 
+            /** @var User $user */
             $user = $userManager->createUser();
-            $role = $em->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
+            $role = $em->getRepository(Role::class)->findOneBy(['role' => 'ROLE_USER']);
             $user
+                ->setOwner($this->getReference('business_unit'))
                 ->setUsername($userName)
                 ->setEmail($userEmail)
                 ->setPlainPassword($userPwd)
-                ->addRole($role)
+                ->addUserRole($role)
                 ->setOrganization($organization)
                 ->addOrganization($organization)
                 ->setFirstName('Test')
@@ -57,8 +65,7 @@ class LimitedAccessTest extends WebTestCase
             $userManager->updateUser($user);
         }
 
-        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
+        $this->updateUserSecurityToken($user->getEmail());
 
         $this->testEntity = $em->getRepository(TestEntity::class)
             ->createQueryBuilder('e')
@@ -71,7 +78,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity
                 ->setName('test')
                 ->setOrganization($organization)
-                ->setOwner($em->getRepository('OroUserBundle:User')->findOneBy(['email' => self::AUTH_USER]));
+                ->setOwner($em->getRepository(User::class)->findOneBy(['email' => self::AUTH_USER]));
             $em->persist($this->testEntity);
             $em->flush();
 
@@ -87,10 +94,7 @@ class LimitedAccessTest extends WebTestCase
         }
     }
 
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         return $this->getContainer()->get('security.authorization_checker');
     }
@@ -108,7 +112,6 @@ class LimitedAccessTest extends WebTestCase
             $this->getAuthorizationChecker()->isGranted('EXECUTE', 'action:test_action')
         );
     }
-
 
     public function testActionByAclAnnotation()
     {
@@ -206,7 +209,6 @@ class LimitedAccessTest extends WebTestCase
         );
     }
 
-
     public function testEntityRecordByDomainObjectWrapper()
     {
         $objectWrapper = new DomainObjectWrapper(
@@ -217,7 +219,6 @@ class LimitedAccessTest extends WebTestCase
             $this->getAuthorizationChecker()->isGranted('DELETE', $objectWrapper)
         );
     }
-
 
     public function testEntityRecordByDomainObjectWrapperWhenAccessGranted()
     {

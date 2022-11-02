@@ -5,77 +5,60 @@ namespace Oro\Bundle\SecurityBundle\Authorization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a set of methods to simplify checking access to controller actions.
+ */
 class ClassAuthorizationChecker
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ObjectIdentityFactory $objectIdentityFactory;
+    private AclAnnotationProvider $aclAnnotationProvider;
+    private LoggerInterface $logger;
 
-    /** @var ServiceLink */
-    private $objectIdentityFactoryLink;
-
-    /** @var ServiceLink */
-    private $annotationProviderLink;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ServiceLink                   $objectIdentityFactoryLink
-     * @param ServiceLink                   $annotationProviderLink
-     * @param LoggerInterface               $logger
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
-        ServiceLink $objectIdentityFactoryLink,
-        ServiceLink $annotationProviderLink,
+        ObjectIdentityFactory $objectIdentityFactory,
+        AclAnnotationProvider $aclAnnotationProvider,
         LoggerInterface $logger
     ) {
         $this->authorizationChecker = $authorizationChecker;
-        $this->objectIdentityFactoryLink = $objectIdentityFactoryLink;
-        $this->annotationProviderLink = $annotationProviderLink;
+        $this->objectIdentityFactory = $objectIdentityFactory;
+        $this->aclAnnotationProvider = $aclAnnotationProvider;
         $this->logger = $logger;
     }
 
     /**
      * Checks if an access to the given method of the given class is granted for the current authentication token.
-     *
-     * @param  string $class
-     * @param  string $method
-     *
-     * @return bool
      */
-    public function isClassMethodGranted($class, $method)
+    public function isClassMethodGranted(string $class, string $method): bool
     {
         $isGranted = true;
 
         // check method level ACL
-        $annotation = $this->getAnnotation($class, $method);
+        $annotation = $this->aclAnnotationProvider->findAnnotation($class, $method);
         if (null !== $annotation) {
             $this->logger->debug(
                 sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
             );
             $isGranted = $this->authorizationChecker->isGranted(
                 $annotation->getPermission(),
-                $this->getObjectIdentity($annotation)
+                $this->objectIdentityFactory->get($annotation)
             );
         }
 
         // check class level ACL
         if ($isGranted && (null === $annotation || !$annotation->getIgnoreClassAcl())) {
-            $annotation = $this->getAnnotation($class);
+            $annotation = $this->aclAnnotationProvider->findAnnotation($class);
             if (null !== $annotation) {
                 $this->logger->debug(
                     sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
                 );
                 $isGranted = $this->authorizationChecker->isGranted(
                     $annotation->getPermission(),
-                    $this->getObjectIdentity($annotation)
+                    $this->objectIdentityFactory->get($annotation)
                 );
             }
         }
@@ -84,42 +67,10 @@ class ClassAuthorizationChecker
     }
 
     /**
-     * Gets ACL annotation is bound to the given class/method.
-     *
-     * @param string $class
-     * @param string $method
-     *
-     * @return AclAnnotation|null
+     * Gets ACL annotation that is bound to the given method of the given class.
      */
-    public function getClassMethodAnnotation($class, $method)
+    public function getClassMethodAnnotation(string $class, string $method): ?AclAnnotation
     {
-        return $this->getAnnotation($class, $method);
-    }
-
-    /**
-     * @param string      $class
-     * @param string|null $method
-     *
-     * @return AclAnnotation|null
-     */
-    private function getAnnotation($class, $method = null)
-    {
-        /** @var AclAnnotationProvider $annotationProvider */
-        $annotationProvider = $this->annotationProviderLink->getService();
-
-        return $annotationProvider->findAnnotation($class, $method);
-    }
-
-    /**
-     * @param mixed $val
-     *
-     * @return ObjectIdentity
-     */
-    private function getObjectIdentity($val)
-    {
-        /** @var ObjectIdentityFactory $objectIdentityFactory */
-        $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
-
-        return $objectIdentityFactory->get($val);
+        return $this->aclAnnotationProvider->findAnnotation($class, $method);
     }
 }

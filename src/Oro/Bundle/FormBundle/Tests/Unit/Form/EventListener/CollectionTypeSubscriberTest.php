@@ -1,24 +1,21 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
 class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CollectionTypeSubscriber
-     */
-    protected $subscriber;
+    /** @var CollectionTypeSubscriber */
+    private $subscriber;
 
-    /**
-     * SetUp test environment
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new CollectionTypeSubscriber();
     }
@@ -27,32 +24,33 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->subscriber->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::POST_SUBMIT, $result);
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
     public function testPostSubmit()
     {
-        $itemEmpty = $this->createMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
+        $itemEmpty = $this->createMock(EmptyItem::class);
         $itemEmpty->expects($this->once())
             ->method('isEmpty')
-            ->will($this->returnValue(true));
-        $itemNotEmpty = $this->createMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
+            ->willReturn(true);
+        $itemNotEmpty = $this->createMock(EmptyItem::class);
         $itemNotEmpty->expects($this->once())
             ->method('isEmpty')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $itemNotEmptyType = $this->createMock(\stdClass::class);
-        $itemNotEmptyType->expects($this->never())->method($this->anything());
+        $itemNotEmptyType->expects($this->never())
+            ->method($this->anything());
 
-        $data = new ArrayCollection(array($itemEmpty, $itemNotEmpty, $itemNotEmptyType));
+        $data = new ArrayCollection([$itemEmpty, $itemNotEmpty, $itemNotEmptyType]);
         $this->subscriber->postSubmit($this->createEvent($data));
 
         $this->assertEquals(
-            array(
+            [
                 1 => $itemNotEmpty,
                 2 => $itemNotEmptyType
-            ),
+            ],
             $data->toArray()
         );
     }
@@ -60,150 +58,137 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testPostSubmitNotCollectionData()
     {
         $data = $this->createMock(\stdClass::class);
-        $data->expects($this->never())->method($this->anything());
+        $data->expects($this->never())
+            ->method($this->anything());
 
         $this->subscriber->postSubmit($this->createEvent($data));
     }
 
     /**
      * @dataProvider preSubmitNoDataDataProvider
-     * @param array|null $data
      */
-    public function testPreSubmitNoData($data)
+    public function testPreSubmitNoData(?array $data)
     {
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
         $event->expects($this->never())
             ->method('setData');
 
         $this->subscriber->preSubmit($event);
     }
 
-    /**
-     * @return array
-     */
-    public function preSubmitNoDataDataProvider()
+    public function preSubmitNoDataDataProvider(): array
     {
-        return array(
-            array(
-                null, array()
-            ),
-            array(
-                array(), array()
-            )
-        );
+        return [
+            [
+                null, []
+            ],
+            [
+                [], []
+            ]
+        ];
     }
 
     public function testPreSubmitWithIgnorePrimaryBehaviour()
     {
-        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $form->expects($this->once())->method('getConfig')
-            ->will($this->returnValue($formConfig));
-        $formConfig->expects($this->once())->method('getOption')
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig->expects($this->once())
+            ->method('getOption')
             ->with('handle_primary')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->once())->method('getForm')
-            ->will($this->returnValue($form));
-        $event->expects($this->once())->method('getData')
-            ->will($this->returnValue([['field1' => 'test']]));
-        $event->expects($this->never())->method('setData');
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
+        $event->expects($this->once())
+            ->method('getData')
+            ->willReturn([['field1' => 'test']]);
+        $event->expects($this->never())
+            ->method('setData');
 
         $this->subscriber->preSubmit($event);
     }
 
     /**
      * @dataProvider preSubmitDataProvider
-     *
-     * @param array $data
-     * @param array $expected
      */
     public function testPreSubmit(array $data, array $expected)
     {
-        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $form->expects($this->once())->method('getConfig')
-            ->will($this->returnValue($formConfig));
-        $formConfig->expects($this->once())->method('getOption')
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig->expects($this->once())
+            ->method('getOption')
             ->with('handle_primary')
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
 
         $event = $this->createEvent($data, $form);
         $this->subscriber->preSubmit($event);
         $this->assertEquals($expected, $event->getData());
     }
 
-    public function preSubmitDataProvider()
+    public function preSubmitDataProvider(): array
     {
-        return array(
-            'set_primary_for_new_data' => array(
-                'data' => array(array('k' => 'v')),
-                'expected' => array(array('k' => 'v', 'primary' => true)),
-            ),
-            'set_primary_for_one_item' => array(
-                'data' => array(array('k' => 'v')),
-                'expected' => array(array('k' => 'v', 'primary' => true)),
-            ),
-            'not_set_primary_for_two_items' => array(
-                'data' => array(array('k' => 'v'), array('k2' => 'v2')),
-                'expected' => array(array('k' => 'v'), array('k2' => 'v2')),
-            ),
-            'primary_is_already_set' => array(
-                'data' => array(array('primary' => true), array(array('k' => 'v'))),
-                'expected' => array(array('primary' => true), array(array('k' => 'v')))
-            ),
-            'skip_empty_data_array' => array(
-                'data' => array(array(array()), array(), array('k' => 'v', 'primary' => true), array()),
-                'expected' => array('2' => array('k' => 'v', 'primary' => true))
-            )
-        );
+        return [
+            'set_primary_for_new_data' => [
+                'data' => [['k' => 'v']],
+                'expected' => [['k' => 'v', 'primary' => true]],
+            ],
+            'set_primary_for_one_item' => [
+                'data' => [['k' => 'v']],
+                'expected' => [['k' => 'v', 'primary' => true]],
+            ],
+            'not_set_primary_for_two_items' => [
+                'data' => [['k' => 'v'], ['k2' => 'v2']],
+                'expected' => [['k' => 'v'], ['k2' => 'v2']],
+            ],
+            'primary_is_already_set' => [
+                'data' => [['primary' => true], [['k' => 'v']]],
+                'expected' => [['primary' => true], [['k' => 'v']]]
+            ],
+            'skip_empty_data_array' => [
+                'data' => [[[]], [], ['k' => 'v', 'primary' => true], []],
+                'expected' => ['2' => ['k' => 'v', 'primary' => true]]
+            ]
+        ];
     }
 
     /**
      * @dataProvider preSubmitNoResetDataProvider
-     * @param array $data
      */
-    public function testPreSubmitNoReset($data)
+    public function testPreSubmitNoReset(array|string $data)
     {
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
         $event->expects($this->never())
             ->method('setData');
         $this->subscriber->preSubmit($event);
     }
 
-    /**
-     * @return array
-     */
-    public function preSubmitNoResetDataProvider()
+    public function preSubmitNoResetDataProvider(): array
     {
-        return array(
-            array(array()),
-            array('foo')
-        );
+        return [
+            [[]],
+            ['foo']
+        ];
     }
 
-    /**
-     * @param mixed $data
-     * @param FormInterface|null $form
-     * @return FormEvent
-     */
-    protected function createEvent($data, FormInterface $form = null)
+    private function createEvent(mixed $data, FormInterface $form = null): FormEvent
     {
-        $form = $form ? $form : $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        return new FormEvent($form, $data);
+        return new FormEvent(
+            $form ?? $this->createMock(FormInterface::class),
+            $data
+        );
     }
 }

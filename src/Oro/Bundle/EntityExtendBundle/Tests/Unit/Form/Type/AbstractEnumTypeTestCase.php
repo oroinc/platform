@@ -3,32 +3,38 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractEnumType;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->doctrine = $this->getMockForAbstractClass(
-            'Doctrine\Common\Persistence\ManagerRegistry',
+            ManagerRegistry::class,
             [],
             '',
             true,
@@ -40,26 +46,20 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestBuildForm(AbstractEnumType $type)
     {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(FormBuilderInterface::class);
 
-        $builder->expects($this->at(0))
+        $builder->expects($this->once())
             ->method('addEventListener')
             ->with(FormEvents::PRE_SET_DATA, [$type, 'preSetData']);
 
         $type->buildForm($builder, []);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForExistingEntity(AbstractEnumType $type)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $parentFormData = new TestEntity('123');
 
@@ -73,19 +73,19 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         );
         $this->expectFormWillReturnData($parentForm, $parentFormData);
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForNullEntity(AbstractEnumType $type)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $parentForm = $this->expectFormWillReturnParentForm($form);
         $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
@@ -97,19 +97,19 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         );
         $this->expectFormWillReturnData($parentForm, null);
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForFormWithoutDataClass(AbstractEnumType $type)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $parentForm = $this->expectFormWillReturnParentForm($form);
         $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
@@ -120,16 +120,16 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ]
         );
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForNewEntityKeepExistingValue(AbstractEnumType $type)
     {
         $enumValueClassName = TestEnumValue::class;
@@ -137,7 +137,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $entity = new TestEntity();
         $entity->setValue($this->createMock($enumValueClassName));
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $formConfig = $this->expectFormWillReturnFormConfig($form);
         $this->expectFormConfigWillReturnOptions(
             $formConfig,
@@ -160,27 +160,26 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->will($this->returnValue('value')); // name of property TestEntity::$value
-
-        $event = $this->getFormEventMock2($form);
+            ->willReturn('value'); // name of property TestEntity::$value
 
         $this->doctrine->expects($this->never())
             ->method('anything');
 
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForNewEntity(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $formConfig = $this->expectFormWillReturnFormConfig($form);
 
         $parentForm = $this->expectFormWillReturnParentForm($form);
@@ -197,7 +196,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         // name of property TestEntity::$value
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->will($this->returnValue('value'));
+            ->willReturn('value');
 
         $this->expectFormConfigWillReturnOptions(
             $formConfig,
@@ -209,8 +208,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
         $this->setExpectationsForLoadDefaultEnumValues($enumValueClassName, ['val1']);
 
-        $event = $this->getFormEventMock2($form);
-
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->once())
             ->method('setData')
             ->with('val1');
@@ -218,14 +219,11 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     */
     public function doTestPreSetDataForNewEntityWithMultiEnum(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $formConfig = $this->expectFormWillReturnFormConfig($form);
         $this->expectFormConfigWillReturnOptions(
             $formConfig,
@@ -253,15 +251,17 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         // name of property TestEntity::$value
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->will($this->returnValue('value'));
-
-        $event = $this->getFormEventMock2($form);
+            ->willReturn('value');
 
         $this->setExpectationsForLoadDefaultEnumValues(
             $enumValueClassName,
             ['val1', 'val2']
         );
 
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->once())
             ->method('setData')
             ->with(['val1', 'val2']);
@@ -292,17 +292,17 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         // This may be achieved with Stub. Stub namespace does not reflect Stub path. So we have to load it manually
         $fileName = ExtendHelper::getShortClassName($enumValueClassName) . '.php';
         require_once(realpath(__DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $fileName));
-        $enumConfig         = new Config(new EntityConfigId('enum', $enumValueClassName));
+        $enumConfig = new Config(new EntityConfigId('enum', $enumValueClassName));
         $enumConfig->set('multiple', $multiple);
-        $enumConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumConfig));
+            ->willReturn($enumConfig);
 
         $type->configureOptions($resolver);
 
@@ -352,33 +352,6 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEventMock2($form)
-    {
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->once())
-            ->method('getForm')
-            ->will($this->returnValue($form));
-
-        return $event;
-    }
-
-    /**
      * @param mixed                                         $entity
      * @param \PHPUnit\Framework\MockObject\MockObject|null $form
      *
@@ -387,23 +360,21 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     protected function getFormEventMock($entity = null, $form = null)
     {
         if (!$form) {
-            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock(FormInterface::class);
         }
-        $rootForm = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $rootForm = $this->createMock(FormInterface::class);
 
         $form->expects($this->once())
             ->method('getRoot')
-            ->will($this->returnValue($rootForm));
+            ->willReturn($rootForm);
         $rootForm->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
         return $event;
     }
@@ -418,12 +389,12 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         \PHPUnit\Framework\MockObject\MockObject $parentForm = null
     ) {
         if (!$parentForm) {
-            $parentForm = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+            $parentForm = $this->createMock(FormInterface::class);
         }
 
         $form->expects($this->once())
             ->method('getParent')
-            ->will($this->returnValue($parentForm));
+            ->willReturn($parentForm);
 
         return $parentForm;
     }
@@ -436,7 +407,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     {
         $form->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
     }
 
     /**
@@ -449,47 +420,35 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         \PHPUnit\Framework\MockObject\MockObject $formConfig = null
     ) {
         if (!$formConfig) {
-            $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+            $formConfig = $this->createMock(FormConfigInterface::class);
         }
 
         $form->expects($this->atLeastOnce())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
         return $formConfig;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $formConfig
-     * @param array $optionsValueMap
-     */
     protected function expectFormConfigWillReturnOptions(
         \PHPUnit\Framework\MockObject\MockObject $formConfig,
         array $optionsValueMap
     ) {
         $formConfig->expects($this->atLeastOnce())
             ->method('getOption')
-            ->will(
-                $this->returnValueMap($optionsValueMap)
-            );
+            ->willReturnMap($optionsValueMap);
     }
 
-    /**
-     * @param string $enumValueClassName
-     * @param array  $defaultValues
-     */
-    protected function setExpectationsForLoadDefaultEnumValues($enumValueClassName, array $defaultValues)
+    protected function setExpectationsForLoadDefaultEnumValues(string $enumValueClassName, array $defaultValues)
     {
-        $repo = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects($this->once())
             ->method('getDefaultValues')
-            ->will($this->returnValue($defaultValues));
+            ->willReturn($defaultValues);
 
         $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->with($enumValueClassName)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
     }
 }

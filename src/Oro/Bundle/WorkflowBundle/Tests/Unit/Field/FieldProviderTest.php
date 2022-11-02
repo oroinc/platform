@@ -3,12 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\Provider\EntityFieldProviderTest;
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldProviderTest extends EntityFieldProviderTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -16,7 +15,7 @@ class FieldProviderTest extends EntityFieldProviderTest
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
-            new FieldTypeHelper([]),
+            $this->fieldTypeHelper,
             $this->doctrine,
             $this->translator,
             []
@@ -28,12 +27,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
-    /**
-     * exclusions are not used in workflow
-     *
-     * {@inheritdoc}
-     */
-    public function fieldsWithRelationsExpectedDataProvider()
+    public function fieldsWithRelationsExpectedDataProvider(): array
     {
         return [
             [
@@ -57,17 +51,14 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldsWithRelationsAndDeepLevelDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelDataProvider(): array
     {
         return [
             [
@@ -91,17 +82,14 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider(): array
     {
         return [
             [
@@ -125,17 +113,14 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelations()
+    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelations(): array
     {
         return [
             [
@@ -159,17 +144,14 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider(): array
     {
         return [
             [
@@ -193,17 +175,14 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional()
+    public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional(): array
     {
         return [
             [
@@ -211,13 +190,13 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'Test1field2',
                         'type' => 'string',
-                        'label' => 'A Translated'
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'id',
                         'type' => 'integer',
                         'label' => 'B Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -237,18 +216,15 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'label' => 'UniRel1 Translated (Test22 Label Translated)',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test22',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithVirtualRelationsAndEnumsDataProvider()
+    public function getFieldsWithVirtualRelationsAndEnumsDataProvider(): array
     {
-        $expectedResult =  [
+        $expectedResult = [
             [
                 [
                     [
@@ -260,47 +236,42 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'rel1',
                         'type' => 'enum',
                         'label' => 'Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue1'
+                        'related_entity_name' => 'Acme\EnumValue1',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'Field 1 Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel2',
                         'type' => 'multiEnum',
                         'label' => 'Multi Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue2'
+                        'related_entity_name' => 'Acme\EnumValue2',
                     ],
                     [
                         'name' => 'virtual_relation',
                         'type' => 'oneToMany',
                         'label' => 'acme.entity.test.virtual_relation.label Translated',
                         'relation_type' => 'oneToMany',
-                        'related_entity_name' => 'OtherEntity'
-                    ]
-                ]
-            ]
+                        'related_entity_name' => 'OtherEntity',
+                    ],
+                ],
+            ],
         ];
 
-        array_splice($expectedResult[0][0], 0, 2, [ $expectedResult[0][0][1], $expectedResult[0][0][0] ]);
+        array_splice($expectedResult[0][0], 0, 2, [$expectedResult[0][0][1], $expectedResult[0][0][0]]);
 
         return $expectedResult;
     }
 
-    /**
-     * exclusions are not used in workflow
-     *
-     * @return array
-     */
-    public function relationsExpectedDataProvider()
+    public function relationsExpectedDataProvider(): array
     {
         return [
             [
-                []
-            ]
+                [],
+            ],
         ];
     }
 }

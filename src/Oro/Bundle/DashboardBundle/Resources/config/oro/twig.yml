@@ -1,2 +1,2 @@
 bundles:
-    - OroDashboardBundle:Form:fields.html.twig
+    - '@OroDashboard/Form/fields.html.twig'

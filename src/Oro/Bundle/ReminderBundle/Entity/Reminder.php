@@ -12,7 +12,7 @@ use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Reminder
+ * A reminder that can be tied up to some event (e.g. a calendar event).
  *
  * @ORM\Table(name="oro_reminder", indexes={
  *     @ORM\Index(name="reminder_state_idx", columns={"state"})
@@ -23,9 +23,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-bell-o"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "comment"={
  *              "immutable"=true
@@ -38,6 +35,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Reminder extends ExtendReminder
 {
@@ -96,7 +94,7 @@ class Reminder extends ExtendReminder
     protected $intervalNumber;
 
     /**
-     * @var integer
+     * @var string
      *
      * @ORM\Column(name="interval_unit", type="string", length=1, nullable=false)
      */
@@ -178,7 +176,7 @@ class Reminder extends ExtendReminder
      * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
     protected $failureException;
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -435,7 +433,7 @@ class Reminder extends ExtendReminder
 
         return $this;
     }
-    
+
     /**
      * Sets reminder data
      *
@@ -451,7 +449,7 @@ class Reminder extends ExtendReminder
         if ($data instanceof SenderAwareReminderDataInterface) {
             $this->setSender($data->getSender());
         }
-        
+
         return $this;
     }
 

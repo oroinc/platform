@@ -1,0 +1,8 @@
+app-modules:
+    - orosync/js/app/modules/content-manager-module
+dynamic-imports:
+    commons:
+        - orosync/js/app/components/ping-handler
+        - orosync/js/app/components/tag-content
+        - orosync/js/content-manager
+        - orosync/js/sync

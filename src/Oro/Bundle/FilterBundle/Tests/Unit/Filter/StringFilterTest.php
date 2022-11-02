@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -13,174 +15,137 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class StringFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StringFilter
-     */
-    protected $filter;
+    /** @var StringFilter */
+    private $filter;
 
-    /**
-     * @var string
-     */
-    protected $filterName = 'filter_name';
-
-    /**
-     * @var string
-     */
-    protected $dataName = 'field_name';
-
-    /**
-     * @var string
-     */
-    protected $parameterName = 'parameter_name';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $formFactory = $this->createMock(FormFactoryInterface::class);
 
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
-
-        $this->filter = new StringFilter($formFactory, $filterUtility);
-        $this->filter->init($this->filterName, [
-            FilterUtility::DATA_NAME_KEY => $this->dataName,
+        $this->filter = new StringFilter($formFactory, new FilterUtility());
+        $this->filter->init('test-filter', [
+            FilterUtility::DATA_NAME_KEY => 'field_name'
         ]);
     }
 
-    /**
-     * @dataProvider applyProvider
-     *
-     * @param array $inputData
-     * @param array $expectedData
-     */
-    public function testApply(array $inputData, array $expectedData)
+    private function getFilterDatasource(): OrmFilterDatasourceAdapter
     {
-        $ds = $this->prepareDatasource();
-
-        $this->filter->apply($ds, $inputData['data']);
-
-        $where = $this->parseQueryCondition($ds);
-
-        $this->assertEquals($expectedData['where'], $where);
-    }
-
-    /**
-     * @return array
-     */
-    public function applyProvider()
-    {
-        return [
-            'EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_EMPTY,
-                        'value' => null,
-                    ],
-                ],
-                'expected' => [
-                    'where' => 'field_name IS NULL OR field_name = \'\'',
-                ],
-            ],
-            'NOT_EMPTY' => [
-                'input' => [
-                    'data' => [
-                        'type' => FilterUtility::TYPE_NOT_EMPTY,
-                        'value' => null,
-                    ],
-                ],
-                'expected' => [
-                    'where' => 'field_name IS NOT NULL AND field_name <> \'\'',
-                ],
-            ],
-            'CONTAINS_EMPTY_STRING' => [
-                'input' => [
-                    'data' => [
-                        'type' => TextFilterType::TYPE_CONTAINS,
-                        'value' => '',
-                    ],
-                ],
-                'expected' => [
-                    'where' => '',
-                ],
-            ],
-            'CONTAINS_STRING' => [
-                'input' => [
-                    'data' => [
-                        'type' => TextFilterType::TYPE_CONTAINS,
-                        'value' => 'test',
-                    ],
-                ],
-                'expected' => [
-                    'where' => 'field_name LIKE %test%',
-                ],
-            ],
-            'CONTAINS_STRING_0' => [
-                'input' => [
-                    'data' => [
-                        'type' => TextFilterType::TYPE_CONTAINS,
-                        'value' => '0',
-                    ],
-                ],
-                'expected' => [
-                    'where' => 'field_name LIKE %0%',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function prepareDatasource()
-    {
-        /* @var $em EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
-        $em->expects($this->any())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr())
-        ;
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName', 'getDatabasePlatform'])
-            ->setConstructorArgs([new QueryBuilder($em)])
-            ->getMock();
-        $ds->expects($this->any())
+            ->willReturn(new Query\Expr());
+        $connection = $this->createMock(Connection::class);
+        $em->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $connection->expects(self::any())
             ->method('getDatabasePlatform')
-            ->willReturn(new \stdClass())
-        ;
+            ->willReturn(new MySqlPlatform());
 
-        return $ds;
+        return new OrmFilterDatasourceAdapter(new QueryBuilder($em));
     }
-
 
     /**
      * @param OrmFilterDatasourceAdapter $ds
+     *
      * @return string
      */
-    protected function parseQueryCondition(OrmFilterDatasourceAdapter $ds)
+    private function parseQueryCondition(OrmFilterDatasourceAdapter $ds)
     {
         $qb = $ds->getQueryBuilder();
 
-        $parameters = array();
+        $parameters = [];
         foreach ($qb->getParameters() as $param) {
-            /* @var $param Query\Parameter */
+            /* @var Query\Parameter $param */
             $parameters[':' . $param->getName()] = $param->getValue();
         }
 
         $parts = $qb->getDQLParts();
-
-        $where = '';
-
-        if ($parts['where']) {
-            $where = str_replace(
-                array_keys($parameters),
-                array_values($parameters),
-                (string)$parts['where']
-            );
+        if (!$parts['where']) {
+            return '';
         }
 
-        return $where;
+        return str_replace(
+            array_keys($parameters),
+            array_values($parameters),
+            (string)$parts['where']
+        );
+    }
+
+    /**
+     * @dataProvider applyProvider
+     */
+    public function testApply(array $data, array $expected)
+    {
+        $ds = $this->getFilterDatasource();
+        $this->filter->apply($ds, $data);
+
+        $where = $this->parseQueryCondition($ds);
+        self::assertEquals($expected['where'], $where);
+    }
+
+    public function applyProvider(): array
+    {
+        return [
+            'NO_TYPE'               => [
+                'data'     => [
+                    'value' => 'test'
+                ],
+                'expected' => [
+                    'where' => 'field_name = test'
+                ]
+            ],
+            'EMPTY'                 => [
+                'data'     => [
+                    'type'  => FilterUtility::TYPE_EMPTY,
+                    'value' => null
+                ],
+                'expected' => [
+                    'where' => 'field_name IS NULL OR field_name = \'\''
+                ]
+            ],
+            'NOT_EMPTY'             => [
+                'data'     => [
+                    'type'  => FilterUtility::TYPE_NOT_EMPTY,
+                    'value' => null
+                ],
+                'expected' => [
+                    'where' => 'field_name IS NOT NULL AND field_name <> \'\''
+                ]
+            ],
+            'CONTAINS_EMPTY_STRING' => [
+                'data'     => [
+                    'type'  => TextFilterType::TYPE_CONTAINS,
+                    'value' => ''
+                ],
+                'expected' => [
+                    'where' => ''
+                ]
+            ],
+            'CONTAINS_STRING'       => [
+                'data'     => [
+                    'type'  => TextFilterType::TYPE_CONTAINS,
+                    'value' => 'test'
+                ],
+                'expected' => [
+                    'where' => 'field_name LIKE %test%'
+                ]
+            ],
+            'CONTAINS_STRING_0'     => [
+                'data'     => [
+                    'type'  => TextFilterType::TYPE_CONTAINS,
+                    'value' => '0'
+                ],
+                'expected' => [
+                    'where' => 'field_name LIKE %0%'
+                ]
+            ]
+        ];
+    }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
     }
 }

@@ -6,43 +6,35 @@ use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Form\Type\PriceType;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PriceTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
-        /* @var $currencyProvider \PHPUnit\Framework\MockObject\MockObject|CurrencyProviderInterface */
-        $currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
+        $currencyProvider = $this->createMock(CurrencyProviderInterface::class);
         $currencyProvider->expects($this->any())
             ->method('getCurrencyList')
-            ->will($this->returnValue(['USD', 'EUR']));
+            ->willReturn(['USD', 'EUR']);
 
-        /* @var $localeSettings \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $currencyNameHelper = $this->createMock(CurrencyNameHelper::class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
-        $currencyNameHelper = $this
-            ->getMockBuilder('Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $priceType = new PriceType();
+        $priceType->setDataClass(Price::class);
 
         return [
             new PreloadedExtension(
                 [
-                    PriceType::class => PriceTypeGenerator::createPriceType($this),
+                    PriceType::class => $priceType,
                     CurrencySelectionType::class => new CurrencySelectionType(
                         $currencyProvider,
                         $localeSettings,
@@ -55,28 +47,62 @@ class PriceTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testValueWhenDefaultEnglishLocale()
+    {
+        $value = 1234567.89;
+        $form = $this->factory->create(PriceType::class, (new Price())->setValue($value));
+        $view = $form->createView();
+
+        $transformer = new NumberToLocalizedStringTransformer(Price::MAX_VALUE_SCALE, true);
+        self::assertEquals($transformer->transform($value), $view->children['value']->vars['value']);
+
+        $submittedValue = 2432765.98;
+        $form->submit(['value' => $transformer->transform($submittedValue), 'currency' => 'USD']);
+
+        self::assertEquals($submittedValue, $form->getData()->getValue());
+    }
+
+    public function testValueWhenGermanLocale()
+    {
+        $previousLocale = \Locale::getDefault();
+        try {
+            \Locale::setDefault('de_DE');
+            $value = 1234567.89;
+            $form = $this->factory->create(PriceType::class, (new Price())->setValue($value));
+            $view = $form->createView();
+
+            $transformer = new NumberToLocalizedStringTransformer(Price::MAX_VALUE_SCALE, true);
+            self::assertEquals($transformer->transform($value), $view->children['value']->vars['value']);
+
+            $submittedValue = 2432765.98;
+            $form->submit(['value' => $transformer->transform($submittedValue), 'currency' => 'USD']);
+
+            self::assertEquals($submittedValue, $form->getData()->getValue());
+        } finally {
+            \Locale::setDefault($previousLocale);
+        }
+    }
+
     /**
-     * @param bool $isValid
-     * @param mixed $defaultData
-     * @param array $submittedData
-     * @param mixed $expectedData
-     * @param array $options
      * @dataProvider submitProvider
      */
-    public function testSubmit($isValid, $defaultData, $submittedData, $expectedData, array $options = [])
-    {
+    public function testSubmit(
+        bool $isValid,
+        mixed $defaultData,
+        array $submittedData,
+        mixed $expectedData,
+        array $options = []
+    ) {
         $form = $this->factory->create(PriceType::class, $defaultData, $options);
 
         $this->assertEquals($defaultData, $form->getData());
         $form->submit($submittedData);
         $this->assertEquals($isValid, $form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             'price without value' => [
@@ -154,9 +180,6 @@ class PriceTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * Test getName
-     */
     public function testGetName()
     {
         $formType = $this->factory->create(PriceType::class);
@@ -165,12 +188,8 @@ class PriceTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var $optionsResolverMock OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-        $optionsResolverMock = $this->getMockBuilder(OptionsResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $optionsResolverMock = $this->createMock(OptionsResolver::class);
 
-        /** @var PriceType $form */
         $form = new PriceType();
         $form->setDataClass(\stdClass::class);
 

@@ -2,108 +2,59 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
+/**
+ * Provides helpful methods to get configuration that is loaded from "Resources/config/oro/features.yml" files.
+ */
 class ConfigurationManager
 {
-    /**
-     * @var ConfigurationProvider
-     */
-    protected $configurationProvider;
+    private ConfigurationProvider $configurationProvider;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     */
     public function __construct(ConfigurationProvider $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;
     }
 
-    /**
-     * @param string $feature
-     * @param string $node
-     * @param null|mixed $default
-     * @return mixed
-     */
-    public function get($feature, $node, $default = null)
+    public function get(string $feature, string $node, mixed $default = null): mixed
     {
-        $configuration = $this->configurationProvider->getFeaturesConfiguration();
-        if (array_key_exists($feature, $configuration) && array_key_exists($node, $configuration[$feature])) {
-            return $configuration[$feature][$node];
-        }
+        $config = $this->configurationProvider->getFeaturesConfiguration();
 
-        return $default;
+        return \array_key_exists($feature, $config) && \array_key_exists($node, $config[$feature])
+            ? $config[$feature][$node]
+            : $default;
     }
 
-    /**
-     * @param string $toggle
-     * @return null|string
-     */
-    public function getFeatureByToggle($toggle)
+    public function getFeatureByToggle(string $toggle): ?string
     {
-        $configuration = $this->configurationProvider->getFeaturesConfiguration();
-        
-        foreach ($configuration as $featureName => $featureConfig) {
-            if (isset($featureConfig['toggle']) && $featureConfig['toggle'] == $toggle) {
-                return $featureName;
-            }
-        }
-        
-        return null;
+        $config = $this->configurationProvider->getTogglesConfiguration();
+
+        return $config[$toggle] ?? null;
     }
 
-    /**
-     * @param string $resourceType
-     * @param string $resource
-     * @return array
-     */
-    public function getFeaturesByResource($resourceType, $resource)
+    public function getFeaturesByResource(string $resourceType, string $resource): array
     {
-        $configuration = $this->configurationProvider->getResourcesConfiguration();
-        if (array_key_exists($resourceType, $configuration)
-            && array_key_exists($resource, $configuration[$resourceType])
-        ) {
-            return $configuration[$resourceType][$resource];
-        }
+        $config = $this->configurationProvider->getResourcesConfiguration();
 
-        return [];
+        return $config[$resourceType][$resource] ?? [];
     }
 
-    /**
-     * @param string $resourceType
-     *
-     * @return array
-     */
-    public function getResourcesByType($resourceType)
+    public function getResourcesByType(string $resourceType): array
     {
-        $configuration = $this->configurationProvider->getResourcesConfiguration();
+        $config = $this->configurationProvider->getResourcesConfiguration();
 
-        return array_key_exists($resourceType, $configuration) ? $configuration[$resourceType] : [];
+        return $config[$resourceType] ?? [];
     }
 
-    /**
-     * @param string $feature
-     * @return array
-     */
-    public function getFeatureDependencies($feature)
+    public function getFeatureDependencies(string $feature): array
     {
-        $configuration = $this->configurationProvider->getDependenciesConfiguration();
-        if (array_key_exists($feature, $configuration)) {
-            return $configuration[$feature];
-        }
+        $config = $this->configurationProvider->getDependenciesConfiguration();
 
-        return [];
+        return $config[$feature] ?? [];
     }
 
-    /**
-     * @param string $feature
-     * @return array
-     */
-    public function getFeatureDependents($feature)
+    public function getFeatureDependents(string $feature): array
     {
-        $configuration = $this->configurationProvider->getDependentsConfiguration();
-        if (array_key_exists($feature, $configuration)) {
-            return $configuration[$feature];
-        }
+        $config = $this->configurationProvider->getDependentsConfiguration();
 
-        return [];
+        return $config[$feature] ?? [];
     }
 }

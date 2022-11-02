@@ -6,6 +6,9 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator;
 
+/**
+ * Adds handling of extended options to the Table class that is used in migrations.
+ */
 class ExtendTable extends TableWithNameGenerator
 {
     const COLUMN_CLASS = 'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn';
@@ -15,9 +18,6 @@ class ExtendTable extends TableWithNameGenerator
      */
     protected $extendOptionsManager;
 
-    /**
-     * @param array $args
-     */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];
@@ -74,7 +74,7 @@ class ExtendTable extends TableWithNameGenerator
             if (!isset($oroOptions['extend']['is_extend'])) {
                 $oroOptions['extend']['is_extend'] = true;
             }
-            $options['notnull'] = false;
+            $options['notnull'] = $options['notnull'] ?? false;
         }
 
         $column = parent::addColumn($columnName, $typeName, $options);
@@ -83,7 +83,9 @@ class ExtendTable extends TableWithNameGenerator
             if (empty($oroOptions[ExtendOptionsManager::TYPE_OPTION])) {
                 $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
             }
-            $column->setOptions([OroOptions::KEY => $oroOptions]);
+
+            $options[OroOptions::KEY] = $oroOptions;
+            $column->setOptions($options);
         }
 
         return $column;

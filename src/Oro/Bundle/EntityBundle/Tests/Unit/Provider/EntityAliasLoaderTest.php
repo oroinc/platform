@@ -10,19 +10,11 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
 class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasLoader */
-    private $loader;
-
-    protected function setUp()
-    {
-        $this->loader = new EntityAliasLoader();
-    }
-
     public function testEmptyLoader()
     {
         $storage = new EntityAliasStorage();
-
-        $this->loader->load($storage);
+        $loader = new EntityAliasLoader([], []);
+        $loader->load($storage);
 
         self::assertEquals([], $storage->getAll());
     }
@@ -30,20 +22,15 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
     public function testLoadWhenSeveralProvidersReturnSameClass()
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
-        $classProvider2 = $this->createMock(EntityClassProviderInterface::class);
-
         $classProvider1->expects(self::once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity1', 'Test\Entity2']);
+        $classProvider2 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider2->expects(self::once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity2', 'Test\Entity3']);
 
-        $this->loader->addEntityClassProvider($classProvider1);
-        $this->loader->addEntityClassProvider($classProvider2);
-
         $aliasProvider1 = $this->createMock(EntityAliasProviderInterface::class);
-        $this->loader->addEntityAliasProvider($aliasProvider1);
         $aliasProvider1->expects(self::any())
             ->method('getEntityAlias')
             ->willReturnMap([
@@ -52,10 +39,9 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
                 ['Test\Entity3', new EntityAlias('alias3', 'plural_alias3')]
             ]);
 
-        $this->loader->addEntityAliasProvider($aliasProvider1);
-
         $storage = new EntityAliasStorage();
-        $this->loader->load($storage);
+        $loader = new EntityAliasLoader([$classProvider1, $classProvider2], [$aliasProvider1]);
+        $loader->load($storage);
 
         self::assertEquals(
             [
@@ -73,7 +59,6 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         $classProvider1->expects(self::once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity1']);
-        $this->loader->addEntityClassProvider($classProvider1);
 
         $aliasProvider1 = $this->createMock(EntityAliasProviderInterface::class);
         $aliasProvider1->expects(self::once())
@@ -84,11 +69,9 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         $aliasProvider2->expects(self::never())
             ->method('getEntityAlias');
 
-        $this->loader->addEntityAliasProvider($aliasProvider1);
-        $this->loader->addEntityAliasProvider($aliasProvider2);
-
         $storage = new EntityAliasStorage();
-        $this->loader->load($storage);
+        $loader = new EntityAliasLoader([$classProvider1], [$aliasProvider1, $aliasProvider2]);
+        $loader->load($storage);
 
         self::assertEquals(
             [
@@ -104,7 +87,6 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         $classProvider1->expects(self::once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity1']);
-        $this->loader->addEntityClassProvider($classProvider1);
 
         $aliasProvider1 = $this->createMock(EntityAliasProviderInterface::class);
         $aliasProvider1->expects(self::once())
@@ -115,11 +97,9 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         $aliasProvider2->expects(self::never())
             ->method('getEntityAlias');
 
-        $this->loader->addEntityAliasProvider($aliasProvider1);
-        $this->loader->addEntityAliasProvider($aliasProvider2);
-
         $storage = new EntityAliasStorage();
-        $this->loader->load($storage);
+        $loader = new EntityAliasLoader([$classProvider1], [$aliasProvider1, $aliasProvider2]);
+        $loader->load($storage);
 
         self::assertEquals([], $storage->getAll());
     }

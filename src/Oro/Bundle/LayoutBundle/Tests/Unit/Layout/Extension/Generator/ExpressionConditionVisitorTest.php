@@ -1,50 +1,45 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisitor;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Oro\Component\PhpUtils\ClassGenerator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
 {
-    // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $expression = $this->getMockBuilder(ParsedExpression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        
+        $expression = $this->createMock(ParsedExpression::class);
+
         $expressionLanguage = $this->createMock(ExpressionLanguage::class);
-        $expressionLanguage->expects($this->once())
+        $expressionLanguage->expects(self::once())
             ->method('compile')
             ->with($expression)
             ->willReturn('(true == $context["enabled"])');
 
         $condition = new ExpressionConditionVisitor($expression, $expressionLanguage);
-        $phpClass = PhpClass::create('LayoutUpdateClass');
+        $phpClass = new ClassGenerator('Test\LayoutUpdateClass');
         $visitContext = new VisitContext($phpClass);
 
-        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
+        $method = $phpClass->addMethod(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
+        $method->addParameter(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR);
+        $method->addParameter(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM);
 
         $condition->startVisit($visitContext);
-        $visitContext->getUpdateMethodWriter()->writeln('echo 123;');
+        $visitContext->appendToUpdateMethodBody('echo 123;');
         $condition->endVisit($visitContext);
 
-        $method->setBody($visitContext->getUpdateMethodWriter()->getContent());
-        $phpClass->setMethod($method);
+        $method->setBody($visitContext->getUpdateMethodBody());
 
-        $strategy = new DefaultGeneratorStrategy();
-        $this->assertSame(
-<<<CLASS
+        self::assertSame(
+            <<<CLASS
+namespace Test;
+
 class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
     public function updateLayout(\$layoutManipulator, \$item)
@@ -52,6 +47,7 @@ class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdat
         if (!\$this->isApplicable(\$item->getContext())) {
             return;
         }
+
         echo 123;
     }
 
@@ -60,10 +56,10 @@ class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdat
         return (true == \$context["enabled"]);
     }
 }
+
 CLASS
             ,
-            $strategy->generate($visitContext->getClass())
+            $visitContext->getClass()->print()
         );
     }
-    //codingStandardsIgnoreEnd
 }

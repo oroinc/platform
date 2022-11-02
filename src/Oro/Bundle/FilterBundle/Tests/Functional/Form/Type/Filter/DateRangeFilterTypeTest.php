@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DateRangeFilterTypeTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->initClient();
@@ -41,7 +41,7 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
                 [
                     'part'  => DateModifierInterface::PART_DAY,
-                    'value' => ['start' => 1, 'end' => 31],
+                    'value' => ['start' => 1, 'end' => 31, 'start_original' => 1, 'end_original' => 31],
                     'type'  => null,
                 ],
             ],
@@ -52,7 +52,7 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
                 [
                     'part'  => DateModifierInterface::PART_MONTH,
-                    'value' => ['start' => 1, 'end' => 12],
+                    'value' => ['start' => 1, 'end' => 12, 'start_original' => 1, 'end_original' => 12],
                     'type'  => null,
                 ],
             ],
@@ -63,7 +63,7 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
                 [
                     'part'  => DateModifierInterface::PART_WEEK,
-                    'value' => ['start' => 1, 'end' => 53],
+                    'value' => ['start' => 1, 'end' => 53, 'start_original' => 1, 'end_original' => 53],
                     'type'  => null,
                 ],
             ],
@@ -74,7 +74,7 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
                 [
                     'part'  => DateModifierInterface::PART_QUARTER,
-                    'value' => ['start' => 1, 'end' => 4],
+                    'value' => ['start' => 1, 'end' => 4, 'start_original' => 1, 'end_original' => 4],
                     'type'  => null,
                 ],
             ],
@@ -85,17 +85,14 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
                 [
                     'part'  => DateModifierInterface::PART_DOY,
-                    'value' => ['start' => 1, 'end' => 366],
+                    'value' => ['start' => 1, 'end' => 366, 'start_original' => 1, 'end_original' => 366],
                     'type'  => null,
                 ],
             ],
         ];
     }
 
-    /**
-     * @return FormFactoryInterface
-     */
-    protected function getFormFactory()
+    private function getFormFactory(): FormFactoryInterface
     {
         return $this->getContainer()->get('form.factory');
     }

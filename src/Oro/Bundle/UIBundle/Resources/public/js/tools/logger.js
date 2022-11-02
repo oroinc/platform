@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var error = require('oroui/js/error');
-    var tools = require('oroui/js/tools');
+    const _ = require('underscore');
+    const error = require('oroui/js/error');
+    const tools = require('oroui/js/tools');
 
     return {
         /**
@@ -17,7 +17,7 @@ define(function(require) {
          * @param {Object} variables - variables to replace in message text
          */
         warn: function(message, variables) {
-            var tpl = _.template(message, {
+            const tpl = _.template(message, {
                 interpolate: /\{\{([\s\S]+?)}}/g
             });
 
@@ -37,7 +37,7 @@ define(function(require) {
          * @param {Object} variables - variables to replace
          */
         error: function(message, variables) {
-            var tpl = _.template(message, {
+            const tpl = _.template(message, {
                 interpolate: /{{([\s\S]+?)}}/g
             });
             throw new Error(tpl(variables || {}));

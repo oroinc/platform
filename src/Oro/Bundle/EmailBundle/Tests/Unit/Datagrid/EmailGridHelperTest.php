@@ -2,9 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,18 +31,12 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $userClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper   = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailSyncManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->activityManager  = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->userClass        = 'Test\User';
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->emailSyncManager = $this->createMock(EmailSynchronizationManager::class);
+        $this->activityManager = $this->createMock(ActivityManager::class);
+        $this->userClass = 'Test\User';
 
         $this->helper = new EmailGridHelper(
             $this->doctrineHelper,
@@ -117,15 +119,11 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
         $entityId = 123;
         $entityClass = 'Test\Entity';
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
@@ -142,15 +140,11 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entityId = 123;
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
@@ -165,15 +159,11 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateDatasourceNoEntityId()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
@@ -188,28 +178,24 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setGetEmailOriginsExpectations($userId, $emailOrigins)
     {
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = $this->createMock(User::class);
+        $em = $this->createMock(EntityManager::class);
+        $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with($this->userClass)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
         $em->expects($this->once())
             ->method('getRepository')
             ->with($this->userClass)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
         $repo->expects($this->once())
             ->method('find')
             ->with($userId)
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $user->expects($this->once())
             ->method('getEmailOrigins')
-            ->will($this->returnValue($emailOrigins));
+            ->willReturn($emailOrigins);
     }
 }

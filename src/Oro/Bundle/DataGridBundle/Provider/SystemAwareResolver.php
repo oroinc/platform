@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Resolve datagrid configs with system configs
+ */
 class SystemAwareResolver implements ContainerAwareInterface
 {
     const KEY_EXTENDS       = 'extends';
@@ -91,11 +95,11 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        if (is_scalar($val) && strpos($val, '%') !== false) {
+        if (str_contains($val, '%')) {
             $val = $this->resolveClassName($val);
         }
 
-        while (is_scalar($val) && strpos($val, '::') !== false) {
+        while (is_scalar($val) && str_contains($val, '::')) {
             $newVal = $this->resolveStatic($datagridName, $key, $val);
             if ($newVal == $val) {
                 break;
@@ -103,7 +107,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             $val = $newVal;
         }
 
-        if (is_scalar($val) && strpos($val, '@') !== false) {
+        if (is_scalar($val) && str_contains($val, '@') && TwigTemplateProperty::TEMPLATE_KEY !== $key) {
             $val = $this->resolveService($datagridName, $key, $val);
         }
 
@@ -128,7 +132,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveClassName($val)
     {
-        if (preg_match('#%([^\'":\s]+)%#', $val, $match)) {
+        if (preg_match('#%([^\'\"\:\s]+)%#', $val, $match)) {
             $matchedString = $match[0];
             $class = $match[1];
 
@@ -152,7 +156,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveStatic($datagridName, $key, $val)
     {
-        if (preg_match('#([^\'"%:\s]+)::([\w\._]+)#', $val, $match)) {
+        if (preg_match('#([^\'\"\%\:\s]+)::([\w\.\_]+)#', $val, $match)) {
             $matchedString = $match[0];
             $class = $match[1];
             $method = $match[2];
@@ -186,7 +190,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveService($datagridName, $key, $val)
     {
-        if (strpos($val, '\@') !== false) {
+        if (str_contains($val, '\@')) {
             return str_replace('\@', '@', $val);
         }
 
@@ -199,7 +203,7 @@ class SystemAwareResolver implements ContainerAwareInterface
         $arguments = null;
         $matchedString = null;
         $lazy = false;
-        if (strpos($val, '->') !== false) {
+        if (str_contains($val, '->')) {
             if (preg_match("~{$serviceRegex}->{$methodRegex}{$argumentsRegex}~six", $val, $matches)) {
                 // Match @service->method("argument")
                 $matchedString = $matches[0];

@@ -5,19 +5,20 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var RelatedEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $relatedEmailsProvider;
 
+    /** @var ContextEmailRecipientsProvider */
     private $emailRecipientsProvider;
-    
-    public function setUp()
+
+    protected function setUp(): void
     {
-        $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
 
         $this->emailRecipientsProvider = new ContextEmailRecipientsProvider($this->relatedEmailsProvider);
     }
@@ -43,12 +44,12 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->relatedEmailsProvider->expects($this->once())
             ->method('getRecipients')
-            ->will($this->returnValue($relatedEmails));
+            ->willReturn($relatedEmails);
 
         $this->assertEquals($expectedRecipients, $this->emailRecipientsProvider->getRecipients($args));
     }
 
-    public function argsProvider()
+    public function argsProvider(): array
     {
         return [
             [

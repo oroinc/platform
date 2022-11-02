@@ -12,22 +12,21 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
  */
 class ConstraintsProvider implements ConstraintsProviderInterface
 {
-    /**
-     * @var MetadataFactoryInterface
-     */
-    protected $metadataFactory;
+    /** @var MetadataFactoryInterface */
+    private $metadataFactory;
 
-    /**
-     * @var array
-     */
-    protected $metadataConstraintsCache;
+    /** @var ConstraintConverterInterface */
+    private $constraintConverter;
 
-    /**
-     * @param MetadataFactoryInterface $metadataFactory
-     */
-    public function __construct(MetadataFactoryInterface $metadataFactory)
-    {
+    /** @var array */
+    private $metadataConstraintsCache;
+
+    public function __construct(
+        MetadataFactoryInterface $metadataFactory,
+        ConstraintConverterInterface $constraintConverter
+    ) {
         $this->metadataFactory = $metadataFactory;
+        $this->constraintConverter = $constraintConverter;
     }
 
     /**
@@ -44,11 +43,14 @@ class ConstraintsProvider implements ConstraintsProviderInterface
 
         $validationGroups = $this->getValidationGroups($form);
 
-        $result = array();
+        $result = [];
         foreach ($constraints as $constraint) {
             $groups = $constraint->groups ?? [Constraint::DEFAULT_GROUP];
             if (array_intersect($validationGroups, $groups)) {
-                $result[] = $constraint;
+                $jsConstraint = $this->constraintConverter->convertConstraint($constraint);
+                if (null !== $jsConstraint) {
+                    $result[] = $jsConstraint;
+                }
             }
         }
 
@@ -66,7 +68,7 @@ class ConstraintsProvider implements ConstraintsProviderInterface
         $isMapped = $form->getConfig()->getOption('mapped', true);
 
         if (!$form->getParent() || !$isMapped) {
-            return array();
+            return [];
         }
 
         $name = $form->getName();
@@ -77,8 +79,7 @@ class ConstraintsProvider implements ConstraintsProviderInterface
             $this->metadataConstraintsCache[$parentKey] = $this->extractMetadataPropertiesConstraints($parent);
         }
 
-        $result = array();
-
+        $result = [];
         if (isset($this->metadataConstraintsCache[$parentKey][$name])) {
             $result = $this->metadataConstraintsCache[$parentKey][$name]->constraints;
         } else {
@@ -100,10 +101,11 @@ class ConstraintsProvider implements ConstraintsProviderInterface
      */
     protected function extractMetadataPropertiesConstraints(FormInterface $form)
     {
-        $constraints = array();
-        if ($form->getConfig()->getDataClass()) {
+        $constraints = [];
+        $dataClass = $form->getConfig()->getDataClass() ?: $form->getConfig()->getOption('entity_class');
+        if ($dataClass) {
             /** @var ClassMetadata $metadata */
-            $metadata = $this->metadataFactory->getMetadataFor($form->getConfig()->getDataClass());
+            $metadata = $this->metadataFactory->getMetadataFor($dataClass);
             $constraints = $metadata->properties;
         }
         $errorMapping = $form->getConfig()->getOption('error_mapping');
@@ -136,7 +138,7 @@ class ConstraintsProvider implements ConstraintsProviderInterface
             $form = $form->getParent();
         } while (null !== $form);
 
-        return array(Constraint::DEFAULT_GROUP);
+        return [Constraint::DEFAULT_GROUP];
     }
 
     /**

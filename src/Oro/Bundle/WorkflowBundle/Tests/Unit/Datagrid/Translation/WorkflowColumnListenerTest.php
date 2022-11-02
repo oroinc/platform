@@ -10,22 +10,11 @@ use Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener;
 class WorkflowColumnListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowColumnListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new WorkflowColumnListener();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->listener);
     }
 
     public function testOnBuildBefore()

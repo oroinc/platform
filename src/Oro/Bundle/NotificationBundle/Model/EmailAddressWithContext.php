@@ -30,9 +30,6 @@ class EmailAddressWithContext implements EmailHolderInterface
         $this->context = $context;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * Warms up Data API resources and sub-resources caches.
+ * Warms up API resources and sub-resources caches.
  */
 class ResourcesCacheWarmer implements CacheWarmerInterface
 {
@@ -20,11 +20,6 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     /** @var array */
     private $requestTypes;
 
-    /**
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     * @param array                $requestTypes
-     */
     public function __construct(
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
@@ -64,6 +59,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUpCache()
     {
+        $this->resourcesProvider->clearCache();
         foreach ($this->requestTypes as $aspects) {
             $version = Version::LATEST;
             $requestType = new RequestType($aspects);

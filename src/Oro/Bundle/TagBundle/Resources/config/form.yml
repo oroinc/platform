@@ -1,39 +1,25 @@
-parameters:
-    oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
-    oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
-    oro_tag.tag.form.handler.tag.class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
-
-    oro_tag.form.type.tag_select.class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
-    oro_tag.form.type.taxonomy_select.class: Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType
-
-    oro_tag.form.subscriber.tag_select.class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
-    oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
-
-    oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-
-    oro_tag.tag.form.type.taxonomy.class: Oro\Bundle\TagBundle\Form\Type\TaxonomyType
-    oro_tag.tag.form.handler.taxonomy.class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
-
 services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
+        public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType]
 
     oro_tag.form.handler.tag:
-        class: '%oro_tag.tag.form.handler.tag.class%'
+        class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
+        public: true
         arguments:
             - '@oro_tag.form.tag'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.tag:
-        class: '%oro_tag.tag.form.type.tag.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagType
         tags:
             - { name: form.type, alias: oro_tag_tag }
 
     oro_tag.form.type.tag_select:
-        class: '%oro_tag.form.type.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
         arguments:
             - '@security.authorization_checker'
             - '@oro_tag.form.transformer.tag_select'
@@ -42,13 +28,13 @@ services:
             - { name: form.type, alias: oro_tag_select }
 
     oro_tag.form.subscriber.tag_select:
-        class: '%oro_tag.form.subscriber.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
         arguments:
             - '@oro_tag.tag.manager'
             - '@oro_tag.helper.taggable_helper'
 
     oro_tag.form.transformer.tag_select:
-        class: '%oro_tag.form.transformer.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
         arguments:  ['@oro_tag.tag.manager']
 
     # Entity configuration choice
@@ -65,25 +51,27 @@ services:
         class: Oro\Bundle\TagBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_tag.tag.entity.class%'
-            - ["name"]
+            - 'Oro\Bundle\TagBundle\Entity\Tag'
+            - ['name']
             - '@oro_security.token_accessor'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
 
     # API
     oro_tag.form.type.tag.api:
-        class: '%oro_tag.tag.form.type.tag.api.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagApiType
         tags:
             - { name: form.type, alias: oro_tag_tag }
 
     oro_tag.form.tag.api:
         class: Symfony\Component\Form\Form
+        public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType, null]
 
     oro_tag.form.handler.api:
-        class: '%oro_tag.tag.form.handler.tag.class%'
+        class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
+        public: true
         arguments:
             - '@oro_tag.form.type.tag.api'
             - '@request_stack'
@@ -91,6 +79,7 @@ services:
 
     oro_tag.form.handler.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
+        public: true
         arguments:
             - '@oro_tag.form.taggable.api'
             - '@request_stack'
@@ -122,23 +111,28 @@ services:
 
     oro_tag.form.taxonomy:
         class: Symfony\Component\Form\Form
+        public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_taxonomy_form", Oro\Bundle\TagBundle\Form\Type\TaxonomyType]
 
+    Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler:
+        alias: oro_tag.form.handler.taxonomy
+
     oro_tag.form.handler.taxonomy:
-        class: '%oro_tag.tag.form.handler.taxonomy.class%'
+        class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
+        public: true
         arguments:
             - '@oro_tag.form.taxonomy'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.taxonomy:
-        class: '%oro_tag.tag.form.type.taxonomy.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TaxonomyType
         tags:
             - { name: form.type, alias: oro_tag_taxonomy }
 
     oro_tag.form.type.taxonomy_select:
-       class: '%oro_tag.form.type.taxonomy_select.class%'
+       class: Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType
        tags:
            - { name: form.type, alias: oro_taxonomy_select }
 

@@ -3,7 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateNotFoundException;
@@ -11,180 +14,173 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Twig\Error\Error;
 
 class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    private const TEMPLATE_NAME = 'templateName';
-    private const LANGUAGE = 'fr_FR';
-    private const TEMPLATE_PARAMS = ['some' => 'value'];
-    private const SUBJECT = 'subject';
-    private const CONTENT = 'content';
-    private const COMPILED_SUBJECT = 'compiled subject';
-    private const COMPILED_CONTENT = 'compiled content';
-
-    /**
-     * @var DoctrineHelper|MockObject
-     */
-    private $doctrineHelper;
-
-    /**
-     * @var EmailRenderer|MockObject
-     */
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRenderer;
 
-    /**
-     * @var LoggerInterface|MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var EmailTemplateContentProvider
-     */
+    /** @var EmailTemplateContentProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->repository = $this->createMock(EmailTemplateRepository::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(EmailTemplate::class)
+            ->willReturn($this->repository);
+
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->provider = new EmailTemplateContentProvider($this->doctrineHelper, $this->emailRenderer);
-        $this->provider->setLogger($this->logger);
+
+        $this->provider = new EmailTemplateContentProvider(
+            $doctrine,
+            $this->emailRenderer,
+            new PropertyAccessor(),
+            $this->logger
+        );
     }
 
-    public function testGetTemplateContentWhenEmailTemplateIsNotFound(): void
+    private function getLocalization(int $id, Localization $parentLocalization = null): Localization
     {
-        $criteria = new EmailTemplateCriteria(self::TEMPLATE_NAME);
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+        if (null !== $parentLocalization) {
+            $localization->setParentLocalization($parentLocalization);
+        }
 
-        $emailTemplateRepository = $this->createMock(EmailTemplateRepository::class);
-        $emailTemplateRepository
-            ->expects($this->once())
-            ->method('findOneLocalized')
-            ->with($criteria, self::LANGUAGE)
-            ->willReturn(null);
+        return $localization;
+    }
 
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityRepositoryForClass')
-            ->willReturnMap([
-                [EmailTemplate::class, $emailTemplateRepository]
-            ]);
+    /**
+     * @dataProvider repositoryExceptionDataProvider
+     */
+    public function testGetTemplateContentRepositoryException(\Throwable $exception): void
+    {
+        $criteria = new EmailTemplateCriteria('test_template');
+        $localization = new Localization();
+        $templateParams = ['any-key' => 'any-val'];
+
+        $this->repository->expects(self::once())
+            ->method('findWithLocalizations')
+            ->with($criteria)
+            ->willThrowException($exception);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                $this->isType('string'),
+                [
+                    'exception' => $exception,
+                    'criteria' => $criteria,
+                ]
+            );
 
         $this->expectException(EmailTemplateNotFoundException::class);
-        $this->provider->getTemplateContent($criteria, self::LANGUAGE, self::TEMPLATE_PARAMS);
+        $this->provider->getTemplateContent($criteria, $localization, $templateParams);
     }
 
-    public function testGetTemplateContentWhenNonUniqueResultException(): void
+    public function repositoryExceptionDataProvider(): array
     {
-        $criteria = new EmailTemplateCriteria(self::TEMPLATE_NAME);
-
-        $nonUniqueResultException = new NonUniqueResultException();
-        $emailTemplateRepository = $this->createMock(EmailTemplateRepository::class);
-        $emailTemplateRepository
-            ->expects($this->once())
-            ->method('findOneLocalized')
-            ->with($criteria, self::LANGUAGE)
-            ->willThrowException($nonUniqueResultException);
-
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityRepositoryForClass')
-            ->willReturnMap([
-                [EmailTemplate::class, $emailTemplateRepository]
-            ]);
-
-        $this->logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Could not find unique email template for the given criteria');
-
-        $this->expectException(EmailTemplateNotFoundException::class);
-        $this->provider->getTemplateContent($criteria, self::LANGUAGE, self::TEMPLATE_PARAMS);
+        return [
+            NoResultException::class => [
+                'exception' => new NoResultException(),
+            ],
+            NonUniqueResultException::class => [
+                'exception' => new NonUniqueResultException(),
+            ],
+        ];
     }
 
-    public function testGetTemplateContentWhenCompileMessageFails(): void
+    public function testGetTemplateContentRendererException(): void
     {
-        $criteria = new EmailTemplateCriteria(self::TEMPLATE_NAME);
+        $criteria = new EmailTemplateCriteria('test_template');
+        $localization = new Localization();
+        $templateParams = ['any-key' => 'any-val'];
 
-        $emailTemplateEntity = $this->getEntity(EmailTemplate::class, [
-            'type' => EmailTemplate::TYPE_HTML,
-            'subject' => self::SUBJECT,
-            'content' => self::CONTENT
-        ]);
+        $emailTemplate = new EmailTemplate();
+        $this->repository->expects(self::once())
+            ->method('findWithLocalizations')
+            ->with($criteria)
+            ->willReturn($emailTemplate);
 
-        $emailTemplateRepository = $this->createMock(EmailTemplateRepository::class);
-        $emailTemplateRepository
-            ->expects($this->once())
-            ->method('findOneLocalized')
-            ->with($criteria, self::LANGUAGE)
-            ->willReturn($emailTemplateEntity);
-
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityRepositoryForClass')
-            ->willReturnMap([
-                [EmailTemplate::class, $emailTemplateRepository]
-            ]);
-
-        $this->logger
-            ->expects($this->once())
-            ->method('error')
-            ->with($this->matchesRegularExpression('/Rendering of email template .* failed/'));
-
-        $twigException = new \Twig_Error('Some error');
-        $this->emailRenderer
-            ->expects($this->once())
+        $exception = new Error('Some error');
+        $this->emailRenderer->expects(self::once())
             ->method('compileMessage')
-            ->with($emailTemplateEntity, self::TEMPLATE_PARAMS)
-            ->willThrowException($twigException);
+            ->with(
+                $this->isInstanceOf(EmailTemplateModel::class),
+                $templateParams
+            )
+            ->willThrowException($exception);
 
         $this->expectException(EmailTemplateCompilationException::class);
-        $this->provider->getTemplateContent($criteria, self::LANGUAGE, self::TEMPLATE_PARAMS);
+        $this->provider->getTemplateContent($criteria, $localization, $templateParams);
     }
 
     public function testGetTemplateContent(): void
     {
-        $criteria = new EmailTemplateCriteria(self::TEMPLATE_NAME);
+        $criteria = new EmailTemplateCriteria('test_template');
+        $templateParams = ['any-key' => 'any-val'];
 
-        $emailTemplateEntity = $this->getEntity(EmailTemplate::class, [
-            'type' => EmailTemplate::TYPE_HTML,
-            'subject' => self::SUBJECT,
-            'content' => self::CONTENT
-        ]);
+        $localizationRoot = $this->getLocalization(1);
+        $localizationChildrenA = $this->getLocalization(2, $localizationRoot);
+        $localizationChildrenB = $this->getLocalization(3, $localizationChildrenA);
 
-        $emailTemplateRepository = $this->createMock(EmailTemplateRepository::class);
-        $emailTemplateRepository
-            ->expects($this->once())
-            ->method('findOneLocalized')
-            ->with($criteria, self::LANGUAGE)
-            ->willReturn($emailTemplateEntity);
+        $emailTemplate = new EmailTemplate();
+        $emailTemplate
+            ->setSubject('Not used default subject')
+            ->setContent('Default content');
 
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityRepositoryForClass')
-            ->willReturnMap([
-               [EmailTemplate::class, $emailTemplateRepository]
+        // Not added template localization for children B for testing fallback without exist template localization
+        $emailTemplate->addTranslation(
+            (new EmailTemplateTranslation())
+                ->setLocalization($localizationChildrenA)
+                ->setSubject('Localized subject')
+                ->setSubjectFallback(false)
+                ->setContent('Not used content')
+                ->setContentFallback(true)
+        );
+
+        $this->repository->expects(self::once())
+            ->method('findWithLocalizations')
+            ->with($criteria)
+            ->willReturn($emailTemplate);
+
+        $this->emailRenderer->expects(self::once())
+            ->method('compileMessage')
+            ->with(
+                (new EmailTemplateModel())
+                    ->setType(EmailTemplateModel::CONTENT_TYPE_HTML)
+                    ->setSubject('Localized subject')
+                    ->setContent('Default content'),
+                $templateParams
+            )
+            ->willReturn([
+                'Compiled subject',
+                'Compiled content',
             ]);
 
-        $this->emailRenderer
-            ->expects($this->once())
-            ->method('compileMessage')
-            ->with($emailTemplateEntity, self::TEMPLATE_PARAMS)
-            ->willReturn([self::COMPILED_SUBJECT, self::COMPILED_CONTENT]);
-
-        $expectedEmailTemplateModel = (new EmailTemplateModel())
-            ->setSubject(self::COMPILED_SUBJECT)
-            ->setContent(self::COMPILED_CONTENT)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
-
+        $model = $this->provider->getTemplateContent($criteria, $localizationChildrenB, $templateParams);
         self::assertEquals(
-            $expectedEmailTemplateModel,
-            $this->provider->getTemplateContent($criteria, self::LANGUAGE, self::TEMPLATE_PARAMS)
+            (new EmailTemplateModel())
+                ->setType(EmailTemplateModel::CONTENT_TYPE_HTML)
+                ->setSubject('Compiled subject')
+                ->setContent('Compiled content'),
+            $model
         );
     }
 }

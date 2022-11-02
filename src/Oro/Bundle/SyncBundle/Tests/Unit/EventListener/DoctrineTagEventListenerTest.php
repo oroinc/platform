@@ -5,79 +5,89 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
 use Oro\Bundle\TestFrameworkBundle\Entity;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tagGenerator;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /**
-     * @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
-    /**
-     * @var DataUpdateTopicSender|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DataUpdateTopicSender|\PHPUnit\Framework\MockObject\MockObject */
     private $dataUpdateTopicSender;
 
-    /**
-     * @var DoctrineTagEventListener
-     */
+    /** @var DoctrineTagEventListener */
     private $eventListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
+        $this->dataUpdateTopicSender = $this->createMock(DataUpdateTopicSender::class);
         $this->em = $this->createMock(EntityManager::class);
         $this->uow = $this->createMock(UnitOfWork::class);
-        $this->em
-            ->expects(self::any())
+        $applicationState = $this->createMock(ApplicationState::class);
+        $applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
+
+        $this->em->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->dataUpdateTopicSender = $this->createMock(DataUpdateTopicSender::class);
-        $this->eventListener = new DoctrineTagEventListener($this->dataUpdateTopicSender, $this->tagGenerator, true);
+        $container = TestContainerBuilder::create()
+            ->add('oro_sync.content.tag_generator', $this->tagGenerator)
+            ->add('oro_sync.content.data_update_topic_sender', $this->dataUpdateTopicSender)
+            ->getContainer($this);
+
+        $this->eventListener = new DoctrineTagEventListener($container, $applicationState);
     }
 
-    /**
-     * @param object $owner
-     *
-     * @return PersistentCollection
-     */
-    private function createPersistentCollection($owner)
+    private function createPersistentCollection(object $owner): PersistentCollection
     {
-        $coll = new PersistentCollection($this->em, 'TestClass', new ArrayCollection());
+        $coll = new PersistentCollection(
+            $this->em,
+            $this->createMock(ClassMetadata::class),
+            new ArrayCollection()
+        );
         $coll->setOwner($owner, ['inversedBy' => null, 'mappedBy' => 'test']);
 
         return $coll;
     }
 
-    /**
-     * @param object $object
-     * @param string $property
-     * @param mixed  $value
-     */
-    private function setPrivateProperty($object, $property, $value)
+    public function testOnFlushForDisabledListener()
     {
-        $refl = new \ReflectionClass($object);
-        $prop = $refl->getProperty($property);
-        $prop->setAccessible(true);
-        $prop->setValue($object, $value);
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityInsertions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityDeletions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledEntityUpdates');
+        $this->uow->expects(self::never())
+            ->method('getScheduledCollectionDeletions');
+        $this->uow->expects(self::never())
+            ->method('getScheduledCollectionUpdates');
+
+        $this->dataUpdateTopicSender->expects(self::never())
+            ->method('send');
+        $this->tagGenerator->expects(self::never())
+            ->method('generate');
+
+        $this->eventListener->setEnabled(false);
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
+        $this->eventListener->postFlush();
     }
 
     public function testOnFlushForScheduledEntityInsertions()
@@ -104,28 +114,20 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $this->tagGenerator->expects(self::at(0))
+        $this->tagGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), true)
-            ->willReturn(['entity1Tag']);
-        $this->tagGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(self::isInstanceOf($entity2), true)
-            ->willReturn(['entity2Tag']);
+            ->willReturnMap([
+                [$entity1, true, false, ['entity1Tag']],
+                [$entity2, true, false, ['entity2Tag']],
+            ]);
 
-        $event = new OnFlushEventArgs($this->em);
-        $this->eventListener->onFlush($event);
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
 
-        self::assertAttributeEquals(
-            ['entity1Tag', 'entity2Tag'],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [spl_object_hash($entity1) => true, spl_object_hash($entity2) => true],
-            'processedEntities',
-            $this->eventListener
-        );
+        $this->dataUpdateTopicSender->expects(self::once())
+            ->method('send')
+            ->with(['entity1Tag', 'entity2Tag']);
+
+        $this->eventListener->postFlush();
     }
 
     public function testOnFlushForScheduledEntityDeletions()
@@ -141,7 +143,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $this->uow->expects(self::once())
             ->method('getScheduledEntityDeletions')
-            ->willReturn([$entity1, $entity2, $entity3]);
+            ->willReturn([ $entity1, $entity2, $entity3]);
         $this->uow->expects(self::once())
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
@@ -152,28 +154,20 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $this->tagGenerator->expects(self::at(0))
+        $this->tagGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), true)
-            ->willReturn(['entity1Tag']);
-        $this->tagGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(self::isInstanceOf($entity2), true)
-            ->willReturn(['entity2Tag']);
+            ->willReturnMap([
+                [$entity1, true, false, ['entity1Tag']],
+                [$entity2, true, false, ['entity2Tag']],
+            ]);
 
-        $event = new OnFlushEventArgs($this->em);
-        $this->eventListener->onFlush($event);
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
 
-        self::assertAttributeEquals(
-            ['entity1Tag', 'entity2Tag'],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [spl_object_hash($entity1) => true, spl_object_hash($entity2) => true],
-            'processedEntities',
-            $this->eventListener
-        );
+        $this->dataUpdateTopicSender->expects(self::once())
+            ->method('send')
+            ->with(['entity1Tag', 'entity2Tag']);
+
+        $this->eventListener->postFlush();
     }
 
     public function testOnFlushForScheduledEntityUpdates()
@@ -200,28 +194,20 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $this->tagGenerator->expects(self::at(0))
+        $this->tagGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
-            ->willReturn(['entity1Tag']);
-        $this->tagGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
-            ->willReturn(['entity2Tag']);
+            ->willReturnMap([
+                [$entity1, false, false, ['entity1Tag']],
+                [$entity2, false, false, ['entity2Tag']],
+            ]);
 
-        $event = new OnFlushEventArgs($this->em);
-        $this->eventListener->onFlush($event);
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
 
-        self::assertAttributeEquals(
-            ['entity1Tag', 'entity2Tag'],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [spl_object_hash($entity1) => true, spl_object_hash($entity2) => true],
-            'processedEntities',
-            $this->eventListener
-        );
+        $this->dataUpdateTopicSender->expects(self::once())
+            ->method('send')
+            ->with(['entity1Tag', 'entity2Tag']);
+
+        $this->eventListener->postFlush();
     }
 
     public function testOnFlushForScheduledCollectionDeletions()
@@ -251,28 +237,20 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $this->tagGenerator->expects(self::at(0))
+        $this->tagGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
-            ->willReturn(['entity1Tag']);
-        $this->tagGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
-            ->willReturn(['entity2Tag']);
+            ->willReturnMap([
+                [$entity1, false, false, ['entity1Tag']],
+                [$entity2, false, false, ['entity2Tag']],
+            ]);
 
-        $event = new OnFlushEventArgs($this->em);
-        $this->eventListener->onFlush($event);
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
 
-        self::assertAttributeEquals(
-            ['entity1Tag', 'entity2Tag'],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [spl_object_hash($entity1) => true, spl_object_hash($entity2) => true],
-            'processedEntities',
-            $this->eventListener
-        );
+        $this->dataUpdateTopicSender->expects(self::once())
+            ->method('send')
+            ->with(['entity1Tag', 'entity2Tag']);
+
+        $this->eventListener->postFlush();
     }
 
     public function testOnFlushForScheduledCollectionUpdates()
@@ -302,59 +280,19 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([$coll1, $coll2, $coll3]);
 
-        $this->tagGenerator->expects(self::at(0))
+        $this->tagGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::isInstanceOf($entity1), false)
-            ->willReturn(['entity1Tag']);
-        $this->tagGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(self::isInstanceOf($entity2), false)
-            ->willReturn(['entity2Tag']);
+            ->willReturnMap([
+                [$entity1, false, false, ['entity1Tag']],
+                [$entity2, false, false, ['entity2Tag']],
+            ]);
 
-        $event = new OnFlushEventArgs($this->em);
-        $this->eventListener->onFlush($event);
-
-        self::assertAttributeEquals(
-            ['entity1Tag', 'entity2Tag'],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [spl_object_hash($entity1) => true, spl_object_hash($entity2) => true],
-            'processedEntities',
-            $this->eventListener
-        );
-    }
-
-    public function testPostFlush()
-    {
-        $this->setPrivateProperty(
-            $this->eventListener,
-            'collectedTags',
-            ['duplicatedTag', 'anotherTag', 'duplicatedTag']
-        );
-        $this->setPrivateProperty(
-            $this->eventListener,
-            'processedEntities',
-            ['entity1' => true, 'entity2' => true]
-        );
+        $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
 
         $this->dataUpdateTopicSender->expects(self::once())
             ->method('send')
-            ->with(['duplicatedTag', 'anotherTag']);
+            ->with(['entity1Tag', 'entity2Tag']);
 
-        $event = new PostFlushEventArgs($this->em);
-        $this->eventListener->postFlush($event);
-
-        self::assertAttributeEquals(
-            [],
-            'collectedTags',
-            $this->eventListener
-        );
-        self::assertAttributeEquals(
-            [],
-            'processedEntities',
-            $this->eventListener
-        );
+        $this->eventListener->postFlush();
     }
 }

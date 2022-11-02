@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\ApiBundle\ApiDoc\ApiDocAnnotationHandlerInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ApiDocAnnotationHandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
@@ -28,8 +28,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the RouteOptionsResolver.
-     *
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
      */
     public function setRouteOptionsResolver(RouteOptionsResolverInterface $routeOptionsResolver)
     {
@@ -38,8 +36,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the RestDocViewDetector.
-     *
-     * @param RestDocViewDetector $docViewDetector
      */
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector)
     {
@@ -48,8 +44,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the ApiDocAnnotationHandler.
-     *
-     * @param ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler
      */
     public function setApiDocAnnotationHandler(ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler)
     {
@@ -98,6 +92,7 @@ trait ApiDocExtractorTrait
      * @param string[] $excludeSections
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doExtractAnnotations(array $routes, $view, array $excludeSections)
     {
@@ -117,8 +112,7 @@ trait ApiDocExtractorTrait
                 $annotation = $this->reader->getMethodAnnotation($method, static::ANNOTATION_CLASS);
                 if (null !== $annotation) {
                     $this->apiDocAnnotationHandler->handle($annotation, $route);
-                    $views = $annotation->getViews();
-                    if ((\in_array($view, $views, true) || (empty($views) && ApiDoc::DEFAULT_VIEW === $view))
+                    if ($this->isApplicableForView($annotation, $view)
                         && !\in_array($annotation->getSection(), $excludeSections, true)
                     ) {
                         $element = ['annotation' => $this->extractData($annotation, $route, $method)];
@@ -126,6 +120,10 @@ trait ApiDocExtractorTrait
                         if ($resource) {
                             $element['resource'] = $resource;
                             $resources[] = $resource;
+                        }
+                        $action = $this->getRouteAction($route);
+                        if ($action) {
+                            $element['action'] = $action;
                         }
                         $array[] = $element;
                     }
@@ -160,10 +158,6 @@ trait ApiDocExtractorTrait
         return $array;
     }
 
-    /**
-     * @param array $array
-     * @param array $resources
-     */
     protected function doAddResources(array &$array, array $resources)
     {
         \rsort($resources);
@@ -176,7 +170,7 @@ trait ApiDocExtractorTrait
             $path = $element['annotation']->getRoute()->getPath();
 
             foreach ($resources as $resource) {
-                if (0 === \strpos($path, $resource) || $resource === $element['annotation']->getResource()) {
+                if (str_starts_with($path, $resource) || $resource === $element['annotation']->getResource()) {
                     $array[$index]['resource'] = $resource;
 
                     $hasResource = true;
@@ -190,9 +184,6 @@ trait ApiDocExtractorTrait
         }
     }
 
-    /**
-     * @param array $array
-     */
     protected function doSortAnnotations(array &$array)
     {
         $methodOrder = [
@@ -270,5 +261,28 @@ trait ApiDocExtractorTrait
         }
 
         return $order;
+    }
+
+    /**
+     * @param Route $route
+     *
+     * @return string|null
+     */
+    protected function getRouteAction(Route $route)
+    {
+        return $route->getDefault('_action');
+    }
+
+    private function isApplicableForView(ApiDoc $annotation, string $view): bool
+    {
+        $views = $annotation->getViews();
+        if (!$views) {
+            return ApiDoc::DEFAULT_VIEW === $view;
+        }
+        if (count($views) === 1 && reset($views) === 'all') {
+            return true;
+        }
+
+        return \in_array($view, $views, true);
     }
 }

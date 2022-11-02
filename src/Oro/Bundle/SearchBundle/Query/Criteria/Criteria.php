@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Query\Criteria;
 use Doctrine\Common\Collections\Criteria as BaseCriteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * Criteria for filtering search results.
+ */
 class Criteria extends BaseCriteria
 {
     /** @var ExpressionBuilder */
@@ -43,8 +46,13 @@ class Criteria extends BaseCriteria
     public static function explodeFieldTypeName($field)
     {
         $fieldType = Query::TYPE_TEXT;
-        if (strpos($field, '.') !== false) {
-            list($fieldType, $field) = explode('.', $field);
+        if (str_contains($field, '.')) {
+            $parts = explode('.', $field, 2);
+            if ($parts[0] === Query::TYPE_TEXT || $parts[0] === Query::TYPE_INTEGER ||
+                $parts[0] === Query::TYPE_DECIMAL || $parts[0] === Query::TYPE_DATETIME
+            ) {
+                [$fieldType, $field] = $parts;
+            }
         }
 
         return [$fieldType, $field];
@@ -56,6 +64,7 @@ class Criteria extends BaseCriteria
      * @param string $operator
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function getSearchOperatorByComparisonOperator($operator)
     {

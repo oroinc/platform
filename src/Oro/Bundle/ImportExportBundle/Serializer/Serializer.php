@@ -3,36 +3,62 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Serializer as BaseSerializer;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
-class Serializer extends BaseSerializer implements DenormalizerInterface, NormalizerInterface
+/**
+ * Serializes and deserializes data given by the import/export functionality.
+ */
+class Serializer extends SymfonySerializer implements SerializerInterface
 {
-    const PROCESSOR_ALIAS_KEY = 'processorAlias';
-    const ENTITY_NAME_KEY     = 'entityName';
+    private const PROCESSOR_ALIAS_KEY = 'processorAlias';
+    private const ENTITY_NAME_KEY = 'entityName';
+
+    /** @var ContextAwareNormalizerInterface[]|ContextAwareDenormalizerInterface[] */
+    protected array $normalizers = [];
+
+    /** @var ContextAwareDenormalizerInterface[] */
+    protected array $denormalizerCache = [];
+
+    /** @var ContextAwareNormalizerInterface[] */
+    protected array $normalizerCache = [];
+
+    public function __construct(array $normalizers = [], array $encoders = [])
+    {
+        parent::__construct($normalizers, $encoders);
+
+        $this->normalizers = $normalizers;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = [])
+    public function normalize($data, string $format = null, array $context = [])
     {
         if (null === $data || is_scalar($data)) {
             return $data;
-        } elseif (is_object($data) && $this->supportsNormalization($data, $format, $context)) {
+        }
+
+        if (is_object($data) && $this->supportsNormalization($data, $format, $context)) {
             $this->cleanCacheIfDataIsCollection($data, $format, $context);
+
             return $this->normalizeObject($data, $format, $context);
-        } elseif ($data instanceof \Traversable) {
+        }
+
+        if ($data instanceof \Traversable) {
             $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
             }
 
             return $normalized;
-        } elseif (is_array($data)) {
+        }
+
+        if (is_array($data)) {
             foreach ($data as $key => $val) {
                 $data[$key] = $this->normalize($val, $format, $context);
             }
@@ -48,7 +74,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
@@ -57,14 +83,13 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         $cacheKey = $this->getCacheKey($type, $format, $context);
 
         if (isset($this->denormalizerCache[$cacheKey])) {
-            /** @var DenormalizerInterface $normalizer */
             $normalizer = $this->denormalizerCache[$cacheKey];
 
             return $normalizer->denormalize($data, $type, $format, $context);
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface
+            if ($normalizer instanceof ContextAwareDenormalizerInterface
                 && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
                 $this->denormalizerCache[$cacheKey] = $normalizer;
 
@@ -80,7 +105,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         try {
             $this->getNormalizer($data, $format, $context);
@@ -94,7 +119,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         try {
             $this->getDenormalizer($data, $type, $format, $context);
@@ -105,33 +130,21 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         return true;
     }
 
-    /**
-     * @param string $type
-     * @param string $format
-     * @param array  $context
-     *
-     * @return string
-     */
-    protected function getCacheKey($type, $format, array $context)
+    protected function getCacheKey(string $type, string $format = null, array $context = []): string
     {
         $cacheKeyFields = [$type, $format];
 
         // Add context fields to cache key
-        $contextFields  = [
+        $contextFields = [
             self::PROCESSOR_ALIAS_KEY,
-            self::ENTITY_NAME_KEY
+            self::ENTITY_NAME_KEY,
         ];
         $cacheKeyFields = array_merge($cacheKeyFields, array_intersect_key($context, array_flip($contextFields)));
 
         return md5(implode('', $cacheKeyFields));
     }
 
-    /**
-     * @param object $data
-     * @param string $format
-     * @param array $context
-     */
-    protected function cleanCacheIfDataIsCollection($data, $format, $context)
+    protected function cleanCacheIfDataIsCollection(object $data, string $format = null, array $context = []): void
     {
         if ($data instanceof Collection) {
             $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
@@ -141,10 +154,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function normalizeObject($object, $format = null, array $context = [])
+    private function normalizeObject($object, string $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
@@ -155,14 +165,13 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         $cacheKey = $this->getCacheKey($class, $format, $context);
 
         if (isset($this->normalizerCache[$cacheKey])) {
-            /** @var NormalizerInterface $normalizer */
             $normalizer = $this->normalizerCache[$cacheKey];
 
             return $normalizer->normalize($object, $format, $context);
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof NormalizerInterface
+            if ($normalizer instanceof ContextAwareNormalizerInterface
                 && $normalizer->supportsNormalization($object, $format, $context)) {
                 $this->normalizerCache[$cacheKey] = $normalizer;
 
@@ -175,20 +184,14 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function getNormalizer($data, $format = null, array $context = [])
+    private function getNormalizer($data, string $format = null, array $context = []): ContextAwareNormalizerInterface
     {
         foreach ($this->normalizers as $normalizer) {
-            if (!$normalizer instanceof NormalizerInterface) {
+            if (!$normalizer instanceof ContextAwareNormalizerInterface) {
                 continue;
             }
 
-            /** @var NormalizerInterface $normalizer */
-            $supportsNormalization = $normalizer->supportsNormalization($data, $format, $context);
-
-            if ($supportsNormalization) {
+            if ($normalizer->supportsNormalization($data, $format, $context)) {
                 return $normalizer;
             }
         }
@@ -196,25 +199,18 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         throw new RuntimeException(sprintf('No normalizer found for format "%s".', $format));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function getDenormalizer($data, $type, $format = null, array $context = [])
-    {
+    private function getDenormalizer(
+        $data,
+        string $type,
+        string $format = null,
+        array $context = []
+    ): ContextAwareDenormalizerInterface {
         foreach ($this->normalizers as $normalizer) {
-            if (!$normalizer instanceof DenormalizerInterface) {
+            if (!$normalizer instanceof ContextAwareDenormalizerInterface) {
                 continue;
             }
 
-            /** @var DenormalizerInterface $normalizer */
-            $supportsDenormalization = $normalizer->supportsDenormalization(
-                $data,
-                $type,
-                $format,
-                $context
-            );
-
-            if ($supportsDenormalization) {
+            if ($normalizer->supportsDenormalization($data, $type, $format, $context)) {
                 return $normalizer;
             }
         }

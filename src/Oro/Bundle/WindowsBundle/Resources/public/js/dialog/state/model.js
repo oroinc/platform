@@ -1,19 +1,22 @@
-define(['backbone'], function(Backbone) {
+define(function(require, exports, module) {
     'use strict';
 
-    var WindowsModel;
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const moduleConfig = require('module-config').default(module.id);
 
     /**
      * @export  orowindows/js/dialog/state/model
      * @class   orowindows.dialog.state.Model
      * @extends Backbone.Model
      */
-    WindowsModel = Backbone.Model.extend({
+    const WindowsModel = BaseModel.extend({
+        urlRoot: moduleConfig.urlRoot,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WindowsModel() {
-            WindowsModel.__super__.constructor.apply(this, arguments);
+        constructor: function WindowsModel(attrs, options) {
+            WindowsModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

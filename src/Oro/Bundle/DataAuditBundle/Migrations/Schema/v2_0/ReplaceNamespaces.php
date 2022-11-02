@@ -67,7 +67,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
                     'WHERE object_id = :object_id AND '.
                     'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id ASC;';
 
-                $this->connection->executeUpdate(
+                $this->connection->executeStatement(
                     $sql,
                     [
                         'object_id' => $row['object_id'],

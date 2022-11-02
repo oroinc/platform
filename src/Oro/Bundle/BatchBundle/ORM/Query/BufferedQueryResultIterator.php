@@ -25,42 +25,42 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
      *
      * @var int
      */
-    private $requestedBufferSize = self::DEFAULT_BUFFER_SIZE;
+    protected $requestedBufferSize = self::DEFAULT_BUFFER_SIZE;
 
     /**
      * Total count of records that should be iterated
      *
      * @var int
      */
-    private $totalCount;
+    protected $totalCount;
 
     /**
      * Index of current page
      *
      * @var int
      */
-    private $page = -1;
+    protected $page = -1;
 
     /**
      * Offset of current record in current page
      *
      * @var int
      */
-    private $offset = -1;
+    protected $offset = -1;
 
     /**
      * A position of a current record within the current page
      *
      * @var int
      */
-    private $position = -1;
+    protected $position = -1;
 
     /**
      * Rows that where loaded for current page
      *
      * @var array
      */
-    private $rows;
+    protected $rows;
 
     /**
      * @var int
@@ -80,7 +80,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
      *
      * @var bool
      */
-    private $reverse = false;
+    protected $reverse = false;
 
     /**
      * {@inheritDoc}
@@ -111,7 +111,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -119,7 +119,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->offset++;
 
@@ -134,7 +134,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         // reset total count only if at least one item was loaded by this iterator
         // for example if we call count method and then start iteration the total count must be calculated once
@@ -153,7 +153,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         if (null === $this->totalCount) {
             $query = $this->cloneQuery($this->getQuery());
@@ -191,9 +191,26 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
 
         $query = $this->getQuery();
 
+        if (!$this->calculateNextPage($query)) {
+            return false;
+        }
+
+        $this->prepareQueryToExecute($query);
+
+        $this->rows = $query->execute();
+
+        if ($this->pageLoadedCallback) {
+            $this->rows = call_user_func($this->pageLoadedCallback, $this->rows);
+        }
+
+        return count($this->rows) > 0;
+    }
+
+    protected function calculateNextPage(Query $query): bool
+    {
         $totalPages = ceil($this->count() / $query->getMaxResults());
         if ($this->reverse) {
-            if ($this->page == -1) {
+            if ($this->page === -1) {
                 $this->page = $totalPages;
             }
             if ($this->page < 1) {
@@ -213,20 +230,11 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
 
         $this->offset = 0;
 
-        $this->prepareQueryToExecute($query);
-        $this->rows = $query->execute();
-
-        if ($this->pageLoadedCallback) {
-            $this->rows = call_user_func($this->pageLoadedCallback, $this->rows);
-        }
-
-        return count($this->rows) > 0;
+        return true;
     }
 
     /**
      * Makes final preparation of a query object before its execute method will be called.
-     *
-     * @param Query $query
      */
     protected function prepareQueryToExecute(Query $query)
     {

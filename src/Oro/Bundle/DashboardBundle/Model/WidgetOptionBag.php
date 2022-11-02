@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-class WidgetOptionBag implements \Serializable
+/**
+ * Contains a list of widget options
+ */
+class WidgetOptionBag
 {
     /**
      * @var array
      */
     protected $options = [];
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
         $this->options = $options;
@@ -50,19 +50,13 @@ class WidgetOptionBag implements \Serializable
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->options);
+        return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($data)
+    public function __unserialize(array $serialized): void
     {
-        $this->options = unserialize($data);
+        $this->options = $serialized;
     }
 }

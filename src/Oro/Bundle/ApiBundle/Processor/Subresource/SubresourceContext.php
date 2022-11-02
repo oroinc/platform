@@ -2,47 +2,47 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraCollection;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * The base execution context for processors for subresources and relationships related actions,
  * such as "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
  * "get_relationship", "update_relationship", "add_relationship" and "delete_relationship".
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SubresourceContext extends Context
 {
     /** FQCN of the parent entity */
-    const PARENT_CLASS_NAME = 'parentClass';
-
-    /** an identifier of the parent entity */
-    const PARENT_ID = 'parentId';
+    private const PARENT_CLASS_NAME = 'parentClass';
 
     /** the association name the sub-resource represents */
-    const ASSOCIATION = 'association';
+    private const ASSOCIATION = 'association';
 
-    /** a flag indicates if an association represents "to-many" or "to-one" relation */
-    const COLLECTION = 'collection';
-
-    /** the parent entity object */
-    const PARENT_ENTITY = 'parentEntity';
+    /** a flag indicates if an association represents "to-many" or "to-one" relationship */
+    private const COLLECTION = 'collection';
 
     /** a configuration of the parent entity */
-    const PARENT_CONFIG = 'parentConfig';
+    private const PARENT_CONFIG = 'parentConfig';
 
     /** metadata of the parent entity */
-    const PARENT_METADATA = 'parentMetadata';
+    private const PARENT_METADATA = 'parentMetadata';
+
+    /** @var mixed */
+    private $parentId;
 
     /** @var ConfigExtraCollection|null */
     private $parentConfigExtras;
@@ -86,7 +86,7 @@ class SubresourceContext extends Context
      */
     public function getParentId()
     {
-        return $this->get(self::PARENT_ID);
+        return $this->parentId;
     }
 
     /**
@@ -96,7 +96,7 @@ class SubresourceContext extends Context
      */
     public function setParentId($parentId)
     {
-        $this->set(self::PARENT_ID, $parentId);
+        $this->parentId = $parentId;
     }
 
     /**
@@ -120,7 +120,7 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Whether an association represents "to-many" or "to-one" relation.
+     * Whether an association represents "to-many" or "to-one" relationship.
      *
      * @return bool
      */
@@ -130,9 +130,9 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Sets a flag indicates whether an association represents "to-many" or "to-one" relation.
+     * Sets a flag indicates whether an association represents "to-many" or "to-one" relationship.
      *
-     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relation
+     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
     public function setIsCollection($value)
     {
@@ -140,33 +140,62 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Checks whether the parent entity exists.
+     * Gets the target base class for the association the sub-resource represents.
+     * E.g. if an association is bases on Doctrine's inheritance mapping,
+     * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
+     * and the base target class will be a mapped superclass
+     * or a parent class for table inheritance association.
      *
-     * @return bool
+     * @return string|null
      */
-    public function hasParentEntity()
+    public function getAssociationBaseTargetClassName()
     {
-        return $this->has(self::PARENT_ENTITY);
+        $parentMetadata = $this->getParentMetadata();
+        if (null === $parentMetadata) {
+            return null;
+        }
+        $associationMetadata = $parentMetadata->getAssociation($this->getAssociationName());
+        if (null === $associationMetadata) {
+            return null;
+        }
+
+        return $associationMetadata->getBaseTargetClassName();
     }
 
     /**
-     * Gets the parent entity object.
-     *
-     * @return object|null
+     * {@inheritdoc}
      */
-    public function getParentEntity()
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
     {
-        return $this->get(self::PARENT_ENTITY);
+        $entityClass = $this->getClassName();
+        if (is_a($entityClass, EntityIdentifier::class, true)) {
+            $entityClass = $this->getAssociationBaseTargetClassName();
+        }
+        if ($entityClass) {
+            $entityClass = $doctrineHelper->getManageableEntityClass(
+                $entityClass,
+                $this->getConfig()
+            );
+        }
+
+        return $entityClass;
     }
 
     /**
-     * Sets the parent entity object.
+     * Returns the parent class of API resource if it is a manageable entity;
+     * otherwise, checks if the parent API resource is based on a manageable entity, and if so,
+     * returns the class name of this entity.
      *
-     * @param object|null $parentEntity
+     * @param DoctrineHelper $doctrineHelper
+     *
+     * @return string|null
      */
-    public function setParentEntity($parentEntity)
+    public function getManageableParentEntityClass(DoctrineHelper $doctrineHelper)
     {
-        $this->set(self::PARENT_ENTITY, $parentEntity);
+        return $doctrineHelper->getManageableEntityClass(
+            $this->getParentClassName(),
+            $this->getParentConfig()
+        );
     }
 
     /**
@@ -197,6 +226,9 @@ class SubresourceContext extends Context
                 $this->parentConfigExtras = new ConfigExtraCollection();
             }
             $this->parentConfigExtras->setConfigExtras($extras);
+            if ($this->isHateoasEnabled() && !$this->parentConfigExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+                $this->parentConfigExtras->addConfigExtra(new HateoasConfigExtra());
+            }
         }
     }
 
@@ -231,8 +263,6 @@ class SubresourceContext extends Context
     /**
      * Adds a request for some configuration data of the parent entity.
      *
-     * @param ConfigExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
     public function addParentConfigExtra(ConfigExtraInterface $extra)
@@ -250,6 +280,28 @@ class SubresourceContext extends Context
     {
         $this->ensureParentConfigExtrasInitialized();
         $this->parentConfigExtras->removeConfigExtra($extraName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHateoas(bool $flag)
+    {
+        parent::setHateoas($flag);
+        if (null !== $this->parentConfigExtras) {
+            if (!$flag) {
+                $this->parentConfigExtras->removeConfigExtra(HateoasConfigExtra::NAME);
+            } elseif (!$this->parentConfigExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+                $this->parentConfigExtras->addConfigExtra(new HateoasConfigExtra());
+            }
+        }
+        if (null !== $this->parentMetadataExtras) {
+            if (!$flag) {
+                $this->parentMetadataExtras->removeMetadataExtra(HateoasMetadataExtra::NAME);
+            } elseif (!$this->parentMetadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->parentMetadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
+        }
     }
 
     /**
@@ -278,8 +330,6 @@ class SubresourceContext extends Context
 
     /**
      * Sets a configuration of the parent entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
      */
     public function setParentConfig(EntityDefinitionConfig $definition = null)
     {
@@ -297,17 +347,12 @@ class SubresourceContext extends Context
      */
     protected function createParentConfigExtras()
     {
-        return [
-            new EntityDefinitionConfigExtra(
-                $this->getAction(),
-                $this->isCollection(),
-                $this->getParentClassName(),
-                $this->getAssociationName()
-            ),
-            new CustomizeLoadedDataConfigExtra(),
-            new DataTransformersConfigExtra(),
-            new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
-        ];
+        $extras = [new EntityDefinitionConfigExtra($this->getAction())];
+        if ($this->isHateoasEnabled()) {
+            $extras[] = new HateoasConfigExtra();
+        }
+
+        return $extras;
     }
 
     /**
@@ -336,12 +381,7 @@ class SubresourceContext extends Context
         }
 
         try {
-            $config = $this->configProvider->getConfig(
-                $parentEntityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getParentConfigExtras()
-            );
+            $config = $this->loadEntityConfig($parentEntityClass, $this->getParentConfigExtras());
             $this->set(self::PARENT_CONFIG, $config->getDefinition());
         } catch (\Exception $e) {
             $this->set(self::PARENT_CONFIG, null);
@@ -378,6 +418,11 @@ class SubresourceContext extends Context
                 $this->parentMetadataExtras = new MetadataExtraCollection();
             }
             $this->parentMetadataExtras->setMetadataExtras($extras);
+            if ($this->isHateoasEnabled()
+                && !$this->parentMetadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)
+            ) {
+                $this->parentMetadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
         }
     }
 
@@ -407,10 +452,8 @@ class SubresourceContext extends Context
 
     /**
      * Sets metadata of the parent entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
-    public function setParentMetadata(EntityMetadata $metadata = null)
+    public function setParentMetadata(?EntityMetadata $metadata)
     {
         if ($metadata) {
             $this->set(self::PARENT_METADATA, $metadata);
@@ -430,6 +473,9 @@ class SubresourceContext extends Context
         $action = $this->getAction();
         if ($action) {
             $extras[] = new ActionMetadataExtra($action);
+        }
+        if ($this->isHateoasEnabled()) {
+            $extras[] = new HateoasMetadataExtra($this->getFilterValues());
         }
 
         return $extras;

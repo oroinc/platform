@@ -1,6 +1,6 @@
 define(function() {
     'use strict';
-    var settings = {};
+    const settings = {};
     settings.recommendedConnectionWidth = 12;
     settings.cornerCost = 100;
     settings.optimizationCornerCost = 99; // recomended value = cornerCost - 1

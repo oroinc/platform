@@ -1,18 +1,17 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var PageMessagesView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var messenger = require('oroui/js/messenger');
-    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
-    var config = require('module').config();
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const messenger = require('oroui/js/messenger');
+    const PageRegionView = require('oroui/js/app/views/base/page-region-view');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         template: null // default template is defined in messenger module
     }, config);
 
-    PageMessagesView = PageRegionView.extend({
+    const PageMessagesView = PageRegionView.extend({
         optionNames: PageRegionView.prototype.optionNames.concat(['messages', 'initializeMessenger']),
 
         initializeMessenger: false,
@@ -36,14 +35,14 @@ define(function(require) {
         route: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageMessagesView(options) {
             PageMessagesView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.initializeMessenger) {
@@ -57,7 +56,7 @@ define(function(require) {
          * Initialize messenger
          */
         _initializeMessenger: function() {
-            var options = {
+            const options = {
                 container: this.$el
             };
 
@@ -79,7 +78,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             _.each(this.messages, function(message) {
@@ -96,7 +95,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
             if (this.disposed) {
@@ -135,7 +134,7 @@ define(function(require) {
          * @param {Object} messages
          */
         _addMessages: function(messages) {
-            var options;
+            let options;
             if (this.pageIsGoingToReload) {
                 options = {afterReload: true};
             }

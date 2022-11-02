@@ -1,160 +1,122 @@
 services:
     oro_entity_config.registry.attribute_type:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry'
-        public: false
+        class: Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry
         arguments:
+            - ~ # service locator for attribute types
             - '@oro_entity.doctrine_helper'
 
     # Attribute types (fields)
     oro_entity_config.attribute_type.bigint:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType'
-        public: false
-        arguments:
-            - 'bigint'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: bigint }
 
     oro_entity_config.attribute_type.boolean:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType'
-        public: false
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: boolean }
 
     oro_entity_config.attribute_type.money:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType'
-        public: false
-        arguments:
-            - 'money'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: money }
 
     oro_entity_config.attribute_type.date:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DateAttributeType'
-        public: false
-        arguments:
-            - 'date'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DateAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: date }
 
     oro_entity_config.attribute_type.datetime:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DateAttributeType'
-        public: false
-        arguments:
-            - 'datetime'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DateAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: datetime }
 
     oro_entity_config.attribute_type.decimal:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType'
-        public: false
-        arguments:
-            - 'decimal'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: decimal }
 
     oro_entity_config.attribute_type.file:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType'
-        public: false
-        arguments:
-            - 'file'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: file }
 
     oro_entity_config.attribute_type.float:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType'
-        public: false
-        arguments:
-            - 'float'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
-
-    oro_entity_config.attribute_type.html_escaped:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\HTMLAttributeType'
-        public: false
-        arguments:
-            - '@oro_ui.html_tag_helper'
-        tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: float }
 
     oro_entity_config.attribute_type.image:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType'
-        public: false
-        arguments:
-            - 'image'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: image }
+
+    oro_entity_config.attribute_type.multifile:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType
+        tags:
+             - { name: oro_entity_config.attribute_type, type: multiFile }
+
+    oro_entity_config.attribute_type.multiimage:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType
+        tags:
+             - { name: oro_entity_config.attribute_type, type: multiImage }
 
     oro_entity_config.attribute_type.integer:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType'
-        public: false
-        arguments:
-            - 'integer'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: integer }
 
-    oro_entity_config.attribute_type.multiEnum:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\MultiEnumAttributeType'
-        public: false
+    oro_entity_config.attribute_type.multienum:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\MultiEnumAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: multiEnum }
 
     oro_entity_config.attribute_type.percent:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType'
-        public: false
-        arguments:
-            - 'percent'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: percent }
 
     oro_entity_config.attribute_type.enum:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\EnumAttributeType'
-        public: false
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\EnumAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: enum }
 
     oro_entity_config.attribute_type.smallint:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType'
-        public: false
-        arguments:
-            - 'smallint'
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: smallint }
 
     oro_entity_config.attribute_type.string:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\StringAttributeType'
-        public: false
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\StringAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: string }
 
     oro_entity_config.attribute_type.text:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\TextAttributeType'
-        public: false
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\TextAttributeType
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: text }
 
     # Attribute types (relations)
-    oro_entity_config.attribute_type.manyToMany:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToManyAttributeType'
-        public: false
+    oro_entity_config.attribute_type.manytomany:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToManyAttributeType
         arguments:
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: manyToMany }
 
-    oro_entity_config.attribute_type.manyToOne:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType'
-        public: false
+    oro_entity_config.attribute_type.manytoone:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType
         arguments:
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: manyToOne }
 
-    oro_entity_config.attribute_type.oneToMany:
-        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\OneToManyAttributeType'
-        public: false
+    oro_entity_config.attribute_type.onetomany:
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Type\OneToManyAttributeType
         arguments:
             - '@oro_entity.entity_name_resolver'
+            - '@oro_entity.doctrine_helper'
         tags:
-             - { name: oro_entity_config.attribute_type }
+             - { name: oro_entity_config.attribute_type, type: oneToMany }

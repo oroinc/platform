@@ -13,7 +13,7 @@ class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFac
         $applicableChecker->addChecker(new MatchApplicableChecker());
         $applicableChecker->addChecker(new SkipGroupApplicableChecker());
         $applicableChecker->addChecker(new GroupRangeApplicableChecker());
-        
+
         return $applicableChecker;
     }
 }

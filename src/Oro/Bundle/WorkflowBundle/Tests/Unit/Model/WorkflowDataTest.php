@@ -3,18 +3,19 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Doctrine\Persistence\Proxy;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowData
-     */
-    protected $data;
+    /** @var WorkflowData */
+    private $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->data = new WorkflowData();
     }
@@ -25,7 +26,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->set('foo', 'bar');
         $this->assertTrue($this->data->isModified());
 
-        $this->data = new WorkflowData(array('foo' => 'bar'));
+        $this->data = new WorkflowData(['foo' => 'bar']);
         $this->assertFalse($this->data->isModified());
         $this->data->set('foo', 'bar');
         $this->assertFalse($this->data->isModified());
@@ -51,13 +52,6 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->remove('foo');
         $this->assertFalse($this->data->has('foo'));
         $this->assertNull($this->data->get('foo'));
-    }
-
-    protected function createAttribute($name)
-    {
-        $attribute = new Attribute();
-        $attribute->setName($name);
-        return $attribute;
     }
 
     public function testIssetGetSetUnset()
@@ -92,19 +86,19 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
 
     public function testCount()
     {
-        $this->assertEquals(0, count($this->data));
+        $this->assertCount(0, $this->data);
 
         $this->data->set('foo', 'bar');
-        $this->assertEquals(1, count($this->data));
+        $this->assertCount(1, $this->data);
 
         $this->data->set('baz', 'qux');
-        $this->assertEquals(2, count($this->data));
+        $this->assertCount(2, $this->data);
 
         $this->data->remove('foo');
-        $this->assertEquals(1, count($this->data));
+        $this->assertCount(1, $this->data);
 
         $this->data->remove('baz');
-        $this->assertEquals(0, count($this->data));
+        $this->assertCount(0, $this->data);
     }
 
     public function testIsEmpty()
@@ -120,12 +114,12 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->set('foo', 'bar');
         $this->data->set('baz', 'qux');
 
-        $data = array();
+        $data = [];
         foreach ($this->data as $key => $value) {
             $data[$key] = $value;
         }
 
-        $this->assertEquals(array('foo' => 'bar', 'baz' => 'qux'), $data);
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $data);
     }
 
     public function testGetValuesAll()
@@ -136,12 +130,12 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->set('quux', 'quux_value');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'bar_value',
                 'baz' => null,
                 'quux' => 'quux_value',
-            ),
+            ],
             $this->data->getValues()
         );
     }
@@ -154,13 +148,13 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->set('quux', 'quux_value');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'baz' => null,
                 'qux' => null,
                 'quux' => 'quux_value',
-            ),
-            $this->data->getValues(array('foo', 'baz', 'qux', 'quux'))
+            ],
+            $this->data->getValues(['foo', 'baz', 'qux', 'quux'])
         );
     }
 
@@ -170,28 +164,28 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data->set('bar', 'bar_value');
         $this->data->set('val', 0);
         $this->assertSame(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'bar_value',
                 'val' => 0,
-            ),
+            ],
             $this->data->getValues()
         );
 
         $this->data->add(
-            array(
+            [
                 'bar' => 'new_bar_value',
                 'baz' => 'baz_value',
                 'val' => null,
-            )
+            ]
         );
         $this->assertSame(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'new_bar_value',
                 'val' => null,
                 'baz' => 'baz_value',
-            ),
+            ],
             $this->data->getValues()
         );
     }
@@ -200,23 +194,23 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
     {
         $name = 'entity';
 
-        $existingEntity = $this->createMock('Doctrine\Common\Persistence\Proxy');
+        $existingEntity = $this->createMock(Proxy::class);
         $existingEntity->expects($this->once())
             ->method('__isInitialized')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $existingEntity->expects($this->once())
             ->method('__load');
 
         $this->data->set($name, $existingEntity);
         $this->assertEquals($existingEntity, $this->data->get($name));
 
-        $removedEntity = $this->createMock('Doctrine\Common\Persistence\Proxy');
+        $removedEntity = $this->createMock(Proxy::class);
         $removedEntity->expects($this->once())
             ->method('__isInitialized')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $removedEntity->expects($this->once())
             ->method('__load')
-            ->will($this->throwException(new EntityNotFoundException()));
+            ->willThrowException(new EntityNotFoundException());
 
         $this->data->set($name, $removedEntity);
         $this->assertNull($this->data->get($name));

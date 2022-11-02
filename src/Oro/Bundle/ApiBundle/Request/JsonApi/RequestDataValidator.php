@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * This class can be used to validate that the request data contains valid JSON.API object(s).
+ * This class can be used to validate that the request data contains valid JSON:API object(s).
  * @link http://jsonapi.org/format/#crud
  */
 class RequestDataValidator extends AbstractRequestDataValidator
@@ -34,11 +34,13 @@ class RequestDataValidator extends AbstractRequestDataValidator
             $allowIncludedResources,
             $requirePrimaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
                 $this->validatePrimaryDataObject($data, $pointer, $requirePrimaryResourceId);
-                $this->validateAttributesAndRelationships($data, $pointer);
                 if ($allowIncludedResources) {
                     $this->validateIncludedResources($requestData);
                 } else {
@@ -70,6 +72,9 @@ class RequestDataValidator extends AbstractRequestDataValidator
             $allowIncludedResources,
             $requirePrimaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestDataCollection($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
@@ -78,7 +83,6 @@ class RequestDataValidator extends AbstractRequestDataValidator
                         $itemPointer = $this->buildPointer($pointer, $key);
                         if (\is_array($item)) {
                             $this->validatePrimaryDataObject($item, $itemPointer, $requirePrimaryResourceId);
-                            $this->validateAttributesAndRelationships($item, $itemPointer);
                         } else {
                             $this->addError($itemPointer, 'The primary resource object should be an object');
                         }
@@ -95,18 +99,15 @@ class RequestDataValidator extends AbstractRequestDataValidator
         });
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     * @param bool   $requirePrimaryResourceId
-     */
     protected function validatePrimaryDataObject(array $data, string $pointer, bool $requirePrimaryResourceId): void
     {
+        $this->validateResourceObjectStructure($data, $pointer);
         $this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer);
         if ($requirePrimaryResourceId) {
             $this->validateRequiredNotBlankString($data, JsonApiDoc::ID, $pointer);
         } else {
             $this->validateNotBlankString($data, JsonApiDoc::ID, $pointer);
         }
+        $this->validateAttributesAndRelationships($data, $pointer);
     }
 }

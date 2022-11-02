@@ -5,31 +5,37 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EnumNameTypeTest extends TypeTestCase
 {
     /** @var EnumNameType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $typeHelper;
+    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $typeHelper;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->typeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper')
+        $this->typeHelper = $this->getMockBuilder(EnumTypeHelper::class)
             ->disableOriginalConstructor()
-            ->setMethods(['hasEnumCode'])
+            ->onlyMethods(['hasEnumCode'])
             ->getMock();
-
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
         $this->type = new EnumNameType($this->typeHelper, $this->nameGenerator);
@@ -37,16 +43,11 @@ class EnumNameTypeTest extends TypeTestCase
 
     /**
      * @dataProvider configureOptionsProvider
-     * @param ConfigIdInterface $configId
-     * @param boolean $isNewConfig
-     * @param boolean $hasEnumCode
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(
         ConfigIdInterface $configId,
-        $isNewConfig,
-        $hasEnumCode,
+        bool $isNewConfig,
+        bool $hasEnumCode,
         array $options,
         array $expectedOptions
     ) {
@@ -55,7 +56,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->typeHelper->expects($this->any())
             ->method('hasEnumCode')
             ->with($configId->getClassName(), $fieldName)
-            ->will($this->returnValue($hasEnumCode));
+            ->willReturn($hasEnumCode);
 
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -79,10 +80,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(
@@ -97,7 +95,7 @@ class EnumNameTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             [
@@ -162,7 +160,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->typeHelper->expects($this->any())
             ->method('hasEnumCode')
             ->with($configId->getClassName(), $configId->getFieldName())
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -171,11 +169,11 @@ class EnumNameTypeTest extends TypeTestCase
 
         $this->assertCount(2, $resolvedOptions['constraints']);
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\NotBlank',
+            NotBlank::class,
             $resolvedOptions['constraints'][0]
         );
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Length',
+            Length::class,
             $resolvedOptions['constraints'][1]
         );
         $this->assertEquals(255, $resolvedOptions['constraints'][1]->max);
@@ -188,7 +186,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->typeHelper->expects($this->any())
             ->method('hasEnumCode')
             ->with($configId->getClassName(), $configId->getFieldName())
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -198,33 +196,35 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertCount(5, $resolvedOptions['constraints']);
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\NotBlank',
+            NotBlank::class,
             $resolvedOptions['constraints'][0]
         );
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Length',
+            Length::class,
             $resolvedOptions['constraints'][1]
         );
         $this->assertEquals($this->nameGenerator->getMaxEnumCodeSize(), $resolvedOptions['constraints'][1]->max);
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Regex',
+            Regex::class,
             $resolvedOptions['constraints'][2]
         );
         $this->assertEquals('/^[\w- ]*$/', $resolvedOptions['constraints'][2]->pattern);
         $this->assertEquals(EnumNameType::INVALID_NAME_MESSAGE, $resolvedOptions['constraints'][2]->message);
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Callback',
+            Callback::class,
             $resolvedOptions['constraints'][3]
         );
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->once())->method('addViolation')->with(EnumNameType::INVALID_NAME_MESSAGE);
+        $context = $this->createMock(ExecutionContextInterface::class);
+        $context->expects($this->once())
+            ->method('addViolation')
+            ->with(EnumNameType::INVALID_NAME_MESSAGE);
         call_user_func($resolvedOptions['constraints'][3]->callback, '!@#$', $context);
 
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName',
+            UniqueEnumName::class,
             $resolvedOptions['constraints'][4]
         );
         $this->assertEquals($configId->getClassName(), $resolvedOptions['constraints'][4]->entityClassName);
@@ -233,9 +233,6 @@ class EnumNameTypeTest extends TypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(
-            TextType::class,
-            $this->type->getParent()
-        );
+        $this->assertEquals(TextType::class, $this->type->getParent());
     }
 }

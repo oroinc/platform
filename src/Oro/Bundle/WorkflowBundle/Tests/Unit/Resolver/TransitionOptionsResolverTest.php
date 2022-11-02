@@ -10,15 +10,12 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsResolver;
+    private $optionsResolver;
 
     /** @var TransitionOptionsResolver */
-    protected $transitionOptionsResolver;
+    private $transitionOptionsResolver;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
         $this->transitionOptionsResolver = new TransitionOptionsResolver($this->optionsResolver);
@@ -26,14 +23,14 @@ class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveTransitionOptions()
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
 
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('getFrontendOptions')
+        $transition->expects($this->once())
+            ->method('getFrontendOptions')
             ->willReturn(['option1' => 'value1']);
-        $transition->expects($this->once())->method('setFrontendOptions')
+        $transition->expects($this->once())
+            ->method('setFrontendOptions')
             ->with(['resolved option' => 'value']);
 
         $this->optionsResolver->expects($this->once())
@@ -46,15 +43,17 @@ class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveTransitionOptionsWithoutOptions()
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
 
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('getFrontendOptions')->willReturn([]);
-        $transition->expects($this->never())->method('setFrontendOptions');
+        $transition->expects($this->once())
+            ->method('getFrontendOptions')
+            ->willReturn([]);
+        $transition->expects($this->never())
+            ->method('setFrontendOptions');
 
-        $this->optionsResolver->expects($this->never())->method('resolveOptions');
+        $this->optionsResolver->expects($this->never())
+            ->method('resolveOptions');
 
         $this->transitionOptionsResolver->resolveTransitionOptions($transition, $workflowItem);
     }

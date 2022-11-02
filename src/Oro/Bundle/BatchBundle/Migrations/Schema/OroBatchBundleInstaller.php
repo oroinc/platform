@@ -11,35 +11,30 @@ class OroBatchBundleInstaller implements Installation
     /**
      * {@inheritdoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createAkeneoBatchJobExecutionTable($schema);
         $this->createAkeneoBatchJobInstanceTable($schema);
-        $this->createAkeneoBatchMappingFieldTable($schema);
-        $this->createAkeneoBatchMappingItemTable($schema);
         $this->createAkeneoBatchStepExecutionTable($schema);
         $this->createAkeneoBatchWarningTable($schema);
 
         /** Foreign keys generation **/
         $this->addAkeneoBatchJobExecutionForeignKeys($schema);
-        $this->addAkeneoBatchMappingFieldForeignKeys($schema);
         $this->addAkeneoBatchStepExecutionForeignKeys($schema);
         $this->addAkeneoBatchWarningForeignKeys($schema);
     }
 
     /**
      * Create akeneo_batch_job_execution table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchJobExecutionTable(Schema $schema)
     {
@@ -63,8 +58,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_job_instance table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchJobInstanceTable(Schema $schema)
     {
@@ -82,38 +75,7 @@ class OroBatchBundleInstaller implements Installation
     }
 
     /**
-     * Create akeneo_batch_mapping_field table
-     *
-     * @param Schema $schema
-     */
-    protected function createAkeneoBatchMappingFieldTable(Schema $schema)
-    {
-        $table = $schema->createTable('akeneo_batch_mapping_field');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('item_id', 'integer', ['notnull' => false]);
-        $table->addColumn('source', 'string', ['length' => 255]);
-        $table->addColumn('destination', 'string', ['length' => 255]);
-        $table->addColumn('identifier', 'boolean', []);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['item_id'], 'IDX_45243258126F525E', []);
-    }
-
-    /**
-     * Create akeneo_batch_mapping_item table
-     *
-     * @param Schema $schema
-     */
-    protected function createAkeneoBatchMappingItemTable(Schema $schema)
-    {
-        $table = $schema->createTable('akeneo_batch_mapping_item');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->setPrimaryKey(['id']);
-    }
-
-    /**
      * Create akeneo_batch_step_execution table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchStepExecutionTable(Schema $schema)
     {
@@ -124,7 +86,6 @@ class OroBatchBundleInstaller implements Installation
         $table->addColumn('status', 'integer', []);
         $table->addColumn('read_count', 'integer', []);
         $table->addColumn('write_count', 'integer', []);
-        $table->addColumn('filter_count', 'integer', []);
         $table->addColumn('start_time', 'datetime', ['notnull' => false]);
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
         $table->addColumn('exit_code', 'string', ['notnull' => false, 'length' => 255]);
@@ -139,8 +100,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_warning table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchWarningTable(Schema $schema)
     {
@@ -157,8 +116,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_job_execution foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchJobExecutionForeignKeys(Schema $schema)
     {
@@ -173,24 +130,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_mapping_field foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addAkeneoBatchMappingFieldForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('akeneo_batch_mapping_field');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('akeneo_batch_mapping_item'),
-            ['item_id'],
-            ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
-        );
-    }
-
-    /**
-     * Add akeneo_batch_step_execution foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchStepExecutionForeignKeys(Schema $schema)
     {
@@ -205,8 +144,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_warning foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchWarningForeignKeys(Schema $schema)
     {

@@ -15,10 +15,6 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
     /** @var ExtendExtension $extendExtension */
     protected $extendExtension;
 
-    /**
-     * @param Schema $schema
-     * @param ExtendExtension $extendExtension
-     */
     public static function addAuthStatusField(Schema $schema, ExtendExtension $extendExtension)
     {
         $enumTable = $extendExtension->addEnumField(
@@ -41,10 +37,6 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
         $enumTable->addOption(OroOptions::KEY, $options);
     }
 
-    /**
-     * @param QueryBag $queries
-     * @param ExtendExtension $extendExtension
-     */
     public static function addEnumValues(QueryBag $queries, ExtendExtension $extendExtension)
     {
         $queries->addPostQuery(new InsertAuthStatusesQuery($extendExtension));
@@ -66,11 +58,6 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
         self::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
     }
 
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     * @param ExtendExtension $extendExtension
-     */
     public static function addAuthStatusFieldAndValues(
         Schema $schema,
         QueryBag $queries,

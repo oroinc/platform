@@ -22,10 +22,6 @@ class InteractiveExecutionController implements Controller
      */
     private $eventDispatcher;
 
-    /**
-     * @param InteractiveExecutionSubscriber $subscriber
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(InteractiveExecutionSubscriber $subscriber, EventDispatcherInterface $eventDispatcher)
     {
         $this->subscriber = $subscriber;

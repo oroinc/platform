@@ -2,63 +2,52 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $groupingConfigProvider;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $dictionaryConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     /** @var DictionaryVirtualFieldProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->groupingConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dictionaryConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
-        $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->provider = new DictionaryVirtualFieldProvider(
-            $this->groupingConfigProvider,
-            $this->dictionaryConfigProvider,
-            $this->entityConfigProvider,
+            $this->configManager,
             $doctrine,
-            $translator
+            $translator,
+            $this->cache,
+            (new InflectorFactory())->build()
         );
     }
 
@@ -66,22 +55,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
-        $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationNames')
-            ->will($this->returnValue(['testRel']));
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('testRel')
-            ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary1'));
-        $entityMetadata->expects($this->any())
-            ->method('isSingleValuedAssociation')
-            ->with('testRel')
-            ->will($this->returnValue(true));
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\Dictionary1'
+            ]
+        ];
 
-        $this->initialize([$entityClassName => $entityMetadata]);
+        $this->initialize($entityMetadata);
 
         $this->assertEquals(
             ['test_rel_name'],
@@ -113,22 +95,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
-        $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationNames')
-            ->will($this->returnValue(['testRel']));
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('testRel')
-            ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary2'));
-        $entityMetadata->expects($this->any())
-            ->method('isSingleValuedAssociation')
-            ->with('testRel')
-            ->will($this->returnValue(true));
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\Dictionary2'
+            ]
+        ];
 
-        $this->initialize([$entityClassName => $entityMetadata]);
+        $this->initialize($entityMetadata);
 
         $this->assertEquals(
             ['test_rel_id', 'test_rel_name'],
@@ -182,22 +157,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
-        $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationNames')
-            ->will($this->returnValue(['testRel']));
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('testRel')
-            ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary3'));
-        $entityMetadata->expects($this->any())
-            ->method('isSingleValuedAssociation')
-            ->with('testRel')
-            ->will($this->returnValue(true));
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\Dictionary3'
+            ]
+        ];
 
-        $this->initialize([$entityClassName => $entityMetadata]);
+        $this->initialize($entityMetadata);
 
         $this->assertEquals(
             ['test_rel_name'],
@@ -230,22 +198,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
-        $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationNames')
-            ->will($this->returnValue(['testRel']));
-        $entityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('testRel')
-            ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary4'));
-        $entityMetadata->expects($this->any())
-            ->method('isSingleValuedAssociation')
-            ->with('testRel')
-            ->will($this->returnValue(true));
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\Dictionary4'
+            ]
+        ];
 
-        $this->initialize([$entityClassName => $entityMetadata]);
+        $this->initialize($entityMetadata);
 
         $this->assertEquals(
             ['test_rel_code', 'test_rel_label'],
@@ -299,128 +260,142 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testCachedDictionaries()
+    {
+        $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
+
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\Dictionary3'
+            ]
+        ];
+
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->with('dictionaries')
+            ->willReturn(['Acme\TestBundle\Entity\Dictionary3' => ['name']]);
+
+        $this->configManager->expects($this->never())
+            ->method('getConfigs');
+        $this->configManager->expects($this->never())
+            ->method('getEntityConfig');
+
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClassName)
+            ->willReturn($entityMetadata);
+
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary3'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
+        );
+    }
+
+    public function testClearCache()
+    {
+        $this->cache->expects($this->once())
+            ->method('clear');
+
+        $this->provider->clearCache();
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function initialize($metadata)
+    private function initialize(ClassMetadata $metadata)
     {
-        $dict1GrpCfg = $this->createEntityConfig(
-            'grouping',
-            'Acme\TestBundle\Entity\Dictionary1',
-            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
-        );
-        $dict1Cfg    = $this->createEntityConfig(
-            'dictionary',
-            'Acme\TestBundle\Entity\Dictionary1',
-            ['virtual_fields' => ['name']]
-        );
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with('dictionaries')
+            ->willReturn([
+                    'Acme\TestBundle\Entity\Dictionary1' => ['name'],
+                    'Acme\TestBundle\Entity\Dictionary2' => ['id', 'name'],
+                    'Acme\TestBundle\Entity\Dictionary3' => ['name'],
+                    'Acme\TestBundle\Entity\Dictionary4' => ['code', 'label']
+            ]);
 
-        $dict2GrpCfg = $this->createEntityConfig(
-            'grouping',
-            'Acme\TestBundle\Entity\Dictionary2',
-            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
-        );
-        $dict2Cfg    = $this->createEntityConfig(
-            'dictionary',
-            'Acme\TestBundle\Entity\Dictionary2',
-            ['virtual_fields' => ['id', 'name']]
-        );
-
-        $dict3GrpCfg = $this->createEntityConfig(
-            'grouping',
-            'Acme\TestBundle\Entity\Dictionary3',
-            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
-        );
-        $dict3Cfg    = $this->createEntityConfig('dictionary', 'Acme\TestBundle\Entity\Dictionary3');
-
-        $dict4GrpCfg = $this->createEntityConfig(
-            'grouping',
-            'Acme\TestBundle\Entity\Dictionary4',
-            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
-        );
-        $dict4Cfg    = $this->createEntityConfig('dictionary', 'Acme\TestBundle\Entity\Dictionary4');
-
-        $this->groupingConfigProvider->expects($this->any())
+        $this->configManager->expects($this->any())
             ->method('getConfigs')
-            ->will($this->returnValue([$dict1GrpCfg, $dict2GrpCfg, $dict3GrpCfg, $dict4GrpCfg]));
-        $this->dictionaryConfigProvider->expects($this->any())
-            ->method('hasConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) {
-                        return in_array(
-                            $className,
-                            [
-                                'Acme\TestBundle\Entity\Dictionary1',
-                                'Acme\TestBundle\Entity\Dictionary2',
-                                'Acme\TestBundle\Entity\Dictionary3',
-                                'Acme\TestBundle\Entity\Dictionary4'
-                            ]
-                        );
-                    }
+            ->with('grouping')
+            ->willReturn([
+                $this->createEntityConfig(
+                    'grouping',
+                    'Acme\TestBundle\Entity\Dictionary1',
+                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                ),
+                $this->createEntityConfig(
+                    'grouping',
+                    'Acme\TestBundle\Entity\Dictionary2',
+                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                ),
+                $this->createEntityConfig(
+                    'grouping',
+                    'Acme\TestBundle\Entity\Dictionary3',
+                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                ),
+                $this->createEntityConfig(
+                    'grouping',
+                    'Acme\TestBundle\Entity\Dictionary4',
+                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
                 )
-            );
-        $this->dictionaryConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use (&$dict1Cfg, &$dict2Cfg, &$dict3Cfg, &$dict4Cfg) {
-                        switch ($className) {
-                            case 'Acme\TestBundle\Entity\Dictionary1':
-                                return $dict1Cfg;
-                            case 'Acme\TestBundle\Entity\Dictionary2':
-                                return $dict2Cfg;
-                            case 'Acme\TestBundle\Entity\Dictionary3':
-                                return $dict3Cfg;
-                            case 'Acme\TestBundle\Entity\Dictionary4':
-                                return $dict4Cfg;
-                            default:
-                                throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
-                        }
-                    }
-                )
-            );
+            ]);
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('dictionary')
+            ->willReturnCallback(function ($scope, $class) {
+                switch ($class) {
+                    case 'Acme\TestBundle\Entity\Dictionary1':
+                        return $this->createEntityConfig('dictionary', $class, ['virtual_fields' => ['name']]);
+                    case 'Acme\TestBundle\Entity\Dictionary2':
+                        return $this->createEntityConfig('dictionary', $class, ['virtual_fields' => ['id', 'name']]);
+                    case 'Acme\TestBundle\Entity\Dictionary3':
+                    case 'Acme\TestBundle\Entity\Dictionary4':
+                        return $this->createEntityConfig('dictionary', $class);
+                    default:
+                        throw new RuntimeException(sprintf('Entity "%s" is not configurable', $class));
+                }
+            });
 
-        $mDataDict1 = $this->createDictionaryMetadata();
-        $mDataDict2 = $this->createDictionaryMetadata();
-        $mDataDict3 = $this->createDictionaryMetadata();
-        $mDataDict4 = $this->createDictionaryMetadata(
-            ['name' => 'string', 'code' => 'string', 'label' => 'string'],
-            'name'
-        );
         $this->em->expects($this->any())
             ->method('getClassMetadata')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use (&$metadata, &$mDataDict1, &$mDataDict2, &$mDataDict3, &$mDataDict4) {
-                        switch ($className) {
-                            case 'Acme\TestBundle\Entity\Dictionary1':
-                                return $mDataDict1;
-                            case 'Acme\TestBundle\Entity\Dictionary2':
-                                return $mDataDict2;
-                            case 'Acme\TestBundle\Entity\Dictionary3':
-                                return $mDataDict3;
-                            case 'Acme\TestBundle\Entity\Dictionary4':
-                                return $mDataDict4;
-                            default:
-                                if (isset($metadata[$className])) {
-                                    return $metadata[$className];
-                                }
-                                throw MappingException::reflectionFailure($className, new \ReflectionException());
+            ->willReturnCallback(function ($class) use ($metadata) {
+                switch ($class) {
+                    case 'Acme\TestBundle\Entity\Dictionary2':
+                    case 'Acme\TestBundle\Entity\Dictionary3':
+                    case 'Acme\TestBundle\Entity\Dictionary1':
+                        return $this->createDictionaryMetadata($class);
+                    case 'Acme\TestBundle\Entity\Dictionary4':
+                        return $this->createDictionaryMetadata(
+                            $class,
+                            ['name' => 'string', 'code' => 'string', 'label' => 'string'],
+                            'name'
+                        );
+                    default:
+                        if ($metadata->name !== $class) {
+                            throw MappingException::reflectionFailure($class, new \ReflectionException());
                         }
-                    }
-                )
-            );
+
+                        return $metadata;
+                }
+            });
     }
 
-    /**
-     * @param string $scope
-     * @param string $className
-     * @param array  $values
-     * @return Config
-     */
-    protected function createEntityConfig($scope, $className, $values = [])
+    private function createEntityConfig(string $scope, string $className, array $values = []): Config
     {
         $config = new Config(new EntityConfigId($scope, $className));
         $config->setValues($values);
@@ -428,40 +403,22 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    /**
-     * @param array  $fields key = fieldName, value = fieldType
-     * @param string $idFieldName
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createDictionaryMetadata($fields = [], $idFieldName = 'id')
-    {
+    private function createDictionaryMetadata(
+        string $className,
+        array $fields = [],
+        string $idFieldName = 'id'
+    ): ClassMetadata {
         if (empty($fields)) {
             $fields = ['id' => 'integer', 'name' => 'string'];
         }
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->any())
-            ->method('getFieldNames')
-            ->will($this->returnValue(array_keys($fields)));
-        $metadata->expects($this->any())
-            ->method('isIdentifier')
-            ->will(
-                $this->returnCallback(
-                    function ($fieldName) use (&$idFieldName) {
-                        return $fieldName === $idFieldName;
-                    }
-                )
-            );
-        $metadata->expects($this->any())
-            ->method('getTypeOfField')
-            ->will(
-                $this->returnCallback(
-                    function ($fieldName) use (&$fields) {
-                        return $fields[$fieldName];
-                    }
-                )
-            );
+        $fieldMappings = [];
+        foreach ($fields as $name => $type) {
+            $fieldMappings[$name] = ['type' => $type];
+        }
+
+        $metadata = new ClassMetadata($className);
+        $metadata->fieldMappings = $fieldMappings;
+        $metadata->identifier = [$idFieldName];
 
         return $metadata;
     }

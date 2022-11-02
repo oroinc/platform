@@ -7,12 +7,10 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 trait FormExtendedTypeTrait
 {
     /**
-     * Provide backward compatibility between Symfony versions < 2.8 and 2.8+
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return FormType::class;
+        return [FormType::class];
     }
 }

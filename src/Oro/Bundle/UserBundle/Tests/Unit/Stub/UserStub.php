@@ -9,6 +9,15 @@ class UserStub extends User
 {
     protected $auth_status;
 
+    public function __construct(?int $id = null)
+    {
+        parent::__construct();
+
+        if ($id !== null) {
+            $this->id = $id;
+        }
+    }
+
     public function getAuthStatus()
     {
         return $this->auth_status;

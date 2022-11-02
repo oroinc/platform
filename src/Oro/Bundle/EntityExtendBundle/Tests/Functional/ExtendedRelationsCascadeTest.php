@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -12,34 +11,20 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ExtendedRelationsCascadeTest extends WebTestCase
 {
-    const ENTITY1 = 'Extend\Entity\TestEntity3';
-    const ENTITY2 = 'Extend\Entity\TestEntity4';
+    private const ENTITY1 = 'Extend\Entity\TestEntity3';
+    private const ENTITY2 = 'Extend\Entity\TestEntity4';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
-        /** @var ManagerRegistry $doctrine */
-        $doctrine = $this->getContainer()->get('doctrine');
-        /** @var EntityManager $em */
-        $em = $doctrine->getManagerForClass(self::ENTITY1);
-
-        return $em;
+        return self::getContainer()->get('doctrine')->getManagerForClass(self::ENTITY1);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $name
-     *
-     * @return object
-     */
-    private function createEntity($entityClass, $name)
+    private function createEntity(string $entityClass, string $name): object
     {
         $entity = new $entityClass();
         $entity->setName($name);

@@ -5,20 +5,25 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements OrganizationContextTokenInterface
+/**
+ * The authentication token that is used when an user uses a username and password to authentication.
+ */
+class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements
+    OrganizationAwareTokenInterface,
+    RolesAwareTokenInterface
 {
-    use OrganizationContextTokenSerializerTrait;
+    use RolesAndOrganizationAwareTokenTrait;
 
     /**
      * @param string       $user
      * @param string       $credentials
      * @param string       $providerKey
-     * @param Organization $organizationContext
+     * @param Organization $organization
      * @param array        $roles
      */
-    public function __construct($user, $credentials, $providerKey, Organization $organizationContext, array $roles = [])
+    public function __construct($user, $credentials, $providerKey, Organization $organization, array $roles = [])
     {
-        $this->setOrganizationContext($organizationContext);
-        parent::__construct($user, $credentials, $providerKey, $roles);
+        parent::__construct($user, $credentials, $providerKey, $this->initRoles($roles));
+        $this->setOrganization($organization);
     }
 }

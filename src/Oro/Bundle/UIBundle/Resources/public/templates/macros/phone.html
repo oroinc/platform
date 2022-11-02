@@ -1,0 +1,15 @@
+<% if (obj.phone) {
+    var phoneNumber;
+    if (_.isObject(phone)) {
+        if (!_.isEmpty(phone.phone)) {
+            phoneNumber = phone.phone;
+        }
+    } else {
+        phoneNumber = phone;
+    }
+    var label = obj.title || phoneNumber;
+    %>
+    <% if (phoneNumber) { %>
+    <a href="tel:<%- phoneNumber %>" title="<%- label %>" class="phone nowrap"><bdo dir="ltr"><%- label %></bdo></a>
+    <% } %>
+<% } %>

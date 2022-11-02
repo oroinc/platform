@@ -16,9 +16,6 @@ class GenderType extends AbstractType
      */
     protected $genderProvider;
 
-    /**
-     * @param GenderProvider $genderProvider
-     */
     public function __construct(GenderProvider $genderProvider)
     {
         $this->genderProvider = $genderProvider;
@@ -48,9 +45,6 @@ class GenderType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

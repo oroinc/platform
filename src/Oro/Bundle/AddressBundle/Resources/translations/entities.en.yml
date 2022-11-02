@@ -6,12 +6,15 @@ country:
     AE: 'United Arab Emirates'
     AF: Afghanistan
     AG: 'Antigua and Barbuda'
+    AI: Anguilla
     AL: Albania
     AM: Armenia
     AO: Angola
     AR: Argentina
+    AS: 'American Samoa'
     AT: Austria
     AU: Australia
+    AX: 'Aland Islands'
     AZ: Azerbaijan
     BA: Bosnia-Herzegovina
     BB: Barbados
@@ -32,6 +35,7 @@ country:
     BY: Belarus
     BZ: Belize
     CA: Canada
+    CC: 'Cocos Islands'
     CD: 'The Democratic Republic of Congo'
     CF: 'Central African Republic'
     CG: 'Republic of the Congo'
@@ -114,6 +118,7 @@ country:
     LV: Latvia
     LY: Libya
     MA: Morocco
+    MC: Monaco
     MD: Moldova
     ME: Montenegro
     MF: 'Saint Martin'
@@ -743,6 +748,7 @@ region:
     BS-MI: 'Moore''s Island'
     BS-NE: 'North Eleuthera'
     BS-NO: 'North Abaco'
+    BS-NP: "New Providence"
     BS-NS: 'North Andros'
     BS-RC: 'Rum Cay'
     BS-RI: 'Ragged Island'

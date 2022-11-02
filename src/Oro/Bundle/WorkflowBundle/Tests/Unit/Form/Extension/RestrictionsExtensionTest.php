@@ -11,40 +11,27 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {
-    /**
-     * @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflowManager;
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowManager;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $restrictionsManager;
+    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $restrictionsManager;
 
-    /**
-     * @var RestrictionsExtension
-     */
-    protected $extension;
+    /** @var RestrictionsExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->restrictionsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->workflowManager     = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper      = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->restrictionsManager = $this->createMock(RestrictionManager::class);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->extension = new RestrictionsExtension(
             $this->workflowManager,
@@ -56,27 +43,21 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormDataProvider
-     *
-     * @param array $options
-     * @param array $fields
-     * @param array $restrictions
      */
     public function testBuildForm(array $options, array $fields = [], array $restrictions = [])
     {
         $hasRestrictions = !empty($restrictions);
-        $data            = (object)[1];
+        $data = (object)[1];
 
         if (!empty($options['data_class']) &&
             empty($options['disable_workflow_restrictions']) &&
             $hasRestrictions
         ) {
-            $this->restrictionsManager
-                ->expects($this->once())
+            $this->restrictionsManager->expects($this->once())
                 ->method('hasEntityClassRestrictions')
                 ->with($options['data_class'])
                 ->willReturn($hasRestrictions);
-            $this->restrictionsManager
-                ->expects($this->once())
+            $this->restrictionsManager->expects($this->once())
                 ->method('getEntityRestrictions')
                 ->with($data)
                 ->willReturn($restrictions);
@@ -89,7 +70,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, $options);
         $dispatcher = $form->getConfig()->getEventDispatcher();
         $event = new FormEvent($form, $data);
-        $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+        $dispatcher->dispatch($event, FormEvents::POST_SET_DATA);
 
         foreach ($fields as $field) {
             $this->assertEquals(
@@ -101,7 +82,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['disable_workflow_restrictions' => false]);
@@ -109,7 +90,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
         return [
             'enabled extension'          => [

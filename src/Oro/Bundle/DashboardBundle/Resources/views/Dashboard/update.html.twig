@@ -1,8 +1,8 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 
 {% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans, "%label%": entity.label} }) %}
 
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig'] %}
 {% set formAction = form.vars.value.id
                     ? path('oro_dashboard_update', { 'id': form.vars.value.id })
                     : path('oro_dashboard_create')  %}
@@ -18,11 +18,13 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.dashboard.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_dashboard_index')) }}
     {% set html = UI.saveAndCloseButton({
         'route': 'oro_dashboard_view',
@@ -54,12 +56,17 @@
 
     {% set dataBlock %}
         {{ form_row(form.label) }}
+        {% if form.owner is defined %}
+            {{ form_row(form.owner) }}
+        {% endif %}
         {% if form.startDashboard is defined %}
             {{ form_row(form.startDashboard) }}
         {% endif %}
-    {% if form.owner is defined %}
-        {{ form_row(form.owner) }}
-    {% endif %}
+        {% for child in form.children %}
+            {% if child.vars.extra_field is defined and child.vars.extra_field %}
+                {{ form_row(child) }}
+            {% endif %}
+        {% endfor %}
     {% endset %}
 
     {% set dataBlocks = [{

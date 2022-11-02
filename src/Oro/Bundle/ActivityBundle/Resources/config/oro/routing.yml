@@ -3,15 +3,165 @@ oro_activity_bundle:
     type:         annotation
     prefix:       /
 
-oro_activity_bundle_api:
-    resource:     "@OroActivityBundle/Resources/config/oro/routing_api.yml"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_activity_target_all_types:
+    path: '/api/rest/{version}/activities/targets.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController::getAllTypesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_target_activity_types:
+    path: '/api/rest/{version}/activities/targets/{entity}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController::getActivityTypesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_target_activities:
+    path: '/api/rest/{version}/activities/targets/{entity}/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController::getActivitiesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_context:
+    path: '/api/rest/{version}/activities/{activity}/{id}/context.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityContextController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_relations:
+    path: '/api/rest/{version}/activities/{activity}/{id}/relations.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityEntityController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_post_activity_relation:
+    path: '/api/rest/{version}/activities/{activity}/{id}/relations.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityEntityController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_delete_activity_relation:
+    path: '/api/rest/{version}/activities/{activity}/{id}/{entity}/{entityId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityEntityController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_search_relations:
+    path: '/api/rest/{version}/activities/{activity}/relations/search.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivitySearchController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_types:
+    path: '/api/rest/{version}/activities.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityController::getTypesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_get_activity_target_types:
+    path: '/api/rest/{version}/activities/{activity}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityController::getTargetTypesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+    options:
+        group: activity_association
+        priority: -5
+
+oro_api_options_activities:
+    path: '/api/rest/{version}/activities.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
     options:
         group: activity_association
         priority: -5

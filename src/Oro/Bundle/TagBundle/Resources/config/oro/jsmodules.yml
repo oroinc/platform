@@ -1,0 +1,11 @@
+aliases:
+    oro/datagrid/cell/tags-cell$: orotag/js/datagrid/cell/tags-cell
+    oro/filter/tags-report-filter$: orotag/js/filter/tags-report-filter
+    oro/select2-multi-autocomplete-component$: orotag/js/components/select2-multi-autocomplete-component
+dynamic-imports:
+    commons:
+        - oro/select2-multi-autocomplete-component
+        - orotag/js/app/views/editor/tags-editor-view
+        - orotag/js/tags-report-filter-initialized
+    orodatagrid:
+        - oro/datagrid/cell/tags-cell

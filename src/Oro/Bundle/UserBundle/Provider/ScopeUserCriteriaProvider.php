@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ScopeUserCriteriaProvider extends AbstractScopeCriteriaProvider
+/**
+ * The scope criteria provider for the current user.
+ */
+class ScopeUserCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    const SCOPE_KEY = 'user';
+    public const USER = 'user';
 
     /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -24,27 +24,25 @@ class ScopeUserCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaForCurrentScope()
+    public function getCriteriaField()
     {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return [];
-        }
-
-        $loggedUser = $token->getUser();
-        if ($loggedUser instanceof User) {
-            return [self::SCOPE_KEY => $loggedUser];
-        }
-
-        return [];
+        return self::USER;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaField()
+    public function getCriteriaValue()
     {
-        return static::SCOPE_KEY;
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            if ($user instanceof User) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 
     /**

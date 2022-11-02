@@ -5,6 +5,7 @@ params:
 log_info:
     - 'Finding an email origin (id:'
     - 'Found " ()" email origin. Id: '
+    - 'Refresh the folders.'
     - 'Get folders enabled for sync...'
     - 'Got 1 folder(s)'
     - 'The folder "Folder 1" is selected.'
@@ -12,4 +13,4 @@ log_info:
     - 'Found 0 email(s).'
 total: 0
 data: []
-errors: ~
+expectedEmailData: ~

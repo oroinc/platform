@@ -1,0 +1,86 @@
+services:
+    oro_api.batch_update_item.processor:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\BatchUpdateItemProcessor
+        arguments:
+            - '@oro_api.processor_bag'
+            - batch_update_item
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    #
+    # initialize
+    #
+
+    oro_api.batch_update_item.json_api.set_entity_class:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\JsonApi\SetEntityClass
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, requestType: json_api, priority: 210 }
+
+    # normalize entity class as soon as possible to allow using initialization processors
+    # intended to work with a specific entity type
+    oro_api.batch_update_item.normalize_entity_class:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\NormalizeEntityClass
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 200 }
+
+    oro_api.batch_update_item.json_api.set_entity_id:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\JsonApi\SetEntityId
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, requestType: json_api, priority: 180 }
+
+    oro_api.batch_update_item.validate_entity_type_supported:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\ValidateEntityTypeSupported
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 160 }
+
+    oro_api.batch_update_item.json_api.set_target_action:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\JsonApi\SetTargetAction
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, requestType: json_api, priority: 150 }
+
+    oro_api.batch_update_item.set_target_processor:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTargetProcessor
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 130 }
+
+    oro_api.batch_update_item.set_target_context:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTargetContext
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 110 }
+
+    oro_api.batch_update_item.set_initialize_groups:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetInitializeGroups
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 100 }
+
+    oro_api.batch_update_item.initialize_target:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\InitializeTarget
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: -100 }
+
+    #
+    # transform_data
+    #
+
+    oro_api.batch_update_item.set_transform_groups:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTransformGroups
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: transform_data, priority: 100 }
+
+    oro_api.batch_update_item.transform_target:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\ExecuteTargetProcessor
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: transform_data, priority: -100 }
+
+    #
+    # normalize_result
+    #

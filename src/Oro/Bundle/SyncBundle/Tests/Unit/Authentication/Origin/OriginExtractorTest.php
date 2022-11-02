@@ -6,30 +6,22 @@ use Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor;
 
 class OriginExtractorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OriginExtractor
-     */
+    /** @var OriginExtractor */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extractor = new OriginExtractor();
     }
 
     /**
      * @dataProvider urlDataProvider
-     *
-     * @param string|null $url
-     * @param string|null $expectedOrigin
      */
-    public function testFromUrl($url, $expectedOrigin)
+    public function testFromUrl(?string $url, ?string $expectedOrigin)
     {
         self::assertEquals($expectedOrigin, $this->extractor->fromUrl($url));
     }
 
-    /**
-     * @return array
-     */
     public function urlDataProvider(): array
     {
         return [

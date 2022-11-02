@@ -4,78 +4,64 @@ namespace Oro\Bundle\QueryDesignerBundle\Model;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-use LogicException;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupNodeConstraint;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupNodeConditions;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Applies an expression to ORM query.
+ */
 class ExpressionBuilder
 {
-    /** @var ValidatorInterface */
-    protected $validator;
+    /** @var GroupNode|null */
+    private $groupNode;
 
-    /** @var GroupNode */
-    protected $groupNode;
+    /** @var GroupNode|null */
+    private $currentGroupNode;
 
-    /** @var GroupNode */
-    protected $currentGroupNode;
-
-    public function __construct()
-    {
-        $this->validator = Validation::createValidator();
-    }
-
-    /**
-     * @param string $condition
-     */
-    public function beginGroup($condition)
+    public function beginGroup(string $condition): void
     {
         $groupNode = new GroupNode($condition);
-        if ($this->currentGroupNode) {
+        if (null !== $this->currentGroupNode) {
             $this->currentGroupNode->addNode($groupNode);
             $this->currentGroupNode = $groupNode;
-        } elseif ($this->groupNode) {
+        } elseif (null !== $this->groupNode) {
             $this->groupNode->addNode($groupNode);
             $this->currentGroupNode = $groupNode;
         } else {
-            $this->currentGroupNode = $this->groupNode = $groupNode;
+            $this->groupNode = $groupNode;
+            $this->currentGroupNode = $groupNode;
         }
     }
 
-    /**
-     * @param Restriction $restriction
-     */
-    public function addRestriction(Restriction $restriction)
+    public function endGroup(): void
     {
-        if (!$this->groupNode) {
-            $this->groupNode        = new GroupNode(FilterUtility::CONDITION_AND);
+        $this->currentGroupNode = $this->currentGroupNode->getParent();
+    }
+
+    public function addRestriction(Restriction $restriction): void
+    {
+        if (null === $this->groupNode) {
+            $this->groupNode = new GroupNode(FilterUtility::CONDITION_AND);
             $this->currentGroupNode = $this->groupNode;
         }
 
         $this->currentGroupNode->addNode($restriction);
     }
 
-    public function endGroup()
+    public function applyRestrictions(QueryBuilder $qb): void
     {
-        $this->currentGroupNode = $this->currentGroupNode->getParent();
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     */
-    public function applyRestrictions(QueryBuilder $qb)
-    {
-        if (!$this->groupNode) {
+        if (null === $this->groupNode) {
             return;
         }
 
-        $violationList = $this->validator->validate($this->groupNode, new GroupNodeConstraint());
-        foreach ($violationList as $violation) {
-            throw new LogicException($violation->getMessage());
+        $violation = $this->validate();
+        if (null !== $violation) {
+            throw new \LogicException($violation->getMessage());
         }
 
-        list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($this->groupNode);
+        [$uncomputedExpr, $computedExpr] = $this->resolveGroupNode($this->groupNode);
         if ($computedExpr) {
             $qb->andHaving($computedExpr);
         }
@@ -84,15 +70,24 @@ class ExpressionBuilder
         }
     }
 
+    private function validate(): ?ConstraintViolationInterface
+    {
+        $violations = Validation::createValidator()->validate($this->groupNode, new GroupNodeConditions());
+
+        return $violations->count() > 0
+            ? $violations[0]
+            : null;
+    }
+
     /**
      * @param GroupNode $gNode
      *
-     * @return mixed Expr[] Where first item is uncomputed expr and 2nd one is computed
+     * @return array [uncomputed expression, computed expression]
      */
-    protected function resolveGroupNode(GroupNode $gNode)
+    private function resolveGroupNode(GroupNode $gNode): array
     {
         $uncomputedRestrictions = [];
-        $computedRestrictions   = [];
+        $computedRestrictions = [];
 
         foreach ($gNode->getChildren() as $node) {
             if ($node instanceof Restriction) {
@@ -102,7 +97,7 @@ class ExpressionBuilder
                     $uncomputedRestrictions[] = $node;
                 }
             } else {
-                list($uncomputedExpr, $computedExpr) = $this->resolveGroupNode($node);
+                [$uncomputedExpr, $computedExpr] = $this->resolveGroupNode($node);
                 if ($uncomputedExpr) {
                     $uncomputedRestrictions[] = new Restriction($uncomputedExpr, $node->getCondition(), false);
                 }
@@ -121,14 +116,14 @@ class ExpressionBuilder
     /**
      * @param Restriction[] $restrictions
      *
-     * @return mixed Expr
+     * @return mixed An expression
      */
-    protected function createExprFromRestrictions(array $restrictions)
+    private function createExprFromRestrictions(array $restrictions)
     {
         return array_reduce(
             $restrictions,
             function ($expr, Restriction $restriction) {
-                if ($expr === null) {
+                if (null === $expr) {
                     return $restriction->getRestriction();
                 }
 

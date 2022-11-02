@@ -1,0 +1,90 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadUsersData
+
+Oro\Bundle\ApiBundle\Entity\AsyncOperation:
+    user_operation1:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_NEW)>'
+        progress: ~
+        summary: []
+        jobId: 1
+        dataFileName: 'test_file_1.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@user'
+        organization: '@organization'
+    user_operation2:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_SUCCESS)>'
+        progress: 1
+        summary:
+            aggregateTime: 100
+            readCount: 5
+            writeCount: 5
+            errorCount: 0
+            createCount: 1
+            updateCount: 4
+        jobId: 3
+        dataFileName: 'test_file_3.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@user'
+        organization: '@organization'
+    user_operation3:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_RUNNING)>'
+        progress: 0.5
+        summary:
+            aggregateTime: 100
+            readCount: 5
+            writeCount: 5
+            errorCount: 0
+            createCount: 1
+            updateCount: 4
+        jobId: 4
+        dataFileName: 'test_file_4.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@user'
+        organization: '@organization'
+    subordinate_bu_user_operation:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_RUNNING)>'
+        progress: 0.3333
+        summary:
+            aggregateTime: 100
+            readCount: 0
+            writeCount: 0
+            errorCount: 0
+            createCount: 0
+            updateCount: 0
+        jobId: 7
+        dataFileName: 'test_file_7.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@subordinate_bu_user'
+        organization: '@organization'
+    default_bu_user_operation:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_NEW)>'
+        progress: ~
+        summary: []
+        jobId: 8
+        dataFileName: 'test_file_8.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@default_bu_user'
+        organization: '@organization'
+    root_bu_user_operation:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_SUCCESS)>'
+        progress: 1
+        summary:
+            aggregateTime: 100
+            readCount: 10
+            writeCount: 10
+            errorCount: 0
+            createCount: 10
+            updateCount: 0
+        jobId: 9
+        dataFileName: 'test_file_9.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@root_bu_user'
+        organization: '@organization'

@@ -2,52 +2,69 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Import;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ValidatorInterface */
-    protected $validator;
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | TranslatorInterface */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | FieldHelper */
-    protected $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigProvider  */
-    protected $extendConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigurableTableDataConverter */
-    protected $configurableDataConverter;
+    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurableDataConverter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | TokenAccessorInterface */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var OwnerChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownerChecker;
 
     /** @var ImportStrategyHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->fieldHelper = $this->createMock(FieldHelper::class);
@@ -55,6 +72,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->configurableDataConverter = $this->createMock(ConfigurableTableDataConverter::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->ownerChecker = $this->createMock(OwnerChecker::class);
 
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
@@ -63,32 +81,31 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
             $this->fieldHelper,
             $this->configurableDataConverter,
             $this->authorizationChecker,
-            $this->tokenAccessor
+            $this->tokenAccessor,
+            $this->ownerChecker
         );
 
         $this->helper->setConfigProvider($this->extendConfigProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Basic and imported entities must be instances of the same class
-     */
-    public function testImportEntityException()
+    public function testImportEntityException(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Basic and imported entities must be instances of the same class');
+
         $basicEntity = new \stdClass();
         $importedEntity = new \DateTime();
-        $excludedProperties = array();
+        $excludedProperties = [];
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Can't find entity manager for stdClass
-     */
-    public function testGetEntityManagerWithException()
+    public function testGetEntityManagerWithException(): void
     {
-        $this->managerRegistry->expects($this->once())
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("Can't find entity manager for stdClass");
+
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with('stdClass')
             ->willReturn(null);
@@ -96,18 +113,18 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->getEntityManager('stdClass');
     }
 
-    public function testGetLoggedUser()
+    public function testGetLoggedUser(): void
     {
         $loggedUser = new User();
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($loggedUser);
 
-        $this->assertSame($loggedUser, $this->helper->getLoggedUser());
+        self::assertSame($loggedUser, $this->helper->getLoggedUser());
     }
 
-    public function testImportNonConfigurableEntity()
+    public function testImportNonConfigurableEntity(): void
     {
         $basicEntity = new \stdClass();
         $importedEntity = new \stdClass();
@@ -116,48 +133,48 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $importedEntity->excludedField = 'excluded';
         $excludedProperties = ['excludedField'];
 
-        $metadata = $this->createMock('\Doctrine\ORM\Mapping\ClassMetadata');
-        $metadata->expects($this->once())
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects(self::once())
             ->method('getFieldNames')
-            ->will($this->returnValue(['fieldOne', 'excludedField']));
+            ->willReturn(['fieldOne', 'excludedField']);
 
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getAssociationNames')
-            ->will($this->returnValue(['fieldTwo', 'fieldThree']));
+            ->willReturn(['fieldTwo', 'fieldThree']);
 
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
                 [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-            ]));
+            ]);
 
-        $this->fieldHelper->expects($this->exactly(3))
+        $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
             ->withConsecutive(
                 [$basicEntity, 'fieldOne', $importedEntity->fieldOne],
                 [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
             );
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('hasConfig')
             ->willReturn(false);
 
-        $entityManager = $this->createMock('Doctrine\ORM\EntityManager');
-        $entityManager->expects($this->once())
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with(get_class($basicEntity))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $this->managerRegistry->expects($this->once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with(get_class($basicEntity))
-            ->will($this->returnValue($entityManager));
+            ->willReturn($entityManager);
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
 
-    public function testImportConfigurableEntity()
+    public function testImportConfigurableEntity(): void
     {
         $basicEntity = new \stdClass();
         $importedEntity = new \stdClass();
@@ -167,9 +184,9 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $importedEntity->deletedField = 'deleted';
         $excludedProperties = ['excludedField'];
 
-        $this->fieldHelper->expects($this->once())
-            ->method('getFields')
-            ->with('stdClass', true)
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->with('stdClass', EntityFieldProvider::OPTION_WITH_RELATIONS)
             ->willReturn(
                 $this->convertFieldNamesToFieldConfigs(
                     [
@@ -182,29 +199,29 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
                 [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-            ]));
+            ]);
 
-        $this->fieldHelper->expects($this->exactly(3))
+        $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
             ->withConsecutive(
                 [$basicEntity, 'fieldOne', $importedEntity->fieldOne],
                 [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
             );
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('hasConfig')
             ->willReturn(true);
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('getConfig')
-            ->willReturnCallback(function ($className, $fieldName) use ($importedEntity) {
+            ->willReturnCallback(function ($className, $fieldName) {
                 $configField = $this->createMock(Config::class);
-                $configField
+                $configField->expects(self::any())
                     ->method('is')
                     ->with('is_deleted')
                     ->willReturn($fieldName === 'deletedField');
@@ -215,49 +232,42 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
 
-    public function testValidateEntityNoErrors()
+    public function testValidateEntityNoErrors(): void
     {
         $entity = new \stdClass();
 
-        $this->validator->expects($this->once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with($entity)
             ->willReturn(new ConstraintViolationList());
 
-        $this->assertNull($this->helper->validateEntity($entity));
+        self::assertNull($this->helper->validateEntity($entity));
     }
 
     /**
-     * @param string|null $path
-     * @param string $error
-     * @param string $expectedMessage
      * @dataProvider validateDataProvider
      */
-    public function testValidateEntity($path, $error, $expectedMessage)
+    public function testValidateEntity(?string $path, string $error, string $expectedMessage): void
     {
         $entity = new \stdClass();
 
-        $violation = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationInterface')
-            ->getMock();
-        $violation->expects($this->once())
+        $violation = $this->createMock(ConstraintViolationInterface::class);
+        $violation->expects(self::once())
             ->method('getPropertyPath')
-            ->will($this->returnValue($path));
-        $violation->expects($this->once())
+            ->willReturn($path);
+        $violation->expects(self::once())
             ->method('getMessage')
-            ->will($this->returnValue($error));
-        $violations = array($violation);
-        $this->validator->expects($this->once())
+            ->willReturn($error);
+        $violations = [$violation];
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with($entity)
-            ->will($this->returnValue($violations));
+            ->willReturn($violations);
 
-        $this->assertEquals(array($expectedMessage), $this->helper->validateEntity($entity));
+        self::assertEquals([$expectedMessage], $this->helper->validateEntity($entity));
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
             'without property path' => [
@@ -275,50 +285,494 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prefixDataProvider
-     * @param string|null $prefix
      */
-    public function testAddValidationErrors($prefix)
+    public function testAddValidationErrors(?string $prefix): void
     {
-        $validationErrors = array('Error1', 'Error2');
+        $validationErrors = ['Error1', 'Error2'];
         $expectedPrefix = $prefix;
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
-            ->getMock();
+        $context = $this->createMock(ContextInterface::class);
         if (null === $prefix) {
-            $context->expects($this->once())
+            $context->expects(self::once())
                 ->method('getReadOffset')
-                ->will($this->returnValue(10));
-            $this->translator->expects($this->once())
+                ->willReturn(10);
+            $this->translator->expects(self::once())
                 ->method('trans')
-                ->with('oro.importexport.import.error %number%', array('%number%' => 10))
-                ->will($this->returnValue('TranslatedError 10'));
+                ->with('oro.importexport.import.error %number%', ['%number%' => 10])
+                ->willReturn('TranslatedError 10');
             $expectedPrefix = 'TranslatedError 10';
         }
 
-        $context->expects($this->exactly(2))
+        $context->expects(self::exactly(2))
             ->method('addError')
-            ->with($this->stringStartsWith($expectedPrefix . ' Error'));
+            ->with(self::stringStartsWith($expectedPrefix . ' Error'));
 
         $this->helper->addValidationErrors($validationErrors, $context, $prefix);
     }
 
-    public function prefixDataProvider()
+    public function prefixDataProvider(): array
     {
-        return array(
-            array(null),
-            array('tst')
-        );
+        return [
+            [null],
+            ['tst'],
+        ];
+    }
+
+    public function testIsGrantedNoUser(): void
+    {
+        $this->tokenAccessor->expects(self::once())
+            ->method('hasUser')
+            ->willReturn(false);
+
+        $object = new \stdClass();
+        self::assertTrue($this->helper->isGranted('EDIT', $object));
     }
 
     /**
-     * @param array $fieldNames
-     *
-     * @return array
+     * @dataProvider trueFalseDataProvider
      */
-    private function convertFieldNamesToFieldConfigs(array $fieldNames)
+    public function testIsGrantedObject(bool $isGranted): void
     {
-        return array_map(function ($fieldName) {
-            return [ 'name' => $fieldName ];
-        }, $fieldNames);
+        $attributes = 'EDIT';
+        $object = new \stdClass();
+
+        $this->assertIsGrantedCall($isGranted, $attributes, $object);
+
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
+    }
+
+    /**
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testIsGrantedObjectProperty(bool $isGranted): void
+    {
+        $attributes = 'EDIT';
+        $object = new \stdClass();
+        $property = 'test';
+
+        $this->assertIsGrantedCall($isGranted, $attributes, $object, $property);
+
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
+    }
+
+    public function trueFalseDataProvider(): array
+    {
+        return [
+            [true],
+            [false]
+        ];
+    }
+
+    /**
+     * @dataProvider isGrantedWhenUsingCacheDataProvider
+     */
+    public function testIsGrantedWhenUsingCache(
+        bool $isGranted,
+        array $isGrantedCalls,
+        array|string $attributes,
+        object|string $object
+    ): void {
+        $this->tokenAccessor->expects(self::any())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects(self::exactly(count($isGrantedCalls)))
+            ->method('isGranted')
+            ->withConsecutive(...$isGrantedCalls)
+            ->willReturn($isGranted);
+
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
+
+        // Ensures that we get same result while authorizationChecker::isGranted is not called again.
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
+    }
+
+    public function isGrantedWhenUsingCacheDataProvider(): array
+    {
+        $object = new \stdClass();
+        $fieldObject = new FieldVote(new \stdClass(), 'testField');
+
+        return [
+            [
+                'isGranted' => true,
+                'isGrantedCalls' => [['CREATE', $object]],
+                'attributes' => 'CREATE',
+                'object' => $object,
+            ],
+            [
+                'isGranted' => false,
+                'isGrantedCalls' => [['CREATE', 'entity:\stdClass']],
+                'attributes' => 'CREATE',
+                'object' => 'entity:\stdClass',
+            ],
+            [
+                'isGranted' => true,
+                'isGrantedCalls' => [['CREATE', 'entity:\stdClass'], ['EDIT', 'entity:\stdClass']],
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => 'entity:\stdClass',
+            ],
+            [
+                'isGranted' => false,
+                'isGrantedCalls' => [['CREATE', $object]],
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => $object,
+            ],
+            [
+                'isGranted' => true,
+                'isGrantedCalls' => [['CREATE', $fieldObject]],
+                'attributes' => 'CREATE',
+                'object' => $fieldObject,
+            ],
+            [
+                'isGranted' => false,
+                'isGrantedCalls' => [['CREATE', $fieldObject]],
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => $fieldObject,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isGrantedForPropertyWhenUsingCacheDataProvider
+     */
+    public function testIsGrantedForPropertyWhenUsingCache(
+        bool $isGranted,
+        array $isGrantedCalls,
+        array|string $attributes,
+        object|string $object,
+        ?string $property
+    ): void {
+        $this->tokenAccessor->expects(self::any())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects(self::exactly(count($isGrantedCalls)))
+            ->method('isGranted')
+            ->withConsecutive(...$isGrantedCalls)
+            ->willReturn($isGranted);
+
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
+
+        // Ensures that we get same result while authorizationChecker::isGranted is not called again.
+        self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
+    }
+
+    public function isGrantedForPropertyWhenUsingCacheDataProvider(): array
+    {
+        $object = new \stdClass();
+        $fieldEntityObject = new FieldVote($object, 'testField');
+        $fieldEntityString = new FieldVote('entity:\stdClass', 'testField');
+
+        return [
+            [
+                'isGranted' => true,
+                'isGrantedCalls' => [['CREATE', $fieldEntityObject]],
+                'attributes' => 'CREATE',
+                'object' => $object,
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => false,
+                'isGrantedCalls' => [['CREATE', $fieldEntityString]],
+                'attributes' => 'CREATE',
+                'object' => 'entity:\stdClass',
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => true,
+                'isGrantedCalls' => [['CREATE', $fieldEntityString], ['EDIT', $fieldEntityString]],
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => 'entity:\stdClass',
+                'property' => 'testField',
+            ],
+            [
+                'isGranted' => false,
+                'isGrantedCalls' => [['CREATE', $fieldEntityObject]],
+                'attributes' => ['CREATE', 'EDIT'],
+                'object' => new \stdClass(),
+                'property' => 'testField',
+            ],
+        ];
+    }
+
+    public function testCheckPermissionGrantedForEntity(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $this->assertIsGrantedCall(true, 'CREATE', $entity);
+
+        self::assertTrue($this->helper->checkPermissionGrantedForEntity($context, 'CREATE', $entity, 'stdClass'));
+    }
+
+    public function testCheckPermissionGrantedForEntityIsDenied(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $this->assertIsGrantedCall(false, 'CREATE', $entity);
+
+        $this->assertAddError($context, 'oro.importexport.import.errors.access_denied_entity');
+
+        self::assertFalse($this->helper->checkPermissionGrantedForEntity($context, 'CREATE', $entity, 'stdClass'));
+    }
+
+    public function testCheckEntityOwnerPermissions(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+
+        $this->ownerChecker->expects(self::once())
+            ->method('isOwnerCanBeSet')
+            ->with($entity)
+            ->willReturn(true);
+        $this->translator->expects(self::never())
+            ->method(self::anything());
+
+        self::assertTrue($this->helper->checkEntityOwnerPermissions($context, $entity));
+    }
+
+    public function testCheckEntityOwnerPermissionsDenied(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::any())
+            ->method('getReadOffset')
+            ->willReturn(1);
+
+        $entity = new \stdClass();
+
+        $this->ownerChecker->expects(self::once())
+            ->method('isOwnerCanBeSet')
+            ->with($entity)
+            ->willReturn(false);
+
+        $this->assertAddValidationErrorCalled($context, 'oro.importexport.import.errors.wrong_owner');
+
+        self::assertFalse($this->helper->checkEntityOwnerPermissions($context, $entity));
+    }
+
+    public function testCheckEntityOwnerPermissionsDeniedWhenSuppressErrors(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::any())
+            ->method('getReadOffset')
+            ->willReturn(1);
+
+        $entity = new \stdClass();
+
+        $this->ownerChecker->expects(self::once())
+            ->method('isOwnerCanBeSet')
+            ->with($entity)
+            ->willReturn(false);
+
+        $context->expects(self::never())
+            ->method('addError');
+
+        self::assertFalse($this->helper->checkEntityOwnerPermissions($context, $entity, true));
+    }
+
+    public function testCheckImportedEntityFieldsAclGrantedForNewEntity(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = null;
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects(self::never())
+            ->method('addError');
+
+        $this->assertIsGrantedCall(true, 'CREATE', new ObjectIdentity('entity', 'stdClass'), 'testField');
+
+        self::assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclGrantedForExistingEntity(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects(self::never())
+            ->method('addError');
+
+        $this->assertIsGrantedCall(true, 'EDIT', $existingEntity, 'testField');
+
+        self::assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclNotGrantedForExistingEntityNoValue(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+
+        $context->expects(self::never())
+            ->method('addError');
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        self::assertTrue(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['anotherField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclAccessDeniedNewEntity(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = null;
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+        $this->fieldHelper->expects(self::once())
+            ->method('setObjectValue')
+            ->with($entity, 'testField', null);
+
+        $this->assertAddError($context, 'oro.importexport.import.errors.access_denied_property_entity');
+        $this->assertIsGrantedCall(false, 'CREATE', new ObjectIdentity('entity', 'stdClass'), 'testField');
+
+        self::assertFalse(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    public function testCheckImportedEntityFieldsAclAccessDeniedExistingEntity(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $entity = new \stdClass();
+        $existingEntity = new \stdClass();
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->willReturn([
+                ['name' => 'testField']
+            ]);
+        $this->fieldHelper->expects(self::once())
+            ->method('getObjectValue')
+            ->with($existingEntity, 'testField')
+            ->willReturn('OLD');
+        $this->fieldHelper->expects(self::once())
+            ->method('setObjectValue')
+            ->with($entity, 'testField', 'OLD');
+
+        $this->assertAddError($context, 'oro.importexport.import.errors.access_denied_property_entity');
+        $this->assertIsGrantedCall(false, 'EDIT', $existingEntity, 'testField');
+
+        self::assertFalse(
+            $this->helper->checkImportedEntityFieldsAcl($context, $entity, $existingEntity, ['testField' => 'TEST'])
+        );
+    }
+
+    private function convertFieldNamesToFieldConfigs(array $fieldNames): array
+    {
+        return array_map(static fn ($fieldName) => ['name' => $fieldName], $fieldNames);
+    }
+
+    private function assertIsGrantedCall(
+        bool $isGranted,
+        string $attribute,
+        mixed $object,
+        ?string $property = null
+    ): void {
+        $this->tokenAccessor->expects(self::once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $aclObject = $object;
+        if ($property) {
+            $aclObject = new FieldVote($object, $property);
+        }
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with($attribute, $aclObject)
+            ->willReturn($isGranted);
+    }
+
+    /**
+     * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
+     * @param string $error
+     */
+    private function assertAddValidationErrorCalled(ContextInterface $context, string $error): void
+    {
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                [$error],
+                ['oro.importexport.import.error %number%']
+            )
+            ->willReturnCallback(static function ($msg) {
+                return $msg . ' TR';
+            });
+
+        $context->expects(self::once())
+            ->method('addError')
+            ->with('oro.importexport.import.error %number% TR ' . $error . ' TR');
+    }
+
+    /**
+     * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
+     * @param string $msg
+     */
+    private function assertAddError(ContextInterface $context, string $msg): void
+    {
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($msg)
+            ->willReturnCallback(static function ($msg) {
+                return $msg . ' TR';
+            });
+
+        $context->expects(self::once())
+            ->method('addError')
+            ->with($msg . ' TR');
+    }
+
+    public function testGetCurrentRowNumber(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::once())
+            ->method('getReadOffset')
+            ->willReturn($rowNumber = 10);
+
+        self::assertEquals($rowNumber, $this->helper->getCurrentRowNumber($context));
+    }
+
+    public function testGetCurrentRowNumberWhenBatchContextInterface(): void
+    {
+        $context = $this->createMock(Context::class);
+        $context->expects(self::once())
+            ->method('getReadOffset')
+            ->willReturn(10);
+        $context->expects(self::once())
+            ->method('getBatchSize')
+            ->willReturn(100);
+        $context->expects(self::once())
+            ->method('getBatchNumber')
+            ->willReturn(2);
+
+        self::assertEquals(110, $this->helper->getCurrentRowNumber($context));
     }
 }

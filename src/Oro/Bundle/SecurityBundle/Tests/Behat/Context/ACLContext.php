@@ -4,10 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -22,15 +22,15 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ACLContext extends OroFeatureContext implements
-    OroPageObjectAware,
-    KernelAwareContext
+class ACLContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
 
-    /** @var OroMainContext */
-    private $oroMainContext;
+    private ?OroMainContext $oroMainContext = null;
+
+    private ?Inflector $inflector = null;
 
     /**
      * @BeforeScenario
@@ -77,7 +77,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntities = array_map(function ($element) {
-            return trim(ucfirst(Inflector::singularize($element)));
+            return trim(ucfirst($this->getInflector()->singularize($element)));
         }, explode(',', $entity));
 
         $this->loginAsAdmin();
@@ -94,7 +94,6 @@ class ACLContext extends OroFeatureContext implements
         $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
-
 
     /**
      * @Given /^(?P<user>(administrator|user)) has following permissions$/
@@ -113,7 +112,7 @@ class ACLContext extends OroFeatureContext implements
 
         foreach ($table->getRows() as $row) {
             $action = $row[0];
-            $singularizedEntity = trim(ucfirst(Inflector::singularize($row[1])));
+            $singularizedEntity = trim(ucfirst($this->getInflector()->singularize($row[1])));
             $accessLevel = $row[2];
             $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
         }
@@ -169,7 +168,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
-        $singularizedEntity = ucfirst(Inflector::singularize($entity));
+        $singularizedEntity = ucfirst($this->getInflector()->singularize($entity));
         $this->loginAsAdmin();
 
         $userRoleForm = $this->openRoleEditForm($role);
@@ -199,8 +198,8 @@ class ACLContext extends OroFeatureContext implements
             $entityName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($role, $value) = explode(':', $cell);
-                $userRoleForm->setPermission($entityName, $role, $value);
+                [$permission, $value] = explode(':', $cell);
+                $userRoleForm->setPermission($entityName, $permission, $value);
             }
         }
     }
@@ -210,7 +209,7 @@ class ACLContext extends OroFeatureContext implements
      *
      * Example: And I check "Access dotmailer statistics" entity permission
      *
-     * @Then /^(?:|I )check "(?P<name>([\w\s]+))" entity permission$/
+     * @Then /^(?:|I )check "(?P<name>(?:[^"]|\\")*)" entity permission$/
      */
     public function checkEntityPermission($name)
     {
@@ -221,7 +220,7 @@ class ACLContext extends OroFeatureContext implements
     /**
      * Example: And I uncheck "Access dotmailer statistics" entity permission
      *
-     * @Then /^(?:|I )uncheck "(?P<name>([\w\s]+))" entity permission$/
+     * @Then /^(?:|I )uncheck "(?P<name>(?:[^"]|\\")*)" entity permission$/
      */
     public function uncheckEntityPermission($name)
     {
@@ -241,12 +240,13 @@ class ACLContext extends OroFeatureContext implements
     public function iSeeFollowingPermissions(TableNode $table)
     {
         $userRoleForm = $this->getRoleViewFormElement();
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($role, $value) = explode(':', $cell);
+                [$role, $value] = explode(':', $cell);
                 self::assertNotEmpty($permissionsArray[$entityName][$role]);
                 $expected = $permissionsArray[$entityName][$role];
                 self::assertEquals(
@@ -263,13 +263,12 @@ class ACLContext extends OroFeatureContext implements
      *            | Language | View | Create | Edit | Assign | Translate |
      *
      * @Then /^the role has not following permissions:$/
-     *
-     * @param TableNode $table
      */
     public function iDontSeeFollowingPermissions(TableNode $table)
     {
         $userRoleForm = $this->getRoleViewFormElement();
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
 
@@ -286,7 +285,7 @@ class ACLContext extends OroFeatureContext implements
      * Asserts that provided capability permissions allowed on view page
      *
      * Example: And following capability permissions should be checked:
-     *           | Manage Abandoned Cart Campaigns |
+     *           | Access system information |
      *
      * @Then /^following capability permissions should be checked:$/
      */
@@ -309,7 +308,7 @@ class ACLContext extends OroFeatureContext implements
      * Asserts that provided capability permissions disallowed on view page
      *
      * Example: And following capability permissions should be unchecked:
-     *           | Manage Abandoned Cart Campaigns |
+     *           | Access system information |
      *
      * @Then /^following capability permissions should be unchecked:$/
      */
@@ -329,23 +328,6 @@ class ACLContext extends OroFeatureContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        try {
-            $page = $this->getPage();
-
-            $page->clickLink('Update schema');
-            $this->waitForAjax();
-            $page->clickLink('Yes, Proceed');
-            $this->waitForAjax();
-        } catch (\Exception $e) {
-            throw $e;
-        }
-    }
-
-    /**
      * Click edit entity button on entity view page
      * Example: Given I'm edit entity
      *
@@ -356,6 +338,146 @@ class ACLContext extends OroFeatureContext implements
         $this->createElement('Entity Edit Button')->click();
     }
 
+    /**
+     * @When /^(?:|I )expand "(?P<entity>(?:[^"]|\\")*)" permissions in "(?P<section>(?:[^"]|\\")*)" section$/
+     *
+     * @param string $entity
+     * @param string $section
+     */
+    public function iExpandEntityPermissions($entity, $section)
+    {
+        $page = $this->getSession()->getPage();
+        $expandElement = $page->find(
+            'xpath',
+            "//h4[contains(@class,'scrollspy-title')][text()=\"$section\"]/.." .
+            "//div[contains(@class,'entity-name')][text()=\"$entity\"]" .
+            "/..//*[contains(@class,'collapse-action')]"
+        );
+        if ($expandElement) {
+            $expandElement->focus();
+            $expandElement->click();
+        }
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for field "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
+     * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for transition "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function permissionIsSetTo(string $fieldName, string $permission, string $accessLevel): void
+    {
+        $element = $this->getPermissionDropdownForField($fieldName, $permission);
+        self::assertNotNull(
+            $element,
+            sprintf('Failed to find "%s" permission dropdown for field "%s"', $permission, $fieldName)
+        );
+        $actualAccessLevel = trim($element->getText());
+        self::assertEquals(
+            $accessLevel,
+            $actualAccessLevel,
+            sprintf(
+                'Expected "%s", got "%s" access level for "%s" permission of "%s" field',
+                $accessLevel,
+                $actualAccessLevel,
+                $permission,
+                $fieldName
+            )
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" transition$/
+     * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" field$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenPermissionDropdown(string $permission, string $fieldName): void
+    {
+        $element = $this->getPermissionDropdownForField($fieldName, $permission);
+        if ($element) {
+            $element->focus();
+            $element->click();
+        }
+    }
+
+    private function getPermissionDropdownForField(string $fieldName, string $permission): ?NodeElement
+    {
+        return $this->getSession()->getPage()->find(
+            'xpath',
+            "//*[contains(@class,'field-name')][contains(text(),'$fieldName')]/" .
+            "..//*[contains(@class,'action-permissions__item')]/" .
+            "*[contains(@class,'action-permissions__label')][text()='$permission']" .
+            "/following-sibling::*[contains(@class,'action-permissions__dropdown-toggle')]"
+        );
+    }
+
+    /**
+     * @Then /^(?:|I )should see next items in permissions dropdown:$/
+     */
+    public function iShouldSeeItemsInPermissionsDropdown(TableNode $table)
+    {
+        $itemElements = $this->findAllElements('Permissions Dropdown Items');
+        $actualItems = [];
+        foreach ($itemElements as $itemElement) {
+            if (!$itemElement->isVisible()) {
+                continue;
+            }
+            $actualItems[] = $itemElement->getText();
+        }
+
+        $expectedItems = [];
+        foreach ($table->getRows() as $row) {
+            $expectedItems[] = reset($row);
+        }
+
+        self::assertEquals($expectedItems, $actualItems);
+    }
+
+    /**
+     * @Then /^(?:|I )choose "(?P<option>[^"]*)" in permissions dropdown$/
+     */
+    public function iSelectOptionInPermissionsDropdown(string $option): void
+    {
+        $itemElements = $this->findAllElements('Permissions Dropdown Items');
+        $itemElement = null;
+        foreach ($itemElements as $itemElement) {
+            if (!$itemElement->isVisible()) {
+                continue;
+            }
+            if (stripos($itemElement->getText(), $option) !== false) {
+                break;
+            }
+        }
+
+        self::assertNotNull($itemElement, 'Selected Option is not found in permissions dropdown');
+
+        $itemElement->focus();
+        $itemElement->click();
+    }
+
+    /**
+     * Change group of field permissions on create/edit pages
+     *
+     * Example: And I select following field permissions:
+     *       | Account name  | View:Business Unit | Create:Global | Edit:None |
+     *
+     * @Then /^(?:|I )select following field permissions:$/
+     */
+    public function iSelectFollowingFieldPermissions(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleEditFormElement();
+
+        foreach ($table->getRows() as $row) {
+            $fieldName = array_shift($row);
+
+            foreach ($row as $cell) {
+                [$permission, $value] = explode(':', $cell);
+                $userRoleForm->setPermission($fieldName, $permission, $value, true);
+            }
+        }
+    }
+
     protected function loginAsAdmin()
     {
         $this->oroMainContext->loginAsUserWithPassword();
@@ -363,7 +485,7 @@ class ACLContext extends OroFeatureContext implements
     }
 
     /**
-     * @param $role
+     * @param Role $role
      * @return UserRoleForm
      */
     protected function openRoleEditForm($role)
@@ -380,14 +502,14 @@ class ACLContext extends OroFeatureContext implements
 
         $filterItem->open();
         $filterItem->selectType('is equal to');
-        $filterItem->setFilterValue($role->__toString());
+        $filterItem->setFilterValue($role->getLabel());
         $filterItem->submit();
         $this->waitForAjax();
 
         /** @var Grid $grid */
         $grid = $this->createElement('Grid');
 
-        $grid->clickActionLink($role, 'Edit');
+        $grid->clickActionLink($role->getLabel(), 'Edit');
         $this->waitForAjax();
 
         return $this->getRoleEditFormElement();
@@ -401,12 +523,12 @@ class ACLContext extends OroFeatureContext implements
     protected function getRole($user)
     {
         if ('administrator' === $user) {
-            return $this->getContainer()
+            return $this->getAppContainer()
                 ->get('oro_entity.doctrine_helper')
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
         } elseif ('user' === $user) {
-            return $this->getContainer()
+            return $this->getAppContainer()
                 ->get('oro_entity.doctrine_helper')
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_DEFAULT]);
@@ -432,5 +554,10 @@ class ACLContext extends OroFeatureContext implements
     protected function getRoleEditFormElement()
     {
         return $this->elementFactory->createElement('UserRoleForm');
+    }
+
+    private function getInflector(): Inflector
+    {
+        return $this->inflector ?: ($this->inflector = (new InflectorFactory())->build());
     }
 }

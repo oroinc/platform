@@ -11,7 +11,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
     /** @var SetResultDocument */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

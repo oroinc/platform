@@ -2,114 +2,80 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 
 class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = '\stdClass';
+    private const CLASS_NAME = \stdClass::class;
 
-    /**
-     * @var FieldsChangesManager
-     */
-    protected $manager;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repo;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $repo;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var FieldsChangesManager */
+    private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->repo = $this->createMock(EntityRepository::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
-            ->will($this->returnValue(self::CLASS_NAME));
-
-        $this->doctrineHelper
-            ->expects($this->any())
+            ->willReturn(self::CLASS_NAME);
+        $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue(1));
-
-        $this->em = $this
-            ->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper
-            ->expects($this->any())
+            ->willReturn(1);
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->em));
-
-        $this->doctrineHelper
-            ->expects($this->any())
+            ->willReturn($this->em);
+        $this->doctrineHelper->expects($this->any())
             ->method('createEntityInstance')
-            ->will($this->returnValue(new FieldsChanges([])));
+            ->willReturn(new FieldsChanges([]));
 
-        $this->repo = $this
-            ->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em
-            ->expects($this->any())
+        $this->em->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->repo));
+            ->willReturn($this->repo);
 
         $this->manager = new FieldsChangesManager($this->doctrineHelper, self::CLASS_NAME);
     }
 
     /**
-     * @param array $fieldsChanges
-     * @param mixed $expected
-     * @param bool  $doRemove
-     *
      * @dataProvider getChangesDataProvider
      */
-    public function testGetChanges($fieldsChanges, $expected, $doRemove)
+    public function testGetChanges(?FieldsChanges $fieldsChanges, array $expected, bool $doRemove)
     {
         if ($fieldsChanges) {
-            $this->repo
-                ->expects($this->any())
+            $this->repo->expects($this->any())
                 ->method('findOneBy')
                 ->with($this->isType('array'))
-                ->will($this->returnValue($fieldsChanges));
+                ->willReturn($fieldsChanges);
         } else {
             $newFieldsChanges = new FieldsChanges([]);
             $newFieldsChanges
                 ->setEntityClass(self::CLASS_NAME)
                 ->setEntityId(1);
 
-            $this->doctrineHelper
-                ->expects($this->once())
+            $this->doctrineHelper->expects($this->once())
                 ->method('createEntityInstance')
-                ->will($this->returnValue($newFieldsChanges));
+                ->willReturn($newFieldsChanges);
 
-            $this->em
-                ->expects($this->once())
+            $this->em->expects($this->once())
                 ->method('persist')
                 ->with($this->equalTo($newFieldsChanges));
         }
 
         if ($doRemove) {
-            $this->em
-                ->expects($this->once())
+            $this->em->expects($this->once())
                 ->method('remove')
                 ->with($this->equalTo($fieldsChanges));
         }
@@ -120,10 +86,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getChangesDataProvider()
+    public function getChangesDataProvider(): array
     {
         return [
             [new FieldsChanges([]), [], false],
@@ -136,19 +99,15 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $fieldsChanges
-     * @param mixed $expected
-     *
      * @dataProvider setChangesDataProvider
      */
-    public function testSetChanges($fieldsChanges, $expected)
+    public function testSetChanges(?FieldsChanges $fieldsChanges, array $expected)
     {
         $entity = new \stdClass();
-        $this->repo
-            ->expects($this->any())
+        $this->repo->expects($this->any())
             ->method('findOneBy')
             ->with($this->isType('array'))
-            ->will($this->returnValue($fieldsChanges));
+            ->willReturn($fieldsChanges);
 
         $fieldsChanges = $this->manager->setChanges($entity, $expected);
 
@@ -158,10 +117,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function setChangesDataProvider()
+    public function setChangesDataProvider(): array
     {
         return [
             [new FieldsChanges(['field']), ['field']],
@@ -172,17 +128,15 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveChanges()
     {
-        $entity        = new \stdClass();
+        $entity = new \stdClass();
         $fieldsChanges = new FieldsChanges([]);
 
-        $this->repo
-            ->expects($this->any())
+        $this->repo->expects($this->any())
             ->method('findOneBy')
             ->with($this->isType('array'))
-            ->will($this->returnValue($fieldsChanges));
+            ->willReturn($fieldsChanges);
 
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('remove')
             ->with($this->equalTo($fieldsChanges));
 

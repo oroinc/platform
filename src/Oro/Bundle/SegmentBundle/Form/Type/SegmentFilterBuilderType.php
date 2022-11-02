@@ -3,7 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\NotEmptyFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType as SegmentTypeEntity;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * SegmentFilterBuilderType is responsible for segment management functionality embedding into other forms.
+ * This form type is responsible for segment management functionality embedding into other forms.
  * Only Filters section is shown to user and could be changed. All other options required for segment creation should
  * be passed as form type options.
  *
@@ -50,10 +51,6 @@ class SegmentFilterBuilderType extends AbstractType
      */
     private $tokenStorage;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenStorageInterface $tokenStorage
@@ -91,6 +88,7 @@ class SegmentFilterBuilderType extends AbstractType
                 'NotBlank' => ['message' => 'oro.query_designer.condition_builder.conditions_group.not_blank'],
             ],
         ]);
+        $resolver->setDefault('field_condition_options', []);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -133,18 +131,18 @@ class SegmentFilterBuilderType extends AbstractType
             'constraints',
             function (Options $options, $value) {
                 if ($options['required']) {
-                    $hasNotBlankFiltersConstraint = false;
+                    $hasNotEmptyFiltersConstraint = false;
                     if ($value && !is_array($value)) {
                         $value = [$value];
                     }
                     foreach ((array)$value as $constraint) {
-                        if ($constraint instanceof NotBlankFilters) {
-                            $hasNotBlankFiltersConstraint = true;
+                        if ($constraint instanceof NotEmptyFilters) {
+                            $hasNotEmptyFiltersConstraint = true;
                             break;
                         }
                     }
-                    if (!$hasNotBlankFiltersConstraint) {
-                        $value[] = new NotBlankFilters();
+                    if (!$hasNotEmptyFiltersConstraint) {
+                        $value[] = new NotEmptyFilters();
                     }
                 }
 
@@ -173,9 +171,6 @@ class SegmentFilterBuilderType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         // Remove owner field if was is automatically added, as owner is set in POST_SUBMIT
@@ -201,9 +196,6 @@ class SegmentFilterBuilderType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         /** @var Segment $segment */
@@ -230,13 +222,9 @@ class SegmentFilterBuilderType extends AbstractType
         }
     }
 
-    /**
-     * @param Segment $segment
-     * @param FormConfigInterface $config
-     */
     private function setSegmentDefinition(Segment $segment, FormConfigInterface $config)
     {
-        $definition = json_decode($segment->getDefinition(), true);
+        $definition = QueryDefinitionUtil::decodeDefinition($segment->getDefinition());
         foreach ((array)$config->getOption('segment_columns') as $column) {
             // Check for column existence and skip adding if found
             if (isset($definition['columns']) && is_array($definition['columns'])) {
@@ -254,14 +242,9 @@ class SegmentFilterBuilderType extends AbstractType
                 'func' => null
             ];
         }
-        $segment->setDefinition(json_encode($definition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
     }
 
-    /**
-     * @param Segment $segment
-     * @param FormConfigInterface $config
-     * @param FormInterface $form
-     */
     private function setSegmentName(Segment $segment, FormConfigInterface $config, FormInterface $form)
     {
         $segmentName = null;
@@ -285,5 +268,7 @@ class SegmentFilterBuilderType extends AbstractType
         $view->vars['condition_builder_options'] = [
             'validation' => $options['condition_builder_validation'],
         ];
+
+        $view->vars['field_condition_options'] = $options['field_condition_options'];
     }
 }

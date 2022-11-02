@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .activity-list-widget {
     position: relative;
 
@@ -7,23 +9,7 @@
         display: none;
     }
 
-    .grid-toolbar {
-        margin-bottom: $activity-toolbar-offset;
-    }
-
-    .filter-box {
-        padding: 0;
-        width: 33%;
-        flex-grow: 1;
-    }
-
-    .pagination {
-        margin: 0;
-    }
-
     .actions-panel {
-        width: $activity-filter-box-width;
-        flex-grow: 1;
         display: flex;
         justify-content: flex-end;
         margin: 0;
@@ -32,16 +18,42 @@
     .activity-list {
         position: relative;
 
-        .filter-item {
-            margin-#{$end}: $activity-filter-item-offset;
+        .grid-toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            grid-template-areas:
+                'filter filter filter'
+                'start center end';
 
-            &:last-child {
-                margin-#{$end}: 0;
+            text-align: left;
+            margin-bottom: 8px;
+
+            .filter-box {
+                grid-area: filter;
+            }
+
+            .pagination {
+                grid-area: center;
+            }
+
+            .actions-panel {
+                grid-area: end;
             }
         }
 
-        .info {
-            margin: $activity-filter-info-offset;
+        .filter-item {
+            margin-bottom: $activity-filter-item-offset;
+
+            // should keep nesting
+            > .btn {
+                height: $activity-filter-item-size;
+
+                line-height: $activity-filter-item-size;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
         }
 
         .info.responsive-cell {
@@ -69,25 +81,16 @@
         font-size: $activity-date-font-size;
     }
 
-    .list-item:last-child {
-        border-bottom: 0;
-    }
-
     .icon {
         width: $activity-icon-size;
 
         font-size: $activity-icon-font-size;
+        line-height: 1;
         text-align: center;
 
         color: $activity-icon-color;
-    }
 
-    .activity-actions {
-        margin-#{$start}: $activity-actions-offset;
-
-        .dropdown-toggle {
-            font-size: $activity-icon-font-size;
-        }
+        flex-shrink: 0;
     }
 
     .comment-count {
@@ -96,7 +99,7 @@
         color: $activity-count-color;
 
         .count {
-            margin-#{$start}: $activity-actions-offset;
+            margin-left: $activity-actions-offset;
         }
     }
 
@@ -110,40 +113,33 @@
         align-items: center;
         width: 100%;
         min-height: $activity-heading-min-height;
-        padding: $activity-heading-offset;
 
         cursor: pointer;
 
         @include clearfix();
 
         .details,
-        .message,
         .message-subject,
+        .message-description,
         .actions {
             @include text-line-truncate(null);
         }
 
         .accordion-icon {
-            width: auto;
-            font-size: $activity-icon-font-size;
-            font-weight: normal;
-
-            padding: $activity-accordion-icon-offset;
-            margin: 0;
-
-            &:hover {
-                color: $activity-accordion-icon-color-hover;
+            .fa-icon {
+                @include fa-icon($activity-accordion-icon-expanded);
             }
 
-            @include fa-icon($activity-accordion-icon-expanded);
-
             &.collapsed {
-                @include fa-icon($activity-accordion-icon-collapsed);
+                .fa-icon {
+                    @include fa-icon($activity-accordion-icon-collapsed);
+                }
             }
         }
 
         .actions {
-            margin-#{$start}: auto;
+            margin-left: auto;
+            padding-left: $content-padding-small;
 
             overflow: visible;
         }
@@ -172,6 +168,10 @@
         }
 
         .message-item {
+            display: flex;
+            align-items: center;
+            padding-right: $activity-message-item-offset;
+
             color: $activity-icon-color;
 
             @include text-line-truncate();
@@ -183,23 +183,33 @@
     }
 
     .accordion-body {
-        padding: 0;
+        padding-top: $activity-accordion-body-offset;
 
         .user-fieldset {
             margin: $activity-user-fieldset-offset;
         }
+    }
 
-        .comment {
-            padding: $activity-comment-offset;
+    .activity-item-email-content {
+        padding: $activity-item-email-content-padding;
+
+        .info {
+            width: 100%;
         }
     }
 
-    .no-data {
-        @include no-data;
+    .activity-item-content {
+        padding: $activity-item-content-padding;
+        margin-bottom: $activity-item-content-margin;
     }
 
-    .responsive-block {
-        margin-bottom: $activity-responsive-block-offset;
+    .list-item:last-child {
+        border-bottom: 0;
+
+        .activity-item-email-content,
+        .activity-item-content {
+            margin-bottom: 0;
+        }
     }
 }
 
@@ -207,22 +217,41 @@
     .btn.filter-select {
         border: none;
         background: none transparent;
-        font-weight: normal;
-        padding-#{$start}: 0;
-        padding-#{$end}: 0;
+        font-weight: font-weight('normal');
+        padding-left: 0;
+        padding-right: 0;
         color: $activity-filter-select-color;
         box-shadow: none;
     }
 
     .filter-item {
-        margin-#{$end}: 0;
+        margin-right: 0;
 
         .fa-close {
-            margin-#{$end}: 0;
+            margin-right: 0;
         }
     }
 
-    .dropdown-toggle:after {
+    .dropdown-toggle::after {
         display: none;
+    }
+}
+
+.responsive-section:not(.responsive-small) {
+    .email-content,
+    .activity-item-content {
+        display: flex;
+
+        > .responsive-cell {
+            &:first-child {
+                padding-right: $activity-item-content-offset;
+
+                border-right: 1px solid $activity-item-content-border-color;
+            }
+
+            &:last-child {
+                padding-left: $activity-item-content-offset;
+            }
+        }
     }
 }

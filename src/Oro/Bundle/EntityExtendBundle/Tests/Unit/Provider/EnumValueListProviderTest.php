@@ -2,56 +2,50 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
     /** @var EnumValueListProvider */
-    protected $enumValueListProvider;
+    private $enumValueListProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager->expects($this->any())
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
             ->method('getProvider')
             ->with('extend')
             ->willReturn($this->extendConfigProvider);
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->enumValueListProvider = new EnumValueListProvider(
-            $this->configManager,
-            $this->doctrine
+            $configManager,
+            $doctrine
         );
     }
 
@@ -168,12 +162,8 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Enum';
 
-        $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $repo = $this->createMock(EntityRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with($className)
@@ -193,9 +183,7 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Enum';
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($className)
@@ -206,47 +194,45 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider->expects($this->exactly(5))
             ->method('getConfig')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        $className,
-                        'id',
-                        $this->getEntityFieldConfig($className, 'id', [])
-                    ],
-                    [
-                        $className,
-                        'name',
-                        $this->getEntityFieldConfig($className, 'name', [])
-                    ],
-                    [
-                        $className,
-                        'priority',
-                        $this->getEntityFieldConfig($className, 'priority', [])
-                    ],
-                    [
-                        $className,
-                        'default',
-                        $this->getEntityFieldConfig($className, 'default', [])
-                    ],
-                    [
-                        $className,
-                        'extend_field',
-                        $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
-                    ],
-                ]
-            );
+                    $className,
+                    'id',
+                    $this->getEntityFieldConfig($className, 'id', [])
+                ],
+                [
+                    $className,
+                    'name',
+                    $this->getEntityFieldConfig($className, 'name', [])
+                ],
+                [
+                    $className,
+                    'priority',
+                    $this->getEntityFieldConfig($className, 'priority', [])
+                ],
+                [
+                    $className,
+                    'default',
+                    $this->getEntityFieldConfig($className, 'default', [])
+                ],
+                [
+                    $className,
+                    'extend_field',
+                    $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
+                ],
+            ]);
 
         $this->assertEquals(
             [
                 'exclusion_policy' => 'all',
                 'hints'            => ['HINT_TRANSLATABLE'],
                 'fields'           => [
-                    'id'       => null,
-                    'name'     => null,
-                    'priority' => [
-                        'result_name' => 'order'
+                    'id'      => null,
+                    'name'    => null,
+                    'order'   => [
+                        'property_path' => 'priority'
                     ],
-                    'default'  => null
+                    'default' => null
                 ]
             ],
             $this->enumValueListProvider->getSerializationConfig($className)
@@ -301,32 +287,17 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @param mixed  $values
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className, $values)
+    private function getEntityConfig(string $className, array $values): Config
     {
-        $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
+        $config = new Config(new EntityConfigId('extend', $className));
         $config->setValues($values);
 
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param mixed  $values
-     *
-     * @return Config
-     */
-    protected function getEntityFieldConfig($className, $fieldName, $values)
+    private function getEntityFieldConfig(string $className, string $fieldName, array $values): Config
     {
-        $configId = new FieldConfigId('extend', $className, $fieldName);
-        $config   = new Config($configId);
+        $config = new Config(new FieldConfigId('extend', $className, $fieldName));
         $config->setValues($values);
 
         return $config;

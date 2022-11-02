@@ -5,15 +5,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 use Doctrine\ORM\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql\MatchAgainst;
 
 /**
  * @group search
  */
 class PdoMysqlTest extends AbstractDriverTest
 {
-    const ENTITY_TITLE = 'test-entity-title';
-    const ENVIRONMENT_NAME = 'MySQL';
-
     public function testGetPlainSql()
     {
         $recordString = PdoMysql::getPlainSql();
@@ -42,7 +40,7 @@ class PdoMysqlTest extends AbstractDriverTest
     protected function assertInitConfiguration(Configuration $configuration)
     {
         $this->assertEquals(
-            'Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql\MatchAgainst',
+            MatchAgainst::class,
             $configuration->getCustomStringFunction('MATCH_AGAINST')
         );
     }

@@ -5,22 +5,15 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Provides a set of methods to help loading of Data API metadata.
+ * Provides a set of methods to help loading of API metadata.
  */
 class MetadataHelper
 {
-    /**
-     * @param mixed  $dataType
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return mixed
-     */
-    public function assertDataType($dataType, $entityClass, $fieldName)
+    public function assertDataType(?string $dataType, string $entityClass, string $fieldName): string
     {
         if (!$dataType) {
             throw new RuntimeException(\sprintf(
@@ -34,16 +27,10 @@ class MetadataHelper
         return $dataType;
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return string|null
-     */
-    public function getFormPropertyPath(EntityDefinitionFieldConfig $field, $targetAction)
+    public function getFormPropertyPath(EntityDefinitionFieldConfig $field, ?string $targetAction): ?string
     {
         $propertyPath = null;
-        if (\in_array($targetAction, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+        if ($targetAction && \in_array($targetAction, [ApiAction::CREATE, ApiAction::UPDATE], true)) {
             $formOptions = $field->getFormOptions();
             if (!empty($formOptions) && \array_key_exists('property_path', $formOptions)) {
                 $propertyPath = $formOptions['property_path'];
@@ -53,18 +40,12 @@ class MetadataHelper
         return $propertyPath;
     }
 
-    /**
-     * @param PropertyMetadata            $propertyMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     */
     public function setPropertyPath(
         PropertyMetadata $propertyMetadata,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         $propertyPath = $this->getFormPropertyPath($field, $targetAction);
         if (!$propertyPath) {
             $propertyPath = $field->getPropertyPath($fieldName);

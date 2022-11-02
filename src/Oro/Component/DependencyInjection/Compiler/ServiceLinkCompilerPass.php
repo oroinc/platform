@@ -4,10 +4,14 @@ namespace Oro\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Finalize the definitions of the service links.
+ */
 class ServiceLinkCompilerPass implements CompilerPassInterface
 {
     /** @var string */
@@ -33,6 +37,9 @@ class ServiceLinkCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $locator = $container->getDefinition('oro_platform.service_link.service_locator');
+        $services = [];
+
         $tags = $container->findTaggedServiceIds($this->tagName);
         foreach ($tags as $id => $tag) {
             /** @var Definition $serviceLinkDef */
@@ -46,39 +53,24 @@ class ServiceLinkCompilerPass implements CompilerPassInterface
 
             $serviceId = $tag[0]['service'];
             $isOptional = false;
-            if (strpos($serviceId, '?') === 0) {
+            if (str_starts_with($serviceId, '?')) {
                 $serviceId = substr($serviceId, 1);
                 $isOptional = true;
             }
 
-            if ($container->hasDefinition($serviceId)) {
-                // the service we are referring to must be public
-                $serviceDef = $container->getDefinition($serviceId);
-                if (!$serviceDef->isPublic()) {
-                    $serviceDef->setPublic(true);
-                }
-            } elseif ($container->hasAlias($serviceId)) {
-                // the service alias we are referring to must be public
-                $serviceAlias = $container->getAlias($serviceId);
-                if (!$serviceAlias->isPublic()) {
-                    $serviceAlias->setPublic(true);
-                }
-            } elseif (!$isOptional) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Target service "%s" is undefined. The service link "%s" with tag "%s" and tag-service "%s"',
-                        $serviceId,
-                        $id,
-                        $this->tagName,
-                        $serviceId
-                    )
-                );
-            }
+            $services[] = new Reference(
+                $serviceId,
+                $isOptional
+                    ? ContainerInterface::IGNORE_ON_INVALID_REFERENCE
+                    : ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE
+            );
 
             $serviceLinkDef
                 ->setClass($this->decoratorClass)
                 ->setPublic(false)
-                ->setArguments([new Reference('service_container'), $serviceId, $isOptional]);
+                ->setArguments([new Reference('oro_platform.service_link.service_locator'), $serviceId, $isOptional]);
         }
+
+        $locator->replaceArgument(0, $services);
     }
 }

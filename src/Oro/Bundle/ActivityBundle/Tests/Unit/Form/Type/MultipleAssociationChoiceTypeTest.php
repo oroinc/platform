@@ -3,29 +3,21 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type\AssociationTypeTestCase;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getFormType()
     {
-        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         return new MultipleAssociationChoiceType(
-            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            new AssociationTypeHelper($this->configManager, $this->createMock(EntityClassResolver::class)),
             $this->configManager
         );
     }
@@ -34,23 +26,19 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
     {
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test', $this->testConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['test', $this->testConfigProvider],
+            ]);
 
         $this->testConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with('Test\Entity2')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->testConfigProvider->expects($this->never())
             ->method('getConfig');
 
         $view    = new FormView();
-        $form    = new Form($this->createMock('Symfony\Component\Form\FormConfigInterface'));
+        $form    = new Form($this->createMock(FormConfigInterface::class));
         $options = [
             'config_id'         => new EntityConfigId('test', 'Test\Entity2'),
             'association_class' => 'test'

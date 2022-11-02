@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationCountModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-notification-count-model
      */
-    EmailNotificationCountModel = BaseModel.extend({
+    const EmailNotificationCountModel = BaseModel.extend({
         defaults: {
             unreadEmailsCount: 0
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailNotificationCountModel() {
-            EmailNotificationCountModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationCountModel(...args) {
+            EmailNotificationCountModel.__super__.constructor.apply(this, args);
         }
     });
 

@@ -6,6 +6,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Represents a context for the query optimization.
+ */
 class QueryOptimizationContext
 {
     /** @var QueryBuilder */
@@ -20,10 +23,6 @@ class QueryOptimizationContext
     /** @var array [alias => Expr\Join, ...] */
     private $aliasToJoinMap;
 
-    /**
-     * @param QueryBuilder      $queryBuilder
-     * @param QueryBuilderTools $qbTools
-     */
     public function __construct(QueryBuilder $queryBuilder, QueryBuilderTools $qbTools)
     {
         // make sure 'from' DQL part is initialized for both original and optimized query builders
@@ -180,7 +179,7 @@ class QueryOptimizationContext
         $toRemoveAliases    = [];
 
         foreach ($aliasToJoinExprMap as $alias => $joinExpr) {
-            if (false === strpos($joinExpr, '.')) {
+            if (!str_contains($joinExpr, '.')) {
                 $this->aliasToClassMap[$alias] = $this->resolveEntityClass($joinExpr);
                 $toRemoveAliases[]             = $alias;
             }

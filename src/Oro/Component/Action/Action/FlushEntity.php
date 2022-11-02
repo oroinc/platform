@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Action\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
@@ -38,10 +38,6 @@ class FlushEntity extends AbstractAction
      */
     protected $registry;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
     {
         parent::__construct($contextAccessor);
@@ -70,6 +66,10 @@ class FlushEntity extends AbstractAction
     protected function executeAction($context)
     {
         $entity = $this->getEntity($context);
+
+        if ($entity === null) {
+            return;
+        }
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass(ClassUtils::getClass($entity));

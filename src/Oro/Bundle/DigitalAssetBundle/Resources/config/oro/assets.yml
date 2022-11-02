@@ -1,0 +1,7 @@
+css:
+    inputs:
+        # Variables
+        - 'bundles/orodigitalasset/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orodigitalasset/css/scss/main.scss'

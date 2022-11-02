@@ -2,133 +2,149 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class TransitionIsAllowedValidatorTest extends \PHPUnit\Framework\TestCase
+class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var TransitionIsAllowedValidator
-     */
-    protected $validator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(WorkflowRegistry::class);
 
-        $this->validator = new TransitionIsAllowedValidator($this->registry);
+        parent::setUp();
+    }
+
+    protected function createValidator()
+    {
+        return new TransitionIsAllowedValidator($this->registry);
+    }
+
+    private function getWorkflowStep(string $name): WorkflowStep
+    {
+        $step = new WorkflowStep();
+        $step->setName($name);
+
+        return $step;
+    }
+
+    private function getWorkflowItem(string $workflowName, WorkflowStep $currentStep): WorkflowItem
+    {
+        $item = $this->createMock(WorkflowItem::class);
+        $item->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn($workflowName);
+        $item->expects($this->any())
+            ->method('getCurrentStep')
+            ->willReturn($currentStep);
+
+        return $item;
+    }
+
+    public function testValidateWhenTransitionAllowed()
+    {
+        $workflowName = 'test_workflow';
+        $transitionName = 'test_transition';
+
+        $currentStep = $this->getWorkflowStep('test_step');
+        $workflowItem = $this->getWorkflowItem($workflowName, $currentStep);
+
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->once())
+            ->method('isTransitionAllowed')
+            ->with($workflowItem, $transitionName, $this->isInstanceOf(Collection::class), true)
+            ->willReturn(true);
+
+        $this->registry->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowName)
+            ->willReturn($workflow);
+
+        $value = new WorkflowData();
+
+        $constraint = new TransitionIsAllowed($workflowItem, $transitionName);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider validateExceptionsDataProvider
      */
-    public function testValidateExceptions($workflowException, $expectedViolations)
-    {
+    public function testValidateExceptions(
+        \Exception $workflowException,
+        string $expectedMessage,
+        array $expectedMessageParameters
+    ) {
         $workflowName = 'test_workflow';
-        $workflowItem = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
-
-        $workflowItem->expects($this->any())
-            ->method('getWorkflowName')
-            ->will($this->returnValue($workflowName));
-
-        $currentStep = new WorkflowStep();
-        $currentStep->setName('test_step');
-        $workflowItem->expects($this->any())
-            ->method('getCurrentStep')
-            ->will($this->returnValue($currentStep));
-
         $transitionName = 'test_transition';
-        $constraint = new TransitionIsAllowed($workflowItem, $transitionName);
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $currentStep = $this->getWorkflowStep('test_step');
+        $workflowItem = $this->getWorkflowItem($workflowName, $currentStep);
+
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->once())
+            ->method('isTransitionAllowed')
+            ->with($workflowItem, $transitionName, $this->isInstanceOf(Collection::class), true)
+            ->willThrowException($workflowException);
 
         $this->registry->expects($this->once())
             ->method('getWorkflow')
             ->with($workflowName)
-            ->will($this->returnValue($workflow));
-
-        $workflow->expects($this->once())
-            ->method('isTransitionAllowed')
-            ->with($workflowItem, $transitionName, $this->isInstanceOf('Doctrine\Common\Collections\Collection'), true)
-            ->will($this->throwException($workflowException));
+            ->willReturn($workflow);
 
         $value = new WorkflowData();
 
-        $context = $this->createMock(ExecutionContextInterface::class);
-
-        foreach (array_values($expectedViolations) as $index => $expectedViolation) {
-            list($message, $params) = array_pad((array)$expectedViolation, 2, array());
-
-            $context->expects($this->at($index))
-                ->method('addViolation')
-                ->with($message, $params);
-        }
-
-        $this->validator->initialize($context);
+        $constraint = new TransitionIsAllowed($workflowItem, $transitionName);
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($expectedMessage)
+            ->setParameters($expectedMessageParameters)
+            ->assertRaised();
     }
 
-    public function validateExceptionsDataProvider()
+    public function validateExceptionsDataProvider(): array
     {
-        /** @var TransitionIsAllowed $constraint */
-        $constraint = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $constraint = $this->createMock(TransitionIsAllowed::class);
 
-        return array(
-            array(
+        return [
+            [
                 'workflowException' => InvalidTransitionException::unknownTransition('test_transition'),
-                'expectedViolations' => array(
-                    array(
-                        $constraint->unknownTransitionMessage,
-                        array('{{ transition }}' => 'test_transition')
-                    )
-                )
-            ),
-            array(
+                'expectedMessage' => $constraint->unknownTransitionMessage,
+                'expectedMessageParameters' => ['{{ transition }}' => 'test_transition']
+            ],
+            [
                 'workflowException' => InvalidTransitionException::notStartTransition(
                     'test_workflow',
                     'test_transition'
                 ),
-                'expectedViolations' => array(
-                    array(
-                        $constraint->notStartTransitionMessage,
-                        array('{{ transition }}' => 'test_transition')
-                    )
-                )
-            ),
-            array(
+                'expectedMessage' => $constraint->notStartTransitionMessage,
+                'expectedMessageParameters' => ['{{ transition }}' => 'test_transition']
+            ],
+            [
                 'workflowException' => InvalidTransitionException::stepHasNoAllowedTransition(
                     'test_workflow',
                     'test_step',
                     'test_transition'
                 ),
-                'expectedViolations' => array(
-                    array(
-                        $constraint->stepHasNotAllowedTransitionMessage,
-                        array('{{ transition }}' => 'test_transition', '{{ step }}' => 'test_step')
-                    )
-                )
-            ),
-            array(
+                'expectedMessage' => $constraint->stepHasNotAllowedTransitionMessage,
+                'expectedMessageParameters' => ['{{ transition }}' => 'test_transition', '{{ step }}' => 'test_step']
+            ],
+            [
                 'workflowException' => new InvalidTransitionException(),
-                'expectedViolations' => array(
-                    $constraint->someConditionsNotMetMessage
-                )
-            ),
-        );
+                'expectedMessage' => $constraint->someConditionsNotMetMessage,
+                'expectedMessageParameters' => []
+            ],
+        ];
     }
 }

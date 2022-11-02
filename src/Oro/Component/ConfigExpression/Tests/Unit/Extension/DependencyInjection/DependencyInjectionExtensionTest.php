@@ -2,23 +2,26 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Extension\DependencyInjection;
 
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
     /** @var DependencyInjectionExtension */
-    protected $extension;
+    private $extension;
 
-    /** @var  array */
-    protected $serviceIds;
+    /** @var array */
+    private $serviceIds;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceIds = ['test' => 'expression_service'];
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->extension = new DependencyInjectionExtension(
             $this->container,
             $this->serviceIds
@@ -33,22 +36,21 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExpression()
     {
-        $expr = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $expr = $this->createMock(ExpressionInterface::class);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('expression_service')
-            ->will($this->returnValue($expr));
+            ->willReturn($expr);
 
         $this->assertSame($expr, $this->extension->getExpression('test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The expression "unknown" is not registered with the service container.
-     */
     public function testGetUnknownExpression()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The expression "unknown" is not registered with the service container.');
+
         $this->extension->getExpression('unknown');
     }
 

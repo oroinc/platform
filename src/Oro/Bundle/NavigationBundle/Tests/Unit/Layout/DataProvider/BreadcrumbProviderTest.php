@@ -7,26 +7,23 @@ use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
 class BreadcrumbProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BreadcrumbProvider
-     */
-    private $provider;
-
-    /**
-     * @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $breadcrumbManager;
 
-    public function setUp()
+    /** @var BreadcrumbProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
-        $this->provider          = new BreadcrumbProvider($this->breadcrumbManager);
+
+        $this->provider = new BreadcrumbProvider($this->breadcrumbManager);
     }
 
     public function testGetBreadcrumbs()
     {
-        $menuName          = 'customer_usermenu';
-        $breadcrumbs       = [
+        $menuName = 'customer_usermenu';
+        $breadcrumbs = [
             [
                 'label' => 'oro.customer.menu.customer_user.label',
                 'url'   => '/customer/user/',

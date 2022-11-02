@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-
 class IntlDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
     const NAME = 'intl';

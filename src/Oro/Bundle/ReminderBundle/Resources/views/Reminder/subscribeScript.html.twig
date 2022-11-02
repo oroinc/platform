@@ -1,9 +1,10 @@
 {% if app.user %}
-    {% placeholder oro_reminder_reminder_templates %}
-    <script type="text/javascript">
-        require(['ororeminder/js/reminder-handler'], function(reminderHandler) {
-            reminderHandler.init({{ app.user.id }}, {{ check_ws() ? 'true' : 'false' }});
-        });
-    </script>
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'ororeminder/js/app/components/reminder-handler-component',
+        options: {
+            userId: app.user.id,
+            wampEnable: check_ws() ? true : false
+        }
+    }) }}></div>
 {% endif %}
-

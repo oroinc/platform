@@ -7,124 +7,63 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * The event listener for Doctrine events that intended to dispatch notification events
+ * when entities are created, updated or removed.
+ */
 class DoctrineListener implements OptionalListenerInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    use OptionalListenerTrait;
 
-    /**
-     * @var EntityPool
-     */
-    protected $entityPool;
+    /** @var EntityPool */
+    private $entityPool;
 
-    /**
-     * @var bool
-     */
-    protected $enabled = true;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
-    /**
-     * @param EntityPool $entityPool
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EntityPool $entityPool, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityPool = $entityPool;
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
-    }
-
-    /**
-     * Persist and flush entities from spool: jobs and email spool items.
-     *
-     * @param PostFlushEventArgs $args
-     * @return $this
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->enabled) {
-            return;
+        if ($this->enabled) {
+            $this->entityPool->persistAndFlush($args->getEntityManager());
         }
-
-        $this->entityPool->persistAndFlush($args->getEntityManager());
-
-        return $this;
     }
 
-    /**
-     * Post update event process
-     *
-     * @param LifecycleEventArgs $args
-     * @return $this
-     */
     public function postUpdate(LifecycleEventArgs $args)
     {
-        if (!$this->enabled) {
-            return;
+        if ($this->enabled) {
+            $this->dispatch('oro.notification.event.entity_post_update', $args->getEntity());
         }
-
-        $this->eventDispatcher
-            ->dispatch('oro.notification.event.entity_post_update', $this->getNotificationEvent($args));
-
-        return $this;
     }
 
-    /**
-     * Post persist event process
-     *
-     * @param LifecycleEventArgs $args
-     * @return $this
-     */
     public function postPersist(LifecycleEventArgs $args)
     {
-        if (!$this->enabled) {
-            return;
+        if ($this->enabled) {
+            $this->dispatch('oro.notification.event.entity_post_persist', $args->getEntity());
         }
-
-        $this->eventDispatcher
-            ->dispatch('oro.notification.event.entity_post_persist', $this->getNotificationEvent($args));
-
-        return $this;
     }
 
-    /**
-     * Post remove event process
-     *
-     * @param LifecycleEventArgs $args
-     * @return $this
-     */
     public function postRemove(LifecycleEventArgs $args)
     {
-        if (!$this->enabled) {
-            return;
+        if ($this->enabled) {
+            $this->dispatch('oro.notification.event.entity_post_remove', $args->getEntity());
         }
-
-        $this->eventDispatcher
-            ->dispatch('oro.notification.event.entity_post_remove', $this->getNotificationEvent($args));
-
-        return $this;
     }
 
     /**
-     * Create new event instance
-     *
-     * @param LifecycleEventArgs $args
-     * @return NotificationEvent
+     * @param string $eventName
+     * @param object $entity
      */
-    public function getNotificationEvent(LifecycleEventArgs $args)
+    private function dispatch($eventName, $entity)
     {
-        $event = new NotificationEvent($args->getEntity());
-
-        return $event;
+        $this->eventDispatcher->dispatch(new NotificationEvent($entity), $eventName);
     }
 }

@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 
 class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ContextNormalizer */
-    protected $contextNormalizer;
+    /** @var ContextNormalizer */
+    private $contextNormalizer;
 
-    /** @var  ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /** @var  ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $scopeManager;
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $scopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);
@@ -27,12 +27,16 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeContext()
     {
-        $entity1 = $this->getMockBuilder(\stdClass::class)->setMethods(['getId'])->getMock();
+        $entity1 = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity1->expects($this->once())
             ->method('getId')
             ->willReturn(101);
 
-        $entity2 = $this->getMockBuilder(\stdClass::class)->setMethods(['getId'])->getMock();
+        $entity2 = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity2->expects($this->once())
             ->method('getId')
             ->willReturn(102);
@@ -75,12 +79,11 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Entity foo_entity with identifier 100 does not exist.
-     */
     public function testDenormalizeContextWithNonExistentEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Entity foo_entity with identifier 100 does not exist.');
+
         $entities = ['foo_entity' => 'FooEntity'];
         $context = ['foo_entity' => 100];
         $scopeType = 'custom_scope_type';

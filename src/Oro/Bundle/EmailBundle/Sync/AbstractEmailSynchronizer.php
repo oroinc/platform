@@ -2,23 +2,28 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Exception\DisableOriginSyncExceptionInterface;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
+ * Abstract class for the email synchronizer.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, LoggerAwareInterface
@@ -39,11 +44,15 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /** @var KnownEmailAddressCheckerFactory */
     protected $knownEmailAddressCheckerFactory;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var KnownEmailAddressCheckerInterface */
     private $knownEmailAddressChecker;
+
+    private NotificationAlertManager $notificationAlertManager;
+
+    protected EmailSyncNotificationBag $notificationsBag;
 
     /** @var TokenInterface */
     private $currentToken;
@@ -56,31 +65,25 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Constructor
-     *
-     * @param ManagerRegistry                 $doctrine
-     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      */
     protected function __construct(
         ManagerRegistry $doctrine,
-        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
+        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
+        NotificationAlertManager $notificationAlertManager
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+        $this->notificationAlertManager = $notificationAlertManager;
         $this->logger = new NullLogger();
+        $this->notificationsBag = new EmailSyncNotificationBag();
     }
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
-    public function setMessageProducer(MessageProducerInterface $producer)
+    public function setMessageProducer(MessageProducerInterface $producer): void
     {
         $this->producer = $producer;
     }
 
-    /**
-     * @param TokenStorage $tokenStorage
-     */
-    public function setTokenStorage(TokenStorage $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
         $this->currentToken = $tokenStorage->getToken();
@@ -113,8 +116,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
+    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1): int
     {
         if (!$this->checkConfiguration()) {
             $this->logger->info('Exit because synchronization was not configured or disabled.');
@@ -151,6 +155,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             }
 
             $processedOrigins[$origin->getId()] = true;
+            $this->notificationsBag->emptyNotifications();
             try {
                 $this->doSyncOrigin($origin, new SynchronizationProcessorSettings());
             } catch (SyncFolderTimeoutException $ex) {
@@ -160,6 +165,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
+            } finally {
+                $this->processNotificationAlerts($origin, $this->notificationsBag->getNotifications());
             }
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
@@ -176,12 +183,12 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Performs a synchronization of emails for the given email origins.
      *
-     * @param int[] $originIds
-     * @param SynchronizationProcessorSettings $settings
+     * @param int[]                                 $originIds
+     * @param SynchronizationProcessorSettings|null $settings
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null)
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -193,6 +200,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
         $failedOriginIds = [];
         foreach ($originIds as $originId) {
+            $this->notificationsBag->emptyNotifications();
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
@@ -201,6 +209,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                     break;
                 } catch (\Exception $ex) {
                     $failedOriginIds[] = $origin->getId();
+                } finally {
+                    $this->processNotificationAlerts($origin, $this->notificationsBag->getNotifications());
+                    $this->notificationsBag->emptyNotifications();
                 }
             }
         }
@@ -265,6 +276,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             if ($processor instanceof LoggerAwareInterface) {
                 $processor->setLogger($this->logger);
             }
+        } catch (DisableOriginSyncExceptionInterface $ex) {
+            $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
+            $this->disableSyncForOrigin($origin);
+
+            throw $ex;
         } catch (\Exception $ex) {
             $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
 
@@ -275,6 +291,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
         try {
             $this->delegateToProcessor($origin, $processor, $settings);
+        } catch (DisableOriginSyncExceptionInterface $ex) {
+            $this->logger->error(sprintf('The synchronization failed. Error: %s', $ex->getMessage()));
+            $this->disableSyncForOrigin($origin);
+
+            throw $ex;
         } catch (SyncFolderTimeoutException $ex) {
             $this->logger->info($ex->getMessage());
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
@@ -292,11 +313,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         }
     }
 
-    /**
-     * @param EmailOrigin $origin
-     * @param AbstractEmailSynchronizationProcessor $processor
-     * @param SynchronizationProcessorSettings|null $settings
-     */
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
@@ -309,7 +325,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             if ($settings) {
                 $processor->setSettings($settings);
             }
-            $processor->process($origin, $syncStartTime);
+            $processor->process($origin, $syncStartTime, $this->notificationsBag);
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
         } else {
             $this->logger->info('Skip because it is already in process.');
@@ -318,7 +334,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Switches the security context to the given organization
-     * @todo: Should be deleted after email sync process will be refactored
+     * Should be deleted after email sync process will be refactored
      */
     protected function impersonateOrganization(Organization $organization = null)
     {
@@ -379,13 +395,14 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Updates a state of the given email origin
      *
-     * @param EmailOrigin $origin
-     * @param int $syncCode Can be one of self::SYNC_CODE_* constants
-     * @param \DateTime|null $synchronizedAt
      * @return bool true if the synchronization code was updated; false if no any changes are needed
      */
-    protected function changeOriginSyncState(EmailOrigin $origin, $syncCode, $synchronizedAt = null)
-    {
+    protected function changeOriginSyncState(
+        EmailOrigin $origin,
+        int $syncCode,
+        ?\DateTime$synchronizedAt = null,
+        bool $disableSync = false
+    ): bool {
         $repo = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $qb   = $repo->createQueryBuilder('o')
             ->update()
@@ -393,13 +410,13 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             ->set('o.syncCodeUpdatedAt', ':updated')
             ->where('o.id = :id')
             ->setParameter('code', $syncCode)
-            ->setParameter('updated', $this->getCurrentUtcDateTime())
+            ->setParameter('updated', $this->getCurrentUtcDateTime(), Types::DATETIME_MUTABLE)
             ->setParameter('id', $origin->getId());
 
         if ($synchronizedAt !== null) {
             $qb
                 ->set('o.synchronizedAt', ':synchronized')
-                ->setParameter('synchronized', $synchronizedAt);
+                ->setParameter('synchronized', $synchronizedAt, Types::DATETIME_MUTABLE);
         }
 
         if ($syncCode === self::SYNC_CODE_IN_PROCESS || $syncCode === self::SYNC_CODE_IN_PROCESS_FORCE) {
@@ -410,17 +427,20 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             $qb->set('o.syncCount', 'o.syncCount + 1');
         }
 
+        if (true === $disableSync) {
+            $qb->set('o.isSyncEnabled', ':isSyncEnabled')
+                ->setParameter('isSyncEnabled', false);
+        }
+
         $affectedRows = $qb->getQuery()->execute();
 
         return $affectedRows > 0;
     }
 
     /**
-     *  Attempts to sets the state of a given email origin to failed.
-     *
-     * @param EmailOrigin $origin
+     *  Attempts to set the state of a given email origin to failed.
      */
-    protected function setOriginSyncStateToFailed(EmailOrigin $origin)
+    protected function setOriginSyncStateToFailed(EmailOrigin $origin): void
     {
         try {
             $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
@@ -428,6 +448,27 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             // ignore any exception here
             $this->logger->error(
                 sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
+                ['exception' => $innerEx]
+            );
+        }
+    }
+
+    /**
+     *  Attempts to disable origin sync and sets the state of a given email origin to failed.
+     */
+    protected function disableSyncForOrigin(EmailOrigin $origin): void
+    {
+        try {
+            $this->changeOriginSyncState(
+                $origin,
+                self::SYNC_CODE_FAILURE,
+                null,
+                true
+            );
+        } catch (\Exception $innerEx) {
+            // ignore any exception here
+            $this->logger->error(
+                sprintf('Cannot disable the origin sync. Error: %s', $innerEx->getMessage()),
                 ['exception' => $innerEx]
             );
         }
@@ -470,14 +511,16 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
+            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('inProcessForce', self::SYNC_CODE_IN_PROCESS_FORCE)
+            ->setParameter('isSyncEnabled', false)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
             ->setParameter('isActive', true)
-            ->setParameter('now', $now)
-            ->setParameter('min', $min)
-            ->setParameter('border', $border)
+            ->setParameter('now', $now, Types::DATETIME_MUTABLE)
+            ->setParameter('min', $min, Types::DATETIME_MUTABLE)
+            ->setParameter('border', $border, Types::DATETIME_MUTABLE)
             ->setParameter('timeShift', $timeShift)
             ->setMaxResults($maxConcurrentTasks + 1);
 
@@ -508,8 +551,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Modifies QueryBuilder to filter origins by enabled owner
-     *
-     * @param QueryBuilder $queryBuilder
      */
     protected function addOwnerFilter(QueryBuilder $queryBuilder)
     {
@@ -543,7 +584,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $queryBuilder = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
+            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
             ->setParameter('isActive', true)
+            ->setParameter('isSyncEnabled', false)
             ->setParameter('id', $originId)
             ->setMaxResults(1);
 
@@ -581,7 +624,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             ->where('o.syncCode = :inProcess AND o.syncCodeUpdatedAt <= :border')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('failure', self::SYNC_CODE_FAILURE)
-            ->setParameter('border', $border)
+            ->setParameter('border', $border, Types::DATETIME_MUTABLE)
             ->getQuery();
 
         $affectedRows = $query->execute();
@@ -598,9 +641,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @param $maxExecTimeInMin
-     */
     protected function calculateClearInterval($maxExecTimeInMin)
     {
         if ($maxExecTimeInMin > 5) {
@@ -609,7 +649,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     }
 
     /**
-     * @param $failedOriginIds
      * @throws \Exception
      */
     private function assertSyncSuccess(array $failedOriginIds)
@@ -622,5 +661,63 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 )
             );
         }
+    }
+
+    private function processNotificationAlerts(EmailOrigin $origin, array $notificationAlerts): void
+    {
+        $userId = $origin->getOwner()?->getId();
+        $organizationId = $origin->getOrganization()->getId();
+        $originId = $origin->getId();
+
+        $authAlertsExist = false;
+        $collectionAlertsExist = false;
+        $failedFoldersExist = false;
+        /** @var $notificationAlert EmailSyncNotificationAlert */
+        foreach ($notificationAlerts as $notificationAlert) {
+            if (EmailSyncNotificationAlert::ALERT_TYPE_AUTH === $notificationAlert->getAlertType()) {
+                $authAlertsExist = true;
+            }
+            if (EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER === $notificationAlert->getAlertType()) {
+                $failedFoldersExist = true;
+            }
+            if (EmailSyncNotificationAlert::ALERT_TYPE_SYNC === $notificationAlert->getAlertType()
+                && EmailSyncNotificationAlert::STEP_GET_LIST === $notificationAlert->getStep()
+            ) {
+                $collectionAlertsExist = true;
+            }
+
+            $notificationAlert->setUserId($userId);
+            $notificationAlert->setOrganizationId($organizationId);
+            $notificationAlert->setEmailOriginId($originId);
+
+            $this->notificationAlertManager->addNotificationAlert($notificationAlert);
+        }
+
+        if (false === $authAlertsExist) {
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                EmailSyncNotificationAlert::ALERT_TYPE_AUTH,
+                $userId,
+                $organizationId
+            );
+
+            if (false === $collectionAlertsExist) {
+                $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+                    EmailSyncNotificationAlert::ALERT_TYPE_SYNC,
+                    EmailSyncNotificationAlert::STEP_GET_LIST,
+                    $userId,
+                    $organizationId
+                );
+            }
+
+            if (false === $failedFoldersExist) {
+                $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                    EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER,
+                    $userId,
+                    $organizationId
+                );
+            }
+        }
+
+        $this->notificationsBag->emptyNotifications();
     }
 }

@@ -2,21 +2,27 @@
 
 namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
-class TitleContentProvider extends TitleServiceAwareContentProvider
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
+
+/**
+ * Returns a page title.
+ */
+class TitleContentProvider implements ContentProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getContent()
+    /** @var TitleServiceInterface */
+    private $titleService;
+
+    public function __construct(TitleServiceInterface $titleService)
     {
-        return $this->titleService->render(array(), null, null, null, true);
+        $this->titleService = $titleService;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getContent()
     {
-        return 'title';
+        return $this->titleService->render([], null, null, null, true);
     }
 }

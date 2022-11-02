@@ -4,18 +4,20 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 
+/**
+ * Adds the following configuration parts to DatagridConfiguration by extending DatagridConfigurationBuilder:
+ * - properties
+ * - actions
+ * - translation hint
+ */
 class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -26,7 +28,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
      */
     public function isApplicable($gridName)
     {
-        return (strpos($gridName, Report::GRID_PREFIX) === 0);
+        return str_starts_with($gridName, Report::GRID_PREFIX);
     }
 
     /**
@@ -44,13 +46,11 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         }
 
         $entityAlias = null;
-        $doctrineMetadata = $this->doctrine->getManagerForClass($className)
-            ->getClassMetadata($className);
-        $identifiers = $doctrineMetadata->getIdentifier();
+        $identifiers = $this->doctrineHelper->getEntityMetadataForClass($className)->getIdentifier();
         $primaryKey = array_shift($identifiers);
         $entityAlias = $configuration->getOrmQuery()->findRootAlias($className);
 
-        if (!$entityAlias || !$primaryKey || count($identifiers) > 1 || !$this->isActionSupported($primaryKey)) {
+        if (!$entityAlias || !$primaryKey || count($identifiers) > 0 || !$this->isActionSupported($primaryKey)) {
             return $configuration;
         }
 
@@ -77,6 +77,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $configuration->getOrmQuery()->addSelect("{$entityAlias}.{$primaryKey}");
         $configuration->offsetAddToArrayByPath('[properties]', $properties);
         $configuration->offsetAddToArrayByPath('[actions]', $viewAction);
+        $configuration->offsetAddToArrayByPath('[source][hints]', ['HINT_TRANSLATABLE']);
 
         return $configuration;
     }
@@ -87,7 +88,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
      */
     protected function isActionSupported($primaryKey)
     {
-        $definition = json_decode($this->source->getDefinition(), true);
+        $definition = QueryDefinitionUtil::decodeDefinition($this->source->getDefinition());
 
         if (!empty($definition['grouping_columns'])) {
             foreach ($definition['grouping_columns'] as $column) {

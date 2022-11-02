@@ -51,9 +51,6 @@ class LimitConsumedMessagesExtension extends AbstractExtension
         $this->checkMessageLimit($context);
     }
 
-    /**
-     * @param Context $context
-     */
     protected function checkMessageLimit(Context $context)
     {
         if ($this->messageConsumed >= $this->messageLimit) {

@@ -12,15 +12,23 @@ datagrids:
                     - language.updatedAt
                     - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
                     - languageOwner.id as owner
+                    - COUNT(translation) as translationCount
+                    - language.installedBuildDate
+                    - language.localFilesLanguage
                 from:
-                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                    - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     left:
                         - { join: language.owner, alias: languageOwner }
+                        -
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                            alias: translation
+                            conditionType: WITH
+                            condition: 'translation.language = language'
         inline_editing:
             enable: true
             behaviour: enable_selected
-            entity_name: '%oro_translation.entity.language.class%'
+            entity_name: 'Oro\Bundle\TranslationBundle\Entity\Language'
         columns:
             language:
                 label: oro.translation.language.entity_label
@@ -42,9 +50,17 @@ datagrids:
                 label: oro.translation.language.enabled.label
                 type: twig
                 frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/enabled.html.twig
-            translationCompleteness: ~
-            translationStatus: ~
+                template: '@OroTranslation/Language/Datagrid/enabled.html.twig'
+            translationCompleteness:
+                 label: oro.translation.language.translation_completeness.label
+                 type: twig
+                 frontend_type: html
+                 template: '@OroTranslation/Language/Datagrid/translationCompleteness.html.twig'
+            translationStatus:
+                 label: oro.translation.language.translation_status.label
+                 type: twig
+                 frontend_type: html
+                 template: '@OroTranslation/Language/Datagrid/translationStatus.html.twig'
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime
@@ -81,11 +97,11 @@ datagrids:
                 createdAt:
                     type:      datetime
                     data_name: language.createdAt
-                    enabled:   false
+                    renderable: false
                 updatedAt:
                     type:      datetime
                     data_name: language.updatedAt
-                    enabled:   false
+                    renderable: false
         properties:
             id: ~
             owner: ~
@@ -97,7 +113,7 @@ datagrids:
 
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
-        extended_entity_name: '%oro_translation.entity.translation.class%'
+        extended_entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
         source:
             type: orm
             query:
@@ -111,22 +127,22 @@ datagrids:
                     - (CASE WHEN translation.value IS NULL THEN false ELSE true END) as status
                     - translationEn.value as englishValue
                 from:
-                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                    - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     inner:
                         -
-                            join: '%oro_translation.entity.translation_key.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\TranslationKey'
                             alias: translationKey
                             conditionType: WITH
                             condition: 1 = 1 # always true (required for DQLBuilder due require conditionType when joining on Entity class)
                     left:
                         -
-                            join: '%oro_translation.entity.translation.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
                         -
-                            join: '%oro_translation.entity.translation.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                             alias: translationEn
                             conditionType: WITH
                             condition: 'translationEn.translationKey = translationKey AND translationEn.language = :en_language'
@@ -136,7 +152,7 @@ datagrids:
         inline_editing:
             enable: true
             behaviour: enable_selected
-            entity_name: '%oro_translation.entity.translation.class%'
+            entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
             acl_resource: oro_translation_language_translate
         columns:
             id:
@@ -147,11 +163,8 @@ datagrids:
             status:
                 label: oro.translation.translation.status.label
                 frontend_type: boolean
-            englishTranslation:
+            englishValue:
                 label: oro.translation.translation.english_translation.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/englishTranslation.html.twig
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
@@ -166,9 +179,6 @@ datagrids:
                             - domain
             current:
                 label: oro.translation.translation.current.label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/current.html.twig
             key:
                 label: oro.translation.translation_key.key.label
             domain:
@@ -182,7 +192,7 @@ datagrids:
                     data_name: language.id
                 status:
                     data_name: status
-                englishTranslation:
+                englishValue:
                     data_name: englishValue
                 value:
                     data_name: value
@@ -191,7 +201,7 @@ datagrids:
                 domain:
                     data_name: domain
             default:
-                language: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                language: ASC
         filters:
             columns:
                 language:
@@ -203,10 +213,11 @@ datagrids:
                 status:
                     type: boolean
                     data_name: status
-                englishTranslation:
+                englishValue:
                     type: string
                     data_name: englishValue
-                value:
+                value_trans:
+                    label: oro.translation.translation.value.label
                     type: string
                     data_name: value
                 key:
@@ -217,7 +228,7 @@ datagrids:
                     data_name: domain
                     options:
                         field_options:
-                            choices: "@oro_translation.provider.translation_domain->getAvailableDomains"
+                            choices: "@oro_translation.provider.translation_domain->getAvailableDomainChoices"
                             multiple: true
         properties:
             id: ~

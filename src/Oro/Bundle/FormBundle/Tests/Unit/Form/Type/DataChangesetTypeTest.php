@@ -23,11 +23,6 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitProvider
-     *
-     * @param $defaultData
-     * @param $viewData
-     * @param $submittedData
-     * @param ArrayCollection $expected
      */
     public function testSubmit($defaultData, $viewData, $submittedData, ArrayCollection $expected)
     {
@@ -39,16 +34,14 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         $data = $form->getData();
 
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             [

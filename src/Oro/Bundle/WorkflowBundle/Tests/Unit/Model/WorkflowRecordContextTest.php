@@ -16,12 +16,11 @@ class WorkflowRecordContextTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $recordContext->getEntity());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Instance of entity object is required. Got `string` instead.
-     */
     public function testInvalidEntityConstruction()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Instance of entity object is required. Got `string` instead.');
+
         new WorkflowRecordContext(EntityStub::class);
     }
 }

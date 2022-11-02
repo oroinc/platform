@@ -6,27 +6,26 @@ use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ImportLayoutManipulator
-     */
-    protected $importLayoutManipulator;
+    /** @var ImportLayoutManipulator */
+    private $importLayoutManipulator;
 
-    /**
-     * @var LayoutUpdateImport|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $import;
+    /** @var LayoutUpdateImport|\PHPUnit\Framework\MockObject\MockObject */
+    private $import;
 
-    /**
-     * @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $layoutManipulator;
+    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $layoutManipulator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
         $this->import = $this->getImportMock('import_id', 'import_root', 'import_namespace');
+
         $this->importLayoutManipulator = new ImportLayoutManipulator($this->layoutManipulator, $this->import);
     }
 
@@ -68,10 +67,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testAddWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('add')
@@ -118,10 +116,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testRemoveWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('remove')
@@ -129,7 +126,6 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
 
         $this->importLayoutManipulator->remove('__id');
     }
-
 
     /**
      * Replace in id, parentId and siblingId
@@ -161,10 +157,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testMoveWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('move')
@@ -207,10 +202,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testAddAliasWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('addAlias')
@@ -249,10 +243,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAliasWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('removeAlias')
@@ -291,10 +284,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testSetOptionWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('setOption')
@@ -333,10 +325,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testAppendOptionWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('appendOption')
@@ -375,10 +366,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testSubtractOptionWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('subtractOption')
@@ -417,10 +407,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testReplaceOptionWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('replaceOption')
@@ -459,10 +448,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testRemoveOptionWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('removeOption')
@@ -501,10 +489,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testChangeBlockTypeWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('changeBlockType')
@@ -543,10 +530,9 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testSetBlockThemeWithParent()
     {
         $parentImport = $this->getImportMock('parent_import_id', 'parent_import_root', 'parent_import_namespace');
-        $this->import
-            ->expects($this->any())
+        $this->import->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parentImport));
+            ->willReturn($parentImport);
 
         $this->layoutManipulator->expects($this->once())
             ->method('setBlockTheme')
@@ -585,18 +571,18 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
      *
      * @return LayoutUpdateImport|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getImportMock($id, $root, $namespace)
+    private function getImportMock($id, $root, $namespace)
     {
         $import = $this->createMock(LayoutUpdateImport::class);
         $import->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($id));
+            ->willReturn($id);
         $import->expects($this->any())
             ->method('getRoot')
-            ->will($this->returnValue($root));
+            ->willReturn($root);
         $import->expects($this->any())
             ->method('getNamespace')
-            ->will($this->returnValue($namespace));
+            ->willReturn($namespace);
 
         return $import;
     }

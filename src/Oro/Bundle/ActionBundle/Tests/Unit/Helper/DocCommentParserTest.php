@@ -9,28 +9,22 @@ use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
 class DocCommentParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DocCommentParser */
-    protected $parser;
+    private $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new DocCommentParser();
     }
 
     /**
      * @dataProvider getFullCommentDataProvider
-     *
-     * @param string $className
-     * @param string $expected
      */
-    public function testGetFullComment($className, $expected)
+    public function testGetFullComment(string $className, string $expected)
     {
         $this->assertSame($expected, $this->parser->getFullComment($className));
     }
 
-    /**
-     * @return array
-     */
-    public function getFullCommentDataProvider()
+    public function getFullCommentDataProvider(): array
     {
         return [
             'with comment' => [
@@ -46,19 +40,13 @@ class DocCommentParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getShortCommentDataProvider
-     *
-     * @param string $className
-     * @param string $expected
      */
-    public function testGetShortComment($className, $expected)
+    public function testGetShortComment(string $className, string $expected)
     {
         $this->assertSame($expected, $this->parser->getShortComment($className));
     }
 
-    /**
-     * @return array
-     */
-    public function getShortCommentDataProvider()
+    public function getShortCommentDataProvider(): array
     {
         return [
             'full comment' => [

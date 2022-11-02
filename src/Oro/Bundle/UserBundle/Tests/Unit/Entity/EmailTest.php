@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,9 +11,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->user = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\User');
+        $this->user = $this->createMock(User::class);
         $this->email = new Email();
     }
 

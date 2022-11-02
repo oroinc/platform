@@ -2,42 +2,38 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class AttachmentEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentEntityGeneratorExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AttachmentEntityGeneratorExtension();
     }
 
     /**
-     * @dataProvider data
+     * @dataProvider supportsDataProvider
      */
-    public function testIsSupports($schema, $assertSuport)
+    public function testSupports(array $schema, bool $expected)
     {
-        $this->assertEquals($assertSuport, $this->extension->supports($schema));
+        self::assertSame($expected, $this->extension->supports($schema));
     }
 
-    public function data()
+    public function supportsDataProvider(): array
     {
-        $fieldConfig = new FieldConfigId(
-            'attachment',
-            'testClass',
-            'test_entity_88620bc9',
-            'manyToOne'
-        );
         return [
             'supports' => [
                 [
-                    'class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
+                    'class' => Attachment::class,
                     'relation' => [[]],
                     'relationData' => [[
-                        'field_id' => $fieldConfig,
+                        'field_id' => new FieldConfigId('attachment', 'testClass', 'test_entity_88620bc9', 'manyToOne'),
                         'target_entity' => 'testEntity',
                         'state' => 'Active'
                     ]]
@@ -46,7 +42,7 @@ class AttachmentEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             'notSupports' => [
                 [
-                    'class'=> 'Oro\Bundle\AttachmentBundle\Entity\File',
+                    'class'=> File::class,
                 ],
                 false
             ]

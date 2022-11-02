@@ -1,0 +1,15 @@
+acl_categories:
+    category2:
+        visible: false
+    category3:
+        label: category3.label.updated
+    category4:
+        tab: false
+    category5:
+        priority: 15
+    category7:
+        label: category7.label
+        tab: false
+        priority: 1
+    category8:
+        label: category8.label

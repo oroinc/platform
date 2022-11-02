@@ -5,6 +5,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 
+/**
+ * The implementation of element that represents a group of checkboxes or radio buttons.
+ */
 class GroupChoiceField extends Element
 {
     /**
@@ -28,6 +31,12 @@ class GroupChoiceField extends Element
     public function setValue($values)
     {
         $values = true === is_array($values) ? $values : [$values];
+
+        foreach ($this->choices as $label => $element) {
+            if ('checkbox' === strtolower($element->getAttribute('type'))) {
+                $element->uncheck();
+            }
+        }
 
         foreach ($values as $label) {
             $choice = $this->getChoice($label);
@@ -88,6 +97,9 @@ class GroupChoiceField extends Element
             $this->choices,
             array_flip(preg_grep(sprintf('/%s/i', preg_quote($label)), array_keys($this->choices)))
         );
+        if (count($choices) > 1 && isset($choices[$label])) {
+            $choices = [$label => $choices[$label]];
+        }
         self::assertCount(1, $choices, sprintf('Too many results for "%s" label', $label));
 
         $choice = array_shift($choices);

@@ -10,6 +10,7 @@ oro:
         gridview:
             entity_label: Grid view
             entity_plural_label: Grid views
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description: Represent grid views
             filters_data.label: Filters
             grid_name.label: Grid name
@@ -34,10 +35,18 @@ oro:
             totalPages: of %totalPages%
             totalRecords: "Total of %totalRecords% records"
             prev: Prev
+            prev.aria_label: "Previous page"
             next: Next
+            next.aria_label: "Next page"
+            pageNumber: Page Number
+            input.aria_label: Current page number
         pagesize:
             label: View per page
             labelShort: Per page
+        cell:
+            blank:
+                placeholder: 'N/A'
+                aria_label: 'Blank'
     grid:
         mass_action:
             label: Mass Actions
@@ -79,4 +88,6 @@ oro:
             fields:
                 default_per_page.label: 'Items per Page by Default'
                 full_screen_layout_enabled.label: 'Lock headers in grids'
-                full_screen_layout_enabled.tooltip: 'This parameter controls whether grid headers are locked on the page during scrolling'
+                full_screen_layout_enabled.tooltip: 'Enable this option to lock grid headers on the page when scrolling.'
+                row_link_enabled.label: 'Row link navigation'
+                row_link_enabled.tooltip: 'Enable this option to make rows in the grid behave like native links.'

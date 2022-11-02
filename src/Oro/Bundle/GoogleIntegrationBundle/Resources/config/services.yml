@@ -1,0 +1,8 @@
+services:
+    oro_google_integration.oauth_user_provider:
+        class: Oro\Bundle\GoogleIntegrationBundle\OAuth\GoogleOAuthUserProvider
+        arguments:
+            - '@oro_user.manager'
+            - '@oro_config.global'
+        tags:
+            - { name: oro.sso.oauth_user_provider, resource_owner: google }

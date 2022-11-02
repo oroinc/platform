@@ -19,9 +19,6 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
      */
     private $itemsRepository;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

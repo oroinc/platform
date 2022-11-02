@@ -13,21 +13,18 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityToIdTransformerTest extends OrmRelatedTestCase
 {
-    /**
-     * @param AssociationMetadata           $metadata
-     * @param EntityMapper|null             $entityMapper
-     * @param IncludedEntityCollection|null $includedEntities
-     *
-     * @return EntityToIdTransformer
-     */
     private function getEntityToIdTransformer(
         AssociationMetadata $metadata,
         EntityMapper $entityMapper = null,
         IncludedEntityCollection $includedEntities = null
-    ) {
+    ): EntityToIdTransformer {
         return new EntityToIdTransformer(
             $this->doctrineHelper,
             new EntityLoader($this->doctrine),
@@ -37,12 +34,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @param string[] $acceptableTargetClassNames
-     *
-     * @return AssociationMetadata
-     */
-    private function getAssociationMetadata(array $acceptableTargetClassNames = [])
+    private function getAssociationMetadata(array $acceptableTargetClassNames = []): AssociationMetadata
     {
         $metadata = new AssociationMetadata();
         $metadata->setAcceptableTargetClassNames($acceptableTargetClassNames);
@@ -60,28 +52,30 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformForEmptyValueDataProvider
      */
-    public function testReverseTransformForEmptyValue($value, $expected)
+    public function testReverseTransformForEmptyValue(array|string|null $value)
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
-        self::assertEquals($expected, $transformer->reverseTransform($value));
+        self::assertNull($transformer->reverseTransform($value));
     }
 
-    public function reverseTransformForEmptyValueDataProvider()
+    public function reverseTransformForEmptyValueDataProvider(): array
     {
         return [
-            [null, null],
-            ['', null],
-            [[], null]
+            [null],
+            [''],
+            [[]]
         ];
     }
 
-    public function testReverseTransform()
+    /**
+     * @dataProvider reverseTransformDataProvider
+     */
+    public function testReverseTransform(array $value)
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
-        $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
@@ -100,6 +94,15 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         );
 
         self::assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
+    public function reverseTransformDataProvider(): array
+    {
+        return [
+            [['class' => Group::class, 'id' => 0]],
+            [['class' => Group::class, 'id' => '0']],
+            [['class' => Group::class, 'id' => 123]],
+        ];
     }
 
     public function testReverseTransformForModelInheritedFromManageableEntity()
@@ -188,19 +191,18 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setName('test');
 
         $includedEntities->setPrimaryEntityId($value['class'], $value['id']);
-        $includedEntities->setPrimaryEntity($entity);
+        $includedEntities->setPrimaryEntity($entity, null);
 
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" entity with "123" identifier does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenEntityNotFound()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(
+            'An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" entity with "123" identifier does not exist.'
+        );
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
@@ -217,14 +219,14 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" entity with "array(id = 123, title = test)" identifier does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'An "%s" entity with "array(id = 123, title = test)" identifier does not exist.',
+            CompositeKeyEntity::class
+        ));
+
         $metadata = $this->getAssociationMetadata([CompositeKeyEntity::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
@@ -246,59 +248,56 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array.
-     */
     public function testReverseTransformWhenInvalidValueType()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array.');
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
         $transformer->reverseTransform(123);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "class" element.
-     */
     public function testReverseTransformWhenValueDoesNotHaveClass()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "class" element.');
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
         $transformer->reverseTransform(['id' => 123]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "id" element.
-     */
     public function testReverseTransformWhenValueDoesNotHaveId()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "id" element.');
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
         $transformer->reverseTransform(['class' => Group::class]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage There are no acceptable classes.
-     */
     public function testReverseTransformWhenAnyEntityTypeShouldBeRejected()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('There are no acceptable classes.');
+
         $metadata = $this->getAssociationMetadata([]);
         $metadata->setEmptyAcceptableTargetsAllowed(false);
         $transformer = $this->getEntityToIdTransformer($metadata);
         $transformer->reverseTransform(['class' => Group::class, 'id' => ['primary' => 1]]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" class is not acceptable. Acceptable classes: Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForNotAcceptableEntity()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The "%s" class is not acceptable. Acceptable classes: %s.',
+            User::class,
+            Group::class
+        ));
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
@@ -306,14 +305,13 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => User::class, 'id' => 123]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" class must be a managed Doctrine entity.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForNotManageableEntity()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(
+            'The "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" class must be a managed Doctrine entity.'
+        );
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
@@ -347,19 +345,45 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" entity with "array(primary = 1)" identifier cannot be loaded.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'An "%s" entity with "array(primary = 1)" identifier cannot be loaded.',
+            Group::class
+        ));
+
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
 
         $value = ['class' => Group::class, 'id' => ['primary' => 1]];
 
         $transformer->reverseTransform($value);
+    }
+
+    /**
+     * @dataProvider reverseTransformWhenIdIsNotAcceptableDataProvider
+     */
+    public function testReverseTransformWhenIdIsNotAcceptable(mixed $id)
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage(
+            'The "id" element is expected to be an integer, non-empty string or non-empty array.'
+        );
+
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = $this->getEntityToIdTransformer($metadata);
+        $value = ['class' => Group::class, 'id' => $id];
+        $transformer->reverseTransform($value);
+    }
+
+    public function reverseTransformWhenIdIsNotAcceptableDataProvider(): array
+    {
+        return [
+            [null],
+            [''],
+            ['  '],
+            [[]],
+        ];
     }
 }

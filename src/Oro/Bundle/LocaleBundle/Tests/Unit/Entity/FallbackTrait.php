@@ -55,9 +55,7 @@ trait FallbackTrait
         // test 'FallbackType::SYSTEM;
         $this->assertEquals($value1, $object->$method($values, $localization3));
 
-        // test logic exception
         $badValues = new ArrayCollection([$value1, $value1]);
-        $this->expectException('LogicException');
         $object->$method($badValues, $localization1);
     }
 }

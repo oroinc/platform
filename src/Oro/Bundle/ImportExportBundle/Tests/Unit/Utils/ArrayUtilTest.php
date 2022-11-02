@@ -8,9 +8,6 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider filterEmptyArraysDataProvider
-     *
-     * @param array $expected
-     * @param array $data
      */
     public function testFilterEmptyArrays(array $expected, array $data)
     {

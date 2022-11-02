@@ -11,7 +11,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\GreaterThan */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\GreaterThan();
         $this->condition->setContextAccessor(new ContextAccessor());

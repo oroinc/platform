@@ -5,33 +5,37 @@ namespace Oro\Bundle\ActionBundle\Helper;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Manages options for "action buttons"
+ */
 class OptionsHelper
 {
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var FormProvider */
     protected $formProvider;
 
-    /**
-     * @param Router              $router
-     * @param TranslatorInterface $translator
-     * @param FormProvider        $formProvider
-     */
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     public function __construct(
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         TranslatorInterface $translator,
-        FormProvider $formProvider
+        FormProvider $formProvider,
+        HtmlTagHelper $htmlTagHelper
     ) {
-        $this->router       = $router;
-        $this->translator   = $translator;
+        $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
         $this->formProvider = $formProvider;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -69,7 +73,7 @@ class OptionsHelper
     protected function createOptions(ButtonInterface $button)
     {
         $data = $this->normalizeTemplateData($button->getTemplateData());
-        $executionUrl = $this->router->generate($data['executionRoute'], $data['routeParams']);
+        $executionUrl = $this->urlGenerator->generate($data['executionRoute'], $data['routeParams']);
 
         $frontendOptions = $data['frontendOptions'];
 
@@ -80,12 +84,15 @@ class OptionsHelper
             'url'            => $executionUrl,
             'jsDialogWidget' => $data['jsDialogWidget'],
         ];
+        if (isset($data['requestMethod'])) {
+            $options['requestMethod'] = $data['requestMethod'];
+        }
         if ($button instanceof OperationButton) {
             $options['executionTokenData'] =
                 $this->formProvider->createTokenData($button->getOperation(), $button->getData());
         }
         if ($data['hasForm']) {
-            $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
+            $dialogUrl = $this->urlGenerator->generate($data['dialogRoute'], $data['routeParams']);
 
             $options = array_merge(
                 $options,
@@ -116,10 +123,11 @@ class OptionsHelper
      */
     protected function getTitle(ButtonInterface $button, array $frontendOptions)
     {
-        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $button->getLabel();
-        $titleParams = isset($frontendOptions['title_parameters']) ? $frontendOptions['title_parameters'] : [];
-
-        return $this->translator->trans($title, $titleParams, $button->getTranslationDomain());
+        return $this->translator->trans(
+            (string) ($frontendOptions['title'] ?? $button->getLabel()),
+            $frontendOptions['title_parameters'] ?? [],
+            $button->getTranslationDomain()
+        );
     }
 
     /**
@@ -130,19 +138,16 @@ class OptionsHelper
      */
     protected function getMessage(ButtonInterface $button, array $frontendOptions)
     {
-        if (empty($frontendOptions['message']['content'])) {
-            return;
+        $content = null;
+        if (isset($frontendOptions['message']['content'])) {
+            $message = $frontendOptions['message'];
+            $parameters = $message['message_parameters'] ?? [];
+
+            $content = $this->translator->trans($message['content'], $parameters, $button->getTranslationDomain());
+            $content = $content !== $message['content'] ? $content : null;
         }
 
-        $messageOptions = $frontendOptions['message'];
-
-        $message = $this->translator->trans(
-            $messageOptions['content'],
-            isset($messageOptions['message_parameters']) ? $messageOptions['message_parameters'] : [],
-            $button->getTranslationDomain()
-        );
-
-        return $message !== $messageOptions['content'] ? $message : null;
+        return $content;
     }
 
     /**
@@ -171,12 +176,12 @@ class OptionsHelper
      */
     protected function normalizeTemplateData(array $data)
     {
-        return array_merge(
+        $normalizedData = array_merge(
             [
                 'hasForm'         => null,
                 'showDialog'      => null,
-                'executionRoute'  => null,
-                'dialogRoute'     => null,
+                'executionRoute'  => '',
+                'dialogRoute'     => '',
                 'routeParams'     => [],
                 'frontendOptions' => [],
                 'buttonOptions'   => [],
@@ -184,5 +189,10 @@ class OptionsHelper
             ],
             $data
         );
+
+        $normalizedData['executionRoute'] = (string) $normalizedData['executionRoute'];
+        $normalizedData['dialogRoute'] = (string) $normalizedData['dialogRoute'];
+
+        return $normalizedData;
     }
 }

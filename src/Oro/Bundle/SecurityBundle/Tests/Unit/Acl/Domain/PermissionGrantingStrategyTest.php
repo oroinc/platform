@@ -7,10 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -31,24 +28,24 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    const SERVICE_BITS        = -16;
-    const REMOVE_SERVICE_BITS = 15;
-    const SERVICE_BITS_0      = 0;
-    const SERVICE_BITS_1      = 16;
-    const MASK_CREATE_BASIC   = 1 + self::SERVICE_BITS_0;
-    const MASK_CREATE_SYSTEM  = 2 + self::SERVICE_BITS_0;
-    const MASK_DELETE_BASIC   = 4 + self::SERVICE_BITS_0;
-    const MASK_DELETE_SYSTEM  = 8 + self::SERVICE_BITS_0;
-    const MASK_VIEW_BASIC     = 1 + self::SERVICE_BITS_1;
-    const MASK_VIEW_SYSTEM    = 2 + self::SERVICE_BITS_1;
-    const MASK_EDIT_BASIC     = 4 + self::SERVICE_BITS_1;
-    const MASK_EDIT_SYSTEM    = 8 + self::SERVICE_BITS_1;
-    const GROUP_CREATE        = self::MASK_CREATE_BASIC + self::MASK_CREATE_SYSTEM;
-    const GROUP_DELETE        = self::MASK_DELETE_BASIC + self::MASK_DELETE_SYSTEM;
-    const GROUP_VIEW          = self::MASK_VIEW_BASIC + self::MASK_VIEW_SYSTEM;
-    const GROUP_EDIT          = self::MASK_EDIT_BASIC + self::MASK_EDIT_SYSTEM;
-    const GROUP_BASIC         = 1 + 4;
-    const GROUP_SYSTEM        = 2 + 8;
+    private const SERVICE_BITS = -16;
+    private const REMOVE_SERVICE_BITS = 15;
+    private const SERVICE_BITS_0 = 0;
+    private const SERVICE_BITS_1 = 16;
+    private const MASK_CREATE_BASIC = 1 + self::SERVICE_BITS_0;
+    private const MASK_CREATE_SYSTEM = 2 + self::SERVICE_BITS_0;
+    private const MASK_DELETE_BASIC = 4 + self::SERVICE_BITS_0;
+    private const MASK_DELETE_SYSTEM = 8 + self::SERVICE_BITS_0;
+    private const MASK_VIEW_BASIC = 1 + self::SERVICE_BITS_1;
+    private const MASK_VIEW_SYSTEM = 2 + self::SERVICE_BITS_1;
+    private const MASK_EDIT_BASIC = 4 + self::SERVICE_BITS_1;
+    private const MASK_EDIT_SYSTEM = 8 + self::SERVICE_BITS_1;
+    private const GROUP_CREATE = self::MASK_CREATE_BASIC + self::MASK_CREATE_SYSTEM;
+    private const GROUP_DELETE = self::MASK_DELETE_BASIC + self::MASK_DELETE_SYSTEM;
+    private const GROUP_VIEW = self::MASK_VIEW_BASIC + self::MASK_VIEW_SYSTEM;
+    private const GROUP_EDIT = self::MASK_EDIT_BASIC + self::MASK_EDIT_SYSTEM;
+    private const GROUP_BASIC = 1 + 4;
+    private const GROUP_SYSTEM = 2 + 8;
 
     /** @var UserSecurityIdentity */
     private $sid;
@@ -65,7 +62,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionGrantingStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->createMock(AclExtensionInterface::class);
         $this->configureTestAclExtension();
@@ -88,28 +85,17 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->setContext($this->createServiceLink($this->context));
     }
 
-    /**
-     * @param object $service
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ServiceLink
-     */
-    private function createServiceLink($service)
+    private function createServiceLink(object $service): ServiceLink
     {
         $serviceLink = $this->createMock(ServiceLink::class);
         $serviceLink->expects(self::any())
             ->method('getService')
-            ->will($this->returnValue($service));
+            ->willReturn($service);
 
         return $serviceLink;
     }
 
-    /**
-     * @param ObjectIdentity|null $oid
-     * @param bool                $entriesInheriting
-     *
-     * @return Acl
-     */
-    private function getAcl($oid = null, $entriesInheriting = true)
+    private function getAcl(ObjectIdentity $oid = null, bool $entriesInheriting = true): Acl
     {
         static $id = 1;
 
@@ -126,21 +112,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getOrganizationMetadata()
-    {
-        return new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id');
-    }
-
-    private function getBusinessUnitMetadata()
-    {
-        return new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id');
-    }
-
-    private function getUserMetadata()
-    {
-        return new OwnershipMetadata('USER', 'owner', 'owner_id');
-    }
-
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function configureTestAclExtension()
     {
         $this->extension->expects(self::any())
@@ -216,24 +190,21 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($permission) {
                 $maskBuilder = $this->createMock(MaskBuilder::class);
                 $maskBuilder->expects(self::any())
-                    ->method('hasMask')
+                    ->method('hasMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return in_array($name, ['GROUP_CREATE', 'GROUP_DELETE', 'GROUP_VIEW', 'GROUP_EDIT'], true);
+                        return in_array($name, ['CREATE', 'DELETE', 'VIEW', 'EDIT'], true);
                     });
                 $maskBuilder->expects(self::any())
-                    ->method('getMask')
+                    ->method('getMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return constant(PermissionGrantingStrategyTest::class . '::' . $name);
+                        return constant(PermissionGrantingStrategyTest::class . '::GROUP_' . $name);
                     });
 
                 return $maskBuilder;
             });
     }
 
-    /**
-     * @param mixed $object
-     */
-    private function setObjectToContext($object)
+    private function setObjectToContext(TestEntity $object)
     {
         $this->context->expects(self::any())
             ->method('getObject')
@@ -245,11 +216,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->context, $this->strategy->getContext());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedReturnsExceptionIfNoAceIsFound()
     {
+        $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -338,11 +307,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedUsesParentAcesOnlyIfInheritingIsSet()
     {
+        $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $parentAcl = $this->getAcl();
@@ -457,8 +424,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider grantingStrategyProvider
      */
-    public function testIsGrantedStrategies($strategy, $mask, $requiredMask, $result, $noAceFoundException)
-    {
+    public function testIsGrantedStrategies(
+        string $strategy,
+        int $mask,
+        int $requiredMask,
+        bool $result,
+        bool $noAceFoundException
+    ) {
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -480,8 +452,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider permissionGrantingStrategyProvider
      */
-    public function testIsGrantedPermissionStrategy($strategy, $mask, $requiredMask, $result, $noAceFoundException)
-    {
+    public function testIsGrantedPermissionStrategy(
+        string $strategy,
+        int $mask,
+        int $requiredMask,
+        bool $result,
+        bool $noAceFoundException
+    ) {
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -496,7 +473,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider grantingStrategyProvider
      */
-    private function assertIsGranted(Acl $acl, $requiredMask, $result, $noAceFoundException)
+    private function assertIsGranted(Acl $acl, int $requiredMask, bool $result, bool $noAceFoundException)
     {
         if (false === $result && !$noAceFoundException) {
             if ($noAceFoundException) {
@@ -510,6 +487,24 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
                 }
             }
         } else {
+            $this->extension->expects(self::any())
+                ->method('getPermissionGroupMask')
+                ->willReturnCallback(function ($mask) {
+                    if ($mask & self::GROUP_VIEW) {
+                        return self::GROUP_VIEW;
+                    }
+                    if ($mask & self::GROUP_EDIT) {
+                        return self::GROUP_EDIT;
+                    }
+                    if ($mask & self::GROUP_CREATE) {
+                        return self::GROUP_CREATE;
+                    }
+                    if ($mask & self::GROUP_DELETE) {
+                        return self::GROUP_DELETE;
+                    }
+
+                    return null;
+                });
             $this->assertSame(
                 $result,
                 $this->strategy->isGranted($acl, [$requiredMask], [$this->sid])
@@ -517,10 +512,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function grantingStrategyProvider()
+    public function grantingStrategyProvider(): array
     {
         return [
             'ALL: mask contains requiredMask'                                                => [
@@ -589,10 +581,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function permissionGrantingStrategyProvider()
+    public function permissionGrantingStrategyProvider(): array
     {
         return [
             'ALL: mask contains requiredMask'                                              => [
@@ -619,11 +608,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedForPermissionStrategyShouldCheckOnlyPermissionEncodedInAceMask()
     {
+        $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -646,6 +633,12 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $acl = $this->getAcl();
         $acl->insertObjectAce($this->sid, self::MASK_VIEW_BASIC, 0, false, 'all');
 
+        $this->extension->expects(self::exactly(2))
+            ->method('getPermissionGroupMask')
+            ->willReturnMap([
+                [self::MASK_VIEW_BASIC, self::GROUP_VIEW],
+                [self::MASK_EDIT_SYSTEM, self::GROUP_EDIT]
+            ]);
         $this->extension->expects(self::never())
             ->method('decideIsGranting');
 
@@ -658,30 +651,19 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param object                $object
-     * @param FieldSecurityMetadata $fieldMetadata
-     */
-    private function setFieldSecurityMetadata($object, FieldSecurityMetadata $fieldMetadata)
+    private function setFieldSecurityMetadata(object $object, string $fieldName, string $fieldAlias = null)
     {
         $securityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
         $securityMetadataProvider->expects($this->any())
             ->method('isProtectedEntity')
             ->willReturn(true);
         $securityMetadataProvider->expects($this->any())
-            ->method('getMetadata')
+            ->method('getProtectedFieldName')
             ->with(get_class($object))
-            ->willReturnCallback(function () use ($object, $fieldMetadata) {
-                return new EntitySecurityMetadata(
-                    'ACL',
-                    get_class($object),
-                    '',
-                    '',
-                    [],
-                    '',
-                    '',
-                    [$fieldMetadata->getFieldName() => $fieldMetadata]
-                );
+            ->willReturnCallback(function ($cls, $fld) use ($fieldName, $fieldAlias) {
+                return $fld === $fieldName && $fieldAlias
+                    ? $fieldAlias
+                    : $fieldName;
             });
 
         $this->strategy->setSecurityMetadataProvider($this->createServiceLink($securityMetadataProvider));
@@ -692,7 +674,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
 
@@ -714,7 +696,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -740,7 +722,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -766,7 +748,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -795,7 +777,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -824,7 +806,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $parentAcl = $this->getAcl();
         $parentAcl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_SYSTEM);
@@ -851,7 +833,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $anotherSid = new RoleSecurityIdentity('ROLE_USER');
 
@@ -879,7 +861,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $anotherSid = new RoleSecurityIdentity('ROLE_USER');
 
@@ -908,7 +890,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->setObjectToContext($obj);
         $fieldName = 'field';
         $fieldAlias = 'fieldAlias';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata($fieldName, '', [], '', $fieldAlias));
+        $this->setFieldSecurityMetadata($obj, $fieldName, $fieldAlias);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldAlias, $this->sid, self::MASK_VIEW_BASIC);
@@ -928,12 +910,12 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedForNotConfigurableField()
+    public function testIsFieldGrantedForFieldWithoutAlias()
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
         $fieldName = 'field';
-        $this->setFieldSecurityMetadata($obj, new FieldSecurityMetadata('anotherField'));
+        $this->setFieldSecurityMetadata($obj, $fieldName);
 
         $acl = $this->getAcl();
         $acl->insertClassFieldAce($fieldName, $this->sid, self::MASK_VIEW_BASIC);
@@ -997,7 +979,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $field = 'testField';
         $object = new TestEntity(123);
         $this->setObjectToContext($object);
-        $this->setFieldSecurityMetadata($object, new FieldSecurityMetadata($field));
+        $this->setFieldSecurityMetadata($object, $field);
 
         $acl = $this->getAcl();
 

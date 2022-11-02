@@ -2,26 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * The base class for REST API that conforms JSON.API specification functional tests.
+ * The base class for REST API that conforms the JSON:API specification functional tests.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
+    protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
     protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
@@ -30,7 +29,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getRequestType()
+    protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
@@ -38,8 +37,27 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
+    protected function getResponseContentType(): string
     {
+        return self::JSON_API_CONTENT_TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    protected function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $server = [],
+        string $content = null
+    ): Response {
+        $this->checkHateoasHeader($server);
+        $this->checkWsseAuthHeader($server);
+        $this->checkCsrfHeader($server);
+
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
@@ -48,11 +66,19 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                         foreach ($filter as $k => $v) {
                             if (is_array($v)) {
                                 $filter[$k] = implode(',', $v);
+                            } elseif (is_bool($v)) {
+                                $filter[$k] = $v ? '1' : '0';
+                            } elseif (!is_string($v)) {
+                                $filter[$k] = (string)$v;
                             }
                         }
                     } else {
                         $filter = implode(',', $filter);
                     }
+                } elseif (is_bool($filter)) {
+                    $filter = $filter ? '1' : '0';
+                } elseif (!is_string($filter)) {
+                    $filter = (string)$filter;
                 }
                 $parameters['filter'][$key] = $filter;
             }
@@ -61,7 +87,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $filters = $parameters['filters'];
             if ($filters) {
                 $separator = '?';
-                if (false !== strpos($uri, '?')) {
+                if (str_contains($uri, '?')) {
                     $separator = '&';
                 }
                 $uri .= $separator . $filters;
@@ -69,612 +95,43 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        if (!array_key_exists('HTTP_X-WSSE', $server)) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        } elseif (!$server['HTTP_X-WSSE']) {
-            unset($server['HTTP_X-WSSE']);
+        $server['HTTP_ACCEPT'] = self::JSON_API_MEDIA_TYPE;
+        if ('POST' === $method || 'PATCH' === $method || 'DELETE' === $method) {
+            $server['CONTENT_TYPE'] = self::JSON_API_CONTENT_TYPE;
+        } elseif (isset($server['CONTENT_TYPE'])) {
+            unset($server['CONTENT_TYPE']);
         }
 
-        $this->client->request(
-            $method,
-            $uri,
-            $parameters,
-            [],
-            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]),
-            $content
-        );
+        $this->client->request($method, $uri, $parameters, [], $server, $content);
 
         // make sure that REST API call does not start the session
-        self::assertFalse(
-            self::getContainer()->get('oro_api.tests.test_session_listener')->isSessionStarted(),
-            sprintf(
-                'The Session must not be started because REST API is stateless. Request: %s %s',
-                $method,
-                $uri
-            )
-        );
+        $this->assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }
 
     /**
-     * Sends GET request for a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function get(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getItemRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends GET request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function getRelationship(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get relationship');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends GET request for a sub-resource of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function getSubresource(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get subresource');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends GET request for a list of entities.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function cget(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getListRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends POST request for an entity resource.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
-     */
-    protected function post(
-        array $routeParameters = [],
-        $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = $this->getRequestData($parameters);
-        $response = $this->request(
-            'POST',
-            $this->getUrl($this->getListRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_CREATED, $entityType, 'post');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends POST request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function postRelationship(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'POST',
-            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                Response::HTTP_NO_CONTENT,
-                $entityType,
-                'post relationship'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends POST request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
-     */
-    protected function postSubresource(
-        array $routeParameters = [],
-        $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = $this->getRequestData($parameters);
-        $response = $this->request(
-            'POST',
-            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                [Response::HTTP_OK, Response::HTTP_CREATED, Response::HTTP_NO_CONTENT],
-                $entityType,
-                'post subresource'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends PATCH request for a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
-     */
-    protected function patch(
-        array $routeParameters = [],
-        $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = $this->getRequestData($parameters);
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl($this->getItemRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'patch');
-            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends PATCH request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function patchRelationship(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                Response::HTTP_NO_CONTENT,
-                $entityType,
-                'patch relationship'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends PATCH request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
-     */
-    protected function patchSubresource(
-        array $routeParameters = [],
-        $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = $this->getRequestData($parameters);
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
-                $entityType,
-                'patch subresource'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends DELETE request for a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function delete(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl($this->getItemRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete');
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends DELETE request for a list of entities.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function cdelete(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl($this->getListRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete list');
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends DELETE request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function deleteRelationship(
-        array $routeParameters = [],
-        array $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl($this->getRelationshipRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                Response::HTTP_NO_CONTENT,
-                $entityType,
-                'delete relationship'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Sends DELETE request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
-     */
-    protected function deleteSubresource(
-        array $routeParameters = [],
-        $parameters = [],
-        array $server = [],
-        $assertValid = true
-    ) {
-        $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = $this->getRequestData($parameters);
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
-            $parameters,
-            $server
-        );
-
-        $this->clearEntityManager();
-
-        if ($assertValid) {
-            $entityType = $this->extractEntityType($routeParameters);
-            self::assertApiResponseStatusCodeEquals(
-                $response,
-                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
-                $entityType,
-                'delete subresource'
-            );
-        }
-
-        return $response;
-    }
-
-    /**
-     * Asserts the response content contains the the given data.
+     * Asserts the response content contains the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
-     * @param Response     $response
-     * @param object|null  $entity          If not null, object will set as entity reference
+     * @param Response     $response        The response object
+     * @param bool         $ignoreOrder     Whether the order of elements in the primary data should not be checked
      */
-    protected function assertResponseContains($expectedContent, Response $response, $entity = null)
-    {
-        if ($entity) {
-            $this->getReferenceRepository()->addReference('entity', $entity);
-        }
-
+    protected function assertResponseContains(
+        array|string $expectedContent,
+        Response $response,
+        bool $ignoreOrder = false
+    ): void {
         $content = self::jsonToArray($response->getContent());
-        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
+        $expectedContent = $this->getResponseData($expectedContent);
 
-        self::assertArrayContains($expectedContent, $content);
-
-        // test the primary data collection count and order
-        if (!empty($expectedContent[JsonApiDoc::DATA])) {
-            $expectedData = $expectedContent[JsonApiDoc::DATA];
-            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
-                $expectedItems = $this->getResponseDataItems($expectedData);
-                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
-                self::assertSame(
-                    $expectedItems,
-                    $actualItems,
-                    'Failed asserting the primary data collection items count and order.'
-                );
-            }
-        }
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return array [['type' => entity type, 'id' => entity id], ...]
-     */
-    private function getResponseDataItems(array $data)
-    {
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = [
-                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
-                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
-            ];
-        }
-
-        return $result;
+        self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false, !$ignoreOrder));
     }
 
     /**
      * Asserts the response contains the given number of data items.
-     *
-     * @param int      $expectedCount
-     * @param Response $response
      */
-    protected static function assertResponseCount($expectedCount, Response $response)
+    protected static function assertResponseCount(int $expectedCount, Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertCount($expectedCount, $content[JsonApiDoc::DATA]);
@@ -682,58 +139,143 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * Asserts the response data are not empty.
-     *
-     * @param Response $response
      */
-    protected static function assertResponseNotEmpty(Response $response)
+    protected static function assertResponseNotEmpty(Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertNotEmpty($content[JsonApiDoc::DATA]);
     }
 
     /**
-     * Asserts the response content contains the the given validation error.
+     * Asserts the response content does not contain the given attributes.
      *
-     * @param array    $expectedError
+     * @param string[] $attributes The names of attributes
      * @param Response $response
-     * @param int      $statusCode
      */
-    protected function assertResponseValidationError(
-        $expectedError,
-        Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
-        $this->assertResponseValidationErrors([$expectedError], $response, $statusCode);
+    protected function assertResponseNotHasAttributes(array $attributes, Response $response): void
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content);
+        self::assertIsArray($content['data']);
+        self::assertArrayHasKey('attributes', $content['data']);
+        self::assertIsArray($content['data']['attributes']);
+        foreach ($attributes as $name) {
+            self::assertArrayNotHasKey($name, $content['data']['attributes']);
+        }
     }
 
     /**
-     * Asserts the response content contains the the given validation errors.
+     * Asserts the response content does not contain the given relationships.
      *
-     * @param array    $expectedErrors
+     * @param string[] $relationships The names of relationships
      * @param Response $response
-     * @param int      $statusCode
+     */
+    protected function assertResponseNotHasRelationships(array $relationships, Response $response): void
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content);
+        self::assertIsArray($content['data']);
+        self::assertArrayHasKey('relationships', $content['data']);
+        self::assertIsArray($content['data']['relationships']);
+        foreach ($relationships as $name) {
+            self::assertArrayNotHasKey($name, $content['data']['relationships']);
+        }
+    }
+
+    /**
+     * Asserts that the response content contains one validation error and it is the given error.
+     */
+    protected function assertResponseValidationError(
+        array $expectedError,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, true);
+    }
+
+    /**
+     * Asserts response status code equals to 404 (Not Found)
+     * and the response content contains "resource not accessible exception" validation error.
+     */
+    protected function assertResourceNotAccessibleResponse(Response $response): void
+    {
+        $this->assertResponseValidationError(
+            ['title' => 'resource not accessible exception', 'detail' => 'The resource is not accessible.'],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    /**
+     * Asserts response status code equals to 404 (Not Found)
+     * and the response content contains "unsupported subresource" validation error.
+     */
+    protected function assertUnsupportedSubresourceResponse(Response $response): void
+    {
+        $this->assertResponseValidationError(
+            ['title' => 'relationship constraint', 'detail' => 'Unsupported subresource.'],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    /**
+     * Asserts that the response content contains the given validation error.
+     */
+    protected function assertResponseContainsValidationError(
+        array $expectedError,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, false);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors and only them.
      */
     protected function assertResponseValidationErrors(
-        $expectedErrors,
+        array $expectedErrors,
         Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, true);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors.
+     */
+    protected function assertResponseContainsValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, false);
+    }
+
+    private function assertValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode,
+        bool $strict
+    ): void {
         static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains([JsonApiDoc::ERRORS => $expectedErrors], $response);
-            self::assertCount(
-                count($expectedErrors),
-                $content[JsonApiDoc::ERRORS],
-                'Unexpected number of validation errors'
-            );
+            if ($strict) {
+                self::assertCount(
+                    count($expectedErrors),
+                    $content[JsonApiDoc::ERRORS],
+                    'Unexpected number of validation errors'
+                );
+            }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),
-                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
                 ),
                 $e->getComparisonFailure()
             );
@@ -745,12 +287,12 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * If the first parameter is a file name, the file will be saved in the `responses` directory
      * near to PHP file contains the test.
      *
-     * @param string   $fileName The file name or full path to the output file
-     *                           Also it can be NULL or empty string, in this case the response content
-     *                           will be written in to the console
-     * @param Response $response
+     * @param string|null $fileName The file name or full path to the output file
+     *                              Also it can be NULL or empty string, in this case the response content
+     *                              will be written in to the console
+     * @param Response    $response
      */
-    protected function dumpYmlTemplate($fileName, Response $response)
+    protected function dumpYmlTemplate(?string $fileName, Response $response): void
     {
         $data = self::jsonToArray($response->getContent());
         if (null === $data) {
@@ -759,13 +301,20 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         if ($this->hasReferenceRepository()) {
             $idReferences = [];
+            $doctrine = self::getContainer()->get('doctrine');
+            $doctrineHelper = $this->getDoctrineHelper();
             $references = $this->getReferenceRepository()->getReferences();
             foreach ($references as $referenceId => $entity) {
-                $entityClass = ClassUtils::getClass($entity);
-                $entityType = $this->getEntityType($entityClass, false);
+                $entityClass = $doctrineHelper->getClass($entity);
+                $entityType = ValueNormalizerUtil::tryConvertToEntityType(
+                    $this->getValueNormalizer(),
+                    $entityClass,
+                    $this->getRequestType()
+                );
                 if ($entityType) {
-                    $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
-                    if (null !== $metadata) {
+                    $em = $doctrine->getManagerForClass($entityClass);
+                    if ($em instanceof EntityManagerInterface) {
+                        $metadata = $em->getClassMetadata($entityClass);
                         $entityId = $metadata->getIdentifierValues($entity);
                         if (count($entityId) === 1) {
                             $entityId = (string)reset($entityId);
@@ -786,7 +335,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         if ($fileName) {
             if ($this->isRelativePath($fileName)) {
-                $fileName = $this->getTestResourcePath('responses', $fileName);
+                $fileName = $this->getTestResourcePath($this->getResponseDataFolderName(), $fileName);
             }
             file_put_contents($fileName, $content);
         } else {
@@ -798,16 +347,16 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @param array $data
      * @param array $idReferences ['entityType::entityId' => [referenceId, entityIdFieldName], ...]
      */
-    protected function normalizeYmlTemplate(array &$data, array $idReferences)
+    protected function normalizeYmlTemplate(array &$data, array $idReferences): void
     {
         if (isset($data[JsonApiDoc::TYPE], $data[JsonApiDoc::ID])) {
             $key = $data[JsonApiDoc::TYPE] . '::' . $data[JsonApiDoc::ID];
             if (isset($idReferences[$key])) {
-                list($referenceId, $entityIdFieldName) = $idReferences[$key];
+                [$referenceId, $entityIdFieldName] = $idReferences[$key];
                 $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
                 if (isset($data[JsonApiDoc::ATTRIBUTES])) {
                     $attributes = $data[JsonApiDoc::ATTRIBUTES];
-                    $dateFields = ['createdAt', 'updatedAt', 'created', 'updated'];
+                    $dateFields = ['createdAt', 'updatedAt'];
                     foreach ($dateFields as $field) {
                         if (isset($attributes[$field])) {
                             $data[JsonApiDoc::ATTRIBUTES][$field] = sprintf(
@@ -828,61 +377,49 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * @param ResponseHeaderBag $headers
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    protected static function isApplicableContentType(ResponseHeaderBag $headers): bool
     {
         return $headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE);
     }
 
     /**
-     * Extracts JSON.API resource identifier from the response.
-     *
-     * @param Response $response
-     *
-     * @return string
+     * Extracts JSON:API resource identifier from the response.
      */
-    protected function getResourceId(Response $response)
+    protected function getResourceId(Response $response): string
     {
         $content = self::jsonToArray($response->getContent());
-        self::assertInternalType('array', $content);
+        self::assertIsArray($content);
         self::assertArrayHasKey(JsonApiDoc::DATA, $content);
-        self::assertInternalType('array', $content[JsonApiDoc::DATA]);
+        self::assertIsArray($content[JsonApiDoc::DATA]);
         self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
     }
 
-    /**
-     * Extracts the list of errors from JSON.API response.
-     *
-     * @param Response $response
-     *
-     * @return string
-     */
-    protected function getResponseErrors(Response $response)
+    protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
     {
-        $content = self::jsonToArray($response->getContent());
-        self::assertInternalType('array', $content);
-        self::assertArrayHasKey(JsonApiDoc::ERRORS, $content);
-        self::assertInternalType('array', $content[JsonApiDoc::ERRORS]);
-
-        return $content[JsonApiDoc::ERRORS];
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('included', $responseContent);
+        foreach ($responseContent['included'] as $item) {
+            if (isset($item['meta']['includeId']) && $item['meta']['includeId'] === $includeId) {
+                return $item['id'];
+            }
+        }
+        self::fail(sprintf('New resource "%s" was not found.', $includeId));
     }
 
     /**
-     * @param array $parameters
-     *
-     * @return string
+     * Extracts the list of errors from JSON:API response.
      */
-    private function extractEntityType(array $parameters)
+    protected function getResponseErrors(Response $response): string
     {
-        if (empty($parameters['entity'])) {
-            return 'unknown';
-        }
+        $content = self::jsonToArray($response->getContent());
+        self::assertIsArray($content);
+        self::assertArrayHasKey(JsonApiDoc::ERRORS, $content);
+        self::assertIsArray($content[JsonApiDoc::ERRORS]);
 
-        return $parameters['entity'];
+        return $content[JsonApiDoc::ERRORS];
     }
 }

@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+$reminders-collection-between-input-space: 4px !default;
+$reminders-collection-number-width: 60px !default;
+$reminders-collection-number-text-align: center !default;
+$reminders-collection-select-unit-width: calc(
+    50% -
+    #{$reminders-collection-number-width * .5 + $reminders-collection-between-input-space}
+) !default;
+$reminders-collection-select-method-width: $reminders-collection-select-unit-width !default;

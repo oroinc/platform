@@ -9,7 +9,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EmptyArrayToNullTransformer */
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new EmptyArrayToNullTransformer();
     }
@@ -18,7 +18,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $value = null;
         self::assertNull(
-            $this->transformer->transform('Test\Class', 'testProp', $value, [], [])
+            $this->transformer->transform($value, [], [])
         );
     }
 
@@ -26,7 +26,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $value = [];
         self::assertNull(
-            $this->transformer->transform('Test\Class', 'testProp', $value, [], [])
+            $this->transformer->transform($value, [], [])
         );
     }
 
@@ -35,7 +35,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
         $value = ['key' => 'value'];
         self::assertSame(
             $value,
-            $this->transformer->transform('Test\Class', 'testProp', $value, [], [])
+            $this->transformer->transform($value, [], [])
         );
     }
 }

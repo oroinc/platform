@@ -30,10 +30,6 @@ class OriginTransformer implements DataTransformerInterface
     /**
      * OriginTransformer constructor.
      *
-     * @param EntityManager          $em
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailOriginHelper      $emailOriginHelper
-     *
      * @throws UnexpectedTypeException When $queryBuilderCallback is set and not callable
      */
     public function __construct(

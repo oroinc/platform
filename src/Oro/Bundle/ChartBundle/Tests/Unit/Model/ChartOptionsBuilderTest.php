@@ -6,21 +6,15 @@ use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
 
 class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChartOptionsBuilder
-     */
-    protected $builder;
+    /** @var ChartOptionsBuilder */
+    private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ChartOptionsBuilder();
     }
 
     /**
-     * @param array $chartOptions
-     * @param array $gridConfig
-     * @param array $expected
-     *
      * @dataProvider dataProvider
      */
     public function testBuildOptions(array $chartOptions, array $gridConfig, array $expected)
@@ -30,10 +24,7 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'empty'      => [

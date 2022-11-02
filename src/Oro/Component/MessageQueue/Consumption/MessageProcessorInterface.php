@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Transport\MessageInterface;

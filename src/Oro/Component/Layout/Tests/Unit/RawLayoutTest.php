@@ -15,9 +15,9 @@ use Oro\Component\Layout\RawLayout;
 class RawLayoutTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayout = new RawLayout();
     }
@@ -79,12 +79,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $this->rawLayout->getParentId('root'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testGetParentIdForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header', 'root', 'header');
@@ -94,13 +93,13 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetParentIdWithEmptyId($id)
+    public function testGetParentIdWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->getParentId($id);
     }
 
@@ -135,31 +134,30 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddWithEmptyId($id)
+    public function testAddWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->add($id, null, 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "id" argument type. Expected "string", "integer" given.
-     */
     public function testAddWithNotStringId()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Invalid "id" argument type. Expected "string", "integer" given.');
+
         $this->rawLayout->add(123, null, 'root');
     }
 
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddWithInvalidId($id)
+    public function testAddWithInvalidId(string $id)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
@@ -171,36 +169,33 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->add($id, null, 'root');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemAlreadyExistsException
-     * @expectedExceptionMessage The "root" item already exists. Remove existing item before add the new item with the same id.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddDuplicate()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemAlreadyExistsException::class);
+        $this->expectExceptionMessage(
+            'The "root" item already exists. Remove existing item before add the new item with the same id.'
+        );
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('root', null, 'root');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "another_root" item cannot be the root item because another root item ("root") already exists.
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedefineRoot()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'The "another_root" item cannot be the root item because another root item ("root") already exists.'
+        );
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('another_root', null, 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" sibling item does not exist.
-     */
     public function testAddToUnknownSibling()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" sibling item does not exist.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -210,12 +205,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->add('item2', 'header1', 'label', [], 'unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The sibling item cannot be the same as the parent item.
-     */
     public function testAddWhenParentEqualsToSibling()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The sibling item cannot be the same as the parent item.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -326,23 +320,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->rawLayout->has('header'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testRemoveUnknown()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->remove('unknown');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testRemoveWithEmptyId($id)
+    public function testRemoveWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->remove($id);
     }
 
@@ -394,21 +387,19 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testMoveUnknown()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->move('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" parent item does not exist.
-     */
     public function testMoveToUnknownParent()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" parent item does not exist.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -420,12 +411,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1', 'unknown', 'item2');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" sibling item does not exist.
-     */
     public function testMoveToUnknownSibling()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" sibling item does not exist.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -437,12 +427,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1', 'header2', 'unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The parent item cannot be the same as the moving item.
-     */
     public function testMoveWhenParentEqualsToMovingItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The parent item cannot be the same as the moving item.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -455,12 +444,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1', 'test_item', 'item2');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The sibling item cannot be the same as the moving item.
-     */
     public function testMoveWhenSiblingEqualsToMovingItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The sibling item cannot be the same as the moving item.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -473,12 +461,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1', 'header2', 'test_item');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The sibling item cannot be the same as the parent item.
-     */
     public function testMoveWhenParentEqualsToSibling()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The sibling item cannot be the same as the parent item.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -492,12 +479,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1', 'test_header', 'test_item');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage At least one parent or sibling item must be specified.
-     */
     public function testMoveWithoutParentAndSibling()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('At least one parent or sibling item must be specified.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -507,14 +493,13 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->move('item1');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The parent item (path: root/header1/item1) cannot be a child of the moving item (path: root/header1).
-     */
-    // @codingStandardsIgnoreEnd
     public function testMoveParentToChild()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'The parent item (path: root/header1/item1) cannot be a child of the moving item (path: root/header1).'
+        );
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header1', 'root', 'header');
@@ -570,13 +555,13 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testMoveWithEmptyId($id)
+    public function testMoveWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->move($id);
     }
 
@@ -591,23 +576,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->rawLayout->hasProperty('header', 'unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testHasPropertyForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->hasProperty('unknown', RawLayout::PATH);
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testHasPropertyWithEmptyId($id)
+    public function testHasPropertyWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->hasProperty($id, RawLayout::PATH);
     }
 
@@ -621,12 +605,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root', 'header'], $this->rawLayout->getProperty('header', RawLayout::PATH));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" item does not have "unknown" property.
-     */
     public function testGetPropertyForUnknownProperty()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The "header" item does not have "unknown" property.');
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header', 'root', 'header');
@@ -635,23 +618,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->getProperty('header', 'unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testGetPropertyForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->getProperty('unknown', RawLayout::PATH);
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetPropertyWithEmptyId($id)
+    public function testGetPropertyWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->getProperty($id, RawLayout::PATH);
     }
 
@@ -666,23 +648,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $this->rawLayout->getProperty('header', 'some_property'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testSetPropertyForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->setProperty('unknown', 'some_property', 123);
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetPropertyWithEmptyId($id)
+    public function testSetPropertyWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->setProperty($id, 'some_property', 123);
     }
 
@@ -725,51 +706,49 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item alias must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddAliasWithEmptyAlias($alias)
+    public function testAddAliasWithEmptyAlias(?string $alias)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item alias must not be empty.');
+
         $this->rawLayout->addAlias($alias, 'root');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddAliasWithEmptyId($id)
+    public function testAddAliasWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->addAlias('test', $id);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "alias" argument type. Expected "string", "integer" given.
-     */
     public function testAddAliasWithNotStringAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Invalid "alias" argument type. Expected "string", "integer" given.');
+
         $this->rawLayout->addAlias(123, 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "id" argument type. Expected "string", "integer" given.
-     */
     public function testAddAliasWithNotStringId()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Invalid "id" argument type. Expected "string", "integer" given.');
+
         $this->rawLayout->addAlias('test', 123);
     }
 
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddAliasWithInvalidAlias($alias)
+    public function testAddAliasWithInvalidAlias(string $alias)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item alias because it contains illegal characters. '
@@ -784,9 +763,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddAliasWithInvalidId($id)
+    public function testAddAliasWithInvalidId(string $id)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
@@ -810,14 +789,14 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('root', $this->rawLayout->resolveId('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\AliasAlreadyExistsException
-     * @expectedExceptionMessage The "test" sting cannot be used as an alias for "header" item because it is already used for "root" item.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddAliasRedefine()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\AliasAlreadyExistsException::class);
+        $this->expectExceptionMessage(
+            'The "test" string cannot be used as an alias for "header" item'
+            . ' because it is already used for "root" item.'
+        );
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header', 'root', 'header');
@@ -827,14 +806,14 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->addAlias('test', 'header');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "root" sting cannot be used as an alias for "root" item because an alias cannot be equal to the item id.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddAliasWhenAliasEqualsId()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'The "root" string cannot be used as an alias for "root" item'
+            . ' because an alias cannot be equal to the item id.'
+        );
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
 
@@ -842,14 +821,14 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->addAlias('root', 'root');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" sting cannot be used as an alias for "root" item because another item with the same id exists.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddAliasWhenAliasEqualsIdOfAnotherItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'The "header" string cannot be used as an alias for "root" item because'
+            . ' another item with the same id exists.'
+        );
+
         // prepare test data
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header', 'root', 'header');
@@ -858,12 +837,11 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->addAlias('header', 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "root" item does not exist.
-     */
     public function testAddAliasForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "root" item does not exist.');
+
         $this->rawLayout->addAlias('header', 'root');
     }
 
@@ -879,23 +857,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->rawLayout->hasAlias('test_header'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\AliasNotFoundException
-     * @expectedExceptionMessage The "unknown" item alias does not exist.
-     */
     public function testRemoveUnknownAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\AliasNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item alias does not exist.');
+
         $this->rawLayout->removeAlias('unknown');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item alias must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testRemoveAliasWithEmptyAlias($alias)
+    public function testRemoveAliasWithEmptyAlias(?string $alias)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item alias must not be empty.');
+
         $this->rawLayout->removeAlias($alias);
     }
 
@@ -923,107 +900,106 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         // do test
         $this->rawLayout->setBlockTheme(
             'root',
-            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+            ['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig']
         );
         $this->rawLayout->setBlockTheme(
             'root',
-            'MyBundle:Layout:theme3.html.twig'
+            '@My/Layout/theme3.html.twig'
         );
         $this->rawLayout->setBlockTheme(
             'header',
-            'MyBundle:Layout:header_theme1.html.twig'
+            '@My/Layout/header_theme1.html.twig'
         );
         $this->rawLayout->setBlockTheme(
             'header',
-            ['MyBundle:Layout:header_theme2.html.twig', 'MyBundle:Layout:header_theme3.html.twig']
+            ['@My/Layout/header_theme2.html.twig', '@My/Layout/header_theme3.html.twig']
         );
 
         $blockThemes = $this->rawLayout->getBlockThemes();
         $this->assertSame(
             [
                 'root'   => [
-                    'MyBundle:Layout:theme1.html.twig',
-                    'MyBundle:Layout:theme2.html.twig',
-                    'MyBundle:Layout:theme3.html.twig'
+                    '@My/Layout/theme1.html.twig',
+                    '@My/Layout/theme2.html.twig',
+                    '@My/Layout/theme3.html.twig'
                 ],
                 'header' => [
-                    'MyBundle:Layout:header_theme1.html.twig',
-                    'MyBundle:Layout:header_theme2.html.twig',
-                    'MyBundle:Layout:header_theme3.html.twig'
+                    '@My/Layout/header_theme1.html.twig',
+                    '@My/Layout/header_theme2.html.twig',
+                    '@My/Layout/header_theme3.html.twig'
                 ]
             ],
             $blockThemes
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testSetBlockThemeForUnknownItem()
     {
-        $this->rawLayout->setBlockTheme('unknown', 'MyBundle:Layout:theme1.html.twig');
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
+        $this->rawLayout->setBlockTheme('unknown', '@My/Layout/theme1.html.twig');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetBlockThemeWithEmptyId($id)
+    public function testSetBlockThemeWithEmptyId(?string $id)
     {
-        $this->rawLayout->setBlockTheme($id, 'MyBundle:Layout:theme1.html.twig');
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
+        $this->rawLayout->setBlockTheme($id, '@My/Layout/theme1.html.twig');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The theme must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetBlockThemeWithEmptyTheme($theme)
+    public function testSetBlockThemeWithEmptyTheme(?string $theme)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The theme must not be empty.');
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->setBlockTheme('root', $theme);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The theme must not be empty.
-     */
     public function testSetBlockThemeWithEmptyThemes()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The theme must not be empty.');
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->setBlockTheme('root', []);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid "themes" argument type. Expected "string or array of strings", "integer" given.
-     */
     public function testSetBlockThemeWithInvalidThemeType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Invalid "themes" argument type. Expected "string or array of strings", "integer" given.'
+        );
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->setBlockTheme('root', 123);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The theme must not be empty.
-     */
     public function testSetFormThemeWithEmptyThemes()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The theme must not be empty.');
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->setFormTheme([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid "themes" argument type. Expected "string or array of strings", "integer" given.
-     */
     public function testSetFormThemeWithInvalidThemeType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Invalid "themes" argument type. Expected "string or array of strings", "integer" given.'
+        );
+
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->setFormTheme(123);
     }
@@ -1035,18 +1011,18 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
 
         // do test
         $this->rawLayout->setFormTheme(
-            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+            ['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig']
         );
         $this->rawLayout->setFormTheme(
-            'MyBundle:Layout:theme3.html.twig'
+            '@My/Layout/theme3.html.twig'
         );
 
         $formThemes = $this->rawLayout->getFormThemes();
         $this->assertSame(
             [
-                'MyBundle:Layout:theme1.html.twig',
-                'MyBundle:Layout:theme2.html.twig',
-                'MyBundle:Layout:theme3.html.twig'
+                '@My/Layout/theme1.html.twig',
+                '@My/Layout/theme2.html.twig',
+                '@My/Layout/theme3.html.twig'
             ],
             $formThemes
         );
@@ -1082,23 +1058,22 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testGetHierarchyForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->getHierarchy('unknown');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetHierarchyWithEmptyId($id)
+    public function testGetHierarchyWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->getHierarchy($id);
     }
 
@@ -1131,27 +1106,26 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     * @expectedExceptionMessage The "unknown" item does not exist.
-     */
     public function testGetHierarchyIteratorForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('The "unknown" item does not exist.');
+
         $this->rawLayout->getHierarchyIterator('unknown');
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The item id must not be empty.
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetHierarchyIteratorWithEmptyId($id)
+    public function testGetHierarchyIteratorWithEmptyId(?string $id)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The item id must not be empty.');
+
         $this->rawLayout->getHierarchyIterator($id);
     }
 
-    public function emptyStringDataProvider()
+    public function emptyStringDataProvider(): array
     {
         return [
             [null],
@@ -1159,7 +1133,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function invalidIdDataProvider()
+    public function invalidIdDataProvider(): array
     {
         return [
             ['-test'],

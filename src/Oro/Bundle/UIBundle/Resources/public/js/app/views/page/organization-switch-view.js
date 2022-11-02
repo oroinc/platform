@@ -3,18 +3,16 @@ define([
 ], function(PageRegionView) {
     'use strict';
 
-    var OrganizationSwitchView;
-
-    OrganizationSwitchView = PageRegionView.extend({
+    const OrganizationSwitchView = PageRegionView.extend({
         template: function(data) {
             return data.organization_switch;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function OrganizationSwitchView() {
-            OrganizationSwitchView.__super__.constructor.apply(this, arguments);
+        constructor: function OrganizationSwitchView(options) {
+            OrganizationSwitchView.__super__.constructor.call(this, options);
         },
 
         pageItems: ['organization_switch']

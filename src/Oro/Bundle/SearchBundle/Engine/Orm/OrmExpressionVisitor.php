@@ -13,6 +13,9 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Visits search query expressions and generate ORM query from them.
+ */
 class OrmExpressionVisitor extends ExpressionVisitor
 {
     /** @var BaseDriver */
@@ -42,11 +45,11 @@ class OrmExpressionVisitor extends ExpressionVisitor
     public function walkComparison(Comparison $comparison)
     {
         $value = $comparison->getValue()->getValue();
-        list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
+        [$type, $field] = $this->explodeCombinedFieldString($comparison->getField());
         QueryBuilderUtil::checkIdentifier($type);
         $condition = Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator());
 
-        list($joinAlias, $index) = $this->driver->getJoinAttributes($field, $type, $this->qb->getAllAliases());
+        [$joinAlias, $index] = $this->driver->getJoinAttributes($field, $type, $this->qb->getAllAliases());
         QueryBuilderUtil::checkIdentifier($joinAlias);
         QueryBuilderUtil::checkIdentifier($index);
         $joinField = $this->driver->getJoinField($type);
@@ -202,7 +205,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
      */
     protected function combineFieldNames($arrayFields, $additionalField)
     {
-        list($type, $field) = Criteria::explodeFieldTypeName($additionalField);
+        [$type, $field] = Criteria::explodeFieldTypeName($additionalField);
         $fieldsString = implode(
             '|',
             array_merge(explode('|', Criteria::explodeFieldTypeName($arrayFields)[1]), [$field])
@@ -218,8 +221,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
      */
     protected function explodeCombinedFieldString($fieldString)
     {
-        list($type, $field) = Criteria::explodeFieldTypeName($fieldString);
-        if (strpos($field, '|') !== false) {
+        [$type, $field] = Criteria::explodeFieldTypeName($fieldString);
+        if (str_contains($field, '|')) {
             $field = explode('|', $field);
         }
 

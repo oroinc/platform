@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var Chaplin = require('chaplin');
-    var BaseComponent;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Chaplin = require('chaplin');
 
     /**
      * Base component's constructor
@@ -18,18 +17,20 @@ define(function(require) {
      * @borrows Chaplin.View.prototype.delegateListener as delegateListener
      * @param {Object} options - Options container
      */
-    BaseComponent = function(options) {
+    function BaseComponent(options) {
         this.cid = _.uniqueId(this.cidPrefix);
-        _.extend(this, _.pick(options, _.result(this, 'optionNames')));
-        _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
+        Object.assign(this, _.pick(options, _.result(this, 'optionNames')));
+        Object.assign(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
-    };
+    }
 
+    BaseComponent.prototype = Object.create(Backbone.Events);
+    BaseComponent.prototype.constructor = BaseComponent;
     BaseComponent.prototype.optionNames = ['model', 'collection', 'name'];
 
     // defines static methods
-    _.extend(BaseComponent, {
+    Object.assign(BaseComponent, {
         /**
          * The component may have a dependency on other components of the same componentManager (siblingComponents)
          * Dependencies can be declared in the components's prototype as `relatedSiblingComponents` property
@@ -65,14 +66,14 @@ define(function(require) {
          * @static
          */
         getRelatedSiblingComponentNames: function(Component) {
-            var PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
-            var dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
+            const PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
+            let dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
             dependencies.push(_.result(Component.prototype, PROP));
-            dependencies = _.extend.apply(null, [{}].concat(dependencies));
+            dependencies = Object.assign({}, ...dependencies);
 
             // remove dependencies without componentName
             // (the name was falsified in descendant component definition, means is doesn't require it anymore)
-            _.each(dependencies, function(componentName, dependencyName) {
+            Object.entries(dependencies).forEach(([dependencyName, componentName]) => {
                 if (!componentName) {
                     delete dependencies[dependencyName];
                 }
@@ -82,18 +83,16 @@ define(function(require) {
         }
     });
 
-    // lends methods from Backbone and Chaplin
-    _.extend(
+    Object.assign(
         BaseComponent.prototype,
-        // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
-        Backbone.Events,
+        // extends BaseComponent.prototype with some Chaplin's functionality
         Chaplin.EventBroker,
         // lends useful methods Chaplin.View
-        _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
+        _.pick(Chaplin.View.prototype, 'delegateListener')
     );
 
     // defines own properties and methods
-    _.extend(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
+    Object.assign(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
         AUXILIARY_OPTIONS: ['_sourceElement', '_subPromises', 'name'],
 
         cidPrefix: 'component',
@@ -108,6 +107,17 @@ define(function(require) {
          * Flag shows if the component is disposed or not
          */
         disposed: false,
+
+        delegateListeners() {
+            Chaplin.View.prototype.delegateListeners.call(this);
+            const siblingComponents = Object.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            siblingComponents.forEach(propName => {
+                if (this[propName]) {
+                    // remove reference to disposed siblingComponents
+                    this.listenToOnce(this[propName], 'dispose', () => delete this[propName]);
+                }
+            });
+        },
 
         /**
          * Runs initialization logic
@@ -129,8 +139,8 @@ define(function(require) {
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
-            var siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
-            var optionNames = _.result(this, 'optionNames');
+            const siblingComponents = Object.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            const optionNames = _.result(this, 'optionNames');
 
             // dispose and remove all own properties
             _.each(this, function(item, name) {

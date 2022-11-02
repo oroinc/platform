@@ -52,8 +52,6 @@ class AclSidManager extends AbstractAclManager
 
     /**
      * Deletes the given security identity.
-     *
-     * @param SID $sid
      */
     public function deleteSid(SID $sid)
     {

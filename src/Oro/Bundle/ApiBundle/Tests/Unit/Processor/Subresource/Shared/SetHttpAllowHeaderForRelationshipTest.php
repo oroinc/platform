@@ -6,8 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SetHttpAllowHeaderForRelationship;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 
 class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorTestCase
@@ -21,7 +21,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
     /** @var SetHttpAllowHeaderForRelationship */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,11 +36,13 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenResponseStatusCodeIsNot405()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
             ->method('getResourceExcludeActions');
+        $this->subresourcesProvider->expects(self::never())
+            ->method('getSubresource');
 
         $this->context->setResponseStatusCode(404);
         $this->context->setParentClassName('Test\Class');
@@ -52,11 +54,13 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllowResponseHeaderAlreadySet()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
             ->method('getResourceExcludeActions');
+        $this->subresourcesProvider->expects(self::never())
+            ->method('getSubresource');
 
         $this->context->setResponseStatusCode(405);
         $this->context->getResponseHeaders()->set('Allow', 'GET');
@@ -69,22 +73,27 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllActionsDisabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(true);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -94,20 +103,19 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllActionsEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $entitySubresources = new ApiResourceSubresources('Test\Class');
-        $entitySubresources->addSubresource('testAssociation');
+        $subresource = new ApiSubresource();
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([]);
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($subresource);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
@@ -121,21 +129,26 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToOneAssociationWhenAtLeastOneAllowedHttpMethodExists()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -144,17 +157,22 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToManyAssociationWhenAtLeastOneAllowedHttpMethodExists()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::UPDATE_RELATIONSHIP]);
+            ->willReturn([ApiAction::UPDATE_RELATIONSHIP]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(true);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -163,22 +181,27 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToOneAssociationWhenNoAllowedHttpMethods()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -188,22 +211,27 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToManyAssociationWhenNoAllowedHttpMethods()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
+                ApiAction::GET_RELATIONSHIP,
+                ApiAction::UPDATE_RELATIONSHIP,
+                ApiAction::ADD_RELATIONSHIP,
+                ApiAction::DELETE_RELATIONSHIP
             ]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(true);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -213,16 +241,21 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::ADD_RELATIONSHIP, ApiActions::DELETE_RELATIONSHIP]);
+            ->willReturn([ApiAction::ADD_RELATIONSHIP, ApiAction::DELETE_RELATIONSHIP]);
+        $this->subresourcesProvider->expects(self::once())
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');
         $this->context->setIsCollection(false);
+        $this->context->setAssociationName('testAssociation');
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
@@ -231,21 +264,20 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenActionDisabledForParticularAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $entitySubresources = new ApiResourceSubresources('Test\Class');
-        $entitySubresources->addSubresource('testAssociation')
-            ->setExcludedActions([ApiActions::UPDATE_RELATIONSHIP]);
+        $subresource = new ApiSubresource();
+        $subresource->setExcludedActions([ApiAction::UPDATE_RELATIONSHIP]);
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::ADD_RELATIONSHIP, ApiActions::DELETE_RELATIONSHIP]);
+            ->willReturn([ApiAction::ADD_RELATIONSHIP, ApiAction::DELETE_RELATIONSHIP]);
         $this->subresourcesProvider->expects(self::once())
-            ->method('getSubresources')
-            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn($entitySubresources);
+            ->method('getSubresource')
+            ->with('Test\Class', 'testAssociation', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn($subresource);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setParentClassName('Test\Class');

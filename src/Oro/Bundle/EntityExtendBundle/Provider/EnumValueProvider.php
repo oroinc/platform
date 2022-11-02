@@ -9,24 +9,16 @@ use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
- * Provider for getting enum values
+ * Provides a way to get enum values.
  */
 class EnumValueProvider
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
-    /**
-     * @var EnumTranslationCache
-     */
-    protected $enumTranslationCache;
+    /** @var EnumTranslationCache */
+    private $enumTranslationCache;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EnumTranslationCache $enumTranslationCache
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EnumTranslationCache $enumTranslationCache)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -34,61 +26,92 @@ class EnumValueProvider
     }
 
     /**
-     * @param string $enumCode
-     * @return array
+     * Get only unique enum translations values.
+     *
+     * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
+     *
+     * @return array [enum value id => enum value name, ...]
      */
-    public function getEnumChoicesByCode($enumCode)
+    public function getEnumChoices(string $enumClass): array
+    {
+        $nonUniqueEnumTranslations = $this->getEnumChoicesWithNonUniqueTranslation($enumClass);
+
+        // array_flip() does not retain the data type of values,
+        // it will convert string value to integer when it is numeric
+        return array_map(
+            static function ($data) {
+                return (string)$data;
+            },
+            array_flip($nonUniqueEnumTranslations)
+        );
+    }
+
+    /**
+     * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
+     *
+     * @return array [enum value name => enum value id, ...]
+     */
+    public function getEnumChoicesWithNonUniqueTranslation(string $enumClass): array
+    {
+        return $this->enumTranslationCache->get($enumClass, $this->getEnumValueRepository($enumClass));
+    }
+
+    /**
+     * @param string $enumCode
+     *
+     * @return array [enum value name => enum value id, ...]
+     */
+    public function getEnumChoicesByCode(string $enumCode): array
     {
         return $this->getEnumChoices(ExtendHelper::buildEnumValueClassName($enumCode));
     }
 
-    /**
-     * @param string $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
-     * @return array
-     */
-    public function getEnumChoices($enumClass)
+    public function getEnumValueByCode(string $enumCode, string $id): AbstractEnumValue
     {
-        if (!$this->enumTranslationCache->contains($enumClass)) {
-            /** @var EnumValueRepository $repository */
-            $repository = $this->doctrineHelper->getEntityRepository($enumClass);
-            $values = $repository->getValues();
-            $result = [];
-
-            /** @var AbstractEnumValue[] $values */
-            foreach ($values as $enum) {
-                $result[$enum->getName()] = $enum->getId();
-            }
-            $this->enumTranslationCache->save($enumClass, $result);
-        } else {
-            $result = $this->enumTranslationCache->fetch($enumClass);
-        }
-
-        return $result;
+        return $this->doctrineHelper->getEntityReference(ExtendHelper::buildEnumValueClassName($enumCode), $id);
     }
 
     /**
-     * @param string $enumCode
-     * @param string $id
-     * @return AbstractEnumValue
+     * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
+     *
+     * @return AbstractEnumValue|null
      */
-    public function getEnumValueByCode($enumCode, $id)
+    public function getDefaultEnumValue(string $enumClass): ?AbstractEnumValue
     {
-        $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+        $defaultStatuses = $this->getDefaultEnumValues($enumClass);
 
-        return $this->doctrineHelper->getEntityReference($enumClass, $id);
+        return $defaultStatuses ? reset($defaultStatuses) : null;
+    }
+
+    public function getDefaultEnumValueByCode(string $enumCode): ?AbstractEnumValue
+    {
+        $defaultStatuses = $this->getDefaultEnumValuesByCode($enumCode);
+
+        return $defaultStatuses ? reset($defaultStatuses) : null;
     }
 
     /**
-     * @param string $enumCode
+     * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
+     *
      * @return AbstractEnumValue[]
      */
-    public function getDefaultEnumValuesByCode($enumCode)
+    public function getDefaultEnumValues(string $enumClass): array
     {
-        $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+        return $this->getEnumValueRepository($enumClass)->getDefaultValues();
+    }
 
-        /** @var EnumValueRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository($enumClass);
+    /**
+     * @param string $enumCode
+     *
+     * @return AbstractEnumValue[]
+     */
+    public function getDefaultEnumValuesByCode(string $enumCode): array
+    {
+        return $this->getDefaultEnumValues(ExtendHelper::buildEnumValueClassName($enumCode));
+    }
 
-        return $repo->getDefaultValues();
+    private function getEnumValueRepository(string $enumClass): EnumValueRepository
+    {
+        return $this->doctrineHelper->getEntityRepository($enumClass);
     }
 }

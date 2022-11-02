@@ -3,50 +3,49 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
-use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Stubs\WorkflowAwareEntityProxyStub;
+use Oro\Component\Testing\ReflectionUtil;
 
-class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionTest
+class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
     use MessageQueueExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerRepository */
+    protected const ENTITY_CLASS = WorkflowAwareEntityProxyStub::class;
+
+    /** @var TransitionEventTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerHelper */
-    protected $helper;
+    private TransitionEventTriggerHelper|\PHPUnit\Framework\MockObject\MockObject $helper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerHandler */
-    protected $handler;
+    private TransitionEventTriggerHandler|\PHPUnit\Framework\MockObject\MockObject $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repository = $this->getMockBuilder(TransitionEventTriggerRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['findAllWithDefinitions'])
-            ->getMock();
+        $this->repository = $this->createMock(TransitionEventTriggerRepository::class);
+        $this->helper = $this->createMock(TransitionEventTriggerHelper::class);
+        $this->handler = $this->createMock(TransitionEventTriggerHandler::class);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityRepositoryForClass')
             ->with(TransitionEventTrigger::class)
             ->willReturn($this->repository);
-
-        $this->helper = $this->getMockBuilder(TransitionEventTriggerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->handler = $this->getMockBuilder(TransitionEventTriggerHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper->expects(self::any())
+            ->method('getEntityIdentifier')
+            ->willReturnCallback(function ($entity) {
+                return ['id' => $entity->getId()];
+            });
 
         $this->extension = new TransitionEventTriggerExtension(
             $this->doctrineHelper,
@@ -57,21 +56,10 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         );
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->helper, $this->handler, $this->repository);
-    }
-
     /**
      * @dataProvider scheduleDataProvider
-     *
-     * @param string $event
-     * @param array $triggers
-     * @param array $changeSet
      */
-    public function testScheduleCreateEvent($event, array $triggers, array $changeSet = [])
+    public function testScheduleCreateEvent(string $event, array $triggers, array $changeSet = []): void
     {
         $entity = $this->getMainEntity();
 
@@ -85,35 +73,30 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             $triggers
         );
 
-        $this->helper->expects($this->exactly(count($triggers)))
+        $this->helper->expects(self::exactly(count($triggers)))
             ->method('isRequirePass')
-            ->willReturnCallback(
-                function ($trigger, $mainEntity, $prevEntity) use ($entity, $changeSet, $triggers) {
-                    $expectedPrevEntity = $changeSet ?
-                        $this->getMainEntity(self::ENTITY_ID, [self::FIELD => $changeSet[self::FIELD]['old']]) :
-                        clone $entity;
+            ->willReturnCallback(function ($trigger, $mainEntity, $prevEntity) use ($entity, $changeSet, $triggers) {
+                $expectedPrevEntity = $changeSet ?
+                    $this->getMainEntity(self::ENTITY_ID, [self::FIELD => $changeSet[self::FIELD]['old']]) :
+                    clone $entity;
 
-                    $this->assertEquals($expectedPrevEntity, $prevEntity);
-                    $this->assertSame($entity, $mainEntity);
-                    $this->assertTrue(in_array($trigger, $triggers));
+                self::assertEquals($expectedPrevEntity, $prevEntity);
+                self::assertSame($entity, $mainEntity);
+                self::assertContains($trigger, $triggers);
 
-                    return true;
-                }
-            );
+                return true;
+            });
 
-        $this->callPreFunctionByEventName($event, $entity, $changeSet);
+        $this->callPreFunctionByEventName($event, $entity, $changeSet, $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
         $expectedSchedules = $this->getExpectedSchedules($triggers);
 
-        $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->extension);
-        $this->assertAttributeEquals($expectedSchedules, 'scheduled', $this->extension);
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEquals($expectedSchedules, $this->getExtensionScheduled($this->extension));
     }
 
-    /**
-     * @return array
-     */
-    public function scheduleDataProvider()
+    public function scheduleDataProvider(): array
     {
         return [
             [
@@ -133,59 +116,78 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             [
                 'event' => EventTriggerInterface::EVENT_DELETE,
                 'triggers' => ['delete']
-            ]
+            ],
+            'case when change set contains a field with missed setter' => [
+                'event' => EventTriggerInterface::EVENT_UPDATE,
+                'triggers' => ['updateEntity'],
+                'changeSet' => [
+                    'hiddenProperty' => ['old' => 'hiddenPropertyValue', 'new' => 'hiddenPropertyValueModified'],
+                    self::FIELD => ['old' => 2, 'new' => 2]
+                ]
+            ],
         ];
     }
 
-    public function testScheduleRequireNotPass()
+    public function testScheduleRequireNotPass(): void
     {
         $this->prepareRepository();
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(false);
+        $this->helper->expects(self::any())
+            ->method('isRequirePass')
+            ->willReturn(false);
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity());
+        $this->callPreFunctionByEventName(
+            EventTriggerInterface::EVENT_CREATE,
+            $this->getMainEntity(),
+            [],
+            $this->extension
+        );
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
 
-        $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->extension);
-        $this->assertAttributeEmpty('scheduled', $this->extension);
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEmpty($this->getExtensionScheduled($this->extension));
     }
 
     /**
      * @dataProvider clearDataProvider
-     *
-     * @param string $className
-     * @param bool $hasScheduled
      */
-    public function testClear($className, $hasScheduled)
+    public function testClear(?string $className, bool $shouldHaveScheduled): void
     {
         $this->prepareRepository();
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
+        $this->helper->expects(self::any())
+            ->method('isRequirePass')
+            ->willReturn(true);
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity());
+        $this->callPreFunctionByEventName(
+            EventTriggerInterface::EVENT_CREATE,
+            $this->getMainEntity(),
+            [],
+            $this->extension
+        );
 
-        $this->assertAttributeEquals($this->getExpectedTriggers($this->getTriggers()), 'triggers', $this->extension);
-        $this->assertAttributeNotEmpty('scheduled', $this->extension);
+        self::assertEquals(
+            $this->getExpectedTriggers($this->getTriggers()),
+            $this->getExtensionTriggers($this->extension)
+        );
+        self::assertNotEmpty($this->getExtensionScheduled($this->extension));
 
         // test
         $this->extension->clear($className);
 
-        $this->assertAttributeEquals(null, 'triggers', $this->extension);
+        self::assertNull($this->getExtensionTriggers($this->extension));
 
-        if ($hasScheduled) {
-            $this->assertAttributeNotEmpty('scheduled', $this->extension);
+        if ($shouldHaveScheduled) {
+            self::assertNotEmpty($this->getExtensionScheduled($this->extension));
         } else {
-            $this->assertAttributeEmpty('scheduled', $this->extension);
+            self::assertEmpty($this->getExtensionScheduled($this->extension));
         }
     }
 
-    /**
-     * @return array
-     */
-    public function clearDataProvider()
+    public function clearDataProvider(): array
     {
         return [
             'clear all' => [
@@ -203,7 +205,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         ];
     }
 
-    public function testProcessNotQueued()
+    public function testProcessNotQueued(): void
     {
         $entityClass = self::ENTITY_CLASS;
         $entity = $this->getMainEntity(null);
@@ -217,48 +219,52 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->prepareRepository();
         $this->prepareTriggerCache($entityClass, EventTriggerInterface::EVENT_CREATE);
 
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::any())
+            ->method('isRequirePass')
+            ->willReturn(true);
+        $this->helper->expects(self::once())
             ->method('getMainEntity')
             ->with($expectedTrigger, $entity)
             ->willReturn($mainEntity);
 
-        $this->handler->expects($this->once())
+        $this->handler->expects(self::once())
             ->method('process')
-            ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, null))
+            ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, ['id' => self::ENTITY_ID]))
             ->willReturn(true);
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $this->extension->process($this->entityManager);
 
-        self::assertMessagesEmpty(TransitionTriggerProcessor::EVENT_TOPIC_NAME);
+        self::assertMessagesEmpty(WorkflowTransitionEventTriggerTopic::getName());
     }
 
-    public function testProcessWithoutMainEntity()
+    public function testProcessWithoutMainEntity(): void
     {
         $this->prepareRepository();
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
-        $this->helper->expects($this->any())->method('getMainEntity')->willReturn(null);
+        $this->helper->expects(self::any())
+            ->method('isRequirePass')
+            ->willReturn(true);
+        $this->helper->expects(self::any())
+            ->method('getMainEntity')
+            ->willReturn(null);
 
-        $this->handler->expects($this->never())->method($this->anything());
+        $this->handler->expects(self::never())
+            ->method(self::anything());
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity());
 
         $this->extension->process($this->entityManager);
 
-        self::assertMessagesEmpty(TransitionTriggerProcessor::EVENT_TOPIC_NAME);
+        self::assertMessagesEmpty(WorkflowTransitionEventTriggerTopic::getName());
     }
 
     /**
      * @dataProvider processQueuedProvider
-     *
-     * @param bool $triggerQueued
-     * @param bool $forceQueued
      */
-    public function testProcessQueued($triggerQueued, $forceQueued)
+    public function testProcessQueued(bool $triggerQueued, bool $forceQueued): void
     {
         $entity = $this->getMainEntity();
 
@@ -269,13 +275,16 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->prepareRepository();
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
-        $this->helper->expects($this->any())->method('isRequirePass')->willReturn(true);
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::any())
+            ->method('isRequirePass')
+            ->willReturn(true);
+        $this->helper->expects(self::once())
             ->method('getMainEntity')
             ->with($expectedTrigger, $entity)
             ->willReturn($entity);
 
-        $this->handler->expects($this->never())->method($this->anything());
+        $this->handler->expects(self::never())
+            ->method(self::anything());
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
@@ -283,18 +292,15 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->extension->process($this->entityManager);
 
         self::assertMessageSent(
-            TransitionTriggerProcessor::EVENT_TOPIC_NAME,
+            WorkflowTransitionEventTriggerTopic::getName(),
             [
                 TransitionTriggerMessage::TRANSITION_TRIGGER => $expectedTrigger->getId(),
-                TransitionTriggerMessage::MAIN_ENTITY => null
+                TransitionTriggerMessage::MAIN_ENTITY => ['id' => self::ENTITY_ID]
             ]
         );
     }
 
-    /**
-     * @return array
-     */
-    public function processQueuedProvider()
+    public function processQueuedProvider(): array
     {
         return [
             'queued' => [
@@ -311,7 +317,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     /**
      * {@inheritdoc}
      */
-    protected function getTriggers($triggerName = null)
+    protected function getTriggers(string $triggerName = null): array|object
     {
         if (!$this->triggers) {
             $priority = 0;
@@ -355,18 +361,27 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
     /**
      * @param TransitionEventTrigger[] $triggers
+     *
      * @return array
      */
-    protected function getExpectedSchedules(array $triggers)
+    private function getExpectedSchedules(array $triggers): array
     {
         $expected = [];
-
         foreach ($triggers as $trigger) {
             $entityClass = $trigger->getEntityClass();
-
             $expected[$entityClass][] = ['trigger' => $trigger, 'entity' => $this->getMainEntity()];
         }
 
         return $expected;
+    }
+
+    private function getExtensionTriggers(AbstractEventTriggerExtension $extension): mixed
+    {
+        return ReflectionUtil::getPropertyValue($extension, 'triggers');
+    }
+
+    private function getExtensionScheduled(AbstractEventTriggerExtension $extension): mixed
+    {
+        return ReflectionUtil::getPropertyValue($extension, 'scheduled');
     }
 }

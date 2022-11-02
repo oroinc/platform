@@ -1,104 +1,95 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
+import loadModules from 'oroui/js/app/services/load-modules';
+import ExpressionEditorView from 'oroform/js/app/views/expression-editor-view';
+import EntityStructureDataProvider from 'oroentity/js/app/services/entity-structure-data-provider';
+import ExpressionEditorUtil from 'oroform/js/expression-editor-util';
+import BaseComponent from 'oroui/js/app/components/base/component';
 
-    var ExpressionEditorComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-    var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+const ExpressionEditorComponent = BaseComponent.extend({
+    /**
+     * @inheritDoc
+     */
+    constructor: function ExpressionEditorComponent(options) {
+        ExpressionEditorComponent.__super__.constructor.call(this, options);
+    },
 
-    ExpressionEditorComponent = BaseComponent.extend({
-        /**
-         * @inheritDoc
-         */
-        constructor: function ExpressionEditorComponent(options) {
-            ExpressionEditorComponent.__super__.constructor.call(this, options);
-        },
+    /**
+     * @param {Object} options
+     * @param {Object} options.dataProviderConfig
+     * @param {Array<string>} options.expressionFunctionProviderModules
+     */
+    initialize(options) {
+        this._deferredInit();
+        $.when(
+            this.initEntityStructureDataProvider(options),
+            this.loadExpressionFunctionProviders(options)
+        )
+            .then(this._init.bind(this, options))
+            .then(this._resolveDeferredInit.bind(this));
 
-        /**
-         * @param {Object} options
-         * @param {Object} options.dataProviderConfig
-         * @param {Array<string>} options.expressionFunctionProviderModules
-         */
-        initialize: function(options) {
-            this._deferredInit();
-            $.when(
-                this.initEntityStructureDataProvider(options),
-                this.loadExpressionFunctionProviders(options)
-            )
-                .then(this._init.bind(this, options))
-                .then(this._resolveDeferredInit.bind(this));
+        ExpressionEditorComponent.__super__.initialize.call(this, options);
+    },
 
-            ExpressionEditorComponent.__super__.initialize.call(this, options);
-        },
+    /**
+     * Initializes entity structure data provider
+     *
+     * @param {Object} options
+     * @return {Promise<EntityStructureDataProvider>}
+     */
+    initEntityStructureDataProvider(options) {
+        return EntityStructureDataProvider
+            .createDataProvider(options.dataProviderConfig, this);
+    },
 
-        /**
-         * Initializes entity structure data provider
-         *
-         * @param {Object} options
-         * @return {Promise<EntityStructureDataProvider>}
-         */
-        initEntityStructureDataProvider: function(options) {
-            return EntityStructureDataProvider
-                .createDataProvider(options.dataProviderConfig, this);
-        },
-
-        /**
-         * Loads FunctionProviders if modules are declared in options
-         *
-         * @return {Promise<[ExpressionFunctionProviderInterface]>|undefined}
-         */
-        loadExpressionFunctionProviders: function(options) {
-            if (options.expressionFunctionProviderModules) {
-                return tools.loadModules(options.expressionFunctionProviderModules)
-                    .then(function() {
-                        // combines separate providers from arguments to single array of providers
-                        return _.values(arguments);
-                    });
-            }
-        },
-
-        /**
-         * Continue initialization once all promises are resolved
-         *
-         * @param {Object} options
-         * @param {EntityStructureDataProvider} entityStructureDataProvider
-         * @param {Array<ExpressionFunctionProviderInterface>} [expressionFunctionProviders]
-         */
-        _init: function(options, entityStructureDataProvider, expressionFunctionProviders) {
-            if (this.disposed) {
-                return;
-            }
-
-            this.entityStructureDataProvider = entityStructureDataProvider;
-
-            var utilOptions = _.extend({
-                dataSourceNames: _.keys(options.dataSource),
-                entityDataProvider: entityStructureDataProvider,
-                expressionFunctionProviders: expressionFunctionProviders
-            }, _.pick(options, 'itemLevelLimit', 'allowedOperations', 'operations', 'supportedNames'));
-            this.expressionEditorUtil = new ExpressionEditorUtil(utilOptions);
-
-            var viewOptions = _.extend({
-                el: options._sourceElement,
-                autoRender: true,
-                util: this.expressionEditorUtil
-            }, _.pick(options, 'dataSource'));
-            this.view = new ExpressionEditorView(viewOptions);
-        },
-
-        /**
-         * Sets root entity in instance EntityStructureDataProvider
-         *
-         * @param {string} entityClassName
-         */
-        setEntity: function(entityClassName) {
-            this.entityStructureDataProvider.setRootEntityClassName(entityClassName);
+    /**
+     * Loads FunctionProviders if modules are declared in options
+     *
+     * @return {Promise<[ExpressionFunctionProviderInterface]>|undefined}
+     */
+    loadExpressionFunctionProviders(options) {
+        if (options.expressionFunctionProviderModules) {
+            return loadModules(options.expressionFunctionProviderModules);
         }
-    });
+    },
 
-    return ExpressionEditorComponent;
+    /**
+     * Continue initialization once all promises are resolved
+     *
+     * @param {Object} options
+     * @param {EntityStructureDataProvider} entityStructureDataProvider
+     * @param {Array<ExpressionFunctionProviderInterface>} [expressionFunctionProviders]
+     */
+    _init(options, entityStructureDataProvider, expressionFunctionProviders) {
+        if (this.disposed) {
+            return;
+        }
+
+        this.entityStructureDataProvider = entityStructureDataProvider;
+
+        const utilOptions = _.extend({
+            dataSourceNames: _.keys(options.dataSource),
+            entityDataProvider: entityStructureDataProvider,
+            expressionFunctionProviders: expressionFunctionProviders
+        }, _.pick(options, 'itemLevelLimit', 'allowedOperations', 'operations', 'supportedNames'));
+        this.expressionEditorUtil = new ExpressionEditorUtil(utilOptions);
+
+        const viewOptions = _.extend({
+            el: options._sourceElement,
+            autoRender: true,
+            util: this.expressionEditorUtil
+        }, _.pick(options, 'dataSource'));
+        this.view = new ExpressionEditorView(viewOptions);
+    },
+
+    /**
+     * Sets root entity in instance EntityStructureDataProvider
+     *
+     * @param {string} entityClassName
+     */
+    setEntity(entityClassName) {
+        this.entityStructureDataProvider.setRootEntityClassName(entityClassName);
+    }
 });
+
+export default ExpressionEditorComponent;

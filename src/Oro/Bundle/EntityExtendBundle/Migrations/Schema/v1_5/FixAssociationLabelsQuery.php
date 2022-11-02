@@ -72,7 +72,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
                     && $label !== $targetEntityLabel
                     && (
                         $label === $this->getLabel('label', $targetClassName, $fieldName)
-                        || false === strpos($label, '.')
+                        || !str_contains($label, '.')
                     )
                 ) {
                     $data['entity']['label'] = $targetEntityLabel;
@@ -85,7 +85,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
                     && (
                         $label === $targetEntityLabel
                         || $label === $this->getLabel('label', $targetClassName, $fieldName)
-                        || false === strpos($label, '.')
+                        || !str_contains($label, '.')
                     )
                 ) {
                     $data['entity']['label'] = $targetEntityPluralLabel;
@@ -104,7 +104,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
                 $types  = ['data' => 'array', 'id' => 'integer'];
                 $this->logQuery($logger, $query, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $params, $types);
+                    $this->connection->executeStatement($query, $params, $types);
                 }
             }
         }
@@ -118,6 +118,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixEntityLabels(array $entityConfigs, LoggerInterface $logger, $dryRun = false)
     {
@@ -129,21 +130,21 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
 
             $hasChanges = false;
             if ($entityConfig['label'] !== $this->getLabel('label', $className)
-                && false === strpos($entityConfig['label'], '.')
+                && !str_contains($entityConfig['label'], '.')
             ) {
                 $entityConfig['label']   = $this->getLabel('label', $className);
                 $data['entity']['label'] = $entityConfig['label'];
                 $hasChanges              = true;
             }
             if ($entityConfig['plural_label'] !== $this->getLabel('plural_label', $className)
-                && false === strpos($entityConfig['plural_label'], '.')
+                && !str_contains($entityConfig['plural_label'], '.')
             ) {
                 $entityConfig['plural_label']   = $this->getLabel('plural_label', $className);
                 $data['entity']['plural_label'] = $entityConfig['plural_label'];
                 $hasChanges                     = true;
             }
             if ($entityConfig['description'] !== $this->getLabel('description', $className)
-                && false === strpos($entityConfig['description'], '.')
+                && !str_contains($entityConfig['description'], '.')
             ) {
                 $entityConfig['description']   = $this->getLabel('description', $className);
                 $data['entity']['description'] = $entityConfig['description'];
@@ -155,7 +156,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
                 $types  = ['data' => 'array', 'id' => 'integer'];
                 $this->logQuery($logger, $query, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $params, $types);
+                    $this->connection->executeStatement($query, $params, $types);
                 }
             }
         }

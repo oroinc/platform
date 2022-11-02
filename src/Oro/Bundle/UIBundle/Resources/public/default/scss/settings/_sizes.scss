@@ -1,0 +1,23 @@
+/* @theme: default; */
+
+$site-width: 1400px !default;
+
+// Breakpoints
+
+// Desktop Media Breakpoint
+$breakpoint-desktop: 1100px !default;
+$breakpoint-tablet: $breakpoint-desktop - 1px !default;
+$breakpoint-tablet-small: 992px !default;
+// iPad mini 4 (768*1024), iPad Air 2 (768*1024), iPad Pro (1024*1366)
+$breakpoint-mobile-big: 767px !default;
+$breakpoint-mobile-landscape: 640px !default;
+// iPhone 4s (320*480), iPhone 5s (320*568), iPhone 6s (375*667), iPhone 6s Plus (414*763)
+$breakpoint-mobile: 414px !default;
+
+// Offsets
+$offset-y: 16px !default;
+$offset-y-m: 8px !default;
+$offset-y-s: 4px !default;
+$offset-x: 16px !default;
+$offset-x-m: 8px !default;
+$offset-x-s: 4px !default;

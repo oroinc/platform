@@ -6,46 +6,32 @@ use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart;
 
 class BaseCartTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_STRING    = 'testString';
-    const TEST_ID        = 123;
-    const TEST_FLOAT     = 123.123;
+    private const TEST_ID = 123;
+    private const TEST_FLOAT = 123.123;
 
-    /** @var BaseCart */
-    protected $entity;
+    private BaseCart $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BaseCart();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     /**
      * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
      */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
     {
         if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
+            call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
         }
 
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
-        $created  = new \DateTime('now');
-        $updated  = new \DateTime('now');
+        $created = new \DateTime('now');
+        $updated = new \DateTime('now');
 
         return [
             'id'        => ['id', self::TEST_ID, self::TEST_ID],

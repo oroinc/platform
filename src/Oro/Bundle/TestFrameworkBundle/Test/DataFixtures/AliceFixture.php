@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\Common\DataFixtures\SharedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 abstract class AliceFixture implements
     SharedFixtureInterface,

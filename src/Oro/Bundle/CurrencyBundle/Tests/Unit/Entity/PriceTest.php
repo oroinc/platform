@@ -7,15 +7,13 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class PriceTest extends \PHPUnit\Framework\TestCase
 {
-    const VALUE = 100;
-    const CURRENCY = 'USD';
+    private const VALUE = 100;
+    private const CURRENCY = 'USD';
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new Price();
 
@@ -24,10 +22,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['value', self::VALUE],
@@ -38,7 +33,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $price = Price::create(self::VALUE, self::CURRENCY);
-        $this->assertInstanceOf('Oro\Bundle\CurrencyBundle\Entity\Price', $price);
+        $this->assertInstanceOf(Price::class, $price);
         $this->assertEquals(self::VALUE, $price->getValue());
         $this->assertEquals(self::CURRENCY, $price->getCurrency());
     }

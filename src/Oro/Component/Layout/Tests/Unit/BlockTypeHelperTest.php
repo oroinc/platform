@@ -5,38 +5,34 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockTypeHelper;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
 
 class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
     /** @var BlockTypeHelper */
-    protected $typeHelper;
+    private $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry   = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->registry = $this->createMock(LayoutRegistryInterface::class);
+
         $this->typeHelper = new BlockTypeHelper($this->registry);
     }
 
     public function testByBlockName()
     {
-        $baseBlockType      = new BaseType();
+        $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
 
-        $this->registry->expects($this->at(0))
-            ->method('getType')
-            ->with(ContainerType::NAME)
-            ->will($this->returnValue($containerBlockType));
-        $this->registry->expects($this->at(1))
-            ->method('getType')
-            ->with(BaseType::NAME)
-            ->will($this->returnValue($baseBlockType));
         $this->registry->expects($this->exactly(2))
-            ->method('getType');
+            ->method('getType')
+            ->withConsecutive([ContainerType::NAME], [BaseType::NAME])
+            ->willReturnOnConsecutiveCalls($containerBlockType, $baseBlockType);
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
@@ -53,13 +49,13 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testByAlreadyCreatedBlockTypeObject()
     {
-        $baseBlockType      = new BaseType();
+        $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
 
         $this->registry->expects($this->once())
             ->method('getType')
             ->with(BaseType::NAME)
-            ->will($this->returnValue($baseBlockType));
+            ->willReturn($baseBlockType);
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
@@ -81,7 +77,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with(BaseType::NAME)
-            ->will($this->returnValue($type));
+            ->willReturn($type);
 
         $this->assertSame(
             [$type],
@@ -116,24 +112,14 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWithAlreadyInitializedContainerParent()
     {
-        $baseBlockType      = new BaseType();
+        $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
-        $headerBlockType    = new HeaderType();
+        $headerBlockType = new HeaderType();
 
-        $this->registry->expects($this->at(0))
-            ->method('getType')
-            ->with(ContainerType::NAME)
-            ->will($this->returnValue($containerBlockType));
-        $this->registry->expects($this->at(1))
-            ->method('getType')
-            ->with(BaseType::NAME)
-            ->will($this->returnValue($baseBlockType));
-        $this->registry->expects($this->at(2))
-            ->method('getType')
-            ->with($headerBlockType->getName())
-            ->will($this->returnValue($headerBlockType));
         $this->registry->expects($this->exactly(3))
-            ->method('getType');
+            ->method('getType')
+            ->withConsecutive([ContainerType::NAME], [BaseType::NAME], [$headerBlockType->getName()])
+            ->willReturnOnConsecutiveCalls($containerBlockType, $baseBlockType, $headerBlockType);
 
         // get parent (here both 'block' and 'container' types are added to the local cache of the BlockTypeHelper)
         $this->assertSame(
@@ -166,16 +152,10 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $baseBlockType = new BaseType();
         $logoBlockType = new LogoType();
 
-        $this->registry->expects($this->at(0))
-            ->method('getType')
-            ->with(BaseType::NAME)
-            ->will($this->returnValue($baseBlockType));
-        $this->registry->expects($this->at(1))
-            ->method('getType')
-            ->with($logoBlockType->getName())
-            ->will($this->returnValue($logoBlockType));
         $this->registry->expects($this->exactly(2))
-            ->method('getType');
+            ->method('getType')
+            ->withConsecutive([BaseType::NAME], [$logoBlockType->getName()])
+            ->willReturnOnConsecutiveCalls($baseBlockType, $logoBlockType);
 
         // get parent (here both 'block' and 'container' types are added to the local cache of the BlockTypeHelper)
         $this->assertSame(
@@ -203,24 +183,14 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWithAlreadyInitializedDerivedType()
     {
-        $baseBlockType      = new BaseType();
+        $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
-        $headerBlockType    = new HeaderType();
+        $headerBlockType = new HeaderType();
 
-        $this->registry->expects($this->at(0))
-            ->method('getType')
-            ->with($headerBlockType->getName())
-            ->will($this->returnValue($headerBlockType));
-        $this->registry->expects($this->at(1))
-            ->method('getType')
-            ->with(ContainerType::NAME)
-            ->will($this->returnValue($containerBlockType));
-        $this->registry->expects($this->at(2))
-            ->method('getType')
-            ->with(BaseType::NAME)
-            ->will($this->returnValue($baseBlockType));
         $this->registry->expects($this->exactly(3))
-            ->method('getType');
+            ->method('getType')
+            ->withConsecutive([$headerBlockType->getName()], [ContainerType::NAME], [BaseType::NAME])
+            ->willReturnOnConsecutiveCalls($headerBlockType, $containerBlockType, $baseBlockType);
 
         // get derived (here all types are added to the local cache of the BlockTypeHelper)
         $this->assertSame(

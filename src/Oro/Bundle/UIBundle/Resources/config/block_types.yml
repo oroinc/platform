@@ -13,18 +13,17 @@ services:
         tags:
             - { name: layout.block_type, alias: widget_actions }
 
-    oro_ui.layout.block_type.vertical_container:
-        parent: oro_layout.block_type.abstract_configurable_container
-        calls:
-            - [setName, ['vertical_container']]
-        tags:
-            - { name: layout.block_type, alias: vertical_container }
-
     oro_ui.layout.block_type.layout_subtree_update:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setName, ['layout_subtree_update']]
-            - [setOptionsConfig, [{reloadEvents: {required: true}, restoreFormState: {default: false}, showLoading: {default: true}}]]
+            - [setOptionsConfig, [{
+                  reloadEvents: {required: true},
+                  restoreFormState: {default: false},
+                  showLoading: {default: true},
+                  onLoadingCssClass: {default: ''},
+                  disableControls: {default: false}
+              }]]
         tags:
             - { name: layout.block_type, alias: layout_subtree_update }
 
@@ -40,7 +39,10 @@ services:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setName, ['breadcrumbs']]
-            - [setOptionsConfig, [{breadcrumbs: {default: '=data["breadcrumb_provider"].getBreadcrumbs(menu_name)'}, menu_name: ~}]]
+            - [setOptionsConfig, [{
+                  breadcrumbs: {default: '=data["breadcrumb_provider"].getBreadcrumbs(menu_name)'}
+                  menu_name: ~
+              }]]
         tags:
             - { name: layout.block_type, alias: breadcrumbs }
 
@@ -48,6 +50,12 @@ services:
         parent: oro_layout.block_type.abstract_configurable
         calls:
             - [setName, ['logo']]
-            - [setOptionsConfig, [{renderLink: {default: true}, route: {default: 'oro_frontend_root'}}]]
+            - [setOptionsConfig, [{
+                  renderLink: {default: true}
+                  route: {default: 'oro_frontend_root'}
+                  src: {default: '=data["asset"].getUrl(data["theme"].getLogo(context["theme"]))'}
+                  width: {default: null}
+                  height: {default: null}
+              }]]
         tags:
             - { name: layout.block_type, alias: logo }

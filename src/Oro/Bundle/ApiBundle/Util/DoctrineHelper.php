@@ -13,7 +13,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 class DoctrineHelper extends BaseHelper
 {
     /** @var array */
-    protected $manageableEntityClasses = [];
+    private $manageableEntityClasses = [];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        parent::reset();
+        $this->manageableEntityClasses = [];
+    }
 
     /**
      * {@inheritdoc}
@@ -125,6 +134,7 @@ class DoctrineHelper extends BaseHelper
      * @param ClassMetadata $metadata
      *
      * @return array [field name => field data-type, ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getIndexedFields(ClassMetadata $metadata)
     {

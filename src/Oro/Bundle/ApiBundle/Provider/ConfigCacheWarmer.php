@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration as Config;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderYamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
- * Warms up Data API configuration cache based on "config_files" section in the bundle configuration
+ * Warms up API configuration cache based on "config_files" section in the bundle configuration
  * and "entity_aliases", "exclusions" and "inclusions" sections
  * in "Resources/config/oro/api.yml" files.
  *
@@ -28,6 +29,9 @@ class ConfigCacheWarmer
     public const INCLUSIONS        = 'inclusions';
 
     private const OVERRIDE_CLASS = 'override_class';
+    private const APP_API_CONFIG_PATH = '../config/oro/';
+    private const YAML_EXTENSION = '.yml';
+
 
     /** @var ConfigExtensionRegistry */
     private $configExtensionRegistry;
@@ -47,13 +51,6 @@ class ConfigCacheWarmer
     /** @var ResourceInterface[] [config file name => ResourceInterface, ...] */
     private $resources;
 
-    /**
-     * @param array                   $configFiles
-     * @param ConfigExtensionRegistry $configExtensionRegistry
-     * @param ConfigCacheFactory      $configCacheFactory
-     * @param bool                    $debug
-     * @param string                  $environment
-     */
     public function __construct(
         array $configFiles,
         ConfigExtensionRegistry $configExtensionRegistry,
@@ -68,10 +65,6 @@ class ConfigCacheWarmer
         $this->environment = $environment;
     }
 
-
-    /**
-     * @param string|null $configKey
-     */
     public function warmUp(string $configKey = null): void
     {
         $configFiles = $this->configFiles;
@@ -107,11 +100,6 @@ class ConfigCacheWarmer
         }
     }
 
-    /**
-     * @param string $configKey
-     * @param string $fileName
-     * @param array  $fileConfig
-     */
     private function dumpConfigCacheForSingleFileApi(string $configKey, string $fileName, array $fileConfig): void
     {
         $config = $fileConfig[self::CONFIG];
@@ -159,15 +147,23 @@ class ConfigCacheWarmer
                     $allSubstitutions[$overriddenEntityClass] = $entityClass;
                 }
             }
-            foreach ($fileConfig[self::EXCLUSIONS] as $exclusion) {
-                if (!$this->hasInclusionOrExclusion($exclusion, $allExclusions)) {
-                    $allExclusions[] = $exclusion;
-                }
+            $exclusions = $this->processInclusionOrExclusion(
+                $fileConfig[self::EXCLUSIONS],
+                $allExclusions,
+                $allInclusions
+            );
+            $inclusions = $this->processInclusionOrExclusion(
+                $fileConfig[self::INCLUSIONS],
+                $allInclusions,
+                $allExclusions
+            );
+            if ($exclusions) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $allExclusions = array_merge($allExclusions, $exclusions);
             }
-            foreach ($fileConfig[self::INCLUSIONS] as $inclusion) {
-                if (!$this->hasInclusionOrExclusion($inclusion, $allInclusions)) {
-                    $allInclusions[] = $inclusion;
-                }
+            if ($inclusions) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $allInclusions = array_merge($allInclusions, $inclusions);
             }
         }
 
@@ -203,14 +199,6 @@ class ConfigCacheWarmer
         );
     }
 
-    /**
-     * @param string $configKey
-     * @param array  $config
-     * @param array  $aliases
-     * @param array  $substitutions
-     * @param array  $exclusions
-     * @param array  $inclusions
-     */
     private function dumpConfigCacheFile(
         string $configKey,
         array $config,
@@ -301,6 +289,13 @@ class ConfigCacheWarmer
         if ('test' === $this->environment) {
             $configFileLoaders[] = new YamlCumulativeFileLoader('Tests/Functional/Environment/' . $fileName);
         }
+        /** Load api configurations from application */
+        if (str_contains($fileName, self::YAML_EXTENSION)) {
+            $fileNameBody = str_replace(self::YAML_EXTENSION, '', $fileName);
+            $configFileLoaders[] = new FolderYamlCumulativeFileLoader(
+                self::APP_API_CONFIG_PATH . $fileNameBody
+            );
+        }
 
         $config = [];
         $configLoader = new CumulativeConfigLoader('oro_api', $configFileLoaders);
@@ -318,12 +313,6 @@ class ConfigCacheWarmer
         );
     }
 
-    /**
-     * @param ConfigurationInterface $configuration
-     * @param array                  $configs
-     *
-     * @return array
-     */
     private function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         $processor = new Processor();
@@ -351,12 +340,23 @@ class ConfigCacheWarmer
         return $hasConfig;
     }
 
-    /**
-     * @param array $item
-     * @param array $items
-     *
-     * @return bool
-     */
+    private function processInclusionOrExclusion(
+        array $items,
+        array $existingItems,
+        array $existingInverseItems
+    ): array {
+        $newItems = [];
+        foreach ($items as $item) {
+            if (!$this->hasInclusionOrExclusion($item, $existingItems)
+                && !$this->hasInclusionOrExclusion($item, $existingInverseItems)
+            ) {
+                $newItems[] = $item;
+            }
+        }
+
+        return $newItems;
+    }
+
     private function hasInclusionOrExclusion(array $item, array $items): bool
     {
         $exist = false;

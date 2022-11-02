@@ -102,7 +102,7 @@ class LayoutContextStub implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return $this->has($name);
     }
@@ -110,7 +110,7 @@ class LayoutContextStub implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         return $this->getOr($name);
     }
@@ -118,7 +118,7 @@ class LayoutContextStub implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
@@ -126,11 +126,10 @@ class LayoutContextStub implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->remove($name);
     }
-
 
     /**
      * {@inheritdoc}

@@ -6,17 +6,14 @@ use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
+use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * The grid listener that adds dynamic changes to email grids.
@@ -26,11 +23,8 @@ class EmailGridListener
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var GridViewManager */
-    protected $gridViewManager;
+    /** @var DatagridStateProviderInterface */
+    private $filtersStateProvider;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -45,30 +39,18 @@ class EmailGridListener
      */
     protected $filterJoins;
 
-    /**
-     * @param EmailQueryFactory      $factory
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param GridViewManager        $gridViewManager
-     * @param ConfigManager          $configManager
-     * @param EmailGridResultHelper  $resultHelper
-     */
     public function __construct(
         EmailQueryFactory $factory,
-        TokenAccessorInterface $tokenAccessor,
-        GridViewManager $gridViewManager,
+        DatagridStateProviderInterface $filtersStateProvider,
         ConfigManager $configManager,
         EmailGridResultHelper $resultHelper
     ) {
         $this->factory = $factory;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->gridViewManager = $gridViewManager;
+        $this->filtersStateProvider = $filtersStateProvider;
         $this->configManager = $configManager;
         $this->resultHelper = $resultHelper;
     }
 
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
     public function onResultBeforeQuery(OrmResultBeforeQuery $event)
     {
         $qb = $event->getQueryBuilder();
@@ -80,8 +62,6 @@ class EmailGridListener
 
     /**
      * Add required filters
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {
@@ -96,16 +76,16 @@ class EmailGridListener
         $isThreadGroupingEnabled = $this->configManager->get('oro_email.threads_grouping');
 
         $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
-        $filters = $this->getFilters($parameters);
+        $filtersState = $this->filtersStateProvider->getState($datagrid->getConfig(), $parameters);
 
         if ($isThreadGroupingEnabled) {
             $this->factory->applyAclThreadsGrouping(
                 $queryBuilder,
                 $datagrid,
-                $filters
+                $filtersState
             );
             if ($countQb) {
-                $this->factory->applyAclThreadsGrouping($countQb, $datagrid, $filters);
+                $this->factory->applyAclThreadsGrouping($countQb, $datagrid, $filtersState);
             }
         } else {
             $this->factory->applyAcl($queryBuilder);
@@ -123,12 +103,11 @@ class EmailGridListener
                 ->setParameter('emailIds', $emailIds);
         }
 
-        $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
+        if ($filtersState) {
+            $this->prepareQueryToFilter($filtersState, $queryBuilder, $countQb);
+        }
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         /** @var ResultRecord[] $records */
@@ -141,23 +120,19 @@ class EmailGridListener
     /**
      * Add joins and group by for query just if filter used. For performance optimization - BAP-10674
      *
-     * @param ParameterBag $parameters
+     * @param array $filtersState
      * @param QueryBuilder $queryBuilder
      * @param QueryBuilder $countQb
      */
-    protected function prepareQueryToFilter($parameters, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
+    protected function prepareQueryToFilter($filtersState, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
     {
-        $filters = $this->getFilters($parameters);
-        if (!$filters) {
-            return;
-        }
         $this->filterJoins = [];
         $groupByFilters = ['cc', 'bcc', 'to', 'folders', 'folder', 'mailbox'];
 
         // As now optimizer could not automatically remove joins for these filters
         // (they do not affect number of rows)
         // adding group by statement
-        if (array_intersect_key($filters, array_flip($groupByFilters))) {
+        if (array_intersect_key($filtersState, array_flip($groupByFilters))) {
             // CountQb doesn't need group by statement cos it already added in grid config
             $queryBuilder->addGroupBy('eu.id');
         }
@@ -169,7 +144,7 @@ class EmailGridListener
         $rParams  = [];
         // Add join for each filter which is based on e.recipients table
         foreach ($rFilters as $rKey => $rFilter) {
-            if (array_key_exists($rKey, $filters)) {
+            if (array_key_exists($rKey, $filtersState)) {
                 $queryBuilder->leftJoin('e.recipients', $rFilter[0], $rFilter[1], $rFilter[2]);
                 $countQb->leftJoin('e.recipients', $rFilter[0], $rFilter[1], $rFilter[2]);
                 $rParams = array_merge($rParams, $rFilter[3]);
@@ -181,51 +156,12 @@ class EmailGridListener
             $countQb->setParameter($rParam, $rParamValue);
         }
         $fFilters = ['folder', 'folders', 'mailbox'];
-        if (array_intersect_key($filters, array_flip($fFilters))) {
+        if (array_intersect_key($filtersState, array_flip($fFilters))) {
             $queryBuilder->leftJoin('eu.folders', 'f');
             $this->filterJoins['eu'][] = 'f';
         }
     }
 
-    /**
-     * @param ParameterBag $parameters
-     *
-     * @return array
-     */
-    protected function getFilters($parameters)
-    {
-        $filters = $parameters->get('_filter');
-        if (!$filters || !is_array($filters)) {
-            $filters = $this->getGridViewFiltersData();
-        }
-
-        return $filters;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getGridViewFiltersData()
-    {
-        $filters = [];
-        $user = $this->tokenAccessor->getUser();
-        if (!$user) {
-            return $filters;
-        }
-        /** @var GridView|null $gridView */
-        $gridView = $this->gridViewManager->getDefaultView($user, 'user-email-grid');
-        if (!$gridView) {
-            return $filters;
-        }
-
-        return $gridView->getFiltersData();
-    }
-
-    /**
-     *
-     * @param QueryBuilder $qb
-     * @param              $part
-     */
     protected function removeGroupByPart(QueryBuilder $qb, $part)
     {
         $groupByParts = $qb->getDQLPart('groupBy');

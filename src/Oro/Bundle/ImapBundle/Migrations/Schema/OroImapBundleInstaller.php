@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ImapBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\TextType;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_3\OroImapBundle as v13;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_4\OroImapBundle as v14;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
@@ -18,7 +20,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_11';
     }
 
     /**
@@ -37,12 +39,20 @@ class OroImapBundleInstaller implements Installation
         /** Foreign keys generation **/
         $this->addOroEmailFolderImapForeignKeys($schema);
         $this->addOroEmailImapForeignKeys($schema);
+        $this->addOriginOauthType($schema);
+        $this->changeEmailTokensLength($schema);
+    }
+
+    private function changeEmailTokensLength(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_email_origin');
+
+        $table->changeColumn('access_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
+        $table->changeColumn('refresh_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
     }
 
     /**
      * Add Imap fields to the oro_email_origin table
-     *
-     * @param Schema $schema
      */
     protected function addImapFieldsToOroEmailOriginTable(Schema $schema)
     {
@@ -56,8 +66,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Create oro_email_folder_imap table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailFolderImapTable(Schema $schema)
     {
@@ -65,14 +73,13 @@ class OroImapBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('folder_id', 'integer', []);
         $table->addColumn('uid_validity', 'integer', []);
+        $table->addColumn('last_uid', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['folder_id'], 'UNIQ_EC4034F9162CB942');
     }
 
     /**
      * Create oro_email_imap table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailImapTable(Schema $schema)
     {
@@ -88,8 +95,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_email_folder_imap foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailFolderImapForeignKeys(Schema $schema)
     {
@@ -104,8 +109,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_email_imap foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailImapForeignKeys(Schema $schema)
     {
@@ -127,8 +130,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_imap_wrong_creds_origin table.
-     *
-     * @param Schema $schema
      */
     protected function addOroImapWrongCredsOriginTable(Schema $schema)
     {
@@ -137,5 +138,15 @@ class OroImapBundleInstaller implements Installation
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['origin_id']);
         $table->addIndex(['owner_id']);
+    }
+
+    protected function addOriginOauthType(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_email_origin');
+        $table->addColumn('account_type', 'string', [
+            'default' => 'other',
+            'notnull' => false,
+            'length'  => 255
+        ]);
     }
 }

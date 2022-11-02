@@ -1,0 +1,5 @@
+dynamic-imports:
+    commons:
+        - ororeport/js/app/views/report-chart-data-schema-view
+        - ororeport/js/app/views/report-chart-view
+        - ororeport/js/view-sql-query-builder

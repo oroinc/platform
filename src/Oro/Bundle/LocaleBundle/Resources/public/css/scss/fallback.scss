@@ -2,50 +2,46 @@
 
 .oro-quarter {
     .selector {
-        width: $oro-quarter-width !important;
+        width: $oro-quarter-width;
         min-width: $oro-quarter-min-width;
         float: $oro-quarter-float;
-        margin-left: $oro-quarter-offset-left;
+
+        &:not(:last-child) {
+            margin-right: $oro-quarter-offset-right;
+        }
 
         span {
-            width: $oro-quarter-span-width !important;
+            width: $oro-quarter-span-width;
         }
 
         select {
-            width: $oro-quarter-select-width !important;
+            width: $oro-quarter-select-width;
             min-width: $oro-quarter-select-min-width;
         }
     }
 }
 
 .fallback-container {
-    .fallback-status {
-        width: $fallback-container-status-width;
-        text-align: $fallback-container-status-text-align;
-        line-height: $fallback-container-status-line-height;
-        height: $fallback-container-status-height;
-    }
-
     input {
-        &[type="radio"],
-        &[type="checkbox"] {
+        &[type='radio'],
+        &[type='checkbox'] {
             margin-top: $fallback-container-input-offset-top;
         }
     }
 
     div {
         &.input-widget-select {
-            width: $fallback-container-select-width !important;
+            width: $fallback-container-select-width;
+            max-width: $fallback-container-select-max-width;
 
             span {
                 padding-right: $fallback-container-select-span-inner-offset-right;
-                min-width: $fallback-container-select-span-min-width;
             }
         }
     }
 }
 
-.mce-tinymce {
+.tox-tinymce {
     &.disabled {
         button {
             opacity: $mce-tinymce-opacity;
@@ -64,14 +60,18 @@
 }
 
 .fallback-item {
-    max-width: $fallback-item-max-width;
-
-    &:not(:first-child) {
+    &:not(.tab-pane):not(:first-child) {
         border-top: $fallback-item-border;
     }
 
-    &:last-child {
+    &:not(.tab-pane):last-child {
         border-bottom: $fallback-item-border;
+    }
+
+    .tox-tinymce {
+        &:not(.tox-fullscreen) {
+            max-width: $fallback-item-mce-tinymce-max-width;
+        }
     }
 }
 
@@ -92,18 +92,36 @@
     display: flex;
     align-items: center;
     margin: $fallback-item-fallback-line-offset;
+    max-width: $fallback-item-label-max-width;
 }
 
 .fallback-item-fallback {
     flex-grow: 1;
+    min-width: $fallback-item-fallback-min-width;
+    max-width: $fallback-item-fallback-max-width;
+
+    + .fallback-item-value {
+        margin-top: $form-container-control-row-space;
+    }
 }
 
 .fallback-item-use-fallback {
-    width: $fallback-item-use-fallback-width;
-}
+    min-width: $fallback-item-use-fallback-width;
 
-.fallback-item-value {
-    width: $fallback-item-value-width;
+    @include text-line-truncate($max-width: $fallback-item-use-fallback-max-width);
+
+    padding-right: $content-padding-small;
+
+    input {
+        &[type='checkbox'],
+        &[type='radio'] {
+            margin-right: $content-padding-small;
+        }
+    }
+
+    .oro-checkbox-view {
+        display: $fallback-item-use-fallback-oro-checkbox-view-display;
+    }
 }
 
 .fallback-item-value-input {
@@ -124,9 +142,13 @@
     .validation-failed {
         width: $fallback-item-value--first-validation-width;
         order: $fallback-item-value--first-validation-order;
+        max-width: $fallback-item-label-max-width;
     }
 
-    input[type="text"] {
-        width: $fallback-item-value--first-input-width;
+    .input-append {
+        .input-group {
+            display: block;
+            margin-right: $fallback-item-value--first-input-group-offset-end;
+        }
     }
 }

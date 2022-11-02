@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WriterErrorEvent extends Event
 {
@@ -60,9 +60,6 @@ class WriterErrorEvent extends Event
         return $this->couldBeSkipped;
     }
 
-    /**
-     * @param \Exception $exception
-     */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;

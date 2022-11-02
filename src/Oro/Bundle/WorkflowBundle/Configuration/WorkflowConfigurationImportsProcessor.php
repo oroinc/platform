@@ -4,7 +4,26 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ImportProcessorFactoryInterface;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
+use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Main entry point of processing workflow imports.
+ * Processes each import and merges them one into another. The existing config is merged onto the resulting imported
+ * config. For example:
+ *
+ *   imports:
+ *     - { resource: 'file1.yml', workflow: workflow1, as: workflow3, replace: [] } # import1
+ *     - { workflow: workflow2, as: workflow3, replace: [] }                        # import2
+ *
+ *   workflows:                                                                     # existing config
+ *     workflow3:
+ *       entity: \stdClass
+ *
+ * will be imported in the following way:
+ * 1. Process and get config from "import1"
+ * 2. Process, get config from "import2" and merge it onto config got in p.1
+ * 3. Merge "existing config" onto config got in p.2
+ */
 class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInterface
 {
     /** @var ImportProcessorFactoryInterface[] */
@@ -16,7 +35,7 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
     /** {@inheritdoc} */
     public function process(array $content, \SplFileInfo $contentSource): array
     {
-        if (!isset($content['imports']) || !is_array($content['imports'])) {
+        if (empty($content['imports']) || !is_array($content['imports'])) {
             return $content;
         }
 
@@ -26,32 +45,35 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
             return $this->processedContent[$filePath];
         }
 
-        foreach ($this->getImportProcessors($content) as $processor) {
+        $importProcessors = $this->getImportProcessors($content['imports']);
+        unset($content['imports']);
+        $importedContent = [];
+
+        foreach ($importProcessors as $processor) {
             $processor->setParent($this);
-            $content = $processor->process($content, $contentSource);
+
+            // Content from partially processed imports is needed in case of recursive import.
+            $this->processedContent[$filePath] = ArrayUtil::arrayMergeRecursiveDistinct($importedContent, $content);
+
+            $importedContent = $processor->process($importedContent, $contentSource);
         }
 
-        unset($content['imports']);
-
-        return $this->processedContent[$filePath] = $content;
+        return $this->processedContent[$filePath] = ArrayUtil::arrayMergeRecursiveDistinct($importedContent, $content);
     }
 
     /**
-     * @param array $content pass by reference to clear imports that got its processors
-     * @return array|ConfigImportProcessorInterface[]
+     * @param array $imports
+     * @return iterable<ConfigImportProcessorInterface>
      */
-    private function getImportProcessors(array &$content): array
+    private function getImportProcessors(array $imports): iterable
     {
-        $processors = [];
-        foreach ($content['imports'] as $index => $import) {
-            $processor = $this->getApplicableProcessor($import);
-            if ($processor) {
-                unset($content['imports'][$index]);
-                $processors[] = $processor;
+        foreach ($imports as $import) {
+            if ($processor = $this->getApplicableProcessor($import)) {
+                yield $processor;
             }
         }
 
-        return $processors;
+        return [];
     }
 
     /**
@@ -71,9 +93,6 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
         );
     }
 
-    /**
-     * @param ImportProcessorFactoryInterface $importProcessorGenerator
-     */
     public function addImportProcessorFactory(ImportProcessorFactoryInterface $importProcessorGenerator)
     {
         $this->importProcessorFactories[] = $importProcessorGenerator;

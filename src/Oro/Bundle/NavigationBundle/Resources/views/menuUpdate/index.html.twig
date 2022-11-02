@@ -1,7 +1,7 @@
 {% extends bap.layout %}
 
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% set pageTitle = 'oro.navigation.menuupdate.menus'|trans %}
 
@@ -11,10 +11,10 @@
 
 {% block content %}
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra navbar-extra-right">
+        <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
-                    {{ include('OroNavigationBundle:menuUpdate:pageHeader.html.twig') }}
+                    {{ include('@OroNavigation/menuUpdate/pageHeader.html.twig') }}
                 </div>
                 {% if entityClass is defined %}
                     <div class="pull-right title-buttons-container invisible"
@@ -43,7 +43,7 @@
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orodatagrid/js/app/components/datagrid-allow-tracking-component',

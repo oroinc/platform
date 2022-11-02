@@ -414,14 +414,14 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: . Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.
-     */
-    // @codingStandardsIgnoreEnd
     public function testDuplicateAdd()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: .'
+            . ' Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.'
+        );
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
@@ -1544,12 +1544,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     public function testSetBlockTheme()
     {
         $this->layoutManipulator
-            ->setBlockTheme(['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig'])
+            ->setBlockTheme(['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig'])
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo')
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo')
-            ->setBlockTheme('MyBundle:Layout:theme3.html.twig');
+            ->setBlockTheme('@My/Layout/my_theme.html.twig', 'logo')
+            ->setBlockTheme('@My/Layout/theme3.html.twig');
 
         $view = $this->getLayoutView();
 
@@ -1574,12 +1574,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->assertSame(
             [
                 'root' => [
-                    'MyBundle:Layout:theme1.html.twig',
-                    'MyBundle:Layout:theme2.html.twig',
-                    'MyBundle:Layout:theme3.html.twig'
+                    '@My/Layout/theme1.html.twig',
+                    '@My/Layout/theme2.html.twig',
+                    '@My/Layout/theme3.html.twig'
                 ],
                 'logo' => [
-                    'MyBundle:Layout:my_theme.html.twig'
+                    '@My/Layout/my_theme.html.twig'
                 ]
             ],
             $blockThemes
@@ -1590,13 +1590,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
-            ->setFormTheme(['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig']);
+            ->setFormTheme(['@My/Layout/form_theme1.html.twig', '@My/Layout/form_theme2.html.twig']);
 
         $this->getLayoutView();
 
         $formThemes = $this->rawLayoutBuilder->getRawLayout()->getFormThemes();
         $this->assertSame(
-            ['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig'],
+            ['@My/Layout/form_theme1.html.twig', '@My/Layout/form_theme2.html.twig'],
             $formThemes
         );
     }

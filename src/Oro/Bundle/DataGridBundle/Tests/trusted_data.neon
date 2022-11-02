@@ -1,0 +1,18 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension:
+            addPageLimits:
+                field: true
+                idx: true
+    safe_methods:
+        Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory:
+            getIdentifierField: true
+            getObjectIdentifier: true
+        Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration:
+            getRootAlias: true
+        Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository:
+            getUserFieldName: true
+        Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository:
+            getOwnerFieldName: true
+            getUserFieldName: true

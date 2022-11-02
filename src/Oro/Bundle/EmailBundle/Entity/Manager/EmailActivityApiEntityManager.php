@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * The API manager for email activities.
+ */
 class EmailActivityApiEntityManager extends ApiEntityManager
 {
     /** @var ActivityManager */
@@ -85,7 +88,6 @@ class EmailActivityApiEntityManager extends ApiEntityManager
             function (QueryBuilder $qb, $targetEntityClass) use ($currentUser, $userClass) {
                 if ($targetEntityClass === $userClass) {
                     // Need to exclude current user from result because of email context
-                    // @see Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager::getEmailContext
                     $qb->andWhere(
                         $qb->expr()->neq(
                             QueryBuilderUtil::getSelectExprByAlias($qb, 'entityId'),

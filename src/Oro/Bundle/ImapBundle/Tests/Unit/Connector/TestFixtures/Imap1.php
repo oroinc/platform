@@ -14,6 +14,6 @@ class Imap1 extends \Oro\Bundle\ImapBundle\Mail\Storage\Imap
 
     public function capability()
     {
-        return array('FEATURE1');
+        return ['FEATURE1'];
     }
 }

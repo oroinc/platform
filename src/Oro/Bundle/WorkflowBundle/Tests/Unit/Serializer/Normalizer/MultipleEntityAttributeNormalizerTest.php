@@ -3,174 +3,161 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attribute;
+    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
+    private $attribute;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var MultipleEntityAttributeNormalizer
-     */
-    protected $normalizer;
+    /** @var MultipleEntityAttributeNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getReference'))
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setMethods(array('getAttribute', 'getName'))
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attribute = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->setMethods(array('getType', 'getOption', 'getName'))
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->workflow = $this->createMock(Workflow::class);
+        $this->attribute = $this->createMock(Attribute::class);
 
         $this->normalizer = new MultipleEntityAttributeNormalizer($this->registry, $this->doctrineHelper);
     }
 
     public function testNormalizeExceptionNotCollection()
     {
-        $workflowName  = 'test_workflow';
+        $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
 
-        $attributeValue = $this->getEntityMock();
+        $attributeValue = $this->createMock(\stdClass::class);
 
-        $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
+        $this->workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn($workflowName);
 
-        $this->attribute->expects($this->never())->method('getOption')->with('class');
+        $this->attribute->expects($this->never())
+            ->method('getOption')
+            ->with('class');
 
         $this->attribute->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($attributeName));
+            ->willReturn($attributeName);
 
-        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
-        $this->expectExceptionMessage(
-            sprintf(
-                'Attribute "test_attribute" of workflow "test_workflow" must be a collection or an array,'
-                . ' but "%s" given',
-                get_class($attributeValue)
-            )
-        );
+        $this->expectException(SerializerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Attribute "test_attribute" of workflow "test_workflow" must be a collection or an array,'
+            . ' but "%s" given',
+            get_class($attributeValue)
+        ));
         $this->normalizer->normalize($this->workflow, $this->attribute, $attributeValue);
     }
 
     public function testNormalizeExceptionNotInstanceofAttributeClassOption()
     {
-        $workflowName  = 'test_workflow';
+        $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
 
-        $attributeValue = array($this->getEntityMock());
+        $attributeValue = [$this->createMock(\stdClass::class)];
 
-        $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
+        $this->workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn($workflowName);
 
         $fooClass = $this->getMockClass('FooClass');
 
-        $this->attribute->expects($this->once())->method('getOption')->with('class')
-            ->will($this->returnValue($fooClass));
+        $this->attribute->expects($this->once())
+            ->method('getOption')
+            ->with('class')
+            ->willReturn($fooClass);
 
         $this->attribute->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($attributeName));
+            ->willReturn($attributeName);
 
-        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
-        $this->expectExceptionMessage(
-            sprintf(
-                'Each value of attribute "test_attribute" of workflow "test_workflow" must be an instance of "%s",'
-                . ' but "%s" found',
-                $fooClass,
-                get_class($attributeValue[0])
-            )
-        );
+        $this->expectException(SerializerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Each value of attribute "test_attribute" of workflow "test_workflow" must be an instance of "%s",'
+            . ' but "%s" found',
+            $fooClass,
+            get_class($attributeValue[0])
+        ));
         $this->normalizer->normalize($this->workflow, $this->attribute, $attributeValue);
     }
 
     public function testDenormalizeExceptionNoEntityManager()
     {
-        $workflowName  = 'test_workflow';
+        $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
 
-        $attributeValue = array($this->getEntityMock());
+        $attributeValue = [$this->createMock(\stdClass::class)];
 
-        $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
-
-        $this->attribute->expects($this->once())->method('getOption')->with('class')
-            ->will($this->returnValue(get_class($attributeValue[0])));
-
-        $this->attribute->expects($this->once())
+        $this->workflow->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($attributeName));
-
-        $this->registry->expects($this->once())->method('getManagerForClass')->with(get_class($attributeValue[0]));
-
-        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
-        $this->expectExceptionMessage(
-            sprintf(
-                'Attribute "%s" of workflow "%s" contains object of "%s", but it\'s not managed entity class',
-                $attributeName,
-                $workflowName,
-                get_class($attributeValue[0])
-            )
-        );
-        $this->normalizer->denormalize($this->workflow, $this->attribute, array());
-    }
-
-    public function testNormalizeEntityArray()
-    {
-        $attributeValue = array($this->getEntityMock(), $this->getEntityMock());
-
-        $this->workflow->expects($this->never())->method($this->anything());
+            ->willReturn($workflowName);
 
         $this->attribute->expects($this->once())
             ->method('getOption')
             ->with('class')
-            ->will($this->returnValue(get_class($attributeValue[0])));
+            ->willReturn(get_class($attributeValue[0]));
 
-        $expectedIds = array(array('id' => 123), array('id' => 456));
+        $this->attribute->expects($this->once())
+            ->method('getName')
+            ->willReturn($attributeName);
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(get_class($attributeValue[0]));
+
+        $this->expectException(SerializerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Attribute "%s" of workflow "%s" contains object of "%s", but it\'s not managed entity class',
+            $attributeName,
+            $workflowName,
+            get_class($attributeValue[0])
+        ));
+        $this->normalizer->denormalize($this->workflow, $this->attribute, []);
+    }
+
+    public function testNormalizeEntityArray()
+    {
+        $attributeValue = [$this->createMock(\stdClass::class), $this->createMock(\stdClass::class)];
+
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
+
+        $this->attribute->expects($this->once())
+            ->method('getOption')
+            ->with('class')
+            ->willReturn(get_class($attributeValue[0]));
+
+        $expectedIds = [['id' => 123], ['id' => 456]];
         $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityIdentifier')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array($attributeValue[0], $expectedIds[0]),
-                        array($attributeValue[1], $expectedIds[1]),
-                    )
-                )
-            );
+            ->willReturnMap([
+                [$attributeValue[0], $expectedIds[0]],
+                [$attributeValue[1], $expectedIds[1]],
+            ]);
 
         $this->assertEquals(
             $expectedIds,
@@ -180,26 +167,26 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeEntityCollection()
     {
-        $attributeValue = new ArrayCollection(array($this->getEntityMock(), $this->getEntityMock()));
+        $attributeValue = new ArrayCollection([
+            $this->createMock(\stdClass::class),
+            $this->createMock(\stdClass::class)
+        ]);
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
         $this->attribute->expects($this->once())
             ->method('getOption')
             ->with('class')
-            ->will($this->returnValue(get_class($attributeValue[0])));
+            ->willReturn(get_class($attributeValue[0]));
 
-        $expectedIds = array(array('id' => 123), array('id' => 456));
+        $expectedIds = [['id' => 123], ['id' => 456]];
         $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityIdentifier')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array($attributeValue[0], $expectedIds[0]),
-                        array($attributeValue[1], $expectedIds[1]),
-                    )
-                )
-            );
+            ->willReturnMap([
+                [$attributeValue[0], $expectedIds[0]],
+                [$attributeValue[1], $expectedIds[1]],
+            ]);
 
         $this->assertEquals(
             $expectedIds,
@@ -210,13 +197,14 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeAndDenormalizeNull($direction)
+    public function testNormalizeAndDenormalizeNull(string $direction)
     {
         $attributeValue = null;
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        if ($direction == 'normalization') {
+        if ($direction === 'normalization') {
             $this->assertNull(
                 $this->normalizer->normalize($this->workflow, $this->attribute, $attributeValue)
             );
@@ -229,28 +217,28 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testDenormalizeEntity()
     {
-        $expectedValue  = array($this->createMock(\stdClass::class), $this->createMock(\stdClass::class));
-        $attributeValue = array(array('id' => 123), array('id' => 456));
+        $expectedValue = [$this->createMock(\stdClass::class), $this->createMock(\stdClass::class)];
+        $attributeValue = [['id' => 123], ['id' => 456]];
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->exactly(3))->method('getOption')
+        $this->attribute->expects($this->exactly(3))
+            ->method('getOption')
             ->with('class')
-            ->will($this->returnValue(get_class($expectedValue[0])));
+            ->willReturn(get_class($expectedValue[0]));
 
-        $this->registry->expects($this->once())->method('getManagerForClass')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with(get_class($expectedValue[0]))
-            ->will($this->returnValue($this->entityManager));
+            ->willReturn($this->entityManager);
 
-        $this->entityManager->expects($this->exactly(2))->method('getReference')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array(get_class($expectedValue[0]), $attributeValue[0], $expectedValue[0]),
-                        array(get_class($expectedValue[1]), $attributeValue[1], $expectedValue[1]),
-                    )
-                )
-            );
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getReference')
+            ->willReturnMap([
+                [get_class($expectedValue[0]), $attributeValue[0], $expectedValue[0]],
+                [get_class($expectedValue[1]), $attributeValue[1], $expectedValue[1]],
+            ]);
 
         $this->assertEquals(
             $expectedValue,
@@ -261,17 +249,20 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testSupportsNormalization($direction)
+    public function testSupportsNormalization(string $direction)
     {
         $attributeValue = 'bar';
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue('entity'));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('entity');
         $this->attribute->expects($this->once())
             ->method('getOption')
             ->with('multiple')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $method = 'supports' . ucfirst($direction);
         $this->assertTrue($this->normalizer->$method($this->workflow, $this->attribute, $attributeValue));
@@ -280,13 +271,16 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testSupportsNormalizationForSingle($direction)
+    public function testSupportsNormalizationForSingle(string $direction)
     {
         $attributeValue = 'bar';
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue('entity'));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('entity');
 
         $method = 'supports' . ucfirst($direction);
         $this->assertFalse($this->normalizer->$method($this->workflow, $this->attribute, $attributeValue));
@@ -295,28 +289,26 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNotSupportsNormalizationWhenNotEntityType($direction)
+    public function testNotSupportsNormalizationWhenNotEntityType(string $direction)
     {
         $attributeValue = 'bar';
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue('object'));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
 
         $method = 'supports' . ucfirst($direction);
         $this->assertFalse($this->normalizer->$method($this->workflow, $this->attribute, $attributeValue));
     }
 
-    public function normalizeDirectionDataProvider()
+    public function normalizeDirectionDataProvider(): array
     {
-        return array(
-            array('normalization'),
-            array('denormalization'),
-        );
-    }
-
-    protected function getEntityMock()
-    {
-        return $this->createMock(\stdClass::class);
+        return [
+            ['normalization'],
+            ['denormalization'],
+        ];
     }
 }

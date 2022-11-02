@@ -4,30 +4,24 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
 class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const INDEX_PHP_FILE = 'index.php';
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
-    protected $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
     /** @var MenuFactory */
-    protected $factory;
+    private $factory;
 
-    /** @var RoutingAwareMenuFactoryExtension */
-    protected $factoryExtension;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
 
-        $this->factoryExtension = new RoutingAwareMenuFactoryExtension($this->router);
-
         $this->factory = new MenuFactory();
-        $this->factory->addExtension($this->factoryExtension);
+        $this->factory->addExtension(new RoutingAwareMenuFactoryExtension($this->router));
     }
 
     public function testBuildOptionsWithEmptyRoute()
@@ -43,8 +37,8 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOptionsWithDefaultKeys()
     {
-        $route   = 'test';
-        $uri     = '#';
+        $route = 'test';
+        $uri = '#';
         $options = ['route' => $route];
 
         $context = new RequestContext();
@@ -54,7 +48,7 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with($route, [], RouterInterface::ABSOLUTE_PATH)
+            ->with($route, [], UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($uri);
 
         $item = $this->factory->createItem('test', $options);
@@ -66,11 +60,11 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOptionsWithKeys()
     {
-        $route       = 'test';
-        $uri         = '#';
+        $route = 'test';
+        $uri = '#';
         $routeParams = ['id' => 1];
-        $routes      = ['test_*'];
-        $options     = [
+        $routes = ['test_*'];
+        $options = [
             'route' => $route,
             'extras' => ['acl_resource_id' => 'id', 'isAllowed' => true, 'routes' => $routes],
             'routeParameters' => $routeParams
@@ -83,7 +77,7 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with($route, $routeParams, RouterInterface::ABSOLUTE_PATH)
+            ->with($route, $routeParams, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($uri);
 
         $item = $this->factory->createItem('test', $options);

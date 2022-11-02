@@ -1,129 +1,135 @@
 <?php
+
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\AddressBundle\Entity\Address;
+use Oro\Bundle\AddressBundle\Form\EventListener\AddressIdentifierSubscriber;
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
-use Oro\Bundle\AddressBundle\Form\Type\CountryType;
-use Oro\Bundle\AddressBundle\Form\Type\RegionType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormView;
+use Oro\Component\Testing\Unit\AddressFormExtensionTestCase;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
 
-class AddressTypeTest extends \PHPUnit\Framework\TestCase
+class AddressTypeTest extends AddressFormExtensionTestCase
 {
+    use EntityTrait;
+
     /**
      * @var AddressType
      */
-    protected $type;
+    private $type;
+
+    protected function setUp(): void
+    {
+        $this->type = new AddressType(
+            new AddressCountryAndRegionSubscriberStub(),
+            new AddressIdentifierSubscriber()
+        );
+
+        parent::setUp();
+    }
 
     /**
-     * Setup test env
+     * Test that ID from the entity passed to mapped=>false field ID of the form by AddressIdentifierSubscriber
      */
-    protected function setUp()
+    public function testEntityIdPassedToForm()
     {
-        $buildAddressFormListener = $this->getMockBuilder(
-            'Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber'
-        )->disableOriginalConstructor()->getMock();
+        /** @var Address $address */
+        $address = $this->getEntity(Address::class, ['id' => 5]);
 
-        $this->type = new AddressType($buildAddressFormListener);
+        $form = $this->factory->create(AddressType::class, $address);
+        $this->assertEquals($address->getId(), $form->get('id')->getData());
+
+        $form->submit(['id' => 10]);
+
+        // Should not change entity ID
+        $this->assertNotEquals($address->getId(), $form->get('id')->getData());
     }
 
-    public function testBuildForm()
+    /**
+     * @param mixed $defaultData
+     * @param array $submittedData
+     * @param mixed $expectedData
+     * @dataProvider submitProvider
+     */
+    public function testSubmit($defaultData, $submittedData, $expectedData)
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $form = $this->factory->create(AddressType::class, $defaultData);
 
-        $builder->expects($this->exactly(15))
-            ->method('add')
-            ->will($this->returnSelf());
+        $form->submit($submittedData);
 
-        $builder->expects($this->at(0))
-            ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Symfony\Component\EventDispatcher\EventSubscriberInterface'))
-            ->will($this->returnSelf());
+        $this->assertTrue($form->isValid(), $form->getErrors(true));
+        $this->assertTrue($form->isSynchronized());
 
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('id', HiddenType::class);
-
-        $builder->expects($this->at(2))
-            ->method('add')
-            ->with('label', TextType::class);
-
-        $builder->expects($this->at(3))
-            ->method('add')
-            ->with('namePrefix', TextType::class);
-
-        $builder->expects($this->at(4))
-            ->method('add')
-            ->with('firstName', TextType::class);
-
-        $builder->expects($this->at(5))
-            ->method('add')
-            ->with('middleName', TextType::class);
-
-        $builder->expects($this->at(6))
-            ->method('add')
-            ->with('lastName', TextType::class);
-
-        $builder->expects($this->at(7))
-            ->method('add')
-            ->with('nameSuffix', TextType::class);
-
-        $builder->expects($this->at(8))
-            ->method('add')
-            ->with('organization', TextType::class);
-
-        $builder->expects($this->at(9))
-            ->method('add')
-            ->with('country', CountryType::class);
-
-        $builder->expects($this->at(10))
-            ->method('add')
-            ->with('street', TextType::class);
-
-        $builder->expects($this->at(11))
-            ->method('add')
-            ->with('street2', TextType::class);
-
-        $builder->expects($this->at(12))
-            ->method('add')
-            ->with('city', TextType::class);
-
-        $builder->expects($this->at(13))
-            ->method('add')
-            ->with('region', RegionType::class);
-
-        $builder->expects($this->at(14))
-            ->method('add')
-            ->with('region_text', HiddenType::class);
-
-        $builder->expects($this->at(15))
-            ->method('add')
-            ->with('postalCode', TextType::class);
-
-        $this->type->buildForm($builder, array());
+        $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function testConfigureOptions()
+    public function submitProvider(): array
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with($this->isType('array'));
+        [$country, $region] = $this->getValidCountryAndRegion();
 
-        $this->type->configureOptions($resolver);
-    }
+        $filledAddress = new Address();
+        $filledAddress
+            ->setLabel('address label_stripped')
+            ->setNamePrefix('prefix_stripped')
+            ->setFirstName('first name_stripped')
+            ->setMiddleName('middle name_stripped')
+            ->setLastName('last name_stripped')
+            ->setNameSuffix('name suffix_stripped')
+            ->setOrganization('organization name_stripped')
+            ->setCountry($country)
+            ->setStreet('street name_stripped')
+            ->setStreet2('street2 name_stripped')
+            ->setCity('city name_stripped')
+            ->setRegion($region)
+            ->setRegionText('Alaska')
+            ->setPostalCode('123456_stripped');
 
-    public function testBuildView()
-    {
-        $view = new FormView();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
-        $this->type->buildView($view, $form, ['region_route' => 'test']);
+        // ID submitted to the form should be ignored due to mapped=>false for ID field
+        $expectedExistingAddress = clone $filledAddress;
 
-        $this->assertArrayHasKey('region_route', $view->vars);
-        $this->assertEquals('test', $view->vars['region_route']);
+        return [
+            'new entity' => [
+                'defaultData' => new Address(),
+                'submittedData' => [
+                    'id' => null,
+                    'label' => 'address label',
+                    'namePrefix' => 'prefix',
+                    'firstName' => 'first name',
+                    'middleName' => 'middle name',
+                    'lastName' => 'last name',
+                    'nameSuffix' => 'name suffix',
+                    'organization' => 'organization name',
+                    'country' => self::COUNTRY_WITH_REGION,
+                    'street' => 'street name',
+                    'street2' => 'street2 name',
+                    'city' => 'city name',
+                    'region' => self::REGION_WITH_COUNTRY,
+                    'region_text' => 'Alaska',
+                    'postalCode' => '123456'
+                ],
+                'expectedData' => $filledAddress,
+            ],
+            'existing entity' => [
+                'defaultData' => clone $filledAddress,
+                'submittedData' => [
+                    'id' => 5,
+                    'label' => 'address label',
+                    'namePrefix' => 'prefix',
+                    'firstName' => 'first name',
+                    'middleName' => 'middle name',
+                    'lastName' => 'last name',
+                    'nameSuffix' => 'name suffix',
+                    'organization' => 'organization name',
+                    'country' => self::COUNTRY_WITH_REGION,
+                    'street' => 'street name',
+                    'street2' => 'street2 name',
+                    'city' => 'city name',
+                    'region' => self::REGION_WITH_COUNTRY,
+                    'region_text' => 'Alaska',
+                    'postalCode' => '123456'
+                ],
+                'expectedData' => $expectedExistingAddress,
+            ]
+        ];
     }
 }

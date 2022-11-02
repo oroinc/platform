@@ -11,8 +11,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Mass action handler that marks mails as seen.
+ */
 class MarkMassActionHandler implements MassActionHandlerInterface
 {
     const MARK_READ = 1;
@@ -40,13 +43,6 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     /** @var EmailManager */
     protected $emailManager;
 
-    /**
-     * @param EntityManager                 $entityManager
-     * @param TranslatorInterface           $translator
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param EmailManager                  $emailManager
-     */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
@@ -175,16 +171,16 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     protected function getResponse(MassActionHandlerArgs $args, $entitiesCount = 0)
     {
         $massAction      = $args->getMassAction();
-        $responseMessage = $massAction->getOptions()->offsetGetByPath('[messages][success]', $this->responseMessage);
+        $responseMessage = (string) $massAction->getOptions()
+            ->offsetGetByPath('[messages][success]', $this->responseMessage);
 
         $successful = $entitiesCount > 0;
         $options    = ['count' => $entitiesCount];
 
         return new MassActionResponse(
             $successful,
-            $this->translator->transChoice(
+            $this->translator->trans(
                 $responseMessage,
-                $entitiesCount,
                 ['%count%' => $entitiesCount]
             ),
             $options

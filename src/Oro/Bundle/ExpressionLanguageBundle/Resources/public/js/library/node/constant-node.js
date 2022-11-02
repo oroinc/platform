@@ -1,35 +1,26 @@
-define(function(require) {
-    'use strict';
+import Node from './node';
 
-    var Node = require('oroexpressionlanguage/js/library/node/node');
-
+class ConstantNode extends Node {
     /**
      * @param {*} value a constant value
      */
-    function ConstantNode(value) {
-        ConstantNode.__super__.constructor.call(this, [], {value: value});
+    constructor(value) {
+        super([], {value: value});
     }
 
-    ConstantNode.prototype = Object.create(Node.prototype);
-    ConstantNode.__super__ = Node.prototype;
+    /**
+     * @inheritDoc
+     */
+    compile(compiler) {
+        compiler.repr(this.attrs.value);
+    }
 
-    Object.assign(ConstantNode.prototype, {
-        constructor: ConstantNode,
+    /**
+     * @inheritDoc
+     */
+    evaluate(functions, values) {
+        return this.attrs.value;
+    }
+}
 
-        /**
-         * @inheritDoc
-         */
-        compile: function(compiler) {
-            compiler.repr(this.attrs.value);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        evaluate: function(functions, values) {
-            return this.attrs.value;
-        }
-    });
-
-    return ConstantNode;
-});
+export default ConstantNode;

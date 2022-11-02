@@ -12,7 +12,7 @@ class RemoveResponseErrorsTest extends GetListProcessorTestCase
     /** @var RemoveResponseErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

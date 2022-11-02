@@ -1,32 +1,26 @@
-define(function() {
-    'use strict';
-
+class ExpressionFunction {
     /**
      * @param {string} name  The function name
      * @param {Function} compiler  A callback to compile the function
      * @param {Function} evaluator  A callback to evaluate the function
      */
-    function ExpressionFunction(name, compiler, evaluator) {
+    constructor(name, compiler, evaluator) {
         this.name = name;
         this.compiler = compiler;
         this.evaluator = evaluator;
     }
 
-    ExpressionFunction.prototype = {
-        constructor: ExpressionFunction,
+    getName() {
+        return this.name;
+    }
 
-        getName: function() {
-            return this.name;
-        },
+    getCompiler() {
+        return this.compiler;
+    }
 
-        getCompiler: function() {
-            return this.compiler;
-        },
+    getEvaluator() {
+        return this.evaluator;
+    }
+}
 
-        getEvaluator: function() {
-            return this.evaluator;
-        }
-    };
-
-    return ExpressionFunction;
-});
+export default ExpressionFunction;

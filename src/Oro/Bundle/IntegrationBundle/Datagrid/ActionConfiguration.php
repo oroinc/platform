@@ -13,9 +13,6 @@ class ActionConfiguration
      */
     private $typesRegistry;
 
-    /**
-     * @param TypesRegistry $typesRegistry
-     */
     public function __construct(TypesRegistry $typesRegistry)
     {
         $this->typesRegistry = $typesRegistry;

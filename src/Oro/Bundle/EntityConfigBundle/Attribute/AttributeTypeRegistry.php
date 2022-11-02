@@ -2,60 +2,56 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Psr\Container\ContainerInterface;
 
+/**
+ * The registry of attribute types.
+ */
 class AttributeTypeRegistry
 {
+    /** @var ContainerInterface */
+    private $attributeTypes;
+
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var ArrayCollection */
-    protected $attributeTypes;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(ContainerInterface $attributeTypes, DoctrineHelper $doctrineHelper)
     {
+        $this->attributeTypes = $attributeTypes;
         $this->doctrineHelper = $doctrineHelper;
-        $this->attributeTypes = new ArrayCollection();
-    }
-
-    /**
-     * @param AttributeTypeInterface $attributeType
-     */
-    public function addAttributeType(AttributeTypeInterface $attributeType)
-    {
-        $this->attributeTypes->set($attributeType->getType(), $attributeType);
     }
 
     /**
      * @param FieldConfigModel $attribute
      *
-     * @return null|AttributeTypeInterface
+     * @return AttributeTypeInterface|null
      */
     public function getAttributeType(FieldConfigModel $attribute)
     {
         $type = $attribute->getType();
-        if (!$this->attributeTypes->containsKey($type)) {
+        if (!$this->attributeTypes->has($type)) {
             $type = $this->getType($attribute);
         }
 
-        return $this->attributeTypes->get($type);
+        if ($type && $this->attributeTypes->has($type)) {
+            return $this->attributeTypes->get($type);
+        }
+
+        return null;
     }
 
     /**
      * @param FieldConfigModel $attribute
      *
-     * @return null|string
+     * @return string|null
      */
-    protected function getType(FieldConfigModel $attribute)
+    private function getType(FieldConfigModel $attribute)
     {
         $className = $attribute->getEntity()->getClassName();
         $fieldName = $attribute->getFieldName();

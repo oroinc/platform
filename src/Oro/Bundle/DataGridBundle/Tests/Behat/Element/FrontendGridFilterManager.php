@@ -20,8 +20,8 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $filterItem->getParent()->click();
-        $this->getSession()->getDriver()->waitForAjax();
+        $filterItem->click();
+        $this->getDriver()->waitForAjax();
 
         self::assertTrue(
             $filterItem->isChecked(),
@@ -56,7 +56,9 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $visibilityCheckbox->getParent()->click();
+        $visibilityCheckbox->click();
+
+        $this->getDriver()->waitForAjax();
 
         self::assertFalse(
             $visibilityCheckbox->isChecked(),
@@ -75,8 +77,20 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $close = $this->find('css', 'span.close');
+        $close = $this->find('css', '[data-role="close"]');
         $close->click();
+    }
+
+    public function hasFilter(string $filterTitle): bool
+    {
+        $this->ensureManagerVisible();
+
+        $filterCheckbox = $this->findFilterCheckbox($filterTitle);
+        if (!$filterCheckbox) {
+            return false;
+        }
+
+        return $filterCheckbox->getParent()->isVisible();
     }
 
     protected function ensureManagerVisible()
@@ -96,13 +110,18 @@ class FrontendGridFilterManager extends Element
      */
     protected function getFilterCheckbox($title)
     {
-        $filterCheckbox = $this->find(
-            'css',
-            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type=checkbox]'
-        );
+        $filterCheckbox = $this->findFilterCheckbox($title);
 
         self::assertNotNull($filterCheckbox, 'Can not find filter: ' . $title);
 
         return $filterCheckbox;
+    }
+
+    private function findFilterCheckbox(string $title): ?NodeElement
+    {
+        return $this->find(
+            'css',
+            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type="checkbox"]'
+        );
     }
 }

@@ -6,4 +6,4 @@ placeholders:
 
     items:
         view_entity_owner_info:
-            template: OroOrganizationBundle::viewOwnerInfo.html.twig
+            template: '@@OroOrganization/viewOwnerInfo.html.twig'

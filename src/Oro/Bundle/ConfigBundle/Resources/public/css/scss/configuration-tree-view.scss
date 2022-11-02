@@ -10,21 +10,26 @@
     }
 
     .jstree {
+        &-search-component {
+            margin-bottom: 13px;
+        }
+
         &-node {
-            margin-left: 24px;
+            margin: 0 0 0 28px;
         }
 
         &-anchor {
-            padding: 0 8px 8px 2px;
+            padding: 0 8px 8px 6px;
+            text-align: left;
         }
 
-        &-actions {
-            &__menu {
-                &--inline {
-                    display: flex;
-                    font-size: 14px;
-                    line-height: 14px;
-                }
+        &-actions__menu--inline {
+            display: flex;
+            font-size: 14px;
+            line-height: 14px;
+
+            .action {
+                color: $secondary;
             }
         }
 
@@ -43,11 +48,11 @@
             }
         }
 
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             display: inline-block;
-            text-align: left;
-            margin: 0 4px 0 0;
+            text-align: center;
+            margin: 0 12px 0 -4px;
             color: $primary-550;
         }
     }

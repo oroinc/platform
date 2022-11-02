@@ -1,62 +1,126 @@
 /* @theme: admin.oro; */
 
-.form-horizontal .query-designer-form {
-    @include clearfix();
+.form-horizontal {
+    .query-designer-form {
+        margin-bottom: $query-designer-controls-group-margin-start;
+    }
 
-    .control-group {
-        float: #{$start};
-        min-height: $query-designer-control-group-min-height;/* @TODO temporary solution, will be fixed in CRM-2025 */
+    .query-designer-row {
+        display: flex;
+        flex-wrap: wrap;
 
-        label.control-label,
-        .control-label.wrap {
-            width: auto;
-            margin-#{$start}: $query-designer-controls-margin-start;
-            min-width: $query-designer-control-label-min-width;/* @TODO temporary solution, will be fixed in CRM-2025 */
+        /* stylelint-disable selector-max-compound-selectors */
+        .select2-container,
+        input.label-text,
+        .function-selector .controls select,
+        .function-selector .controls .selector {
+            width: 100%;
+            max-width: 100%;
         }
+        /* stylelint-enable selector-max-compound-selectors */
 
-        .controls {
-            margin-#{$start}: $query-designer-controls-margin-start;
-            float: #{$start};
-        }
-    }
+        .control-group {
+            float: left;
+            flex-direction: column;
+            margin-right: $query-designer-controls-group-margin-start;
+            margin-bottom: $query-designer-controls-group-margin-start;
 
-    .select2-container {
-        width: $query-designer-select2-container-width !important;
-    }
-    input.label-text {
-        width: $query-designer-label-text-width;
-    }
-    .function-selector .controls select {
-        width: $query-designer-function-selector-width;
-    }
-    .sorting-selector .controls select {
-        width: $query-designer-sorting-selector-width;
-    }
-    .filter-box {
-        padding: $query-designer-filter-box-padding;
-        background: $query-designer-filter-box-background;
+            .control-label {
+                width: auto;
+                padding-top: 0;
+                padding-bottom: $form-horizontal-control-label-offset;
 
-        > .btn-group {
-            margin: 0;
-        }
-
-        .filter-item {
-            padding: 0;
-
-            > .btn {
-                border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
-                border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+                text-align: left;
             }
 
-            .filter-select .select-filter-widget,
-            .filter-criteria-hint {
-                font-weight: normal;
+            .controls {
+                float: left;
+                margin-left: 0;
+                min-width: 0;
+
+                // stylelint-disable-next-line selector-max-compound-selectors
+                .select2-container {
+                    order: -1;
+                }
+            }
+        }
+
+        .control-group-hidden,
+        .control-group-text,
+        .control-group-choice {
+            width: $query-designer-control-group-width;
+        }
+
+        .control-group-choice {
+            max-width: $query-designer-control-group-width;
+        }
+
+        .control-group-hidden {
+            .controls {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        // stylelint-disable-next-line selector-max-compound-selectors
+        .sorting-selector .controls select {
+            width: $query-designer-sorting-selector-width;
+        }
+
+        @include selector-width($query-designer-sorting-selector-width);
+
+        .submit-cancel-buttons {
+            margin-left: auto;
+            margin-bottom: $query-designer-controls-group-margin-start;
+
+            @include clearfix();
+
+            &::before {
+                display: block;
+                height: $form-horizontal-control-label-line-height + $form-horizontal-control-label-offset;
+
+                content: '';
+            }
+
+            .btn-group {
+                float: none;
+            }
+
+            .btn {
+                margin-left: $query-designer-submit-cancel-buttons-margin-start;
+            }
+        }
+
+        .filter-box {
+            padding: $query-designer-filter-box-padding;
+            background: $query-designer-filter-box-background;
+
+            > .btn-group {
+                margin: 0;
+            }
+
+            .filter-item {
+                padding: 0;
+
+                /* stylelint-disable selector-max-compound-selectors */
+                > .btn {
+                    border-top-right-radius: $query-designer-filter-item-border-radius;
+                    border-bottom-right-radius: $query-designer-filter-item-border-radius;
+                }
+
+                .filter-select .select-filter-widget,
+                .filter-criteria-hint {
+                    font-weight: font-weight('light');
+                }
+                /* stylelint-enable selector-max-compound-selectors */
             }
         }
     }
 
-    .submit-cancel-buttons .btn-group {
-        margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+    .query-designer-grouping-form {
+        .control-group {
+            float: none;
+        }
     }
 }
 
@@ -65,51 +129,45 @@
         th {
             font-size: $query-designer-grid-th-font-size;
         }
+
+        td {
+            padding-top: $query-designer-grid-td-offset-top;
+            vertical-align: top;
+        }
+
         .label-column,
         .label-cell {
             width: $query-designer-grid-label-cell-width;
         }
+
+        .label-cell {
+            word-break: break-all;
+        }
+
         .function-column,
         .function-cell {
             width: $query-designer-grid-function-cell-width;
         }
+
         .sorting-column,
         .sorting-cell {
             width: $query-designer-grid-sorting-cell-width;
         }
-        .label-cell {
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+
         .index-column,
         .index-cell {
             width: $query-designer-grid-index-cell-width;
         }
+
+        .action-column {
+            text-align: right;
+        }
+
         .action-cell {
+            padding-top: $table-tbody-td-offset;
+            padding-right: 0;
+
             white-space: nowrap;
         }
-        .action-column,
-        .action-cell {
-            width: $query-designer-grid-action-cell-width;
-        }
-    }
-
-    i.fa-list {
-        cursor: move;
-        cursor: -moz-grab;
-        cursor: -webkit-grab;
-        font-size: $query-designer-list-icon-font-size;
-    }
-}
-.query-designer-columns-grid-container {
-    .grid {
-        .action-column,
-        .action-cell {
-            width: $query-designer-columns-grid-action-cell-width;
-        }
-    }
-
-    tbody tr {
-        cursor: default;
     }
 }

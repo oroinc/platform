@@ -8,7 +8,7 @@ Oro\Bundle\UserBundle\Entity\User:
     username: megan
     organization: '@organization'
     organizations: ['@organization']
-    roles: ['@userRole']
+    userRoles: ['@userRole']
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email: megan@example.com

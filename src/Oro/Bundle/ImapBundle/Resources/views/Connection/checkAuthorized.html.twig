@@ -1,0 +1,43 @@
+{% if form.imapAccountType.userEmailOrigin.user.vars.value|length %}
+    <div class="control-group">
+        <div class="control-label wrap">
+            {{ 'oro.imap.configuration.reset_email.label'|trans }}
+        </div>
+        <div class="controls oro-item-collection">
+            <div class="controls-line-group">
+                <strong>{{ form.imapAccountType.userEmailOrigin.user.vars.value }}</strong>
+                <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                        title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+                >
+                    <span class="fa-close" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="control-group">
+    <div class="controls">
+        {{ form_row(form.imapAccountType.userEmailOrigin.checkFolder) }}
+    </div>
+</div>
+{{ form_row(form.imapAccountType.userEmailOrigin.folders) }}
+
+{{ form_row(form.imapAccountType.userEmailOrigin.user) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.accessToken) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.refreshToken) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.clientId) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.imapPort) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.imapHost) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.imapEncryption) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.smtpPort) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.smtpHost) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.smtpEncryption) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.accessTokenExpiresAt) }}
+{{ form_row(form.imapAccountType.userEmailOrigin.accountType) }}
+
+<div class="control-group">
+    <div class="controls">
+        <div class="google-alert google-connection-status alert alert-error" role="alert" style="display: none"></div>
+    </div>
+</div>

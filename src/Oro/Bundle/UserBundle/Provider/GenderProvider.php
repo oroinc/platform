@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\UserBundle\Model\Gender;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GenderProvider
 {
@@ -25,9 +25,6 @@ class GenderProvider
      */
     protected $translatedChoices;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

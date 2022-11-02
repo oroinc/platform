@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -14,6 +14,9 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Synchronizes data to the application using an import processor
+ */
 class SyncProcessor extends AbstractSyncProcessor
 {
     /** @var ManagerRegistry */
@@ -287,7 +290,7 @@ class SyncProcessor extends AbstractSyncProcessor
         if ($isSuccess) {
             if ($errors) {
                 $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
-                $warningsText .= implode($errors, PHP_EOL);
+                $warningsText .= implode(PHP_EOL, $errors);
 
                 $message .= PHP_EOL . $warningsText;
             }

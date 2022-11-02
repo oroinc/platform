@@ -2,64 +2,68 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessor;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
-use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
-use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraCollection;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessor;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * The base execution context for Data API processors for public actions.
+ * The base execution context for API processors for public actions.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Context extends NormalizeResultContext implements ContextInterface
 {
-    /** FQCN of an entity */
-    const CLASS_NAME = 'class';
-
-    /** a prefix for all configuration sections */
-    const CONFIG_PREFIX = 'config_';
-
-    /** metadata of an entity */
-    const METADATA = 'metadata';
-
-    /** a query is used to get result data */
-    const QUERY = 'query';
-
-    /** the Criteria object is used to add additional restrictions to a query is used to get result data */
-    const CRITERIA = 'criteria';
-
-    /** the response status code */
-    const RESPONSE_STATUS_CODE = 'responseStatusCode';
-
     /**
      * this header can be used to request additional data like "total count"
      * that will be returned in a response headers
      */
-    const INCLUDE_HEADER = 'X-Include';
+    public const INCLUDE_HEADER = 'X-Include';
+
+    /** FQCN of an entity */
+    private const CLASS_NAME = 'class';
+
+    /** the response status code */
+    private const RESPONSE_STATUS_CODE = 'responseStatusCode';
+
+    /** indicates whether the current action processes a master API request */
+    private const MASTER_REQUEST = 'masterRequest';
 
     /** indicates whether the current request is CORS request */
-    const CORS = 'cors';
+    private const CORS = 'cors';
+
+    /** whether HATEOAS is enabled */
+    private const HATEOAS = 'hateoas';
+
+    /** not resolved identifiers */
+    private const NOT_RESOLVED_IDENTIFIERS = 'not_resolved_identifiers';
 
     /** @var FilterCollection */
     private $filters;
@@ -82,23 +86,42 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var DocumentBuilderInterface|null */
     private $responseDocumentBuilder;
 
+    /** @var EntityDefinitionConfig|null|bool */
+    private $config = false;
+
+    /** @var array */
+    private $configSections = [];
+
     /** @var ConfigExtraCollection */
     private $configExtras;
+
+    /** @var EntityMetadata|null|bool */
+    private $metadata = false;
 
     /** @var MetadataExtraCollection|null */
     private $metadataExtras;
 
-    /**
-     * @param ConfigProvider   $configProvider
-     * @param MetadataProvider $metadataProvider
-     */
+    /** @var array|null */
+    private $infoRecords;
+
+    /** @var ParameterBagInterface|null */
+    private $sharedData;
+
+    /** @var mixed */
+    private $query;
+
+    /** @var Criteria|null */
+    private $criteria;
+
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct();
         $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
+        $this->set(self::MASTER_REQUEST, false);
         $this->set(self::CORS, false);
+        $this->set(self::HATEOAS, false);
     }
 
     /**
@@ -115,6 +138,17 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
+    {
+        return $doctrineHelper->getManageableEntityClass(
+            $this->getClassName(),
+            $this->getConfig()
+        );
     }
 
     /**
@@ -190,7 +224,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $statusCode = $this->getResponseStatusCode();
 
-        return $statusCode>= 200 && $statusCode < 300;
+        return $statusCode >= 200 && $statusCode < 300;
     }
 
     /**
@@ -227,7 +261,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function getFilterValues()
     {
         if (null === $this->filterValues) {
-            $this->filterValues = new NullFilterValueAccessor();
+            $this->filterValues = new FilterValueAccessor();
         }
 
         return $this->filterValues;
@@ -241,12 +275,24 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->filterValues = $accessor;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isMasterRequest(): bool
+    {
+        return $this->get(self::MASTER_REQUEST);
+    }
 
     /**
-     * Indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function setMasterRequest(bool $master): void
+    {
+        $this->set(self::MASTER_REQUEST, $master);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isCorsRequest(): bool
     {
@@ -254,10 +300,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * Sets a flag indicates whether the current request is CORS request.
-     * @link https://www.w3.org/TR/cors/
-     *
-     * @param bool $cors
+     * {@inheritdoc}
      */
     public function setCorsRequest(bool $cors): void
     {
@@ -267,9 +310,144 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function isHateoasEnabled(): bool
+    {
+        return (bool)$this->get(self::HATEOAS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHateoas(bool $flag)
+    {
+        $this->set(self::HATEOAS, $flag);
+        if (!$flag) {
+            $this->configExtras->removeConfigExtra(HateoasConfigExtra::NAME);
+        } elseif (!$this->configExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+            $this->configExtras->addConfigExtra(new HateoasConfigExtra());
+        }
+        if (null !== $this->metadataExtras) {
+            if (!$flag) {
+                $this->metadataExtras->removeMetadataExtra(HateoasMetadataExtra::NAME);
+            } elseif (!$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSharedData(): ParameterBagInterface
+    {
+        if (null === $this->sharedData) {
+            $this->sharedData = new ParameterBag();
+        }
+
+        return $this->sharedData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSharedData(ParameterBagInterface $sharedData): void
+    {
+        $this->sharedData = $sharedData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNormalizationContext(): array
+    {
+        return [
+            self::ACTION       => $this->getAction(),
+            self::VERSION      => $this->getVersion(),
+            self::REQUEST_TYPE => $this->getRequestType(),
+            'sharedData'       => $this->getSharedData()
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInfoRecords(): ?array
+    {
+        return $this->infoRecords;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setInfoRecords(?array $infoRecords): void
+    {
+        $this->infoRecords = $infoRecords;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addInfoRecord(string $key, $value): void
+    {
+        $this->infoRecords[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void
+    {
+        foreach ($infoRecords as $key => $val) {
+            if ($key) {
+                $this->infoRecords[$propertyPath][$key] = $val;
+            } elseif (\is_array($val)) {
+                foreach ($val as $k => $v) {
+                    $this->infoRecords[$propertyPath][$k] = $v;
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotResolvedIdentifiers(): array
+    {
+        return $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addNotResolvedIdentifier(string $path, NotResolvedIdentifier $identifier): void
+    {
+        $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
+        $notResolvedIdentifiers[$path] = $identifier;
+        $this->set(self::NOT_RESOLVED_IDENTIFIERS, $notResolvedIdentifiers);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeNotResolvedIdentifier(string $path): void
+    {
+        $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS);
+        if ($notResolvedIdentifiers) {
+            unset($notResolvedIdentifiers[$path]);
+            if ($notResolvedIdentifiers) {
+                $this->set(self::NOT_RESOLVED_IDENTIFIERS, $notResolvedIdentifiers);
+            } else {
+                $this->remove(self::NOT_RESOLVED_IDENTIFIERS);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasQuery()
     {
-        return $this->has(self::QUERY);
+        return null !== $this->query;
     }
 
     /**
@@ -277,7 +455,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getQuery()
     {
-        return $this->get(self::QUERY);
+        return $this->query;
     }
 
     /**
@@ -285,11 +463,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setQuery($query)
     {
-        if ($query) {
-            $this->set(self::QUERY, $query);
-        } else {
-            $this->remove(self::QUERY);
-        }
+        $this->query = $query;
     }
 
     /**
@@ -297,15 +471,15 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getCriteria()
     {
-        return $this->get(self::CRITERIA);
+        return $this->criteria;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setCriteria($criteria)
+    public function setCriteria(Criteria $criteria = null)
     {
-        $this->set(self::CRITERIA, $criteria);
+        $this->criteria = $criteria;
     }
 
     /**
@@ -322,6 +496,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setConfigExtras(array $extras)
     {
         $this->configExtras->setConfigExtras($extras);
+        if ($this->isHateoasEnabled() && !$this->configExtras->hasConfigExtra(HateoasConfigExtra::NAME)) {
+            $this->configExtras->addConfigExtra(new HateoasConfigExtra());
+        }
     }
 
     /**
@@ -369,7 +546,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasConfig()
     {
-        return $this->has($this->getConfigKey());
+        return false !== $this->config;
     }
 
     /**
@@ -377,12 +554,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getConfig()
     {
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
+        if (false === $this->config) {
             $this->loadConfig();
         }
 
-        return $this->get($key);
+        return $this->config;
     }
 
     /**
@@ -390,7 +566,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setConfig(?EntityDefinitionConfig $definition)
     {
-        $this->set($this->getConfigKey(), $definition);
+        $this->config = $definition;
         if (null === $definition) {
             $this->removeAllConfigSections();
         }
@@ -454,7 +630,7 @@ class Context extends NormalizeResultContext implements ContextInterface
             return false;
         }
 
-        return $this->has(self::CONFIG_PREFIX . $configSection);
+        return \array_key_exists($configSection, $this->configSections);
     }
 
     /**
@@ -466,16 +642,15 @@ class Context extends NormalizeResultContext implements ContextInterface
             return null;
         }
 
-        $key = self::CONFIG_PREFIX . $configSection;
-        if (!$this->has($key)) {
-            if (!$this->has($this->getConfigKey())) {
-                $this->loadConfig();
-            } else {
+        if (!\array_key_exists($configSection, $this->configSections)) {
+            if (false !== $this->config) {
                 $this->setConfigOf($configSection, null);
+            } else {
+                $this->loadConfig();
             }
         }
 
-        return $this->get($key);
+        return $this->configSections[$configSection];
     }
 
     /**
@@ -487,24 +662,29 @@ class Context extends NormalizeResultContext implements ContextInterface
             throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
         }
 
-        $this->set(self::CONFIG_PREFIX . $configSection, $config);
+        $this->configSections[$configSection] = $config;
 
         // make sure that all config sections, including a main section, are added to the context
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
+        if (false === $this->config) {
+            $this->config = null;
         }
         $this->ensureAllConfigSectionsSet();
     }
 
     /**
-     * Gets a key of a main section of an entity configuration.
+     * @param string $entityClass
+     * @param array  $extras
      *
-     * @return string
+     * @return Config
      */
-    protected function getConfigKey()
+    protected function loadEntityConfig($entityClass, array $extras)
     {
-        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION;
+        return $this->configProvider->getConfig(
+            $entityClass,
+            $this->getVersion(),
+            $this->getRequestType(),
+            $extras
+        );
     }
 
     /**
@@ -522,12 +702,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
 
         try {
-            $config = $this->configProvider->getConfig(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getConfigExtras()
-            );
+            $config = $this->loadEntityConfig($entityClass, $this->getConfigExtras());
             $this->processLoadedConfig($config);
         } catch (\Exception $e) {
             $this->processLoadedConfig(null);
@@ -536,23 +711,23 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * @param Config|null $config
-     */
     protected function processLoadedConfig(?Config $config)
     {
         // add loaded config sections to the context
         if ($config && !$config->isEmpty()) {
             foreach ($config as $key => $value) {
-                $this->set(self::CONFIG_PREFIX . $key, $value);
+                if (ConfigUtil::DEFINITION === $key) {
+                    $this->config = $value;
+                } else {
+                    $this->configSections[$key] = $value;
+                }
             }
         }
 
         // make sure that all config sections, including a main section, are added to the context
         // even if a section was not returned by the config provider
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
+        if (false === $this->config) {
+            $this->config = null;
         }
         $this->ensureAllConfigSectionsSet();
     }
@@ -564,9 +739,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $configSections = $this->getConfigSections();
         foreach ($configSections as $name) {
-            $key = self::CONFIG_PREFIX . $name;
-            if (!$this->has($key)) {
-                $this->set($key, null);
+            if (!\array_key_exists($name, $this->configSections)) {
+                $this->configSections[$name] = null;
             }
         }
     }
@@ -578,9 +752,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $configSections = $this->getConfigSections();
         foreach ($configSections as $name) {
-            $key = self::CONFIG_PREFIX . $name;
-            if ($this->has($key)) {
-                $this->remove($key);
+            if (\array_key_exists($name, $this->configSections)) {
+                unset($this->configSections[$name]);
             }
         }
     }
@@ -617,6 +790,9 @@ class Context extends NormalizeResultContext implements ContextInterface
                 $this->metadataExtras = new MetadataExtraCollection();
             }
             $this->metadataExtras->setMetadataExtras($extras);
+            if ($this->isHateoasEnabled() && !$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+                $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
+            }
         }
     }
 
@@ -663,7 +839,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasMetadata()
     {
-        return $this->has(self::METADATA);
+        return false !== $this->metadata;
     }
 
     /**
@@ -671,11 +847,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getMetadata()
     {
-        if (!$this->has(self::METADATA)) {
+        if (false === $this->metadata) {
             $this->loadMetadata();
         }
 
-        return $this->get(self::METADATA);
+        return $this->metadata;
     }
 
     /**
@@ -684,9 +860,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setMetadata(?EntityMetadata $metadata)
     {
         if ($metadata) {
-            $this->set(self::METADATA, $metadata);
+            $this->metadata = $metadata;
         } else {
-            $this->remove(self::METADATA);
+            $this->metadata = false;
         }
     }
 
@@ -706,6 +882,9 @@ class Context extends NormalizeResultContext implements ContextInterface
             )
         ) {
             $this->metadataExtras->addMetadataExtra(new ActionMetadataExtra($action));
+        }
+        if ($this->isHateoasEnabled() && !$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
+            $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
         }
     }
 
@@ -732,6 +911,7 @@ class Context extends NormalizeResultContext implements ContextInterface
                     $config,
                     $this->getMetadataExtras()
                 );
+                $this->initializeMetadata($metadata);
             }
             $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
@@ -741,12 +921,41 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * @param EntityMetadata|null $metadata
-     */
     protected function processLoadedMetadata(?EntityMetadata $metadata)
     {
         // add loaded metadata to the context
-        $this->set(self::METADATA, $metadata);
+        $this->metadata = $metadata;
+    }
+
+    private function initializeMetadata(
+        EntityMetadata $metadata,
+        string $path = null,
+        TargetMetadataAccessor $targetMetadataAccessor = null
+    ): void {
+        if (null === $targetMetadataAccessor) {
+            $targetMetadataAccessor = new TargetMetadataAccessor(
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->metadataProvider,
+                $this->getMetadataExtras(),
+                $this->configProvider,
+                $this->getConfigExtras()
+            );
+        }
+
+        $metadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $associationName => $association) {
+            $associationPath = $path
+                ? $path . ConfigUtil::PATH_DELIMITER . $associationName
+                : $associationName;
+            $association->setTargetMetadataAccessor($targetMetadataAccessor);
+            $association->setAssociationPath($associationPath);
+            $targetMetadata = $association->getTargetMetadata();
+            if (null !== $targetMetadata) {
+                $this->initializeMetadata($targetMetadata, $associationPath, $targetMetadataAccessor);
+            }
+        }
     }
 }

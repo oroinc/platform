@@ -1,29 +1,39 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 
 class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FixAddressesTypesSubscriber
-     */
-    protected $subscriber;
+    /** @var FixAddressesTypesSubscriber */
+    private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new FixAddressesTypesSubscriber('owner.addresses');
+    }
+
+    private function createAddress(AddressType $type = null): TypedAddress
+    {
+        $address = new TypedAddress();
+        if (null !== $type) {
+            $address->addType($type);
+        }
+
+        return $address;
     }
 
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
-            array(FormEvents::POST_SUBMIT => 'postSubmit'),
+            [FormEvents::POST_SUBMIT => 'postSubmit'],
             $this->subscriber->getSubscribedEvents()
         );
     }
@@ -33,16 +43,12 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSubmit(array $allAddresses, $formAddressKey, array $expectedAddressesData)
     {
-        $owner = new TypedAddressOwner($allAddresses);
-
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->setMethods(array('getData'))
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($allAddresses[$formAddressKey]));
+        $owner = new TypedAddressOwner();
+        foreach ($allAddresses as $address) {
+            $address->setOwner($owner);
+            $owner->getAddresses()->add($address);
+        }
+        $event = new FormEvent($this->createMock(FormInterface::class), $allAddresses[$formAddressKey]);
 
         $this->subscriber->postSubmit($event);
 
@@ -52,46 +58,38 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function postSubmitDataProvider()
+    public function postSubmitDataProvider(): array
     {
         $billing = new AddressType('billing');
         $shipping = new AddressType('shipping');
 
-        return array(
-            'unset_primary_and_remove_type' => array(
-                'allAddresses' => array(
-                    'foo' => $this->createAddress()->addType($billing),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->addType($shipping),
-                ),
+        return [
+            'unset_primary_and_remove_type' => [
+                'allAddresses' => [
+                    'foo' => $this->createAddress($billing),
+                    'bar' => $this->createAddress($billing),
+                    'baz' => $this->createAddress($shipping),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('typeNames' => array('billing')),
-                    'bar' => array('typeNames' => array()),
-                    'baz' => array('typeNames' => array('shipping'))
-                )
-            ),
-            'nothing_to_do' => array(
-                'allAddresses' => array(
+                'expectedAddressesData' => [
+                    'foo' => ['typeNames' => ['billing']],
+                    'bar' => ['typeNames' => []],
+                    'baz' => ['typeNames' => ['shipping']]
+                ]
+            ],
+            'nothing_to_do' => [
+                'allAddresses' => [
                     'foo' => $this->createAddress(),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->addType($shipping),
-                ),
+                    'bar' => $this->createAddress($billing),
+                    'baz' => $this->createAddress($shipping),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('typeNames' => array()),
-                    'bar' => array('typeNames' => array('billing')),
-                    'baz' => array('typeNames' => array('shipping'))
-                )
-            ),
-        );
-    }
-
-    /**
-     * @return TypedAddress
-     */
-    protected function createAddress()
-    {
-        return new TypedAddress();
+                'expectedAddressesData' => [
+                    'foo' => ['typeNames' => []],
+                    'bar' => ['typeNames' => ['billing']],
+                    'baz' => ['typeNames' => ['shipping']]
+                ]
+            ],
+        ];
     }
 }

@@ -9,11 +9,11 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEnumFilter;
 
 class SearchEnumFilterTest extends AbstractSearchEnumFilterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->filter = new SearchEnumFilter($this->formFactory, $this->filterUtility, $this->dictionaryManager);
+        $this->filter = new SearchEnumFilter($this->formFactory, new FilterUtility(), $this->dictionaryManager);
     }
 
     public function testApply()
@@ -24,7 +24,6 @@ class SearchEnumFilterTest extends AbstractSearchEnumFilterTest
             'value2'
         ];
 
-        /** @var SearchFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
         $ds->expects($this->once())
             ->method('addRestriction')
@@ -41,5 +40,11 @@ class SearchEnumFilterTest extends AbstractSearchEnumFilterTest
                 ]
             )
         );
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

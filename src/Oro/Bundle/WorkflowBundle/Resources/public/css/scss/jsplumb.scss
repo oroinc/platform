@@ -1,9 +1,25 @@
 /* @theme: admin.oro; */
 
-/* mixins */
-@mixin workflow-hover-block {
-    border: 1px solid $hover-border-color;
-    background: linear-gradient($hover-gradient-start-color, $hover-gradient-middle-color 3%, $hover-gradient-end-color);
+/* stylelint-disable no-descending-specificity, selector-class-pattern */
+
+@keyframes fade-in {
+    to {
+        height: 0;
+        margin: 0;
+        opacity: 0;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 /* styles */
@@ -11,79 +27,86 @@
 .workflow-step,
 .workflow-transition-overlay,
 .workflow-flowchart {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
 .workflow-step-editor,
 .workflow-step-viewer {
-    border-top: 1px solid #f1f1f1;
-
-    .workflow-table-container {
-        padding-top: 20px;
-    }
-
     .workflow-flowchart-container {
-        background-color: #fafafa;
-        border: 1px solid #f1f1f1;
-        border-top-width: 0;
-    }
-}
+        background-color: $flowchart-bg-color;
+        overflow: hidden;
 
-.workflow-flowchart-controls {
-    padding: 10px 10px 0;
-    min-height: 32px;
-    position: absolute;
-    z-index: 600;
+        &.failed {
+            border-width: 0;
 
-    .checkbox-group {
-        background: rgba(251, 251, 251, .7);
-        padding: 5px 7px 2px 7px;
+            .workflow-flowchart-controls {
+                display: none;
+            }
 
-        input[type='checkbox'] {
-            margin-top: -2px;
-            margin-right: 6px;
+            .workflow-flowchart-wrapper {
+                animation: fade-in .5s both;
+            }
+        }
+
+        &.fixed {
+            .workflow-flowchart-wrapper {
+                animation: fade-out .5s both;
+            }
+        }
+
+        .zoom-controls {
+            padding: $flowchart-checkbox-group-padding;
         }
     }
 }
 
-.workflow-flowchart-wrapper {
-    overflow: hidden;
-    height: 700px;
+.workflow-flowchart-controls {
+    padding: $flowchart-controls-padding;
+    min-height: $flowchart-controls-min-height;
+    position: absolute;
+    z-index: $flowchart-controls-z-index;
+
+    .checkbox-group {
+        background-color: $flowchart-checkbox-group-bg-color;
+        padding: $flowchart-checkbox-group-padding;
+    }
 }
 
-.workflow-flowchart {
-    position: relative;
-    min-height: 610px;
-    margin: 0;
+.workflow-flowchart-alert {
+    margin-top: $flowchart-alert-margin-top;
+}
 
-    ._jsPlumb_endpoint {
-        z-index: 100;
+.workflow-flowchart-wrapper {
+    overflow: hidden;
+    height: $flowchart-wrapper-height;
+    border: $flowchart-wrapper-border;
+
+    .workflow-flowchart {
+        position: relative;
+        height: 100%;
+        margin: 0;
+
+        ._jsPlumb_endpoint {
+            z-index: $jsplumb-endpoint-z-index;
+        }
     }
 }
 
 .workflow-flowchart {
     .workflow-step {
-        z-index: 100;
+        z-index: $flowchart-step-z-index;
         position: absolute;
-        border-radius: 3px;
-        padding: 8px 18px;
-        height: 38px;
-        color: #fff;
-        border: 1px solid $step-border-color;
-        max-width: 180px;
-        background: linear-gradient($step-gradient-start-color, $step-gradient-end-color);
-        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3);
-        text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+        border-radius: $flowchart-step-border-radius;
+        padding: $flowchart-step-v-padding $flowchart-step-h-padding;
+        height: $flowchart-step-height;
+        color: $flowchart-step-color;
+        max-width: $flowchart-step-max-width;
+        background-color: $flowchart-step-bg-color;
 
         .step-label {
             text-align: center;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: $flowchart-step-font-size;
+            font-weight: font-weight('bold');
             width: 100%;
             cursor: default;
 
@@ -96,110 +119,149 @@
             width: $jsplumb-source-radius * 2;
             height: $jsplumb-source-radius * 2;
             border-radius: $jsplumb-source-radius;
-            border: $jsplumb-source-radius / 2 solid $source-border-color;
+            border: $jsplumb-source-border;
             position: absolute;
             visibility: hidden;
-            background: linear-gradient($source-gradient-start-color, $source-gradient-middle-color 3%, $source-gradient-end-color);
-
-            &:hover {
-                background: linear-gradient(darken($source-gradient-start-color, 5%), darken($source-gradient-middle-color, 5%) 3%, darken($source-gradient-end-color, 5%));
-                cursor: pointer;
-            }
+            background: $jsplumb-source-bg-color;
 
             &.jsplumb-source-top-left {
                 top: -$jsplumb-source-radius;
-                left: -$jsplumb-source-radius;
+                left: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-top-right {
                 top: -$jsplumb-source-radius;
-                right: -$jsplumb-source-radius;
+                right: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-bottom-right {
                 bottom: -$jsplumb-source-radius;
-                right: -$jsplumb-source-radius;
+                right: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-bottom-left {
                 bottom: -$jsplumb-source-radius;
-                left: -$jsplumb-source-radius;
+                left: $jsplumb-source-radius * .5;
+            }
+        }
+
+        &.dropdown .dropdown-toggle {
+            padding-right: $flowchart-step-h-padding;
+
+            &::before {
+                right: $flowchart-step-h-padding;
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-step-bg-color,
+                        rgba($flowchart-step-bg-color, .2)
+                    );
             }
         }
 
         &:hover {
             .jsplumb-source {
                 visibility: visible;
+                cursor: pointer;
             }
         }
 
-        &.dropdown {
-            .dropdown-toggle {
-                position: absolute;
+        &._jsPlumb_hover,
+        &._jsPlumb_source_hover,
+        &._jsPlumb_target_hover,
+        &:not(.start-step).jsplumb-drag-hover,
+        &:hover {
+            color: $flowchart-step-color;
+
+            background-color: $flowchart-step-hover-bg-color;
+
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-step-hover-bg-color,
+                        rgba($flowchart-step-hover-bg-color, .2)
+                    );
+            }
+        }
+
+        &.start-step {
+            height: $flowchart-start-step-height;
+            width: $flowchart-start-step-width;
+            padding: 0;
+
+            line-height: $flowchart-start-step-height;
+            background-color: $flowchart-start-step-bg-color;
+
+            border-radius: $flowchart-start-step-border-radius;
+            vertical-align: middle;
+
+            &:hover {
+                background-color: $flowchart-start-step-hover-bg-color;
+            }
+
+            .jsplumb-source {
+                width: $jsplumb-start-source-radius * 2;
+                height: $jsplumb-start-source-radius * 2;
+                border-radius: $jsplumb-start-source-radius;
+            }
+
+            .jsplumb-source-top-left {
+                top: $jsplumb-start-source-offset;
+                left: $jsplumb-start-source-offset;
+            }
+
+            .jsplumb-source-top-right {
+                top: $jsplumb-start-source-offset;
+                right: $jsplumb-start-source-offset;
+            }
+
+            .jsplumb-source-bottom-right {
+                bottom: $jsplumb-start-source-offset;
+                right: $jsplumb-start-source-offset;
+            }
+
+            .jsplumb-source-bottom-left {
+                bottom: $jsplumb-start-source-offset;
+                left: $jsplumb-start-source-offset;
+            }
+
+            .step-label {
+                width: 100%;
+            }
+        }
+
+        &.final-step {
+            background-color: $flowchart-final-step-bg-color;
+
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-final-step-bg-color,
+                        rgba($flowchart-final-step-bg-color, .2)
+                    );
+            }
+
+            &._jsPlumb_hover,
+            &._jsPlumb_source_hover,
+            &._jsPlumb_target_hover,
+            &.jsplumb-drag-hover,
+            &:hover {
+                background-color: $flowchart-final-step-hover-bg-color;
+
+                .dropdown-toggle::before {
+                    background-image:
+                        linear-gradient(
+                            to left,
+                            $flowchart-final-step-hover-bg-color,
+                            rgba($flowchart-final-step-hover-bg-color, .2)
+                        );
+                }
             }
         }
     }
 
-    .workflow-step.start-step {
-        border-radius: 42.5px;
-        height: 85px;
-        width: 85px;
-        border: 1px solid $start-step-border-color;
-        background: linear-gradient($start-step-gradient-start-color, $start-step-gradient-end-color);
-
-        .jsplumb-source-top-left {
-            top: 2px;
-            left: 2px;
-        }
-
-        .jsplumb-source-top-right {
-            top: 2px;
-            right: 2px;
-        }
-
-        .jsplumb-source-bottom-right {
-            bottom: 2px;
-            right: 2px;
-        }
-
-        .jsplumb-source-bottom-left {
-            bottom: 2px;
-            left: 2px;
-        }
-
-        .step-label {
-            margin-top: 22.5px;
-            width: 100%;
-        }
-    }
-
-    .workflow-step.final-step {
-        border: 1px solid $final-step-border-color;
-        background: linear-gradient($final-step-gradient-start-color, $final-step-gradient-end-color);
-    }
-
-    /* transition */
-    .workflow-transition-overlay {
-        padding: 3px 11px;
-        border-radius: 3px;
-        height: 28px;
-        border: 1px solid $transition-overlay-border-color;
-        background: linear-gradient($transition-overlay-gradient-start-color, $transition-overlay-gradient-end-color);
-        box-shadow: 0 3px 7px 0 #e8e8e8;
-
-        &:hover,
-        &._jsPlumb_hover {
-            z-index: 200;
-        }
-
-        .transition-label {
-            max-width: $transition-label-max-width;
-            margin-top: 1px;
-            cursor: default;
-        }
-    }
-
-    /* common style for step and transition */
     &.workflow-drag-connection {
         .jsplumb-source {
             visibility: visible;
@@ -212,55 +274,62 @@
         }
 
         .workflow-step.connection-source {
-            @include workflow-hover-block();
-        }
-    }
-
-    .workflow-step {
-        &._jsPlumb_hover,
-        &._jsPlumb_source_hover,
-        &._jsPlumb_target_hover,
-        &:not(.start-step).jsplumb-drag-hover,
-        &:hover {
-            color: #fff;
-
-            @include workflow-hover-block();
-        }
-
-        &.dropdown {
-            .dropdown-toggle {
-                margin-left: 2px;
-            }
-
-            &:hover {
-                .dropdown-toggle {
-                    position: absolute;
-                    right: 4px;
-                }
-            }
+            background-color: $flowchart-step-hover-bg-color;
         }
     }
 
     .workflow-transition-overlay {
-        opacity: .7;
+        padding: $flowchart-transition-v-padding $flowchart-transition-h-padding;
+        border-radius: $flowchart-transition-border-radius;
+        font-size: $flowchart-transition-font-size;
+        height: $flowchart-transition-height;
+        color: $flowchart-transition-color;
+        background-color: $flowchart-transition-bg-color;
+        opacity: $flowchart-transition-opacity;
+
+        .transition-label {
+            max-width: $flowchart-transition-label-max-width;
+            cursor: default;
+        }
+
+        &.dropdown .dropdown-toggle {
+            padding-right: $flowchart-transition-h-padding;
+
+            &::before {
+                right: $flowchart-transition-h-padding;
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-transition-bg-color,
+                        rgba($flowchart-transition-bg-color, .3)
+                    );
+            }
+        }
 
         &._jsPlumb_hover,
         &._jsPlumb_source_hover,
         &._jsPlumb_target_hover,
         &:not(.start-step).jsplumb-drag-hover,
         &:hover {
-            border: 1px solid #b68e65;
-            background: #fff3e6;
-            color: #7c6248;
+            background-color: $flowchart-transition-hover-bg-color;
+            color: $flowchart-transition-hover-color;
             opacity: 1;
+            // stylelint-disable-next-line declaration-no-important
             display: block !important;
-        }
+            z-index: $flowchart-transition-hover-z-index;
 
-        &.dropdown .dropdown-toggle {
-            margin: 0 -5px;
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-transition-hover-bg-color,
+                        rgba($flowchart-transition-hover-bg-color, .3)
+                    );
+            }
         }
     }
 
+    /* common style for step and transition */
     .workflow-step,
     .workflow-transition-overlay {
         white-space: nowrap;
@@ -268,8 +337,8 @@
         .step-label,
         .transition-label {
             overflow: hidden;
-            text-overflow: ellipsis;
             display: inline-block;
+            text-overflow: ellipsis;
         }
 
         &.dropdown {
@@ -278,21 +347,35 @@
                 text-shadow: none;
             }
 
+            .dropdown-toggle {
+                vertical-align: top;
+                display: none;
+                position: absolute;
+                cursor: pointer;
+                right: 0;
+
+                &::before {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    left: 0;
+                    height: 100%;
+                }
+
+                &::after {
+                    position: relative;
+                }
+            }
+
             &:hover {
                 .dropdown-toggle {
                     display: inline-block;
                 }
             }
-
-            .dropdown-toggle {
-                vertical-align: top;
-                display: none;
-                cursor: pointer;
-            }
         }
 
         &.dropdown.show {
-            z-index: 101;
+            z-index: $flowchart-transition-open-dropdown-z-index;
 
             .dropdown-toggle {
                 display: inline-block;
@@ -306,6 +389,8 @@
 
     .workflow-transition-endpoint-hover {
         opacity: 1;
+        box-shadow: $flowchart-transition-endpoint-box-shadow;
+        border-radius: $flowchart-transition-endpoint-border-radius;
     }
 
     &.workflow-flowchart-editor {
@@ -315,15 +400,6 @@
 
         .step-label {
             cursor: move;
-        }
-
-        .workflow-transition-overlay {
-            padding-right: 16px;
-
-            &:hover,
-            &.show {
-                padding-right: 11px;
-            }
         }
     }
 }

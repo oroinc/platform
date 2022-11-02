@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * This constraint can be used to check if an access to read an associated entity is granted.
+ * This constraint is used to check whether an access to an associated entity is granted.
  * By default the VIEW permission is used to check.
  *
  * @Annotation
@@ -21,17 +21,9 @@ class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterf
     /**
      * {@inheritdoc}
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return Response::HTTP_FORBIDDEN;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'oro_api.validator.access_granted';
     }
 
     /**

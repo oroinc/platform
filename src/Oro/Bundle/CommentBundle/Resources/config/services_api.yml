@@ -1,0 +1,29 @@
+services:
+    oro_comment.api.comment_association_provider:
+        class: Oro\Bundle\CommentBundle\Api\CommentAssociationProvider
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+
+    oro_comment.api.get_config.add_comment_associations:
+        class: Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociations
+        arguments:
+            - '@oro_comment.api.comment_association_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', priority: -10 }
+
+    oro_comment.api.get_config.add_comment_association_descriptions:
+        class: Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociationDescriptions
+        arguments:
+            - '@oro_comment.api.comment_association_provider'
+            - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+            - '@oro_api.entity_name_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
+
+    oro_comment.api.collect_subresources.exclude_change_comment_subresources:
+        class: Oro\Bundle\CommentBundle\Api\Processor\ExcludeChangeCommentSubresources
+        arguments:
+            - '@oro_comment.api.comment_association_provider'
+        tags:
+            - { name: oro.api.processor, action: collect_subresources, priority: -20 }

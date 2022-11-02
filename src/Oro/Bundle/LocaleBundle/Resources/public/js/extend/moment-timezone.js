@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var moment = require('moment-timezone');
-    var origTz = moment.fn.tz;
+    const _ = require('underscore');
+    const moment = require('moment-timezone');
+    const origTz = moment.fn.tz;
 
     /**
      * Getter/Setter for moment's timezone
@@ -16,15 +16,15 @@ define(function(require) {
         if (name) {
             this._z = moment.tz.zone(name);
             if (this._z && keepTime) {
-                var dateTimeString;
-                var dateTimeFormat = 'YYYY-MM-DD[T]HH:mm:ss';
+                let dateTimeString;
+                const dateTimeFormat = 'YYYY-MM-DD[T]HH:mm:ss';
                 if (this.hasOwnProperty('_tzm')) {
                     dateTimeString = this.add(this._tzm, 'minutes').clone().utc().format(dateTimeFormat);
                     delete this._tzm;
                 } else {
                     dateTimeString = this.format(dateTimeFormat);
                 }
-                var momentWithCorrectTZ = moment.tz(dateTimeString, dateTimeFormat, true, name);
+                const momentWithCorrectTZ = moment.tz(dateTimeString, dateTimeFormat, true, name);
                 _.extend(this, _.pick(momentWithCorrectTZ, '_d', '_isUTC', '_offset'));
             } else {
                 origTz.call(this, name);

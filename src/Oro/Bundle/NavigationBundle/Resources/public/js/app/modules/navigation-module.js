@@ -1,7 +1,4 @@
-define(function(require) {
-    'use strict';
+import mediator from 'oroui/js/mediator';
+import pageStateChecker from 'oronavigation/js/app/services/page-state-checker';
 
-    var mediator = require('oroui/js/mediator');
-
-    mediator.setHandler('isPageStateChanged', function() {}); // default handler returns undefined
-});
+mediator.setHandler('isPageStateChanged', pageStateChecker.isStateChanged);

@@ -1,125 +1,130 @@
-parameters:
-    oro_query_designer.query_designer.manager.class:                Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
-    oro_query_designer.query_designer.restriction_builder.class:    Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder
-    oro_query_designer.config.resolver.class:                       Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
-    oro_query_designer.grid.extension.orm_datasource.class:         Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
-    oro_query_designer.validator.query_validator.class:             Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
-    oro_query_designer.validator.grouping_validator.class:          Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator
-    oro_query_designer.grid.datagrid_configuration_builder.class:   Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
-    oro_query_designer.group_by_helper.class:                       Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 services:
     oro_query_designer.query_designer.manager:
-        class: '%oro_query_designer.query_designer.manager.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
+        lazy: true
         arguments:
-            - []
+            - '@oro_query_designer.configuration.provider'
             - '@oro_query_designer.config.resolver'
             - '@oro_entity.entity_hierarchy_provider'
+            - '@oro_filter.extension.orm_filter_bag'
             - '@translator'
 
-    oro_query_designer.query_designer.manager.link:
-        tags:
-            - { name: oro_service_link,  service: oro_query_designer.query_designer.manager }
+    Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager:
+        alias: 'oro_query_designer.query_designer.manager'
 
     oro_query_designer.query_designer.restriction_builder:
-        class: '%oro_query_designer.query_designer.restriction_builder.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder
         arguments:
             - '@oro_query_designer.query_designer.manager'
+            - '@oro_config.manager'
+            - '@oro_filter.execution_context'
 
     oro_query_designer.config.resolver:
-        class: '%oro_query_designer.config.resolver.class%'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
         arguments:
             - '@oro_entity.orm.entity_class_resolver'
             - '@service_container'
 
+    oro_query_designer.configuration.provider:
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/query_designer.php'
+            - '%kernel.debug%'
+            - '@oro_query_designer.configuration'
+
+    oro_query_designer.configuration:
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration
+        public: false
+        arguments:
+            - "@=service('oro_filter.extension.orm_filter_bag').getFilterNames()"
+
+    Oro\Bundle\QueryDesignerBundle\Command\DumpConfigReferenceCommand:
+        class: Oro\Bundle\QueryDesignerBundle\Command\DumpConfigReferenceCommand
+        public: false
+        arguments:
+            - '@oro_query_designer.configuration'
+        tags:
+            - { name: console.command }
+
     oro_query_designer.grid.extension.orm_datasource:
-        class: '%oro_query_designer.grid.extension.orm_datasource.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
         arguments:
             - '@oro_query_designer.query_designer.restriction_builder'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_query_designer.exclusion_provider:
-        class: '%oro_entity.exclusion_provider.chain.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         calls:
             - [addProvider, ['@oro_entity.exclusion_provider']]
 
-    oro_query_designer.virtual_field_provider:
-        alias: oro_entity.virtual_field_provider.chain
-
     oro_query_designer.entity_provider:
-        class: '%oro_entity.entity_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityProvider
         parent: oro_entity.entity_provider.abstract
+        lazy: true
         calls:
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
 
     oro_query_designer.entity_field_provider:
-        class: '%oro_entity.entity_field_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
         parent: oro_entity.entity_field_provider.abstract
+        lazy: true
         calls:
             - [setEntityProvider, ['@oro_query_designer.entity_provider']]
-            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider.chain']]
+            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
             - [setExclusionProvider, ['@oro_query_designer.exclusion_provider']]
 
     oro_query_designer.entity_field_list_provider:
-        class: '%oro_entity.entity_field_list_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
+        public: true
         arguments:
             - '@oro_query_designer.entity_field_provider'
             - '@oro_query_designer.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'
 
     oro_query_designer.grid.datagrid_configuration_builder:
-        class: '%oro_query_designer.grid.datagrid_configuration_builder.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
+        public: false
         arguments:
             - '@oro_query_designer.query_designer.manager'
-            - '@oro_entity.virtual_field_provider.chain'
-            - '@doctrine'
+            - '@oro_entity.virtual_field_provider'
+            - '@oro_entity.virtual_relation_provider'
+            - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.datagrid.guesser'
             - '@oro_entity.entity_name_resolver'
-        calls:
-            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
 
     oro_query_designer.validator.query_validator:
-        class: '%oro_query_designer.validator.query_validator.class%'
+        class: Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryValidator
         arguments:
+            - '@oro_filter.execution_context'
             - '@oro_datagrid.configuration.provider.chain'
             - '@oro_datagrid.datagrid.builder'
             - '@oro_entity.doctrine_helper'
-            - '@translator'
             - '%kernel.debug%'
         tags:
-            - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
+            - { name: validator.constraint_validator }
 
-    oro_query_designer.validator.definition_query_validator:
-        class: Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator
+    oro_query_designer.validator.query_definition_validator:
+        class: Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryDefinitionValidator
         arguments:
-            - '@oro_query_designer.entity_field_list_provider'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_query_designer.entity_field_provider'
         tags:
-            - { name: validator.constraint_validator, alias: oro_query_designer.definition_query_validator }
+            - { name: validator.constraint_validator }
 
-    oro_query_designer.validator.grouping_validator:
-        class: '%oro_query_designer.validator.grouping_validator.class%'
-        arguments:
-            - '@translator'
+    oro_query_designer.sql_walker.sub_query_limit:
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitOutputResultModifier
+        abstract: true
         tags:
-            - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }
+            - { name: oro_entity.sql_walker }
 
     oro_query_designer.group_by_helper:
-        class: '%oro_query_designer.group_by_helper.class%'
-
-    oro_query_designer.query_designer.filter_processor:
-        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\FilterProcessor
-        arguments:
-            - '@oro_query_designer.query_designer.manager'
-            - '@oro_entity.virtual_field_provider.chain'
-            - '@doctrine'
-            - '@oro_query_designer.query_designer.restriction_builder'
-        calls:
-            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
-        tags:
-            - { name: oro_dashboard.widget_provider.filter }
+        class: Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 
     oro_query_designer.query_designer.subquery_limit_helper:
-        class: 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper'
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper
         public: false
 
     oro_query_designer.query_designer.segment_filters_purifier:

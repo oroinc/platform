@@ -19,10 +19,6 @@ class LocaleExtension extends AbstractExtension
     /** @var TranslatableListener */
     private $translatableListener;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param TranslatableListener $translatableListener
-     */
     public function __construct(LocaleSettings $localeSettings, TranslatableListener $translatableListener)
     {
         $this->localeSettings = $localeSettings;
@@ -32,9 +28,16 @@ class LocaleExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onStart(Context $context): void
     {
         \Locale::setDefault($this->localeSettings->getLocale());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onPreReceived(Context $context): void
+    {
         $this->translatableListener->setTranslatableLocale($this->localeSettings->getLanguage());
     }
 }

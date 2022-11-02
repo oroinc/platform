@@ -2,43 +2,31 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener\ORM;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadata;
+    /** @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadata;
 
-    /**
-     * @var GeneratedValueStrategyListener
-     */
-    protected $listener;
+    /** @var GeneratedValueStrategyListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->event = $this
-            ->getMockBuilder('Doctrine\ORM\Event\LoadClassMetadataEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $this->metadata = $this->createMock(ClassMetadataInfo::class);
 
         $this->listener = new GeneratedValueStrategyListener(
             DatabaseDriverInterface::DRIVER_POSTGRESQL
@@ -49,8 +37,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
     {
         $listener = new GeneratedValueStrategyListener('not_postgres');
 
-        $this->event
-            ->expects($this->never())
+        $this->event->expects($this->never())
             ->method('getClassMetadata');
 
         $listener->loadClassMetadata($this->event);
@@ -58,73 +45,57 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testNotIdGeneratorSequence()
     {
-        $this->event
-            ->expects($this->once())
+        $this->event->expects($this->once())
             ->method('getClassMetadata')
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
-        $this->metadata
-            ->expects($this->once())
+        $this->metadata->expects($this->once())
             ->method('isIdGeneratorSequence')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->listener->loadClassMetadata($this->event);
     }
 
     /**
-     * @param string              $field
-     * @param string              $sequence
-     * @param string              $type
-     * @param AbstractIdGenerator $generator
-     *
      * @dataProvider identityGeneratorProvider
      */
-    public function testIdentityGenerator($field, $sequence, $type, AbstractIdGenerator $generator)
-    {
-        $this->event
-            ->expects($this->once())
+    public function testIdentityGenerator(
+        string $field,
+        string $sequence,
+        string $type,
+        AbstractIdGenerator $generator
+    ) {
+        $this->event->expects($this->once())
             ->method('getClassMetadata')
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
         $this->metadata->sequenceGeneratorDefinition = ['sequenceName' => $sequence];
 
-        $this->metadata
-            ->expects($this->once())
+        $this->metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue($field));
-
-        $this->metadata
-            ->expects($this->once())
+            ->willReturn($field);
+        $this->metadata->expects($this->once())
             ->method('isIdGeneratorSequence')
-            ->will($this->returnValue(true));
-
-        $this->metadata
-            ->expects($this->once())
+            ->willReturn(true);
+        $this->metadata->expects($this->once())
             ->method('getFieldMapping')
-            ->with($this->equalTo($field))
-            ->will($this->returnValue(['type' => $type]));
-
-        $this->metadata
-            ->expects($this->once())
+            ->with($field)
+            ->willReturn(['type' => $type]);
+        $this->metadata->expects($this->once())
             ->method('setIdGeneratorType')
-            ->with($this->equalTo(ClassMetadata::GENERATOR_TYPE_IDENTITY));
-
-        $this->metadata
-            ->expects($this->once())
+            ->with(ClassMetadata::GENERATOR_TYPE_IDENTITY);
+        $this->metadata->expects($this->once())
             ->method('setIdGenerator')
-            ->with($this->equalTo($generator));
+            ->with($generator);
 
         $this->listener->loadClassMetadata($this->event);
     }
 
-    /**
-     * @return array
-     */
-    public function identityGeneratorProvider()
+    public function identityGeneratorProvider(): array
     {
         return [
-            ['id', 'id_field_seq', Type::INTEGER, new IdentityGenerator('id_field_seq')],
-            ['id', 'id_field_seq', Type::BIGINT, new BigIntegerIdentityGenerator('id_field_seq')],
+            ['id', 'id_field_seq', Types::INTEGER, new IdentityGenerator('id_field_seq')],
+            ['id', 'id_field_seq', Types::BIGINT, new BigIntegerIdentityGenerator('id_field_seq')],
         ];
     }
 }

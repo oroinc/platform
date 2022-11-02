@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
@@ -11,25 +10,14 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
  */
 class ConfigurablePermissionProvider
 {
-    const CACHE_ID = 'configurable_permissions';
-    const DEFAULT_CONFIGURABLE_NAME = 'default';
+    public const DEFAULT_CONFIGURABLE_NAME = 'default';
 
     /** @var ConfigurablePermissionConfigurationProvider */
     private $configurationProvider;
 
-    /** @var CacheProvider */
-    private $cache;
-
-    /**
-     * @param ConfigurablePermissionConfigurationProvider $configurationProvider
-     * @param CacheProvider $cache
-     */
-    public function __construct(
-        ConfigurablePermissionConfigurationProvider $configurationProvider,
-        CacheProvider $cache
-    ) {
+    public function __construct(ConfigurablePermissionConfigurationProvider $configurationProvider)
+    {
         $this->configurationProvider = $configurationProvider;
-        $this->cache = $cache;
     }
 
     /**
@@ -38,7 +26,7 @@ class ConfigurablePermissionProvider
      */
     public function get($name)
     {
-        $data = $this->getConfigurablePermissionsData();
+        $data = $this->configurationProvider->getConfiguration();
         if (!isset($data[$name]) || !is_array($data[$name])) {
             return new ConfigurablePermission($name);
         }
@@ -52,25 +40,6 @@ class ConfigurablePermissionProvider
             $this->getValue($data, 'capabilities', []),
             $this->getValue($data, 'workflows', [])
         );
-    }
-
-    public function buildCache()
-    {
-        $this->cache->save(self::CACHE_ID, $this->configurationProvider->getConfiguration());
-    }
-
-    /**
-     * @return array
-     */
-    private function getConfigurablePermissionsData()
-    {
-        $configuration = $this->cache->fetch(self::CACHE_ID);
-        if (false === $configuration) {
-            $configuration = $this->configurationProvider->getConfiguration();
-            $this->cache->save(self::CACHE_ID, $configuration);
-        }
-
-        return $configuration;
     }
 
     /**

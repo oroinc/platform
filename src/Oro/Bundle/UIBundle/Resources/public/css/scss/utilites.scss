@@ -1,0 +1,28 @@
+/* @theme: admin.oro; */
+
+.hide {
+    // override inline styles
+    // stylelint-disable-next-line declaration-no-important
+    display: none !important;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.direction-ltr {
+    /* rtl:ignore */
+    direction: ltr;
+    unicode-bidi: bidi-override;
+}
+
+// extend bootstrap .list-unstyled class
+// link: https://github.com/twbs/bootstrap/blob/v4.1.0/scss/_type.scss#L84
+.list-unstyled {
+    margin-bottom: 0;
+}
+
+.no-transition {
+    // stylelint-disable-next-line declaration-no-important
+    transition: none !important;
+}

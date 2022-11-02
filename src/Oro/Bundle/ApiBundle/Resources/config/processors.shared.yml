@@ -13,6 +13,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: create, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 250 }
@@ -22,6 +23,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: options, group: initialize, priority: 250 }
 
     oro_api.validate_request_type_and_version:
@@ -33,6 +35,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: create, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: update, group: initialize, priority: 210 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 210 }
@@ -42,7 +45,46 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 210 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: options, group: initialize, priority: 210 }
+
+    oro_api.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 200 }
+
+    oro_api.check_no_hateoas_links:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\CheckNoHateoasLinks
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: delete, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: create, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: update, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, requestType: rest, priority: 190 }
 
     oro_api.subresource.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
@@ -73,6 +115,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 20 }
             - { name: oro.api.processor, action: create, group: initialize, priority: 20 }
             - { name: oro.api.processor, action: update, group: initialize, priority: 20 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 20 }
             - { name: oro.api.processor, action: not_allowed, group: initialize, actionType: list|item, priority: 30 }
             - { name: oro.api.processor, action: options, group: initialize, actionType: list|item, priority: 30 }
 
@@ -98,35 +141,49 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 18 }
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 18 }
 
+    oro_api.add_meta_property_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
+        arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 10 }
+
     oro_api.set_default_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
+        arguments:
+            - '%oro_api.max_related_entities%'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -10 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -10 }
 
-    oro_api.json_api.handle_include_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
+    oro_api.handle_include_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\HandleIncludeFilter
         arguments:
+            - '@oro_api.filter_names_registry'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -20 }
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -20 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, priority: -20 }
+            - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
 
-    oro_api.json_api.handle_fields_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
+    oro_api.handle_fields_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter
         arguments:
+            - '@oro_api.filter_names_registry'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -20 }
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -20 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, priority: -20 }
+            - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
 
     oro_api.handle_meta_property_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
         arguments:
+            - '@oro_api.filter_names_registry'
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
@@ -142,7 +199,6 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -50 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -50 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -50 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -50 }
 
     oro_api.json_api.normalize_id_filter_key:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIdFilterKey
@@ -151,20 +207,7 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -55 }
             - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -55 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -55 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -55 }
-
-    oro_api.rest.register_dynamic_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
-        arguments:
-            - '@oro_api.filter_factory'
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.config_provider'
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -59 }
-            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: rest&!json_api, priority: -59 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: rest&!json_api, priority: -59 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: rest&!json_api, priority: -59 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, collection: true, priority: -55 }
 
     oro_api.register_dynamic_filters:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
@@ -172,59 +215,62 @@ services:
             - '@oro_api.filter_factory'
             - '@oro_api.doctrine_helper'
             - '@oro_api.config_provider'
-            - 'filter'
+            - '@oro_api.filter_names_registry'
         tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -60 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -60 }
-
-    oro_api.rest.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: rest&!json_api, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: rest&!json_api, priority: -100 }
-
-    oro_api.rest.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultPaging
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: rest&!json_api, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: rest&!json_api, priority: -100 }
 
     oro_api.json_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -105 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -105 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -105 }
-
-    oro_api.json_api.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultPaging
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -105 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -105 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -105 }
-
-    oro_api.json_api.add_include_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -200 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, priority: -200 }
-
-    oro_api.json_api.add_fields_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter
         arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -95 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, collection: true, priority: -95 }
+
+    oro_api.set_default_sorting:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting
+        arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: '!json_api', priority: -100 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: '!json_api', collection: true, priority: -100 }
+
+    oro_api.set_default_paging:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging
+        arguments:
+            - '@oro_api.filter_names_registry'
+            - '%oro_api.default_page_size%'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -100 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -100 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -100 }
+
+    oro_api.add_include_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddIncludeFilter
+        arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+
+    oro_api.add_fields_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddFieldsFilter
+        arguments:
+            - '@oro_api.filter_names_registry'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -200 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: json_api, priority: -200 }
+            - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
 
-    oro_api.add_meta_property_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
+    oro_api.remove_meta_property_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveMetaPropertyFilter
+        arguments:
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
@@ -234,8 +280,8 @@ services:
     # resource_check
     #
 
-    oro_api.resource_availability_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ActionAvailabilityCheck
+    oro_api.validate_action_availability:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateActionAvailability
         arguments:
             - '@oro_api.resources_provider'
         tags:
@@ -245,10 +291,11 @@ services:
             - { name: oro.api.processor, action: delete_list, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: create, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: update, group: resource_check, priority: 20 }
+            - { name: oro.api.processor, action: update_list, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: list|item, priority: 20 }
 
-    oro_api.subresource.parent_resource_availability_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentActionAvailabilityCheck
+    oro_api.subresource.validate_parent_action_availability:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentActionAvailability
         arguments:
             - '@oro_api.resources_provider'
         tags:
@@ -262,10 +309,10 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: relationship|subresource, priority: 20 }
 
-    oro_api.entity_type_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+    oro_api.validate_entity_type_feature:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeFeature
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: resource_check, priority: 10 }
@@ -273,12 +320,13 @@ services:
             - { name: oro.api.processor, action: delete_list, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: create, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: update, group: resource_check, priority: 10 }
+            - { name: oro.api.processor, action: update_list, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: list|item, priority: 10 }
 
-    oro_api.subresource.parent_entity_type_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck
+    oro_api.subresource.validate_parent_entity_type_feature:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: delete_subresource, group: resource_check, priority: 10 }
@@ -294,23 +342,14 @@ services:
     # normalize_input
     #
 
-    oro_api.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+    oro_api.validate_meta_property_filter_supported:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateMetaPropertyFilterSupported
+        arguments:
+            - '@oro_api.filter_names_registry'
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: delete, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: create, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: get_subresource, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 240 }
-            - { name: oro.api.processor, action: update_relationship, group: normalize_input, priority: 240 }
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, priority: 250 }
 
     oro_api.subresource.validate_parent_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityIdExists
@@ -357,6 +396,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
         tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: 100 }
@@ -367,10 +407,10 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, requestType: json_api, priority: 90 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, requestType: json_api, collection: true, priority: 90 }
 
     oro_api.subresource.json_api.validate_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\ValidateRequestData
@@ -441,15 +481,25 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: json_api, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, requestType: json_api, priority: -50 }
 
+    oro_api.validate_paging:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidatePaging
+        arguments:
+            - '@oro_api.filter_names_registry'
+            - '%oro_api.max_entities%'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: -100 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, priority: -100 }
+
     oro_api.validate_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.config_provider'
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, priority: -100 }
 
     oro_api.validate_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
@@ -472,22 +522,22 @@ services:
     # security_check (primary resource)
     #
 
-    oro_api.get.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.get.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
 
-    oro_api.delete.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.delete.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - DELETE
         tags:
@@ -499,11 +549,11 @@ services:
     # the "security_check" group is disabled for the "get" action is executed by
     # the "oro_api.create.load_normalized_entity" and "oro_api.update.load_normalized_entity" processors
     # so, if you add own security processor for the "get" action, add it for "create" and "update" actions as well
-    oro_api.entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.validate_entity_type_access.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
@@ -515,22 +565,22 @@ services:
     # security_check (subresources)
     #
 
-    oro_api.subresource.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
 
-    oro_api.subresource.parent_entity_type_security_check.edit:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access.edit:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - EDIT
         tags:
@@ -542,11 +592,11 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 10 }
 
     # VIEW permissions for the parent entity are required because the response may contains the updated relationship
-    oro_api.subresource.parent_entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access.view:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
@@ -582,38 +632,74 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: 50 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: 50 }
 
+    oro_api.set_default_ordering:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultOrdering
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -10 }
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -10 }
+
     oro_api.normalize_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging
+        arguments:
+            - '%oro_api.max_entities%'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -70 }
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -70 }
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -70 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -70 }
+
+    oro_api.subresource.build_unidirectional_association_subresource_query:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -90 }
 
     oro_api.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_connector'
+            - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -100 }
 
     oro_api.build_query.single:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_connector'
             - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
+
+    oro_api.subresource.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -100 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -100 }
+
+    oro_api.apply_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ApplyCriteria
+        arguments:
+            - '@oro_api.criteria_connector'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -110 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -110 }
 
     oro_api.subresource.add_parent_entity_id_to_query:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -150 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -150 }
@@ -643,10 +729,44 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: 250 }
 
+    oro_api.subresource.validate_parent_entity_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityAccess
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.query_acl_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
+
+    oro_api.subresource.load_extended_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: load_data }
+            - { name: oro.api.processor, action: get_subresource, group: load_data }
+
+    oro_api.subresource.load_nested_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }
+
     oro_api.load_entity_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
             - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, priority: -10 }
@@ -665,7 +785,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_loader'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.query_acl_helper'
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
@@ -674,7 +795,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_loader'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.query_acl_helper'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: load_data, priority: -10 }
@@ -718,12 +840,34 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -50 }
 
+    oro_api.remove_info_records_for_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveInfoRecordsForSingleItem
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, hateoas: true, priority: -200 }
+
+    oro_api.remove_info_records_for_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveInfoRecordsForCollection
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: true, hateoas: true, priority: -200 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: true, hateoas: true, priority: -200 }
+
+    oro_api.add_page_number_to_info_record:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddPageNumberToInfoRecord
+        arguments:
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, requestType: rest&json_api, hateoas: true, priority: -205 }
+            - { name: oro.api.processor, action: get_subresource, group: load_data, requestType: rest&json_api, collection: true, hateoas: true, priority: -205 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, requestType: rest&json_api, collection: true, hateoas: true, priority: -205 }
+
     #
     # data_security_check
     #
 
-    oro_api.subresource.parent_entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
+    oro_api.subresource.validate_parent_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - EDIT
@@ -757,6 +901,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: false, priority: -10 }
@@ -768,6 +913,7 @@ services:
             - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, collection: true, priority: -10 }
@@ -800,10 +946,11 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 250 }
 
     oro_api.json_api.process_included_entities:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessIncludedEntities
         arguments:
             - '@oro_api.action_processor_bag'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.exception_text_extractor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: 200 }
             - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: 200 }
@@ -814,6 +961,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
         arguments:
             - '@oro_api.form_helper'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
 
@@ -821,6 +969,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
         arguments:
             - '@oro_api.form_helper'
+            - '@oro_api.doctrine_helper'
             - true
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
@@ -849,57 +998,84 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -50 }
 
+    oro_api.pre_validate_included_forms:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PreValidateIncludedForms
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -58 }
+
+    oro_api.pre_validate_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PreValidateForm
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -60 }
+
     oro_api.validate_included_forms:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateIncludedForms
         arguments:
             - '@oro_api.form_validation_handler'
         tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: -70 }
-            - { name: oro.api.processor, action: update, group: transform_data, priority: -70 }
-            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -70 }
-            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -68 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -68 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -68 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -68 }
 
     oro_api.validate_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateForm
         arguments:
             - '@oro_api.form_validation_handler'
         tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: update, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -90 }
-            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -90 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -70 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -70 }
 
-    oro_api.json_api.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors
+    oro_api.post_validate_included_forms:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PostValidateIncludedForms
         arguments:
-            - '@oro_api.constraint_text_extractor'
-            - '@oro_api.error_completer_registry'
+            - '@oro_api.form_validation_handler'
         tags:
-            - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: -99 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -78 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -78 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -78 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -78 }
 
-    oro_api.json_api.subresource.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\CollectFormErrors
+    oro_api.post_validate_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PostValidateForm
         arguments:
-            - '@oro_api.constraint_text_extractor'
-            - '@oro_api.error_completer_registry'
+            - '@oro_api.form_validation_handler'
         tags:
-            - { name: oro.api.processor, action: delete_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: add_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update_subresource, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: add_relationship, group: transform_data, requestType: json_api, priority: -99 }
-            - { name: oro.api.processor, action: update_relationship, group: transform_data, requestType: json_api, priority: -99 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -80 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -80 }
 
     oro_api.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
@@ -909,6 +1085,7 @@ services:
         arguments:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -100 }
@@ -951,7 +1128,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -250 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -250 }
             # add this processor to the begin of "normalize_result" group to make sure that
-            # the entity mapper is removed from the Context even if an error occurred
+            # the entity mapper is removed from the context even if an error occurred
             - { name: oro.api.processor, action: create, group: normalize_result, priority: 250 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: 250 }
@@ -989,6 +1166,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SaveParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: save_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: save_data, priority: -10 }
@@ -1030,6 +1208,7 @@ services:
         arguments:
             - '@oro_api.entity_title_provider'
             - '@oro_api.expanded_association_extractor'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get, group: finalize, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: finalize, collection: false, priority: -10 }
@@ -1039,6 +1218,7 @@ services:
         arguments:
             - '@oro_api.entity_title_provider'
             - '@oro_api.expanded_association_extractor'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: finalize, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: finalize, collection: true, priority: -10 }
@@ -1077,6 +1257,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -10 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -10 }
@@ -1086,6 +1267,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -10 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -10 }
 
     oro_api.normalize_errors:
@@ -1099,6 +1281,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -20 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -20 }
@@ -1108,6 +1291,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -20 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -20 }
 
     oro_api.rest.set_http_response_status_code:
@@ -1121,19 +1305,27 @@ services:
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, priority: -30 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.created:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-            - 201
+            - 201 # HTTP_CREATED
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -30 }
+
+    oro_api.rest.set_http_response_status_code.accepted:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
+        arguments:
+            - 202 # HTTP_ACCEPTED
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.no_content:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-            - 204
+            - 204 # HTTP_NO_CONTENT
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -30 }
@@ -1144,9 +1336,47 @@ services:
     oro_api.rest.set_http_response_status_code.not_allowed:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-            - 405
+            - 405 # HTTP_METHOD_NOT_ALLOWED
         tags:
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, priority: -30 }
+
+    oro_api.rest.set_www_authenticate_response_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetWwwAuthenticateResponseHeader
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+
+    oro_api.rest.remove_empty_unauthorized_response_error:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveEmptyUnauthorizedResponseError
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
 
     oro_api.rest.remove_response_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveResponseErrors
@@ -1157,6 +1387,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -35 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -35 }
@@ -1165,12 +1396,101 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, priority: -35 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -35 }
+
+    oro_api.set_result_document_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocumentBuilder
+        arguments:
+            - '@oro_api.document_builder_factory'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: create, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: options, group: normalize_result, priority: -40 }
+
+    oro_api.rest.add_hateoas_links:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\AddHateoasLinks
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+
+    oro_api.subresource.rest.add_hateoas_links:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\AddHateoasLinksForSubresource
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.subresources_provider'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+
+    oro_api.relationship.rest.add_hateoas_links:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\AddHateoasLinksForRelationship
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.subresources_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+
+    oro_api.rest.add_hateoas_pagination_links:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\AddPaginationLinks
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@oro_api.filter_names_registry'
+            - '@router'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&json_api, hateoas: true, priority: -45 }
+
+    oro_api.subresource.rest.add_hateoas_pagination_links:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\AddPaginationLinksForSubresource
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@oro_api.filter_names_registry'
+            - '@router'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest&json_api, collection: true, hateoas: true, priority: -45 }
+
+    oro_api.relationship.rest.add_hateoas_pagination_links:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\AddPaginationLinksForRelationship
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@oro_api.filter_names_registry'
+            - '@router'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest&json_api, collection: true, hateoas: true, priority: -45 }
 
     oro_api.build_result_document.single_item:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
-            - '@oro_api.document_builder_factory'
             - '@oro_api.error_completer_registry'
             - '@logger'
         tags:
@@ -1179,6 +1499,7 @@ services:
             - { name: oro.api.processor, action: delete, group: normalize_result, priority: -50 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -50 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, collection: false, priority: -50 }
@@ -1192,7 +1513,6 @@ services:
     oro_api.build_result_document.collection:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument
         arguments:
-            - '@oro_api.document_builder_factory'
             - '@oro_api.error_completer_registry'
             - '@logger'
         tags:
@@ -1227,6 +1547,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -150 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -150 }
@@ -1236,6 +1557,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -150 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -150 }
 
     oro_api.assert_not_has_errors:
@@ -1247,6 +1569,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -190 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -190 }
@@ -1256,6 +1579,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -190 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -190 }
 
     oro_api.assert_has_result:
@@ -1283,19 +1607,20 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: json_api, priority: -210 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: json_api, priority: -210 }
 
     oro_api.json_api.assert_result_data_is_array:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AssertResultDataIsArray
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -215 }
-            - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: true, requestType: json_api, priority: -215 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_result, collection: true, requestType: json_api, priority: -215 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: json_api, collection: true, priority: -215 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: json_api, collection: true, priority: -215 }
 
     oro_api.rest.cors.set_allow_origin:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowOrigin
         arguments:
-            - [] # allowedOrigins. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -235 }
@@ -1311,14 +1636,13 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -235 }
 
     oro_api.rest.cors.set_allow_and_expose_headers:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowAndExposeHeaders
         arguments:
-            - [] # allowedHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - [] # exposableHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - false # isCredentialsAllowed. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -240 }
@@ -1334,6 +1658,7 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -240 }
 
     oro_api.rest.set_http_allow_header.single_item:
@@ -1344,8 +1669,8 @@ services:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: not_allowed, group: normalize_result, actionType: item, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: options, group: normalize_result, actionType: item, requestType: rest, priority: -250 }
+            - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, actionType: item, priority: -250 }
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, actionType: item, priority: -250 }
 
     oro_api.rest.set_http_allow_header.collection:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeaderForList
@@ -1355,8 +1680,9 @@ services:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: not_allowed, group: normalize_result, actionType: list, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: options, group: normalize_result, actionType: list, requestType: rest, priority: -250 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -250 }
+            - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, actionType: list, priority: -250 }
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, actionType: list, priority: -250 }
 
     oro_api.subresource.rest.set_http_allow_header:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SetHttpAllowHeaderForSubresource
@@ -1368,8 +1694,8 @@ services:
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: not_allowed, group: normalize_result, actionType: subresource, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: options, group: normalize_result, actionType: subresource, requestType: rest, priority: -250 }
+            - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, actionType: subresource, priority: -250 }
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, actionType: subresource, priority: -250 }
 
     oro_api.relationship.rest.set_http_allow_header:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SetHttpAllowHeaderForRelationship
@@ -1381,8 +1707,8 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, priority: -250 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: not_allowed, group: normalize_result, actionType: relationship, requestType: rest, priority: -250 }
-            - { name: oro.api.processor, action: options, group: normalize_result, actionType: relationship, requestType: rest, priority: -250 }
+            - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, actionType: relationship, priority: -250 }
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, actionType: relationship, priority: -250 }
 
     oro_api.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
@@ -1393,6 +1719,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -250 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: json_api, priority: -250 }
@@ -1402,4 +1729,5 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: json_api, priority: -250 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: json_api, priority: -250 }

@@ -5,14 +5,10 @@ namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 use Oro\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\Tests\Node\AbstractNodeTest;
 
 class BinaryNodeTest extends AbstractNodeTest
 {
-    /**
-     * @return array
-     */
-    public function getEvaluateData()
+    public function getEvaluateData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -58,10 +54,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getCompileData()
+    public function getCompileData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -96,10 +89,10 @@ class BinaryNodeTest extends AbstractNodeTest
             ['pow(5, 2)', new BinaryNode('**', new ConstantNode(5), new ConstantNode(2))],
             ['("a" . "b")', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))],
 
-            ['in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('a'), $array)],
-            ['in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('c'), $array)],
-            ['!in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('c'), $array)],
-            ['!in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('a'), $array)],
+            ['in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('a'), $array)],
+            ['in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('c'), $array)],
+            ['!in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('c'), $array)],
+            ['!in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('a'), $array)],
 
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
@@ -110,10 +103,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getDumpData()
+    public function getDumpData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));

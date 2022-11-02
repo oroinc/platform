@@ -11,6 +11,10 @@ oro:
             entity_filter: "Entity filter"
         controller:
             tag.saved.message: "Tag saved"
+        feature:
+            manage:
+                label: Tag Management
+                description: Enables creating and managing descriptive keywords (tags) to organize the data extracted from various sources into logical categories and subcategories.
         form:
             choose_tag: "Choose a tag"
             choose_taxonomy: "Choose a taxonomy"
@@ -21,11 +25,14 @@ oro:
             search_result: Records tagged as "%name%"
 
         created_by.label:    Created By
-        entity_description:  Show records tagged by this tag
+        entity_description:  A non-hierarchical keyword assigned to a record. Can be used for filtering.
         entity_label:        Tag
         entity_plural_label: Tags
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
-        name.label:          Name
+        name:
+            label:           Name
+            description:     The name of a tag.
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
@@ -40,10 +47,14 @@ oro:
             entity_label:        Tagging
             entity_name.label:   Entity name
             entity_plural_label: Taggings
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:            Id
             owner.label:         Owner
             record_id.label:     Record
             tag.label:           Tag
+
+            datagrid:
+                entity_hint: Results
 
         tags_label: Tags
 
@@ -53,8 +64,10 @@ oro:
 
         taxonomy:
             label:                  Taxonomy
+            description:            The taxonomic unit associated with a tag.
             entity_label:           Taxonomy
             entity_plural_label:    Taxonomies
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:     Units that tags can be grouped into.
             owner.label:            Owner
             background_color:
@@ -63,7 +76,7 @@ oro:
             id.label:               Id
             name:
                 label:              Name
-                description:        A name of a taxonomic unit.
+                description:        The name of a taxonomic unit.
             organization.label:     Organization
             tags.label:             Tags
             created:
@@ -72,6 +85,9 @@ oro:
             updated:
                 label:              Updated at
                 description:        The date and time when a taxonomic unit was last updated.
+
+            datagrid:
+                entity_hint: Taxonomies
 
         system_configuration:
             groups:
@@ -89,6 +105,10 @@ oro:
             my_taxonomies: My taxonomies
         controller:
             saved.message: "Taxonomy has been saved"
+        feature:
+            manage:
+                label: Taxonomy Management
+                description: Enables creating taxonomies that help color code and classify the tags.
         form:
             choose_taxonomy: "Choose a taxonomy"
             choose_or_create_taxonomy: "Select an existing taxonomy or create a new one"
@@ -98,6 +118,7 @@ oro:
         created_by.label:    Created By
         entity_label:        Taxonomy
         entity_plural_label: Taxonomies
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         name.label:          Name
         owner.label:         Owner

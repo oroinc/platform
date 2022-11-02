@@ -3,39 +3,28 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Locates and parses process configuration files.
+ */
 class ProcessConfigurationProvider extends AbstractConfigurationProvider
 {
     const NODE_ROOT = 'processes';
     const NODE_DEFINITIONS = 'definitions';
     const NODE_TRIGGERS = 'triggers';
 
-    /**
-     * @var string
-     */
-    protected $configFilePattern = 'processes.yml';
+    protected string $configFilePattern = 'processes.yml';
+    protected ProcessDefinitionListConfiguration $definitionConfiguration;
+    protected ProcessTriggerListConfiguration $triggerConfiguration;
 
-    /**
-     * @var ProcessDefinitionListConfiguration
-     */
-    protected $definitionConfiguration;
-
-    /**
-     * @var ProcessTriggerListConfiguration
-     */
-    protected $triggerConfiguration;
-
-    /**
-     * @param array $kernelBundles
-     * @param ProcessDefinitionListConfiguration $definitionConfiguration
-     * @param ProcessTriggerListConfiguration $triggerConfiguration
-     */
     public function __construct(
         array $kernelBundles,
         ProcessDefinitionListConfiguration $definitionConfiguration,
-        ProcessTriggerListConfiguration $triggerConfiguration
+        ProcessTriggerListConfiguration $triggerConfiguration,
+        KernelInterface $kernel,
     ) {
-        parent::__construct($kernelBundles);
+        parent::__construct($kernelBundles, $kernel);
 
         $this->definitionConfiguration = $definitionConfiguration;
         $this->triggerConfiguration = $triggerConfiguration;
@@ -46,6 +35,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
      * @param array|null $usedDefinitions
      * @return array
      * @throws InvalidConfigurationException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getProcessConfiguration(
         array $usedDirectories = null,

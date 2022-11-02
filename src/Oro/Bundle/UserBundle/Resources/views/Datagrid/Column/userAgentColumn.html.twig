@@ -1,0 +1,19 @@
+{% if value %}
+    {% set collapseId = 'collapse-'|uniqid %}
+    <div class="collapse-block" style="width:250px">
+        <div id="{{ collapseId }}" class="collapse-overflow collapse no-transition"
+             data-collapsed-text="{{ 'Show more'|trans }}"
+             data-expanded-text="{{ 'Show less'|trans }}"
+             data-check-overflow="true"
+             data-toggle="false"
+             data-state-id="{{ 'collapseBlock[' ~ record.getValue('id') ~ ']' ~ record.getValue('id') }}"
+        >{{ value }}</div>
+        <a href="#"
+           role="button"
+           class="collapse-toggle"
+           data-toggle="collapse"
+           data-target="{{ '#' ~ collapseId }}"
+           aria-expanded="false"
+           aria-controls="{{ collapseId }}"><span data-text>{{ 'Show more'|trans }}</span></a>
+    </div>
+{% endif %}

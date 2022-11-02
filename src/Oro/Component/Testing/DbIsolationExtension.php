@@ -1,13 +1,17 @@
 <?php
+
 namespace Oro\Component\Testing;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Testing\Doctrine\Events;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
+/**
+ * Provides functions to operate DB transactions.
+ */
 trait DbIsolationExtension
 {
     /**
@@ -16,23 +20,26 @@ trait DbIsolationExtension
     protected static $dbIsolationConnections = [];
 
     /**
-     * @param bool $nestTransactionsWithSavepoints
-     *
      * @internal
      */
-    protected function startTransaction($nestTransactionsWithSavepoints = false)
+    protected function startTransaction(bool $nestTransactionsWithSavepoints = false)
     {
-        if (false == $this->getClient() instanceof Client) {
-            throw new \LogicException('The client must be instance of Client');
+        if (false == $this->getClientInstance() instanceof KernelBrowser) {
+            throw new \LogicException('The client must be instance of KernelBrowser');
         }
-        if (false == $this->getClient()->getContainer()) {
+        if (false == $this->getClientInstance()->getContainer()) {
             throw new \LogicException('The client missing a container. Make sure the kernel was booted');
         }
 
-        /** @var RegistryInterface $registry */
-        $registry = $this->getClient()->getContainer()->get('doctrine');
-        foreach ($registry->getManagers() as $name => $em) {
+        /** @var ManagerRegistry $registry */
+        $registry = $this->getClientInstance()->getContainer()->get('doctrine');
+        foreach ($registry->getManagers() as $em) {
             if ($em instanceof EntityManagerInterface) {
+                $objectId = spl_object_id($em->getConnection());
+                if (array_key_exists($objectId, self::$dbIsolationConnections)) {
+                    continue;
+                }
+
                 $em->clear();
                 $connection = $em->getConnection();
                 if ($connection->getNestTransactionsWithSavepoints() !== $nestTransactionsWithSavepoints) {
@@ -40,7 +47,7 @@ trait DbIsolationExtension
                 }
                 $connection->beginTransaction();
 
-                self::$dbIsolationConnections[$name.uniqid('connection', true)] = $connection;
+                self::$dbIsolationConnections[$objectId] = $connection;
             }
         }
     }
@@ -50,7 +57,7 @@ trait DbIsolationExtension
      */
     protected static function rollbackTransaction()
     {
-        foreach (self::$dbIsolationConnections as $name => $connection) {
+        foreach (array_reverse(self::$dbIsolationConnections) as $connection) {
             $rolledBack = false;
             while ($connection->isConnected() && $connection->isTransactionActive()) {
                 $connection->rollBack();
@@ -66,7 +73,7 @@ trait DbIsolationExtension
     }
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Client
+     * @return \Symfony\Bundle\FrameworkBundle\KernelBrowser
      */
-    abstract protected function getClient();
+    abstract protected static function getClientInstance();
 }

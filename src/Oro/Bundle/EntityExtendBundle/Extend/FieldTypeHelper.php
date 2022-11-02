@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
+
+/**
+ * The helper class that provides methods related to extended field types.
+ */
 class FieldTypeHelper
 {
-    /**
-     * @var string[]
-     *      key   = data type name
-     *      value = underlying data type
-     */
-    protected $underlyingTypesMap;
+    /** @var EntityExtendConfigurationProvider */
+    private $configurationProvider;
 
-    /**
-     * @param string[] $underlyingTypesMap key = data type name, value = underlying data type
-     */
-    public function __construct($underlyingTypesMap)
+    public function __construct(EntityExtendConfigurationProvider $configurationProvider)
     {
-        $this->underlyingTypesMap = $underlyingTypesMap;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -36,7 +34,7 @@ class FieldTypeHelper
                 RelationType::ONE_TO_ONE,
                 RelationType::ONE_TO_MANY,
                 RelationType::MANY_TO_ONE,
-                RelationType::MANY_TO_MANY,
+                RelationType::MANY_TO_MANY
             ],
             true
         );
@@ -49,10 +47,8 @@ class FieldTypeHelper
      */
     public function getUnderlyingType($type)
     {
-        if (!isset($this->underlyingTypesMap[$type])) {
-            return $type;
-        }
+        $underlyingTypes = $this->configurationProvider->getUnderlyingTypes();
 
-        return $this->underlyingTypesMap[$type];
+        return $underlyingTypes[$type] ?? $type;
     }
 }

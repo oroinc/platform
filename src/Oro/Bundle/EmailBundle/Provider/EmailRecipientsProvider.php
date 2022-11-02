@@ -4,10 +4,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailRecipientsProvider
 {
@@ -20,10 +18,6 @@ class EmailRecipientsProvider
     /** @var EmailRecipientsProviderInterface[] */
     protected $providers = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EmailRecipientsHelper $emailRecipientsHelper
-     */
     public function __construct(TranslatorInterface $translator, EmailRecipientsHelper $emailRecipientsHelper)
     {
         $this->translator = $translator;

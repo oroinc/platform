@@ -9,8 +9,12 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Provides attachments linked to an entity.
+ */
 class AttachmentProvider
 {
     /** @var EntityManager */
@@ -19,19 +23,22 @@ class AttachmentProvider
     /** @var AttachmentAssociationHelper */
     protected $attachmentAssociationHelper;
 
-    /**
-     * @param EntityManager               $entityManager
-     * @param AttachmentAssociationHelper $attachmentAssociationHelper
-     * @param AttachmentManager           $attachmentManager
-     */
+    /** @var AttachmentManager */
+    private $attachmentManager;
+
+    /** @var PictureSourcesProviderInterface */
+    private $pictureSourcesProvider;
+
     public function __construct(
         EntityManager $entityManager,
         AttachmentAssociationHelper $attachmentAssociationHelper,
-        AttachmentManager $attachmentManager
+        AttachmentManager $attachmentManager,
+        PictureSourcesProviderInterface $pictureSourcesProvider
     ) {
         $this->em                          = $entityManager;
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
         $this->attachmentManager           = $attachmentManager;
+        $this->pictureSourcesProvider      = $pictureSourcesProvider;
     }
 
     /**
@@ -58,23 +65,16 @@ class AttachmentProvider
     }
 
     /**
-     * @todo should be moved out after BAP-11405
-     *
      * @param $entity
      *
      * @return File
      */
     private function getAttachmentByEntity($entity)
     {
-        $accessor   = PropertyAccess::createPropertyAccessor();
-        $attachment = $accessor->getValue($entity, 'attachment');
-
-        return $attachment;
+        return (PropertyAccess::createPropertyAccessor())->getValue($entity, 'attachment');
     }
 
     /**
-     * @todo should be marked as deprecated after BAP-11405
-     *
      * @param $entity
      *
      * @return array
@@ -85,35 +85,36 @@ class AttachmentProvider
         $attachment = $this->getAttachmentByEntity($entity);
         if ($attachment && $attachment->getId()) {
             $thumbnail = '';
+            $thumbnailSources = [];
             if ($this->attachmentManager->isImageType($attachment->getMimeType())) {
-                $thumbnail = $this->attachmentManager->getResizedImageUrl(
+                $thumbnailPictureSources = $this->pictureSourcesProvider->getResizedPictureSources(
                     $attachment,
                     AttachmentManager::THUMBNAIL_WIDTH,
                     AttachmentManager::THUMBNAIL_HEIGHT
                 );
+
+                $thumbnail = $thumbnailPictureSources['src'];
+                $thumbnailSources = $thumbnailPictureSources['sources'];
             }
+
+            $attachmentPictureSources = $this->pictureSourcesProvider->getFilteredPictureSources($attachment);
             $result = [
-                'attachmentURL'       => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
-                'attachmentFileName'  => $attachment->getOriginalFilename(),
-                'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
-                'attachmentThumbnail' => $thumbnail
+                'attachmentURL' => [
+                    'url' => $attachmentPictureSources['src'],
+                    'sources' => $attachmentPictureSources['sources'],
+                    'downloadUrl' => $this->attachmentManager
+                        ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
+                ],
+                'attachmentSize' => BytesFormatter::format($attachment->getFileSize()),
+                'attachmentFileName' => $attachment->getOriginalFilename() ?: $attachment->getFilename(),
+                'attachmentIcon' => $this->attachmentManager->getAttachmentIconClass($attachment),
+                'attachmentThumbnailPicture' => [
+                    'src' => $thumbnail,
+                    'sources' => $thumbnailSources,
+                ],
             ];
         }
 
         return $result;
-    }
-
-    /**
-     * @todo should be moved out after BAP-11405
-     *
-     * @param $entity
-     * @param File $attachment
-     *
-     * @return string
-     */
-    private function getAttachmentURL($entity, $attachment)
-    {
-        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }

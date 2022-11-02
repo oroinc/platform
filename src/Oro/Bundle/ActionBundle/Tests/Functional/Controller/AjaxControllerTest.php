@@ -2,38 +2,43 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
+    use OperationAwareTestTrait;
 
-    const MESSAGE_DEFAULT = 'test message';
-    const MESSAGE_NEW = 'new test message';
+    private const MESSAGE_DEFAULT = 'test message';
+    private const MESSAGE_NEW = 'new test message';
 
     /** @var TestActivity */
     private $entity;
 
-    /** @var FilesystemCache */
-    protected $cacheProvider;
+    /** @var ConfigurationProvider */
+    private $configProvider;
+
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
-        $this->loadFixtures([
-            'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
-        ]);
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
 
+        $this->loadFixtures([LoadTestEntityData::class]);
         $this->entity = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)
             ->setMessage(self::MESSAGE_DEFAULT);
     }
@@ -41,11 +46,9 @@ class AjaxControllerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
-
-        parent::tearDown();
+        $this->configModifier->resetCache();
     }
 
     /**
@@ -76,7 +79,7 @@ class AjaxControllerTest extends WebTestCase
         array $flashMessages = [],
         array $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
     ) {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->setOperationsConfig($config);
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
@@ -109,7 +112,10 @@ class AjaxControllerTest extends WebTestCase
             $this->assertTrue($result->isRedirect($location));
         }
 
-        $this->assertEquals($flashMessages, $this->getContainer()->get('session')->getFlashBag()->all());
+        $this->assertEquals(
+            $flashMessages,
+            $this->getSession()->getFlashBag()->all()
+        );
 
         if ($statusCode === Response::HTTP_FORBIDDEN) {
             $response = self::getJsonResponseContent($result, Response::HTTP_FORBIDDEN);
@@ -302,29 +308,35 @@ class AjaxControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param $operationName
-     * @param $entityId
-     * @param $entityClass
-     * @param $datagrid
-     *
-     * @return array
-     */
-    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
+    public function testExecuteActionNotFound(): void
     {
-        $actionContext = [
-            'entityId'    => $entityId,
-            'entityClass' => $entityClass,
-            'datagrid'    => $datagrid
-        ];
-        $container = self::getContainer();
-        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
-        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+        $operationName = 'oro_action_test_action';
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_action_operation_execute',
+                [
+                    'operationName' => $operationName,
+                    'route' => 'oro_user_view',
+                    'entityId' => 42,
+                    'entityClass' => User::class,
+                ]
+            )
+        );
 
-        $tokenData = $container->get('oro_action.operation.execution.form_provider')
-            ->createTokenData($operation, $actionData);
-        $container->get('session')->save();
+        $result = $this->client->getResponse();
 
-        return $tokenData;
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NOT_FOUND);
+        $this->assertEquals(
+            ['error' => ['Operation with name "oro_action_test_action" not found']],
+            $this->getSession()->getFlashBag()->all()
+        );
+    }
+
+    private function setOperationsConfig(array $operations)
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

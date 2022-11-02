@@ -4,17 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
 
 class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const NODE = 'test_node';
-    const ATTRIBUTE_NAME = 'test_attr_name';
-    const WORKFLOW_LABEL = 'test.workflow.label.key';
+    private const WORKFLOW_LABEL = 'test.workflow.label.key';
 
     /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $routeHelper;
@@ -25,18 +21,10 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationsDatagridLinksProvider */
     private $linksProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->routeHelper = $this->getMockBuilder(TranslationsDatagridRouteHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->routeHelper = $this->createMock(TranslationsDatagridRouteHelper::class);
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->linksProvider = new TranslationsDatagridLinksProvider(
             $this->routeHelper,
@@ -44,29 +32,19 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->linksProvider, $this->routeHelper, $this->linksProvider);
-    }
-
     /**
      * @dataProvider getWorkflowTranslateLinksDataProvider
-     *
-     * @param array $config
-     * @param bool $languagesAvailable
-     * @param array $expected
      */
-    public function testGetWorkflowTranslateLinks(array $config, $languagesAvailable, array $expected)
+    public function testGetWorkflowTranslateLinks(array $config, bool $languagesAvailable, array $expected)
     {
         $definition = new WorkflowDefinition();
         $definition->setName('test_workflow')->setLabel(self::WORKFLOW_LABEL)->setConfiguration($config);
 
-        $this->languageProvider->expects($this->once())->method('getAvailableLanguages')->willReturn(
-            $languagesAvailable ? ['en'] : []
-        );
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguageCodes')
+            ->willReturn($languagesAvailable ? ['en'] : []);
 
-        $this->routeHelper
-            ->expects($languagesAvailable ? $this->atLeastOnce() : $this->never())
+        $this->routeHelper->expects($languagesAvailable ? $this->atLeastOnce() : $this->never())
             ->method('generate')
             ->willReturnCallback(function ($data) {
                 return sprintf('link_to_%s', $data['key']);
@@ -75,10 +53,7 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->linksProvider->getWorkflowTranslateLinks($definition));
     }
 
-    /**
-     * @return array
-     */
-    public function getWorkflowTranslateLinksDataProvider()
+    public function getWorkflowTranslateLinksDataProvider(): array
     {
         return [
             'empty' => [
@@ -164,19 +139,5 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
                 'expected' => [],
             ],
         ];
-    }
-
-    /**
-     * @param string $workflowName
-     * @return TranslationKeySource
-     */
-    protected function getWorkflowSource($workflowName)
-    {
-        $translationKeySource = new TranslationKeySource(
-            new WorkflowTemplate(),
-            ['workflow_name' => $workflowName]
-        );
-
-        return $translationKeySource;
     }
 }

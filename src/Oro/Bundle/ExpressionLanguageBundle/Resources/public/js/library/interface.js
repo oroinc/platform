@@ -1,37 +1,30 @@
-define(function() {
-    'use strict';
-
-    function Interface(methods) {
-        this.methods = methods || {};
+class Interface {
+    /**
+     * @param {Object.<string, function>} methods object with dummy methods, names and arguments number are checked
+     */
+    constructor(methods = {}) {
+        this.methods = methods;
     }
 
-    Interface.prototype = {
-        constructor: Interface,
-
-        expectToBeImplementedBy: function(obj) {
-            var missingMethods = [];
-            for (var name in this.methods) {
-                if (
-                    this.methods.hasOwnProperty(name) &&
-                    (typeof obj[name] !== 'function' || obj[name].length !== this.methods[name].length)
-                ) {
-                    missingMethods.push(name);
-                }
+    /**
+     * Check passed prototype or an instance to have expected methods
+     *
+     * @param {object} obj prototype or an instance
+     */
+    expectToBeImplementedBy(obj) {
+        const missingMethods = Object.keys(this.methods)
+            .filter(name => typeof obj[name] !== 'function' || obj[name].length !== this.methods[name].length)
+            .map(name => '`' + name + '`');
+        if (missingMethods.length !== 0) {
+            let message;
+            if (missingMethods.length > 1) {
+                message = `Methods ${missingMethods.join(', ')} are required.`;
+            } else {
+                message = `Method ${missingMethods[0]} is required.`;
             }
-            if (missingMethods.length !== 0) {
-                missingMethods = missingMethods.map(function(name) {
-                    return '`' + name + '`';
-                });
-                var message;
-                if (missingMethods.length > 1) {
-                    message = 'Methods ' + missingMethods.join(', ') + ' are required.';
-                } else {
-                    message = 'Method ' + missingMethods[0] + ' is required.';
-                }
-                throw new TypeError(message);
-            }
+            throw new TypeError(message);
         }
-    };
+    }
+}
 
-    return Interface;
-});
+export default Interface;

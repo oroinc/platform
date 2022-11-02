@@ -3,20 +3,21 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
+use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
+class FeatureContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
 
     /**
      * Example: And I append grid "test-grid" for active workflow "My Workflow Title"
@@ -35,7 +36,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $configuration[WorkflowDefinition::CONFIG_DATAGRIDS][] =  $gridName;
         $workflow->getDefinition()->setConfiguration($configuration);
 
-        $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowDefinition::class)->flush();
+        $this->getAppContainer()->get('doctrine')->getManagerForClass(WorkflowDefinition::class)->flush();
     }
 
     /**
@@ -56,7 +57,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
 
         $workflow->getDefinition()->setApplications($applications);
 
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = $this->getAppContainer()->get('doctrine');
         $doctrine->getManagerForClass(WorkflowDefinition::class)->flush();
     }
 
@@ -66,11 +67,11 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      */
     protected function getWorkflowByTitle($title)
     {
-        /* @var $translationHelper WorkflowTranslationHelper */
-        $translationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
+        /* @var WorkflowTranslationHelper $translationHelper */
+        $translationHelper = $this->getAppContainer()->get('oro_workflow.helper.translation');
 
-        /* @var $workflowRegistry WorkflowRegistry */
-        $workflowRegistry = $this->getContainer()->get('oro_workflow.registry');
+        /* @var WorkflowRegistry $workflowRegistry */
+        $workflowRegistry = $this->getAppContainer()->get('oro_workflow.registry');
 
         $workflows = $workflowRegistry->getActiveWorkflows()->filter(
             function (Workflow $workflow) use ($translationHelper, $title) {
@@ -81,6 +82,25 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         return $workflows->isEmpty() ? null : $workflows->first();
     }
 
+    private function getWorkflowDefinitionByTitle(string $title): ?WorkflowDefinition
+    {
+        /* @var WorkflowTranslationHelper $translationHelper */
+        $translationHelper = $this->getAppContainer()->get('oro_workflow.helper.translation');
+
+        /* @var WorkflowRegistry $workflowRegistry */
+        $doctrineHelper = $this->getAppContainer()->get('oro_entity.doctrine_helper');
+        $workflowDefinitionRepository = $doctrineHelper->getEntityRepositoryForClass(WorkflowDefinition::class);
+
+        $workflowDefinitions = array_filter(
+            $workflowDefinitionRepository->findAll(),
+            function (WorkflowDefinition $workflow) use ($translationHelper, $title) {
+                return $title === $translationHelper->findTranslation($workflow->getLabel());
+            }
+        );
+
+        return $workflowDefinitions ? reset($workflowDefinitions) : null;
+    }
+
     /**
      * Asserts that provided workflow permissions allowed on role view page
      *
@@ -88,19 +108,18 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      *            | Test Workflow | View Workflow:Global | Perform transitions:Global |
      *
      * @Then /^the role has following active workflow permissions:$/
-     *
-     * @param TableNode $table
      */
     public function iSeeFollowingWorkflowPermissions(TableNode $table)
     {
         /** @var UserRoleViewForm $userRoleForm */
         $userRoleForm = $this->elementFactory->createElement('User Role View Workflow Permissions');
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $workflowName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($role, $value) = explode(':', $cell);
+                [$role, $value] = explode(':', $cell);
                 self::assertNotEmpty($permissionsArray[$workflowName][$role]);
                 $expected = $permissionsArray[$workflowName][$role];
                 self::assertEquals(
@@ -115,20 +134,111 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     /**
      * @Given /^complete workflow fixture loading$/
      */
-    public function completeWorkflowFixtureLoading()
+    public function completeWorkflowFixtureLoading(): void
     {
-        $container = $this->getContainer();
+        $container = $this->getAppContainer();
+        $container->get('oro_workflow.cache.entity_aware')->invalidateActiveRelated();
+        $container->get('oro_translation.provider.translation_domain')->clearCache();
+        $container->get('oro_translation.js_dumper')->dumpTranslations();
+    }
 
-        $cache = $container->get('oro_workflow.cache.entity_aware');
-        $cache->invalidateActiveRelated();
+    /**
+     * @Given /^(?:I )?activate "(?P<workflowTitle>[^"]*)" workflow$/
+     */
+    public function activateWorkflow(string $workflowTitle): void
+    {
+        $workflowDefinition = $this->getWorkflowDefinitionByTitle($workflowTitle);
 
-        $provider = $container->get('oro_translation.provider.translation_domain');
-        $provider->clearCache();
+        self::assertNotNull($workflowDefinition, sprintf('Workflow %s was not found', $workflowTitle));
 
-        $translator = $container->get('translator.default');
-        $translator->rebuildCache();
+        $helper = $this->getAppContainer()->get('oro_workflow.helper.workflow_deactivation');
 
-        $dumper = $container->get('oro_translation.js_dumper');
-        $dumper->dumpTranslations();
+        try {
+            $workflowsToDeactivate = $helper->getWorkflowsToDeactivation($workflowDefinition)
+                ->map(
+                    function (Workflow $workflow) {
+                        return $workflow->getName();
+                    }
+                )->getValues();
+
+            $this->deactivateWorkflows($workflowsToDeactivate);
+        } catch (WorkflowException $e) {
+            $workflowDefinition = null;
+        }
+
+        self::assertNotEmpty($workflowDefinition, sprintf('Workflow %s could not be activated', $workflowTitle));
+
+        $this->getAppContainer()->get('oro_workflow.registry.workflow_manager')->getManager()
+            ->activateWorkflow($workflowDefinition->getName());
+    }
+
+    /**
+     * @When scheduled cron processes are executed
+     */
+    public function processScheduledCronTriggers()
+    {
+        $commandRunner = $this->getAppContainer()->get('oro_cron.async.command_runner');
+        $repository = $this->getAppContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityRepositoryForClass(Schedule::class);
+
+        $schedules = $repository->findBy(['command' => HandleProcessTriggerCommand::getDefaultName()]);
+
+        /** @var Schedule $schedule */
+        foreach ($schedules as $schedule) {
+            $commandRunner->run($schedule->getCommand(), $this->resolveCommandOptions($schedule->getArguments()));
+        }
+    }
+
+    /**
+     * @When price lists scheduled cron processes are executed
+     */
+    public function processPriceListsScheduledCronTriggers()
+    {
+        $commandRunner = $this->getAppContainer()->get('oro_cron.async.command_runner');
+        $repository = $this->getAppContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityRepositoryForClass(Schedule::class);
+
+        $schedules = $repository->findBy(['command' => 'oro:cron:price-lists:schedule']);
+
+        /** @var Schedule $schedule */
+        foreach ($schedules as $schedule) {
+            $commandRunner->run($schedule->getCommand(), $this->resolveCommandOptions($schedule->getArguments()));
+        }
+    }
+
+    /**
+     * @param array $commandOptions
+     * @return array
+     */
+    private function resolveCommandOptions(array $commandOptions)
+    {
+        $options = [];
+        foreach ($commandOptions as $key => $option) {
+            $params = explode('=', $option, 2);
+            if (is_array($params) && count($params) === 2) {
+                $options[$params[0]] = $params[1];
+            } else {
+                $options[$key] = $option;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @throws WorkflowException
+     */
+    private function deactivateWorkflows(array $workflowNames): void
+    {
+        $workflowManager = $this->getAppContainer()->get('oro_workflow.registry.workflow_manager')->getManager();
+
+        foreach ($workflowNames as $workflowName) {
+            if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
+                $workflow = $workflowManager->getWorkflow($workflowName);
+
+                $workflowManager->resetWorkflowData($workflow->getName());
+                $workflowManager->deactivateWorkflow($workflow->getName());
+            }
+        }
     }
 }

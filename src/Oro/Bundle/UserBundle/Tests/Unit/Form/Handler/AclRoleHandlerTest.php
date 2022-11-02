@@ -16,29 +16,34 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $privilegeRepository;
+    private $privilegeRepository;
 
     /** @var AclManager */
-    protected $aclManager;
+    private $aclManager;
 
     /** @var AclRoleHandler */
-    protected $handler;
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = $this->createMock(FormFactory::class);
         $aclCache = $this->createMock(AclCacheInterface::class);
         $this->privilegeRepository = $this->createMock(AclPrivilegeRepository::class);
         $this->aclManager = $this->createMock(AclManager::class);
 
-        $this->handler = new AclRoleHandler($factory, $aclCache, []);
+        $this->handler = new class($factory, $aclCache, []) extends AclRoleHandler {
+            public function xgetExtensionFilters(): array
+            {
+                return $this->extensionFilters;
+            }
+        };
         $this->handler->setAclPrivilegeRepository($this->privilegeRepository);
         $this->handler->setAclManager($this->aclManager);
     }
 
     public function testAddExtensionFilter()
     {
-        $this->assertAttributeEmpty('extensionFilters', $this->handler);
+        self::assertEmpty($this->handler->xgetExtensionFilters());
 
         $actionKey = 'action';
         $entityKey = 'entity';
@@ -52,13 +57,13 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
             $actionKey => [$defaultGroup],
             $entityKey => [$defaultGroup],
         ];
-        $this->assertAttributeEquals($expectedFilters, 'extensionFilters', $this->handler);
+        self::assertEquals($expectedFilters, $this->handler->xgetExtensionFilters());
 
         // each group added only once
         $this->handler->addExtensionFilter($actionKey, $defaultGroup);
         $this->handler->addExtensionFilter($entityKey, $defaultGroup);
 
-        $this->assertAttributeEquals($expectedFilters, 'extensionFilters', $this->handler);
+        self::assertEquals($expectedFilters, $this->handler->xgetExtensionFilters());
     }
 
     public function testGetAllPrivilegesUseAclGroup()
@@ -67,15 +72,15 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
         $privilege2 = new AclPrivilege();
         $role = $this->createMock(AbstractRole::class);
         $sid = $this->createMock(SecurityIdentityInterface::class);
-        $this->aclManager->expects($this->once())
+        $this->aclManager->expects(self::once())
             ->method('getSid')
             ->with($role)
             ->willReturn($sid);
-        $this->privilegeRepository->expects($this->once())
+        $this->privilegeRepository->expects(self::once())
             ->method('getPrivileges')
             ->with($sid, AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
             ->willReturn(new ArrayCollection([$privilege1, $privilege2]));
 
-        $this->assertEquals([], $this->handler->getAllPrivileges($role));
+        self::assertEquals([], $this->handler->getAllPrivileges($role));
     }
 }

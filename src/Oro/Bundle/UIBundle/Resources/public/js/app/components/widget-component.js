@@ -1,20 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var WidgetComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
+    const $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
      * @export oroui/js/app/components/widget-component
      * @extends oroui.app.components.base.Component
      * @class oroui.app.components.WidgetComponent
      */
-    WidgetComponent = BaseComponent.extend({
+    const WidgetComponent = BaseComponent.extend({
         /**
          * @property {oroui.widget.AbstractWidget}
          * @constructor
@@ -36,14 +34,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WidgetComponent() {
-            WidgetComponent.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetComponent(options) {
+            WidgetComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (options.initialized) {
@@ -63,13 +61,13 @@ define(function(require) {
                     this._bindOpenEvent();
                 } else {
                     this._deferredInit();
-                    this.openWidget().done(_.bind(this._resolveDeferredInit, this));
+                    this.openWidget().done(this._resolveDeferredInit.bind(this));
                 }
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (!this.disposed && this.$element) {
@@ -84,19 +82,19 @@ define(function(require) {
          * @protected
          */
         _bindOpenEvent: function() {
-            var eventName = this.options.createOnEvent;
-            var handler = _.bind(function(e) {
+            const eventName = this.options.createOnEvent;
+            const handler = e => {
                 e.preventDefault();
                 this.openWidget();
-            }, this);
+            };
             this.$element.on(eventName + '.' + this.cid, handler);
 
-            mediator.on('widget_dialog:stateChange', _.bind(function(widget, data) {
+            mediator.on('widget_dialog:stateChange', (widget, data) => {
                 if (this.previousWidgetData && this.previousWidgetData.id === widget.getWid()) {
                     this.previousWidgetData.open = data.state === 'minimized';
                     this.previousWidgetData.widget = widget;
                 }
-            }, this));
+            });
         },
 
         /**
@@ -106,19 +104,19 @@ define(function(require) {
          *  @return {Promise}
          */
         openWidget: function() {
-            var deferredOpen = $.Deferred();
-            var $element = this.$element;
+            const deferredOpen = $.Deferred();
+            const $element = this.$element;
             if ($element) {
                 $element.addClass('widget-component-processing');
                 deferredOpen.then(function() {
                     $element.removeClass('widget-component-processing');
                 });
             }
-            var widgetModuleName;
+            let widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
-                tools.loadModules(widgetModuleName, function(Widget) {
+                loadModules(widgetModuleName, function(Widget) {
                     if (this.disposed) {
                         return;
                     }
@@ -138,9 +136,8 @@ define(function(require) {
          * @protected
          */
         _openWidget: function(deferredOpen) {
-            var widget;
-            var Widget = this.widget;
-            var options = $.extend(true, {}, this.options.options);
+            const Widget = this.widget;
+            const options = $.extend(true, {}, this.options.options);
 
             if (!this.options.multiple && this.previousWidgetData.open) {
                 this.previousWidgetData.widget.widget.dialog('restore');
@@ -154,17 +151,17 @@ define(function(require) {
             }
 
             // Create and open widget
-            widget = new Widget(options);
+            const widget = new Widget(options);
             this.previousWidgetData.id = widget.getWid();
 
             this._bindEnvironmentEvent(widget);
 
             if (!this.options.multiple) {
                 this.opened = true;
-                this.listenTo(widget, 'widgetRemove', _.bind(function() {
+                this.listenTo(widget, 'widgetRemove', () => {
                     this.opened = false;
                     delete this.view;
-                }, this));
+                });
 
                 if (widget.isEmbedded()) {
                     // save reference to widget (only for a single + embedded instance)
@@ -182,8 +179,8 @@ define(function(require) {
 
             if (widget.deferredRender) {
                 widget.deferredRender
-                    .done(_.bind(deferredOpen.resolve, deferredOpen))
-                    .fail(_.bind(deferredOpen.reject, deferredOpen));
+                    .done(deferredOpen.resolve.bind(deferredOpen))
+                    .fail(deferredOpen.reject.bind(deferredOpen));
             } else {
                 deferredOpen.resolve(widget);
             }
@@ -196,10 +193,10 @@ define(function(require) {
          * @protected
          */
         _bindEnvironmentEvent: function(widget) {
-            var reloadEvent = this.options['reload-event'];
-            var reloadGridName = this.options['reload-grid-name'];
-            var refreshWidgetAlias = this.options['refresh-widget-alias'];
-            var reloadWidgetAlias = this.options['reload-widget-alias'];
+            let reloadEvent = this.options['reload-event'];
+            const reloadGridName = this.options['reload-grid-name'];
+            const refreshWidgetAlias = this.options['refresh-widget-alias'];
+            const reloadWidgetAlias = this.options['reload-widget-alias'];
 
             reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
 

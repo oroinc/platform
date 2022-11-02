@@ -1,0 +1,21 @@
+help:
+    vendors:
+        Bar:
+            alias: BarAlias
+
+    resources:
+        Bar\Bundle\BarBundle\Controller\BarController:
+            alias: Bar\Bundle\BarBundle\Controller\BarOverrideController
+
+        Bar\Bundle\BarBundle\Controller\BarController::fooAction:
+            prefix: baz/prefix
+            uri: bar/uri
+            alias: bar/alias
+            server: http://server.com/
+            link: http://server.com/foo/custom
+
+    routes:
+        bar_route:
+            uri: bar/uri
+            server: http://server.com/
+            link: http://server.com/bar/custom

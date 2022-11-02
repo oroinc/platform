@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Helper;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Provides a set of reusable utility methods for dashboard widgets
@@ -28,18 +28,13 @@ class DateHelper
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param LocaleSettings    $localeSettings
-     * @param RegistryInterface $doctrine
-     * @param AclHelper         $aclHelper
-     */
-    public function __construct(LocaleSettings $localeSettings, RegistryInterface $doctrine, AclHelper $aclHelper)
+    public function __construct(LocaleSettings $localeSettings, ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
         $this->doctrine       = $doctrine;
         $this->localeSettings = $localeSettings;
@@ -333,6 +328,7 @@ class DateHelper
         $end   = $dateRange['end'];
 
         if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+            QueryBuilderUtil::checkIdentifier($field);
             $qb = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')

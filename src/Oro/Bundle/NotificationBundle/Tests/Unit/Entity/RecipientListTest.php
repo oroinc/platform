@@ -2,183 +2,116 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class RecipientListTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RecipientList
-     */
-    protected $entity;
+    private RecipientList $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new RecipientList();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
-    public function testEmptyRecipientList()
+    public function testEmptyRecipientList(): void
     {
         // get id should return null cause this entity was not loaded from DB
-        $this->assertNull($this->entity->getId());
+        self::assertNull($this->entity->getId());
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getUsers());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getGroups());
+        self::assertInstanceOf(ArrayCollection::class, $this->entity->getUsers());
+        self::assertInstanceOf(ArrayCollection::class, $this->entity->getGroups());
     }
 
-    public function testSetterGetterForUsers()
+    public function testSetterGetterForUsers(): void
     {
         // test adding through array collection interface
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock(User::class);
         $this->entity->getUsers()->add($user);
 
-        $this->assertContains($user, $this->entity->getUsers());
+        self::assertContains($user, $this->entity->getUsers());
 
         // clear collection
         $this->entity->getUsers()->clear();
-        $this->assertTrue($this->entity->getUsers()->isEmpty());
+        self::assertTrue($this->entity->getUsers()->isEmpty());
 
         // test setter
         $this->entity->addUser($user);
-        $this->assertContains($user, $this->entity->getUsers());
-
+        self::assertContains($user, $this->entity->getUsers());
 
         // remove group
         $this->entity->removeUser($user);
-        $this->assertTrue($this->entity->getUsers()->isEmpty());
+        self::assertTrue($this->entity->getUsers()->isEmpty());
     }
 
-    public function testSetterGetterForGroups()
+    public function testSetterGetterForGroups(): void
     {
         // test adding through array collection interface
-        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
+        $group = $this->createMock(Group::class);
         $this->entity->getGroups()->add($group);
 
-        $this->assertContains($group, $this->entity->getGroups());
+        self::assertContains($group, $this->entity->getGroups());
 
         // clear collection
         $this->entity->getGroups()->clear();
-        $this->assertTrue($this->entity->getGroups()->isEmpty());
+        self::assertTrue($this->entity->getGroups()->isEmpty());
 
         // test setter
         $this->entity->addGroup($group);
-        $this->assertContains($group, $this->entity->getGroups());
-
+        self::assertContains($group, $this->entity->getGroups());
 
         // remove group
         $this->entity->removeGroup($group);
-        $this->assertTrue($this->entity->getGroups()->isEmpty());
+        self::assertTrue($this->entity->getGroups()->isEmpty());
     }
 
-    public function testSetterGetterForEmail()
+    public function testSetterGetterForEmail(): void
     {
-        $this->assertNull($this->entity->getEmail());
+        self::assertNull($this->entity->getEmail());
 
         $this->entity->setEmail('test');
-        $this->assertEquals('test', $this->entity->getEmail());
+        self::assertEquals('test', $this->entity->getEmail());
     }
 
-    public function testSetterGetterForEntityEmails()
+    public function testSetterGetterForEntityEmails(): void
     {
         $entityFields = ['field1', 'field2'];
 
-        $this->assertEquals([], $this->entity->getEntityEmails());
+        self::assertEquals([], $this->entity->getEntityEmails());
 
         $this->entity->setEntityEmails($entityFields);
-        $this->assertEquals($entityFields, $this->entity->getEntityEmails());
+        self::assertEquals($entityFields, $this->entity->getEntityEmails());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
-        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $group = $this->createMock(Group::class);
+        $user = $this->createMock(User::class);
 
         // test when email filled
         $this->entity->setEmail('test email');
-        $this->assertInternalType('string', $this->entity->__toString());
-        $this->assertNotEmpty($this->entity->__toString());
+        self::assertIsString($this->entity->__toString());
+        self::assertNotEmpty($this->entity->__toString());
         // clear email
         $this->entity->setEmail(null);
 
         // test when users filled
         $this->entity->addUser($user);
-        $this->assertInternalType('string', $this->entity->__toString());
-        $this->assertNotEmpty($this->entity->__toString());
+        self::assertIsString($this->entity->__toString());
+        self::assertNotEmpty($this->entity->__toString());
         // clear users
         $this->entity->getUsers()->clear();
 
         // test when groups filled
         $this->entity->addGroup($group);
-        $this->assertInternalType('string', $this->entity->__toString());
-        $this->assertNotEmpty($this->entity->__toString());
+        self::assertIsString($this->entity->__toString());
+        self::assertNotEmpty($this->entity->__toString());
         // clear groups
         $this->entity->getGroups()->clear();
 
         // should be empty if nothing filled
-        $this->assertEmpty($this->entity->__toString());
-    }
-
-    public function testNotValidData()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface $context */
-        $context = $this->createMock(ExecutionContextInterface::class);
-
-        $context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('testPath'));
-
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $context->expects($this->once())
-            ->method('buildViolation')
-            ->willReturn($builder);
-        $builder->expects($this->once())
-            ->method('atPath')
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('addViolation');
-
-        $this->entity->isValid($context);
-    }
-
-    public function testValidData()
-    {
-        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface $context */
-        $context = $this->createMock(ExecutionContextInterface::class);
-
-        $context->expects($this->never())
-            ->method('getPropertyPath');
-        $context->expects($this->never())
-            ->method('buildViolation');
-
-        // Only users
-        $this->entity->addUser($user);
-        $this->entity->isValid($context);
-        // clear users
-        $this->entity->getUsers()->clear();
-
-        // Only groups
-        $this->entity->addGroup($group);
-        $this->entity->isValid($context);
-        // clear groups
-        $this->entity->getGroups()->clear();
-
-        // Only email
-        $this->entity->setEmail('test Email');
-        $this->entity->isValid($context);
-        $this->entity->setEmail(null);
-
-        // Only entity emails
-        $this->entity->setEntityEmails(['field1']);
-        $this->entity->isValid($context);
-        $this->entity->setEntityEmails([]);
+        self::assertEmpty($this->entity->__toString());
     }
 }

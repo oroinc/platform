@@ -9,6 +9,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by an enum entity.
+ */
 class EnumFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'enum';
@@ -16,12 +19,6 @@ class EnumFilter extends BaseMultiChoiceFilter
     /** @var DictionaryApiEntityManager */
     protected $dictionaryApiEntityManager;
 
-    /**
-     * Constructor
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -60,9 +57,8 @@ class EnumFilter extends BaseMultiChoiceFilter
     {
         $metadata = parent::getMetadata();
         if ($metadata['class']) {
-            $this->dictionaryApiEntityManager->setClass(
-                $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true)
-            );
+            $resolvedEntityClass = $this->resolveMetadataClass($metadata);
+            $this->dictionaryApiEntityManager->setClass($resolvedEntityClass);
             $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
                 $this->getForm()->get('value')->getData()
             );
@@ -74,10 +70,34 @@ class EnumFilter extends BaseMultiChoiceFilter
     /**
      * {@inheritDoc}
      */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * @param array $metadata
+     *
+     * @return string
+     */
+    private function resolveMetadataClass(array $metadata)
+    {
+        if (\array_key_exists('class', $metadata)
+            && str_starts_with($metadata['class'], ExtendHelper::ENTITY_NAMESPACE)
+        ) {
+            return $metadata['class'];
+        }
+
+        return $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 

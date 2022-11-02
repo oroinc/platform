@@ -1,0 +1,18 @@
+Oro\Bundle\IntegrationBundle\Entity\Stub\TestTransport1Settings:
+    integration1_transport1:
+        transport1Field: 'test'
+    integration2_transport1:
+        transport1Field: 'test2'
+Oro\Bundle\IntegrationBundle\Entity\Channel:
+    integration1:
+        type: 'test_channel'
+        name: 'Test Integration active'
+        enabled: true
+        organization: '@organization'
+        transport: '@integration1_transport1'
+    integration2:
+        type: 'test_channel_2'
+        name: 'Test Integration inactive'
+        enabled: false
+        organization: '@organization'
+        transport: '@integration2_transport1'

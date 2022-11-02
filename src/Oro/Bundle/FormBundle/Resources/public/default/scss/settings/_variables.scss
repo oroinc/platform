@@ -1,13 +1,29 @@
 /* @theme: default; */
 
-$base-ui-element-offset: 11px 16px;
-$base-ui-element-font-size: $base-font-size;
-$base-ui-element-font-family: $base-font;
-$base-ui-element-line-height: 1.1;
-$base-ui-element-border: 1px solid get-color('additional', 'light');
-$base-ui-element-border-radius: 5px;
-$base-ui-element-bg-color: get-color('additional', 'ultra');
-$base-ui-element-color: get-color('additional', 'darker');
+$base-ui-element-offset: 11px 16px !default;
+$base-ui-element-cursor: null !default;
 
+$base-ui-element-font-size: $base-font-size !default;
+$base-ui-element-font-family: $base-font !default;
+$base-ui-element-line-height: 1.5 !default;
+
+$base-ui-element-border-size: 1px !default;
+$base-ui-element-border: $base-ui-element-border-size solid get-color('additional', 'light') !default;
+$base-ui-element-border-radius: 5px !default;
+$base-ui-element-bg-color: get-color('additional', 'ultra') !default;
+$base-ui-element-color: get-color('additional', 'darker') !default;
+$base-ui-element-placeholder-color: get-color('additional', 'middle');
 $base-ui-element-height-size-m: 38px !default;
 
+$base-ui-element-arrow-color: get-color('additional', 'dark') !default;
+
+$base-ui-element-border-color-focus: transparent !default;
+$base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
+                              0 0 6px lighten(get-color('ui', 'normal'), 1%) !default;
+$base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
+                          0 0 0 3px get-color('ui', 'focus'),
+                          0 0 6px lighten(get-color('ui', 'normal'), 1%) !default;
+$base-ui-popup-border-radius: $base-ui-element-border-radius !default;
+
+$base-ui-popup-background: get-color('additional', 'ultra') !default;
+$base-ui-popup-box-shadow: 1px 2px 8px rgba(0 0 0 / 40%) !default;

@@ -16,9 +16,6 @@ class EntityConfigHelper
      */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -62,8 +59,6 @@ class EntityConfigHelper
 
     /**
      * Prepare metadata field.
-     *
-     * @param FieldMetadata $fieldMetadata
      */
     public function prepareFieldMetadataPropertyPath(FieldMetadata $fieldMetadata)
     {

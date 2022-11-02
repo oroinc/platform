@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -15,6 +14,8 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
+ * Doctrine ORM Entity WorkflowDefinition.
+ *
  * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
@@ -29,9 +30,6 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true
@@ -93,7 +91,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var boolean
      *
-     * @ORM\Column(name="system", type="boolean")
+     * @ORM\Column(name="`system`", type="boolean")
      */
     protected $system = false;
 
@@ -175,7 +173,6 @@ class WorkflowDefinition implements DomainObjectInterface
      *      orphanRemoval=true,
      *      cascade={"all"}
      * )
-     * @JMS\Exclude
      */
     protected $restrictions;
 

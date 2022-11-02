@@ -3,83 +3,140 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Bundles\TestBundle2\TestBundle2;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestService;
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
+    /** @var SettingsProvider */
+    private $settingsProvider;
+
+    /** @var string */
+    private $cacheFile;
+
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
+
     /**
-     * @dataProvider configProvider
-     *
-     * @param array  $config
-     * @param string $integrationType
-     * @param array  $expectedFields
-     * @param bool   $resolvedValue
+     * {@inheritdoc}
      */
-    public function testGetFormSettings($config, $integrationType, $expectedFields, $resolvedValue)
+    protected function setUp(): void
     {
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $resolver  = new SystemAwareResolver();
-        $resolver->setContainer($container);
+        $this->cacheFile = $this->getTempFile('IntegrationSettingsProvider');
 
-        $service = new TestService($resolvedValue);
-        $container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [['test.client', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service]]
-                )
-            );
+        $this->container = $this->createMock(ContainerInterface::class);
+        $resolver = new SystemAwareResolver();
+        $resolver->setContainer($this->container);
 
-        $provider = new SettingsProvider($config, $resolver);
-        $result   = $provider->getFormSettings('synchronization_settings', $integrationType);
+        $this->settingsProvider = new SettingsProvider(
+            $this->cacheFile,
+            false,
+            $resolver
+        );
 
-        $this->assertEquals($expectedFields, array_keys($result));
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2)
+            ]);
     }
 
     /**
-     * @return array
+     * @dataProvider getFormSettingsDataProvider
      */
-    public function configProvider()
+    public function testGetFormSettings($integrationType, $resolvedValue, $expectedResult)
     {
-        $regularConfig = [
-            'form' => [
-                'synchronization_settings' => [
-                    'schedule'     => [
-                        'type'       => 'schedule_form_type',
-                        'applicable' => ['@test.client->testMethod()'],
-                        'options'    => []
-                    ],
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnMap([
+                ['test.client', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new TestService($resolvedValue)]
+            ]);
+
+        $this->assertSame(
+            $expectedResult,
+            $this->settingsProvider->getFormSettings('synchronization_settings', $integrationType)
+        );
+    }
+
+    public function getFormSettingsDataProvider(): array
+    {
+        return [
+            'should return all fields'                            => [
+                'integrationType' => 'simple',
+                'resolvedValue'   => true,
+                'expectedResult'  => [
                     'enabled'      => [
                         'type'       => 'choice',
-                        'options'    => ['choices' => ['Enabled', 'Disabled']],
                         'priority'   => -200,
-                        'applicable' => [],
+                        'options'    => ['choices' => ['Enabled' => 0, 'Disabled' => 1]],
+                        'applicable' => []
+                    ],
+                    'schedule'     => [
+                        'type'       => 'schedule_form_type',
+                        'applicable' => [true],
+                        'options'    => []
                     ],
                     'some_setting' => [
                         'type'       => 'choice',
                         'applicable' => ['simple'],
-                        'priority'   => 100,
-                        'options'    => [],
+                        'priority'   => 200,
+                        'options'    => []
+                    ]
+                ]
+            ],
+            'should not return field depends on resolved value'   => [
+                'integrationType' => 'simple',
+                'resolvedValue'   => false,
+                'expectedResult'  => [
+                    'enabled'      => [
+                        'type'       => 'choice',
+                        'priority'   => -200,
+                        'options'    => ['choices' => ['Enabled' => 0, 'Disabled' => 1]],
+                        'applicable' => []
                     ],
+                    'some_setting' => [
+                        'type'       => 'choice',
+                        'applicable' => ['simple'],
+                        'priority'   => 200,
+                        'options'    => []
+                    ]
+                ]
+            ],
+            'should not return field depends on integration type' => [
+                'integrationType' => 'other',
+                'resolvedValue'   => true,
+                'expectedResult'  => [
+                    'enabled'  => [
+                        'type'       => 'choice',
+                        'priority'   => -200,
+                        'options'    => ['choices' => ['Enabled' => 0, 'Disabled' => 1]],
+                        'applicable' => []
+                    ],
+                    'schedule' => [
+                        'type'       => 'schedule_form_type',
+                        'applicable' => [true],
+                        'options'    => []
+                    ]
                 ]
             ]
         ];
+    }
 
-        return [
-            'should return fields'      => [
-                'config'          => $regularConfig,
-                'given type'      => 'other',
-                'fields expected' => ['enabled', 'schedule'],
-                'resolved value'  => true
-            ],
-            'should use resolved value' => [
-                'config'          => $regularConfig,
-                'given type'      => 'simple',
-                'fields expected' => ['enabled', 'some_setting'],
-                'resolved value'  => false
-            ]
-        ];
+    public function testGetFormSettingsForUndefinedForm()
+    {
+        $this->assertSame(
+            [],
+            $this->settingsProvider->getFormSettings('other', 'simple')
+        );
     }
 }

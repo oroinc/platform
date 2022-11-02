@@ -1,48 +1,77 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\NavigationBundle\Command;
 
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
- * Class ResetMenuUpdatesCommand
- * Console command implementation
- *
- * @package Oro\Bundle\NavigationBundle\Command
+ * Resets menu updates.
  */
-class ResetMenuUpdatesCommand extends ContainerAwareCommand
+class ResetMenuUpdatesCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected static $defaultName = 'oro:navigation:menu:reset';
+
+    private UserManager $userManager;
+    private ScopeManager $scopeManager;
+    private MenuUpdateManager $menuUpdateManager;
+    private string $menuUpdateScopeType;
+
+    public function __construct(
+        UserManager $userManager,
+        ScopeManager $scopeManager,
+        MenuUpdateManager $menuUpdateManager,
+        string $menuUpdateScopeType
+    ) {
+        parent::__construct();
+        $this->userManager = $userManager;
+        $this->scopeManager = $scopeManager;
+        $this->menuUpdateManager = $menuUpdateManager;
+        $this->menuUpdateScopeType = $menuUpdateScopeType;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:navigation:menu:reset')
-            ->addOption(
-                'user',
-                'u',
-                InputArgument::OPTIONAL,
-                'Email of existing user'
+            ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
+            ->addOption('menu', 'm', InputOption::VALUE_REQUIRED, 'Menu name to reset')
+            ->setDescription('Resets menu updates.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command resets all menu updates.
+
+  <info>php %command.full_name%</info>
+
+The <info>--user</info> option can be used to reset menu updates for a specific user:
+
+  <info>php %command.full_name% --user=<user-email></info>
+
+The <info>--menu</info> option can be used to reset only a specific menu:
+
+  <info>php %command.full_name% --menu=<menu-name></info>
+
+Both options can be combined to further limit the scope being reset.
+
+  <info>php %command.full_name% --user=<user-email> --menu=<menu-name></info>
+
+HELP
             )
-            ->addOption(
-                'menu',
-                'm',
-                InputArgument::OPTIONAL,
-                'Menu name to reset'
-            )
-            ->setDescription('Resets menu updates depends on scope (organization/user).')
-            ->setHelp('If “user” param is not set - reset global scope, otherwise reset user scope.');
+            ->addUsage('--menu=<menu-name>')
+            ->addUsage('--user=<user-email>')
+            ->addUsage('--user=<user-email> --menu=<menu-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $menu = $input->getOption('menu');
@@ -51,10 +80,7 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
         $email = $input->getOption('user');
         if ($email) {
             /** @var User $user */
-            $user = $this
-                ->getContainer()
-                ->get('oro_user.manager')
-                ->findUserByEmail($email);
+            $user = $this->userManager->findUserByEmail($email);
 
             if (is_null($user)) {
                 throw new \Exception(sprintf('User with email %s not exists.', $email));
@@ -71,7 +97,7 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
             if (!$helper->ask($input, $output, $question)) {
                 $output->writeln('<error>Command aborted</error>');
 
-                return;
+                return 1;
             }
         }
 
@@ -92,27 +118,18 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
         }
 
         $output->writeln($message);
+
+        return 0;
     }
 
-    /**
-     * @param User|null   $user
-     * @param string|null $menuName
-     */
-    private function resetMenuUpdates($user = null, $menuName = null)
+    private function resetMenuUpdates(?User $user = null, ?string $menuName = null): void
     {
-        $scopeType = $this->getContainer()->getParameter('oro_navigation.menu_update.scope_type');
-        $scopeManager = $this
-            ->getContainer()
-            ->get('oro_scope.scope_manager');
         if (null !== $user) {
-            $scope = $scopeManager->findOrCreate($scopeType, ['user' => $user]);
-        } else {
-            $scope = $scopeManager->findOrCreate($scopeType);
+            $context = ['user' => $user];
         }
 
-        $this
-            ->getContainer()
-            ->get('oro_navigation.manager.menu_update')
-            ->deleteMenuUpdates($scope, $menuName);
+        $scope = $this->scopeManager->findOrCreate($this->menuUpdateScopeType, $context ?? []);
+
+        $this->menuUpdateManager->deleteMenuUpdates($scope, $menuName);
     }
 }

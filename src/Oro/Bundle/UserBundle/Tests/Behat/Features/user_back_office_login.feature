@@ -17,6 +17,9 @@ Feature: User back office login
     When I click "Log in"
     Then I should be on Admin Dashboard page
 
+    When I go to "/admin/user/login-check"
+    Then I should be on Admin Dashboard page
+
   Scenario: failing back office login using username with a wrong password
     Given I am logged out
     And I am on Login page
@@ -94,11 +97,10 @@ Feature: User back office login
   Scenario: Add translation for unsuccessful login error on back office and switch to second language
     Given I login as administrator
     And I go to System / Configuration
-    When I follow "System Configuration/General Setup/Language Settings" on configuration sidebar
+    When I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And fill form with:
-      | Supported Languages | [English, Zulu] |
-      | Use Default         | false           |
-      | Default Language    | Zulu            |
+      | Enabled Localizations | [English, Zulu_Loc] |
+      | Default Localization  | Zulu_Loc            |
     And I submit form
     And go to System/Localization/Translations
     When filter Translated Value as is empty
@@ -106,7 +108,6 @@ Feature: User back office login
     Then I edit "oro_user.login.errors.bad_credentials" Translated Value as "Your login was unsuccessful - Zulu"
     And I should see following records in grid:
       |Your login was unsuccessful - Zulu|
-    And click "Update Cache"
 
   Scenario: Check translated unsuccessful login error
     Given I am logged out

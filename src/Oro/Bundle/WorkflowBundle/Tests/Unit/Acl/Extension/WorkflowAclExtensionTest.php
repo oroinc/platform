@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\RootOwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension\Stub\DomainObjectStub;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadata;
@@ -20,54 +24,47 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    private const PATTERN_ALL_OFF = '(PV) system:.. global:.. deep:.. local:.. basic:..';
+
     /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $objectIdAccessor;
+    private $objectIdAccessor;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityOwnerAccessor;
+    private $entityOwnerAccessor;
 
     /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $decisionMaker;
+    private $decisionMaker;
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var WorkflowAclMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowMetadataProvider;
+    private $workflowMetadataProvider;
 
     /** @var WorkflowTransitionAclExtension|\PHPUnit\Framework\MockObject\MockObject */
-    protected $transitionAclExtension;
+    private $transitionAclExtension;
 
     /** @var WorkflowAclExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
         $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->workflowMetadataProvider = $this->getMockBuilder(WorkflowAclMetadataProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->transitionAclExtension = $this->getMockBuilder(WorkflowTransitionAclExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->workflowMetadataProvider = $this->createMock(WorkflowAclMetadataProvider::class);
+        $this->transitionAclExtension = $this->createMock(WorkflowTransitionAclExtension::class);
 
         $this->extension = new WorkflowAclExtension(
             $this->objectIdAccessor,
@@ -124,6 +121,36 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetDefaultPermission()
+    {
+        self::assertSame('', $this->extension->getDefaultPermission());
+    }
+
+    /**
+     * @dataProvider getPermissionGroupMaskProvider
+     */
+    public function testGetPermissionGroupMask(int $mask, ?int $expectedPermissionGroupMask)
+    {
+        self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
+    }
+
+    public function getPermissionGroupMaskProvider(): array
+    {
+        return [
+            [0, null],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_BASIC, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_LOCAL, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_DEEP, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_GLOBAL, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_SYSTEM, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_BASIC, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_LOCAL, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_DEEP, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_GLOBAL, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_SYSTEM, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS]
+        ];
+    }
+
     public function testGetAllowedPermissions()
     {
         self::assertEquals(
@@ -138,10 +165,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaskPattern()
     {
-        self::assertEquals(
-            WorkflowMaskBuilder::PATTERN_ALL_OFF,
-            $this->extension->getMaskPattern(0)
-        );
+        self::assertEquals(self::PATTERN_ALL_OFF, $this->extension->getMaskPattern(0));
     }
 
     public function testGetMaskBuilder()
@@ -165,12 +189,12 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getServiceBitsProvider
      */
-    public function testGetServiceBits($mask, $expectedMask)
+    public function testGetServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
-    public function getServiceBitsProvider()
+    public function getServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -195,12 +219,12 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeServiceBitsProvider
      */
-    public function testRemoveServiceBits($mask, $expectedMask)
+    public function testRemoveServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
-    public function removeServiceBitsProvider()
+    public function removeServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -225,13 +249,13 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notSupportedObjectProvider
      */
-    public function testDecideIsGrantingForNotSupportedObject($object)
+    public function testDecideIsGrantingForNotSupportedObject(mixed $object)
     {
         $securityToken = $this->createMock(TokenInterface::class);
         self::assertTrue($this->extension->decideIsGranting(0, $object, $securityToken));
     }
 
-    public function notSupportedObjectProvider()
+    public function notSupportedObjectProvider(): array
     {
         return [
             ['test'],
@@ -245,12 +269,8 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         $relatedEntity = new \stdClass();
         $securityToken = $this->createMock(TokenInterface::class);
 
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->createMock(Workflow::class);
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflow->expects(self::once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
@@ -306,5 +326,100 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
                 $securityToken
             )
         );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithSystemAccessLevelProvider
+     */
+    public function testValidateMaskForRootWithSystemAccessLevel(int $mask)
+    {
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::SYSTEM_LEVEL);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn(new RootOwnershipMetadata());
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelProvider
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevel(int $mask)
+    {
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn(new RootOwnershipMetadata());
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevelAndInvalidMasks(int $mask, string $expectedException)
+    {
+        $this->expectException(InvalidAclMaskException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Invalid ACL mask "%s" for ObjectIdentity(workflow, (root)).',
+            $expectedException
+        ));
+
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    public static function validateMaskForRootWithSystemAccessLevelProvider(): array
+    {
+        return [
+            [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
+            [1 << 1 /* MASK_PERFORM_TRANSITIONS_BASIC */],
+            [1 << 2 /* MASK_VIEW_WORKFLOW_LOCAL */],
+            [1 << 3 /* MASK_PERFORM_TRANSITIONS_LOCAL */],
+            [1 << 4 /* MASK_VIEW_WORKFLOW_DEEP */],
+            [1 << 5 /* MASK_PERFORM_TRANSITIONS_DEEP */],
+            [1 << 6 /* MASK_VIEW_WORKFLOW_GLOBAL */],
+            [1 << 7 /* MASK_PERFORM_TRANSITIONS_GLOBAL */],
+            [1 << 8 /* MASK_VIEW_WORKFLOW_SYSTEM */],
+            [1 << 9 /* MASK_PERFORM_TRANSITIONS_SYSTEM */]
+        ];
+    }
+
+    public static function validateMaskForRootWithoutSystemAccessLevelProvider(): array
+    {
+        return [
+            [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
+            [1 << 1 /* MASK_PERFORM_TRANSITIONS_BASIC */],
+            [1 << 2 /* MASK_VIEW_WORKFLOW_LOCAL */],
+            [1 << 3 /* MASK_PERFORM_TRANSITIONS_LOCAL */],
+            [1 << 4 /* MASK_VIEW_WORKFLOW_DEEP */],
+            [1 << 5 /* MASK_PERFORM_TRANSITIONS_DEEP */],
+            [1 << 6 /* MASK_VIEW_WORKFLOW_GLOBAL */],
+            [1 << 7 /* MASK_PERFORM_TRANSITIONS_GLOBAL */],
+        ];
+    }
+
+    public static function validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider(): array
+    {
+        return [
+            [1 << 8 /* MASK_VIEW_WORKFLOW_SYSTEM */, '(PV) system:.V global:.. deep:.. local:.. basic:..'],
+            [1 << 9 /* MASK_PERFORM_TRANSITIONS_SYSTEM */, '(PV) system:P. global:.. deep:.. local:.. basic:..']
+        ];
     }
 }

@@ -2,35 +2,47 @@
 
 namespace Oro\Bundle\EmailBundle\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Model\EmailHolderNameInterface;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class EmailExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to work with emails:
+ *   - oro_get_email
+ *   - oro_get_full_name_email
+ *   - oro_get_email_address_name
+ *   - oro_get_email_address
+ *   - oro_get_email_thread_attachments
+ *   - oro_can_attache
+ *   - oro_get_mailbox_process_label
+ *   - oro_get_email_ws_event
+ *   - oro_get_unread_emails_count
+ *   - oro_get_absolute_url
+ */
+class EmailExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_email';
-
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -65,7 +77,7 @@ class EmailExtension extends \Twig_Extension
      */
     protected function getDoctrine()
     {
-        return $this->container->get('doctrine');
+        return $this->container->get(ManagerRegistry::class);
     }
 
     /**
@@ -81,7 +93,7 @@ class EmailExtension extends \Twig_Extension
      */
     protected function getAuthorizationChecker()
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
     /**
@@ -100,7 +112,18 @@ class EmailExtension extends \Twig_Extension
         return $this->container->get('oro_email.related_emails.provider');
     }
 
+    protected function getUrlProvider(): UrlProvider
+    {
+        return $this->container->get('oro_email.provider.url_provider');
+    }
+
+    protected function getAclHelper(): AclHelper
+    {
+        return $this->container->get(AclHelper::class);
+    }
+
     /**
+     * @param string $entityClass
      * @return EntityRepository
      */
     protected function getRepository($entityClass)
@@ -111,18 +134,19 @@ class EmailExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
-            new \Twig_SimpleFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
-            new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
-            new \Twig_SimpleFunction('oro_get_email_thread_recipients', [$this, 'getEmailThreadRecipients']),
-            new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
-            new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
-            new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
-            new \Twig_SimpleFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
-            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
+            new TwigFunction('oro_get_email', [$this, 'getEmail']),
+            new TwigFunction('oro_get_full_name_email', [$this, 'getFullNameEmail']),
+            new TwigFunction('oro_get_email_address_name', [$this, 'getEmailAddressName']),
+            new TwigFunction('oro_get_email_address', [$this, 'getEmailAddress']),
+            new TwigFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
+            new TwigFunction('oro_can_attache', [$this, 'canReAttach']),
+            new TwigFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
+            new TwigFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
+            new TwigFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount']),
+            new TwigFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl'])
         ];
     }
 
@@ -144,18 +168,25 @@ class EmailExtension extends \Twig_Extension
     }
 
     /**
-     * Gets the recipients of the given thread
+     * Gets the email address with full name of the given object
+     * If the name is not available, it defaults to $this->>getEmail()
      *
-     * @param EmailThread $thread
-     * @return EmailRecipient[]
-     * @deprecated since 2.3. Use EmailGridResultHelper::addEmailRecipients instead
+     * @param object $object
+     * @return string Full name and email address
+     * "Amanda Cole" <AmandaRCole@example.org>
      */
-    public function getEmailThreadRecipients($thread)
+    public function getFullNameEmail($object)
     {
-        /** @var EmailRecipientRepository $repo */
-        $repo = $this->getRepository('OroEmailBundle:EmailRecipient');
+        if (!is_a($object, EmailHolderNameInterface::class)) {
+            return $this->getEmail($object);
+        }
 
-        return $repo->getThreadUniqueRecipients($thread);
+        $email = $this->getEmail($object);
+
+        /** @var EmailHolderNameInterface $object */
+        $name = $object->getEmailHolderName();
+
+        return $this->getEmailAddressHelper()->buildFullEmailAddress($email, $name);
     }
 
     /**
@@ -261,7 +292,7 @@ class EmailExtension extends \Twig_Extension
         /** @var EmailRepository $repo */
         $repo = $this->getRepository('OroEmailBundle:Email');
         $result = $repo->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
-        $total = $repo->getCountNewEmails($currentUser, $currentOrganization);
+        $total = $repo->getCountNewEmails($currentUser, $currentOrganization, null, $this->getAclHelper());
         $result[] = ['num' => $total, 'id' => 0];
 
         return $result;
@@ -278,10 +309,31 @@ class EmailExtension extends \Twig_Extension
     }
 
     /**
+     * @param $route
+     * @param array $routeParams
+     * @return string
+     */
+    public function getAbsoluteUrl($route, $routeParams = []): string
+    {
+        return $this->getUrlProvider()->getAbsoluteUrl($route, $routeParams);
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            'oro_email.email_holder_helper' => EmailHolderHelper::class,
+            'oro_email.email.address.helper' => EmailAddressHelper::class,
+            'oro_email.manager.email_attachment_manager' => EmailAttachmentManager::class,
+            'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,
+            'oro_security.token_accessor' => TokenAccessorInterface::class,
+            'oro_email.related_emails.provider' => RelatedEmailsProvider::class,
+            'oro_email.provider.url_provider' => UrlProvider::class,
+            ManagerRegistry::class,
+            AuthorizationCheckerInterface::class,
+            AclHelper::class,
+        ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Restriction\RestrictionManager;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Restriction;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
@@ -11,24 +11,22 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowRegistry;
+    private $workflowRegistry;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var RestrictionManager */
-    protected $restrictionManager;
+    private $restrictionManager;
 
     /** @var WorkflowRestrictionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-        $this->repository = $this->getMockBuilder(WorkflowRestrictionRepository::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->repository = $this->createMock(WorkflowRestrictionRepository::class);
 
         $this->restrictionManager = new RestrictionManager(
             $this->workflowRegistry,
@@ -55,8 +53,10 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflow->expects($this->once())->method('getName')->willReturn('test_workflow');
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn('test_workflow');
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')

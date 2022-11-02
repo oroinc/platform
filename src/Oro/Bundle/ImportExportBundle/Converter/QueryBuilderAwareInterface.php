@@ -11,8 +11,6 @@ interface QueryBuilderAwareInterface
 {
     /**
      * Set query builder to converter
-     *
-     * @param QueryBuilder $queryBuilder
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder);
 }

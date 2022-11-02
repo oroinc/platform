@@ -1,0 +1,14 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger:
+            fillData:
+                fieldName: true
+            findNavigationHistoryItem:
+                tableName: true
+                selectExpr: true
+    safe_methods:
+        Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger:
+            getColumnName: true
+        Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository:
+            getNavigationItemClassName: true

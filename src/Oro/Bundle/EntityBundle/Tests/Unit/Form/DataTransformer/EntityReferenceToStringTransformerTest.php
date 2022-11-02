@@ -3,32 +3,33 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityReferenceToStringTransformer */
-    protected $transformer;
+    private $transformer;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->will($this->returnCallback(function ($entity) {
+            ->willReturnCallback(function ($entity) {
                 if ($entity instanceof TestEntity) {
                     return 1;
                 }
 
                 return null;
-            }));
+            });
         $doctrineHelper->expects($this->any())
             ->method('getEntityReference')
-            ->will($this->returnCallback(function ($entityClass) {
+            ->willReturnCallback(function ($entityClass) {
                 return new $entityClass();
-            }));
+            });
 
         $this->transformer = new EntityReferenceToStringTransformer($doctrineHelper);
     }
@@ -36,12 +37,12 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform($value, $expectedValue)
+    public function testTransform(?object $value, ?string $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->transform($value));
     }
 
-    public function transformProvider()
+    public function transformProvider(): array
     {
         return [
             [
@@ -50,32 +51,28 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 new TestEntity(),
-                json_encode([
-                    'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'entityId'    => 1,
-                ]),
+                json_encode(['entityClass' => TestEntity::class, 'entityId' => 1], JSON_THROW_ON_ERROR),
             ],
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "object", "integer" given
-     */
-    public function testTransformWhenInvalidValueType()
+    public function testTransformWhenInvalidValueType(): void
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "object", "int" given');
+
         $this->transformer->transform(123);
     }
 
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform($value, $expectedValue)
+    public function testReverseTransform(?string $value, ?object $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformProvider()
+    public function reverseTransformProvider(): array
     {
         return [
             [
@@ -83,47 +80,37 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                json_encode([
-                    'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'entityId'    => 1,
-                ]),
+                json_encode(['entityClass' => TestEntity::class, 'entityId' => 1], JSON_THROW_ON_ERROR),
                 new TestEntity(),
             ],
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a string.
-     */
-    public function testReverseTransformWithInvalidValueType()
+    public function testReverseTransformWithInvalidValueType(): void
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a string.');
+
         $this->transformer->reverseTransform(123);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "entityClass" element after decoding a string.
-     */
-    public function testReverseTransformWithMissingEntityClass()
+    public function testReverseTransformWithMissingEntityClass(): void
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "entityClass" element after decoding a string.');
+
         $this->transformer->reverseTransform(
-            json_encode([
-                'entityId' => 1
-            ])
+            json_encode(['entityId' => 1], JSON_THROW_ON_ERROR)
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "entityId" element after decoding a string.
-     */
-    public function testReverseTransformWithMissingEntityId()
+    public function testReverseTransformWithMissingEntityId(): void
     {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "entityId" element after decoding a string.');
+
         $this->transformer->reverseTransform(
-            json_encode([
-                'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
-            ])
+            json_encode(['entityClass' => TestEntity::class], JSON_THROW_ON_ERROR)
         );
     }
 }

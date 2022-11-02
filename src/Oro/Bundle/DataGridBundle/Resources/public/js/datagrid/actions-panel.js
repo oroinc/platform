@@ -1,9 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var ActionsPanel;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
     /**
      * Panel with action buttons
@@ -12,7 +11,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.ActionsPanel
      * @extends Backbone.View
      */
-    ActionsPanel = Backbone.View.extend({
+    const ActionsPanel = Backbone.View.extend({
         /** @property String */
         className: 'btn-group',
 
@@ -23,10 +22,10 @@ define(function(require) {
         launchers: [],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ActionsPanel() {
-            ActionsPanel.__super__.constructor.apply(this, arguments);
+        constructor: function ActionsPanel(options) {
+            ActionsPanel.__super__.constructor.call(this, options);
         },
 
         /**
@@ -36,18 +35,18 @@ define(function(require) {
          * @param {Array} [options.actions] List of actions
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             this.subviews = [];
             if (opts.actions) {
                 this.setActions(opts.actions);
             }
 
-            ActionsPanel.__super__.initialize.apply(this, arguments);
+            ActionsPanel.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -55,7 +54,7 @@ define(function(require) {
             }
             delete this.launchers;
             delete this.actions;
-            ActionsPanel.__super__.dispose.apply(this, arguments);
+            ActionsPanel.__super__.dispose.call(this);
         },
 
         /**
@@ -66,9 +65,13 @@ define(function(require) {
         render: function() {
             this.$el.empty();
 
-            _.each(this.launchers, function(launcher) {
+            const isDropdown = this.$el.is('.dropdown-menu');
+
+            this.launchers.forEach(launcher => {
+                launcher.setOptions({withinDropdown: isDropdown});
                 this.$el.append(launcher.render().$el);
-            }, this);
+                launcher.trigger('appended');
+            });
 
             return this;
         },
@@ -92,7 +95,7 @@ define(function(require) {
                 this.actions.push(action);
                 this.launchers.push(action.createLauncher());
             }, this);
-            this.subviews.push.apply(this.subviews, this.actions);
+            this.subviews.push(...this.actions);
         },
 
         /**

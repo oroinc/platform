@@ -2,10 +2,15 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Processor;
 
+use ArrayIterator;
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Storage\Part\PartInterface;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
-use Zend\Mail\Header\ContentType;
-use Zend\Mail\Storage\Part\PartInterface;
 
+/**
+ * Process email content based on type and parts.
+ */
 class ContentProcessor
 {
     /**
@@ -58,6 +63,8 @@ class ContentProcessor
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -66,6 +73,7 @@ class ContentProcessor
      * @param PartInterface $part The message part where the content is stored
      *
      * @return Content
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function extractContent(PartInterface $part)
     {
@@ -75,7 +83,6 @@ class ContentProcessor
             $contentType = $contentTypeHeader->getType();
             $charset     = $contentTypeHeader->getParameter('charset');
 
-            // TODO BAP-7343 Remove this quick fix
             if (null === $charset) {
                 foreach ($contentTypeHeader->getParameters() as $key => $paramValue) {
                     if ('charset' === trim($key)) {
@@ -94,7 +101,8 @@ class ContentProcessor
         $headerKey = 'Content-Transfer-Encoding';
         if ($part->getHeaders()->has($headerKey)) {
             $header = $part->getHeader($headerKey);
-            if ($header instanceof \ArrayIterator) {
+            if ($header instanceof ArrayIterator) {
+                /** @var HeaderInterface $headerItem */
                 foreach ($header as $headerItem) {
                     if ($headerItem->getFieldName() === $headerKey) {
                         $contentTransferEncoding = $headerItem->getFieldValue();

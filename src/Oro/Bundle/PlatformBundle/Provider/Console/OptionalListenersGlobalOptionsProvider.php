@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Provider\Console;
 
@@ -8,27 +9,20 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Adds --disabled-listeners global command option to disable optional listeners.
+ */
 class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
-    const ALL_OPTIONAL_LISTENERS_VALUE = 'all';
-    const DISABLE_OPTIONAL_LISTENERS   = 'disabled-listeners';
+    public const DISABLE_OPTIONAL_LISTENERS = 'disabled-listeners';
 
-    /**
-     * @var OptionalListenerManager
-     */
-    protected $listenersManager;
+    protected OptionalListenerManager $listenersManager;
 
-    /**
-     * @param OptionalListenerManager $listenerManager
-     */
     public function __construct(OptionalListenerManager $listenerManager)
     {
         $this->listenersManager = $listenerManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addGlobalOptions(Command $command)
     {
         $options = [
@@ -36,11 +30,9 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
                 self::DISABLE_OPTIONAL_LISTENERS,
                 null,
                 InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
-                sprintf(
-                    'Disable optional listeners, "%s" to disable all listeners, '
-                    .'command "%s" shows all listeners',
-                    self::ALL_OPTIONAL_LISTENERS_VALUE,
-                    OptionalListenersCommand::NAME
+                \sprintf(
+                    '"<comment>all</comment>" or run <info>%s</info> to see available',
+                    OptionalListenersCommand::getDefaultName(),
                 )
             ),
         ];
@@ -48,10 +40,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
         $this->addOptionsToCommand($command, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resolveGlobalOptions(InputInterface $input)
+    public function resolveGlobalOptions(InputInterface $input): void
     {
         $listeners = $this->getListenersToDisable($input);
         if (!empty($listeners)) {
@@ -59,18 +48,13 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
         }
     }
 
-    /**
-     *
-     * @param InputInterface $input
-     * @return array
-     */
-    protected function getListenersToDisable(InputInterface $input)
+    protected function getListenersToDisable(InputInterface $input): array
     {
         $listeners = [];
 
         $listenerList = $input->getOption(self::DISABLE_OPTIONAL_LISTENERS);
         if (!empty($listenerList)) {
-            if (count($listenerList) === 1 && $listenerList[0] === self::ALL_OPTIONAL_LISTENERS_VALUE) {
+            if (count($listenerList) === 1 && $listenerList[0] === 'all') {
                 $listeners = $this->listenersManager->getListeners();
             } else {
                 $listeners = $listenerList;

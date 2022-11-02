@@ -1,13 +1,20 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection;
 
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * ExtensionTestCase class provides an easy way to test extension load.
+ * ExtensionTestCase class provides an easy way to test dependency injection extensions.
  *
  * Usage:
  * <code>
@@ -15,30 +22,25 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  * {
  *     $this->loadExtension(new MyBundleExtension());
  *
- *     $expectedDefinitions = array();
+ *     $expectedDefinitions = [...];
  *     $this->assertDefinitionsLoaded($expectedDefinitions);
  *
- *     $expectedParameters = array();
+ *     $expectedParameters = [...];
  *     $this->assertParametersLoaded($expectedParameters);
  * }
  * </code>
  */
 abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var array
-     */
-    protected $actualDefinitions = [];
+    /** @var Definition[] */
+    protected array $actualDefinitions = [];
 
-    /**
-     * @var array
-     */
-    protected $actualParameters = [];
+    /** @var Alias[] */
+    protected array $actualAliases = [];
 
-    /**
-     * @var array
-     */
-    protected $extensionConfigs = [];
+    protected array $actualParameters = [];
+
+    protected array $extensionConfigs = [];
 
     /**
      * Verifies that definitions have been initialized (defined and not empty)
@@ -48,135 +50,268 @@ abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
      * public function testLoadDefinitions()
      * {
      *     $this->loadExtension(new MyBundleExtension());
-     *     $expectedDefinitions = array();
+     *     $expectedDefinitions = [...];
      *     $this->assertDefinitionsLoaded($expectedDefinitions);
      * }
      * </code>
-     *
-     * @param array $expectedDefinitions
      */
-    protected function assertDefinitionsLoaded(array $expectedDefinitions)
+    protected function assertDefinitionsLoaded(array $expectedDefinitions): void
     {
         foreach ($expectedDefinitions as $serviceId) {
-            $this->assertArrayHasKey(
+            static::assertArrayHasKey(
                 $serviceId,
                 $this->actualDefinitions,
-                sprintf('Definition for "%s" service has not been loaded.', $serviceId)
+                \sprintf('Definition for "%s" service has not been loaded.', $serviceId)
             );
-            $this->assertNotEmpty(
+            static::assertNotEmpty(
                 $this->actualDefinitions[$serviceId],
-                sprintf('Definition for "%s" service is empty.', $serviceId)
+                \sprintf('Definition for "%s" service is empty.', $serviceId)
             );
         }
     }
 
     /**
-     * Verifies that parameters have been initialized (defined and not empty)
+     * Verifies that aliases have been initialized (defined and not empty)
+     */
+    protected function assertAliasesLoaded(array $expectedAliases): void
+    {
+        foreach ($expectedAliases as $serviceId) {
+            static::assertArrayHasKey(
+                $serviceId,
+                $this->actualAliases,
+                \sprintf('Definition for "%s" service has not been loaded.', $serviceId)
+            );
+            static::assertNotEmpty(
+                $this->actualAliases[$serviceId],
+                \sprintf('Definition for "%s" service is empty.', $serviceId)
+            );
+        }
+    }
+
+    /**
+     * Verifies visibility of defined services and aliases
+     * NOTE: service visibility can be changed in compiler passes. This method check only config definition
+     *
+     * @param string[] $expectedPublicServices
+     */
+    protected function assertPublicServices(array $expectedPublicServices): void
+    {
+        $loadedServices = \array_merge(\array_keys($this->actualDefinitions), \array_keys($this->actualAliases));
+        $publicServices = \array_intersect($loadedServices, $expectedPublicServices);
+
+        static::assertCount(\count($expectedPublicServices), $publicServices);
+
+        $errors = [];
+        foreach ($publicServices as $serviceId) {
+            try {
+                $this->assertServiceIsPublic($serviceId);
+            } catch (ExpectationFailedException $e) {
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        foreach (\array_diff($loadedServices, $publicServices) as $serviceId) {
+            try {
+                $definitionId = (string)($this->actualAliases[$serviceId] ?? $serviceId);
+
+                // Can't predict check aliases for services from another bundles
+                if (!isset($this->actualDefinitions[$definitionId])) {
+                    continue;
+                }
+
+                $class = $this->actualDefinitions[$definitionId]->getClass() ?? $definitionId;
+
+                // All controllers must be registered as public
+                if (is_subclass_of($class, AbstractController::class)) {
+                    $this->assertServiceIsPublic(
+                        $serviceId,
+                        \sprintf('Definition for "%s" must be public because it is Controller.', $serviceId)
+                    );
+                    continue;
+                }
+
+                // Otherwise service must be a private as default
+                $this->assertServiceIsPrivate($serviceId);
+            } catch (ExpectationFailedException $e) {
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        static::assertCount(0, $errors, \implode(PHP_EOL, $errors));
+    }
+
+    /**
+     * Service or alias must be defined as public
+     */
+    protected function assertServiceIsPublic(string $serviceId, ?string $message = null): void
+    {
+        $definition = $this->getLoadedDefinition($serviceId);
+
+        static::assertTrue(
+            $definition->isPublic() && !$definition->isPrivate(),
+            $message ?? \sprintf('Definition for "%s" must be public.', $serviceId)
+        );
+    }
+
+    /**
+     * Service or alias must be defined as private
+     */
+    protected function assertServiceIsPrivate(string $serviceId, ?string $message = null): void
+    {
+        $definition = $this->getLoadedDefinition($serviceId);
+
+        static::assertTrue(
+            !$definition->isPublic() || $definition->isPrivate(),
+            $message ?? \sprintf('Definition for "%s" must be private.', $serviceId)
+        );
+    }
+
+    /**
+     * @return Alias|Definition
+     */
+    protected function getLoadedDefinition(string $serviceId)
+    {
+        /** @var Definition|Alias $definition */
+        $definition = $this->actualDefinitions[$serviceId] ?? $this->actualAliases[$serviceId] ?? null;
+        static::assertNotNull(
+            $definition,
+            \sprintf('Definition for "%s" service or alias has not been loaded.', $serviceId)
+        );
+
+        return $definition;
+    }
+
+    /**
+     * Verifies that parameters have been initialized (is defined)
      *
      * Usage:
      * <code>
      * public function testLoadParameters()
      * {
      *     $this->loadExtension(new MyBundleExtension());
-     *     $expectedParameters = array();
+     *     $expectedParameters = [...];
      *     $this->assertParametersLoaded($expectedParameters);
      * }
      * </code>
-     *
-     * @param array $expectedParameters
      */
-    protected function assertParametersLoaded(array $expectedParameters)
+    protected function assertParametersLoaded(array $expectedParameters): void
     {
         foreach ($expectedParameters as $parameterName) {
-            $this->assertArrayHasKey(
+            static::assertArrayHasKey(
                 $parameterName,
                 $this->actualParameters,
-                sprintf('Parameter "%s" has not been loaded.', $parameterName)
-            );
-            $this->assertNotEmpty(
-                $this->actualParameters[$parameterName],
-                sprintf('Parameter "%s" is empty.', $parameterName)
+                \sprintf('Parameter "%s" has not been loaded.', $parameterName)
             );
         }
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
+     * @return MockObject|ContainerBuilder
      */
-    protected function buildContainerMock()
+    protected function buildContainerMock(): ContainerBuilder
     {
         return $this->createMock(ContainerBuilder::class);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
+     * @return MockObject|ContainerBuilder
      */
-    protected function getContainerMock()
+    protected function getContainerMock(): ContainerBuilder
     {
-        $container = $this->buildContainerMock();
-        $container->expects($this->any())
+        $containerBuilder = $this->buildContainerMock();
+        $containerBuilder
             ->method('setDefinition')
-            ->will(
-                $this->returnCallback(
-                    function ($id, Definition $definition) {
-                        $this->actualDefinitions[$id] = $definition;
-                    }
-                )
+            ->willReturnCallback(
+                function ($id, Definition $definition) {
+                    $this->actualDefinitions[$id] = $definition;
+                    return $definition;
+                }
             );
-        $container->expects($this->any())
-            ->method('setParameter')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $value) {
-                        $this->actualParameters[$name] = $value;
+        $containerBuilder
+            ->method('setAlias')
+            ->willReturnCallback(
+                function ($alias, $id) {
+                    if (\is_string($id)) {
+                        $id = new Alias($id);
+                    } elseif (!$id instanceof Alias) {
+                        throw new InvalidArgumentException('$id must be a string, or an Alias object.');
                     }
-                )
-            );
-        $container->expects($this->any())
-            ->method('prependExtensionConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($name, array $config) {
-                        if (!isset($this->extensionConfigs[$name])) {
-                            $this->extensionConfigs[$name] = [];
-                        }
-                        array_unshift($this->extensionConfigs[$name], $config);
-                    }
-                )
-            );
 
-        return $container;
+                    $this->actualAliases[$alias] = $id;
+                }
+            );
+        $containerBuilder
+            ->method('setParameter')
+            ->willReturnCallback(
+                function ($name, $value) {
+                    $this->actualParameters[$name] = $value;
+                }
+            );
+        $containerBuilder
+            ->method('prependExtensionConfig')
+            ->willReturnCallback(
+                function ($name, array $config) {
+                    if (!isset($this->extensionConfigs[$name])) {
+                        $this->extensionConfigs[$name] = [];
+                    }
+                    \array_unshift($this->extensionConfigs[$name], $config);
+                }
+            );
+        $containerBuilder
+            ->method('getDefinition')
+            ->willReturnCallback(
+                function (string $id) {
+                    return $this->actualDefinitions[$id] ?? null;
+                }
+            );
+        $containerBuilder
+            ->method('hasDefinition')
+            ->willReturnCallback(
+                function (string $id) {
+                    return isset($this->actualDefinitions[$id]);
+                }
+            );
+        $containerBuilder->expects(self::any())
+            ->method('getReflectionClass')
+            ->willReturnCallback(static fn ($class) =>  new \ReflectionClass($class));
+        $containerBuilder->expects(self::any())
+            ->method('getParameterBag')
+            ->willReturn(new ParameterBag($this->actualParameters));
+
+        return $containerBuilder;
     }
 
     /**
      * Loads provided extension using a mocked container so that the definitions and parameters could be verified later.
-     *
-     * @param \Symfony\Component\HttpKernel\DependencyInjection\Extension $extension
-     * @param array $config An optional array of configuration values
-     * @return $this
      */
-    protected function loadExtension(Extension $extension, $config = [])
+    protected function loadExtension(Extension $extension, array $config = []): self
     {
         $extension->load($config, $this->getContainerMock());
 
         return $this;
     }
 
-    /**
-     * @param array $expectedExtensionConfigs
-     */
-    protected function assertExtensionConfigsLoaded(array $expectedExtensionConfigs)
-    {
+    protected function assertExtensionConfigsLoaded(
+        array $expectedExtensionConfigs,
+        array $expectedExtensionConfigValues = []
+    ): void {
         foreach ($expectedExtensionConfigs as $extensionName) {
-            $this->assertArrayHasKey(
+            static::assertArrayHasKey(
                 $extensionName,
                 $this->extensionConfigs,
-                sprintf('Config for extension "%s" has not been loaded.', $extensionName)
+                \sprintf('Config for extension "%s" has not been loaded.', $extensionName)
             );
-            $this->assertNotEmpty(
+            static::assertNotEmpty(
                 $this->extensionConfigs[$extensionName],
-                sprintf('Config for extension "%s" is empty.', $extensionName)
+                \sprintf('Config for extension "%s" is empty.', $extensionName)
             );
+            if (isset($expectedExtensionConfigValues[$extensionName])) {
+                static::assertEquals(
+                    $expectedExtensionConfigValues[$extensionName],
+                    $this->extensionConfigs[$extensionName],
+                    \sprintf('Config for extension "%s" is different than expected.', $extensionName)
+                );
+            }
         }
     }
 }

@@ -1,53 +1,66 @@
-parameters:
-    oro_search.string_filter.class: Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter
-
 services:
     oro_search.string_filter:
-        class: '%oro_search.string_filter.class%'
+        class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: string, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: string }
 
     oro_search.number_filter:
         class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: number, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: number }
 
     oro_search.number_range_filter:
         class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberRangeFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: number-range, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: number-range }
 
     oro_search.percent_filter:
         class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchPercentFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: percent, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: percent }
 
     oro_search.enum_filter:
         class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEnumFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_entity.manager.dictionary.api'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: enum, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: enum }
 
     oro_search.entity_filter:
         class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEntityFilter'
+        public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
-            - { name: oro_search.extension.search_filter.filter, type: entity, datasource: search }
+            - { name: oro_search.extension.search_filter.filter, type: entity }
+
+    oro_search.boolean_filter:
+        class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchBooleanFilter'
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@translator'
+        tags:
+            - { name: oro_search.extension.search_filter.filter, type: boolean }

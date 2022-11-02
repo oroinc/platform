@@ -2,75 +2,101 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProviderAbstract;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The search mapping provider.
  */
-class SearchMappingProvider extends AbstractSearchMappingProvider
+class SearchMappingProvider extends AbstractSearchMappingProvider implements
+    WarmableConfigCacheInterface,
+    ClearableConfigCacheInterface
 {
-    const CACHE_KEY = 'oro_search.mapping_config';
+    private EventDispatcherInterface $dispatcher;
+    private MappingConfigurationProviderAbstract $mappingConfigProvider;
+    private CacheItemPoolInterface $cache;
+    private ?array $configuration = null;
+    private string $cacheKey;
+    private string $eventName;
 
-    /** @var Cache */
-    protected $cache;
-
-    /** @var array */
-    protected $mappingConfig;
-
-    /** @var array|null */
-    protected $processedConfig;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param Cache $cache
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, Cache $cache = null)
-    {
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        MappingConfigurationProviderAbstract $mappingConfigProvider,
+        CacheItemPoolInterface $cache,
+        string $cacheKeyPrefix,
+        string $searchEngineName,
+        string $eventName
+    ) {
         $this->dispatcher = $dispatcher;
-        $this->cache = $cache ?: new ArrayCache();
+        $this->mappingConfigProvider = $mappingConfigProvider;
+        $this->cache = $cache;
+        $this->cacheKey = $cacheKeyPrefix . ':' . $searchEngineName;
+        $this->eventName = $eventName;
     }
 
-    /**
-     * @param array $mappingConfig
-     */
-    public function setMappingConfig($mappingConfig)
+    public function getMappingConfig(): array
     {
-        $this->mappingConfig = $mappingConfig;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMappingConfig()
-    {
-        if (null !== $this->processedConfig) {
-            return $this->processedConfig;
+        if (null === $this->configuration) {
+            $cacheItem = $this->cache->getItem($this->getCacheKey());
+            $config = $this->fetchMappingConfigFromCache($cacheItem);
+            if (null === $config) {
+                $config = $this->loadMappingConfig();
+                $this->saveMappingConfigToCache($cacheItem, $config);
+            }
+            $this->configuration = $config;
         }
 
-        $cachedConfig = $this->cache->fetch(static::CACHE_KEY);
-        if (false !== $cachedConfig) {
-            $this->processedConfig = $cachedConfig;
-
-            return $this->processedConfig;
-        }
-
-        $event = new SearchMappingCollectEvent($this->mappingConfig);
-        $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
-
-        $this->processedConfig = $event->getMappingConfig();
-        $this->cache->save(static::CACHE_KEY, $this->processedConfig);
-
-        return $this->processedConfig;
+        return $this->configuration;
     }
 
-    public function clearCache()
+    public function clearCache(): void
     {
-        $this->cache->delete(static::CACHE_KEY);
+        $this->configuration = null;
+        $this->cache->deleteItem($this->getCacheKey());
+    }
+
+    public function warmUpCache(): void
+    {
+        $this->configuration = null;
+        $this->cache->deleteItem($this->getCacheKey());
+        $this->getMappingConfig();
+    }
+
+    private function fetchMappingConfigFromCache(CacheItemInterface $cacheItem): ?array
+    {
+        $config = null;
+        if ($cacheItem->isHit()) {
+            [$timestamp, $value] = $cacheItem->get();
+            if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
+                $config = $value;
+            }
+        }
+
+        return $config;
+    }
+
+    private function saveMappingConfigToCache(CacheItemInterface $cacheItem, array $config): void
+    {
+        $cacheItem->set([$this->mappingConfigProvider->getCacheTimestamp(), $config]);
+        $this->cache->save($cacheItem);
+    }
+
+    private function loadMappingConfig(): array
+    {
+        $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());
+        $this->dispatcher->dispatch($event, $this->eventName);
+
+        return $event->getMappingConfig();
+    }
+
+    private function getCacheKey(): string
+    {
+        return UniversalCacheKeyGenerator::normalizeCacheKey($this->cacheKey);
     }
 }

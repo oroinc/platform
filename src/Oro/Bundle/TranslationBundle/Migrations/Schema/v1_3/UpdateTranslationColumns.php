@@ -26,9 +26,6 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
         $this->addOroTranslationForeignKeys($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function updateOroTranslationTable(Schema $schema)
     {
         $table = $schema->getTable('oro_translation');
@@ -44,9 +41,6 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
         $table->addUniqueIndex(['language_id', 'translation_key_id'], 'language_key_uniq');
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addOroTranslationForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_translation');

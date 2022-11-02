@@ -27,7 +27,7 @@
 {% endblock %}
 
 {% block oro_acl_label_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <strong>
         {{ value|trans }}
     </strong>
@@ -68,7 +68,7 @@
 {% endblock %}
 
 {% block oro_acl_privilege_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         <tr {% if form.vars.value.identity.name == "(default)" %}class="default-field"{% endif %}>
             <td>
                 {{ form_widget(form.identity) }}
@@ -87,7 +87,7 @@
                 {{ form_widget(form.permissions) }}
             {% endif %}
         </tr>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_acl_permission_widget %}

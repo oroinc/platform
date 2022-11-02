@@ -1,8 +1,8 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-], function($, _, __) {
+define(function(require) {
     'use strict';
 
-    var defaultParam = {
+    const __ = require('orotranslation/js/translator');
+    const defaultParam = {
         invalid_message: 'This value is not valid.',
         invalid_message_parameters: {}
     };
@@ -14,15 +14,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
         'Repeated',
         function(value, element, params) {
             // validator should be added to repeated field (second one)
-            var attr = element.hasAttribute('data-ftid') ? 'data-ftid' : 'id';
-            var id = element.getAttribute(attr);
-            var secondName = params.second_name || '';
-            var firstId = id.slice(0, -secondName.length) + (params.first_name || '');
-            var firstElement = document.querySelector('[' + attr + '="' + firstId + '"]');
+            const attr = element.hasAttribute('data-ftid') ? 'data-ftid' : 'id';
+            const id = element.getAttribute(attr);
+            const secondName = params.second_name || '';
+            const firstId = id.slice(0, -secondName.length) + (params.first_name || '');
+            const firstElement = document.querySelector('[' + attr + '="' + firstId + '"]');
             return firstElement && (this.optional(firstElement) || value === this.elementValue(firstElement));
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.invalid_message, param.invalid_message_parameters);
         }
     ];

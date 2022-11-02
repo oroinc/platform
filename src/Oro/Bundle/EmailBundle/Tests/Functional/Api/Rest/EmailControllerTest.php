@@ -7,10 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailControllerTest extends WebTestCase
 {
-    const INCORRECT_ID = -1;
-
-    /** @var array */
-    protected $email = [
+    private array $email = [
         'folders' => [
             ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
         ],
@@ -22,41 +19,38 @@ class EmailControllerTest extends WebTestCase
         'importance' => 'low',
         'body' => 'Test body',
         'bodyType' => 'text',
-        'receivedAt' => '2015-06-19 12:17:51'
+        'receivedAt' => '2015-06-19T12:17:51Z'
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([LoadAdminOwnerEmailData::class]);
     }
 
-    /**
-     * @return array
-     */
     public function testCget()
     {
         $url = $this->getUrl('oro_api_get_emails');
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
 
         $emails = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($emails);
         $this->assertCount(10, $emails);
 
-        $this->client->request('GET', $url . '?messageId=' . urlencode($emails[0]['messageId']));
+        $this->client->jsonRequest('GET', $url . '?messageId=' . urlencode($emails[0]['messageId']));
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId<>' . urlencode($emails[0]['messageId']));
+        $this->client->jsonRequest('GET', $url . '?messageId<>' . urlencode($emails[0]['messageId']));
         $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $url . '?messageId=' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
         );
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $url . '?messageId<>' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
         );
@@ -66,7 +60,7 @@ class EmailControllerTest extends WebTestCase
     public function testGet()
     {
         $id = $this->getReference('email_1')->getId();
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_email', ['id' => $id])
         );
@@ -76,17 +70,17 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
         $this->assertEquals('My Web Store Introduction', $result['subject']);
-        $this->assertContains('Thank you for signing up to My Web Store!', $result['body']);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $result['body']);
 
         return $result['id'];
     }
 
-    public function testCreateEmail()
+    public function testCreateEmail(): int
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertTrue($email['head']);
 
@@ -95,12 +89,10 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @depends testCreateEmail
-     *
-     * @param integer $id
      */
-    public function testCreateForExistingEmail($id)
+    public function testCreateForExistingEmail(int $id)
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->assertEquals($response['id'], $id, 'Existing email should be updated');
@@ -112,7 +104,7 @@ class EmailControllerTest extends WebTestCase
     public function testCreateForExistingEmailButWithChangedProtectedProperty()
     {
         $newEmail = array_merge($this->email, ['subject' => 'New subject']);
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $newEmail);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
         // The original exception message is returned only if functional tests are running in debug mode
@@ -131,25 +123,21 @@ class EmailControllerTest extends WebTestCase
         $email['messageId'] = 'new.test@email-bundle.func-test';
         unset($email['subject'], $email['body'], $email['bodyType']);
 
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotNull($email['subject'], "The Subject cannot be null. It should be empty string");
-        $this->assertNotNull($email['body'], "The Body cannot be null. It should be empty string");
+        $this->assertNotNull($email['subject'], 'The Subject cannot be null. It should be empty string');
+        $this->assertNotNull($email['body'], 'The Body cannot be null. It should be empty string');
     }
 
     /**
      * @depends testCreateEmail
-     *
-     * @param integer $id
-     *
-     * @return int
      */
-    public function testUpdateEmail($id)
+    public function testUpdateEmail(int $id): int
     {
-        $folders   = [];
+        $folders = [];
         $folders[] = [
             'fullName' => 'INBOX \ Folder1',
             'name'     => 'Folder1',
@@ -161,20 +149,19 @@ class EmailControllerTest extends WebTestCase
             'type'     => 'inbox'
         ];
 
-
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [
                 'seen'    => 1,
-                'receivedAt' => '2015-06-19 12:17:51',
+                'receivedAt' => '2015-06-19T12:17:51Z',
                 'folders' => $folders
             ]
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
         $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         return $id;
@@ -182,12 +169,10 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @depends testUpdateEmail
-     *
-     * @param integer $id
      */
-    public function testUpdateEmailProtectedProperty($id)
+    public function testUpdateEmailProtectedProperty(int $id)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [

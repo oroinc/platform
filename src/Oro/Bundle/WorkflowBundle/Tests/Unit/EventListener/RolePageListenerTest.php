@@ -9,34 +9,37 @@ use Oro\Bundle\WorkflowBundle\EventListener\RolePageListener;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RolePageListener */
-    protected $listener;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    protected function setUp()
+    /** @var RolePageListener */
+    private $listener;
+
+    protected function setUp(): void
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->requestStack = new RequestStack();
+
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($value) {
                 return 'translated: ' . $value;
             });
 
-        $this->requestStack = new RequestStack();
         $this->listener = new RolePageListener($translator, $this->requestStack);
     }
 
     public function testOnUpdatePageRenderWithoutRequest()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -48,9 +51,9 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdatePageRenderOnWrongPage()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -64,9 +67,9 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdatePageRenderOnNonCloneRolePage()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -86,18 +89,18 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onUpdatePageRenderRoutesProvider
      */
-    public function testOnUpdatePageRenderWithEntityInEvent($routeName, $routeParameters = [])
+    public function testOnUpdatePageRenderWithEntityInEvent(string $routeName, array $routeParameters = [])
     {
         $entity = new Role();
         $form = new FormView();
         $form->vars['value'] = new \stdClass();
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeFormRenderEvent(
             $form,
             [
                 'dataBlocks' => [
                     ['first block'],
-                    ['second block'],
+                    'second' => ['second block'],
                     ['third block']
                 ]
             ],
@@ -109,7 +112,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => false
@@ -117,14 +120,14 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($renderedHtml);
 
-
         $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
 
         $data = $event->getFormData();
         $this->assertCount(4, $data['dataBlocks']);
-        $workflowBlock = $data['dataBlocks'][3];
+        $this->assertEquals([0 => 0, 1 => 'second', 2 => 1, 3 => 2], array_keys($data['dataBlocks']));
+        $workflowBlock = $data['dataBlocks'][2];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',
             $workflowBlock['title']
@@ -138,18 +141,18 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onUpdatePageRenderRoutesProvider
      */
-    public function testOnUpdatePageRenderWithoutEntityInEvent($routeName, $routeParameters = [])
+    public function testOnUpdatePageRenderWithoutEntityInEvent(string $routeName, array $routeParameters = [])
     {
         $entity = new Role();
         $form = new FormView();
         $form->vars['value'] = $entity;
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeFormRenderEvent(
             $form,
             [
                 'dataBlocks' => [
                     ['first block'],
-                    ['second block'],
+                    'second' => ['second block'],
                     ['third block']
                 ]
             ],
@@ -161,7 +164,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => false
@@ -169,14 +172,14 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($renderedHtml);
 
-
         $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
 
         $data = $event->getFormData();
         $this->assertCount(4, $data['dataBlocks']);
-        $workflowBlock = $data['dataBlocks'][3];
+        $this->assertEquals([0 => 0, 1 => 'second', 2 => 1, 3 => 2], array_keys($data['dataBlocks']));
+        $workflowBlock = $data['dataBlocks'][2];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',
             $workflowBlock['title']
@@ -187,7 +190,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function onUpdatePageRenderRoutesProvider()
+    public function onUpdatePageRenderRoutesProvider(): array
     {
         return [
             ['oro_user_role_update'],
@@ -199,7 +202,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRenderWithoutRequest()
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             [],
             new \stdClass()
         );
@@ -212,7 +215,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRenderOnNonUpdateRolePage()
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock('\Twig_Environment'),
+            $this->createMock(Environment::class),
             [],
             new \stdClass()
         );
@@ -227,7 +230,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnViewPageRender()
     {
         $entity = new Role();
-        $twig = $this->createMock('\Twig_Environment');
+        $twig = $this->createMock(Environment::class);
         $event = new BeforeViewRenderEvent(
             $twig,
             [
@@ -240,12 +243,11 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             $entity
         );
 
-
         $renderedHtml = '<div>Rendered datagrid position</div>';
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => true
@@ -253,13 +255,13 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($renderedHtml);
 
-
         $this->requestStack->push(new Request([], [], ['_route' => 'oro_user_role_view']));
 
         $this->listener->onViewPageRender($event);
 
         $data = $event->getData();
         $this->assertCount(4, $data['dataBlocks']);
+        $this->assertEquals([0, 1, 2, 3], array_keys($data['dataBlocks']));
         $workflowBlock = $data['dataBlocks'][3];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',

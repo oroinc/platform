@@ -7,21 +7,25 @@ use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerI
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityApiHandlerProcessor
-     */
-    protected $processor;
+    /** @var EntityApiHandlerProcessor */
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new EntityApiHandlerProcessor();
     }
 
     public function testAddAndGetHandlers()
     {
-        $handlers = [$this->getHandlerMock(), $this->getHandlerMock()];
+        $handlers = [
+            $this->createMock(EntityApiHandlerInterface::class),
+            $this->createMock(EntityApiHandlerInterface::class)
+        ];
 
         foreach ($handlers as $handler) {
             $this->processor->addHandler($handler);
@@ -36,11 +40,10 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
     public function testGetHandlerByClass()
     {
         $entity = new SomeEntity();
-        $handler = $this->getHandlerMock();
+        $handler = $this->createMock(EntityApiHandlerInterface::class);
         $this->processor->addHandler($handler);
 
-        $handler
-            ->expects($this->once())
+        $handler->expects($this->once())
             ->method('getClass')
             ->willReturn(ClassUtils::getClass($entity));
 
@@ -53,11 +56,10 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
     public function testGetHandlerByClassNull()
     {
         $entity = new SomeEntity();
-        $handler = $this->getHandlerMock();
+        $handler = $this->createMock(EntityApiHandlerInterface::class);
         $this->processor->addHandler($handler);
 
-        $handler
-            ->expects($this->once())
+        $handler->expects($this->once())
             ->method('getClass')
             ->willReturn(ClassUtils::getClass($entity));
 
@@ -131,39 +133,22 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->invalidateProcess($entity);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityApiHandlerInterface
-     */
-    protected function getHandlerMock()
+    private function prepareProcess(object $entity, string $method, int $count = 0): void
     {
-        return $this
-            ->createMock('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface');
-    }
-
-    /**
-     * @param $entity
-     * @param string $method
-     * @param int $count
-     */
-    protected function prepareProcess($entity, $method, $count = 0)
-    {
-        $handler = $this->getHandlerMock();
+        $handler = $this->createMock(EntityApiHandlerInterface::class);
         $this->processor->addHandler($handler);
 
         if ($count === 0) {
-            $handler
-                ->expects($this->once())
+            $handler->expects($this->once())
                 ->method('getClass')
                 ->willReturn('some/class');
         } else {
-            $handler
-                ->expects($this->once())
+            $handler->expects($this->once())
                 ->method('getClass')
                 ->willReturn(ClassUtils::getClass($entity));
         }
 
-        $handler
-            ->expects($this->exactly($count))
+        $handler->expects($this->exactly($count))
             ->method($method);
     }
 }

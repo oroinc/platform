@@ -2,51 +2,39 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCartItem;
 
 class BaseCartItemTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_STRING = 'testString';
-    const TEST_ID     = 123;
-    const TEST_FLOAT  = 123.123;
+    private const TEST_STRING = 'testString';
+    private const TEST_ID = 123;
+    private const TEST_FLOAT = 123.123;
 
-    /** @var BaseCartItem */
-    protected $entity;
+    private BaseCartItem $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BaseCartItem();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
+     * @dataProvider getSetDataProvider
      */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
     {
         if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
+            call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
         }
 
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
-        $created  = new \DateTime('now');
-        $updated  = new \DateTime('now');
-        $cartMock = $this->createMock('Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart');
+        $created = new \DateTime('now');
+        $updated = new \DateTime('now');
+        $cartMock = $this->createMock(BaseCart::class);
 
         return [
             'id'             => ['id', self::TEST_ID, self::TEST_ID],

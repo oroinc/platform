@@ -3,24 +3,24 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Event\EntityConfigListener;
 
 class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var EntityConfigListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->listener = new EntityConfigListener();
     }
@@ -33,18 +33,16 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
 
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -66,18 +64,16 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
 
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -95,18 +91,16 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
 
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
 
         $expectedConfig = clone $config;
         $expectedConfig->set('owner_field_name', 'owner');

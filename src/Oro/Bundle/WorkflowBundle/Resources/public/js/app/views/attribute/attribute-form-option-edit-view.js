@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var AttributeFormOptionEditView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
     require('jquery.validate');
 
-    AttributeFormOptionEditView = BaseView.extend({
+    const AttributeFormOptionEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -33,25 +32,25 @@ define(function(require) {
         requiredOptions: ['workflow', 'entityFieldsProvider'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AttributeFormOptionEditView() {
-            AttributeFormOptionEditView.__super__.constructor.apply(this, arguments);
+        constructor: function AttributeFormOptionEditView(options) {
+            AttributeFormOptionEditView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};
-            var requiredMissed = this.requiredOptions.filter(function(option) {
+            const requiredMissed = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (requiredMissed.length) {
                 throw new TypeError('Missing required option(s): ' + requiredMissed.join(', '));
             }
             this.options = _.defaults(options, this.options);
-            var template = this.options.template || $('#attribute-form-option-edit-template').html();
+            const template = this.options.template || $('#attribute-form-option-edit-template').html();
             this.template = _.template(template);
 
             this.entity_field_template = this.options.entity_field_template ||
@@ -63,7 +62,7 @@ define(function(require) {
         },
 
         onAdd: function() {
-            var formData = helper.getFormData(this.form);
+            const formData = helper.getFormData(this.form);
 
             formData.property_path = this.options
                 .entityFieldsProvider.getRelativePropertyPathByPath(formData.property_path);
@@ -110,7 +109,7 @@ define(function(require) {
             this._deferredRender();
             this.form = $(this.template(this.options.data)).filter('form');
             this.form.validate({
-                submitHandler: _.bind(this.onAdd, this)
+                submitHandler: this.onAdd.bind(this)
             });
             this.form.on('submit', function(e) {
                 e.preventDefault();
@@ -123,7 +122,7 @@ define(function(require) {
             this.labelEl = this.form.find('[name=label]');
             this.requiredEl = this.form.find('[name=required]');
 
-            this.resetBtn.click(_.bind(this.resetForm, this));
+            this.resetBtn.click(this.resetForm.bind(this));
 
             this.$el.append(this.form);
             // since we have no async operation right here but there is one in subview `deferredRender` promise

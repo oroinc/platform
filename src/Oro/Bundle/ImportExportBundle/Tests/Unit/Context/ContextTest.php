@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Context;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
 
@@ -30,6 +30,17 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([
             ['header_1' => 'value_1'], ['header_1' => 'value_2'], ['header_1' => 'value_3']
         ], $context->getPostponedRows());
+    }
+
+    public function testIncrementRead()
+    {
+        $context = new Context(['incremented_read' => false]);
+        $context->incrementReadCount(1);
+        self::assertNull($context->getReadCount());
+
+        $context->removeOption('incremented_read');
+        $context->incrementReadCount(1);
+        self::assertEquals(1, $context->getReadCount());
     }
 
     public function testExceptions()

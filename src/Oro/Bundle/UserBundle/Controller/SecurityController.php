@@ -2,38 +2,53 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class SecurityController extends Controller
+/**
+ * Main security authentication controller
+ */
+class SecurityController extends AbstractController
 {
     /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            CsrfTokenManagerInterface::class,
+            AuthenticationUtils::class,
+            RequestStack::class
+        ]);
+    }
+
+    /**
      * @Route("/login", name="oro_user_security_login")
-     * @Template
+     * @Template("@OroUser/Security/login.html.twig")
      */
     public function loginAction()
     {
         if ($this->getUser()) {
             return $this->redirect($this->generateUrl('oro_default'));
         }
-        $request = $this->get('request_stack')->getCurrentRequest();
+        $request = $this->get(RequestStack::class)->getCurrentRequest();
         // 302 redirect does not processed by Backbone.sync handler, but 401 error does.
         if ($request->isXmlHttpRequest()) {
             return new Response(null, 401);
         }
 
-        $helper           = $this->get('security.authentication_utils');
-        $csrfTokenManager = $this->get('security.csrf.token_manager');
-
         return [
             // last username entered by the user (if any)
-            'last_username' => $helper->getLastUsername(),
+            'last_username' => $this->get(AuthenticationUtils::class)->getLastUsername(),
             // last authentication error (if any)
-            'error'         => $helper->getLastAuthenticationError(),
+            'error'         => $this->get(AuthenticationUtils::class)->getLastAuthenticationError(),
             // CSRF token for the login form
-            'csrf_token'    => $csrfTokenManager->getToken('authenticate')->getValue(),
+            'csrf_token'    => $this->get(CsrfTokenManagerInterface::class)->getToken('authenticate')->getValue(),
         ];
     }
 
@@ -42,6 +57,10 @@ class SecurityController extends Controller
      */
     public function checkAction()
     {
+        if ($this->getUser()) {
+            return $this->redirect($this->generateUrl('oro_default'));
+        }
+
         throw new \RuntimeException(
             'You must configure the check path to be handled by the firewall ' .
             'using form_login in your security firewall configuration.'

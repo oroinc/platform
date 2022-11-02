@@ -38,9 +38,6 @@ class DbalSchema extends BaseSchema
         $this->addQueueTable();
     }
 
-    /**
-     * @param BaseSchema $schema
-     */
     public function addToSchema(BaseSchema $schema)
     {
         foreach ($this->getTables() as $table) {

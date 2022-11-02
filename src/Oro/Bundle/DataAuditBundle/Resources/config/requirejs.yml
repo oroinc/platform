@@ -1,9 +1,0 @@
-config:
-    paths:
-        'orodataaudit/js/app/views/data-audit-condition-view': 'bundles/orodataaudit/js/app/views/data-audit-condition-view.js'
-        'orodataaudit/js/app/components/segment-component-extension': 'bundles/orodataaudit/js/app/components/segment-component-extension.js'
-        'orodataaudit/js/audit-filter': 'bundles/orodataaudit/js/audit-filter.js'
-        'orodataaudit/js/app/modules/entity-filter-preset-module': 'bundles/orodataaudit/js/app/modules/entity-filter-preset-module.js'
-
-    appmodules:
-        - orodataaudit/js/app/modules/entity-filter-preset-module

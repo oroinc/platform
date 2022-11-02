@@ -4,38 +4,28 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
-use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
+/**
+ * Adds "virtual" option for virtual fields.
+ */
 class EntityVirtualStructureOptionsListener
 {
-    const OPTION_NAME = 'virtual';
+    private const OPTION_NAME = 'virtual';
 
-    /** @var ChainVirtualFieldProvider */
-    protected $virtualFieldProvider;
+    /** @var VirtualFieldProviderInterface */
+    private $virtualFieldProvider;
 
-    /**
-     * @param ChainVirtualFieldProvider $virtualFieldProvider
-     */
-    public function __construct(ChainVirtualFieldProvider $virtualFieldProvider)
+    public function __construct(VirtualFieldProviderInterface $virtualFieldProvider)
     {
         $this->virtualFieldProvider = $virtualFieldProvider;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();
-
         foreach ($data as $entityStructure) {
-            if (!$entityStructure instanceof EntityStructure) {
-                continue;
-            }
-
             $className = $entityStructure->getClassName();
-
             $fields = $entityStructure->getFields();
             foreach ($fields as $field) {
                 $fieldName = $field->getName();
@@ -51,7 +41,6 @@ class EntityVirtualStructureOptionsListener
                 }
             }
         }
-
         $event->setData($data);
     }
 }

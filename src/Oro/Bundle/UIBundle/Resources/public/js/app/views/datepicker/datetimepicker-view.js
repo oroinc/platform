@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var DateTimePickerView;
-    var _ = require('underscore');
-    var DatePickerView = require('./datepicker-view');
-    var dateTimePickerViewMixin = require('./datetimepicker-view-mixin');
+    const $ = require('jquery');
+    const DatePickerView = require('./datepicker-view');
+    const dateTimePickerViewMixin = require('./datetimepicker-view-mixin');
 
-    DateTimePickerView = DatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
+    const DateTimePickerView = DatePickerView.extend(Object.assign({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
-        defaults: _.extend({}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
+        defaults: $.extend(true, {}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DateTimePickerView() {
-            DateTimePickerView.__super__.constructor.apply(this, arguments);
+        constructor: function DateTimePickerView(options) {
+            DateTimePickerView.__super__.constructor.call(this, options);
         },
 
         /**

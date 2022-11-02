@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -17,10 +17,6 @@ class CreateEntity extends CreateObject
      */
     protected $registry;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
     {
         parent::__construct($contextAccessor);

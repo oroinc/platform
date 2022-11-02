@@ -2,46 +2,30 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTags;
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTagsValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
+class NoTagsValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $constraint;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var NoTagsValidator
-     */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->constraint = $this->createMock('Oro\\Bundle\\EmbeddedFormBundle\\Validator\\Constraints\\NoTags');
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->validator = new NoTagsValidator();
-        $this->validator->initialize($this->context);
+        return new NoTagsValidator();
     }
 
     /**
-     * @test
      * @dataProvider valuesWithoutErrors
      */
-    public function shouldValidateWithoutErrors($value)
+    public function testShouldValidateWithoutErrors(?string $value)
     {
-        $this->context->expects($this->never())
-            ->method($this->anything());
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new NoTags();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
-    public function valuesWithoutErrors()
+    public function valuesWithoutErrors(): array
     {
         return [
             'empty value' => [''],
@@ -63,19 +47,18 @@ class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
      * @dataProvider valuesWithErrors
      */
-    public function shouldValidateWithErrors($value)
+    public function testShouldValidateWithErrors(string $value)
     {
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->message);
+        $constraint = new NoTags();
+        $this->validator->validate($value, $constraint);
 
-        $this->validator->validate($value, $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
-    public function valuesWithErrors()
+    public function valuesWithErrors(): array
     {
         return [
             'value with closed style' => [
@@ -91,17 +74,18 @@ class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
      * @dataProvider invalidValues
      */
-    public function shouldFailWithInvalidValue($value, $exceptionMessage)
+    public function testShouldFailWithInvalidValue(mixed $value, string $exceptionMessage)
     {
-        $this->expectException('Symfony\\Component\\Validator\\Exception\\UnexpectedTypeException');
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage($exceptionMessage);
-        $this->validator->validate($value, $this->constraint);
+
+        $constraint = new NoTags();
+        $this->validator->validate($value, $constraint);
     }
 
-    public function invalidValues()
+    public function invalidValues(): array
     {
         return [
             'array' => [

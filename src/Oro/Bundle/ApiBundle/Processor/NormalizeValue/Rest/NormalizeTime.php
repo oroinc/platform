@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
  */
 class NormalizeTime extends AbstractProcessor
 {
-    const REQUIREMENT = '\d{2}:\d{2}(:\d{2}(\.\d+)?)?';
+    private const REQUIREMENT = '\d{2}:\d{2}(:\d{2}(\.\d+)?)?';
 
     /**
      * {@inheritdoc}

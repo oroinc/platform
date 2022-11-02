@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException;
 
+/**
+ * Chain of ownership metadata providers
+ */
 class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
     /** @var OwnershipMetadataProviderInterface[] */
@@ -77,33 +80,6 @@ class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterfa
     public function getOrganizationClass()
     {
         return $this->getSupportedProvider()->getOrganizationClass();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3, use getUserClass instead
-     */
-    public function getBasicLevelClass()
-    {
-        return $this->getSupportedProvider()->getBasicLevelClass();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3, use getBusinessUnitClass instead
-     */
-    public function getLocalLevelClass($deep = false)
-    {
-        return $this->getSupportedProvider()->getLocalLevelClass($deep);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated since 2.3, use getOrganizationClass instead
-     */
-    public function getGlobalLevelClass()
-    {
-        return $this->getSupportedProvider()->getGlobalLevelClass();
     }
 
     /**

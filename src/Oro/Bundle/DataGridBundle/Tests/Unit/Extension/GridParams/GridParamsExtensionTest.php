@@ -1,44 +1,35 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridParams;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension;
 
 class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GridParamsExtension
-     */
-    protected $extension;
+    /** @var GridParamsExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension  = new GridParamsExtension();
         $this->extension->setParameters(new ParameterBag());
     }
 
     /**
-     * @param $input
-     * @param $result
-     *
      * @dataProvider isApplicableProvider
      */
-    public function testIsApplicable($input, $result)
+    public function testIsApplicable(array $input, bool $result)
     {
         $this->assertEquals(
-            $this->extension->isApplicable(
-                DatagridConfiguration::create($input)
-            ),
-            $result
+            $result,
+            $this->extension->isApplicable(DatagridConfiguration::create($input))
         );
     }
 
-    /**
-     * @return array
-     */
-    public function isApplicableProvider()
+    public function isApplicableProvider(): array
     {
         return [
             'applicable' => [
@@ -61,18 +52,12 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $parameters
-     * @param $gridParameters
      * @dataProvider visitMetadataProvider
      */
-    public function testVisitMetadata($parameters, $gridParameters)
+    public function testVisitMetadata(array $parameters, array $gridParameters)
     {
-        $dataGridConfig = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dataGridConfig = $this->createMock(DatagridConfiguration::class);
+        $metadata = $this->createMock(MetadataObject::class);
 
         $this->extension->setParameters(new ParameterBag($parameters));
 
@@ -83,10 +68,7 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($dataGridConfig, $metadata);
     }
 
-    /**
-     * @return array
-     */
-    public function visitMetadataProvider()
+    public function visitMetadataProvider(): array
     {
         return [
             'with grid params' => [

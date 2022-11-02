@@ -1,0 +1,6 @@
+dynamic-imports:
+    commons:
+        - orosegment/js/app/components/aggregated-field-condition-extension
+        - orosegment/js/app/components/refresh-button
+        - orosegment/js/app/components/segment-component
+        - orosegment/js/app/views/segment-condition-view

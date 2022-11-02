@@ -2,27 +2,36 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowAndExposeHeaders;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsSettings;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
+class SetCorsAllowAndExposeHeadersTest extends GetListProcessorTestCase
 {
-    /** @var Context */
-    private $context;
-
-    protected function setUp()
-    {
-        $this->context = new Context(
-            $this->createMock(ConfigProvider::class),
-            $this->createMock(MetadataProvider::class)
+    /**
+     * @param bool     $isCredentialsAllowed
+     * @param string[] $allowedHeaders
+     * @param string[] $exposableHeaders
+     *
+     * @return CorsSettings
+     */
+    private function getCorsSettings(
+        bool $isCredentialsAllowed,
+        array $allowedHeaders,
+        array $exposableHeaders
+    ): CorsSettings {
+        return new CorsSettings(
+            0,
+            [],
+            $isCredentialsAllowed,
+            $allowedHeaders,
+            $exposableHeaders
         );
     }
 
     public function testAllowHeadersForNotPreflightRequest()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $processor->process($this->context);
 
         self::assertFalse($this->context->getResponseHeaders()->has('Access-Control-Allow-Headers'));
@@ -30,31 +39,31 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testDefaultAllowHeadersForPreflightRequest()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
         $processor->process($this->context);
 
         self::assertEquals(
-            'Content-Type,X-Include',
+            'Authorization,Content-Type,X-Include',
             $this->context->getResponseHeaders()->get('Access-Control-Allow-Headers')
         );
     }
 
     public function testAllowHeadersForPreflightRequestWithAdditionalHeaders()
     {
-        $processor = new SetCorsAllowAndExposeHeaders(['AllowHeader1'], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, ['AllowHeader1'], []));
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
         $processor->process($this->context);
 
         self::assertEquals(
-            'Content-Type,X-Include,AllowHeader1',
+            'Authorization,Content-Type,X-Include,AllowHeader1',
             $this->context->getResponseHeaders()->get('Access-Control-Allow-Headers')
         );
     }
 
     public function testAllowHeadersWhenTheyAreAlreadySet()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $this->context->getResponseHeaders()->set('Access-Control-Allow-Headers', 'header1,header2');
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
         $processor->process($this->context);
@@ -67,7 +76,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testDefaultExposeHeaders()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $processor->process($this->context);
 
         self::assertEquals(
@@ -78,7 +87,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testExposeHeadersWithAdditionalHeaders()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], ['ExposeHeader1'], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], ['ExposeHeader1']));
         $processor->process($this->context);
 
         self::assertEquals(
@@ -89,7 +98,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testExposeHeadersWhenTheyAreAlreadySet()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $this->context->getResponseHeaders()->set('Access-Control-Expose-Headers', 'header1,header2,header2');
         $processor->process($this->context);
 
@@ -101,7 +110,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testCredentialsAllowed()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], true);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(true, [], []));
         $processor->process($this->context);
 
         self::assertEquals(
@@ -112,7 +121,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testCredentialsNotAllowed()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], ['ExposeHeader1'], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], ['ExposeHeader1']));
         $processor->process($this->context);
 
         self::assertFalse(
@@ -122,7 +131,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
 
     public function testAllowCredentialHeaderIsAlreadySet()
     {
-        $processor = new SetCorsAllowAndExposeHeaders([], [], false);
+        $processor = new SetCorsAllowAndExposeHeaders($this->getCorsSettings(false, [], []));
         $this->context->getResponseHeaders()->set('Access-Control-Allow-Credentials', 'true');
         $processor->process($this->context);
 

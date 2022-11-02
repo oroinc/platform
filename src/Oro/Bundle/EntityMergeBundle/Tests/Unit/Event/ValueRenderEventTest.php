@@ -3,37 +3,26 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface;
 
 class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ValueRenderEvent
-     */
-    protected $target;
+    /** @var MetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadata;
 
-    /**
-     * @var \DateTime
-     */
-    protected $originalValue;
+    /** @var \DateTime */
+    private $originalValue;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadata;
+    /** @var string */
+    private $convertedValue;
 
-    /**
-     * @var string
-     */
-    protected $convertedValue;
+    /** @var ValueRenderEvent */
+    private $target;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->metadata = $this->createMock(MetadataInterface::class);
         $this->originalValue = new \DateTime();
-
         $this->convertedValue = date('Y-m');
 
         $this->target = new ValueRenderEvent($this->convertedValue, $this->originalValue, $this->metadata);

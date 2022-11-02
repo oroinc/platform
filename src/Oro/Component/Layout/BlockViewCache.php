@@ -2,65 +2,53 @@
 
 namespace Oro\Component\Layout;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The cache for layout block views.
  */
 class BlockViewCache implements BlockViewCacheInterface
 {
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
+    protected CacheInterface $cache;
+    protected Serializer $serializer;
 
-    /**
-     * @var Serializer
-     */
-    protected $serializer;
-
-    /**
-     * @param CacheProvider $cacheProvider
-     * @param Serializer    $serializer
-     */
-    public function __construct(CacheProvider $cacheProvider, Serializer $serializer)
+    public function __construct(CacheInterface $cacheProvider, Serializer $serializer)
     {
         $this->cache = $cacheProvider;
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(ContextInterface $context, BlockView $rootView)
+    public function save(ContextInterface $context, BlockView $rootView): void
     {
-        $hash = $context->getHash();
-
-        $serialized = $this->serializer->serialize($rootView, JsonEncoder::FORMAT);
-
-        $this->cache->save($hash, $serialized);
+        $this->doCache($context->getHash(), $this->serializer->serialize($rootView, JsonEncoder::FORMAT));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function fetch(ContextInterface $context)
+    public function fetch(ContextInterface $context): ?BlockView
     {
         $hash = $context->getHash();
-        $value = $this->cache->fetch($hash);
+        $value = $this->doCache($hash);
 
-        return false !== $value
-            ? $this->serializer->deserialize($value, BlockView::class, JsonEncoder::FORMAT)
+        return null !== $value
+            ? $this->serializer->deserialize($value, BlockView::class, JsonEncoder::FORMAT, ['context_hash' => $hash])
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
-        $this->cache->deleteAll();
+        $this->cache->clear();
+    }
+
+    private function doCache(string $cacheKey, ?string $data = null): ?string
+    {
+        $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey($cacheKey);
+        if ($data) {
+            $this->cache->delete($cacheKey);
+        }
+        return $this->cache->get($cacheKey, function () use ($data) {
+            return $data;
+        });
     }
 }

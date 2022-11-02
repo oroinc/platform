@@ -2,46 +2,57 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Psr\Container\ContainerInterface;
+
+/**
+ * Contains all object normalisers
+ * and allows to get a normaliser suitable for a specific object type and a request type.
+ */
 class ObjectNormalizerRegistry
 {
-    /** @var array */
-    private $normalizers = [];
+    /** @var array [[normalizer service id, object class, request type expression], ...] */
+    private $normalizers;
 
-    /** @var ObjectNormalizerInterface[]|null */
-    private $sortedNormalizers;
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var RequestExpressionMatcher */
+    private $matcher;
 
     /**
-     * Registers a normalizer for a specific object type
-     *
-     * @param ObjectNormalizerInterface $normalizer
-     * @param int                       $priority
+     * @param array                    $normalizers [[service id, object class, request type expression], ...]
+     * @param ContainerInterface       $container
+     * @param RequestExpressionMatcher $matcher
      */
-    public function addNormalizer(ObjectNormalizerInterface $normalizer, $priority = 0)
+    public function __construct(array $normalizers, ContainerInterface $container, RequestExpressionMatcher $matcher)
     {
-        $this->normalizers[$priority][] = $normalizer;
-        $this->sortedNormalizers = null;
+        $this->normalizers = $normalizers;
+        $this->container = $container;
+        $this->matcher = $matcher;
     }
 
     /**
-     * Gets a normalizer for a given object
+     * Gets a normalizer for a given object.
      *
-     * @param object $object
+     * @param object      $object
+     * @param RequestType $requestType
      *
      * @return ObjectNormalizerInterface|null
      */
-    public function getObjectNormalizer($object)
+    public function getObjectNormalizer($object, RequestType $requestType): ?ObjectNormalizerInterface
     {
-        if (null === $this->sortedNormalizers) {
-            krsort($this->normalizers);
-            $this->sortedNormalizers = call_user_func_array('array_merge', $this->normalizers);
-        }
-
-        foreach ($this->sortedNormalizers as $normalizer) {
-            if ($normalizer->supports($object)) {
-                return $normalizer;
+        $result = null;
+        foreach ($this->normalizers as list($serviceId, $objectClass, $expression)) {
+            if (is_a($object, $objectClass)
+                && (!$expression || $this->matcher->matchValue($expression, $requestType))
+            ) {
+                $result = $this->container->get($serviceId);
+                break;
             }
         }
 
-        return null;
+        return $result;
     }
 }

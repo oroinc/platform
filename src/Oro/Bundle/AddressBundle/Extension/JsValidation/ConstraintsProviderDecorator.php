@@ -17,9 +17,6 @@ class ConstraintsProviderDecorator implements ConstraintsProviderInterface
      */
     private $constraintsProvider;
 
-    /**
-     * @param ConstraintsProviderInterface $constraintsProvider
-     */
     public function __construct(ConstraintsProviderInterface $constraintsProvider)
     {
         $this->constraintsProvider = $constraintsProvider;

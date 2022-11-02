@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetConfigurationLoadEvent extends Event
 {
@@ -13,9 +13,6 @@ class WidgetConfigurationLoadEvent extends Event
      */
     protected $configuration = [];
 
-    /**
-     * @param array $configuration
-     */
     public function __construct(array $configuration = [])
     {
         $this->configuration = $configuration;
@@ -29,9 +26,6 @@ class WidgetConfigurationLoadEvent extends Event
         return $this->configuration;
     }
 
-    /**
-     * @param array $configuration
-     */
     public function setConfiguration(array $configuration = [])
     {
         $this->configuration = $configuration;

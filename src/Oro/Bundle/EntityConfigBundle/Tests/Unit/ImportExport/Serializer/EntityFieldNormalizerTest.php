@@ -2,70 +2,52 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Serializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
-    const FIELD_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
-
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var FieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldTypeProvider;
+    private $fieldTypeProvider;
 
     /** @var EntityFieldNormalizer */
-    protected $normalizer;
+    private $normalizer;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
 
         $this->normalizer = new EntityFieldNormalizer($this->registry, $this->configManager, $this->fieldTypeProvider);
     }
 
     /**
-     * @param mixed $inputData
-     * @param bool $expected
-     *
      * @dataProvider supportsNormalizationProvider
      */
-    public function testSupportsNormalization($inputData, $expected)
+    public function testSupportsNormalization(mixed $inputData, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($inputData));
     }
 
     /**
-     * @param array $inputData
-     * @param bool $expected
-     *
      * @dataProvider supportsDenormalizationProvider
      */
-    public function testSupportsDenormalization(array $inputData, $expected)
+    public function testSupportsDenormalization(array $inputData, bool $expected)
     {
         $this->assertEquals(
             $expected,
@@ -74,9 +56,6 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider normalizeProvider
      */
     public function testNormalize(array $inputData, array $expectedData)
@@ -93,21 +72,16 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeExceptionDataProvider
-     *
-     * @@expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Data doesn't contains entity id
-     *
-     * @param array $data
      */
     public function testDenormalizeException(array $data)
     {
-        $this->normalizer->denormalize($data, null);
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage("Data doesn't contains entity id");
+
+        $this->normalizer->denormalize($data, '');
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeExceptionDataProvider()
+    public function denormalizeExceptionDataProvider(): array
     {
         return [
             [
@@ -123,15 +97,12 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param FieldConfigModel $expectedData
-     *
      * @dataProvider denormalizeProvider
      */
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
         /* @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $objectManager */
-        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock(ObjectManager::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -151,10 +122,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $this->normalizer->denormalize($inputData['data'], $inputData['class']));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDenormalizationProvider()
+    public function supportsDenormalizationProvider(): array
     {
         return [
             'supported' => [
@@ -163,7 +131,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
                         'type' => 'type1',
                         'fieldName' => 'field1',
                     ],
-                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
+                    'type' => FieldConfigModel::class,
                 ],
                 'expected' => true
             ],
@@ -180,17 +148,14 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
             'data is not array' => [
                 'input' => [
                     'data' => 'testdata',
-                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
+                    'type' => FieldConfigModel::class,
                 ],
                 'expected' => false
             ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function supportsNormalizationProvider()
+    public function supportsNormalizationProvider(): array
     {
         return [
             'supported' => [
@@ -208,10 +173,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeProvider()
+    public function normalizeProvider(): array
     {
         return [
             [
@@ -246,11 +208,9 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function denormalizeProvider()
+    public function denormalizeProvider(): array
     {
         return [
             [
@@ -301,7 +261,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class' => 'testClass1',
                     'configModel' => [
                         'id' => 11,
-                        'class' => 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
+                        'class' => EntityConfigModel::class,
                         'object' => $this->getEntityConfigModel(1, 'className1'),
                     ],
                     'fieldType' => [
@@ -388,33 +348,19 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getEnumOptions()
+    private function getEnumOptions(): array
     {
         return [EntityFieldNormalizer::CONFIG_TYPE => EntityFieldNormalizer::TYPE_ENUM];
     }
 
-    /**
-     * @param string $type
-     * @return array
-     */
-    protected function getOptions($type)
+    private function getOptions(string $type): array
     {
         return [EntityFieldNormalizer::CONFIG_TYPE => $type];
     }
 
-    /**
-     * @param string $scope
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProvider($scope)
+    private function getConfigProvider(string $scope): ConfigProvider
     {
-        /* @var $provider ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())
             ->method('getScope')
             ->willReturn($scope);
@@ -422,54 +368,26 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         return $provider;
     }
 
-    /**
-     * @param int $objectId
-     * @param string $className
-     * @return EntityConfigModel
-     */
-    protected function getEntityConfigModel($objectId, $className)
+    private function getEntityConfigModel(int $objectId, string $className): EntityConfigModel
     {
-        return $this->getEntity(self::ENTITY_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId, 'className' => $className]);
-    }
-
-    /**
-     * @param int $objectId
-     * @param string $fieldName
-     * @param string $type
-     * @param array $scopes
-     * @return FieldConfigModel
-     */
-    protected function getFieldConfigModel($objectId, $fieldName, $type, array $scopes)
-    {
-        /** @var FieldConfigModel $model */
-        $model = $this->getEntity(
-            self::FIELD_CONFIG_MODEL_CLASS_NAME,
-            ['id' => $objectId, 'fieldName' => $fieldName, 'type' => $type]
-        );
-
-        foreach ($scopes as $scope => $values) {
-            $model->fromArray($scope, $values, []);
-        }
+        $model = new EntityConfigModel($className);
+        ReflectionUtil::setId($model, $objectId);
 
         return $model;
     }
 
-    /**
-     * @param string $className
-     * @param array $properties
-     * @return object
-     */
-    protected function getEntity($className, array $properties)
-    {
-        $reflectionClass = new \ReflectionClass($className);
-        $entity = $reflectionClass->newInstance();
-
-        foreach ($properties as $property => $value) {
-            $method = $reflectionClass->getProperty($property);
-            $method->setAccessible(true);
-            $method->setValue($entity, $value);
+    private function getFieldConfigModel(
+        ?int $objectId,
+        ?string $fieldName,
+        string $type,
+        array $scopes
+    ): FieldConfigModel {
+        $model = new FieldConfigModel($fieldName, $type);
+        ReflectionUtil::setId($model, $objectId);
+        foreach ($scopes as $scope => $values) {
+            $model->fromArray($scope, $values);
         }
 
-        return $entity;
+        return $model;
     }
 }

@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
+use Gos\Bundle\PubSubRouterBundle\Router\Route;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BroadcastTopic */
-    private $broadcast;
+    private BroadcastTopic $broadcast;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->broadcast = new BroadcastTopic('broadcast_topic');
     }
@@ -24,23 +25,23 @@ class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPublish(): void
     {
-        /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection */
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects(self::never())
             ->method(self::anything());
 
         $event = new \stdClass();
 
-        /** @var Topic|\PHPUnit\Framework\MockObject\MockObject $topic */
         $topic = $this->createMock(Topic::class);
         $topic->expects(self::once())
             ->method('broadcast')
             ->with($event, ['data1'], ['data2']);
 
-        /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject $wampRequest */
-        $wampRequest = $this->createMock(WampRequest::class);
-        $wampRequest->expects(self::never())
-            ->method(self::anything());
+        $wampRequest = new WampRequest(
+            'route',
+            $this->createMock(Route::class),
+            $this->createMock(ParameterBag::class),
+            'matched'
+        );
 
         $this->broadcast->onPublish($connection, $topic, $wampRequest, $event, ['data1'], ['data2']);
     }

@@ -22,9 +22,6 @@ class OroDataAuditBundle implements Migration
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createAuditField(Schema $schema)
     {
         $oroAuditFieldTable = $schema->createTable('oro_audit_field');

@@ -7,7 +7,7 @@ datagrids:
                 select:
                     - j
                 from:
-                    - { table: OroMessageQueueBundle:Job, alias: j }
+                    - { table: Oro\Bundle\MessageQueueBundle\Entity\Job, alias: j }
                 where:
                     and:
                         - j.rootJob IS NULL
@@ -20,7 +20,7 @@ datagrids:
             status:
                 label: oro.message_queue_job.grid.columns.status
                 type: twig
-                template: OroMessageQueueBundle:Job:Datagrid/status.html.twig
+                template: '@OroMessageQueue/Job/Datagrid/status.html.twig'
                 frontend_type: html
             unique:
                 label: oro.message_queue_job.grid.columns.unique
@@ -52,7 +52,7 @@ datagrids:
             percent:
                 label: 'Progress'
                 type: twig
-                template: OroMessageQueueBundle:Job:Datagrid/percent.html.twig
+                template: '@OroMessageQueue/Job/Datagrid/percent.html.twig'
                 frontend_type: html
         sorters:
             columns:
@@ -106,6 +106,8 @@ datagrids:
 
         actions:
             view:
+                label: oro.grid.action.view
+                icon: eye
                 type: navigate
                 link: child_jobs_link
                 acl_resource: oro_message_queue_job
@@ -126,7 +128,7 @@ datagrids:
                 select:
                     - j
                 from:
-                    - { table: OroMessageQueueBundle:Job, alias: j }
+                    - { table: Oro\Bundle\MessageQueueBundle\Entity\Job, alias: j }
                 where:
                     and:
                         - j.rootJob = :root_job_id
@@ -141,7 +143,7 @@ datagrids:
             status:
                 label: oro.message_queue_job.grid.columns.status
                 type: twig
-                template: OroMessageQueueBundle:Job:Datagrid/status.html.twig
+                template: '@OroMessageQueue/Job/Datagrid/status.html.twig'
                 frontend_type: html
             createdAt:
                 label: oro.message_queue_job.grid.columns.createdAt

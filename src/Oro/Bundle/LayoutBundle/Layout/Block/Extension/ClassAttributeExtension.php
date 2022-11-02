@@ -18,9 +18,6 @@ class ClassAttributeExtension extends BaseClassAttributeExtension
     /** @var ExpressionEncoderRegistry */
     protected $encoderRegistry;
 
-    /**
-     * @param ExpressionEncoderRegistry $encoderRegistry
-     */
     public function __construct(ExpressionEncoderRegistry $encoderRegistry)
     {
         $this->encoderRegistry = $encoderRegistry;

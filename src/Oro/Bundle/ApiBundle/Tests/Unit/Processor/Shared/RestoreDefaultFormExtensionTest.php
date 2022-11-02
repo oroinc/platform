@@ -21,7 +21,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
     /** @var RestoreDefaultFormExtension */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -65,7 +65,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
             ->method('setConfigAccessor')
             ->with(null);
 
-        $this->context->set(RestoreDefaultFormExtension::API_FORM_EXTENSION_ACTIVATED, true);
+        $this->context->set('apiFormExtensionActivated', true);
         $this->processor->process($this->context);
     }
 
@@ -87,14 +87,14 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
             ->method('setConfigAccessor')
             ->with(self::identicalTo($configAccessor));
 
-        $this->context->set(RestoreDefaultFormExtension::API_FORM_EXTENSION_ACTIVATED, true);
-        $this->context->set(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_ENTITIES, $includedEntities);
-        $this->context->set(RestoreDefaultFormExtension::PREVIOUS_METADATA_ACCESSOR, $metadataAccessor);
-        $this->context->set(RestoreDefaultFormExtension::PREVIOUS_CONFIG_ACCESSOR, $configAccessor);
+        $this->context->set('apiFormExtensionActivated', true);
+        $this->context->set('previousIncludedEntities', $includedEntities);
+        $this->context->set('previousMetadataAccessor', $metadataAccessor);
+        $this->context->set('previousConfigAccessor', $configAccessor);
         $this->processor->process($this->context);
 
-        self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_ENTITIES));
-        self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_METADATA_ACCESSOR));
-        self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_CONFIG_ACCESSOR));
+        self::assertFalse($this->context->has('previousIncludedEntities'));
+        self::assertFalse($this->context->has('previousMetadataAccessor'));
+        self::assertFalse($this->context->has('previousConfigAccessor'));
     }
 }

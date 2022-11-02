@@ -1,8 +1,8 @@
 {% set isWidgetContext = isWidgetContext is defined ? isWidgetContext : false %}
-{% extends isWidgetContext ? 'OroFormBundle:Layout:widgetForm.html.twig' : bap.layout %}
+{% extends isWidgetContext ? '@OroForm/Layout/widgetForm.html.twig' : bap.layout %}
 
-{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroSync/Include/contentTags.html.twig' as syncMacro %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set entity = entity is defined ? entity : null %}
 
@@ -11,6 +11,8 @@
 {% endblock before_content_addition %}
 
 {% block content %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if isWidgetContext and savedId is defined and savedId %}
         {% block widget_context %}
             <div {{ UI.renderPageComponentAttributes({
@@ -58,113 +60,117 @@
             {% endblock page_widget_actions %}
         {% else %}
         <div class="container-fluid page-title">
-            <div class="navigation clearfix navbar-extra navbar-extra-right">
-                <div class="row">
-                    <div class="pull-left pull-left-extra">
-                        {% block pageHeader %}
-                            <div class="clearfix customer-info well-small{% if avatar is not defined %} customer-simple{% endif %}">
-                                {% if avatar is defined %}
-                                    <div class="visual">
-                                        <img src="{{ avatar ? avatar : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
-                                    </div>
-                                {% endif %}
-                                <div class="customer-content pull-left">
-                                    <div class="clearfix">
-                                        {% block breadcrumbs %}
-                                            {% if breadcrumbs is defined %}
-                                                <div class="pull-left">
-                                                    <div class="sub-title">
-                                                        {%- if breadcrumbs.indexPath is defined -%}
-                                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
-                                                        {%- else -%}
-                                                            {{ breadcrumbs.indexLabel }}
-                                                        {%- endif -%}
-                                                    </div>
-                                                    <span class="separator">/</span>
-                                                    {% if breadcrumbs.additional is defined %}
-                                                        {% for breadcrumb in breadcrumbs.additional %}
-                                                            <div class="sub-title">
-                                                                {%- if breadcrumb.indexPath is defined -%}
-                                                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
-                                                                {%- else -%}
-                                                                    {{ breadcrumb.indexLabel }}
-                                                                {%- endif -%}
-                                                            </div>
-                                                            <span class="separator">/</span>
-                                                        {% endfor %}
-                                                    {% endif %}
-                                                    {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
-                                                        <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
-                                                    {% else %}
-                                                        <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
-                                                    {% endif %}
+            {% set titleButtonsBlock %}
+                {% placeholder update_navButtons_before with {entity: entity} %}
+                {% block navButtons %}{% placeholder update_navButtons with {entity: entity} %}{% endblock navButtons %}
+                {% placeholder update_navButtons_after with {entity: entity} %}
+                {% if form.vars.method != 'GET' %}
+                    {% set inputAction  = form.vars.default_input_action is defined
+                        ? form.vars.default_input_action
+                        : ''
+                    %}
+                    <input
+                            type="hidden"
+                            name="input_action"
+                            value="{{ inputAction }}"
+                            data-form-id="{{ form.vars.id }}"
+                    >
+                {% endif %}
+            {% endset %}
+
+            {% set pageActionsBlock %}
+                {% block pageActions %}
+                    {% placeholder update_pageActions_before with {entity: entity} %}
+
+                    {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : form.vars.value.id|default %}
+                    {% if audit_entity_id %}
+                        {% placeholder change_history_block with {
+                            'entity': entity|default(form.vars.value),
+                            'entity_class': audit_entity_class|default(null),
+                            'id': audit_entity_id,
+                            'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value.__toString : null),
+                            'audit_path': audit_path|default('oro_dataaudit_history'),
+                            'audit_show_change_history': audit_show_change_history|default(false)
+                        } %}
+                    {% endif %}
+
+                    {% placeholder update_pageActions_after with {entity: entity} %}
+                {% endblock pageActions %}
+            {% endset %}
+
+            <div class="navigation navbar-extra navbar-extra-right">
+                {% block pageHeader %}
+                    <div class="row">
+                        <div class="pull-left pull-left-extra">
+                            {% block pageTitleIcon %}{% endblock %}
+
+                            <div class="page-title__path">
+                                <div class="top-row">
+                                    {% block breadcrumbs %}
+                                        {% if breadcrumbs is defined %}
+                                            <div class="page-title__entity-title-wrapper">
+                                                <div class="sub-title">
+                                                    {%- if breadcrumbs.indexPath is defined -%}
+                                                        <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
+                                                    {%- else -%}
+                                                        {{ breadcrumbs.indexLabel }}
+                                                    {%- endif -%}
                                                 </div>
-                                            {% endif %}
-                                            {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
-                                        {% endblock breadcrumbs %}
-                                    </div>
-                                    <div class="clearfix">
-                                        <ul class="inline">
-                                            {% block stats %}
-                                                {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
-                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
-                                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
-                                                    {% endif %}
-                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
-                                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
-                                                    {% endif %}
+                                                <span class="separator">/</span>
+                                                {% if breadcrumbs.additional is defined %}
+                                                    {% for breadcrumb in breadcrumbs.additional %}
+                                                        <div class="sub-title">
+                                                            {%- if breadcrumb.indexPath is defined -%}
+                                                                <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                                            {%- else -%}
+                                                                {{ breadcrumb.indexLabel }}
+                                                            {%- endif -%}
+                                                        </div>
+                                                        <span class="separator">/</span>
+                                                    {% endfor %}
                                                 {% endif %}
-                                            {% endblock stats %}
-                                        </ul>
-                                    </div>
+                                                {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
+                                                    <h1 class="page-title__entity-title">{{ breadcrumbs.entityTitle|raw }}</h1>
+                                                {% else %}
+                                                    <h1 class="page-title__entity-title">{{ breadcrumbs.entityTitle }}</h1>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
+                                    {% endblock breadcrumbs %}
                                 </div>
                             </div>
-                        {% endblock pageHeader %}
-                    </div>
-                    <div class="pull-right">
-                        <div class="pull-right title-buttons-container">
-                            {% placeholder update_navButtons_before with {entity: entity} %}
-                            {% block navButtons %}{% placeholder update_navButtons with {entity: entity} %}{% endblock navButtons %}
-                            {% placeholder update_navButtons_after with {entity: entity} %}
-
-                            {% if form.vars.method != 'GET' %}
-                                {% set inputAction  = form.vars.default_input_action is defined
-                                    ? form.vars.default_input_action
-                                    : constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE')
-                                %}
-                                <input
-                                        type="hidden"
-                                        name="input_action"
-                                        value="{{ inputAction }}"
-                                        data-form-id="{{ form.vars.id }}"
-                                />
-                            {% endif %}
                         </div>
-                        <div class="pull-right user-info-state">
+                        <div class="pull-right title-buttons-container">
+                            {{ titleButtonsBlock }}
+                        </div>
+                    </div>
+                    <div class="row inline-info">
+                        <div class="pull-left-extra">
+                            <div class="clearfix">
+                                <ul class="inline">
+                                    {% block stats %}
+                                        {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
+                                            {% if is_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
+                                                <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
+                                            {% endif %}
+                                            {% if is_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
+                                                <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endblock stats %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="pull-right page-title__entity-info-state">
                             <div class="inline-decorate-container">
                                 <ul class="inline-decorate">
-                                    {% block pageActions %}
-                                        {% placeholder update_pageActions_before with {entity: entity} %}
-
-                                        {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : form.vars.value.id|default %}
-                                        {% if audit_entity_id %}
-                                            {% placeholder change_history_block with {
-                                                'entity': entity|default(form.vars.value),
-                                                'entity_class': audit_entity_class|default(null),
-                                                'id': audit_entity_id,
-                                                'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value.__toString : null),
-                                                'audit_path': audit_path|default('oro_dataaudit_history'),
-                                                'audit_show_change_history': audit_show_change_history|default(false)
-                                            } %}
-                                        {% endif %}
-
-                                        {% placeholder update_pageActions_after with {entity: entity} %}
-                                    {% endblock pageActions %}
+                                    {{ pageActionsBlock }}
                                 </ul>
                             </div>
                         </div>
                     </div>
-                </div>
+                {% endblock pageHeader %}
             </div>
         </div>
         {% endif %}

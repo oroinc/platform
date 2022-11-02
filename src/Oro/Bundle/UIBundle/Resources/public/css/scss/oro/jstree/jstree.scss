@@ -9,7 +9,7 @@
     .jstree-node {
         position: $jstree-default-node-position;
         background: $jstree-default-node-background;
-        margin-left: $jstree-default-node-offset-left;
+        margin: 0 0 0 $jstree-default-node-offset-left;
     }
 
     > .jstree-container-ul > .jstree-node {
@@ -26,8 +26,8 @@
         display: $jstree-themeicon-display;
     }
 
-    .jstree-open > .jstree-ocl:before,
-    .jstree-closed > .jstree-ocl:before {
+    .jstree-open > .jstree-ocl::before,
+    .jstree-closed > .jstree-ocl::before {
         font-family: $jstree-open-font-family;
         font-size: $jstree-open-font-size;
         font-weight: $jstree-open-font-weight;
@@ -35,11 +35,11 @@
         color: $jstree-open-color;
     }
 
-    .jstree-open > .jstree-ocl:before {
+    .jstree-open > .jstree-ocl::before {
         content: $jstree-open-jocl-content;
     }
 
-    .jstree-closed > .jstree-ocl:before {
+    .jstree-closed > .jstree-ocl::before {
         content: $jstree-closed-jocl-content;
     }
 
@@ -56,6 +56,12 @@
     .jstree-wholerow-hovered {
         height: $jstree-wholerow-hovered-height;
         background: $jstree-wholerow-hovered-background;
+    }
+
+    .jstree-anchor,
+    .jstree-animated,
+    .jstree-wholerow {
+        transition: $jstree-wholerow-transition;
     }
 
     .jstree-anchor {
@@ -80,12 +86,6 @@
         &:active {
             color: $jstree-anchor-active-color;
         }
-    }
-
-    .jstree-anchor,
-    .jstree-animated,
-    .jstree-wholerow {
-        transition: $jstree-wholerow-transition;
     }
 
     .jstree-search {
@@ -113,12 +113,16 @@
         color: $jstree-icon-checkbox-color;
         margin: $jstree-icon-checkbox-offset;
 
-        &:before {
+        &::before {
             position: $jstree-icon-checkbox-icon-position;
             top: $jstree-icon-checkbox-icon-top;
+
+            /* rtl:begin:ignore */
             left: $jstree-icon-checkbox-icon-left;
             transform: $jstree-icon-checkbox-icon-transform;
             margin-left: $jstree-icon-checkbox-icon-offset-left;
+
+            /* rtl:end:ignore */
             font-size: $jstree-icon-checkbox-icon-font-size;
             line-height: $jstree-icon-checkbox-icon-line-height;
             font-family: $jstree-icon-checkbox-icon-font-family;
@@ -130,26 +134,20 @@
             background: $jstree-checked-background;
             border-color: $jstree-checked-border-color;
 
-            &:before {
+            &::before {
                 content: $jstree-checked-content;
             }
         }
+    }
+
+    .jstree-loading {
+        padding: $jstree-loading-inner-offset;
     }
 }
 
 .jstree-search-component {
     position: $jstree-search-component-position;
     margin-bottom: $jstree-search-component-bottom-offset;
-
-    &.active-search & {
-        &__clear-icon {
-            display: $jstree-search-component-clear-active-search-clear-display;
-        }
-
-        &__search-icon {
-            display: $jstree-search-component-clear-active-search-search-display;
-        }
-    }
 
     &__input {
         &:not(textarea) {
@@ -162,6 +160,11 @@
         }
     }
 
+    &__search-icon {
+        display: $jstree-search-component-search-icon-display;
+        pointer-events: $jstree-search-component-search-icon-pointer-events;
+    }
+
     &__clear-icon,
     &__search-icon {
         display: $jstree-search-component-clear-icon-display;
@@ -170,7 +173,6 @@
         top: $jstree-search-component-clear-icon-top;
         right: $jstree-search-component-clear-icon-right;
         font-size: $jstree-search-component-clear-icon-font-size;
-        z-index: $jstree-search-component-clear-icon-z-index;
         color: $jstree-search-component-clear-icon-color;
         cursor: $jstree-search-component-clear-icon-cursor;
 
@@ -179,17 +181,19 @@
         }
     }
 
-    &__search-icon {
-        display: $jstree-search-component-search-icon-display;
-        pointer-events: $jstree-search-component-search-icon-pointer-events;
+    &.active-search & {
+        &__clear-icon {
+            display: $jstree-search-component-clear-active-search-clear-display;
+        }
+
+        &__search-icon {
+            display: $jstree-search-component-clear-active-search-search-display;
+        }
     }
 }
 
 .content-with-sidebar--content {
     .tree-empty-content {
-        text-align: $tree-empty-content-sidebar-text-align;
-        padding-top: $tree-empty-content-sidebar-inner-offset;
         padding-bottom: $tree-empty-content-sidebar-inner-offset;
-        background: $tree-empty-content-sidebar-background;
     }
 }

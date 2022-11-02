@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EnumFilterType extends AbstractMultiChoiceType
 {
@@ -24,10 +24,6 @@ class EnumFilterType extends AbstractMultiChoiceType
      */
     protected $valueProvider;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EnumValueProvider $valueProvider
-     */
     public function __construct(TranslatorInterface $translator, EnumValueProvider $valueProvider)
     {
         parent::__construct($translator);

@@ -4,42 +4,31 @@ namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+/**
+ * The base class for security voters that checks whether an access is granted for an entity object.
+ */
 abstract class AbstractEntityVoter implements VoterInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var array
-     */
+    /** @var string[] */
     protected $supportedAttributes = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
+    /** @var string */
+    protected $className;
+
+    protected DoctrineHelper $doctrineHelper;
+
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
-     * @param string $className
+     * Sets the class name of an entity this voter works with.
      */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->className = $className;
     }
@@ -53,7 +42,7 @@ abstract class AbstractEntityVoter implements VoterInterface
      */
     protected function supportsAttribute($attribute)
     {
-        return in_array($attribute, $this->supportedAttributes);
+        return \in_array($attribute, $this->supportedAttributes, true);
     }
 
     /**
@@ -76,6 +65,7 @@ abstract class AbstractEntityVoter implements VoterInterface
      * Check whether at least one of the the attributes is supported
      *
      * @param array $attributes
+     *
      * @return bool
      */
     protected function supportsAttributes(array $attributes)
@@ -96,7 +86,7 @@ abstract class AbstractEntityVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$object || !is_object($object)) {
+        if (!\is_object($object)) {
             return self::ACCESS_ABSTAIN;
         }
 
@@ -118,9 +108,10 @@ abstract class AbstractEntityVoter implements VoterInterface
 
     /**
      * @param string $class
-     * @param int $identifier
-     * @param array $attributes
+     * @param int    $identifier
+     * @param array  $attributes
      * @return int
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getPermission($class, $identifier, array $attributes)
     {
@@ -143,8 +134,8 @@ abstract class AbstractEntityVoter implements VoterInterface
             $permission = $this->getPermissionForAttribute($class, $identifier, $attribute);
 
             // if not abstain or changing from granted to denied
-            if ($result === self::ACCESS_ABSTAIN && $permission !== self::ACCESS_ABSTAIN
-                || $result === self::ACCESS_GRANTED && $permission === self::ACCESS_DENIED
+            if (($result === self::ACCESS_ABSTAIN && $permission !== self::ACCESS_ABSTAIN)
+                || ($result === self::ACCESS_GRANTED && $permission === self::ACCESS_DENIED)
             ) {
                 $result = $permission;
             }
@@ -160,48 +151,30 @@ abstract class AbstractEntityVoter implements VoterInterface
 
     /**
      * @param string $class
-     * @param int $identifier
+     * @param int    $identifier
      * @param string $attribute
+     *
      * @return int
      */
     abstract protected function getPermissionForAttribute($class, $identifier, $attribute);
 
     /**
      * @param object $object
+     *
      * @return string
      */
     protected function getEntityClass($object)
     {
-        if ($object instanceof ObjectIdentityInterface) {
-            $class = ObjectIdentityHelper::removeGroupName($object->getType());
-        } elseif ($object instanceof FieldVote) {
-            return $this->getEntityClass($object->getDomainObject());
-        } else {
-            $class = $this->doctrineHelper->getEntityClass($object);
-        }
-
-        return ClassUtils::getRealClass($class);
+        return EntityClassResolverUtil::getEntityClass($object);
     }
 
     /**
      * @param object $object
+     *
      * @return int|null
      */
     protected function getEntityIdentifier($object)
     {
-        if ($object instanceof ObjectIdentityInterface) {
-            $identifier = $object->getIdentifier();
-            if (!filter_var($identifier, FILTER_VALIDATE_INT)) {
-                $identifier = null;
-            } else {
-                $identifier = (int)$identifier;
-            }
-        } elseif ($object instanceof FieldVote) {
-            return $this->getEntityIdentifier($object->getDomainObject());
-        } else {
-            $identifier = $this->doctrineHelper->getSingleEntityIdentifier($object, false);
-        }
-
-        return $identifier;
+        return EntityIdentifierResolverUtil::getEntityIdentifier($object, $this->doctrineHelper);
     }
 }

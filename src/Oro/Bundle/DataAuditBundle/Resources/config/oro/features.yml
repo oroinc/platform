@@ -1,0 +1,21 @@
+features:
+    data_audit:
+        label: oro.dataaudit.feature.manage.label
+        description: oro.dataaudit.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_entityconfig_audit
+            - oro_entityconfig_audit_field
+            - oro_dataaudit_index
+            - oro_dataaudit_history
+            - oro_api_get_audits
+            - oro_api_get_audit
+            - oro_api_get_audit_fields
+            - oro_api_options_audits
+        entities:
+            - Oro\Bundle\DataAuditBundle\Entity\Audit
+            - Oro\Bundle\DataAuditBundle\Entity\AuditField
+        navigation_items:
+            - application_menu.system_tab.audit_list
+        placeholder_items:
+            - change_history_block

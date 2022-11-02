@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var CheckConnectionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    CheckConnectionView = BaseView.extend({
+    const CheckConnectionView = BaseView.extend({
         route: 'oro_email_check_smtp_connection',
 
         entity: 'user',
@@ -26,40 +25,40 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CheckConnectionView() {
-            CheckConnectionView.__super__.constructor.apply(this, arguments);
+        constructor: function CheckConnectionView(options) {
+            CheckConnectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['entity', 'entityId', 'organization']));
         },
 
         checkSmtpConnection: function(event) {
-            var data = this.$el.find('[data-class="smtp_settings"]').serializeArray();
-            var $messageContainer = this.$el.find('.check-smtp-connection-messages');
+            const data = this.$el.find('[data-class="smtp_settings"]').serializeArray();
+            const $messageContainer = this.$el.find('.check-smtp-connection-messages');
             mediator.execute('showLoading');
             this.clear();
             $.ajax({
                 type: 'POST',
                 url: this.getUrl(),
                 data: this.prepareData(data),
-                success: _.bind(function(response) {
+                success: response => {
                     if (response) {
                         this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                     } else {
                         this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
                     }
-                }, this),
+                },
                 errorHandlerMessage: false,
-                error: _.bind(function() {
+                error: () => {
                     this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
-                }, this),
-                complete: function() {
+                },
+                complete: () => {
                     mediator.execute('hideLoading');
                 }
             });
@@ -75,14 +74,14 @@ define(function(require) {
         },
 
         prepareData: function(data) {
-            var result = {};
-            _.each(data, _.bind(function(item) {
-                var pattern = /^([^\[]+\[.+_)([^\]]+)(\].*)/i;
+            const result = {};
+            _.each(data, item => {
+                const pattern = /^([^\[]+\[.+_)([^\]]+)(\].*)/i;
                 if (pattern.test(item.name)) {
                     item.name = item.name.match(pattern)[2];
                     result[item.name] = item.value;
                 }
-            }, this));
+            });
             return result;
         },
 

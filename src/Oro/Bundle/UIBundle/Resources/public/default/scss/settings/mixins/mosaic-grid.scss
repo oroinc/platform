@@ -1,0 +1,15 @@
+/* @theme: default; */
+
+@mixin mosaic-grid(
+    $mosaic-grid-column-width: auto,
+    $mosaic-grid-column-count: 3
+) {
+    columns: $mosaic-grid-column-width $mosaic-grid-column-count;
+}
+
+@mixin mosaic-grid-break-inside(
+    $break-inside-value: avoid
+) {
+    page-break-inside: $break-inside-value;
+    break-inside: $break-inside-value;
+}

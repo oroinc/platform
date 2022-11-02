@@ -14,7 +14,7 @@
 
     {{ widgetResponse|json_encode|raw }}
 {% else %}
-    {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+    {% form_theme form with ['@OroForm/Form/fields.html.twig', _self] %}
     <div class="widget-content">
         <div class="form-container">
             {% set formAction = app.request.uri %}

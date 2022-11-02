@@ -6,9 +6,9 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -27,7 +27,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionRecordListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -40,51 +40,55 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->listener->setEnabled(false);
 
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $this->listener->postPersist($this->createMock(WorkflowTransitionRecord::class), $this->args);
     }
 
     /**
      * @dataProvider postPersistDataProvider
-     *
-     * @param WorkflowTransitionRecord $transitionRecord
-     * @param TokenInterface|null $token
-     * @param bool $expected
      */
-    public function testPostPersist($transitionRecord, $token, $expected)
-    {
+    public function testPostPersist(
+        WorkflowTransitionRecord $transitionRecord,
+        ?TokenInterface $token,
+        WorkflowNotificationEvent $expected
+    ) {
         $this->listener->setEnabled(true);
 
-        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(LoadWorkflowNotificationEvents::TRANSIT_EVENT, $expected);
+            ->with($expected, WorkflowEvents::NOTIFICATION_TRANSIT_EVENT);
 
         $this->listener->postPersist($transitionRecord, $this->args);
     }
 
-    /**
-     * @return array
-     */
-    public function postPersistDataProvider()
+    public function postPersistDataProvider(): array
     {
         $entity = new \stdClass();
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getEntity')->willReturn($entity);
+        $workflowItem->expects($this->any())
+            ->method('getEntity')
+            ->willReturn($entity);
 
-        /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject $transitionRecord */
         $transitionRecord = $this->createMock(WorkflowTransitionRecord::class);
-        $transitionRecord->expects($this->any())->method('getWorkflowItem')->willReturn($workflowItem);
+        $transitionRecord->expects($this->any())
+            ->method('getWorkflowItem')
+            ->willReturn($workflowItem);
 
         $user = new User();
 
         $token = $this->createMock(TokenInterface::class);
 
         $tokenWithUser = $this->createMock(TokenInterface::class);
-        $tokenWithUser->expects($this->any())->method('getUser')->willReturn($user);
+        $tokenWithUser->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
 
         return [
             'without token' => [

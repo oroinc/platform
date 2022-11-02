@@ -1,6 +1,14 @@
 define(function(require) {
     'use strict';
 
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const collectionTools = require('oroui/js/tools/collection-tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const BoardDataCollection = require('../../models/board-data-collection');
+
     /**
      * This plugin changes grid appearance to scrum board
      *
@@ -15,16 +23,7 @@ define(function(require) {
      * @param {Function} options.transition.class - transition class implementation
      * @param {Function} options.transition.save_api_accessor - api accessor to use when saving transition
      */
-    var BoardAppearancePlugin;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var collectionTools = require('oroui/js/tools/collection-tools');
-    var tools = require('oroui/js/tools');
-    var BoardDataCollection = require('../../models/board-data-collection');
-
-    BoardAppearancePlugin = BasePlugin.extend({
+    const BoardAppearancePlugin = BasePlugin.extend({
         /**
          * Default pagesize
          * @type {Number}
@@ -32,15 +31,15 @@ define(function(require) {
         defaultPagesize: 10,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
-            var boardPlugin = this;
+            const boardPlugin = this;
 
-            var BoardView = this.options.board_view;
-            var ColumnView = this.options.column_view;
-            var ColumnHeaderView = this.options.column_header_view;
-            var Card = this.options.card_view;
+            const BoardView = this.options.board_view;
+            const ColumnView = this.options.column_view;
+            const ColumnHeaderView = this.options.column_header_view;
+            const Card = this.options.card_view;
 
             this.view = new BoardView({
                 readonly: this.options.readonly,
@@ -55,7 +54,7 @@ define(function(require) {
             });
 
             this.listenTo(this.view, 'update', function(model, updateOptions) {
-                var transition = updateOptions.column.get('transition').class.build(
+                const transition = updateOptions.column.get('transition').class.build(
                     model,
                     updateOptions.column,
                     this,
@@ -128,7 +127,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disable: function() {
             this.main.$el.find('.board').hide();
@@ -186,9 +185,9 @@ define(function(require) {
         getBoardCollection: function() {
             if (!this._collection) {
                 this._collection = new BoardDataCollection(this.main.collection.models);
-                this._collection.listenTo(this.main.collection, 'add remove reset sort', _.bind(function() {
+                this._collection.listenTo(this.main.collection, 'add remove reset sort', () => {
                     this._collection.reset(this.main.collection.models);
-                }, this));
+                });
             }
             return this._collection;
         },
@@ -199,7 +198,7 @@ define(function(require) {
          * @return {Backbone.Collection}
          */
         getColumns: function() {
-            var component = this;
+            const component = this;
             function createBoardColumnDefinition(id, column) {
                 return {
                     id: id,
@@ -215,9 +214,9 @@ define(function(require) {
                 };
             }
             if (!this._columns) {
-                var columnCollections = [];
-                for (var i = 0; i < this.options.columns.length; i++) {
-                    var column = this.options.columns[i];
+                const columnCollections = [];
+                for (let i = 0; i < this.options.columns.length; i++) {
+                    const column = this.options.columns[i];
                     columnCollections.push(createBoardColumnDefinition(i, column));
                 }
                 this._columns = new Backbone.Collection(columnCollections);
@@ -281,16 +280,13 @@ define(function(require) {
             });
 
             return $.when(
-                tools.loadModuleAndReplace(options, 'board_view'),
-                tools.loadModuleAndReplace(options, 'card_view'),
-                tools.loadModuleAndReplace(options, 'column_header_view'),
-                tools.loadModuleAndReplace(options, 'column_view'),
-                $.when.apply($, options.columns.map(function(column) {
-                    return tools.loadModuleAndReplace(column.transition, 'class');
-                })),
-                $.when.apply($, options.columns.map(function(column) {
-                    return tools.loadModuleAndReplace(column.transition.save_api_accessor, 'class');
-                }))
+                loadModules.fromObjectProp(options, 'board_view'),
+                loadModules.fromObjectProp(options, 'card_view'),
+                loadModules.fromObjectProp(options, 'column_header_view'),
+                loadModules.fromObjectProp(options, 'column_view'),
+                $.when(...options.columns.map(column => loadModules.fromObjectProp(column.transition, 'class'))),
+                $.when(...options.columns
+                    .map(column => loadModules.fromObjectProp(column.transition.save_api_accessor, 'class')))
             );
         }
     });

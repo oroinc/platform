@@ -3,10 +3,6 @@
 .fallback-container {
     width: $fallback-width;
 
-    .mce-tinymce {
-        width: $fallback-mce-tinymce-width !important;
-    }
-
     .fallback-status {
         line-height: $fallback-item-use-fallback-status-line-height;
         height: $fallback-item-use-fallback-status-height;
@@ -14,7 +10,7 @@
 
     div {
         &.input-widget-select {
-            width: $fallback-container-select-mobile-width !important;
+            width: $fallback-container-select-mobile-width;
 
             span {
                 min-width: $fallback-container-select-span-mobile-min-width;
@@ -25,6 +21,10 @@
             }
         }
     }
+}
+
+.fallback-item-fallback-line {
+    max-width: $fallback-item-mobile-label-max-width;
 }
 
 .fallback-item {
@@ -38,7 +38,11 @@
 .fallback-item-value--first {
     width: $fallback-item-value-mobile--first-width;
 
-    input[type="text"] {
+    .input-append {
+        width: 100%;
+    }
+
+    input[type='text'] {
         width: $fallback-item-value-mobile--first-input-width;
     }
 }

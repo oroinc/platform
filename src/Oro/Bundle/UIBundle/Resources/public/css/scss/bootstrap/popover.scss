@@ -1,19 +1,20 @@
 /* @theme: admin.oro; */
 
-@import "bowerassets/bootstrap/scss/popover";
+/* rtl:begin:ignore */
+
+@import '~@oroinc/bootstrap/scss/popover';
 
 .popover {
     box-shadow: $popover-box-shadow;
-    z-index: $popover-z-index;
 
     .arrow {
         z-index: $popover-arrow-z-index;
 
-        &:before {
+        &::before {
             content: none;
         }
 
-        &:after {
+        &::after {
             background-color: $popover-arrow-color;
             width: $popover-arrow-size;
             height: $popover-arrow-size;
@@ -25,7 +26,7 @@
 
     &.bs-popover-top {
         .arrow {
-            &:after {
+            &::after {
                 bottom: $popover-arrow-offset;
                 box-shadow: $popover-arrow-top-shadow;
             }
@@ -34,7 +35,7 @@
 
     &.bs-popover-bottom {
         .arrow {
-            &:after {
+            &::after {
                 top: $popover-arrow-offset;
                 box-shadow: $popover-arrow-bottom-shadow;
             }
@@ -43,7 +44,7 @@
 
     &.bs-popover-left {
         .arrow {
-            &:after {
+            &::after {
                 right: $popover-arrow-offset;
                 box-shadow: $popover-arrow-left-shadow;
             }
@@ -52,7 +53,7 @@
 
     &.bs-popover-right {
         .arrow {
-            &:after {
+            &::after {
                 left: $popover-arrow-offset;
                 box-shadow: $popover-arrow-right-shadow;
             }
@@ -68,27 +69,33 @@
         padding: 8px 14px;
         margin: 0;
         font-size: 14px;
-        font-weight: normal;
+        font-weight: font-weight('light');
         line-height: 18px;
-        background-color: #f7f7f7;
-        border-bottom: 1px solid #ebebeb;
+        background-color: $primary-900;
+        border-bottom: 1px solid $additional-ultra-light;
         border-radius: 5px 5px 0 0;
     }
+}
 
-    &-body {
-        background-color: $popover-body-bg;
-        padding-right: $popover-body-offset-right;
+/* rtl:end:ignore */
 
-        &.popover-no-close-button {
-            padding-right: $popover-body-offset-right-no-close;
-        }
+.popover-body {
+    background-color: $popover-body-bg;
+    padding-right: $popover-body-offset-right;
+
+    &.popover-no-close-button {
+        padding-right: $popover-body-offset-right-no-close;
     }
+}
 
-    &-close {
-        position: $popover-close-position;
-        top: $popover-close-position-y;
-        right: $popover-close-position-x;
-        cursor: $popover-close-cursor;
-        color: $popover-close-color;
+.popover-close {
+    position: $popover-close-position;
+    top: $popover-close-position-y;
+    right: $popover-close-position-x;
+    cursor: $popover-close-cursor;
+    color: $popover-close-color;
+
+    &::before {
+        font-size: $popover-close-before-font-size;
     }
 }

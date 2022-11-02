@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator;
 
+/**
+ * Generates layout updates directly from PHP code.
+ */
 class PhpLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function doGenerateBody(GeneratorData $data)
+    protected function doGenerateBody(GeneratorData $data): string
     {
-        return trim(str_replace(['<?php', '<?', '?>'], '', $data->getSource()));
+        return \str_replace(['<?php', '<?', '?>'], '', $data->getSource());
     }
 }

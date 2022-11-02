@@ -4,30 +4,22 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\IncreaseValue;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class IncreaseValueTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var IncreaseValue */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->action = new IncreaseValue(new ContextAccessor(), $this->container);
-        $this->action->setDispatcher($this->eventDispatcher);
+        $this->action = new IncreaseValue(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitialize()
@@ -37,53 +29,47 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
             'value' => 3
         ];
 
-        $this->assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
-
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        self::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute parameter is required.
-     */
     public function testInitializeNoParametersException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute parameter is required.');
+
         $this->action->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be defined.
-     */
     public function testInitializeNoAttributeException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be defined.');
+
         $this->action->initialize(['test' => 'test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     */
     public function testInitializeInvalidAttributeException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize(['attribute' => 'test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be integer.
-     */
     public function testInitializeInvalidValueExceptionWithString()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be integer.');
+
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => 'string']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be integer.
-     */
     public function testInitializeInvalidValueExceptionWithPropertyPath()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be integer.');
+
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => new PropertyPath('test2')]);
     }
 
@@ -95,16 +81,13 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals(['test' => 101], $context->getValues());
+        self::assertEquals(['test' => 101], $context->getValues());
     }
 
     /**
-     * @dataProvider executeActionDapaProvider
-     *
-     * @param int $value
-     * @param int $expected
+     * @dataProvider executeActionDataProvider
      */
-    public function testExecuteAction($value, $expected)
+    public function testExecuteAction(int $value, int $expected)
     {
         $options = ['attribute' => new PropertyPath('test'), 'value' => $value];
         $context = new StubStorage(['test' => 100]);
@@ -112,16 +95,15 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals(['test' => $expected], $context->getValues());
+        self::assertEquals(['test' => $expected], $context->getValues());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function executeActionDapaProvider()
+    public function executeActionDataProvider(): array
     {
-        yield 'positive value' => ['value' => 500, 'expected' => 600];
-        yield 'negative value' => ['value' => -500, 'expected' => -400];
-        yield 'zero value' => ['value' => 0, 'expected' => 100];
+        return [
+            'positive value' => ['value' => 500, 'expected' => 600],
+            'negative value' => ['value' => -500, 'expected' => -400],
+            'zero value'     => ['value' => 0, 'expected' => 100]
+        ];
     }
 }

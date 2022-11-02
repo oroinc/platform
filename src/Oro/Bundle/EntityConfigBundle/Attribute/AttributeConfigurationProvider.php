@@ -7,14 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class AttributeConfigurationProvider
+/**
+ * Provides a set of method to simplify working with attribute configuration data.
+ */
+class AttributeConfigurationProvider implements AttributeConfigurationProviderInterface
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -39,6 +39,17 @@ class AttributeConfigurationProvider
     {
         return $this->getConfig($attribute, 'extend')
             ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     *
+     * @return bool
+     */
+    public function isAttributeCustom(FieldConfigModel $attribute)
+    {
+        return $this->getConfig($attribute, 'extend')
+            ->is('owner', ExtendScope::OWNER_CUSTOM);
     }
 
     /**
@@ -79,16 +90,6 @@ class AttributeConfigurationProvider
     public function isAttributeSortable(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute)->is('sortable');
-    }
-
-    /**
-     * @param FieldConfigModel $attribute
-     *
-     * @return bool
-     */
-    public function isAttributeVisible(FieldConfigModel $attribute)
-    {
-        return $this->getConfig($attribute)->is('visible');
     }
 
     /**

@@ -1,9 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
+/**
+ * Provides methods to generate method names for extended relations.
+ */
 class AssociationNameGenerator
 {
     /**
@@ -15,7 +19,7 @@ class AssociationNameGenerator
      */
     public static function classify($string)
     {
-        return Inflector::classify(null === $string ? '' : $string);
+        return InflectorFactory::create()->classify(null === $string ? '' : $string);
     }
 
     /**
@@ -76,20 +80,6 @@ class AssociationNameGenerator
     public static function generateResetTargetsMethodName($associationKind)
     {
         return sprintf('reset%sTargets', self::classify($associationKind));
-    }
-
-    /**
-     * Generates method name to get all associated entities
-     *
-     * @param string|null $associationKind The association type or NULL for unclassified (default) association
-     *
-     * @return string
-     *
-     * @deprecated since 2.0. Method "get%sTargets" without parameters should be used instead of "get%sTargetEntities"
-     */
-    public static function generateGetTargetEntitiesMethodName($associationKind)
-    {
-        return sprintf('get%sTargetEntities', self::classify($associationKind));
     }
 
     /**

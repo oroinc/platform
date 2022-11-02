@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\Criteria;
 
 /**
  * A filter that can be used to specify how a result collection should be sorted.
+ * @see \Oro\Bundle\ApiBundle\Filter\FilterNames::getSortFilterName
  */
 class SortFilter extends StandaloneFilterWithDefaultValue
 {
     /**
      * {@inheritdoc}
      */
-    public function apply(Criteria $criteria, FilterValue $value = null)
+    public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $val = null !== $value
             ? $value->getValue()

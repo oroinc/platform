@@ -5,6 +5,9 @@ namespace Oro\Bundle\InstallerBundle;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Responsible for running php scripts in current thread
+ */
 class ScriptExecutor
 {
     const ORO_SCRIPT_ANNOTATION = 'OroScript';
@@ -24,11 +27,6 @@ class ScriptExecutor
      */
     protected $commandExecutor;
 
-    /**
-     * @param OutputInterface    $output
-     * @param ContainerInterface $container
-     * @param CommandExecutor    $commandExecutor
-     */
     public function __construct(
         OutputInterface $output,
         ContainerInterface $container,
@@ -49,7 +47,7 @@ class ScriptExecutor
         if (is_file($fileName)) {
             $tokens = [];
             if (preg_match(
-                '/@' . self::ORO_SCRIPT_ANNOTATION . '(\(("([\w -]*)")?\))?/i',
+                '/@' . self::ORO_SCRIPT_ANNOTATION . '(\(("([\w \-]*)")?\))?/i',
                 file_get_contents($fileName),
                 $tokens
             )

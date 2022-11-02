@@ -3,6 +3,7 @@ oro:
         plural_label: Comment
         entity_plural_label: Comments
         actions_label: Comment actions
+        no_data_found: There are no comments
         action:
             delete: Delete Comment
             update: Update Comment

@@ -6,19 +6,12 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessDefinition
-     */
-    protected $entity;
+    /** @var ProcessDefinition */
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new ProcessDefinition();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     /**
@@ -37,22 +30,19 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testValue, $this->entity->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
-        return array(
-            'name' => array('name', 'test'),
-            'label' => array('label', 'Test Definition'),
-            'enabled' => array('enabled', false, true),
-            'actionsConfiguration' => array('actionsConfiguration', array('my' => 'configuration')),
-            'relatedEntity' => array('relatedEntity', 'My\Entity'),
-            'executionOrder' => array('executionOrder', 42, 0),
-            'excludeDefinitions' => array('excludeDefinitions', array('test'), array()),
-            'createdAt' => array('createdAt', new \DateTime()),
-            'updatedAt' => array('updatedAt', new \DateTime()),
-        );
+        return [
+            'name' => ['name', 'test'],
+            'label' => ['label', 'Test Definition'],
+            'enabled' => ['enabled', false, true],
+            'actionsConfiguration' => ['actionsConfiguration', ['my' => 'configuration']],
+            'relatedEntity' => ['relatedEntity', 'My\Entity'],
+            'executionOrder' => ['executionOrder', 42, 0],
+            'excludeDefinitions' => ['excludeDefinitions', ['test'], []],
+            'createdAt' => ['createdAt', new \DateTime()],
+            'updatedAt' => ['updatedAt', new \DateTime()],
+        ];
     }
 
     public function testImport()
@@ -64,7 +54,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
             ->setRelatedEntity('My/Entity')
             ->setExecutionOrder(25)
             ->setExcludeDefinitions(['foo'])
-            ->setActionsConfiguration(array('key' => 'value'));
+            ->setActionsConfiguration(['key' => 'value']);
 
         $this->assertNotEquals($importedEntity->getName(), $this->entity->getName());
         $this->assertNotEquals($importedEntity->getLabel(), $this->entity->getLabel());

@@ -1,0 +1,203 @@
+datagrids:
+    digital-asset-grid:
+        extended_entity_name: 'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset'
+        source:
+            type: orm
+            query:
+                select:
+                    - digitalAsset
+                    - file
+                    - digitalAsset.id
+                    - file.originalFilename
+                    - file.mimeType
+                    - file.fileSize
+                    - file.createdAt
+                    - file.updatedAt
+                    - CONCAT(owner.firstName, ' ', owner.lastName) as ownerName
+                from:
+                    - { table: 'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset', alias: digitalAsset }
+                join:
+                    left:
+                        - { join: digitalAsset.sourceFile, alias: file }
+                        - { join: digitalAsset.owner, alias: owner }
+        columns:
+            title:
+                type: localized_value
+                label: oro.digitalasset.titles.label
+                data_name: titles
+            originalFilename:
+                type: twig
+                label: oro.attachment.file.filename.label
+                frontend_type: html
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/sourceFileLink.html.twig'
+                data_name: sourceFile
+            fileSize:
+                label: oro.attachment.file.file_size.label
+                cellClassName: 'direction-ltr'
+                type: twig
+                frontend_type: html
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/fileSize.html.twig'
+            mimeType:
+                label: oro.attachment.file.mime_type.label
+            owner:
+                label: oro.attachment.file.owner.label
+                data_name: ownerName
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+            updatedAt:
+                label: oro.ui.updated_at
+                frontend_type: datetime
+                renderable: false
+        properties:
+            id: ~
+            title:
+                type: localized_value
+                data_name: titles
+            updateLink:
+                type: url
+                route: oro_digital_asset_update
+                params:
+                    - id
+        sorters:
+            columns:
+                title:
+                    data_name: title
+                originalFilename:
+                    data_name: file.originalFilename
+                fileSize:
+                    data_name: file.fileSize
+                mimeType:
+                    data_name: file.mimeType
+                owner:
+                    data_name: ownerName
+                createdAt:
+                    data_name: digitalAsset.createdAt
+                updatedAt:
+                    data_name: digitalAsset.updatedAt
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                title:
+                    type: string
+                    label: oro.digitalasset.titles.label
+                    data_name: title
+                originalFilename:
+                    type: string
+                    label: oro.attachment.file.filename.label
+                    data_name: file.originalFilename
+                fileSize:
+                    type: number
+                    label: oro.digitalasset.datagrid.filter.file_size.label
+                    data_name: file.fileSize
+                mimeType:
+                    type: choice
+                    label: oro.attachment.file.mime_type.label
+                    data_name: file.mimeType
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: '@oro_digital_asset.provider.file_constraints->getMimeTypesAsChoices'
+                            translatable_options: false
+                owner:
+                    type: choice-tree
+                    label: oro.digitalasset.datagrid.column.owner.label
+                    data_name: digitalAsset.owner
+                    autocomplete_alias: assigned_to_organization_users
+                    renderedPropertyName: fullName
+                    className: 'Oro\Bundle\UserBundle\Entity\User'
+                createdAt:
+                    type: datetime
+                    data_name: digitalAsset.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: digitalAsset.updatedAt
+                    renderable: false
+        actions:
+            update:
+                type: navigate
+                label: oro.grid.action.update
+                link: updateLink
+                icon: edit
+                acl_resource: oro_digital_asset_update
+                rowAction: true
+
+    digital-asset-select-file-grid:
+        extends: digital-asset-grid
+        options:
+            entityHint: oro.digitalasset.datagrid.entity_hint.files
+        source:
+            query:
+                where:
+                    and:
+                        - file.fileSize < CAST(:max_file_size as int)
+                        - file.mimeType IN (:mime_types)
+            bind_parameters:
+                -
+                    name: mime_types
+                -
+                    name: max_file_size
+                    type: integer
+        properties:
+            previewMetadata:
+                type: callback
+                callable: ['@oro_digital_asset.provider.preview_metadata', 'getMetadata']
+                params: ['sourceFile']
+                frontend_type: row_array
+        columns:
+            originalFilename:
+                label: oro.digitalasset.datagrid.column.original_filename.label
+                order: 20
+            title:
+                order: 30
+            fileSize:
+                order: 40
+                renderable: false
+                cellClassName: 'direction-ltr'
+            mimeType:
+                order: 50
+                renderable: false
+            owner:
+                label: oro.digitalasset.datagrid.column.owner.label
+                order: 60
+            createdAt:
+                order: 70
+            updatedAt:
+                renderable: false
+        filters:
+            columns:
+                fileSize:
+                    renderable: false
+                mimeType:
+                    renderable: false
+        action_configuration:
+            update: false
+            delete: true
+
+    digital-asset-select-image-grid:
+        extends: digital-asset-select-file-grid
+        options:
+            entityHint: oro.digitalasset.datagrid.entity_hint.images
+        columns:
+            file:
+                type: twig
+                label: oro.digitalasset.datagrid.column.file.label
+                frontend_type: html
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/image.html.twig'
+                data_name: sourceFile
+                order: 10
+            originalFilename:
+                order: 20
+            title:
+                order: 30
+            fileSize:
+                order: 40
+            mimeType:
+                order: 50
+            owner:
+                order: 60
+            createdAt:
+                order: 70
+            updatedAt:
+                renderable: false

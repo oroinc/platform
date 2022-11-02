@@ -1,0 +1,14 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConditionsGroupBuilder:
+            apply:
+                subDql: true
+        Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryBuilderGroupingOrmQueryConverter:
+            addFromStatement:
+                entityClass: true
+                tableAlias: true
+            addJoinStatement:
+                join: true
+                joinAlias: true
+                joinCondition: true

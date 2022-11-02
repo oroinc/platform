@@ -1,9 +1,14 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% set contentProviderContent = oro_ui_content_provider_manager.getContent(['navigationElements'])|first %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+{% if isDesktopVersion() %}
+
+{% set contentProviderContent = oro_get_content(null, ['navigationElements'])|first %}
 <div id="bookmark-buttons">
     <div class="navigation clearfix">
         <div class="top-action-box">
-            <button class="btn btn-icon btn-light favorite-button" {% if contentProviderContent['favoriteButton'] == false %}style="display: none"{% endif %}
+            {% apply spaceless %}
+            <button class="btn btn-icon btn-light-custom favorite-button{% if contentProviderContent['favoriteButton'] == false %} hide{% endif %}"
+                    type="button"
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -18,13 +23,15 @@
                             tabOptions: {
                                 el: '#favorite-content',
                                 listSelector: '.extra-list',
-                                fallbackSelector: '.dot-menu-empty-message'
+                                fallbackSelector: '.no-data'
                             }
                         }
                     }) }}>
-                        <i class="fa-star-o hide-text">{{ 'oro.navigation.favorites.button'|trans }}</i>
+                        <span class="fa-star-o"></span>
+                        {{- 'oro.navigation.favorites.button'|trans -}}
             </button>
-            <button class="btn btn-icon btn-light minimize-button" {% if contentProviderContent['pinButton'] == false %}style="display: none"{% endif %}
+            <button class="btn btn-icon btn-light-custom minimize-button{% if contentProviderContent['pinButton'] == false %} hide{% endif %}"
+                    type="button"
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
@@ -38,21 +45,29 @@
                             },
                             dropdownOptions: {
                                 el: '#pinbar .show-more',
-                                listSelector: '.dropdown-menu'
+                                listSelector: '[data-role="pin-bar-dropdown-items"]'
                             },
                             barOptions: {
-                                el: '#pinbar .list-bar',
-                                listSelector: 'ul',
+                                el: '#pinbar',
+                                listSelector: '.list-bar ul',
                                 fallbackSelector: '.pin-bar-empty'
-                            },
-                            pageStateOptions: {
-                                el: '#container',
-                                keepElement: true
                             }
                         }
                     }) }}>
-                        <i class="fa-thumb-tack hide-text">{{ 'oro.navigation.pins.button'|trans }}</i>
+                        <span class="fa-thumb-tack"></span>
+                        {{- 'oro.navigation.pins.button'|trans -}}
             </button>
+            {% endapply %}
         </div>
     </div>
 </div>
+
+{% endif %}
+<script {{ UI.renderPageComponentAttributes({
+    view: 'oronavigation/js/app/views/page-state-view',
+    name: 'page-state-component',
+    options: {
+        el: '#container',
+        keepElement: true
+    }
+}) }}></script>

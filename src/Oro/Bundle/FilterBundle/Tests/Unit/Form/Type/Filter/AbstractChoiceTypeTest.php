@@ -6,87 +6,61 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const TRANSLATION_PREFIX = 'trans_';
+    private const TRANSLATION_PREFIX = 'trans_';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var AbstractChoiceType
-     */
-    protected $instance;
+    /** @var AbstractChoiceType */
+    private $instance;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('trans'))
-            ->getMockForAbstractClass();
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->instance = $this->getMockForAbstractClass(
-            '\Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType',
-            array($this->translator)
+            AbstractChoiceType::class,
+            [$this->translator]
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->translator);
-        unset($this->instance);
-    }
-
     /**
-     * @param string $expectedTranslationDomain
-     * @param array $options
-     * @param string|null $parentTranslationDomain
-     * @param array $expectedChoices
-     * @param array $inputChoices
-     *
      * @dataProvider finishViewDataProvider
      */
     public function testFinishView(
-        $expectedTranslationDomain,
-        $options,
-        $parentTranslationDomain = null,
-        $expectedChoices = array(),
-        $inputChoices = array()
+        string $expectedTranslationDomain,
+        array $options,
+        string $parentTranslationDomain = null,
+        array $expectedChoices = [],
+        array $inputChoices = []
     ) {
         // expectations for translator
         if ($expectedChoices) {
             $prefix = self::TRANSLATION_PREFIX;
             $this->translator->expects($this->exactly(count($expectedChoices)))
                 ->method('trans')
-                ->with($this->isType('string'), array(), $expectedTranslationDomain)
-                ->will(
-                    $this->returnCallback(
-                        function ($id) use ($prefix) {
-                            return $prefix . $id;
-                        }
-                    )
-                );
+                ->with($this->isType('string'), [], $expectedTranslationDomain)
+                ->willReturnCallback(function ($id) use ($prefix) {
+                    return $prefix . $id;
+                });
         } else {
             $this->translator->expects($this->never())
                 ->method('trans');
         }
 
-        /** @var FormInterface $form */
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $form = $this->createMock(FormInterface::class);
         $filterFormView = $this->getFilterFormView($parentTranslationDomain, $inputChoices);
 
         $this->instance->finishView($filterFormView, $form, $options);
 
         // get list of actual translated choices
-        /** @var FormView $valueFormView */
         $valueFormView = $filterFormView->children['value'];
         $choiceViews = $valueFormView->vars['choices'];
-        $actualChoices = array();
+        $actualChoices = [];
         /** @var ChoiceView $choiceView */
         foreach ($choiceViews as $choiceView) {
             $actualChoices[$choiceView->value] = $choiceView->label;
@@ -95,57 +69,47 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedChoices, $actualChoices);
     }
 
-    /**
-     * @return array
-     */
-    public function finishViewDataProvider()
+    public function finishViewDataProvider(): array
     {
-        return array(
-            'domain from options' => array(
+        return [
+            'domain from options' => [
                 'expectedTranslationDomain' => 'optionsDomain',
-                'options'                   => array('translation_domain' => 'optionsDomain'),
+                'options'                   => ['translation_domain' => 'optionsDomain'],
                 'parentTranslationDomain'   => 'parentDomain',
-                'expectedChoices'           => array(
+                'expectedChoices'           => [
                     'key1' => self::TRANSLATION_PREFIX . 'value1',
                     'key2' => self::TRANSLATION_PREFIX . 'value2',
-                ),
-                'inputChoices'              => array(
+                ],
+                'inputChoices'              => [
                     'key1' => 'value1',
                     'key2' => 'value2',
-                ),
-            ),
-            'domain from parent' => array(
+                ],
+            ],
+            'domain from parent' => [
                 'expectedTranslationDomain' => 'parentDomain',
-                'options'                   => array(),
+                'options'                   => [],
                 'parentTranslationDomain'   => 'parentDomain',
-                'expectedChoices'           => array('key' => self::TRANSLATION_PREFIX . 'value'),
-                'inputChoices'              => array('key' => 'value'),
-            ),
-            'default domain' => array(
+                'expectedChoices'           => ['key' => self::TRANSLATION_PREFIX . 'value'],
+                'inputChoices'              => ['key' => 'value'],
+            ],
+            'default domain' => [
                 'expectedTranslationDomain' => 'messages',
-                'options'                   => array(),
+                'options'                   => [],
                 'parentTranslationDomain'   => null,
-                'expectedChoices'           => array('key' => self::TRANSLATION_PREFIX . 'value'),
-                'inputChoices'              => array('key' => 'value'),
-            ),
-            'empty choices' => array(
+                'expectedChoices'           => ['key' => self::TRANSLATION_PREFIX . 'value'],
+                'inputChoices'              => ['key' => 'value'],
+            ],
+            'empty choices' => [
                 'expectedTranslationDomain' => 'messages',
-                'options'                   => array(),
-            )
-        );
+                'options'                   => [],
+            ]
+        ];
     }
 
-    /**
-     * Get filter form view object
-     *
-     * @param string|null $parentTranslationDomain
-     * @param array $choices
-     * @return FormView
-     */
-    protected function getFilterFormView($parentTranslationDomain = null, $choices = array())
+    private function getFilterFormView(string $parentTranslationDomain = null, array $choices = []): FormView
     {
         $choicesFormView = new FormView();
-        $choicesFormView->vars['choices'] = array();
+        $choicesFormView->vars['choices'] = [];
         foreach ($choices as $value => $label) {
             $choicesFormView->vars['choices'][] = new ChoiceView('someData', $value, $label);
         }

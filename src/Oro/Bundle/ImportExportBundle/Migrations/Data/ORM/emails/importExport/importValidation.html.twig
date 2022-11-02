@@ -2,7 +2,7 @@
 @subject = Result of import validation file {{ data['fileName'] }}
 @isSystem = 1
 @isEditable = 1
-{% spaceless %}
+{% apply spaceless %}
 <style>
     @media (max-width: 480pt) {
         .wrapper{
@@ -27,4 +27,4 @@
         <a href="{{ data['downloadLogUrl'] }}">Error log</a>
     {% endif %}
 </div>
-{% endspaceless %}
+{% endapply %}

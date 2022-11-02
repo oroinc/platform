@@ -17,15 +17,15 @@
     .dropdown-menu {
         cursor: default;
         text-align: left;
-        font-weight: normal;
-        padding: 20px;
-        border-color: #ccc;
+        font-weight: font-weight('light');
+        padding: 22px $content-padding 25px;
+        border-color: $additional-extra-light;
         min-width: 300px;
 
         .close {
             position: absolute;
-            top: 16px;
-            right: 20px;
+            top: 12px;
+            right: 15px;
         }
     }
 
@@ -33,13 +33,24 @@
         font-size: $datagrid-settings-title-font-size;
         line-height: $datagrid-settings-title-line-height;
         margin: $datagrid-settings-title-offset;
+        font-weight: font-weight('bold');
     }
 
     &__tabs {
         border-bottom: none;
     }
 
+    &-right-flap {
+        position: absolute;
+        left: 100%;
+        width: 22px;
+        top: 27px;
+        bottom: 0;
+    }
+
     &__wrapper {
+        width: 262px;
+
         .ui-sortable-placeholder {
             border-top: 3px solid transparent;
         }
@@ -54,12 +65,12 @@
                 top: auto;
                 bottom: 0;
 
-                &:before {
+                &::before {
                     top: auto;
                     bottom: 6px;
                 }
 
-                &:after {
+                &::after {
                     top: auto;
                     bottom: 7px;
                 }
@@ -74,21 +85,33 @@
         td {
             &.title-cell {
                 white-space: nowrap;
+
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                max-width: 148px;
+
+                padding-left: 16px;
+                padding-right: 0;
             }
 
             &.visibility-cell {
-                text-align: center;
+                text-align: left;
+                padding-left: 16px;
+                padding-right: 16px;
             }
 
             &.sort-cell {
+                padding-left: 16px;
+                padding-right: 16px;
                 white-space: nowrap;
-                text-align: center;
+                text-align: left;
 
                 .btn.move-up,
                 .btn.move-down {
                     padding: 0;
 
-                    [class^="fa-"] {
+                    [class^='fa-'] {
                         margin: 0;
                     }
                 }
@@ -134,37 +157,42 @@
             label {
                 margin-bottom: 0;
             }
-
-            input[type='checkbox'] {
-                margin-bottom: 3px;
-            }
         }
 
         .table-header-wrapper {
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
-            border: 1px solid #ddd;
-            margin: 10px 0 0;
+            margin-top: $datagrid-settings-table-offset-top;
+
+            .table {
+                th {
+                    padding: 4px 16px;
+                }
+            }
         }
 
         .table-wrapper {
             border-bottom-left-radius: 3px;
             border-bottom-right-radius: 3px;
-            border: 1px solid #ddd;
             border-top: none;
             max-height: 2000px;
             overflow: auto;
             overflow-x: hidden;
             margin: 0;
 
+            .thead-sizing {
+                display: table-header-group;
+                visibility: hidden;
+            }
+
             .table {
                 margin-top: -1px;
 
                 th {
-                    padding-top: 0;
-                    padding-bottom: 0;
+                    padding: 0 16px;
                     overflow: hidden;
 
+                    // stylelint-disable-next-line selector-max-compound-selectors
                     span {
                         padding: 0;
                         line-height: 0;
@@ -177,7 +205,7 @@
     &-title {
         font-size: $base-font-size--l;
         line-height: $base-font-size--l;
-        font-weight: bold;
+        font-weight: font-weight('bold');
         margin-bottom: -3px;
     }
 
@@ -187,37 +215,46 @@
     }
 
     &-filter {
-        margin-top: 4px;
-
         .datagrid-settings-renderable-tab {
-            &:not(:last-of-type):after {
-                content: "|";
+            &:not(:last-of-type) {
+                margin-right: 3px;
+
+                &::after {
+                    content: '';
+                    width: 1px;
+                    height: 12px;
+                    margin: 0 0 0 4px;
+                    background: $primary-700;
+                    display: inline-block;
+                }
             }
+
             &.active {
                 pointer-events: none;
-                color: $primary;
+                color: $primary-200;
             }
         }
     }
 
     &-search {
-        margin: 15px 0 10px 0;
+        margin: 15px 0 12px;
         position: relative;
 
         input {
             margin: 0;
             width: 100%;
+            padding: 4px 8px;
         }
 
-        &.empty:after {
-            content: "\f002";
-            font-family: FontAwesome;
+        &.empty::after {
+            content: '\f002';
+            font-family: $fa-font-family;
             font-size: $base-font-size * 1.15;
             color: lighten($btn-text-color, 15%);
             position: absolute;
             top: 50%;
             margin-top: -12px;
-            right: 12px;
+            right: 10px;
             z-index: 0;
         }
 
@@ -228,7 +265,7 @@
             margin-top: -10px;
             z-index: 1;
             font-size: $base-font-size * 1.15;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             line-height: 20px;
             color: lighten($btn-text-color, 15%);
 
@@ -257,21 +294,7 @@
         }
     }
 
-    &-no-columns {
-        margin-top: 10px;
-        text-align: center;
-        font-size: 14px;
-        padding: 20px;
-        background: $primary-900;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-    }
-
-    &-right-flap {
-        position: absolute;
-        left: 100%;
-        width: 22px;
-        top: 27px;
-        bottom: 0;
+    .no-data {
+        padding-top: $datagrid-settings-table-offset-top;
     }
 }

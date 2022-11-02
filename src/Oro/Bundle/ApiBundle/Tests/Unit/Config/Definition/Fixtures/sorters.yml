@@ -90,7 +90,7 @@ invalid_field_exclude:
                 field1:
                     exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.sorters.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.sorters.fields.field1.exclude". Expected "bool", but got "int".'
 
 null_field_property_path:
     config:

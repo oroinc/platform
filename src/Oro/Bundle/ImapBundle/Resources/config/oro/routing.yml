@@ -3,7 +3,22 @@ oro_imap_connection:
     type:         annotation
     prefix:       /
 
-oro_imap_gmail_connection:
-    resource:     "@OroImapBundle/Controller/GmailConnectionController.php"
-    type:         annotation
-    prefix:       /
+oro_imap_gmail_access_token:
+    path: '/gmail/connection/access-token'
+    controller: Oro\Bundle\ImapBundle\Controller\GmailAccessTokenController::accessTokenAction
+    methods: [POST]
+
+oro_imap_gmail_connection_check:
+    path: '/gmail/connection/check'
+    controller: Oro\Bundle\ImapBundle\Controller\CheckConnectionController::checkAction
+    methods: [POST]
+
+oro_imap_microsoft_access_token:
+    path: '/microsoft-identity/connection/access-token'
+    controller: Oro\Bundle\ImapBundle\Controller\MicrosoftAccessTokenController::accessTokenAction
+    methods: [POST, GET]
+
+oro_imap_microsoft_connection_check:
+    path: '/microsoft-identity/connection/check'
+    controller: Oro\Bundle\ImapBundle\Controller\CheckConnectionController::checkAction
+    methods: [POST]

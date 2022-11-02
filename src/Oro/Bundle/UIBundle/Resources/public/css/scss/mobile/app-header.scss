@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, no-duplicate-selectors */
+
 %header-button {
     text-align: center;
     border: 0 none;
@@ -12,15 +14,40 @@
 }
 
 .app-header {
+    ~ * .sticky,
+    ~ * .floatThead.floatThead-fixed .grid-header:first-child,
+    &.sticky {
+        transition: margin-top 500ms, transform 500ms;
+    }
+
+    @at-root .disable-touch-scrolling#{&} {
+        position: fixed;
+    }
+}
+
+:not(.disable-touch-scrolling) & {
+    &.scrolled-down,
+    &.input-focused {
+        .app-header.sticky-out-of-viewport {
+            ~ * .sticky-pinned,
+            ~ * .floatThead.floatThead-fixed .grid-header:first-child,
+            &.sticky-pinned {
+                margin-top: -$app-header-height;
+            }
+        }
+    }
+}
+
+.app-header {
     background-color: $app-header-bg-color;
     color: $app-header-text-color;
-    position: fixed;
+    position: absolute;
     z-index: $mobile-app-header-z-index;
     width: 100%;
     height: $app-header-height;
     max-height: $app-header-height;
     top: 0;
-    #{$start}: 0;
+    left: 0;
 
     .navbar .nav {
         position: static;
@@ -37,51 +64,40 @@
 
         @include safe-area-offset(padding, 0);
 
-        .nav-content {
-            padding: 0 $mobile-app-header-dropdown-item-padding;
-        }
-
         .dropdown-menu {
-            #{$start}: 0;
+            left: 0;
 
             color: $app-header-dropdown-menu-color;
 
             .nav-header {
-                padding-#{$start}: $mobile-app-header-dropdown-item-padding;
-                padding-#{$end}: $mobile-app-header-dropdown-item-padding;
-                margin-#{$end}: $app-header-dropdown-close-icon-margin + $app-header-dropdown-close-icon-font-size;
-                margin-bottom: $mobile-app-header-header-margin-bottom;
-
+                margin-right: $mobile-app-header-header-margin-end;
                 font-size: $mobile-app-header-header-font-size;
+                line-height: 1;
                 text-transform: none;
 
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
-            .nav-header-title {
-                @include fa-icon($app-header-dropdown-close-icon);
+            .btn-close {
+                position: absolute;
+                top: 0;
+                left: auto;
+                right: 0;
+                z-index: $zindex-dropdown + 1;
 
-                &:before {
-                    position: absolute;
-                    top: 0;
-                    #{$start}: auto;
-                    #{$end}: 0;
-                    z-index: $zindex-dropdown + 1;
+                margin: $app-header-dropdown-close-icon-margin;
+                padding: 0;
 
-                    margin: $app-header-dropdown-close-icon-margin;
-                    padding: 0;
+                color: $app-header-dropdown-close-icon-color;
+                box-shadow: none;
 
+                &:focus {
+                    outline: none;
+                }
+
+                &::before {
                     font-size: $app-header-dropdown-close-icon-font-size;
-                    line-height: $app-header-dropdown-close-icon-font-size;
-                    color: $app-header-dropdown-close-icon-color;
-
-                    background-color: transparent;
-                    background-image: none;
-                    border: 0 none;
-
-                    display: block;
-                    box-shadow: none;
                 }
             }
 
@@ -94,14 +110,14 @@
     .main-menu-toggler {
         @extend %header-button;
 
-        float: #{$start};
+        float: left;
         padding: 0 $mobile-app-header-main-menu-toggler-h-padding;
         color: $app-header-logo-text-color;
     }
 
     .organization-logo-wrapper {
-        margin-#{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
-        margin-#{$end}: $mobile-app-header-organization-logo-wrapper-margin-end;
+        margin-left: $mobile-app-header-organization-logo-wrapper-margin-start;
+        margin-right: $mobile-app-header-organization-logo-wrapper-margin-end;
 
         .organization-switcher,
         .organization-switcher > * {
@@ -110,24 +126,44 @@
 
         .organization-switcher {
             margin: 0;
-            float: $start;
+            float: left;
         }
 
         .logo {
             font-size: $mobile-app-header-organization-logo-font-size;
             color: $app-header-logo-text-color;
+            font-weight: font-weight('bold');
             margin: 0;
-            float: #{$start};
+            float: left;
             line-height: $app-header-height;
             height: $app-header-height;
             white-space: nowrap;
+            max-width: 100%;
 
             .organization-name {
                 color: inherit;
+                text-transform: uppercase;
                 display: inline-block;
-                vertical-align: middle;
+                max-width: $app-header-max-width;
+
                 @include text-line-truncate($app-header-max-width, true);
             }
+
+            &.dropdown-toggle {
+                padding-right: 32px;
+                position: relative;
+
+                &::after {
+                    position: absolute;
+                    right: 10px;
+                    top: ($app-header-height - 5) * .5;
+                }
+            }
+        }
+
+        li > a {
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         li.dropdown.show > .logo {
@@ -136,13 +172,12 @@
     }
 
     .dropdown-menu {
-        #{$start}: 0;
+        left: 0;
         max-width: $mobile-app-header-dropdown-menu-max-width;
     }
 
     &__search-and-shortcuts {
-        position: relative;
-        float: #{$end};
+        float: right;
         margin: 0;
         height: $app-header-height;
 
@@ -152,37 +187,32 @@
             }
 
             .dropdown-menu {
-                .nav-header {
-                    padding-#{$start}: $mobile-app-header-dropdown-item-padding;
-                    padding-#{$end}: $mobile-app-header-dropdown-item-padding;
-                }
+                padding: $mobile-app-header-dropdown-menu-padding;
             }
         }
 
         .header-dropdown-shortcut {
-            &__search {
-                width: 100%;
+            .dropdown-menu {
+                left: auto;
+                right: 0;
+
+                &::before {
+                    left: auto;
+                    right: $tablet-app-header-shortcuts-arrow-end;
+                }
             }
 
-            .dropdown-menu {
-                #{$start}: auto;
-                #{$end}: 0;
-
-                .nav-content {
-                    margin-bottom: $mobile-app-header-shortcuts-content-margin-bottom;
-                }
-
-                &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-shortcuts-arrow-end;
+            .dropdown-item {
+                > a {
+                    font-size: $mobile-app-header-dropdown-link-font-size;
                 }
             }
         }
 
         .header-dropdown-search {
             .dropdown-menu {
-                #{$start}: auto;
-                #{$end}: 0;
+                left: auto;
+                right: 0;
                 max-width: none;
 
                 .nav-content {
@@ -190,16 +220,16 @@
                 }
 
                 .dropdown-menu {
-                    #{$start}: 0;
-                    #{$end}: auto;
+                    left: 0;
+                    right: auto;
                     max-height: $mobile-app-header-search-dropdown-menu-max-height;
                     overflow-y: auto;
                     overflow-x: visible;
                 }
 
-                &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-search-arrow-end;
+                &::before {
+                    left: auto;
+                    right: $tablet-app-header-search-arrow-end;
                 }
 
                 .search-suggestion-list {
@@ -212,7 +242,7 @@
                     }
                 }
 
-                .no-result-message {
+                .no-data {
                     top: $input-size - $input-border-width;
                 }
 
@@ -222,6 +252,10 @@
                     .select2-container {
                         width: 100%;
                         margin-bottom: $mobile-app-header-search-form-row-margin-bottom;
+                    }
+
+                    .search-field-container {
+                        margin-right: 12px;
                     }
                 }
             }
@@ -233,35 +267,54 @@
     }
 
     .user-menu {
-        float: $end;
+        float: right;
         margin: 0;
 
         .dropdown {
             > .dropdown-toggle {
                 @extend %header-button;
-                padding-#{$end}: $mobile-app-header-user-menu-toggler-padding-end;
+
+                padding-right: $mobile-app-header-user-menu-toggler-padding-end;
             }
 
             .dropdown-menu {
-                #{$start}: auto;
-                #{$end}: $tablet-app-header-user-menu-offset;
+                padding: $mobile-app-header-dropdown-menu-padding;
+                left: auto;
+                right: $tablet-app-header-user-menu-offset;
 
-                &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-user-menu-arrow-end;
+                .nav-header {
+                    margin-right: $mobile-app-header-header-margin-end;
+                }
+
+                .divider {
+                    border-bottom: $mobile-app-header-user-menu-divider-border-bottom;
+                }
+
+                li:not(.nav-header):not(.divider) {
+                    padding: $mobile-app-header-dropdown-item-padding;
+
+                    > a {
+                        font-size: $mobile-app-header-dropdown-link-font-size;
+                        padding: 0;
+                    }
+                }
+
+                &::before {
+                    left: auto;
+                    right: $tablet-app-header-user-menu-arrow-end;
                 }
             }
         }
     }
 
-
     @media only screen and (max-width: $small-devices-media-breakpoint) {
         &__search-and-shortcuts,
-        .user-menu {
+        .user-menu,
+        .organization-logo-wrapper {
             > .dropdown > .dropdown-menu {
                 position: fixed;
-                #{$start}: 0;
-                #{$end}: 0;
+                left: 0;
+                right: 0;
                 top: $app-header-height;
                 bottom: 0;
                 margin-top: 0;
@@ -270,25 +323,29 @@
                 min-width: 0;
                 width: auto;
 
-                &:after {
+                &::after {
                     position: fixed;
                     top: $app-header-height;
                 }
             }
         }
 
-        .user-menu .dropdown .dropdown-menu:before {
-            #{$end}: $phone-app-header-user-menu-arrow-end;
+        .organization-logo-wrapper .dropdown .dropdown-menu::before {
+            left: $mobile-app-header-organization-logo-wrapper-margin-start;
+        }
+
+        .user-menu .dropdown .dropdown-menu::before {
+            right: $phone-app-header-user-menu-arrow-end;
         }
 
         &__search-and-shortcuts {
-            .header-dropdown-search .dropdown-menu:before {
-                #{$end}: $phone-app-header-search-arrow-end;
+            .header-dropdown-search .dropdown-menu::before {
+                right: $phone-app-header-search-arrow-end;
             }
 
             .header-dropdown-shortcut .dropdown-menu {
-                &:before {
-                    #{$end}: $phone-app-header-shortcuts-arrow-end;
+                &::before {
+                    right: $phone-app-header-shortcuts-arrow-end;
                 }
 
                 .shortcut-search-input {

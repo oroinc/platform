@@ -12,9 +12,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 
 abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = Item::class;
-    const FIELD_NAME = 'test_field_name';
-    const LOCALE = 'de';
+    protected const CLASS_NAME = Item::class;
+    protected const FIELD_NAME = 'test_field_name';
+    protected const LOCALE = 'de';
 
     /** @var FieldConfigModel */
     protected $attribute;
@@ -25,7 +25,7 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
     /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entity = new EntityConfigModel(self::CLASS_NAME);
 

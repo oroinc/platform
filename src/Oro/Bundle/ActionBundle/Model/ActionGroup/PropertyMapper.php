@@ -11,9 +11,6 @@ class PropertyMapper
     /** @var ContextAccessor */
     private $accessor;
 
-    /**
-     * @param ContextAccessor|null $accessor
-     */
     public function __construct(ContextAccessor $accessor = null)
     {
         $this->accessor = $accessor ?: new ContextAccessor();

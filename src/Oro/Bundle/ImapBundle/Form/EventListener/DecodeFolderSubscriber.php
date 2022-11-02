@@ -20,8 +20,6 @@ class DecodeFolderSubscriber implements EventSubscriberInterface
 
     /**
      * Decode folders from json pack
-     *
-     * @param FormEvent $event
      */
     public function decodeFolders(FormEvent $event)
     {

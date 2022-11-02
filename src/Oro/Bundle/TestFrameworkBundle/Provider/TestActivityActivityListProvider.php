@@ -9,21 +9,17 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
+/**
+ * Provides a way to use TestActivity entity in an activity list.
+ */
 class TestActivityActivityListProvider implements ActivityListProviderInterface
 {
-    const ACTIVITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
-    const ACL_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var ActivityAssociationHelper */
     protected $activityAssociationHelper;
 
-    /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ActivityAssociationHelper $activityAssociationHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ActivityAssociationHelper $activityAssociationHelper
@@ -39,33 +35,33 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
             $entityClass,
-            self::ACTIVITY_CLASS,
+            TestActivity::class,
             $accessible
         );
     }
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getSubject($entity)
     {
-        /** @var $entity TestActivity */
         return $entity->getMessage();
     }
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getDescription($entity)
     {
-        /** @var $entity TestActivity */
         return $entity->getDescription();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getData(ActivityList $activityListEntity)
+    public function getData(ActivityList $activityList)
     {
         return [];
     }
@@ -80,11 +76,11 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
-    public function getOrganization($activityEntity)
+    public function getOrganization($entity)
     {
-        /** @var $activityEntity TestActivity */
-        return $activityEntity->getOrganization();
+        return $entity->getOrganization();
     }
 
     /**
@@ -92,35 +88,19 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getTemplate()
     {
-        return 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig';
+        return '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($activityEntity)
+    public function getRoutes($entity)
     {
         return [
             'itemView'   => '',
             'itemEdit'   => '',
             'itemDelete' => ''
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getActivityClass()
-    {
-        return self::ACTIVITY_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAclClass()
-    {
-        return self::ACL_CLASS;
     }
 
     /**
@@ -136,15 +116,16 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicable($entity)
     {
-        if (is_object($entity)) {
-            $entity = $this->doctrineHelper->getEntityClass($entity);
+        if (\is_object($entity)) {
+            return $entity instanceof TestActivity;
         }
 
-        return $entity === self::ACTIVITY_CLASS;
+        return $entity === TestActivity::class;
     }
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getTargetEntities($entity)
     {
@@ -153,6 +134,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getActivityOwners($entity, ActivityList $activityList)
     {
@@ -167,6 +149,15 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
         $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
+
         return [$activityOwner];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return true;
     }
 }

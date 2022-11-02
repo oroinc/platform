@@ -2,64 +2,55 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\UIBundle\Provider\ObjectIdAccessorInterface;
 use Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestClass;
+use Oro\Bundle\UIBundle\Twig\TabExtension;
 
 class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TabMenuWidgetProvider */
-    protected $provider;
+    /** @var ObjectIdAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectIdAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $objectIdAccessor;
+    /** @var TabExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $widgetProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $widgetProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->objectIdAccessor = $this->createMock('Oro\Bundle\UIBundle\Provider\ObjectIdAccessorInterface');
-        $this->widgetProvider   = $this->getMockBuilder('Oro\Bundle\UIBundle\Twig\TabExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->objectIdAccessor = $this->createMock(ObjectIdAccessorInterface::class);
+        $this->widgetProvider = $this->createMock(TabExtension::class);
     }
 
     public function testSupportsWithoutEntityClass()
     {
-        $this->provider = new TabMenuWidgetProvider(
+        $provider = new TabMenuWidgetProvider(
             $this->objectIdAccessor,
             $this->widgetProvider,
             'test_menu'
         );
 
-        $this->assertTrue($this->provider->supports(new TestClass()));
-        $this->assertTrue($this->provider->supports(new \stdClass()));
+        $this->assertTrue($provider->supports(new TestClass()));
+        $this->assertTrue($provider->supports(new \stdClass()));
     }
 
     public function testSupports()
     {
-        $this->provider = new TabMenuWidgetProvider(
+        $provider = new TabMenuWidgetProvider(
             $this->objectIdAccessor,
             $this->widgetProvider,
             'test_menu',
-            'Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass'
+            TestBaseClass::class
         );
 
-        $this->assertTrue($this->provider->supports(new TestBaseClass()));
-        $this->assertTrue($this->provider->supports(new TestClass()));
-        $this->assertFalse($this->provider->supports(new \stdClass()));
+        $this->assertTrue($provider->supports(new TestBaseClass()));
+        $this->assertTrue($provider->supports(new TestClass()));
+        $this->assertFalse($provider->supports(new \stdClass()));
     }
 
     public function testGetWidgets()
     {
-        $this->provider = new TabMenuWidgetProvider(
-            $this->objectIdAccessor,
-            $this->widgetProvider,
-            'test_menu'
-        );
-
-        $entity   = new TestClass();
+        $entity = new TestClass();
         $entityId = 123;
 
         $widgets = [
@@ -70,15 +61,17 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->objectIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($entityId));
+            ->willReturn($entityId);
         $this->widgetProvider->expects($this->once())
             ->method('getTabs')
             ->with('test_menu', ['id' => $entityId])
-            ->will($this->returnValue($widgets));
+            ->willReturn($widgets);
 
-        $this->assertEquals(
-            $widgets,
-            $this->provider->getWidgets($entity)
+        $provider = new TabMenuWidgetProvider(
+            $this->objectIdAccessor,
+            $this->widgetProvider,
+            'test_menu'
         );
+        $this->assertEquals($widgets, $provider->getWidgets($entity));
     }
 }

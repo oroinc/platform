@@ -9,8 +9,11 @@ use Brick\Math\BigRational as BrickBigRational;
 
 /**
  * Common interface for arbitrary-precision rational numbers.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-abstract class BigNumber implements \Serializable, \JsonSerializable
+abstract class BigNumber implements \JsonSerializable
 {
     /**
      * @var string Target Brick library class;
@@ -137,8 +140,6 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
 
     /**
      * BigNumber constructor.
-     *
-     * @param BrickBigNumber $brickBigNumber
      */
     protected function __construct(BrickBigNumber $brickBigNumber)
     {
@@ -540,9 +541,9 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
      * @link http://php.net/manual/en/serializable.serialize.php
      * @return string the string representation of the object or null
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return $this->getTargetObject()->serialize();
+        return $this->getTargetObject()->__serialize();
     }
 
     /**
@@ -561,10 +562,10 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
     /**
      * Specify data which should be serialized to JSON
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * @return string data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return $this->__toString();
     }
@@ -577,7 +578,7 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
      * </p>
      * @return void
      */
-    abstract public function unserialize($serialized);
+    abstract public function __unserialize(array $serialized): void;
 
     /**
      * Returns target Brick BigNumber object for this instance

@@ -11,17 +11,14 @@ use Oro\Bundle\ApiBundle\Model\Error;
  */
 class NormalizeResultContext extends ApiContext
 {
-    /**
-     * a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred
-     */
-    const SOFT_ERRORS_HANDLING = 'softErrorsHandling';
+    /** bool */
+    private $softErrorsHandling = false;
 
     /** @var Error[] */
     private $errors;
 
     /**
-     * Whether any error happened during the processing of an action.
+     * Whether any error occurred when processing an action.
      *
      * @return bool
      */
@@ -31,7 +28,7 @@ class NormalizeResultContext extends ApiContext
     }
 
     /**
-     * Gets all errors happened during the processing of an action.
+     * Gets all errors occurred when processing an action.
      *
      * @return Error[]
      */
@@ -46,8 +43,6 @@ class NormalizeResultContext extends ApiContext
 
     /**
      * Registers an error.
-     *
-     * @param Error $error
      */
     public function addError(Error $error)
     {
@@ -66,28 +61,24 @@ class NormalizeResultContext extends ApiContext
     }
 
     /**
-     * Gets a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred.
+     * Gets a value indicates whether errors and exceptions should just stop processing
+     * or an exception should be thrown is any error or exception occurred.
      *
      * @return bool
      */
     public function isSoftErrorsHandling()
     {
-        return (bool)$this->get(self::SOFT_ERRORS_HANDLING);
+        return $this->softErrorsHandling;
     }
 
     /**
-     * Sets a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred.
+     * Sets a value indicates whether errors and exceptions should just stop processing
+     * or an exception should be thrown is any error or exception occurred.
      *
      * @param bool $softErrorsHandling
      */
     public function setSoftErrorsHandling($softErrorsHandling)
     {
-        if ($softErrorsHandling) {
-            $this->set(self::SOFT_ERRORS_HANDLING, true);
-        } else {
-            $this->remove(self::SOFT_ERRORS_HANDLING);
-        }
+        $this->softErrorsHandling = $softErrorsHandling;
     }
 }

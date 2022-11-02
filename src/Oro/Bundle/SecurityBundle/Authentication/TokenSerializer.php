@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
+/**
+ * The default implementation of the security token serializer.
+ */
 class TokenSerializer implements TokenSerializerInterface
 {
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -29,12 +28,12 @@ class TokenSerializer implements TokenSerializerInterface
      */
     public function serialize(TokenInterface $token)
     {
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token instanceof OrganizationAwareTokenInterface) {
             $user = $token->getUser();
             if ($user instanceof AbstractUser) {
                 return sprintf(
                     'organizationId=%d;userId=%d;userClass=%s;roles=%s',
-                    $token->getOrganizationContext()->getId(),
+                    $token->getOrganization()->getId(),
                     $user->getId(),
                     ClassUtils::getRealClass($user),
                     $this->packRoles($token)
@@ -71,21 +70,14 @@ class TokenSerializer implements TokenSerializerInterface
      */
     private function packRoles(TokenInterface $token)
     {
-        return implode(
-            ',',
-            array_map(
-                function (RoleInterface $role) {
-                    return $role->getRole();
-                },
-                $token->getRoles()
-            )
-        );
+        return implode(',', $token->getRoleNames());
     }
 
     /**
      * @param string $value organizationId=int;userId=int;userClass=string;roles=string,...
      *
      * @return array|null [organizationId, userId, userClass, roles]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function unpack($value)
     {
@@ -157,7 +149,7 @@ class TokenSerializer implements TokenSerializerInterface
         }
 
         $roleObjects = [];
-        $allRoles = $user->getRoles();
+        $allRoles = $user->getUserRoles();
         foreach ($allRoles as $role) {
             if (in_array($role->getRole(), $roles, true)) {
                 $roleObjects[] = $role;

@@ -41,8 +41,6 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
 
     /**
      * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {

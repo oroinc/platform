@@ -11,7 +11,7 @@ class IndexDecimalTest extends \PHPUnit\Framework\TestCase
      */
     private $index;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->index = new IndexDecimal();
     }

@@ -14,10 +14,6 @@ class PlaceholderFilter
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param AttachmentAssociationHelper $attachmentAssociationHelper
-     * @param DoctrineHelper              $doctrineHelper
-     */
     public function __construct(
         AttachmentAssociationHelper $attachmentAssociationHelper,
         DoctrineHelper $doctrineHelper

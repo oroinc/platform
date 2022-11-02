@@ -20,8 +20,6 @@ class OroEmbeddedFormBundle implements Migration
 
     /**
      * Adds owner_id field
-     *
-     * @param Schema $schema
      */
     public static function addOwner(Schema $schema)
     {
@@ -40,8 +38,6 @@ class OroEmbeddedFormBundle implements Migration
 
     /**
      * Set ownership type for EmbeddedForm entity to Organization
-     *
-     * @param QueryBag $queries
      */
     public static function setOwnership(QueryBag $queries)
     {

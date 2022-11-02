@@ -1,0 +1,58 @@
+/* @theme: admin.oro; */
+
+// Variables for both checkbox and radio
+$checkbox-background: $primary-inverse !default;
+$checkbox-size: 16px !default;
+$checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !important !default;
+$checkbox-appearance: none !default;
+$checkbox-vertical-align: middle !default;
+$checkbox-margin: 0 !default;
+$checkbox-border: 2px solid $primary-750 !default;
+$checkbox-color: $primary-inverse !default;
+$checkbox-display: inline-grid !default;
+$checkbox-border-radius: 3px !default;
+$checkbox-flex: none !default;
+$checkbox-outline: none !default;
+
+$checkbox-icon-size: 10px !default;
+$checkbox-icon-line-height: 1 !default;
+$checkbox-icon-checked: $fa-var-check !default;
+$checkbox-icon-indeterminate: $fa-var-minus !default;
+$checkbox-icon-place-self: center !default;
+$checkbox-icon-opacity: 0 !default;
+$checkbox-icon-opacity-checked: 1 !default;
+
+$checkbox-gap: 8px !default;
+$checkbox-sibling-label-display: inline !default;
+$checkbox-sibling-label-vertical-align: middle !default;
+
+// Checked
+$checkbox-background-checked: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-border-color-checked: var(--checkbox-skin-color, #{$secondary}) !default;
+
+// Indeterminate
+$checkbox-background-indeterminate: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-border-color-indeterminate: var(--checkbox-skin-color, #{$secondary}) !default;
+
+// Hover
+$checkbox-border-color-hover: var(--checkbox-skin-color, #{$secondary}) !default;
+
+// Focus
+$checkbox-border-color-focus: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-box-shadow-focus: 0 0 5px var(--checkbox-skin-color, #{$secondary}) !default;
+
+// Disable
+$checkbox-opacity-disabled: .5 !default;
+
+// Variables for radio
+$checkbox-radio-border: 2px solid $primary-750 !default;
+$checkbox-radio-border-radius: 50% !default;
+
+$checkbox-radio-icon-content: '' !default;
+$checkbox-radio-icon-background-checked: $secondary !default;
+$checkbox-radio-icon-size: 10px !default;
+$checkbox-radio-icon-border-radius: 50% !default;
+
+// Focus
+$checkbox-radio-border-color-focus: $secondary !default;
+$checkbox-radio-border-color-checked-focus: $secondary !default;

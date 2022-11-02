@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\StatisticModelInterface;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyInterface;
 
+/**
+ * Doctrine repository for working with Statistic model.
+ */
 class StatisticRepository implements BatchRepositoryInterface, ObjectRepository, AvgStrategyAwareInterface
 {
     const MAX_LIMIT = 10000;
@@ -35,7 +38,6 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
 
     /**
      * StatisticRepository constructor.
-     * @param Connection $connection
      */
     public function __construct(Connection $connection)
     {
@@ -50,10 +52,15 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->collection[] = $model;
     }
 
+    /**
+     * @param int $numberOfBuilds
+     * @param array $criteria
+     * @return array
+     */
     public function getLastBuildIds($numberOfBuilds, array $criteria)
     {
         $buildIdsQueryBuilder = $this->connection->createQueryBuilder()
-            ->select("build_id")
+            ->select('build_id')
             ->from($this->className::getName())
             ->groupBy('build_id')
             ->orderBy('build_id', 'DESC')
@@ -118,6 +125,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         }
 
         $this->connection->close();
+        $this->collection = [];
     }
 
     /**
@@ -157,7 +165,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
 
         $models = array_map(function (array $data) {
             $model = $this->className::fromArray($data);
-            $this->collection[$model->getId()] = $model;
+            $this->collection[$model->getPath()] = $model;
 
             return $model;
         }, $result);
@@ -189,9 +197,31 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         }
 
         $model = $this->className::fromArray($result);
-        $this->collection[$model->getId()] = $model;
+        $this->collection[$model->getPath()] = $model;
 
         return $model;
+    }
+
+    /**
+     * @param int $lifetime
+     * @return int
+     */
+    public function removeOldStatistics(int $lifetime)
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date->modify(sprintf('-%d seconds', $lifetime));
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->delete($this->className::getName())
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->lt('created_at', '?'),
+                    $qb->expr()->isNull('created_at')
+                )
+            )
+            ->setParameter(0, $date->format('Y-m-d H:i:s'));
+
+        return $qb->execute();
     }
 
     /**
@@ -226,9 +256,6 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->className = $className;
     }
 
-    /**
-     * @param AvgStrategyInterface $avgStrategy
-     */
     public function setAvgStrategy(AvgStrategyInterface $avgStrategy)
     {
         $this->avgStrategy = $avgStrategy;

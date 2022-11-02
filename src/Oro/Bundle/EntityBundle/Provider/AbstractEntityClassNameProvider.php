@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base class for services to get human-readable names in English of entity classes.
+ */
 abstract class AbstractEntityClassNameProvider
 {
     /** @var ConfigManager */
@@ -13,15 +16,13 @@ abstract class AbstractEntityClassNameProvider
 
     /** @var TranslatorInterface */
     protected $translator;
+    private Inflector $inflector;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
+    public function __construct(ConfigManager $configManager, TranslatorInterface $translator, Inflector $inflector)
     {
         $this->configManager = $configManager;
         $this->translator = $translator;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -61,7 +62,7 @@ abstract class AbstractEntityClassNameProvider
         if ($labelName) {
             $translated = $this->translator->trans($labelName, [], null, 'en');
             if ($translated && $translated !== $labelName) {
-                return $entityClassName . ' ' . ($isPlural ? Inflector::pluralize($translated) : $translated);
+                return $entityClassName . ' ' . ($isPlural ? $this->inflector->pluralize($translated) : $translated);
             }
         }
 
@@ -72,17 +73,17 @@ abstract class AbstractEntityClassNameProvider
      * @param string $entityClass
      * @param bool   $isPlural
      *
-     * @return string|null
+     * @return string
      */
-    protected function getLabelName($entityClass, $isPlural = false)
+    protected function getLabelName($entityClass, $isPlural = false): string
     {
         if (!$this->configManager->hasConfig($entityClass)
             || $this->configManager->isHiddenModel($entityClass)
         ) {
-            return null;
+            return '';
         }
 
-        return $this->configManager->getEntityConfig('entity', $entityClass)
+        return (string) $this->configManager->getEntityConfig('entity', $entityClass)
             ->get($isPlural ? 'plural_label' : 'label');
     }
 
@@ -90,17 +91,17 @@ abstract class AbstractEntityClassNameProvider
      * @param string $entityClass
      * @param string $fieldName
      *
-     * @return string|null
+     * @return string
      */
-    protected function getFieldLabelName($entityClass, $fieldName)
+    protected function getFieldLabelName($entityClass, $fieldName): string
     {
         if (!$this->configManager->hasConfig($entityClass, $fieldName)
             || $this->configManager->isHiddenModel($entityClass, $fieldName)
         ) {
-            return null;
+            return '';
         }
 
-        return $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
+        return (string) $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
             ->get('label');
     }
 }

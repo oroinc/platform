@@ -1,4 +1,31 @@
 Oro\Bundle\AttachmentBundle\Entity\Attachment:
-    properies:
+    properties:
+        file:
+            - NotBlank: ~
+            - Valid: ~
+    getters:
+        target:
+            - NotBlank: ~
+
+Oro\Bundle\AttachmentBundle\Entity\FileItem:
+    properties:
+        sortOrder:
+            - NotBlank: ~
+            - Range:
+                min: 0
+                max: 2147483647
         file:
             - Valid: ~
+
+Oro\Bundle\AttachmentBundle\Entity\File:
+    properties:
+        fileSize:
+            - Type: integer
+            - Range:
+                max: 2147483647 # max allowed value for integer column
+        uuid:
+            - Uuid:
+                groups: ['Default', 'import_field_type']
+        externalUrl:
+            - Length:
+                  max: 1024

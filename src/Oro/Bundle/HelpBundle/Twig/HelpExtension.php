@@ -2,30 +2,23 @@
 
 namespace Oro\Bundle\HelpBundle\Twig;
 
-use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class HelpExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve the online help URL:
+ *   - get_help_link
+ */
+class HelpExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_help';
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return HelpLinkProvider
-     */
-    protected function getHelpLinkProvider()
-    {
-        return $this->container->get('oro_help.model.help_link_provider');
     }
 
     /**
@@ -34,14 +27,12 @@ class HelpExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_help_link', [$this, 'getHelpLinkUrl']),
+            new TwigFunction('get_help_link', [$this, 'getHelpLinkUrl'])
         ];
     }
 
     /**
-     * Get help link
-     *
-     * @return bool
+     * @return string
      */
     public function getHelpLinkUrl()
     {
@@ -51,8 +42,15 @@ class HelpExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            'oro_help.help_link_provider' => HelpLinkProvider::class,
+        ];
+    }
+
+    private function getHelpLinkProvider(): HelpLinkProvider
+    {
+        return $this->container->get('oro_help.help_link_provider');
     }
 }

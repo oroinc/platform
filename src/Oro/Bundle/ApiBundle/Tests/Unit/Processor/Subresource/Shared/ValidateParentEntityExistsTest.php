@@ -3,14 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityExists;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ValidateParentEntityExistsTest extends GetSubresourceProcessorTestCase
+class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var ValidateParentEntityExists */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,12 +24,11 @@ class ValidateParentEntityExistsTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage The parent entity does not exist.
-     */
     public function testProcessWhenParentEntityDoesNotExist()
     {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The parent entity does not exist.');
+
         $this->processor->process($this->context);
     }
 }

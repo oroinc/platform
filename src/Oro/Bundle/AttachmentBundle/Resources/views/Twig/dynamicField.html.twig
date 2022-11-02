@@ -1,0 +1,28 @@
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+
+{% set type = data.fieldConfigId.fieldType %}
+{% set fieldName = data.fieldConfigId.fieldName %}
+{% set className = data.fieldConfigId.className %}
+{% set entityId = data.entity.id %}
+{% set value = data.value|default(null) %}
+
+{% if type == 'file' %}
+    {% set value %}
+        {{- oro_file_view(value) -}}
+    {% endset %}
+{% elseif type == 'image' %}
+    {% set value %}
+        {{- oro_image_view(value) -}}
+    {% endset %}
+{% endif %}
+
+{% if type == 'file' or type == 'image' %}
+    {{ value|default('N/A'|trans) }}
+{% else %}
+    {% set gridName = (type == 'multiFile' ? 'attachment-files-grid' : 'attachment-images-grid') %}
+    {% set gridFullName = oro_datagrid_build_fullname(gridName, fieldName) %}
+    <div class="widget-content">
+        {{ dataGrid.renderGrid(gridFullName, {entityId: entityId, entityField: fieldName, entityTable: className}) }}
+    </div>
+{% endif %}

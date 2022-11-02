@@ -12,16 +12,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class LoadConfigurationSectionsTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configRepository;
+    /** @var ConfigurationRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $configRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
     /** @var LoadConfigurationSections */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

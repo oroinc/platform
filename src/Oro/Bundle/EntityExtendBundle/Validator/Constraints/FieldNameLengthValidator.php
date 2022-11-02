@@ -15,9 +15,6 @@ class FieldNameLengthValidator extends LengthValidator
     /** @var ExtendDbIdentifierNameGenerator */
     private $nameGenerator;
 
-    /**
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;

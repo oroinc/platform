@@ -23,10 +23,6 @@ class ReleaseDataFixtureMigration implements Migration
      */
     protected $expr;
 
-    /**
-     * @param array $fixturesData
-     * @param array $mappingData
-     */
     public function __construct(array $fixturesData, array $mappingData)
     {
         $this->fixturesData = $fixturesData;

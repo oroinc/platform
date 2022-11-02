@@ -5,12 +5,12 @@ define([
 ], function($, _, messenger) {
     'use strict';
 
-    var stringsWithNoFlashTags = [
+    const stringsWithNoFlashTags = [
         'Your <a href="/customer/rfp/view/49">Request For Quote</a> has been successfully resubmitted.',
         '<p>Your <a href="/customer/rfp/view/49">Request For Quote</a> has been successfully resubmitted.</p>'
     ];
 
-    var stringsWithoutNoFlashTags = [
+    const stringsWithoutNoFlashTags = [
         'Your has been <span>successfully</span> resubmitted.',
         '<p>Your has been successfully resubmitted.</p>'
     ];

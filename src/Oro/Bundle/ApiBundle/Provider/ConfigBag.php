@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
- * A storage for configuration of all registered Data API resources.
+ * A storage for configuration of all registered API resources.
  */
-class ConfigBag implements ConfigBagInterface
+class ConfigBag implements ConfigBagInterface, ResetInterface
 {
-    private const ENTITIES  = 'entities';
-    private const RELATIONS = 'relations';
+    private const ENTITIES = 'entities';
 
     /** @var ConfigCache */
     private $configCache;
@@ -19,10 +20,6 @@ class ConfigBag implements ConfigBagInterface
     /** @var array */
     private $config;
 
-    /**
-     * @param ConfigCache $configCache
-     * @param string      $configFile
-     */
     public function __construct(ConfigCache $configCache, string $configFile)
     {
         $this->configCache = $configCache;
@@ -34,7 +31,13 @@ class ConfigBag implements ConfigBagInterface
      */
     public function getClassNames(string $version): array
     {
-        return \array_keys($this->findConfigs(self::ENTITIES, $version));
+        $this->ensureInitialized();
+
+        if (!isset($this->config[self::ENTITIES])) {
+            return [];
+        }
+
+        return array_keys($this->config[self::ENTITIES]);
     }
 
     /**
@@ -42,54 +45,20 @@ class ConfigBag implements ConfigBagInterface
      */
     public function getConfig(string $className, string $version): ?array
     {
-        return $this->findConfig(self::ENTITIES, $className, $version);
+        $this->ensureInitialized();
+
+        return $this->config[self::ENTITIES][$className] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRelationConfig(string $className, string $version): ?array
+    public function reset()
     {
-        return $this->findConfig(self::RELATIONS, $className, $version);
+        $this->config = null;
     }
 
-    /**
-     * @param string $section
-     * @param string $version
-     *
-     * @return array
-     */
-    private function findConfigs($section, $version)
-    {
-        $this->ensureInitialized();
-
-        if (!isset($this->config[$section])) {
-            return [];
-        }
-
-        return $this->config[$section];
-    }
-
-    /**
-     * @param string $section
-     * @param string $className
-     * @param string $version
-     *
-     * @return array|null
-     */
-    private function findConfig($section, $className, $version)
-    {
-        $this->ensureInitialized();
-
-        if (!isset($this->config[$section][$className])) {
-            // no config for the requested class
-            return null;
-        }
-
-        return $this->config[$section][$className];
-    }
-
-    private function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null === $this->config) {
             $this->config = $this->configCache->getConfig($this->configFile);

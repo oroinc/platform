@@ -1,0 +1,6 @@
+Oro\Bundle\DataGridBundle\Datagrid\ParameterBag:
+    attributes:
+        _pager:
+            groups: [ 'datagrid_results' ]
+        _sort_by:
+            groups: [ 'datagrid_results' ]

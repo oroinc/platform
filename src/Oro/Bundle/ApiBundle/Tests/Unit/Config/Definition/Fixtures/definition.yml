@@ -18,23 +18,29 @@ default_exclusion_policy:
     expected:
         exclusion_policy: none
 
-exclusion_policy:
+all_exclusion_policy:
     config:
         exclusion_policy: all
     expected:
         exclusion_policy: all
 
+custom_fields_exclusion_policy:
+    config:
+        exclusion_policy: custom_fields
+    expected:
+        exclusion_policy: custom_fields
+
 null_exclusion_policy:
     config:
         exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
 
 invalid_exclusion_policy:
     config:
         exclusion_policy: invalid
     expected: []
-    error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
 
 documentation_resource:
     config:
@@ -85,13 +91,13 @@ invalid_identifier_field_names:
     config:
         identifier_field_names: 123
     expected: []
-    error: 'Invalid type for path "entity.identifier_field_names". Expected array, but got integer'
+    error: 'Invalid type for path "entity.identifier_field_names". Expected "array", but got "int"'
 
 default_max_results:
     config:
         max_results: ~
     expected: []
-    error: 'Invalid type for path "entity.max_results". Expected int, but got NULL.'
+    error: 'Invalid type for path "entity.max_results". Expected "int", but got "null".'
 
 zero_max_results:
     config:
@@ -135,16 +141,20 @@ invalid_hints:
     expected: []
     error: 'Unrecognized option "extra" under "entity.hints.0"'
 
-empty_post_serialize:
+empty_inner_join_associations:
     config:
-        post_serialize: ~
+        inner_join_associations: []
     expected: []
 
-post_serialize:
+inner_join_associations:
     config:
-        post_serialize: [class, method]
+        inner_join_associations:
+            - association1
+            - association2.association21
     expected:
-        post_serialize: [class, method]
+        inner_join_associations:
+            - association1
+            - association2.association21
 
 description_cannot_be_set_in_config:
     config:
@@ -192,7 +202,7 @@ invalid_value_for_disable_inclusion:
     config:
         disable_inclusion: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_inclusion". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_inclusion". Expected "bool", but got "int"'
 
 enable_fieldset:
     config:
@@ -210,7 +220,7 @@ invalid_value_for_disable_fieldset:
     config:
         disable_fieldset: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_fieldset". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_fieldset". Expected "bool", but got "int"'
 
 enable_meta_properties:
     config:
@@ -228,7 +238,25 @@ invalid_value_for_disable_meta_properties:
     config:
         disable_meta_properties: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_meta_properties". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_meta_properties". Expected "bool", but got "int"'
+
+enable_partial_load:
+    config:
+        disable_partial_load: false
+    expected:
+        disable_partial_load: false
+
+disable_partial_load:
+    config:
+        disable_partial_load: true
+    expected:
+        disable_partial_load: true
+
+invalid_value_for_disable_partial_load:
+    config:
+        disable_partial_load: 123
+    expected: []
+    error: 'Invalid type for path "entity.disable_partial_load". Expected "bool", but got "int"'
 
 all_attributes:
     config:
@@ -241,7 +269,9 @@ all_attributes:
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
-        post_serialize: [class, method]
+        inner_join_associations:
+            - association1
+            - association2.association21
     expected:
         exclusion_policy: all
         documentation_resource: [test.md]
@@ -252,7 +282,9 @@ all_attributes:
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
-        post_serialize: [class, method]
+        inner_join_associations:
+            - association1
+            - association2.association21
 
 empty_field:
     config:
@@ -284,7 +316,7 @@ invalid_field_exclude:
             field1:
                 exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.exclude". Expected "bool", but got "int".'
 
 field_property_path:
     config:
@@ -332,7 +364,7 @@ invalid_field_meta_property:
             field1:
                 meta_property: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.meta_property". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.meta_property". Expected "bool", but got "int".'
 
 field_collapse:
     config:
@@ -354,7 +386,7 @@ invalid_field_collapse:
             field1:
                 collapse: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.collapse". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.collapse". Expected "bool", but got "int".'
 
 data_transformer_should_not_be_supported:
     config:
@@ -445,14 +477,37 @@ field_target_class_without_target_type:
         fields:
             field1:
                 target_class: Test\Class
+
+field_target_class_with_target_type_to_one:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-one
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
                 target_type: to-one
 
-field_target_class_with_target_type:
+field_target_class_with_target_type_to_many:
     config:
         fields:
             field1:
                 target_class: Test\Class
                 target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
+
+field_target_class_with_target_type_colection:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: collection
     expected:
         fields:
             field1:
@@ -686,13 +741,13 @@ invalid_entity_form_type:
     config:
         form_type: []
     expected: []
-    error: 'Invalid type for path "entity.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.form_type". Expected "scalar", but got "array".'
 
 invalid_entity_form_options:
     config:
         form_options: test
     expected: []
-    error: 'Invalid type for path "entity.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.form_options". Expected "array", but got "string"'
 
 dash_in_field_name:
     config:
@@ -721,6 +776,16 @@ field_form:
                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1
+            field7:
+                post_processor: test
+                post_processor_options: ~
+            field8:
+                post_processor: test
+                post_processor_options: []
+            field9:
+                post_processor: test
+                post_processor_options:
+                    option1: value1
     expected:
         fields:
             field1: []
@@ -735,6 +800,14 @@ field_form:
                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1
+            field7:
+                post_processor: test
+            field8:
+                post_processor: test
+            field9:
+                post_processor: test
+                post_processor_options:
+                    option1: value1
 
 invalid_field_form_type:
     config:
@@ -742,7 +815,7 @@ invalid_field_form_type:
             field1:
                 form_type: []
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.fields.field1.form_type". Expected "scalar", but got "array".'
 
 invalid_field_form_options:
     config:
@@ -750,7 +823,49 @@ invalid_field_form_options:
             field1:
                 form_options: test
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.fields.field1.form_options". Expected "array", but got "string"'
+
+invalid_field_post_processor:
+    config:
+        fields:
+            field1:
+                post_processor: []
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.post_processor". Expected "scalar", but got "array".'
+
+unknown_field_post_processor:
+    config:
+        fields:
+            field1:
+                post_processor: another
+    expected: []
+    error: 'Invalid configuration for path "entity.fields.field1": The post processor "another" is unknown. Known post processors: "twig, test".'
+
+invalid_field_post_processor_options:
+    config:
+        fields:
+            field1:
+                post_processor_options: test
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.post_processor_options". Expected "array", but got "string"'
+
+twig_field_post_processor_without_options:
+    config:
+        fields:
+            field1:
+                post_processor: twig
+    expected: []
+    error: 'Invalid configuration for path "entity.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
+
+twig_field_post_processor_without_template:
+    config:
+        fields:
+            field1:
+                post_processor: twig
+                post_processor_options:
+                    option1: value1
+    expected: []
+    error: 'Invalid configuration for path "entity.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
 
 field_depends_on:
     config:
@@ -768,4 +883,4 @@ invalid_field_depends_on:
             field1:
                 depends_on: field2
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.depends_on". Expected array, but got string'
+    error: 'Invalid type for path "entity.fields.field1.depends_on". Expected "array", but got "string"'

@@ -21,7 +21,7 @@ class EnumChoiceType extends AbstractEnumType
         $resolver->setDefaults(
             [
                 'placeholder' => null,
-                'empty_data'  => null
+                'empty_data'  => static fn (Options $options) => $options['multiple'] ? [] : null,
             ]
         );
 

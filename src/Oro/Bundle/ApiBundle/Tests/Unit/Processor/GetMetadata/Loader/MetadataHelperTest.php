@@ -3,16 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 
 class MetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MetadataHelper */
     private $metadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = new MetadataHelper();
     }
@@ -26,21 +27,32 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "testField" field of the "Test\Class" entity.
+     * @dataProvider emptyDataTypeDataProvider
      */
-    // @codingStandardsIgnoreEnd
-    public function testAssertDataTypeForEmptyDataType()
+    public function testAssertDataTypeForEmptyDataType(?string $dataType)
     {
-        $this->metadataHelper->assertDataType('', 'Test\Class', 'testField');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "data_type" configuration attribute should be specified'
+            . ' for the "testField" field of the "Test\Class" entity.'
+        );
+
+        $this->metadataHelper->assertDataType($dataType, 'Test\Class', 'testField');
+    }
+
+    public function emptyDataTypeDataProvider(): array
+    {
+        return [
+            [''],
+            [null]
+        ];
     }
 
     /**
      * @dataProvider getFormPropertyPathProvider
      */
-    public function testGetFormPropertyPath($expectedPropertyPath, $formOptions, $targetAction)
+    public function testGetFormPropertyPath(?string $expectedPropertyPath, ?array $formOptions, string $targetAction)
     {
         $field = new EntityDefinitionFieldConfig();
         $field->setFormOptions($formOptions);
@@ -51,43 +63,43 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFormPropertyPathProvider()
+    public function getFormPropertyPathProvider(): array
     {
         return [
             [
                 null,
                 null,
-                ApiActions::CREATE
+                ApiAction::CREATE
             ],
             [
                 null,
                 null,
-                ApiActions::UPDATE
-            ],
-            [
-                null,
-                ['data_class' => 'Test\Class'],
-                ApiActions::CREATE
+                ApiAction::UPDATE
             ],
             [
                 null,
                 ['data_class' => 'Test\Class'],
-                ApiActions::UPDATE
+                ApiAction::CREATE
+            ],
+            [
+                null,
+                ['data_class' => 'Test\Class'],
+                ApiAction::UPDATE
             ],
             [
                 'test',
                 ['property_path' => 'test'],
-                ApiActions::CREATE
+                ApiAction::CREATE
             ],
             [
                 'test',
                 ['property_path' => 'test'],
-                ApiActions::UPDATE
+                ApiAction::UPDATE
             ],
             [
                 null,
                 ['property_path' => 'test'],
-                ApiActions::GET
+                ApiAction::GET
             ]
         ];
     }
@@ -102,7 +114,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
@@ -118,7 +130,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
@@ -134,7 +146,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::CREATE
+            ApiAction::CREATE
         );
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
@@ -150,7 +162,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::UPDATE
+            ApiAction::UPDATE
         );
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
@@ -166,7 +178,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             $propertyMetadata,
             $fieldName,
             $field,
-            ApiActions::GET
+            ApiAction::GET
         );
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }

@@ -1,30 +1,21 @@
-parameters:
-    oro_entity_extend.entity_metadata_builder.class:            Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder
-    oro_entity_extend.entity_metadata_builder.relations.class:  Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder
-    oro_entity_extend.entity_metadata_builder.indices.class:    Oro\Bundle\EntityExtendBundle\ORM\IndexMetadataBuilder
-    oro_entity_extend.listener.entity_listener.class:           Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
-    oro_entity_extend.manager.multi_enum_entity.class:          Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager
-
 services:
     oro_entity_extend.entity_metadata_builder:
-        class: '%oro_entity_extend.entity_metadata_builder.class%'
+        class: Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder
         arguments:
             - '@oro_entity_config.provider.extend'
-
-    oro_entity_extend.link.entity_metadata_builder:
-        tags:
-            - { name: oro_service_link, service: oro_entity_extend.entity_metadata_builder }
+            - !tagged_iterator oro_entity_extend.entity_metadata_builder
 
     oro_entity_extend.entity_metadata_builder.relations:
-        class: '%oro_entity_extend.entity_metadata_builder.relations.class%'
+        class: Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.db_id_name_generator'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity_extend.entity_metadata_builder, priority: 10 }
 
     oro_entity_extend.entity_metadata_builder.indices:
-        class: '%oro_entity_extend.entity_metadata_builder.indices.class%'
+        class: Oro\Bundle\EntityExtendBundle\ORM\IndexMetadataBuilder
         arguments:
             - '@oro_entity_config.provider.extend'
             - '@oro_entity_extend.db_id_name_generator'
@@ -32,15 +23,17 @@ services:
             - { name: oro_entity_extend.entity_metadata_builder, priority: 20 }
 
     oro_entity_extend.listener.entity_listener:
-        class: '%oro_entity_extend.listener.entity_listener.class%'
+        class: Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
         arguments:
-            - '@oro_entity_extend.link.entity_metadata_builder'
-            - '@oro_entity_extend.manager.multi_enum_entity'
+            - '@oro_entity_extend.entity_metadata_builder'
             - '@annotation_reader'
             - '@oro_entity_config.provider.extend'
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
-            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
 
-    oro_entity_extend.manager.multi_enum_entity:
-        class: '%oro_entity_extend.manager.multi_enum_entity.class%'
+    oro_entity_extend.listener.save_multi_enum_entity_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\SaveMultiEnumEntityListener
+        arguments:
+            - '@Doctrine\Inflector\Inflector'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }

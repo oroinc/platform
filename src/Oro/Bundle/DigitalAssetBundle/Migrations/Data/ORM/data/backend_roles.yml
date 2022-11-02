@@ -1,0 +1,4 @@
+ROLE_CATALOG_MANAGER:
+    permissions:
+        entity|Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset: [CREATE_SYSTEM, VIEW_SYSTEM, EDIT_SYSTEM, DELETE_SYSTEM]
+        action|oro_search: [EXECUTE]

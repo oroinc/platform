@@ -12,9 +12,6 @@ interface BlockTypeInterface
      *
      * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the block.
-     *
-     * @param BlockBuilderInterface $builder
-     * @param Options               $options
      */
     public function buildBlock(BlockBuilderInterface $builder, Options $options);
 
@@ -27,10 +24,6 @@ interface BlockTypeInterface
      * A view of a block is built before the views of the child blocks are built.
      * This means that you cannot access child views in this method. If you need
      * to do so, move your logic to {@link finishView()} instead.
-     *
-     * @param BlockView      $view
-     * @param BlockInterface $block
-     * @param Options        $options
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options);
 
@@ -44,9 +37,6 @@ interface BlockTypeInterface
      * been built and finished and can be accessed. You should only implement
      * such logic in this method that actually accesses child views. For everything
      * else you are recommended to implement {@link buildView()} instead.
-     *
-     * @param BlockView      $view
-     * @param BlockInterface $block
      */
     public function finishView(BlockView $view, BlockInterface $block);
 

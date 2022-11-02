@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
+/**
+ * Helper to work with associations
+ */
 class AssociationTypeHelper extends ConfigTypeHelper
 {
     /** @var EntityClassResolver */
@@ -15,10 +18,6 @@ class AssociationTypeHelper extends ConfigTypeHelper
     /** @var array */
     protected $owningSideEntities = [];
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
     {
         parent::__construct($configManager);
@@ -60,7 +59,7 @@ class AssociationTypeHelper extends ConfigTypeHelper
             $activitySupport = $dictionaryConfigProvider
                 ->getConfig($className)
                 ->get(GroupingScope::GROUP_DICTIONARY_ACTIVITY_SUPPORT);
-            if ($activitySupport === 'true') {
+            if ($activitySupport === true) {
                 return true;
             }
         }

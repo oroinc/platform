@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Filters a mailbox datagrid by organizations the current user has permissions to update
+ * if the "email" feature is enabled.
+ */
 class MailboxGridListener implements FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
@@ -19,25 +24,18 @@ class MailboxGridListener implements FeatureToggleableInterface
 
     const PATH_UPDATE_LINK_DIRECT_PARAMS = '[properties][update_link][direct_params]';
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param Registry  $doctrine
-     * @param AclHelper $aclHelper
-     */
-    public function __construct(Registry $doctrine, AclHelper $aclHelper)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
         $this->doctrine = $doctrine;
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * @param PreBuild $event
-     */
     public function onPreBuild(PreBuild $event)
     {
         if (!$this->isFeaturesEnabled()) {
@@ -63,8 +61,6 @@ class MailboxGridListener implements FeatureToggleableInterface
 
     /**
      * Mailbox grids have to be manually filtered because mailbox access is determined by access to different entity.
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {
@@ -103,12 +99,12 @@ class MailboxGridListener implements FeatureToggleableInterface
     protected function getAuthorisedOrganizationIds()
     {
         /** @var EntityManager $manager */
-        $manager = $this->doctrine->getManagerForClass('OroOrganizationBundle:Organization');
+        $manager = $this->doctrine->getManagerForClass(Organization::class);
 
         $qb = $manager->createQueryBuilder();
 
         $qb->select('o.id')
-            ->from('OroOrganizationBundle:Organization', 'o');
+            ->from(Organization::class, 'o');
 
         $query = $qb->getQuery();
 

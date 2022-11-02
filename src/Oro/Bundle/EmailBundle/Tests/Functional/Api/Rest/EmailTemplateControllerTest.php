@@ -2,24 +2,22 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailTemplateControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 
-        $this->loadFixtures(
-            [
-                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData'
-            ]
-        );
+        $this->loadFixtures([LoadEmailTemplateData::class]);
     }
 
     public function testGetWithoutParams()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates')
         );
@@ -30,7 +28,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGet()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName
@@ -44,8 +42,10 @@ class EmailTemplateControllerTest extends WebTestCase
 
     public function testGetNonSystemNoEntity()
     {
-        $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        /** @var EmailTemplate $template */
+        $template = $this->getReference('emailTemplate3');
+        $entityName = str_replace('\\', '_', $template->getEntityName());
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -56,13 +56,26 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(1, $result);
+        $this->assertEquals(
+            [
+                [
+                    'id'          => $template->getId(),
+                    'name'        => $template->getName(),
+                    'is_system'   => $template->getIsSystem(),
+                    'is_editable' => $template->getIsEditable(),
+                    'content'     => $template->getContent(),
+                    'entity_name' => $template->getEntityName(),
+                    'type'        => $template->getType()
+                ]
+            ],
+            $result
+        );
     }
 
     public function testGetNonSystemEntity()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -79,7 +92,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetSystemNonEntity()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -97,7 +110,7 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $reference = $this->getReference('emailTemplate3');
         $entityName = str_replace('\\', '_', $reference->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -108,7 +121,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(12, $result);
+        $this->assertCount(13, $result);
     }
 
     /**
@@ -127,7 +140,7 @@ class EmailTemplateControllerTest extends WebTestCase
             ->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -137,7 +150,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('body', $data);
         $this->assertArrayHasKey('subject', $data);
         $this->assertArrayHasKey('type', $data);
@@ -156,7 +169,7 @@ class EmailTemplateControllerTest extends WebTestCase
             ->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -166,7 +179,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('body', $data);
         $this->assertArrayHasKey('subject', $data);
         $this->assertArrayHasKey('type', $data);
@@ -178,7 +191,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetCompiledEmailTemplateNoEntityFound()
     {
         $emailTemplate = $this->getReference('emailTemplate2');
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -188,7 +201,27 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 404);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('message', $data);
+    }
+
+    /**
+     * Check that server returns 422 HTTP error when failed to compile email template
+     */
+    public function testGetCompiledEmailCompileFailed()
+    {
+        $emailTemplate = $this->getReference(LoadEmailTemplateData::SYSTEM_FAIL_TO_COMPILE);
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => 1]
+            )
+        );
+
+        $data = $this->getJsonResponseContent($this->client->getResponse(), 422);
+
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('reason', $data);
     }
 }

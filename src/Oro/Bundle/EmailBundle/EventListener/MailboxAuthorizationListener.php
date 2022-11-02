@@ -2,31 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Verifies the access to current organization against update permission. If not granted, throws
+ * access denied response to user.
+ */
 class MailboxAuthorizationListener
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    protected ManagerRegistry $registry;
 
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    protected AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
+    protected TokenAccessorInterface $tokenAccessor;
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     */
     public function __construct(
         ManagerRegistry $registry,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -39,10 +35,8 @@ class MailboxAuthorizationListener
 
     /**
      * Filters requests to MailboxController.
-     *
-     * @param FilterControllerEvent $event
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
 
@@ -80,18 +74,12 @@ class MailboxAuthorizationListener
         }
     }
 
-    /**
-     * @return OrganizationRepository
-     */
-    protected function getOrganizationRepository()
+    protected function getOrganizationRepository(): OrganizationRepository
     {
         return $this->registry->getRepository('OroOrganizationBundle:Organization');
     }
 
-    /**
-     * @return MailboxRepository
-     */
-    protected function getMailboxRepository()
+    protected function getMailboxRepository(): MailboxRepository
     {
         return $this->registry->getRepository('OroEmailBundle:Mailbox');
     }

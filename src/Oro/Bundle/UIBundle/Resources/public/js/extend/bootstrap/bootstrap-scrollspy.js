@@ -1,28 +1,28 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var MutationObserver = window.MutationObserver;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const MutationObserver = window.MutationObserver;
 
-    var NAME = 'scrollspy';
-    var DATA_KEY = 'bs.scrollspy';
-    var EVENT_KEY = '.' + DATA_KEY;
-    var DATA_API_KEY = '.data-api';
-    var NAV_LINKS = '.nav > a';
-    var Event = {
+    const NAME = 'scrollspy';
+    const DATA_KEY = 'bs.scrollspy';
+    const EVENT_KEY = '.' + DATA_KEY;
+    const DATA_API_KEY = '.data-api';
+    const NAV_LINKS = '.nav > a';
+    const Event = {
         LOAD_DATA_API: 'load' + EVENT_KEY + DATA_API_KEY
     };
-    var Selector = {
+    const Selector = {
         DATA_SPY: '[data-spy="scroll"]'
     };
 
     require('bootstrap-scrollspy');
 
-    var ScrollSpy = $.fn[NAME].Constructor;
-    var JQUERY_NO_CONFLICT = $.fn[NAME].noConflict();
+    const ScrollSpy = $.fn[NAME].Constructor;
+    const JQUERY_NO_CONFLICT = $.fn[NAME].noConflict();
 
-    var OroScrollSpy = function OroScrollSpy(element, options) {
+    const OroScrollSpy = function OroScrollSpy(element, options) {
         ScrollSpy.call(this, element, options);
 
         this._selector += ', ' + this._config.target + ' ' + NAV_LINKS;
@@ -31,8 +31,8 @@ define(function(require) {
             return;
         }
 
-        var $element = $(element);
-        var $collection = $element.is('body') ? $element.children() : $element;
+        const $element = $(element);
+        const $collection = $element.is('body') ? $element.children() : $element;
 
         this._mutationObserver = new MutationObserver(_.debounce(function(mutations) {
             // Destroy scrollspy if element is not exist in the DOM
@@ -67,14 +67,14 @@ define(function(require) {
                 this._mutationObserver = null;
             }
 
-            return ScrollSpy.prototype.dispose.apply(this, arguments);
+            return ScrollSpy.prototype.dispose.call(this);
         }
     });
 
     OroScrollSpy._jQueryInterface = function _jQueryInterface(config) {
         return this.each(function() {
-            var data = $(this).data(DATA_KEY);
-            var _config = typeof config === 'object' && config;
+            let data = $(this).data(DATA_KEY);
+            const _config = typeof config === 'object' && config;
 
             if (!data) {
                 data = new OroScrollSpy(this, _config);
@@ -106,10 +106,10 @@ define(function(require) {
     });
 
     $(window).off(Event.LOAD_DATA_API).on(Event.LOAD_DATA_API, function() {
-        var scrollSpys = $.makeArray($(Selector.DATA_SPY));
+        const scrollSpys = $.makeArray($(Selector.DATA_SPY));
 
-        for (var i = scrollSpys.length; i--;) {
-            var $spy = $(scrollSpys[i]);
+        for (let i = scrollSpys.length; i--;) {
+            const $spy = $(scrollSpys[i]);
 
             ScrollSpy._jQueryInterface.call($spy, $spy.data());
         }

@@ -18,10 +18,6 @@ class CryptedDataTransformerFactory implements CryptedDataTransformerFactoryInte
      */
     private $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     * @param LoggerInterface $logger
-     */
     public function __construct(SymmetricCrypterInterface $crypter, LoggerInterface $logger)
     {
         $this->logger = $logger;

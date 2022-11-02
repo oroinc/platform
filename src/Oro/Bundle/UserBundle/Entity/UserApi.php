@@ -61,7 +61,7 @@ class UserApi implements UserApiKeyInterface
      */
     public function isEnabled()
     {
-        return $this->getUser()->getOrganizations()->contains($this->getOrganization());
+        return $this->getUser()->isBelongToOrganization($this->getOrganization());
     }
 
     /**

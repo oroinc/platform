@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
+/**
+ * Interface for import/export processors aware of the name of the entity they are responsible for processing.
+ */
 interface EntityNameAwareInterface
 {
     /**
@@ -9,5 +12,5 @@ interface EntityNameAwareInterface
      *
      * @param string $entityName
      */
-    public function setEntityName($entityName);
+    public function setEntityName(string $entityName): void;
 }

@@ -1,19 +1,94 @@
-oro_sidebar_widget_api:
-    resource: Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController
-    type: rest
-    prefix: api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version: latest
+#
+# OLD REST API ROUTES
+#
 
-oro_sidebar_state_api:
-    resource: Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController
-    type: rest
-    prefix: api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+oro_api_cget_sidebarwidgets:
+    path: '/api/rest/{version}/sidebarwidgets/{placement}.{_format}'
+    methods: [GET]
     defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController::cgetAction'
+        _format: json
         version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_sidebarwidgets:
+    path: '/api/rest/{version}/sidebarwidgets/{placement}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_post_sidebarwidgets:
+    path: '/api/rest/{version}/sidebarwidgets.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_sidebarwidgets:
+    path: '/api/rest/{version}/sidebarwidgets/{widgetId}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        widgetId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_sidebarwidgets:
+    path: '/api/rest/{version}/sidebarwidgets/{widgetId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        widgetId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_sidebars:
+    path: '/api/rest/{version}/sidebars/{position}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_post_sidebars:
+    path: '/api/rest/{version}/sidebars.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_sidebars:
+    path: '/api/rest/{version}/sidebars/{stateId}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        stateId: \d+
+        _format: json
+        version: latest|v1

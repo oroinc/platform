@@ -15,10 +15,6 @@ class EntityHierarchyProvider extends AbstractEntityHierarchyProvider
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider)
     {
         parent::__construct($doctrineHelper);

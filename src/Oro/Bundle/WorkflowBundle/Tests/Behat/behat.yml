@@ -3,16 +3,15 @@ oro_behat_extension:
     OroWorkflowBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroWorkflowBundle::FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\WorkflowBundle\Tests\Behat\Context\FeatureContext
       paths:
         - '@OroWorkflowBundle/Tests/Behat/Features'
 
   elements:
     Workflow Page Title:
       selector: 'div.top-row h1, h1.page-title span.page-title__text'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Workflow Transition Form:
       selector: 'form[name="oro_workflow_transition"]'
@@ -35,7 +34,7 @@ oro_behat_extension:
         mapping:
           Name: 'label'
           Position: 'order'
-          
+
     Workflow Transition Edit Info Form:
       selector: 'div[id="transition-form"] form'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
@@ -61,12 +60,10 @@ oro_behat_extension:
           Label: 'label'
 
     Workflow System Label:
-      selector: 'div.badge:contains("System") i.fa-circle'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '.badge:contains("System") i.fa-circle'
 
     Workflow Readonly Label:
-      selector: 'div.badge:contains("Read-only") i.fa-circle'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '.badge:contains("Read-only") i.fa-circle'
 
     User Role View Workflow Permissions:
       selector:
@@ -76,4 +73,3 @@ oro_behat_extension:
 
     Default Step Dropdown:
       selector: 'label:contains("Default step") + .controls > .select2-container > a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

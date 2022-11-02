@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityId;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
@@ -17,7 +18,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     /** @var NormalizeParentEntityId */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +47,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
 
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -56,13 +57,14 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(123, $this->context->getParentId());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessForInvalidParentId()
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
 
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -78,6 +80,27 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
                     ->setInnerException(new \Exception('some error'))
             ],
             $this->context->getErrors()
+        );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForNotResolvedParentId()
+    {
+        $this->context->setParentClassName('Test\Class');
+        $this->context->setParentId('test');
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
+
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with($this->context->getParentId(), self::identicalTo($this->context->getParentMetadata()))
+            ->willReturn(null);
+
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getParentId());
+        self::assertEquals(
+            ['parentId' => new NotResolvedIdentifier('test', 'Test\Class')],
+            $this->context->getNotResolvedIdentifiers()
         );
     }
 }

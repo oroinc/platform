@@ -16,8 +16,8 @@ class ProcessorIterator implements \Iterator
     /** @var ApplicableCheckerInterface */
     protected $applicableChecker;
 
-    /** @var ProcessorFactoryInterface */
-    protected $processorFactory;
+    /** @var ProcessorRegistryInterface */
+    protected $processorRegistry;
 
     /** @var int */
     protected $index;
@@ -25,22 +25,16 @@ class ProcessorIterator implements \Iterator
     /** @var int */
     protected $maxIndex;
 
-    /**
-     * @param array                      $processors
-     * @param ContextInterface           $context
-     * @param ApplicableCheckerInterface $applicableChecker
-     * @param ProcessorFactoryInterface  $processorFactory
-     */
     public function __construct(
         array $processors,
         ContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorFactoryInterface $processorFactory
+        ProcessorRegistryInterface $processorRegistry
     ) {
         $this->processors = $processors;
         $this->context = $context;
         $this->applicableChecker = $applicableChecker;
-        $this->processorFactory = $processorFactory;
+        $this->processorRegistry = $processorRegistry;
     }
 
     /**
@@ -55,8 +49,6 @@ class ProcessorIterator implements \Iterator
 
     /**
      * Replaces existing applicable checker.
-     *
-     * @param ApplicableCheckerInterface $applicableChecker
      */
     public function setApplicableChecker(ApplicableCheckerInterface $applicableChecker)
     {
@@ -118,21 +110,15 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): ProcessorInterface
     {
-        $processorId = $this->processors[$this->index][0];
-        $processor = $this->processorFactory->getProcessor($processorId);
-        if (null === $processor) {
-            throw new \RuntimeException(\sprintf('The processor "%s" does not exist.', $processorId));
-        }
-
-        return $processor;
+        return $this->processorRegistry->getProcessor($this->processors[$this->index][0]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->nextApplicable();
     }
@@ -140,7 +126,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->index;
     }
@@ -148,7 +134,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->index <= $this->maxIndex;
     }
@@ -156,7 +142,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->index = -1;
         $this->maxIndex = \count($this->processors) - 1;

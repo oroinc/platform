@@ -3,7 +3,7 @@ define(function() {
     'use strict';
 
     /** @exports persistentStorage */
-    var persistentStorage;
+    let persistentStorage;
 
     try {
         // test localStorage
@@ -84,7 +84,7 @@ define(function() {
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             hasOwnProperty: function(sKey) {
                 return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))

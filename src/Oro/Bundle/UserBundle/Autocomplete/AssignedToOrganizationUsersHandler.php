@@ -50,8 +50,6 @@ class AssignedToOrganizationUsersHandler extends UserSearchHandler
 
     /**
      * Apply limitation by current organization
-     *
-     * @param Query $query
      */
     protected function addOrganizationLimits(Query $query)
     {

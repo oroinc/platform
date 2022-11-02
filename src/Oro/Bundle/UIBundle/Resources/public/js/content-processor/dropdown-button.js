@@ -1,14 +1,20 @@
-define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
+    require('jquery-ui/widget');
 
     /**
      * Converts buttons sequence from container to group with main buttons
      * and rest buttons in dropdown
      */
-    $.widget('oroui.dropdownButtonProcessor', {
+    $.widget('oroui.dropdownButtonProcessor', _.extend({}, stickyElementMixin, {
         options: {
             separator: '.separator-btn',
-            includeButtons: '.btn, .divider, .dropdown-menu>li>*',
+            includeButtons: '.btn, .divider, .dropdown-divider, .dropdown-menu>li>*',
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             useMainButtonsClone: false,
@@ -27,20 +33,25 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         dropdown: null,
 
         _create: function() {
+            this._togglerId = _.uniqueId('dropdown-toggle-');
             // replaces button's separators
-            this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
+            this.element
+                .find(this.options.separator)
+                .replaceWith('<div class="dropdown-divider" aria-hidden="true"></div>');
 
             this._renderButtons();
         },
 
         _destroy: function() {
+            this.disposeSticky();
+
             delete this.group;
             delete this.main;
             delete this.dropdown;
         },
 
         _renderButtons: function() {
-            var $elems = this._collectButtons();
+            let $elems = this._collectButtons();
             if ($elems.length <= 1) {
                 this._removeDropdownMenu();
                 return;
@@ -58,12 +69,28 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             // pushes rest buttons to dropdown
             $elems = $elems.not(this.group);
             if ($elems.length > this.options.minItemQuantity) {
-                this.group.append(this._moreButton());
+                const $moreButton = this._moreButton();
+                this.group.append($moreButton);
+
+                this.initializeSticky({
+                    $stickyElement: $moreButton,
+                    stickyOptions: this.options.stickyOptions
+                });
+
                 $elems = this.dropdown = this._dropdownMenu($elems);
             }
             this.group.append($elems);
 
             this.element.find('.btn-group').remove().end().prepend(this.group);
+        },
+
+        /**
+         * Checks if the button processor has grouped buttons
+         *
+         * @return {boolean}
+         */
+        isGrouped: function() {
+            return Boolean(this.group);
         },
 
         /**
@@ -89,7 +116,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @private
          */
         _mainButtons: function($buttons) {
-            var $main = $buttons.filter(this.options.mainButtons);
+            let $main = $buttons.filter(this.options.mainButtons);
             if (!$main.length) {
                 $main = $buttons.first();
             }
@@ -104,15 +131,20 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @private
          */
         _moreButton: function() {
-            var $button = $('<a href="#"/>');
+            const $button = $('<a></a>');
             $button
                 .attr($.extend({
+                    'id': this._togglerId,
+                    'href': '#',
                     'role': 'button',
+                    'aria-label': __('oro.ui.dropdown_option_aria_label'),
+                    'aria-haspopup': true,
+                    'aria-expanded': false,
                     'data-toggle': 'dropdown',
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
                 }, this.options.moreButtonAttrs))
-                .addClass('btn dropdown-toggle')
+                .addClass('btn dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel);
 
@@ -128,7 +160,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          */
         _dropdownMenu: function($buttons) {
             return $('<ul></ul>', {
-                'class': 'dropdown-menu'
+                'class': 'dropdown-menu',
+                'role': 'menu',
+                'aria-labelledby': this._togglerId
             }).append(this._prepareButtons($buttons));
         },
 
@@ -141,11 +175,18 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         _prepareMainButton: function($main) {
             $main = $main.clone(true);
             if (this.options.truncateLength) {
-                var self = this;
+                const self = this;
                 // set text value string
                 $main.contents().each(function() {
                     if (this.nodeType === Node.TEXT_NODE) {
-                        this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
+                        const text = this.nodeValue.trim();
+                        const shortText = text.substring(0, self.options.truncateLength);
+                        if (shortText !== text) {
+                            this.parentNode.setAttribute('title', text);
+                            this.parentNode
+                                .setAttribute('aria-label', __('oro.ui.dropdown_main_btn_prefix') + ' ' + text);
+                            this.nodeValue = shortText + '\u2026';
+                        }
                     }
                 });
             }
@@ -153,12 +194,13 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _prepareButtons: function($buttons) {
+            $buttons.filter(':not(.dropdown-divider)').addClass('dropdown-item');
             return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).addClass('dropdown-item').wrap('<li></li>').parent();
+                }).wrap('<li role="menuitem"></li>').parent();
         }
-    });
+    }));
 
     return $;
 });

@@ -1,11 +1,13 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% extends '@OroUI/actions/index.html.twig' %}
 
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set pageTitle = 'oro.integration.integration.entity_plural_label'|trans %}
 {% set gridName  = 'oro-integration-grid' %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_integration_create') %}
         {{ UI.addButton({
             'path': path('oro_integration_create'),

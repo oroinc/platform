@@ -2,295 +2,168 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
-use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
-use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
-use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
+use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
 use Oro\Component\Config\CumulativeResourceManager;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const ROOT_NODE_NAME = 'test_root_node';
-    const ROOT_NODE_OPERATION = 'operations';
+    use TempDirExtension;
 
-    const BUNDLE1 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1';
-    const BUNDLE2 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2';
-    const BUNDLE3 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3';
+    private const DEFAULT_CONFIG_FOR_OPERATION = [
+        'routes' => [],
+        'replace' => [],
+        'applications' => [],
+        'groups' => [],
+        'for_all_entities' => false,
+        'entities' => [],
+        'exclude_entities' => [],
+        'for_all_datagrids' => false,
+        'datagrids' => [],
+        'exclude_datagrids' => [],
+        'order' => 0,
+        'enabled' => true,
+        'page_reload' => true,
+        'attributes' => [],
+        'button_options' => [
+            'page_component_options' => [],
+            'data' => []
+        ],
+        'frontend_options' => [
+            'options' => [],
+            'title_parameters' => [],
+            'show_dialog' => true
+        ],
+        'datagrid_options' => [
+            'mass_action' => [],
+            'data' => []
+        ],
+        'preactions' => [],
+        'form_init' => [],
+        'actions' => [],
+        'preconditions' => [],
+        'conditions' => []
+    ];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationListConfiguration */
-    protected $definitionConfiguration;
+    private string $cacheFile;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationConfigurationValidator */
-    protected $definitionConfigurationValidator;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
-    protected $cacheProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->definitionConfiguration = $this->createMock(OperationListConfiguration::class);
-        $this->definitionConfigurationValidator = $this->createMock(OperationConfigurationValidator::class);
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
-    }
+        $container = $this->createMock(Container::class);
+        $container->expects($this->any())
+            ->method('getParameterBag')
+            ->willReturn(new ParameterBag());
 
-    public function testGetActionConfigurationWithCache()
-    {
-        $config = ['test' => 'config'];
+        $this->cacheFile = $this->getTempFile('ActionConfigurationProvider');
 
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn($config);
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
+        $bundle3 = new TestBundle3();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2),
+                $bundle3->getName() => get_class($bundle3)
+            ]);
 
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            [],
-            [],
-            self::ROOT_NODE_NAME
+        $this->configurationProvider = new ConfigurationProvider(
+            $this->cacheFile,
+            false,
+            $container
         );
-
-        $this->assertEquals($config, $configurationProvider->getConfiguration());
     }
 
-    public function testWarmUpCache()
+    public function testGetConfigurationWithCache()
     {
-        $this->assertConfigurationCacheBuilt();
-
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            [self::BUNDLE1 => ['test_action' => ['label' => 'Test Action']]],
-            [self::BUNDLE1],
-            self::ROOT_NODE_NAME
-        );
-
-        $configurationProvider->warmUpCache();
-    }
-
-    public function testWarmUpResourceCache()
-    {
-        $bundles = [
-            'TestBundle1' => self::BUNDLE1,
-            'TestBundle2' => self::BUNDLE2,
+        $cachedConfig = [
+            'operations' => [],
+            'action_groups' => []
         ];
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
-        $temporaryContainer = new ContainerBuilder();
-        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
-
-        $this->definitionConfiguration->expects($this->once())
-            ->method('processConfiguration')
-            ->willReturnArgument(0);
-
-        $this->cacheProvider->expects($this->once())
-            ->method('save')
-            ->with(
-                self::ROOT_NODE_OPERATION,
-                [
-                    'test_operation1' => ['label' => 'Test Operation 1'],
-                    'test_operation2' => ['label' => 'Test Operation 2'],
-                    'test_operation4' => ['label' => 'Test Operation 4']
-                ]
-            );
-
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            [],
-            $bundles,
-            self::ROOT_NODE_OPERATION
-        );
-
-        $configurationProvider->warmUpResourceCache($temporaryContainer);
-
-        $resources = $temporaryContainer->getResources();
-        $this->assertCount(1, $resources);
+        $this->assertEquals($cachedConfig, $this->configurationProvider->getConfiguration());
     }
 
-    public function testClearCache()
+    public function testGetConfigurationWithoutCache()
     {
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            [],
-            [],
-            self::ROOT_NODE_NAME
-        );
+        $config = $this->configurationProvider->getConfiguration();
 
-        $this->cacheProvider->expects($this->once())
-            ->method('delete')
-            ->with(self::ROOT_NODE_NAME);
-
-        $configurationProvider->clearCache();
-    }
-
-    public function testGetActionConfigurationWithIgnoreCache()
-    {
-        $config = [
-            'action1' => [
-                'label' => 'Label1',
-            ],
-        ];
-
-        $this->cacheProvider->expects($this->never())->method('fetch');
-        $this->cacheProvider->expects($this->never())->method('save');
-
-        $this->definitionConfiguration->expects($this->once())
-            ->method('processConfiguration')
-            ->willReturnCallback(function ($config) {
-                return $config;
-            });
-
-        $this->definitionConfigurationValidator->expects($this->once())
-            ->method('validate')
-            ->with($config);
-
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            [self::BUNDLE1 => $config],
-            [self::BUNDLE1],
-            self::ROOT_NODE_NAME
-        );
-
-        $this->assertEquals($config, $configurationProvider->getConfiguration(true));
-    }
-
-    /**
-     * @dataProvider getActionConfigurationDataProvider
-     *
-     * @param array $rawConfig
-     * @param array $expected
-     */
-    public function testGetActionConfigurationWithoutCache(array $rawConfig, array $expected)
-    {
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(false);
-
-        $this->assertConfigurationCacheBuilt();
-
-        $configurationProvider = new ConfigurationProvider(
-            new ConfigurationLoader(),
-            $this->definitionConfiguration,
-            $this->definitionConfigurationValidator,
-            $this->cacheProvider,
-            $rawConfig,
-            [self::BUNDLE1, self::BUNDLE2, self::BUNDLE3],
-            self::ROOT_NODE_NAME
-        );
-
-        $configs = $configurationProvider->getConfiguration();
-
-        $this->assertInternalType('array', $configs);
-        $this->assertEquals($expected, $configs);
-    }
-
-    /**
-     * @return array
-     */
-    public function getActionConfigurationDataProvider()
-    {
-        return [
-            [
-                [
-                    self::BUNDLE1 => [
-                        'test_action1' => [
-                            'label' => 'Test Action1',
-                            'replace' => ['test'],
-                            'routes' => ['test_route_bundle1']
-                        ],
-                        'test_action2' => [
-                            'extends' => 'test_action1'
-                        ],
-                        'test_action4' => [
-                            'label' => 'Test Action1',
-                            'some_config' => [
-                                'sub_config1' => 'data1',
-                                'sub_config2' => 'data2',
-                                'sub_config3' => 'data3',
-                            ],
-                            'message' => 'custom value with %%percent escaped string%% parameter'
-                        ]
-                    ],
-                    self::BUNDLE2 => [
-                        'test_action1' => [
-                            'replace' => ['routes'],
-                        ],
-                        'test_action4' => [
-                            'label' => 'Test Action4',
-                            'some_config' => [
-                                'replace' => ['sub_config1', 'sub_config3'],
-                                'sub_config3' => 'replaced data',
-                            ],
-                            'custom key with %%percent escaped string%% parameter' => 'value'
-                        ]
-                    ],
-                    self::BUNDLE3 => [
-                        'test_action1' => [
-                            'replace' => ['routes'],
-                            'routes' => ['test_route_bundle3']
-                        ],
-                        'test_action2' => [
-                            'label' => 'Test Action2 Bundle3',
-                            'extends' => 'test_action1',
-                        ],
-                        'test_action3' => [
-                            'extends' => 'test_action2',
-                            'routes' => ['test_route_bundle3_new']
-                        ]
-                    ]
-                ],
-                [
-                    'test_action1' => [
-                        'label' => 'Test Action1',
-                        'routes' => ['test_route_bundle3']
-                    ],
-                    'test_action2' => [
-                        'label' => 'Test Action2 Bundle3',
-                        'routes' => ['test_route_bundle3']
-                    ],
-                    'test_action4' => [
-                        'label' => 'Test Action4',
-                        'some_config' => ['sub_config2' => 'data2', 'sub_config3' => 'replaced data'],
+        $expectedActionOperations = [
+            'test_action1' => array_merge(self::DEFAULT_CONFIG_FOR_OPERATION, [
+                'label' => 'Test Action1',
+                'routes' => ['test_route_bundle3']
+            ]),
+            'test_action2' => array_merge(self::DEFAULT_CONFIG_FOR_OPERATION, [
+                'label' => 'Test Action2 Bundle3',
+                'routes' => ['test_route_bundle3']
+            ]),
+            'test_action4' => array_merge(self::DEFAULT_CONFIG_FOR_OPERATION, [
+                'label' => 'Test Action4',
+                'button_options' => [
+                    'page_component_options' => [],
+                    'data' => [
                         'message' => 'custom value with %percent escaped string% parameter',
                         'custom key with %percent escaped string% parameter' => 'value'
-                    ],
-                    'test_action3' => [
-                        'label' => 'Test Action2 Bundle3',
-                        'routes' => ['test_route_bundle3', 'test_route_bundle3_new']
+                    ]
+                ],
+                'datagrid_options' => [
+                    'mass_action' => [],
+                    'data' => [
+                        'sub_config2' => 'data2',
+                        'sub_config3' => 'replaced data'
+                    ]
+                ]
+            ]),
+            'test_action3' => array_merge(self::DEFAULT_CONFIG_FOR_OPERATION, [
+                'label' => 'Test Action2 Bundle3',
+                'routes' => ['test_route_bundle3', 'test_route_bundle3_new']
+            ])
+        ];
+        $this->assertEquals($expectedActionOperations, $config['operations']);
+
+        $expectedActionGroups = [
+            'group1' => [
+                'parameters' => [
+                    '$.data' => [
+                        'type' => 'Oro\Bundle\TestBundle\Entity\Test',
+                        'default' => true
+                    ]
+                ],
+                'conditions' => [
+                    '@gt' => ['$updatedAt', '$.date']
+                ],
+                'actions' => [
+                    [
+                        '@assign_value' => ['$expired', true]
+                    ]
+                ]
+            ],
+            'group2' => [
+                'parameters' => [
+                    '$.date' => [
+                        'type' => 'DateTime',
+                        'message' => 'No data specified!'
+                    ]
+                ],
+                'conditions' => [
+                    '@gt' => ['$updatedAt', '$.date']
+                ],
+                'actions' => [
+                    [
+                        '@assign_value' => ['$expired', true]
                     ]
                 ]
             ]
         ];
-    }
-
-    protected function assertConfigurationCacheBuilt()
-    {
-        $this->cacheProvider->expects($this->once())
-            ->method('save')
-            ->with(self::ROOT_NODE_NAME)
-            ->willReturn(true);
-
-        $this->definitionConfiguration->expects($this->once())
-            ->method('processConfiguration')
-            ->willReturnCallback(function (array $configs) {
-                return $configs;
-            });
-
-        $this->definitionConfigurationValidator->expects($this->once())->method('validate');
+        $this->assertEquals($expectedActionGroups, $config['action_groups']);
     }
 }

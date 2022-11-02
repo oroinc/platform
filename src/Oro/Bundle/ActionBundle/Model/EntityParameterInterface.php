@@ -4,9 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 interface EntityParameterInterface extends ParameterInterface
 {
-    /**
-     * @param array $entityAcl
-     */
     public function setEntityAcl(array $entityAcl);
 
     /**

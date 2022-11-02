@@ -6,12 +6,8 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\BooleanParameterFilter;
 
 class BooleanParameterFilterTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @dataProvider filterDataProvider
-     *
-     * @param $expected
-     * @param $rawValue
      */
     public function testFilter($expected, $rawValue)
     {

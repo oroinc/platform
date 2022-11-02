@@ -9,14 +9,13 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowDefinitionTranslationFieldsIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Updates workflow related translations after a workflow is created, updated or deleted.
+ */
 class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
 {
-    /** @var TranslationManager */
-    private $translationManager;
+    private TranslationManager $translationManager;
 
-    /**
-     * @param TranslationManager $translationManager
-     */
     public function __construct(TranslationManager $translationManager)
     {
         $this->translationManager = $translationManager;
@@ -25,7 +24,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WorkflowEvents::WORKFLOW_AFTER_CREATE => 'ensureTranslationKeys',
@@ -34,11 +33,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param WorkflowChangesEvent $changesEvent
-     * @throws \InvalidArgumentException
-     */
-    public function ensureTranslationKeys(WorkflowChangesEvent $changesEvent)
+    public function ensureTranslationKeys(WorkflowChangesEvent $changesEvent): void
     {
         $newWorkflowDefinitionFields = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
         foreach ($newWorkflowDefinitionFields as $translationKey => $value) {
@@ -47,11 +42,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $this->translationManager->flush();
     }
 
-    /**
-     * @param WorkflowChangesEvent $changesEvent
-     * @throws \LogicException
-     */
-    public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
+    public function clearTranslationKeys(WorkflowChangesEvent $changesEvent): void
     {
         $originalDefinition = $changesEvent->getOriginalDefinition();
 
@@ -64,8 +55,10 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
 
         $newKeys = [];
         foreach ($updatedDefinitionKeys as $newTranslationKey) {
-            $this->ensureTranslationKey($newTranslationKey);
-            $newKeys[] = $newTranslationKey;
+            if ($newTranslationKey) {
+                $this->ensureTranslationKey($newTranslationKey);
+                $newKeys[] = $newTranslationKey;
+            }
         }
 
         $oldKeys = array_values(iterator_to_array($previousDefinitionKeys));
@@ -76,11 +69,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $this->translationManager->flush();
     }
 
-    /**
-     * @param WorkflowChangesEvent $workflowChangesEvent
-     * @throws \InvalidArgumentException
-     */
-    public function deleteTranslationKeys(WorkflowChangesEvent $workflowChangesEvent)
+    public function deleteTranslationKeys(WorkflowChangesEvent $workflowChangesEvent): void
     {
         $deletedDefinition = new WorkflowDefinitionTranslationFieldsIterator($workflowChangesEvent->getDefinition());
 
@@ -90,18 +79,12 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $this->translationManager->flush();
     }
 
-    /**
-     * @param string $key
-     */
-    private function ensureTranslationKey($key)
+    private function ensureTranslationKey(string $key): void
     {
         $this->translationManager->findTranslationKey($key, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 
-    /**
-     * @param string $key
-     */
-    private function removeTranslationKey($key)
+    private function removeTranslationKey(string $key): void
     {
         $this->translationManager->removeTranslationKey($key, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }

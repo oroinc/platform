@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Form type for global fields of system configuration.
+ * The form type that is a container for system configuration fields.
  */
 class FormFieldType extends AbstractType
 {
@@ -24,16 +24,16 @@ class FormFieldType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'target_field_options' => [],
-                'use_parent_field_options' => [],
-                'target_field_type' => TextType::class,
-                'target_field_alias' => 'text',
-                'resettable'           => true,
-                'parent_checkbox_label' => ''
-            ]
-        );
+        $resolver->setDefaults([
+            'target_field_type'        => TextType::class,
+            'target_field_alias'       => 'text',
+            'target_field_options'     => [],
+            'resettable'               => true,
+            'use_parent_field_label'   => '',
+            'use_parent_field_options' => [],
+            'value_hint'               => null,
+            'translatable_value_hint'  => true
+        ]);
 
         // adds same class for config with "resettable: true", as have config with "resettable: false"
         $resolver->setNormalizer('attr', function (Options $options, $attr) {
@@ -41,11 +41,10 @@ class FormFieldType extends AbstractType
                 $attr = [];
             }
 
-            if (!isset($attr['class'])) {
-                $attr['class'] = '';
-            }
-
-            $attr['class'] = sprintf('%s control-group-%s', $attr['class'], $options['target_field_alias']);
+            $additionalCssClass = 'control-group-' . $options['target_field_alias'];
+            $attr['class'] = !empty($attr['class'])
+                ? sprintf('%s %s', $attr['class'], $additionalCssClass)
+                : $additionalCssClass;
 
             return $attr;
         });
@@ -56,28 +55,28 @@ class FormFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $useParentOptions = $options['use_parent_field_options'];
-        $useParentType    = ParentScopeCheckbox::class;
-        if (!$options['resettable']) {
+        $resettable = $options['resettable'];
+        if ($resettable) {
+            $useParentType = ParentScopeCheckbox::class;
+            $useParentOptions = $options['use_parent_field_options'];
+            $useParentOptions['label'] = $options['use_parent_field_label'];
+        } else {
+            $useParentType = HiddenType::class;
             $useParentOptions = ['data' => 0];
-            $useParentType    = HiddenType::class;
         }
-        $useParentOptions['label'] = $options['parent_checkbox_label'];
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
 
-        if ($options['resettable']) {
+        if ($resettable) {
             $this->addFieldDisableListeners($builder);
         }
     }
 
     /**
-     * Add listeners that disable fields according to the state of `use_parent_scope_value` checkbox
-     *
-     * @param FormBuilderInterface $builder
+     * Adds listeners that disable fields according to the state of "use_parent_scope_value" checkbox.
      */
-    protected function addFieldDisableListeners(FormBuilderInterface $builder)
+    private function addFieldDisableListeners(FormBuilderInterface $builder): void
     {
         // Initially disable/enable 'value' field depending on the checkbox 'use_parent_scope_value'
         $builder->addEventListener(
@@ -86,8 +85,7 @@ class FormFieldType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
                 $parentValueDisabled = $form->get('value')->getConfig()->getOption('disabled');
-                $disabled = isset($data['use_parent_scope_value']) ? $data['use_parent_scope_value'] : false;
-                $disabled = $disabled || $parentValueDisabled;
+                $disabled = ($data['use_parent_scope_value'] ?? false) || $parentValueDisabled;
                 FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
                 if ($parentValueDisabled) {
                     FormUtils::replaceField($form, 'use_parent_scope_value', ['disabled' => $disabled]);
@@ -99,27 +97,22 @@ class FormFieldType extends AbstractType
         $builder->get('use_parent_scope_value')->addEventListener(
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
-                $form = $event->getForm()->getParent();
-                $disabled = $event->getForm()->getData();
-                FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
+                $form = $event->getForm();
+                FormUtils::replaceField($form->getParent(), 'value', ['disabled' => (bool)$form->getData()]);
             }
         );
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['value_field_only'] = empty($options['resettable']) && empty($options['label']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
+        if (!empty($options['value_hint'])) {
+            $view->vars['value_hint'] = $options['value_hint'];
+            $view->vars['translatable_value_hint'] = $options['translatable_value_hint'];
+        }
     }
 
     /**

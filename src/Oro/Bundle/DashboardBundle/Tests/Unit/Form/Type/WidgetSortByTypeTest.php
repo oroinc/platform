@@ -9,12 +9,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetSortByTypeTest extends TypeTestCase
 {
-    /**
-     * @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
 
@@ -22,7 +20,7 @@ class WidgetSortByTypeTest extends TypeTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     protected function getExtensions()
     {
@@ -31,7 +29,7 @@ class WidgetSortByTypeTest extends TypeTestCase
         ];
     }
 
-    public function testSubmitValidData()
+    public function testSubmitValidData(): void
     {
         $fields = [
             [
@@ -50,16 +48,17 @@ class WidgetSortByTypeTest extends TypeTestCase
             'className' => 'TestClass',
         ];
 
-        $this->fieldProvider->expects($this->any())
-            ->method('getFields')
+        $this->fieldProvider->expects(self::any())
+            ->method('getEntityFields')
             ->with('TestClass')
-            ->will($this->returnValue($fields));
+            ->willReturn($fields);
 
         $form = $this->factory->create(WidgetSortByType::class, null, ['class_name' => 'TestClass']);
         $form->submit($formData);
 
-        $this->assertTrue($form->isValid());
-        $this->assertEquals(
+        self::assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals(
             $formData,
             $form->getData()
         );

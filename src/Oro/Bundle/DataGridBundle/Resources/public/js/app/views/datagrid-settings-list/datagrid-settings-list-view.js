@@ -1,43 +1,43 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsListView;
-    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings.html');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @class DatagridSettingsListView
      * @extends BaseView
      */
-    DatagridSettingsListView = BaseView.extend({
+    const DatagridSettingsListView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'dropdown-menu',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="datagrid-settings-select-all"]': 'onSelectAll',
             'click [data-role="datagrid-settings-unselect-all"]': 'onUnselectAll',
-            'click [data-role="datagrid-settings-reset"]': 'reset'
+            'click [data-role="datagrid-settings-reset"]': 'reset',
+            'click [data-role="close"]': 'closeDropdown'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change:renderable collection': 'onRenderableChange',
@@ -45,25 +45,25 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DatagridSettingsListView() {
-            DatagridSettingsListView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListView(options) {
+            DatagridSettingsListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DatagridSettingsListView.__super__.initialize.call(this, options);
-            this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
+            this.filterer = options.columnFilterModel.filterer.bind(options.columnFilterModel);
             // to handle renderable change at once for multiple changes
             this.onRenderableChange = _.debounce(this.onRenderableChange, 0);
             this.listenTo(options.columnFilterModel, 'change', this.updateView);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsListView.__super__.render.call(this);
@@ -75,20 +75,36 @@ define(function(require) {
          * Update filter view from its state
          */
         updateView: function() {
-            var models = this._getFilteredModels();
-            var hasUnrenderable = Boolean(_.find(models, function(model) {
+            const models = this._getFilteredModels();
+            const hasUnrenderable = Boolean(_.find(models, function(model) {
                 return !model.get('renderable');
             }));
-            var hasRenderable = Boolean(_.find(models, function(model) {
+            const hasRenderable = Boolean(_.find(models, function(model) {
                 return model.get('renderable');
             }));
-            var hasChanged = Boolean(_.find(models, function(model) {
+            const hasChanged = Boolean(_.find(models, function(model) {
                 return model.get('renderable') !== model.get('metadata').renderable;
             }));
+            const actions = [{
+                $el: this.$('[data-role="datagrid-settings-select-all"]'),
+                toApply: !hasUnrenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-unselect-all"]'),
+                toApply: !hasRenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-reset"]'),
+                toApply: !hasChanged
+            }];
 
-            this.$('[data-role="datagrid-settings-select-all"]').toggleClass('disabled', !hasUnrenderable);
-            this.$('[data-role="datagrid-settings-unselect-all"]').toggleClass('disabled', !hasRenderable);
-            this.$('[data-role="datagrid-settings-reset"]').toggleClass('disabled', !hasChanged);
+            for (const {$el, toApply} of actions) {
+                $el.toggleClass('disabled', toApply);
+
+                if ($el.is(':button')) {
+                    $el.attr('disabled', toApply);
+                } else {
+                    $el.attr('aria-disabled', toApply);
+                }
+            }
 
             this.toggleWholeSelectButtons(hasUnrenderable);
         },
@@ -106,13 +122,13 @@ define(function(require) {
          * Fix view height
          */
         adjustListHeight: function() {
-            var windowHeight = $(window).height();
-            var $wrapper = this.$('[data-role="datagrid-settings-table-wrapper"]');
-            var $footerHeight = (this.$('[data-role="datagrid-settings-footer"]').outerHeight() || 0) +
+            const windowHeight = $(window).height();
+            const $wrapper = this.$('[data-role="datagrid-settings-table-wrapper"]');
+            const $footerHeight = (this.$('[data-role="datagrid-settings-footer"]').outerHeight() || 0) +
                 this.getUIDialogActionHeight() +
                 this.getDropdownBottomInnerOffset();
-            var rect = $wrapper[0].getBoundingClientRect();
-            var margin = (this.$('[data-role="datagrid-settings-table"]').outerHeight(true) - rect.height) / 2;
+            const rect = $wrapper[0].getBoundingClientRect();
+            const margin = (this.$('[data-role="datagrid-settings-table"]').outerHeight(true) - rect.height) / 2;
 
             $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 120) + 'px');
         },
@@ -122,7 +138,7 @@ define(function(require) {
          * @returns {Number}
          */
         getUIDialogActionHeight: function() {
-            var $actions = this.$el.closest('.ui-dialog').find('.ui-dialog-buttonpane');
+            const $actions = this.$el.closest('.ui-dialog').find('.ui-dialog-buttonpane');
 
             return $actions.length ? $actions.outerHeight() : 0;
         },
@@ -132,7 +148,7 @@ define(function(require) {
          * @returns {Number}
          */
         getDropdownBottomInnerOffset: function() {
-            var $dropdown = this.$el.closest('.dropdown-menu');
+            const $dropdown = this.$el.closest('.dropdown-menu');
 
             return parseInt($dropdown.length
                 ? window.getComputedStyle($dropdown.get(0), null).getPropertyValue('padding-bottom')
@@ -198,6 +214,13 @@ define(function(require) {
             return _.filter(this.collection.filter(this.filterer), function(model) {
                 return !model.get('disabledVisibilityChange');
             });
+        },
+
+        /**
+         * Extra handler for close dropdown
+         */
+        closeDropdown: function() {
+            this.$el.trigger('tohide.bs.dropdown');
         }
     });
 

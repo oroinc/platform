@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\ContextHelper;
@@ -17,9 +17,6 @@ class SimpleContextAggregator implements ContextAggregatorInterface
     /** @var ContextRegistry */
     protected $contextRegistry;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;

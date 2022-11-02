@@ -19,10 +19,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new AttributeGroupListener(new SlugGenerator());
         $this->em = $this->createMock(EntityManagerInterface::class);
@@ -33,7 +30,8 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
         $group = new AttributeGroupStub(1, 'label');
         $group->setCode('some-code');
 
-        $this->em->expects($this->never())->method('getRepository');
+        $this->em->expects($this->never())
+            ->method('getRepository');
 
         $eventArgs = new LifecycleEventArgs($group, $this->em);
         $this->listener->prePersist($group, $eventArgs);
@@ -55,9 +53,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
     ) {
         $eventArgs = new LifecycleEventArgs($group, $this->em);
 
-        $repository = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
 
         $repository->expects($this->exactly(count($repositoryArgs)))
             ->method('findOneBy')
@@ -73,10 +69,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCodeSlug, $group->getCode());
     }
 
-    /**
-     * @return array
-     */
-    public function prePersistDataProvider()
+    public function prePersistDataProvider(): array
     {
         $group1 = new AttributeGroupStub(1, 'проверка транслитерации!');
         $group1->setAttributeFamily((new AttributeFamily())->setCode('group1Family'));

@@ -27,11 +27,6 @@ class NestedAssociationType extends AbstractType
     /** @var EntityLoader */
     protected $entityLoader;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param DoctrineHelper            $doctrineHelper
-     * @param EntityLoader              $entityLoader
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         DoctrineHelper $doctrineHelper,
@@ -60,7 +55,8 @@ class NestedAssociationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false])
+            ->setDefault('compound', false)
+            ->setDefault('multiple', true)
             ->setRequired(['metadata', 'config'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('config', [EntityDefinitionFieldConfig::class]);

@@ -6,9 +6,12 @@ use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
+/**
+ * The datasource for datagrid that is used to update menu.
+ */
 class MenuUpdateDatasource implements DatasourceInterface
 {
     /** @var BuilderChainProvider */
@@ -20,25 +23,25 @@ class MenuUpdateDatasource implements DatasourceInterface
     /** @var string */
     protected $scopeType;
 
-    /** @var MenuConfiguration */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider */
+    protected $configurationProvider;
 
     /**
      * @param BuilderChainProvider  $chainProvider
      * @param MenuManipulator       $menuManipulator
      * @param string                $scopeType
-     * @param MenuConfiguration    $menuConfiguration
+     * @param ConfigurationProvider $configurationProvider
      */
     public function __construct(
         BuilderChainProvider $chainProvider,
         MenuManipulator $menuManipulator,
         $scopeType,
-        MenuConfiguration $menuConfiguration
+        ConfigurationProvider $configurationProvider
     ) {
         $this->chainProvider = $chainProvider;
         $this->menuManipulator = $menuManipulator;
         $this->scopeType = $scopeType;
-        $this->menuConfiguration = $menuConfiguration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -60,7 +63,7 @@ class MenuUpdateDatasource implements DatasourceInterface
     {
         $rows = [];
 
-        $tree = $this->menuConfiguration->getTree();
+        $tree = $this->configurationProvider->getMenuTree();
         foreach ($tree as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
             if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {

@@ -16,6 +16,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
+ * Common methods for config grid listeners.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractConfigGridListener
@@ -36,24 +38,14 @@ abstract class AbstractConfigGridListener
     /** @var SystemAwareResolver */
     protected $datagridResolver;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param SystemAwareResolver $datagridResolver
-     */
     public function __construct(ConfigManager $configManager, SystemAwareResolver $datagridResolver)
     {
         $this->configManager    = $configManager;
         $this->datagridResolver = $datagridResolver;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     abstract public function onBuildAfter(BuildAfter $event);
 
-    /**
-     * @param BuildBefore $event
-     */
     abstract public function onBuildBefore(BuildBefore $event);
 
     /**
@@ -157,6 +149,7 @@ abstract class AbstractConfigGridListener
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getDynamicSortersAndFilters(array $orderedFields)
     {
@@ -179,12 +172,12 @@ abstract class AbstractConfigGridListener
 
             if (isset($field['filterable']) && $field['filterable']) {
                 $filters['columns'][$fieldName] = [
-                    'data_name'                => isset($field['expression']) ? $field['expression'] : $fieldName,
-                    'type'                     => isset($field['filter_type']) ? $field['filter_type'] : 'string',
-                    'frontend_type'            => $field['frontend_type'],
-                    'label'                    => $field['label'],
-                    'options'                  => isset($field['filter_options']) ? $field['filter_options'] : [],
-                    FilterUtility::ENABLED_KEY => isset($field['show_filter']) ? $field['show_filter'] : true,
+                    'data_name'                   => $field['expression'] ?? $fieldName,
+                    'type'                        => $field['filter_type'] ?? 'string',
+                    'frontend_type'               => $field['frontend_type'],
+                    'label'                       => $field['label'],
+                    'options'                     => $field['filter_options'] ?? [],
+                    FilterUtility::RENDERABLE_KEY => $field['show_filter'] ?? true,
                 ];
 
                 if (isset($field['choices'])) {
@@ -200,8 +193,6 @@ abstract class AbstractConfigGridListener
     }
 
     /**
-     * @TODO fix adding actions from different scopes such as EXTEND
-     *
      * @param array  $actions
      * @param string $type
      */
@@ -232,10 +223,6 @@ abstract class AbstractConfigGridListener
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param                       $itemType
-     */
     protected function addEntityConfigProperties(DatagridConfiguration $config, $itemType)
     {
         // configure properties from config providers

@@ -35,6 +35,7 @@ class OrmPagerExtension extends AbstractPagerExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         /** @var OrmDatasource $datasource */
+        $this->pager->setDatagrid($datasource->getDatagrid());
         if ($datasource->getCountQb()) {
             $this->pager->setCountQb($datasource->getCountQb(), $datasource->getCountQueryHints());
         }
@@ -55,7 +56,9 @@ class OrmPagerExtension extends AbstractPagerExtension
         if ((!$perPageLimit && $onePage) || $mode === ModeExtension::MODE_CLIENT) {
             // no restrictions applied
             $this->pager->setPage(0);
-            $this->pager->setMaxPerPage(0);
+            $total = $this->pager->computeNbResult() ?? self::SOFT_LIMIT;
+            $this->pager->adjustTotalCount($total);
+            $this->pager->setMaxPerPage($total);
         } elseif ($onePage && $perPageLimit) {
             // one page with limit
             $this->pager->setPage(0);

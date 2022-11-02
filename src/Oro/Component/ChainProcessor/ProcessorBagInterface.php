@@ -9,27 +9,20 @@ interface ProcessorBagInterface
 {
     /**
      * Registers a processor applicable checker.
-     *
-     * @param ApplicableCheckerInterface $checker
-     * @param int                        $priority
      */
-    public function addApplicableChecker(ApplicableCheckerInterface $checker, $priority = 0);
+    public function addApplicableChecker(ApplicableCheckerInterface $checker, int $priority = 0): void;
 
     /**
      * Gets an iterator that can be used to iterate through processors applicable to the given context.
-     *
-     * @param ContextInterface $context
-     *
-     * @return ProcessorIterator
      */
-    public function getProcessors(ContextInterface $context);
+    public function getProcessors(ContextInterface $context): ProcessorIterator;
 
     /**
      * Gets all registered actions.
      *
      * @return string[]
      */
-    public function getActions();
+    public function getActions(): array;
 
     /**
      * Gets all groups registered for the given action.
@@ -39,5 +32,5 @@ interface ProcessorBagInterface
      *
      * @return string[]
      */
-    public function getActionGroups($action);
+    public function getActionGroups(string $action): array;
 }

@@ -2,18 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
 /**
  * This context save behat execution time, all detailed steps can be found at
  * - "Manage Email Feature"
  */
-class EmailFeatureToggleContext extends OroFeatureContext implements KernelAwareContext
+class EmailFeatureToggleContext extends OroFeatureContext
 {
-    use KernelDictionary;
-
     /**
      * @When /^(?:|I )enable Email feature$/
      */
@@ -37,7 +33,7 @@ class EmailFeatureToggleContext extends OroFeatureContext implements KernelAware
      */
     protected function setFeatureState($state, $section, $name)
     {
-        $configManager = $this->getContainer()->get('oro_config.global');
+        $configManager = $this->getAppContainer()->get('oro_config.global');
         $configManager->set(sprintf('%s.%s', $section, $name), $state ? 1 : 0);
         $configManager->flush();
     }

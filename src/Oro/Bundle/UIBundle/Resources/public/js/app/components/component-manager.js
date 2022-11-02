@@ -1,22 +1,22 @@
-define([
-    'require',
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oroui/js/app/components/base/component',
-    'oroui/js/component-shortcuts-manager',
-    'chaplin' // it is a circular dependency, so there's no local variable assigned
-], function(require, $, _, __, tools, BaseComponent, ComponentShortcutsManager) {
+define(function(require) {
     'use strict';
 
-    var console = window.console;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
+
+    const console = window.console;
 
     function ComponentManager($el) {
         this.$el = $el;
         this.components = {};
         this.initPromises = {};
         this._bindContainerChangesEvents();
+        this._bindInitOnEvents();
     }
 
     ComponentManager.prototype = {
@@ -26,17 +26,19 @@ define([
          * Initializes Page Components for DOM element
          *
          * @param {Object?} options
+         * @param {jQuery?} $container
          * @return {Promise}
          */
-        init: function(options) {
+        init(options, $container) {
             this.initOptions = options || {};
 
-            var elements = this._collectElements();
-            var elementsData = this._readElementsData(elements);
+            const elements = this._collectElements($container);
+            const elementsData = this._readElementsData(elements);
+            this._bindReferentialInitOnEvents($container);
 
             // collect nested elements' data
-            _.each(elementsData, function(data) {
-                data.subElementsData = _.filter(elementsData, function(subElementData) {
+            elementsData.forEach(data => {
+                data.subElementsData = elementsData.filter(subElementData => {
                     return data.options._sourceElement.has(subElementData.options._sourceElement).length;
                 });
             });
@@ -45,17 +47,16 @@ define([
             // (nested items have to be initialized first)
             elementsData.reverse();
 
-            var promises = _.map(elementsData, function(data) {
+            const promises = elementsData.map(data => {
                 // collect promises of dependencies
-                data.options._subPromises = _.object(_.map(data.subElementsData, function(subElementData) {
+                data.options._subPromises = Object.fromEntries(data.subElementsData.map(subElementData => {
                     return [subElementData.options.name, subElementData.promise];
                 }));
                 return (data.promise = this._loadAndInitializeComponent(data));
-            }, this);
-
-            return $.when.apply($, _.compact(promises)).then(function() {
-                return _.compact(arguments);
             });
+
+            return $.when(...promises.filter(Boolean))
+                .then((...args) => args.filter(Boolean));
         },
 
         /**
@@ -63,79 +64,142 @@ define([
          *  - on 'content:changed' event -- updates layout
          *  - on 'content:remove' event -- disposes related components (if they are left undisposed)
          *
-         * @protected
+         * @private
          */
-        _bindContainerChangesEvents: function() {
-            var self = this;
-
+        _bindContainerChangesEvents() {
             // if the container catches content changed event -- updates its layout
-            this.$el.on('content:changed' + this.eventNamespace, _.bind(function(e) {
-                if (e.isDefaultPrevented()) {
+            this.$el.on('content:changed' + this.eventNamespace, event => {
+                if (event.isDefaultPrevented()) {
                     return;
                 }
-                e.preventDefault();
-                this.init(this.initOptions).done(function() {
-                    $(e.target).trigger('content:initialized');
+                event.preventDefault();
+                this.init(this.initOptions).done(() => {
+                    $(event.target).trigger('content:initialized');
                 });
-            }, this));
+            });
 
             // if the container catches content remove event -- disposes related components
-            this.$el.on('content:remove' + this.eventNamespace, function(e) {
-                if (e.isDefaultPrevented()) {
+            this.$el.on('content:remove' + this.eventNamespace, event => {
+                if (event.isDefaultPrevented()) {
                     return;
                 }
-                e.preventDefault();
-                $(e.target).find('[data-bound-component]').each(function() {
-                    var component = self.findComponent(this);
-                    if (component) {
-                        component.dispose();
-                    }
+                event.preventDefault();
+                $(event.target).find('[data-bound-component]').toArray().forEach(el => {
+                    Object.values(this.components).forEach(item => {
+                        if (item.el === el) {
+                            item.component.dispose();
+                        }
+                    });
                 });
             });
         },
 
         /**
-         * Collect all elements that have components declaration from current layout
+         * Bind suspended initialization handler on DOM-events
          *
-         * @returns {Array.<jQuery>} elements
-         * @protected
+         * @param {string[]} [events=['click', 'mouseover', 'focusin']]
+         * @param {string?} selector
+         * @param {jQuery?} $currentTarget
+         * @private
          */
-        _collectElements: function() {
-            var elements = [];
-            var self = this;
+        _bindInitOnEvents(events = ['click', 'mouseover', 'focusin'], selector, $currentTarget) {
+            const oppositeEvent = {
+                click: null,
+                mouseover: 'mouseout',
+                focusin: 'focusout'
+            };
 
-            var shortcuts = ComponentShortcutsManager.getAll();
-            var selector = _.map(shortcuts, function(shortcut) {
-                return '[' + shortcut.dataAttr + ']';
-            });
-
-            this.$el.find(selector.join(',')).each(function() {
-                var $elem = $(this);
-                if (self._isInOwnLayout($elem)) {
+            const initOnEvent = event => {
+                const $initOnContainer = $currentTarget || $(event.currentTarget);
+                if (!$initOnContainer.attr('data-page-component-init-on')) {
+                    // already initialized on another event (when init-on has several events at once click,focusin
                     return;
                 }
+                $initOnContainer.removeAttr('data-page-component-init-on');
+                const tempNS = _.uniqueId('.tempEventNS');
+                const oppositeEventName = oppositeEvent[event.type];
+                const $target = $(event.target);
+                if (oppositeEventName) {
+                    // listen to opposite event, and once it occurs -- invalidate initial event
+                    $target.one(oppositeEventName + tempNS, () => event = null);
+                }
+                // add initial event to options, to make it available for handlers execution of the dispatched event
+                const initOptions = Object.assign({}, this.initOptions, {
+                    get _initEvent() {
+                        return event;
+                    }
+                });
+                this.init(initOptions, $initOnContainer)
+                    .done(() => {
+                        $target.off(tempNS);
+                    });
+            };
 
-                var elemData = $elem.data();
-                _.each(shortcuts, function(shortcut) {
-                    var dataKey = shortcut.dataKey;
-                    var dataAttr = shortcut.dataAttr;
-                    if (elemData[dataKey] === undefined) {
+            events.forEach(eventName => {
+                this.$el[selector ? 'one' : 'on'](
+                    `${eventName}${this.eventNamespace}`,
+                    selector || `[data-page-component-init-on*="${eventName}"]`,
+                    initOnEvent
+                );
+            });
+        },
+
+        /**
+         * @param {jQuery?} $container
+         * @private
+         */
+        _bindReferentialInitOnEvents($container) {
+            ($container || this.$el).find('[data-page-component-init-on]')
+                .each((i, elem) => {
+                    const $elem = $(elem);
+                    if (!this._isInLayout($elem)) {
+                        return;
+                    }
+                    const value = $elem.attr('data-page-component-init-on').trim();
+                    const [, events, selector] = value.match(/^((?:click|focusin|mouseover|,)+)\s+(.+)$/) || [];
+                    if (events) {
+                        $elem.attr('data-page-component-init-on', 'bound');
+                        this._bindInitOnEvents(events.split(','), selector, $elem);
+                    }
+                });
+        },
+
+        /**
+         * Collect all elements that have components declaration from current layout
+         *
+         * @param {jQuery?} $container
+         * @returns {Array.<jQuery>} elements
+         * @private
+         */
+        _collectElements($container) {
+            const elements = [];
+
+            const shortcuts = Object.values(ComponentShortcutsManager.getAll());
+            const selector = shortcuts.map(shortcut => `[${shortcut.dataAttr}]`);
+
+
+            ($container || this.$el)
+                .find(selector.join(','))
+                .addBack(selector.join(','))
+                .each((i, elem) => {
+                    const $elem = $(elem);
+                    if (!this._isInLayout($elem) || !this._isReadyToInit($elem)) {
                         return;
                     }
 
-                    var data = ComponentShortcutsManager.getComponentData(shortcut, elemData[dataKey]);
-                    data.pageComponentOptions = $.extend(
-                        true,
-                        data.pageComponentOptions,
-                        $elem.data('pageComponentOptions')
-                    );
-                    $elem.removeAttr(dataAttr)
-                        .removeData(dataKey)
-                        .data(data);
+                    const elemData = $elem.data();
+                    const shortcut = shortcuts.find(shortcut => shortcut.dataKey in elemData);
+
+                    if (shortcut) {
+                        const dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
+                        $elem
+                            .removeAttr(shortcut.dataAttr)
+                            .removeData(shortcut.dataKey)
+                            .data(dataUpdate);
+                    }
 
                     elements.push($elem);
                 });
-            });
 
             return elements;
         },
@@ -145,13 +209,27 @@ define([
          *
          * @param {jQuery} $element
          * @return {boolean}
-         * @protected
+         * @private
          */
-        _isInOwnLayout: function($element) {
+        _isInLayout($element) {
             // find nearest marked container with separate layout
-            var $separateLayout = $element.parents('[data-layout="separate"]:first');
-            // collects container elements from current layout
-            return $separateLayout.length && _.contains($separateLayout.parents(), this.$el[0]);
+            const $layoutElement = $element.parent().closest('[data-layout="separate"]', this.$el);
+            return $layoutElement.is(this.$el);
+        },
+
+        /**
+         * Check if the declaration of component on the element is ready to be initialized
+         *  - filter out elements with components that have to be initialized on DOM event (click, focusin, mouseover)
+         *
+         * @param {jQuery} $element
+         * @return {boolean}
+         * @private
+         */
+        _isReadyToInit($element) {
+            const $initOnContainer = $element.closest('[data-page-component-init-on]', this.$el);
+
+            return !$initOnContainer.length || !this._isInLayout($initOnContainer) ||
+                $initOnContainer.is('[data-page-component-init-on="asap"]');
         },
 
         /**
@@ -159,11 +237,11 @@ define([
          *
          * @param {Array.<jQuery>} elements
          * @returns {Array.<{element: jQuery, module: string, options: Object}>}
-         * @protected
+         * @private
          */
-        _readElementsData: function(elements) {
-            return _.compact(_.map(elements, function($elem) {
-                var data;
+        _readElementsData(elements) {
+            const elementsData = elements.map($elem => {
+                let data;
                 try {
                     data = this._readData($elem);
                     data.element = $elem;
@@ -175,7 +253,9 @@ define([
                 this._cleanupData(data.element);
 
                 return data;
-            }, this));
+            }).filter(Boolean);
+
+            return elementsData;
         },
 
         /**
@@ -183,10 +263,10 @@ define([
          *
          * @param {jQuery} $elem
          * @throws {Error}
-         * @protected
+         * @private
          */
-        _readData: function($elem) {
-            var data = {
+        _readData($elem) {
+            const data = {
                 module: $elem.data('pageComponentModule'),
                 options: $.extend(true, {}, this.initOptions, $elem.data('pageComponentOptions'))
             };
@@ -212,14 +292,15 @@ define([
          * Cleanup trace of data attributes in the DOM element
          *
          * @param {jQuery} $elem
-         * @protected
+         * @private
          */
-        _cleanupData: function($elem) {
+        _cleanupData($elem) {
             $elem
                 .removeData('pageComponentModule')
                 .removeData('pageComponentOptions')
                 .removeAttr('data-page-component-module')
-                .removeAttr('data-page-component-options');
+                .removeAttr('data-page-component-options')
+                .removeAttr('data-page-component-init-on');
         },
 
         /**
@@ -227,20 +308,20 @@ define([
          *
          * @param {{element: jQuery, module: string, options: Object}} data
          * @returns {Promise}
-         * @protected
+         * @private
          */
-        _loadAndInitializeComponent: function(data) {
-            var initDeferred = $.Deferred();
+        _loadAndInitializeComponent(data) {
+            const initDeferred = $.Deferred();
 
-            tools.loadModules(data.module)
+            loadModules(data.module)
                 .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
-                .catch(this._onRequireJsError.bind(this, initDeferred));
+                .catch(this._onComponentLoadError.bind(this, initDeferred));
 
-            var initPromise = initDeferred
+            const initPromise = initDeferred
                 .promise(Object.create({targetData: data}))
-                .always(function() {
+                .always(() => {
                     delete this.initPromises[data.options.name];
-                }.bind(this));
+                });
 
             this.initPromises[data.options.name] = {promise: initPromise, dependsOn: []};
 
@@ -255,16 +336,16 @@ define([
          * @param {jQuery.Deferred} initDeferred
          * @param {Object} options
          * @param {Function} Component
-         * @protected
+         * @private
          */
-        _onComponentLoaded: function(initDeferred, options, Component) {
+        _onComponentLoaded(initDeferred, options, Component) {
             if (this.disposed) {
                 initDeferred.resolve();
                 return;
             }
 
-            var message;
-            var name = options.name;
+            let message;
+            const name = options.name;
 
             if (this.components.hasOwnProperty(name)) {
                 message = 'Component with the name "' + name + '" is already registered in the layout';
@@ -275,9 +356,9 @@ define([
                 return;
             }
 
-            var dependencies = this._getComponentDependencies(Component, options);
+            let dependencies = this._getComponentDependencies(Component, options);
 
-            if (_.isEmpty(dependencies)) {
+            if (!Object.keys(dependencies).length) {
                 this._initializeComponent(initDeferred, options, Component);
             } else {
                 try {
@@ -289,10 +370,10 @@ define([
                     return;
                 }
 
-                $.when.apply($, _.values(dependencies)).then(function() {
+                $.when(...Object.values(dependencies)).then(() => {
                     options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME] = dependencies;
                     this._initializeComponent(initDeferred, options, Component);
-                }.bind(this));
+                });
             }
         },
 
@@ -302,13 +383,13 @@ define([
          * @param {jQuery.Deferred} initDeferred
          * @param {Object} options
          * @param {BaseComponent|Function} Component
-         * @protected
+         * @private
          */
-        _initializeComponent: function(initDeferred, options, Component) {
-            var name = options.name;
-            var $elem = options._sourceElement;
+        _initializeComponent(initDeferred, options, Component) {
+            const name = options.name;
+            const $elem = options._sourceElement;
 
-            var component = new Component(options);
+            const component = new Component(options);
             if (component instanceof BaseComponent) {
                 this.add(name, component, $elem[0]);
             }
@@ -316,14 +397,28 @@ define([
             if (component.deferredInit) {
                 component.deferredInit
                     .always(initDeferred.resolve.bind(initDeferred))
-                    .fail(function(error) {
-                        var moduleName = $elem.attr('data-bound-component');
-                        var message = 'Initialization has failed for component "' + moduleName + '"';
+                    .fail(error => {
+                        const componentModuleName = $elem.attr('data-bound-component');
+                        const viewModuleName = $elem.attr('data-bound-view');
+                        const widgetName = $elem.attr('data-bound-input-widget');
+                        let notes = [];
                         if (name) {
-                            message += ' (name "' + name + '")';
+                            notes.push(`component name "${name}"`);
                         }
+                        if (viewModuleName) {
+                            notes.push(`view module "${viewModuleName}"`);
+                        }
+                        if (widgetName) {
+                            if (viewModuleName !== 'no-name') {
+                                notes.push(` with widget "${viewModuleName}"`);
+                            } else {
+                                notes.push('with some widget');
+                            }
+                        }
+                        notes = notes.length ? ` (${notes.join(', ')})` : '';
+                        const message = `Initialization has failed for component "${componentModuleName}"${notes}`;
                         this._handleError(message, error);
-                    }.bind(this));
+                    });
             } else {
                 initDeferred.resolve(component);
             }
@@ -336,13 +431,14 @@ define([
          * @param {Object} options configuration options for a Component
          * @return {Object.<string, string>} where key is internal name for component's instance,
          *                                  value is component's name in componentManager
+         * @private
          */
-        _getComponentDependencies: function(Component, options) {
-            var dependencies = BaseComponent.getRelatedSiblingComponentNames(Component);
+        _getComponentDependencies(Component, options) {
+            const dependencies = BaseComponent.getRelatedSiblingComponentNames(Component);
 
             // options can only change componentName of existing dependency, can not make it falsy
-            var updateFromOptions = _.result(options, BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME);
-            _.each(updateFromOptions, function(componentName, dependencyName) {
+            const updateFromOptions = _.result(options, BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME, {});
+            Object.entries(updateFromOptions).forEach(([dependencyName, componentName]) => {
                 if (componentName && dependencies[dependencyName]) {
                     dependencies[dependencyName] = componentName;
                 }
@@ -358,26 +454,26 @@ define([
          * @param {Object.<string, string>} dependencies
          * @throws error on circular dependency
          * @return {Object.<string, BaseComponent|Promise|undefined>}
+         * @private
          */
-        _resolveRelatedSiblings: function(componentName, dependencies) {
-            var deps = _.mapObject(dependencies, function(siblingComponentName, dependencyName) {
+        _resolveRelatedSiblings(componentName, dependencies) {
+            const deps = Object.create({__initial__: dependencies});
+
+            Object.entries(dependencies).forEach(([dependencyName, siblingComponentName]) => {
+                let siblingComponent;
                 if (this.initPromises[siblingComponentName]) {
-                    if (!this._hasCircularDependency(componentName, siblingComponentName)) {
-                        this.initPromises[componentName].dependsOn.push(siblingComponentName);
-                    } else {
-                        throw new Error('The "' + componentName +
-                            '" component has circular dependency of sibling components');
+                    if (this._hasCircularDependency(componentName, siblingComponentName)) {
+                        throw new Error(`"${componentName}" component has circular dependency of sibling components`);
                     }
-                    return this.initPromises[siblingComponentName].promise
-                        .then(function(component) {
-                            return (deps[dependencyName] = component);
-                        });
-                } else if (this.get(siblingComponentName)) {
-                    return this.get(siblingComponentName);
+                    this.initPromises[componentName].dependsOn.push(siblingComponentName);
+                    siblingComponent = this.initPromises[siblingComponentName].promise
+                        .then(component => (deps[dependencyName] = component));
                 } else {
-                    return void 0;
+                    siblingComponent = this.get(siblingComponentName) || void 0;
                 }
-            }, this);
+
+                deps[dependencyName] = siblingComponent;
+            });
 
             return deps;
         },
@@ -388,11 +484,12 @@ define([
          * @param {string} componentName name of depender component
          * @param {string} siblingComponentName name of dependee component
          * @return {boolean}
+         * @private
          */
-        _hasCircularDependency: function(componentName, siblingComponentName) {
-            var name;
-            var checked = [];
-            var queue = [siblingComponentName].concat(this.initPromises[componentName].dependsOn);
+        _hasCircularDependency(componentName, siblingComponentName) {
+            let name;
+            const checked = [];
+            const queue = [siblingComponentName].concat(this.initPromises[componentName].dependsOn);
 
             do {
                 name = queue.pop();
@@ -401,7 +498,7 @@ define([
                 }
                 checked.push(name);
                 if (this.initPromises[name]) {
-                    queue.push.apply(queue, _.difference(this.initPromises[name].dependsOn, checked));
+                    queue.push(..._.difference(this.initPromises[name].dependsOn, checked));
                 }
             } while (queue.length > 0);
 
@@ -413,11 +510,10 @@ define([
          *
          * @param {jQuery.Deferred} initDeferred
          * @param {Error} error
-         * @protected
+         * @private
          */
-        _onRequireJsError: function(initDeferred, error) {
-            var message = 'Cannot load module "' + error.requireModules[0] + '"';
-            this._handleError(message, error);
+        _onComponentLoadError(initDeferred, error) {
+            this._handleError(null, error);
             // prevent interface from blocking by loader
             initDeferred.resolve();
         },
@@ -429,16 +525,13 @@ define([
          *
          * @param {string|null} message
          * @param {Error} error
-         * @protected
+         * @private
          */
-        _handleError: function(message, error) {
-            if (tools.debug) {
-                if (console && console.error) {
-                    console.error.apply(console, _.compact([message, error]));
-                } else {
-                    throw error;
-                }
-            } else if (error) {
+        _handleError(message, error) {
+            if (console && console.error) {
+                console.error(...[message, error].filter(Boolean));
+            }
+            if (!tools.debug) {
                 // if there is unhandled error -- show user message
                 require('chaplin').mediator
                     .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
@@ -450,7 +543,7 @@ define([
          *
          * @param {string} name
          */
-        get: function(name) {
+        get(name) {
             if (name in this.components) {
                 return this.components[name].component;
             } else {
@@ -465,7 +558,7 @@ define([
          * @param {BaseComponent} component to set
          * @param {HTMLElement} el
          */
-        add: function(name, component, el) {
+        add(name, component, el) {
             if (this.disposed) {
                 // in case the manager already disposed -- dispose passed component as well
                 component.dispose();
@@ -476,9 +569,9 @@ define([
                 component: component,
                 el: el
             };
-            component.once('dispose', _.bind(function() {
+            component.once('dispose', () => {
                 delete this.components[name];
-            }, this));
+            });
             return component;
         },
 
@@ -487,8 +580,8 @@ define([
          *
          * @param {string} name component name to remove
          */
-        remove: function(name) {
-            var item = this.components[name];
+        remove(name) {
+            const item = this.components[name];
             delete this.components[name];
             if (item) {
                 item.component.dispose();
@@ -498,16 +591,15 @@ define([
         /**
          * Destroys all linked components
          */
-        removeAll: function() {
-            _.each(this.components, function(item, name) {
-                this.remove(name);
-            }, this);
+        removeAll() {
+            Object.keys(this.components)
+                .forEach(name => this.remove(name));
         },
 
         /**
          * Disposes component manager
          */
-        dispose: function() {
+        dispose() {
             this.$el.off(this.eventNamespace);
             this.removeAll();
             delete this.$el;
@@ -516,28 +608,13 @@ define([
         },
 
         /**
-         * Find component related to the element
-         *
-         * @param {HTMLElement} el
-         * @returns {BaseComponent}
-         */
-        findComponent: function(el) {
-            var item = _.find(this.components, function(item) {
-                return item.el === el;
-            });
-            if (item) {
-                return item.component;
-            }
-        },
-
-        /**
          * Applies callback function to all component in the collection
          *
          * @param {Function} callback
          * @param {Object} context
          */
-        forEachComponent: function(callback, context) {
-            _.each(this.components, function(item) {
+        forEachComponent(callback, context) {
+            Object.values(this.components).forEach(item => {
                 callback.apply(context, [item.component]);
             });
         }

@@ -8,9 +8,9 @@ use Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider;
 class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailBodyEntityNameProvider */
-    protected $emailBodyEntityNameProvider;
+    private $emailBodyEntityNameProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailBodyEntityNameProvider = new EmailBodyEntityNameProvider();
     }
@@ -18,12 +18,12 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameProvider
      */
-    public function testGetName($entity, $expectedResult)
+    public function testGetName(?object $entity, string|bool $expectedResult)
     {
         $this->assertSame($expectedResult, $this->emailBodyEntityNameProvider->getName(null, null, $entity));
     }
 
-    public function getNameProvider()
+    public function getNameProvider(): array
     {
         return [
             'text body' => [
@@ -54,7 +54,7 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameDQLProvider
      */
-    public function testGetNameDQL($className, $expectedResult)
+    public function testGetNameDQL(string $className, string|bool $expectedResult)
     {
         $this->assertSame(
             $expectedResult,
@@ -62,7 +62,7 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getNameDQLProvider()
+    public function getNameDQLProvider(): array
     {
         return [
             'email body' => [

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var DataGridThemeOptionsManager;
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    DataGridThemeOptionsManager = {
+    const DataGridThemeOptionsManager = {
         defaults: {
             optionPrefix: '',
             tagName: '',
@@ -18,14 +17,14 @@ define(function(require) {
         },
 
         createConfigurator: function(gridThemeOptions) {
-            var configurator = _.extend({
+            const configurator = _.extend({
                 gridThemeOptions: gridThemeOptions
             }, this);
-            return _.bind(configurator.configure, configurator);
+            return configurator.configure.bind(configurator);
         },
 
         configure: function(view, options, parentView) {
-            var themeOptions = options.themeOptions = $.extend(
+            const themeOptions = options.themeOptions = $.extend(
                 true,
                 {},
                 this.defaults,
@@ -34,7 +33,7 @@ define(function(require) {
                 this.gridThemeOptions
             );
 
-            var optionPrefix = themeOptions.optionPrefix;
+            const optionPrefix = themeOptions.optionPrefix;
             if (optionPrefix) {
                 _.each(themeOptions, function(value, option) {
                     if (optionPrefix && option.indexOf(optionPrefix) === 0) {
@@ -46,12 +45,12 @@ define(function(require) {
                 });
             }
 
-            _.each(themeOptions, _.bind(function(value, option) {
-                var configurator = option + 'Option';
+            _.each(themeOptions, (value, option) => {
+                const configurator = option + 'Option';
                 if (_.isFunction(this[configurator])) {
                     this[configurator](view, options, value, parentView);
                 }
-            }, this));
+            });
         },
 
         mergeOption: function(view, options, key, value, mergeCallback) {
@@ -64,9 +63,9 @@ define(function(require) {
             }
 
             if (_.isFunction(options[key])) {
-                var oldValueFunction = options[key];
+                const oldValueFunction = options[key];
                 options[key] = function() {
-                    var oldValue = oldValueFunction.call(this);
+                    const oldValue = oldValueFunction.call(this);
                     return mergeCallback(oldValue, value);
                 };
             } else {

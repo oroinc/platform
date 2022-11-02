@@ -10,22 +10,11 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var ButtonSearchContext */
-    protected $buttonSearchContext;
+    private $buttonSearchContext;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->buttonSearchContext = new ButtonSearchContext();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->buttonSearchContext);
     }
 
     public function testProperties()
@@ -43,24 +32,21 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getSetEntityDataProvider
-     *
-     * @param int|string|array $entityId
      */
-    public function testGetSetEntity($entityId)
+    public function testGetSetEntity(mixed $entityId)
     {
         $this->buttonSearchContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonSearchContext->getEntityClass());
         $this->assertSame($entityId, $this->buttonSearchContext->getEntityId());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function getSetEntityDataProvider()
+    public function getSetEntityDataProvider(): array
     {
-        yield 'simple int id' => [10];
-        yield 'simple string id' => [uniqid('', true)];
-        yield 'array id' => [[10, uniqid('', true)]];
+        return [
+            'simple int id' => [10],
+            'simple string id' => [uniqid('', true)],
+            'array id' => [[10, uniqid('', true)]]
+        ];
     }
 
     public function testGetHash()

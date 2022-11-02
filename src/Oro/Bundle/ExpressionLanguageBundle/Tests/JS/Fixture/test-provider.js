@@ -1,27 +1,22 @@
-define(function(require) {
-    'use strict';
+import expressionFunctionProviderInterface
+    from 'oroexpressionlanguage/js/library/expression-function-provider-interface';
+import ExpressionFunction from 'oroexpressionlanguage/js/library/expression-function';
 
-    var ExpressionFunctionProviderInterface =
-        require('oroexpressionlanguage/js/library/expression-function-provider-interface');
-    var ExpressionFunction = require('oroexpressionlanguage/js/library/expression-function');
-
-    function TestProvider() {
-        // nothing to do
+/**
+ * @implements ExpressionFunctionProviderInterface
+ */
+class TestProvider {
+    getFunctions() {
+        return [
+            new ExpressionFunction('identity', function(input) {
+                return input;
+            }, function(values, input) {
+                return input;
+            })
+        ];
     }
+}
 
-    TestProvider.prototype = {
-        getFunctions: function() {
-            return [
-                new ExpressionFunction('identity', function(input) {
-                    return input;
-                }, function(values, input) {
-                    return input;
-                })
-            ];
-        }
-    };
+expressionFunctionProviderInterface.expectToBeImplementedBy(TestProvider.prototype);
 
-    ExpressionFunctionProviderInterface.expectToBeImplementedBy(TestProvider.prototype);
-
-    return TestProvider;
-});
+export default TestProvider;

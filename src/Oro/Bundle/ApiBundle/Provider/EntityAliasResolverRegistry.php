@@ -5,12 +5,14 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry that allows to get the entity alias resolver for a specific request type.
  */
-class EntityAliasResolverRegistry
+class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     /** @var array [[resolver service id, request type expression], ...] */
     private $entityAliasResolvers;
@@ -41,10 +43,6 @@ class EntityAliasResolverRegistry
 
     /**
      * Returns the entity alias resolver that contains entity aliases for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return EntityAliasResolver
      *
      * @throws \LogicException if a entity alias resolver does not exist for the given request type
      */

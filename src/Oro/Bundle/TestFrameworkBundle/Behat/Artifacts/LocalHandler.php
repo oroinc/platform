@@ -5,28 +5,19 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TokenGenerator;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Saves test artifacts to the local filesystem
+ */
 class LocalHandler implements ArtifactsHandlerInterface
 {
-    /**
-     * @var string
-     */
-    protected $directory;
-
-    /**
-     * @var string
-     */
-    protected $baseUrl;
-
-    /**
-     * @var bool
-     */
-    protected $autoClear;
+    private string $directory;
+    private ?string $baseUrl;
 
     public function __construct(array $config)
     {
         $this->directory = rtrim($config['directory'], DIRECTORY_SEPARATOR);
-        $this->baseUrl = trim($config['base_url'], " \t\n\r\0\x0B\\");
-
+        $this->baseUrl = $config['base_url'] ? trim($config['base_url'], " \t\n\r\0\x0B\\") : null;
+        $this->baseUrl = rtrim($this->baseUrl, '/').'/';
         $filesystem = new Filesystem();
         if ($config['auto_clear']) {
             $filesystem->remove($this->directory);
@@ -47,7 +38,11 @@ class LocalHandler implements ArtifactsHandlerInterface
 
         file_put_contents($screenshotName, $file);
 
-        return trim($this->baseUrl, '/').'/'.trim($fileName, '/');
+        if ($this->baseUrl) {
+            return $this->baseUrl.$fileName;
+        }
+
+        return 'file://'.$screenshotName;
     }
 
     /**

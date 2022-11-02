@@ -2,29 +2,28 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider;
+use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
 
 class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $taggableHelper;
+
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
     /** @var TagVirtualRelationProvider */
-    protected $provider;
+    private $provider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
-    protected $taggableHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
-    protected $doctrineHelper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->taggableHelper = $this->createMock(TaggableHelper::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->provider = new TagVirtualRelationProvider(
             $this->taggableHelper,
@@ -35,20 +34,17 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isVirtualRelationProvider
      */
-    public function testIsVirtualRelation($class, $field, $isTaggable, $expected)
+    public function testIsVirtualRelation(string $class, string $field, bool $isTaggable, bool $expected)
     {
         $this->setHelperExpectation($isTaggable);
-        $this->assertEquals($expected, $this->provider->isVirtualRelation($class, $field));
+        $this->assertSame($expected, $this->provider->isVirtualRelation($class, $field));
     }
 
-    /**
-     * @return array
-     */
-    public function isVirtualRelationProvider()
+    public function isVirtualRelationProvider(): array
     {
         return [
-            ['Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable', 'tags_virtual', true, true],
-            ['Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable', 'another_relation', true, false],
+            [Taggable::class, 'tags_virtual', true, true],
+            [Taggable::class, 'another_relation', true, false],
             ['stdClass', 'tags_virtual', false, false]
         ];
     }
@@ -56,32 +52,29 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getVirtualRelationQueryProvider
      */
-    public function testGetVirtualRelationQuery($class, $field, $isTaggable, $expected)
+    public function testGetVirtualRelationQuery(string $class, string $field, bool $isTaggable, array $expected)
     {
         $this->setHelperExpectation($isTaggable);
         $this->assertEquals($expected, $this->provider->getVirtualRelationQuery($class, $field));
     }
 
-    /**
-     * @return array
-     */
-    public function getVirtualRelationQueryProvider()
+    public function getVirtualRelationQueryProvider(): array
     {
         return [
             [
-                'Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable',
+                Taggable::class,
                 'tags_virtual',
-                'true',
+                true,
                 [
                     'join' => [
                         'left' => [
                             [
-                                'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
+                                'join'          => Tagging::class,
                                 'alias'         => 'virtualTagging',
                                 'conditionType' => 'WITH',
-                                'condition'     => "(virtualTagging.entityName = "
+                                'condition'     => '(virtualTagging.entityName = '
                                     . "'Oro\\Bundle\\TagBundle\\Tests\\Unit\\Fixtures\\Taggable' and "
-                                    . "virtualTagging.recordId = entity.id)"
+                                    . 'virtualTagging.recordId = entity.id)'
                             ],
                             [
                                 'join'  => 'virtualTagging.tag',
@@ -91,7 +84,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            ['Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable', 'another_relation', true, []],
+            [Taggable::class, 'another_relation', true, []],
             ['stdClass', 'tags_virtual', false, []]
         ];
     }
@@ -99,35 +92,39 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getVirtualRelationsProvider
      */
-    public function testGetVirtualRelations($class, $isTaggable, $entityIdentifierFieldName, $expected)
-    {
+    public function testGetVirtualRelations(
+        string $class,
+        bool $isTaggable,
+        string $entityIdentifierFieldName,
+        array $expected
+    ) {
         $this->setHelperExpectation($isTaggable, $entityIdentifierFieldName);
         $this->assertEquals($expected, $this->provider->getVirtualRelations($class));
     }
 
-    public function getVirtualRelationsProvider()
+    public function getVirtualRelationsProvider(): array
     {
         return [
             [
-                'Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable',
+                Taggable::class,
                 true,
                 'pkField',
                 [
                     'tags_virtual' => [
                         'label' => 'oro.tag.entity_plural_label',
                         'relation_type' => 'ManyToMany',
-                        'related_entity_name' => 'Oro\Bundle\TagBundle\Entity\Tag',
+                        'related_entity_name' => Tag::class,
                         'target_join_alias' => 'virtualTag',
                         'query' => [
                             'join' => [
                                 'left' => [
                                     [
-                                        'join'          => 'Oro\Bundle\TagBundle\Entity\Tagging',
+                                        'join'          => Tagging::class,
                                         'alias'         => 'virtualTagging',
                                         'conditionType' => 'WITH',
-                                        'condition'     => "(virtualTagging.entityName = "
+                                        'condition'     => '(virtualTagging.entityName = '
                                             . "'Oro\\Bundle\\TagBundle\\Tests\\Unit\\Fixtures\\Taggable' and "
-                                            . "virtualTagging.recordId = entity.pkField)"
+                                            . 'virtualTagging.recordId = entity.pkField)'
                                     ],
                                     [
                                         'join'  => 'virtualTagging.tag',
@@ -148,7 +145,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('virtualTag', $this->provider->getTargetJoinAlias('', ''));
     }
 
-    protected function setHelperExpectation($isTaggable, $entityIdentifierFieldName = 'id')
+    private function setHelperExpectation(bool $isTaggable, string $entityIdentifierFieldName = 'id')
     {
         $this->taggableHelper->expects($this->any())
             ->method('isTaggable')

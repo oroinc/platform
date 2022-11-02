@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_11;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -190,7 +191,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
         $rows = $this->connection->fetchAll($sql);
 
         foreach ($rows as $key => $row) {
-            $type = Type::getType(Type::TARRAY);
+            $type = Type::getType(Types::ARRAY);
             $platform = $this->connection->getDatabasePlatform();
             $data = $type->convertToPHPValue($row['data'], $platform);
 
@@ -201,7 +202,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
                     $data['entity']['icon'] = $newIconName;
 
                     $data = $type->convertToDatabaseValue($data, $platform);
-                    
+
                     $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
                     $params = [$data, $row['id']];
 
@@ -222,7 +223,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
     private function createIconName($name)
     {
         foreach (self::$iconReplaceMask as $pattern => $replace) {
-            $exact = (substr($pattern, -1) === '*' ? '': '$');
+            $exact = str_ends_with($pattern, '*') ? '': '$';
             $pattern = '/' . $pattern . $exact .'/';
             $next = false;
 

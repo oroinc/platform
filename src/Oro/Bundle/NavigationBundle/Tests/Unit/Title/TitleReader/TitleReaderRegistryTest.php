@@ -1,33 +1,12 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
 use Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader\Stub\TitleReaderStub;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
 class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TitleReaderRegistry */
-    private $registry = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
-    {
-        $this->registry = new TitleReaderRegistry();
-    }
-
-    public function testGetTitleReaders()
-    {
-        $this->assertEquals([], $this->registry->getTitleReaders());
-
-        $reader = new TitleReaderStub(['route_name' => 'Route Name']);
-
-        $this->registry->addTitleReader($reader);
-
-        $this->assertSame([$reader], $this->registry->getTitleReaders());
-    }
-
     /**
      * @dataProvider titleReaderProvider
      *
@@ -37,11 +16,9 @@ class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTitleByRoute(array $readers, $routeName, $expectedTitle)
     {
-        foreach ($readers as $reader) {
-            $this->registry->addTitleReader($reader);
-        }
+        $registry = new TitleReaderRegistry($readers);
 
-        $this->assertEquals($expectedTitle, $this->registry->getTitleByRoute($routeName));
+        $this->assertEquals($expectedTitle, $registry->getTitleByRoute($routeName));
     }
 
     /**

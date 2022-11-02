@@ -17,9 +17,6 @@ class WidgetItemsType extends AbstractType
     /** @var EventSubscriberInterface */
     private $itemsSubscriber;
 
-    /**
-     * @param EventSubscriberInterface $itemsSubscriber
-     */
     public function __construct(EventSubscriberInterface $itemsSubscriber)
     {
         $this->itemsSubscriber = $itemsSubscriber;

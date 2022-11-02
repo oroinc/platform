@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
@@ -41,12 +41,12 @@ class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
 
     public function propertiesDataProvider()
     {
-        return array(
+        return [
             ['scope', 'testScope'],
             ['code', 'testCode'],
             ['value', 'testValue'],
             ['entity', new EntityConfigModel()],
             ['field', new FieldConfigModel()],
-        );
+        ];
     }
 }

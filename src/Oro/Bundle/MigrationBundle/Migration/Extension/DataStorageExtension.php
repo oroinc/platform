@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\DataStorageInterface;
 class DataStorageExtension implements DataStorageInterface
 {
     /** @var array */
-    protected $data = [];
+    private $data = [];
 
     /**
      * {@inheritdoc}
@@ -25,7 +25,9 @@ class DataStorageExtension implements DataStorageInterface
      */
     public function get($key, $default = null)
     {
-        return $this->has($key) ? $this->data[$key] : $default;
+        return array_key_exists($key, $this->data)
+            ? $this->data[$key]
+            : $default;
     }
 
     /**
@@ -42,16 +44,5 @@ class DataStorageExtension implements DataStorageInterface
     public function remove($key)
     {
         unset($this->data[$key]);
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @deprecated since 1.9. use {@see set} method instead
-     */
-    public function put($key, $value)
-    {
-        $this->data[$key] = $value;
     }
 }

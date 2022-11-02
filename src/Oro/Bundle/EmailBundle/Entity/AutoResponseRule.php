@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * AutoResponseRule ORM entity.
+ *
  * @ORM\Table(name="oro_email_auto_response_rule")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository")
  */
@@ -24,7 +25,6 @@ class AutoResponseRule
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Assert\NotBlank
      */
     protected $name;
 
@@ -40,7 +40,6 @@ class AutoResponseRule
      *
      * @ORM\ManyToOne(targetEntity="EmailTemplate", cascade={"persist"})
      * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="CASCADE")
-     * @Assert\NotBlank
      */
     protected $template;
 

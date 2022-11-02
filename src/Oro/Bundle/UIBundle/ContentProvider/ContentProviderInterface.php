@@ -2,34 +2,15 @@
 
 namespace Oro\Bundle\UIBundle\ContentProvider;
 
+/**
+ * Represents a service that provides a content for "hash navigation" response.
+ */
 interface ContentProviderInterface
 {
     /**
-     * Get content provider name.
+     * Gets a content.
      *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Get content.
-     *
-     * @return string
+     * @return mixed
      */
     public function getContent();
-
-    /**
-     * Get content provider state.
-     *
-     * @return bool
-     */
-    public function isEnabled();
-
-    /**
-     * Set content provider state.
-     *
-     * @param bool $enabled
-     * @return ContentProviderInterface
-     */
-    public function setEnabled($enabled);
 }

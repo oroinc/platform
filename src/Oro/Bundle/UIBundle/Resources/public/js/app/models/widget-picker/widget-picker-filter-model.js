@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerFilterModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    WidgetPickerFilterModel = BaseModel.extend({
+    const WidgetPickerFilterModel = BaseModel.extend({
         defaults: {
             search: ''
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WidgetPickerFilterModel() {
-            WidgetPickerFilterModel.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerFilterModel(attrs, options) {
+            WidgetPickerFilterModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -21,9 +20,9 @@ define(function(require) {
          * @returns {boolean} true if item included and false otherwise
          */
         filterer: function(item) {
-            var search = this.get('search').toLowerCase();
-            var title = item.get('title').toLowerCase();
-            var description = item.get('description').toLowerCase();
+            const search = this.get('search').toLowerCase();
+            const title = item.get('title').toLowerCase();
+            const description = item.get('description').toLowerCase();
             if (search.length === 0) {
                 return true;
             }

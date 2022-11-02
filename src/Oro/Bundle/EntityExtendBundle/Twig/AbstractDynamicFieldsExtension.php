@@ -3,18 +3,21 @@
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
+/**
+ * Abstract Twig extension for the implementations of the functions to get dynamic fields of entities:
+ *   - oro_get_dynamic_fields
+ *   - oro_get_dynamic_field
+ */
+abstract class AbstractDynamicFieldsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_config_fields';
-
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -26,8 +29,8 @@ abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_get_dynamic_fields', [$this, 'getFields']),
-            new \Twig_SimpleFunction('oro_get_dynamic_field', [$this, 'getField']),
+            new TwigFunction('oro_get_dynamic_fields', [$this, 'getFields']),
+            new TwigFunction('oro_get_dynamic_field', [$this, 'getField']),
         ];
     }
 
@@ -44,12 +47,4 @@ abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
      * @return array
      */
     abstract public function getField($entity, FieldConfigModel $field);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
-    }
 }

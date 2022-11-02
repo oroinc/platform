@@ -27,17 +27,17 @@
         box-shadow: $oro-datagrid-card-sortable-helper-box-shadow;
     }
 
-    &[data-transition-status="error"] {
+    &[data-transition-status='error'] {
         background: $oro-datagrid-card-transition-status-error-background;
         box-shadow: $oro-datagrid-card-transition-status-box-shadow;
     }
 
-    &[data-transition-status="success"].transition-status-just-changed {
+    &[data-transition-status='success'].transition-status-just-changed {
         background: $oro-datagrid-card-transition-status-success-background;
         box-shadow: $oro-datagrid-card-transition-status-box-shadow;
     }
 
-    &[data-transition-status="in_progress"] {
+    &[data-transition-status='in_progress'] {
         background: $oro-datagrid-card-transition-status-in-progress-background;
         box-shadow: $oro-datagrid-card-transition-status-box-shadow;
     }
@@ -56,7 +56,7 @@
 .card-actions {
     position: absolute;
     top: 0;
-    #{$end}: 5px;
+    right: 5px;
 }
 
 .card-amount {

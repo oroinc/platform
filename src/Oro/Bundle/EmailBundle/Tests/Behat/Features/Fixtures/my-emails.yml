@@ -13,7 +13,7 @@ Oro\Bundle\UserBundle\Entity\User:
     username (unique): <username()>
     organization: '@organization'
     organizations: ['@organization']
-    roles: ['@adminRole']
+    userRoles: ['@adminRole']
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email (unique): <email()>
@@ -23,8 +23,7 @@ Oro\Bundle\UserBundle\Entity\User:
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:
     owner: '@userCharlie'
-    email: charlie@sheen.com
-    hasOwner: true
+    email: 'charlie@sheen.com'
 
 Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
   adminEmailOrigin:
@@ -49,12 +48,12 @@ Oro\Bundle\EmailBundle\Entity\Email:
     subject: 'There is no spoon'
     emailBody: '@emailBody1'
     sentAt: '<(new DateTime("2010-10-31"))>'
-    fromName: '"Charlie Sheen" <charlie@sheen.com>'
+    fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
     fromEmailAddress: '@charlieAddress'
     internalDate: '<(new DateTime("2010-10-31"))>'
     messageId: fsdfasdf
     emailUsers: ['@adminEmailUser1']
-  email:
+  email2:
     subject: 'Re: There is no spoon'
     emailBody: '@emailBody2'
     sentAt: '<(new DateTime("2010-11-01"))>'
@@ -62,13 +61,18 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromEmailAddress: '@adminEmailAddress'
     internalDate: '<(new DateTime("2010-11-01"))>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser1']
-
+    emailUsers: ['@adminEmailUser2']
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
   adminEmailUser1:
     email: '@email1'
     receivedAt: '@email1->sentAt'
     owner: '@admin'
+    organization: '@organization'
+    folders: ['@adminEmailFolder']
+  adminEmailUser2:
+    email: '@email2'
+    receivedAt: '@email2->sentAt'
+    owner: '@userCharlie'
     organization: '@organization'
     folders: ['@adminEmailFolder']

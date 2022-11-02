@@ -1,68 +1,35 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
+@import 'base-input';
+
 .input {
-    border-radius: $input-field-border-radius;
-    background-color: $input-background-color;
-    border: $input-border-width solid $input-border-color;
-    font-family: $input-font-family;
-    padding: $input-inner-offset;
-    box-shadow: $input-box-shadow;
-    color: $input-color;
-    margin-bottom: $input-outer-offset-bottom;
-    box-sizing: $input-box-sizing;
-    outline: $input-outline;
-    width: $field-width;
-
-    &:not(textarea) {
-        height: $field-size;
-    }
-
-    &:focus {
-        box-shadow: $input-focus-box-shadow;
-        border-color: $input-focus-border-color;
-
-        &:invalid {
-            &:focus {
-                box-shadow: $input-invalid-focus-box-shadow;
-                border-color: $input-invalid-focus-border-color;
-            }
-        }
-    }
-
-    &:disabled {
-        border-color: $input-disabled-border-color;
-        background-color: $input-disabled-background-color;
-        color: $input-disabled-color;
-        resize: $input-disabled-resize;
-    }
-
-    &.error {
-        border-color: $input-error-border-color;
-        box-shadow: $input-error-box-shadow;
-    }
-
-    .control-group & {
-        margin-bottom: $input-control-group-outer-offset-bottom;
-    }
-
-    @include placeholder {
-        color: $primary-700;
-    }
+    @extend %base-input;
 }
 
 /**
     Uploader uniform
 **/
 .uploader {
+    color: $uploader-color;
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
     border: $input-border-width solid $input-border-color;
     height: $uploader-height;
-    line-height: $uploader-line-height;
-    float: $uploader-float;
+    width: $uploader-width;
+
     white-space: $uploader-white-space;
-    color: $uploader-color;
+    line-height: $uploader-line-height;
     font-family: $uploader-font-family;
+
+    @at-root div#{&} {
+        display: $uploader-display;
+    }
+
+    input {
+        width: $uploader-input-inner-width;
+    }
 
     .filename,
     .action {
@@ -70,16 +37,27 @@
         line-height: $uploader-action-line-height;
         display: $uploader-action-display;
         vertical-align: $uploader-action-vertical-align;
-        padding: $uploader-action-inner-offset;
         box-sizing: $uploader-action-box-sizing;
     }
 
     .filename {
-        width: $uploader-filename-width;
+        padding: $uploader-filename-inner-offset;
+        flex-grow: 1;
+
+        @include text-line-truncate($uploader-filename-width);
     }
 
     .action {
+        width: $uploader-action-width;
+        padding: $uploader-action-inner-offset;
         border-left: $input-border-width solid $input-border-color;
+        flex-shrink: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .clear-search-button {
+        display: none;
     }
 
     &.focus,
@@ -99,37 +77,100 @@
             border-color: $uploader-action-active-border-color;
         }
     }
+
+    &.disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+        resize: $input-disabled-resize;
+    }
+
+    &.error {
+        border-color: $danger-dark;
+
+        .action {
+            border-color: $danger-dark;
+        }
+
+        &.focus,
+        &.hover {
+            border-color: $danger-dark;
+
+            .action {
+                border-color: $danger-dark;
+            }
+        }
+    }
+
+    .validation-failed {
+        padding-top: 4px;
+    }
 }
 
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
-.uneditable-input,
-.selector {
+#{map_get($oro-form-selectors, 'inputs')} {
     @extend .input;
+
+    &.full {
+        width: 100%;
+    }
+}
+
+/*
+    Select multiple
+ */
+select[multiple] {
+    border-radius: $input-field-border-radius;
+    background-color: $input-background-color;
+    color: $input-color;
+    border: $input-border-width solid $input-border-color;
+    font-family: $input-font-family;
+    margin-bottom: $input-outer-offset-bottom;
+    box-sizing: $input-box-sizing;
+    outline: $input-outline;
+    width: $field-width;
+    height: $field-size;
+    padding: $input-inner-offset;
+    vertical-align: top;
+    overflow-y: auto;
+
+    &:focus {
+        border-color: $input-focus-border-color;
+        z-index: 1;
+    }
+
+    &:disabled {
+        color: $input-disabled-color;
+    }
+
+    option {
+        padding: $select-multiple-option-inner-offset;
+        border-radius: $select-multiple-option-border-radius;
+
+        &:not(:last-child) {
+            margin-bottom: $select-multiple-option-not-last-offset-bottom;
+        }
+    }
+
+    td & {
+        margin-bottom: 0;
+    }
+
+    .control-group & {
+        margin-bottom: $input-control-group-outer-offset-bottom;
+    }
 }
 
 /* Select */
 .selector {
     line-height: $selector-line-height;
     height: $selector-height;
-    width: $selector-width;
     border: $selector-border;
     background-color: $selector-background-color;
     border-radius: $selector-border-radius;
     padding: $selector-inner-offset;
+
+    max-width: $selector-max-width;
+    width: $selector-width;
 
     option {
         padding-left: $selector-option-inner-offset-left;
@@ -144,6 +185,7 @@ input[type="color"],
         width: $selector-select-width;
         box-sizing: $selector-select-box-sizing;
         color: $selector-select-color;
+        appearance: none;
     }
 
     span {
@@ -156,15 +198,16 @@ input[type="color"],
         overflow: $selector-uniform-overflow;
         text-overflow: $selector-uniform-text-overflow;
         position: $selector-uniform-position;
+        width: $selector-uniform-width;
 
-        &:after {
-            content: "\f0dd";
+        &::after {
+            content: '\f0dd';
             margin: $selector-uniform-arrow-outer-offset;
             display: $selector-uniform-arrow-display;
             font-size: $base-font-size--m;
             font-family: $selector-uniform-arrow-font-family;
             position: $selector-uniform-arrow-position;
-            #{$end}: $selector-uniform-arrow-right;
+            right: $selector-uniform-arrow-right;
             color: $selector-uniform-arrow-color;
             line-height: $selector-uniform-line-height;
         }
@@ -184,7 +227,7 @@ input[type="color"],
             background-color: $input-disabled-background-color;
             color: $input-disabled-color;
 
-            &:after {
+            &::after {
                 color: $input-disabled-border-color;
             }
         }
@@ -195,16 +238,6 @@ input[type="color"],
             border-color: $input-disabled-border-color;
             background-color: $input-disabled-background-color;
             color: $input-disabled-color;
-        }
-    }
-
-    &.error {
-        span {
-            color: $input-error-color;
-
-            &:after {
-                color: $input-error-border-color;
-            }
         }
     }
 }
@@ -224,8 +257,10 @@ input[type="color"],
         height: $add-on-height;
         width: $add-on-height;
         line-height: $add-on-line-height;
+        text-align: center;
         padding: $add-on-inner-offset;
         display: inline-block;
+        flex-shrink: 0;
 
         input[type='checkbox'],
         input[type='radio'] {
@@ -250,8 +285,9 @@ input[type="color"],
     }
 
     .error & {
-        border-color: $input-error-border-color;
-        color: $input-error-border-color;
+        &:not(.btn-square-light):not(.btn-square-lighter) {
+            border-color: $input-error-border-color;
+        }
     }
 
     .input-append & {
@@ -261,6 +297,10 @@ input[type="color"],
         &:not(:first-of-type) {
             margin-left: $add-on-append-outer-offset-left;
         }
+
+        &:first-child {
+            margin-left: 0;
+        }
     }
 
     .input-prepend & {
@@ -269,6 +309,32 @@ input[type="color"],
 
         &:not(:last-of-type) {
             margin-right: $add-on-prepend-outer-offset-right;
+        }
+    }
+}
+
+.input-append,
+.input-prepend {
+    &.collection-element-primary {
+        .add-on {
+            background: $primary-900;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    .btn {
+        &:focus {
+            border-color: $secondary-100;
+        }
+    }
+
+    &.error {
+        input:not(:focus),
+        .selector:not(.focus) {
+            border-color: $input-error-border-color;
         }
     }
 }
@@ -290,8 +356,8 @@ input[type="color"],
 .entity-select-btn,
 .entity-create-btn {
     &.btn {
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             margin: $entity-create-btn-icon-offset;
             vertical-align: $entity-create-btn-icon-vertical-align;
         }
@@ -303,54 +369,87 @@ input[type="color"],
     }
 }
 
-.form-horizontal .control-group {
-    margin: 0;
-    max-width: 800px;
-}
+.form-horizontal {
+    > .span6 {
+        max-width: $form-container-column-max-width;
+        margin-right: $form-container-column-offset-right;
+        float: left;
 
-.form-container .control-group {
-    margin: 0 0 10px;
-}
+        &:not(:last-of-type) {
+            margin-bottom: $form-container-control-row-space;
+        }
+    }
 
-/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls {
-    select {
-        width: $select-width;
+    .control-group {
+        margin: 0;
+        max-width: $form-container-control-group-max-width;
+
+        &--column {
+            flex-direction: column;
+        }
+
+        .reminders-collection {
+            + .add-list-item {
+                margin-top: 0;
+            }
+        }
     }
 }
+
+.form-container,
+.form-horizontal {
+    .control-group-subline {
+        &:not(:last-of-type) {
+            margin: 0 0 $content-padding-small;
+        }
+    }
+
+    .control-group,
+    .control-group-container {
+        &:not(:last-of-type) {
+            margin-bottom: $form-container-control-row-space;
+        }
+
+        &--column:not(:last-of-type) {
+            margin: 0;
+        }
+
+        &.control-group-checkbox {
+            margin-top: -$content-padding-small;
+        }
+    }
+
+    div[data-name='field__default-product-options'] {
+        margin: 0 0 $form-container-control-row-space;
+    }
+
+    + .form-horizontal,
+    + .form-container {
+        margin-top: $form-container-control-row-space;
+    }
+}
+
 // Need refactor
-// ie, chrome, safari
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
+// chrome, safari
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    appearance: none;
     margin: 0;
 }
 
 // firefox
 input[type='number'] {
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .alert .message ul:last-child {
     margin-bottom: 0;
 }
 
-input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
-.ui-datepicker-dialog-is-below,
-.timepicker-dialog-is-below,
-.input-append.select2-drop-below,
-.controls.select2-drop-below select,
-.controls.select2-drop-below .select2-container,
-.controls .selector.focus {
-    + span.validation-failed {
-        @include floating-validation-message();
-    }
-}
-
 .loading > .input-append {
     position: relative;
 
-    & .btn:focus {
+    .btn:focus {
         outline: 0 none;
     }
 
@@ -359,7 +458,7 @@ input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
         box-shadow: none;
     }
 
-    &:after {
+    &::after {
         content: '';
         display: block;
         position: absolute;
@@ -368,10 +467,71 @@ input[type='text'].hasDatepicker.ui-datepicker-dialog-is-below:focus,
         bottom: 0;
         left: 0;
         right: 0;
-        background: url(../../../orodatagrid/images/preloader.gif) repeat;
+        background: url('#{$global-url}/oroui/img/preloader.gif') repeat;
     }
 }
 
-.timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
+.timepicker-dialog-is-below.timepicker-error + span.validation-failed::after {
     left: 128px;
+}
+
+.clearable-input {
+    &__container {
+        position: relative;
+        display: block;
+    }
+
+    &__placeholder-icon {
+        display: none;
+    }
+
+    &__container--clear .clearable-input__placeholder-icon {
+        color: $btn-text-color;
+        display: block;
+        position: absolute;
+        right: 0;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    &__clear {
+        [class^='fa-'] {
+            @include fa-icon($fa-var-close);
+        }
+
+        position: absolute;
+        right: 0;
+    }
+
+    &__container--clear .clearable-input__clear {
+        display: none;
+    }
+}
+
+.form-flex {
+    > .control-group {
+        .control-label {
+            .tooltip-icon {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    .widget-actions {
+        display: inline-flex;
+        align-items: flex-start;
+
+        .btn {
+            + .btn {
+                margin-left: 8px;
+            }
+        }
+    }
+}
+
+@include non-touch-device {
+    select[multiple] {
+        height: $select-multiple-height;
+        padding: $select-multiple-inner-offset;
+    }
 }

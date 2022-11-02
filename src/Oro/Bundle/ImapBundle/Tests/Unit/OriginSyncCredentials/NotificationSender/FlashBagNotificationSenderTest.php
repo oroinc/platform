@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FlashBagNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +22,7 @@ class FlashBagNotificationSenderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $requestStack = new RequestStack();
         $request = new Request();

@@ -28,6 +28,11 @@ class CmsArticle
     public $text;
 
     /**
+     * @ORM\Column(type="json")
+     */
+    public $types;
+
+    /**
      * @ORM\ManyToOne(targetEntity="CmsUser", inversedBy="articles")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
@@ -46,7 +51,7 @@ class CmsArticle
 
     /**
      * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id")
      */
     public $organization;
 

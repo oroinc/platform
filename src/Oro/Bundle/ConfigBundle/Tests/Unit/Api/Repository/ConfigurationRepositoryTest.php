@@ -5,20 +5,19 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Repository;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
+use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
 
 class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigApiManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ConfigurationRepository */
-    protected $configRepository;
+    private $configRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigApiManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigApiManager::class);
 
         $this->configRepository = new ConfigurationRepository($this->configManager);
     }

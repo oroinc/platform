@@ -3,58 +3,48 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var WorkflowDatagridLabelListener
-     */
-    protected $listener;
+    private WorkflowDatagridLabelListener $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->listener = new WorkflowDatagridLabelListener($this->translator);
     }
 
-    protected function tearDown()
+    public function testTrans(): void
     {
-        unset($this->translator, $this->listener);
-    }
-
-    public function testTrans()
-    {
-        $this->translator
-            ->expects($this->atLeastOnce())
+        $this->translator->expects($this->atLeastOnce())
             ->method('trans')
             ->with(
                 $this->anything(),
                 $this->anything(),
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                 $this->anything()
-            );
+            )
+            ->willReturnArgument(0);
         $this->listener->trans('ANY_STRING');
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $datagridConfiguration = $this->getStubConfiguration();
-        $mockEvent = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildBefore')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockEvent->expects($this->atLeastOnce())->method('getConfig')->willReturn($datagridConfiguration);
+        $mockEvent = $this->createMock(BuildBefore::class);
+        $mockEvent->expects($this->atLeastOnce())
+            ->method('getConfig')
+            ->willReturn($datagridConfiguration);
         $this->listener->onBuildBefore($mockEvent);
 
         //Verify Step Name Column
@@ -62,7 +52,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'frontend_type' => 'html',
                 'type' => 'callback',
-                'callable' => [$this->listener, "trans"],
+                'callable' => [$this->listener, 'trans'],
                 'params' => ['c2'],
                 'label' => 'Step Name',
                 'translatable' => false,
@@ -92,7 +82,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'frontend_type' => 'html',
                 'type' => 'callback',
-                'callable' => [$this->listener, "trans"],
+                'callable' => [$this->listener, 'trans'],
                 'params' => ['c3'],
                 'label' => 'Workflow Name',
                 'translatable' => false,
@@ -127,7 +117,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function getStubConfiguration()
+    private function getStubConfiguration(): DatagridConfiguration
     {
         return DatagridConfiguration::create(
             [

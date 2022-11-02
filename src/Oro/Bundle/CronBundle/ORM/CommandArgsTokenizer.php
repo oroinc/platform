@@ -4,20 +4,21 @@ namespace Oro\Bundle\CronBundle\ORM;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
+/**
+ * CLI command command arguments tokenizer.
+ */
 class CommandArgsTokenizer
 {
-    const REGEX_STRING = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
-    const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
+    private const REGEX_STRING = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
+    private const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
 
     /** @var CommandArgsNormalizer[] */
-    protected $normalizers = [];
+    private array $normalizers = [];
 
     /**
-     * Registers a normalizer
-     *
-     * @param CommandArgsNormalizer $normalizer
+     * Registers a normalizer.
      */
-    public function addNormalizer(CommandArgsNormalizer $normalizer)
+    public function addNormalizer(CommandArgsNormalizer $normalizer): void
     {
         $this->normalizers[] = $normalizer;
     }
@@ -30,28 +31,28 @@ class CommandArgsTokenizer
      *
      * @throws \InvalidArgumentException When unable to parse the input string
      */
-    public function tokenize($str, AbstractPlatform $platform)
+    public function tokenize(string $str, AbstractPlatform $platform): array
     {
         $normalizer = $this->getNormalizer($platform);
 
         $tokens = [];
-        $length = strlen($str);
-        $i      = 0;
+        $length = \strlen($str);
+        $i = 0;
         while ($i < $length) {
-            if (preg_match('/\s+/A', $str, $match, null, $i)) {
+            if (preg_match('/\s+/A', $str, $match, 0, $i)) {
                 // skip whitespaces
-            } elseif (preg_match('/([^="\'\s]+?)(=?)(' . self::REGEX_QUOTED_STRING . '+)/A', $str, $match, null, $i)) {
+            } elseif (preg_match('/([^="\'\s]+?)(=?)(' . self::REGEX_QUOTED_STRING . '+)/A', $str, $match, 0, $i)) {
                 $tokens[] =
                     $match[1]
                     . $match[2]
                     . $normalizer->quoteArgValue(
-                        $normalizer->normalize(substr($match[3], 1, strlen($match[3]) - 2))
+                        $normalizer->normalize(substr($match[3], 1, -1))
                     );
-            } elseif (preg_match('/' . self::REGEX_QUOTED_STRING . '/A', $str, $match, null, $i)) {
+            } elseif (preg_match('/' . self::REGEX_QUOTED_STRING . '/A', $str, $match, 0, $i)) {
                 $tokens[] = $normalizer->quoteArg(
-                    $normalizer->normalize(substr($match[0], 1, strlen($match[0]) - 2))
+                    $normalizer->normalize(substr($match[0], 1, -1))
                 );
-            } elseif (preg_match('/' . self::REGEX_STRING . '/A', $str, $match, null, $i)) {
+            } elseif (preg_match('/' . self::REGEX_STRING . '/A', $str, $match, 0, $i)) {
                 $tokens[] = $normalizer->normalize($match[1]);
             } else {
                 // should never happen
@@ -60,7 +61,7 @@ class CommandArgsTokenizer
                 );
             }
 
-            $i += strlen($match[0]);
+            $i += \strlen($match[0]);
         }
 
         return $tokens;
@@ -73,7 +74,7 @@ class CommandArgsTokenizer
      *
      * @throws \InvalidArgumentException if there is no normalizer for the given database platform
      */
-    protected function getNormalizer(AbstractPlatform $platform)
+    private function getNormalizer(AbstractPlatform $platform): CommandArgsNormalizer
     {
         for ($i = count($this->normalizers) - 1; $i >= 0; $i--) {
             if ($this->normalizers[$i]->supports($platform)) {

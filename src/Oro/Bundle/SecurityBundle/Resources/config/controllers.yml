@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\SecurityBundle\Controller\AclPermissionController:
+        arguments:
+            - '@oro_entity.routing_helper'
+            - '@oro_security.acl.manager'
+
+    Oro\Bundle\SecurityBundle\Controller\SwitchOrganizationController:
+        arguments:
+            - '@security.token_storage'
+            - '@event_dispatcher'
+            - '@translator'
+            - '@router'

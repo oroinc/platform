@@ -2,83 +2,39 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ProcessDataSerializeListener
+/**
+ * Performs serialization and deserialization of ProcessJob data.
+ */
+class ProcessDataSerializeListener implements ServiceSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    protected $format = 'json';
+    private ContainerInterface $container;
+    private string $format = 'json';
+    /** @var ProcessJob[] */
+    private array $scheduledEntities = [];
 
-    /**
-     * @var ProcessJob[]
-     */
-    protected $scheduledEntities = array();
-
-    /** @var ServiceLink */
-    private $serializerLink;
-
-    /**
-     * @param ServiceLink $serializerLink
-     */
-    public function __construct(ServiceLink $serializerLink)
+    public function __construct(ContainerInterface $container)
     {
-        $this->serializerLink = $serializerLink;
-    }
-
-    /**
-     * Deserialize data of ProcessJob
-     *
-     * @param ProcessJob $processJob
-     */
-    protected function deserialize(ProcessJob $processJob)
-    {
-        // Pass serializer into ProcessJob to make lazy loading of entity item data.
-        $processJob->setSerializer($this->getSerializer(), $this->format);
-    }
-
-    /**
-     * @param object $entity
-     * @return bool
-     */
-    protected function isSupported($entity)
-    {
-        return $entity instanceof ProcessJob;
+        $this->container = $container;
     }
 
     /**
      * Before flush, serializes all ProcessJob's data
-     *
-     * @param OnFlushEventArgs $args
      */
-    public function onFlush(OnFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args): void
     {
-        /** @var ProcessJob $entity */
-        $unitOfWork = $args->getEntityManager()->getUnitOfWork();
-
-        foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
-                $this->scheduledEntities[] = $entity;
-            }
-        }
-
-        foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
-            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
-                $this->scheduledEntities[] = $entity;
-            }
-        }
+        $uow = $args->getEntityManager()->getUnitOfWork();
+        $this->scheduleEntities($uow->getScheduledEntityInsertions());
+        $this->scheduleEntities($uow->getScheduledEntityUpdates());
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->scheduledEntities) {
             while ($processJob = array_shift($this->scheduledEntities)) {
@@ -90,34 +46,62 @@ class ProcessDataSerializeListener
 
     /**
      * After ProcessJob loaded deserialize $serializedData
-     *
-     * @param ProcessJob         $entity
-     * @param LifecycleEventArgs $args
      */
-    public function postLoad(ProcessJob $entity, LifecycleEventArgs $args)
+    public function postLoad(ProcessJob $entity): void
     {
         $this->deserialize($entity);
     }
 
+    private function scheduleEntities(array $entities): void
+    {
+        foreach ($entities as $entity) {
+            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
+                $this->scheduledEntities[] = $entity;
+            }
+        }
+    }
+
     /**
      * Serialize data of ProcessJob
-     *
-     * @param ProcessJob $processJob
      */
-    protected function serialize(ProcessJob $processJob)
+    private function serialize(ProcessJob $processJob): void
     {
         $processData = $processJob->getData();
-        $serializedData = $this->getSerializer()
-            ->serialize($processData, $this->format, array('processJob' => $processJob));
+        $serializedData = $this->getSerializer()->serialize(
+            $processData,
+            $this->format,
+            ['processJob' => $processJob]
+        );
         $processJob->setSerializedData($serializedData);
         $processData->setModified(false);
     }
 
     /**
-     * @return SerializerInterface
+     * Deserialize data of ProcessJob
      */
-    private function getSerializer()
+    private function deserialize(ProcessJob $processJob): void
     {
-        return $this->serializerLink->getService();
+        // Pass serializer into ProcessJob to make lazy loading of entity item data.
+        $processJob->setSerializer($this->getSerializer(), $this->format);
+    }
+
+    private function isSupported(object $entity): bool
+    {
+        return $entity instanceof ProcessJob;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_workflow.serializer.process.serializer' => SerializerInterface::class
+        ];
+    }
+
+    private function getSerializer(): SerializerInterface
+    {
+        return $this->container->get('oro_workflow.serializer.process.serializer');
     }
 }

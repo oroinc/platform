@@ -1,30 +1,29 @@
 define(function(require) {
     'use strict';
 
-    var contentManager;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var mediator = require('oroui/js/mediator');
-    var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const mediator = require('oroui/js/mediator');
+    const PageableCollection = require('orodatagrid/js/pageable-collection');
+    const GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
 
     function updateState(collection) {
-        var key = collection.stateHashKey();
-        var hash = collection.stateHashValue(true);
+        const key = collection.stateHashKey();
+        const hash = collection.stateHashValue(true);
         mediator.execute('pageCache:state:save', key, collection.clone(), hash);
     }
 
-    contentManager = {
+    const contentManager = {
         /**
          * Fetches grid collection from page cache storage
          *
          * @param {string} gridName
          */
         get: function(gridName) {
-            var hash;
-            var isActual;
-            var key = PageableCollection.stateHashKey(gridName);
-            var collection = mediator.execute('pageCache:state:fetch', key);
+            let hash;
+            let isActual;
+            const key = PageableCollection.stateHashKey(gridName);
+            let collection = mediator.execute('pageCache:state:fetch', key);
             if (collection) {
                 hash = collection.stateHashValue(true);
                 // check if collection reflects grid state in url
@@ -56,7 +55,7 @@ define(function(require) {
          * @param {string} gridName
          */
         getViewsCollection: function(gridName) {
-            var key = GridViewsCollection.stateHashKey(gridName);
+            const key = GridViewsCollection.stateHashKey(gridName);
             return mediator.execute('pageCache:state:fetch', key);
         },
 

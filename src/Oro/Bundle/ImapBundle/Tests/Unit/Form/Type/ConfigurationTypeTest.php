@@ -3,92 +3,91 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
-use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
+use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFoldersValidator;
+use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator;
+use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Constraints\ValidValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
-    const TEST_PASSWORD = 'somePassword';
+    private const TEST_PASSWORD = 'somePassword';
+    private const OAUTH_ACCOUNT_TYPE = 'oauth1';
 
     /** @var SymmetricCrypterInterface */
-    protected $encryptor;
+    private $encryptor;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $imapSettingsChecker;
 
-    protected function setUp()
+    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $smtpSettingsChecker;
+
+    protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
-
-        $user = $this->createMock(User::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->imapSettingsChecker = $this->createMock(ImapSettingsChecker::class);
+        $this->smtpSettingsChecker = $this->createMock(SmtpSettingsChecker::class);
 
         $organization = $this->createMock(Organization::class);
-
-        $user->expects($this->any())
+        $user = $this->createMock(User::class);
+        $user->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-
-        $this->translator = $this->createMock(Translator::class);
-
-        $this->configProvider = $this
-            ->getMockBuilder(ConfigProvider::class)
-            ->setMethods(['hasConfig', 'getConfig', 'get'])
-            ->disableOriginalConstructor()
-            ->getMock();
 
         parent::setUp();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        CheckButtonType::class => new CheckButtonType(),
-                        EmailFolderTreeType::class => new EmailFolderTreeType(),
-                        ConfigurationType::class => $type
+                        new CheckButtonType(),
+                        new EmailFolderTreeType(),
+                        new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator)
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
                 $this->getValidatorExtension(true)
@@ -97,125 +96,108 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getValidators()
+    protected function getValidators(): array
     {
-        $valid = new Valid();
-        $emailFolders = new EmailFolders();
+        $this->imapSettingsChecker->expects(self::any())
+            ->method('checkConnection')
+            ->willReturn(true);
+        $smtpSettingsFactory = $this->createMock(SmtpSettingsFactory::class);
+        $smtpSettingsFactory->expects(self::any())
+            ->method('createFromUserEmailOrigin')
+            ->willReturn(new SmtpSettings());
+        $this->smtpSettingsChecker->expects(self::any())
+            ->method('checkConnection')
+            ->willReturn(true);
 
         return [
-            $valid->validatedBy() => $this->createMock(ConstraintValidatorInterface::class),
-            $emailFolders->validatedBy() => new EmailFoldersValidator($this->translator),
+            ValidValidator::class => $this->createMock(ConstraintValidatorInterface::class),
+            EmailFoldersValidator::class => new EmailFoldersValidator(),
+            ImapConnectionConfigurationValidator::class => new ImapConnectionConfigurationValidator(
+                $this->imapSettingsChecker
+            ),
+            SmtpConnectionConfigurationValidator::class => new SmtpConnectionConfigurationValidator(
+                $this->smtpSettingsChecker,
+                $smtpSettingsFactory
+            )
         ];
     }
 
-    protected function tearDown()
+    public function testBindValidDataShouldBindCorrectDataExceptPassword(): void
     {
-        parent::tearDown();
-        unset($this->encryptor);
+        $formData =
+        [
+            'imapHost' => 'someHost',
+            'imapPort' => '123',
+            'smtpHost' => '',
+            'smtpPort' => '',
+            'imapEncryption' => 'ssl',
+            'smtpEncryption' => 'ssl',
+            'user' => 'someUser',
+            'accountType' => self::OAUTH_ACCOUNT_TYPE,
+            'password' => self::TEST_PASSWORD,
+        ];
+        $form = $this->factory->create(ConfigurationType::class);
+        $form->submit($formData);
+
+        self::assertEquals('someHost', $form->get('imapHost')->getData());
+        self::assertEquals(self::OAUTH_ACCOUNT_TYPE, $form->get('accountType')->getData());
+        self::assertEquals('123', $form->get('imapPort')->getData());
+        self::assertEquals('', $form->get('smtpHost')->getData());
+        self::assertEquals('', $form->get('smtpPort')->getData());
+        self::assertEquals('ssl', $form->get('imapEncryption')->getData());
+        self::assertEquals('ssl', $form->get('smtpEncryption')->getData());
+        self::assertEquals('someUser', $form->get('user')->getData());
+
+        /** @var UserEmailOrigin $entity */
+        $entity = $form->getData();
+        self::assertInstanceOf(UserEmailOrigin::class, $entity);
+
+        self::assertEquals('someHost', $entity->getImapHost());
+        self::assertEquals(self::OAUTH_ACCOUNT_TYPE, $entity->getAccountType());
+        self::assertEquals('123', $entity->getImapPort());
+        self::assertEquals('', $entity->getSmtpHost());
+        self::assertEquals('', $entity->getSmtpPort());
+        self::assertEquals('ssl', $entity->getImapEncryption());
+        self::assertEquals('ssl', $entity->getSmtpEncryption());
+        self::assertEquals('someUser', $entity->getUser());
+
+        self::assertEquals(self::TEST_PASSWORD, $this->encryptor->decryptData($entity->getPassword()));
     }
 
-    /**
-     * @param array $formData
-     * @param array|bool $expectedViewData
-     *
-     * @param array $expectedModelData
-     *
-     * @dataProvider setDataProvider
-     */
-    public function testBindValidData($formData, $expectedViewData, $expectedModelData)
+    public function testBindValidDataShouldNotCreateEmptyEntity(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
-        if ($expectedViewData) {
-            $form->submit($formData);
-            foreach ($expectedViewData as $name => $value) {
-                $this->assertEquals($value, $form->get($name)->getData());
-            }
 
-            $entity = $form->getData();
-            foreach ($expectedModelData as $name => $value) {
-                if ($name === 'password') {
-                    $encodedPass = $this->readAttribute($entity, $name);
-                    $this->assertEquals($this->encryptor->decryptData($encodedPass), $value);
-                } else {
-                    $this->assertAttributeEquals($value, $name, $entity);
-                }
-            }
-        } else {
-            $form->submit($formData);
-            $this->assertNull($form->getData());
-        }
+        $form->submit([
+            'imapHost' => '',
+            'imapPort' => '',
+            'smtpHost' => '',
+            'smtpPort' => '',
+            'imapEncryption' => '',
+            'smtpEncryption' => '',
+            'user' => '',
+            'password' => ''
+        ]);
+
+        self::assertNull($form->getData());
     }
 
     /**
-     * @return array
-     */
-    public function setDataProvider()
-    {
-        return [
-            'should bind correct data except password' => [
-                [
-                    'imapHost' => 'someHost',
-                    'imapPort' => '123',
-                    'smtpHost' => '',
-                    'smtpPort' => '',
-                    'imapEncryption' => 'ssl',
-                    'smtpEncryption' => 'ssl',
-                    'user' => 'someUser',
-                    'password' => self::TEST_PASSWORD,
-                ],
-                [
-                    'imapHost' => 'someHost',
-                    'imapPort' => '123',
-                    'smtpHost' => '',
-                    'smtpPort' => '',
-                    'imapEncryption' => 'ssl',
-                    'smtpEncryption' => 'ssl',
-                    'user' => 'someUser',
-                ],
-                [
-                    'imapHost' => 'someHost',
-                    'imapPort' => '123',
-                    'smtpHost' => '',
-                    'smtpPort' => '',
-                    'imapEncryption' => 'ssl',
-                    'smtpEncryption' => 'ssl',
-                    'user' => 'someUser',
-                    'password' => self::TEST_PASSWORD
-                ],
-            ],
-            'should not create empty entity' => [
-                [
-                    'imapHost' => '',
-                    'imapPort' => '',
-                    'smtpHost' => '',
-                    'smtpPort' => '',
-                    'imapEncryption' => '',
-                    'smtpEncryption' => '',
-                    'user' => '',
-                    'password' => ''
-                ],
-                false,
-                false
-            ]
-        ];
-    }
-
-    /**
-     * @param string $foldersForm
-     * @param array $folders
-     * @param array|bool $expectedFoldersCount
-     *
      * @dataProvider setFolderDataProvider
      */
-    public function testBindValidFolderData($foldersForm, $folders, $expectedFoldersCount)
-    {
+    public function testBindValidFolderData(
+        string|array|null $foldersForm,
+        ?array $folders,
+        int $expectedFoldersCount
+    ): void {
         $formData = [
             'imapHost' => 'someHost',
             'imapPort' => '123',
             'smtpHost' => '',
             'smtpPort' => '',
+            'accountType' => self::OAUTH_ACCOUNT_TYPE,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
@@ -241,13 +223,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit($formData);
         $entity = $form->getData();
-        $this->assertEquals($expectedFoldersCount, $entity->getFolders()->count());
+        self::assertEquals($expectedFoldersCount, $entity->getFolders()->count());
     }
 
-    /**
-     * @return array
-     */
-    public function setFolderDataProvider()
+    public function setFolderDataProvider(): array
     {
         return [
             'one folder' => [
@@ -277,7 +256,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * If submitted empty password, it should be populated from old entity
      */
-    public function testBindEmptyPassword()
+    public function testBindEmptyPassword(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -291,6 +270,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -298,20 +278,20 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->assertEquals(self::TEST_PASSWORD, $entity->getPassword());
+        self::assertEquals(self::TEST_PASSWORD, $entity->getPassword());
     }
 
     /**
      * In case when user or host field was changed new configuration should be created
      * and old one will be not active.
      */
-    public function testCreatingNewConfiguration()
+    public function testCreatingNewConfiguration(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $entity->setImapHost('someHost');
-        $this->assertTrue($entity->isActive());
+        self::assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
@@ -321,6 +301,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -328,23 +309,23 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->assertNotSame($entity, $form->getData());
+        self::assertNotSame($entity, $form->getData());
 
-        $this->assertInstanceOf(UserEmailOrigin::class, $form->getData());
-        $this->assertTrue($form->getData()->isActive());
+        self::assertInstanceOf(UserEmailOrigin::class, $form->getData());
+        self::assertTrue($form->getData()->isActive());
     }
 
     /**
      * In case when user or host field was changed new configuration should NOT be created if imap and smtp
      * are inactive.
      */
-    public function testNotCreatingNewConfigurationWhenImapInactive()
+    public function testNotCreatingNewConfigurationWhenImapInactive(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $entity->setImapHost('someHost');
-        $this->assertTrue($entity->isActive());
+        self::assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
@@ -352,6 +333,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'useImap' => 0,
                 'useSmtp' => 0,
                 'imapHost' => 'someHost',
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
@@ -362,20 +344,20 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->assertNotSame($entity, $form->getData());
-        $this->assertNull($form->getData());
+        self::assertNotSame($entity, $form->getData());
+        self::assertNull($form->getData());
     }
 
     /**
-     * Case when user submit empty form but have configuration
-     * configuration should be not active and relation should be broken
+     * Case when user submit empty form but have configuration.
+     * Configuration should be not active and relation should be broken
      */
-    public function testSubmitEmptyForm()
+    public function testSubmitEmptyForm(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
-        $this->assertTrue($entity->isActive());
+        self::assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
@@ -383,6 +365,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapHost' => '',
                 'imapPort' => '',
                 'smtpHost' => '',
+                'type'     => '',
                 'smtpPort' => '',
                 'imapEncryption' => '',
                 'smtpEncryption' => '',
@@ -391,43 +374,39 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->assertNotSame($entity, $form->getData());
-        $this->assertNotInstanceOf(UserEmailOrigin::class, $form->getData());
-        $this->assertNull($form->getData());
+        self::assertNotSame($entity, $form->getData());
+        self::assertNotInstanceOf(UserEmailOrigin::class, $form->getData());
+        self::assertNull($form->getData());
     }
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $submitData
-     * @param bool $expectedValid
      */
-    public function testSubmit(array $submitData, $expectedValid)
+    public function testSubmit(array $submitData, bool $expectedValid): void
     {
         $form = $this->factory->create(ConfigurationType::class);
         $form->submit($submitData);
 
-        $this->assertEquals($expectedValid, $form->isValid());
+        self::assertEquals($expectedValid, $form->isValid());
+        self::assertTrue($form->isSynchronized());
 
         if (!$expectedValid) {
             $constraint = new EmailFolders();
 
-            $this->assertContains($constraint->message, (string)$form->getErrors());
+            self::assertStringContainsString($constraint->message, (string)$form->getErrors());
         }
 
-        $this->assertInstanceOf(UserEmailOrigin::class, $form->getData());
+        self::assertInstanceOf(UserEmailOrigin::class, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         $config = [
             'imapHost' => 'someImapHost',
             'imapPort' => '123',
             'smtpHost' => 'someSmtpHost',
             'smtpPort' => '456',
+            'accountType' => self::OAUTH_ACCOUNT_TYPE,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
@@ -436,28 +415,32 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         ];
 
         return [
-            'use imap disabled, use stmp disabled' => [
+            'use imap disabled, use smtp disabled' => [
                 'submitData' => array_merge($config, ['useImap' => false, 'useSmtp' => false]),
                 'expectedValid' => true,
             ],
-            'use imap disabled, use stmp enabled' => [
+            'use imap disabled, use smtp enabled' => [
                 'submitData' => array_merge($config, ['useImap' => false, 'useSmtp' => true]),
                 'expectedValid' => true,
             ],
-            'use imap enabled, use stmp enabled' => [
+            'use imap enabled, use smtp enabled' => [
                 'submitData' => array_merge($config, ['useImap' => true, 'useSmtp' => true]),
                 'expectedValid' => false,
             ],
-            'use imap enabled, use stmp disabled' => [
+            'use imap enabled, use smtp disabled' => [
                 'submitData' => array_merge($config, ['useImap' => true, 'useSmtp' => false]),
                 'expectedValid' => false,
             ]
         ];
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $this->assertEquals(ConfigurationType::NAME, $type->getName());
+        $type = new ConfigurationType(
+            $this->encryptor,
+            $this->tokenAccessor,
+            $this->translator
+        );
+        self::assertEquals(ConfigurationType::NAME, $type->getName());
     }
 }

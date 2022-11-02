@@ -1,25 +1,28 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Util;
 
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\JsonSerializableClass;
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\SimpleClass;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JSONTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldDecodeString()
+    public function testShouldDecodeString(): void
     {
-        $this->assertSame(['foo' => 'fooVal'], JSON::decode('{"foo": "fooVal"}'));
+        self::assertSame(['foo' => 'fooVal'], JSON::decode('{"foo": "fooVal"}'));
     }
 
-    public function testThrowIfMalformedJson()
+    public function testThrowIfMalformedJson(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The malformed json given. ');
-        $this->assertSame(['foo' => 'fooVal'], JSON::decode('{]'));
+        $this->expectException(\JsonException::class);
+        JSON::decode('{]');
     }
 
-    public function nonStringDataProvider()
+    public function nonStringDataProvider(): array
     {
         $resource = fopen('php://memory', 'r');
         fclose($resource);
@@ -35,63 +38,52 @@ class JSONTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider nonStringDataProvider
-     */
-    public function testShouldThrowExceptionIfInputIsNotString($value)
+    public function testShouldReturnNullIfInputStringIsEmpty(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Accept only string argument but got:');
-        $this->assertSame(0, JSON::decode($value));
+        self::assertNull(JSON::decode(''));
     }
 
-    public function testShouldReturnNullIfInputStringIsEmpty()
+    public function testShouldEncodeArray(): void
     {
-        $this->assertNull(JSON::decode(''));
+        self::assertEquals('{"key":"value"}', JSON::encode(['key' => 'value']));
     }
 
-    public function testShouldEncodeArray()
+    public function testShouldEncodeString(): void
     {
-        $this->assertEquals('{"key":"value"}', JSON::encode(['key' => 'value']));
+        self::assertEquals('"string"', JSON::encode('string'));
     }
 
-    public function testShouldEncodeString()
+    public function testShouldEncodeNumeric(): void
     {
-        $this->assertEquals('"string"', JSON::encode('string'));
+        self::assertEquals('123.45', JSON::encode(123.45));
     }
 
-    public function testShouldEncodeNumeric()
+    public function testShouldEncodeNull(): void
     {
-        $this->assertEquals('123.45', JSON::encode(123.45));
+        self::assertEquals('null', JSON::encode(null));
     }
 
-    public function testShouldEncodeNull()
-    {
-        $this->assertEquals('null', JSON::encode(null));
-    }
-
-    public function testShouldEncodeObjectOfStdClass()
+    public function testShouldEncodeObjectOfStdClass(): void
     {
         $obj = new \stdClass();
         $obj->key = 'value';
 
-        $this->assertEquals('{"key":"value"}', JSON::encode($obj));
+        self::assertEquals('{"key":"value"}', JSON::encode($obj));
     }
 
-    public function testShouldEncodeObjectOfSimpleClass()
+    public function testShouldEncodeObjectOfSimpleClass(): void
     {
-        $this->assertEquals('{"keyPublic":"public"}', JSON::encode(new SimpleClass()));
+        self::assertEquals('{"keyPublic":"public"}', JSON::encode(new SimpleClass()));
     }
 
-    public function testShouldEncodeObjectOfJsonSerializableClass()
+    public function testShouldEncodeObjectOfJsonSerializableClass(): void
     {
-        $this->assertEquals('{"key":"value"}', JSON::encode(new JsonSerializableClass()));
+        self::assertEquals('{"key":"value"}', JSON::encode(new JsonSerializableClass()));
     }
 
-    public function testThrowIfValueIsResource()
+    public function testThrowIfValueIsResource(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Could not encode value into json. Error 8 and message Type is not supported');
+        $this->expectException(\JsonException::class);
 
         $resource = fopen('php://memory', 'r');
         fclose($resource);

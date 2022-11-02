@@ -1,45 +1,39 @@
 <?php
-namespace Oro\Bundle\InstallerBundleTests\Unit;
+
+namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\InstallerBundle\Tests\Unit\Fixture\src\TestPackage\src\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\InstallerBundle\Tests\Unit\Fixture\src\TestPackage\src\Test2Bundle\TestPackageTest2Bundle;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ScriptManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScriptManager
-     */
-    protected $scriptManager;
+    private ScriptManager $scriptManager;
 
-    protected $kernel;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->kernel->expects($this->any())
-            ->method('getRootDir')
-            ->will($this->returnValue(__DIR__ . '/Fixture/app'));
+        $kernel = $this->createMock(KernelInterface::class);
+        $kernel->expects(self::any())
+            ->method('getProjectDir')
+            ->willReturn(__DIR__ . '/Fixture/app');
 
         $bundles = [
             new TestPackageTest1Bundle(),
-            new TestPackageTest2Bundle()
+            new TestPackageTest2Bundle(),
         ];
 
-        $this->kernel->expects($this->any())
+        $kernel->expects(self::any())
             ->method('getBundles')
-            ->will($this->returnValue($bundles));
+            ->willReturn($bundles);
 
-        $this->scriptManager = new ScriptManager($this->kernel);
+        $this->scriptManager = new ScriptManager($kernel);
     }
 
-    public function testGetScriptFiles()
+    public function testGetScriptFiles(): void
     {
         $scriptFiles = $this->scriptManager->getScriptFiles();
-        $this->assertEquals(3, count($scriptFiles));
+        self::assertCount(3, $scriptFiles);
 
         $files = [
             '/Fixture/src/TestPackage/src/Test1Bundle/install.php',
@@ -48,36 +42,34 @@ class ScriptManagerTest extends \PHPUnit\Framework\TestCase
         ];
         $i = 0;
         foreach ($scriptFiles as $scriptFile) {
-            $scriptFile = str_replace(DIRECTORY_SEPARATOR, '/', str_replace(__DIR__, '', $scriptFile));
-            $this->assertEquals($files[$i], $scriptFile);
-            $i++;
+            $scriptFile = str_replace([__DIR__, DIRECTORY_SEPARATOR], ['', '/'], $scriptFile);
+            self::assertEquals($files[$i++], $scriptFile);
         }
     }
 
-    public function testGetScriptLabels()
+    public function testGetScriptLabels(): void
     {
         $scriptLabels = $this->scriptManager->getScriptLabels();
-        $this->assertEquals(3, count($scriptLabels));
+        self::assertCount(3, $scriptLabels);
 
         $labels = [
             'Test1 Bundle Installer',
             'Test2 Bundle Installer',
-            'Test Package Installer'
+            'Test Package Installer',
         ];
         $i = 0;
         foreach ($scriptLabels as $scriptLabel) {
-            $this->assertEquals($labels[$i], $scriptLabel);
-            $i++;
+            self::assertEquals($labels[$i++], $scriptLabel);
         }
     }
 
-    public function testGetScriptFileByKey()
+    public function testGetScriptFileByKey(): void
     {
         $scriptFiles = $this->scriptManager->getScriptFiles();
         foreach ($scriptFiles as $scriptKey => $scriptFile) {
-            $this->assertEquals($scriptFile, $this->scriptManager->getScriptFileByKey($scriptKey));
+            self::assertEquals($scriptFile, $this->scriptManager->getScriptFileByKey($scriptKey));
         }
 
-        $this->assertFalse($this->scriptManager->getScriptFileByKey('false_installer'));
+        self::assertFalse($this->scriptManager->getScriptFileByKey('false_installer'));
     }
 }

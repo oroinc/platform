@@ -7,6 +7,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Extend options builder
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendOptionsBuilder
 {
     /** @var EntityMetadataHelper */
@@ -18,25 +23,25 @@ class ExtendOptionsBuilder
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var bool */
+    protected $isDryRunMode = false;
+
     /** @var array */
     protected $tableToEntitiesMap = [];
 
     /** @var array */
     protected $result = [];
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     * @param ConfigManager        $configManager
-     */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        bool $isDryRunMode = false
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
         $this->configManager        = $configManager;
+        $this->isDryRunMode         = $isDryRunMode;
     }
 
     /**
@@ -84,6 +89,13 @@ class ExtendOptionsBuilder
     public function addColumnOptions($tableName, $columnName, $options)
     {
         $entityClassNames = $this->getEntityClassNames($tableName, null, false);
+
+        // Filtering entities by contains only the required column
+        if (!isset($options['extend']['is_extend'])) {
+            $entityClassNames = array_filter($entityClassNames, function ($className) use ($columnName) {
+                return $this->entityMetadataHelper->isEntityClassContainsColumn($className, $columnName);
+            });
+        }
         if (!$entityClassNames) {
             return;
         }
@@ -114,7 +126,8 @@ class ExtendOptionsBuilder
             foreach ($target as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
-                        $targetEntityNames = $this->getEntityClassNames($optionValue);
+                        $throwExceptionIfNotFound = $this->isDryRunMode ? false : true;
+                        $targetEntityNames = $this->getEntityClassNames($optionValue, null, $throwExceptionIfNotFound);
                         if (count($targetEntityNames) > 1) {
                             throw new \LogicException(sprintf(
                                 'Table "%s" is expected to be related with 1 entity, but %d entities found',

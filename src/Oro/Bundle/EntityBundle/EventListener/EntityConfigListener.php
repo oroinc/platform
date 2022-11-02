@@ -6,9 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 
 class EntityConfigListener
 {
-    /**
-     * @param FieldConfigEvent $event
-     */
     public function createField(FieldConfigEvent $event)
     {
         $configProvider = $event->getConfigManager()->getProvider('entity');

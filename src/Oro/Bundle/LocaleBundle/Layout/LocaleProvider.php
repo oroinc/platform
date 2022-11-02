@@ -13,9 +13,6 @@ class LocaleProvider
      */
     protected $localizationHelper;
 
-    /**
-     * @param LocalizationHelper $localizationHelper
-     */
     public function __construct(LocalizationHelper $localizationHelper)
     {
         $this->localizationHelper = $localizationHelper;

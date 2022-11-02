@@ -2,125 +2,67 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Guesser;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Validator\Constraints\Length;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    const CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeClassName';
+    private const CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeClassName';
+    private const CLASS_PROPERTY = 'SomeClassProperty';
+    private const PROPERTY_TYPE = 'bigint';
+    private const SOME_LABEL = 'someLabel';
 
-    /**
-     * @var string
-     */
-    const CLASS_PROPERTY = 'SomeClassProperty';
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $formConfigProvider;
 
-    /**
-     * @var string
-     */
-    const PROPERTY_TYPE = 'bigint';
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $extendConfigProvider;
 
-    /**
-     * @var array
-     */
-    private static $entityConfig = [
-        'label' => self::SOME_LABEL
-    ];
+    private ExtendFieldFormTypeProvider $extendFieldFormTypeProvider;
 
-    /**
-     * @var string
-     */
-    const SOME_LABEL = 'someLabel';
+    private ExtendFieldFormOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $extendFieldFormOptionsProvider;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $managerRegistry;
+    private ExtendFieldTypeGuesser $guesser;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $entityConfigProvider;
-
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $formConfigProvider;
-
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $extendConfigProvider;
-
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $enumConfigProvider;
-
-    /**
-     * @var ExtendFieldTypeGuesser
-     */
-    private $guesser;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->enumConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->formConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendFieldFormTypeProvider = new ExtendFieldFormTypeProvider();
+        $this->extendFieldFormOptionsProvider = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
 
         $this->guesser = new ExtendFieldTypeGuesser(
-            $this->managerRegistry,
-            $this->entityConfigProvider,
+            $this->createMock(ManagerRegistry::class),
+            $entityConfigProvider,
             $this->formConfigProvider,
             $this->extendConfigProvider,
-            $this->enumConfigProvider
+            $this->extendFieldFormTypeProvider,
+            $this->extendFieldFormOptionsProvider
         );
     }
 
-    /**
-     * @param bool $hasConfig
-     */
-    private function expectsHasExtendConfig($hasConfig)
+    private function expectsHasExtendConfig(bool $hasConfig): void
     {
-        $this->extendConfigProvider
-            ->expects($this->once())
+        $this->extendConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
             ->willReturn($hasConfig);
     }
 
-    /**
-     * @param $scopeName
-     * @param $scopeOptions
-     * @param $fieldType
-     * @return Config
-     */
-    private function createFieldConfig($scopeName, $scopeOptions, $fieldType)
+    private function createFieldConfig(string $scopeName, array $scopeOptions, string $fieldType): Config
     {
         return new Config(
             new FieldConfigId($scopeName, self::CLASS_NAME, self::CLASS_PROPERTY, $fieldType),
@@ -134,65 +76,43 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
      * @param string $scopeName
      * @param array $scopeOptions
      */
-    private function createConfigProviderExpectation($configProvider, $fieldType, $scopeName, array $scopeOptions)
-    {
+    private function createConfigProviderExpectation(
+        ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider,
+        string $fieldType,
+        string $scopeName,
+        array $scopeOptions
+    ): void {
         $config = $this->createFieldConfig($scopeName, $scopeOptions, $fieldType);
 
-        $configProvider
-            ->expects($this->once())
+        $configProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
             ->willReturn($config);
     }
 
-    /**
-     * @param array $scopeOptions
-     * @param string $fieldType
-     */
-    private function expectsGetFormConfig(array $scopeOptions, $fieldType = self::PROPERTY_TYPE)
+    private function expectsGetFormConfig(array $scopeOptions, string $fieldType = self::PROPERTY_TYPE): void
     {
         $this->createConfigProviderExpectation($this->formConfigProvider, $fieldType, 'form', $scopeOptions);
     }
 
-    /**
-     * @param array $scopeOptions
-     * @param string $fieldType
-     */
-    private function expectsGetExtendConfig(array $scopeOptions, $fieldType = self::PROPERTY_TYPE)
+    private function expectsGetExtendConfig(array $scopeOptions, string $fieldType = self::PROPERTY_TYPE): void
     {
         $this->createConfigProviderExpectation($this->extendConfigProvider, $fieldType, 'extend', $scopeOptions);
     }
 
-    /**
-     * @param array $scopeOptions
-     * @param string $fieldType
-     */
-    private function expectsGetEntityConfig(array $scopeOptions, $fieldType = self::PROPERTY_TYPE)
-    {
-        $this->createConfigProviderExpectation($this->entityConfigProvider, $fieldType, 'entity', $scopeOptions);
-    }
-
-    /**
-     * @param TypeGuess $typeGuess
-     */
-    private function assertIsDefaultTypeGuess($typeGuess)
+    private function assertIsDefaultTypeGuess(TypeGuess $typeGuess): void
     {
         $defaultTypeGuess = new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE);
-        $this->assertEquals($defaultTypeGuess, $typeGuess);
+        self::assertEquals($defaultTypeGuess, $typeGuess);
     }
 
-    /**
-     * @param TypeGuess $typeGuess
-     * @param array $options
-     * @param string $type
-     */
-    private function assertTypeGuess($typeGuess, array $options = [], $type = 'text')
+    private function assertTypeGuess(TypeGuess $typeGuess, array $options = [], string $type = 'text'): void
     {
         $defaultTypeGuess = new TypeGuess($type, $options, TypeGuess::HIGH_CONFIDENCE);
-        $this->assertEquals($defaultTypeGuess, $typeGuess);
+        self::assertEquals($defaultTypeGuess, $typeGuess);
     }
 
-    public function testGuessTypeWhenNoExtendConfigExists()
+    public function testGuessTypeWhenNoExtendConfigExists(): void
     {
         $this->expectsHasExtendConfig(false);
 
@@ -201,7 +121,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    public function testGuessTypeWhenExtendConfigExistsAndFormConfigNotEnabled()
+    public function testGuessTypeWhenExtendConfigExistsAndFormConfigNotEnabled(): void
     {
         $this->expectsHasExtendConfig(true);
         $this->expectsGetFormConfig(['is_enabled' => false]);
@@ -211,12 +131,12 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    public function testGuessTypeWhenFormScopeHasTypeButNotApplicable()
+    public function testGuessTypeWhenFormScopeHasTypeButNotApplicable(): void
     {
         $this->expectsHasExtendConfig(true);
         $this->expectsGetFormConfig([
             'is_enabled' => true,
-            'type' => 'text'
+            'type' => 'text',
         ]);
 
         $this->expectsGetExtendConfig([]);
@@ -226,294 +146,220 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    public function testGuessTypeWhenFormScopeHasTypeAndFieldIsApplicable()
+    public function testGuessTypeWhenFormScopeHasTypeAndFieldIsApplicable(): void
     {
         $this->expectsHasExtendConfig(true);
         $this->expectsGetFormConfig([
             'is_enabled' => true,
-            'type' => 'text'
+            'type' => 'text',
         ]);
 
-        $this->expectsGetExtendConfig([
-            'owner' => ExtendScope::ORIGIN_CUSTOM,
-        ]);
+        $this->expectsGetExtendConfig(['owner' => ExtendScope::OWNER_CUSTOM]);
 
-        $this->expectsGetEntityConfig(self::$entityConfig);
-
-        $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
-
-        $this->assertTypeGuess($typeGuess, [
+        $options = [
             'label' => self::SOME_LABEL,
             'required' => false,
-            'block' => 'general'
-        ]);
+            'block' => 'general',
+        ];
+        $this->extendFieldFormOptionsProvider
+            ->expects(self::once())
+            ->method('getOptions')
+            ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
+            ->willReturn($options);
+
+        $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
+
+        $this->assertTypeGuess($typeGuess, $options);
     }
 
-    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapNotExists()
+    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapNotExists(): void
     {
         $this->expectsHasExtendConfig(true);
         $this->expectsGetFormConfig(['is_enabled' => true]);
 
-        $this->expectsGetExtendConfig([]);
+        $this->expectsGetExtendConfig(['owner' => ExtendScope::OWNER_CUSTOM]);
+
+        $this->extendFieldFormOptionsProvider
+            ->expects(self::never())
+            ->method('getOptions');
 
         $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
 
         $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsButNotApplicable()
-    {
+    /**
+     * @dataProvider notApplicableRegularFieldDataProvider
+     */
+    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsButNotApplicableForRegularField(
+        string $fieldType,
+        array $extendConfig
+    ): void {
         $this->expectsHasExtendConfig(true);
-        $this->expectsGetFormConfig(['is_enabled' => true]);
+        $this->expectsGetFormConfig(['is_enabled' => true], $fieldType);
 
-        $this->expectsGetExtendConfig([]);
+        $this->expectsGetExtendConfig($extendConfig, $fieldType);
 
-        $this->guesser->addExtendTypeMapping('bigint', 'text');
+        $this->extendFieldFormOptionsProvider
+            ->expects(self::never())
+            ->method('getOptions');
+
+        $this->extendFieldFormTypeProvider->addExtendTypeMapping($fieldType, 'text');
         $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
 
         $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    /**
-     * @return array
-     */
-    public function simpleTypeDataProvider()
+    public function notApplicableRegularFieldDataProvider(): array
     {
         return [
-            'boolean' => [
-                'fieldType' => 'boolean',
-                'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
-                ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'configs' => ['allowClear' => false],
-                    'choices' => [
-                        'No' => false,
-                        'Yes' => true
-                    ]
-                ]
+            'empty extend config' => ['fieldType' => self::PROPERTY_TYPE, 'extendConfig' => []],
+            'owner is not custom' => [
+                'fieldType' => self::PROPERTY_TYPE,
+                'extendConfig' => ['owner' => ExtendScope::OWNER_SYSTEM],
             ],
-            'string' => [
-                'fieldType' => 'string',
-                'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
-                    'length' => 17
-                ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'constraints' => [
-                        new Length(['max' => 17])
-                    ]
-                ]
+            'field is deleted' => [
+                'fieldType' => self::PROPERTY_TYPE,
+                'extendConfig' => ['owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true, 'is_deleted' => true],
             ],
-            'decimal' => [
-                'fieldType' => 'decimal',
+            'but state is new' => [
+                'fieldType' => self::PROPERTY_TYPE,
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
-                    'precision' => 8,
-                    'scale' => 2
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
+                    'is_deleted' => false,
+                    'state' => ExtendScope::STATE_NEW,
                 ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'constraints' => [
-                        new Decimal(['precision' => 8, 'scale' => 2])
-                    ]
-                ]
-            ]
+            ],
+            'state is deleted' => [
+                'fieldType' => self::PROPERTY_TYPE,
+                'extendConfig' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
+                    'is_deleted' => false,
+                    'state' => ExtendScope::STATE_DELETE,
+                ],
+            ],
+            'fieldType is TO_ONE' => [
+                'fieldType' => RelationType::TO_ONE,
+                'extendConfig' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
+                    'is_deleted' => false,
+                    'state' => ExtendScope::STATE_ACTIVE,
+                ],
+            ],
         ];
     }
 
     /**
-     * @dataProvider simpleTypeDataProvider
-     *
-     * @param string $fieldType
-     * @param array $extendConfig
-     * @param array $expectedOptions
+     * @dataProvider notApplicableRelationDataProvider
      */
-    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsAndFieldIsApplicableAndFieldTypeIsSimple(
-        $fieldType,
-        array $extendConfig,
-        array $expectedOptions
-    ) {
+    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsButNotApplicableForRelation(
+        string $fieldType,
+        array $fileExtendScopeOptions
+    ): void {
         $this->expectsHasExtendConfig(true);
         $this->expectsGetFormConfig(['is_enabled' => true], $fieldType);
 
-        $this->expectsGetExtendConfig($extendConfig);
-
-        $this->expectsGetEntityConfig(self::$entityConfig);
-
-        $this->guesser->addExtendTypeMapping($fieldType, 'customType');
-        $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
-
-        $this->assertTypeGuess($typeGuess, $expectedOptions, 'customType');
-    }
-
-    /**
-     * @return array
-     */
-    public function relationTypesDataProvider()
-    {
-        $relationOptions = [
-            'fieldType' => RelationType::MANY_TO_ONE,
-            'extendConfig' => [
-                'owner' => ExtendScope::ORIGIN_CUSTOM,
-                'target_entity' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
-                'target_field' => 'SomeTargetField'
-            ],
-            'expectedOptions' => [
-                'label' => self::SOME_LABEL,
-                'required' => false,
-                'block' => 'SomeTargetEntity',
-                'initial_elements' => null,
-                'default_element' => 'default_SomeClassProperty',
-                'class' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
-                'selector_window_title' => 'Select SomeTargetEntity',
-                'block_config' => [
-                    'SomeTargetEntity' => [
-                        'title' => null,
-                        'subblocks' => [
-                            [
-                                'useSpan' => false
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+        $extendScopeOptions = [
+            'owner' => ExtendScope::OWNER_CUSTOM,
+            'is_extend' => true,
+            'is_deleted' => false,
+            'state' => ExtendScope::STATE_ACTIVE,
+            'target_entity' => File::class,
         ];
-
-        return [
-            'many_to_one' => [
-                'fieldType' => RelationType::MANY_TO_ONE,
-                'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
-                    'target_entity' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
-                    'target_field' => 'SomeTargetField'
-                ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'entity_class' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
-                    'configs' => [
-                        'placeholder'   => 'oro.form.choose_value',
-                        'component'  => 'relation',
-                        'target_entity' => 'Oro_Bundle_SomeBundle_Entity_SomeTargetEntity',
-                        'target_field'  => 'SomeTargetField',
-                        'properties'    => ['SomeTargetField'],
-                    ]
-                ]
-            ],
-            'one_to_many' => array_merge($relationOptions, ['fieldType' => RelationType::ONE_TO_MANY]),
-            'many_to_many' => array_merge($relationOptions, ['fieldType' => RelationType::MANY_TO_MANY])
-        ];
-    }
-
-    /**
-     * @dataProvider relationTypesDataProvider
-     *
-     * @param string $fieldType
-     * @param array $extendConfig
-     * @param array $expectedOptions
-     */
-    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsAndFieldIsApplicable(
-        $fieldType,
-        array $extendConfig,
-        array $expectedOptions
-    ) {
-        $this->expectsHasExtendConfig(true);
-        $this->expectsGetFormConfig(['is_enabled' => true], $fieldType);
-
-        $fieldConfig = $this->createFieldConfig('extend', $extendConfig, $fieldType);
-        $targetConfig = new Config(new EntityConfigId('extend', $extendConfig['target_entity']), []);
+        $extendFieldConfig = $this->createFieldConfig('extend', $extendScopeOptions, $fieldType);
+        $fileExtendConfig = $this->createFieldConfig('extend', $fileExtendScopeOptions, $fieldType);
 
         $this->extendConfigProvider
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getConfig')
-            ->willReturnOnConsecutiveCalls($fieldConfig, $targetConfig);
+            ->withConsecutive([self::CLASS_NAME, self::CLASS_PROPERTY], [File::class])
+            ->willReturn($extendFieldConfig, $fileExtendConfig);
 
-        $this->expectsGetEntityConfig(self::$entityConfig);
+        $this->extendFieldFormOptionsProvider
+            ->expects(self::never())
+            ->method('getOptions');
 
-        $this->guesser->addExtendTypeMapping($fieldType, 'text');
+        $this->extendFieldFormTypeProvider->addExtendTypeMapping($fieldType, 'text');
         $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
 
-        $this->assertTypeGuess($typeGuess, $expectedOptions);
+        $this->assertIsDefaultTypeGuess($typeGuess);
     }
 
-    /**
-     * @return array
-     */
-    public function enumTypesDataProvider()
+    public function notApplicableRelationDataProvider(): array
     {
         return [
-            'enum' => [
-                'fieldType' => 'enum',
-                'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+            'has target_entity and is deleted' => [
+                'fieldType' => 'file',
+                'fileExtendScopeOptions' => [
+                    'is_extend' => true,
+                    'is_deleted' => true,
                 ],
-                'enumConfig' => [
-                    'enum_code' => 'SomeEnumCode'
-                ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'enum_code' => 'SomeEnumCode'
-                ]
             ],
-            'multiEnum' => [
-                'fieldType' => 'multiEnum',
+            'has target_entity and state is new' => [
+                'fieldType' => 'file',
+                'fileExtendScopeOptions' => [
+                    'is_extend' => true,
+                    'is_deleted' => false,
+                    'state' => ExtendScope::STATE_NEW,
+
+                ],
+            ],
+            'has target_entity and state is deleted' => [
+                'fieldType' => 'file',
+                'fileExtendScopeOptions' => [
+                    'is_extend' => true,
+                    'is_deleted' => false,
+                    'state' => ExtendScope::STATE_DELETE,
+
+                ],
+            ],
+        ];
+    }
+
+    public function guessTypeDataProvider(): array
+    {
+        return [
+            'regular field' => [
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                 ],
-                'enumConfig' => [
-                    'enum_code' => 'SomeEnumCode'
+            ],
+            'regular extend field' => [
+                'extendConfig' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
                 ],
-                'expectedOptions' => [
-                    'label' => self::SOME_LABEL,
-                    'required' => false,
-                    'block' => 'general',
-                    'enum_code' => 'SomeEnumCode',
-                    'expanded' => true
-                ]
-            ]
+            ],
         ];
     }
 
     /**
-     * @dataProvider enumTypesDataProvider
-     *
-     * @param string $fieldType
-     * @param array $extendConfig
-     * @param array $enumConfig
-     * @param array $expectedOptions
+     * @dataProvider guessTypeDataProvider
      */
-    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsAndFieldIsApplicableWithEnumTypes(
-        $fieldType,
-        array $extendConfig,
-        array $enumConfig,
-        array $expectedOptions
-    ) {
+    public function testGuessTypeWhenFormScopeHasNoTypeAndTypeMapExistsAndFieldIsApplicable(array $extendConfig): void
+    {
         $this->expectsHasExtendConfig(true);
-        $this->expectsGetFormConfig(['is_enabled' => true], $fieldType);
+        $this->expectsGetFormConfig(['is_enabled' => true]);
 
         $this->expectsGetExtendConfig($extendConfig);
-        $this->expectsGetEntityConfig(self::$entityConfig);
 
-        $this->enumConfigProvider
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($this->createFieldConfig('enum', $enumConfig, $fieldType));
+        $options = [
+            'label' => self::SOME_LABEL,
+            'required' => false,
+            'block' => 'general',
+        ];
+        $this->extendFieldFormOptionsProvider
+            ->expects(self::once())
+            ->method('getOptions')
+            ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
+            ->willReturn($options);
 
-        $this->guesser->addExtendTypeMapping($fieldType, 'text');
+        $this->extendFieldFormTypeProvider->addExtendTypeMapping(self::PROPERTY_TYPE, 'customType');
         $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
 
-        $this->assertTypeGuess($typeGuess, $expectedOptions);
+        $this->assertTypeGuess($typeGuess, $options, 'customType');
     }
 }

@@ -2,88 +2,61 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper as ToolConfigHelper;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ConfigModelManager
 {
-    /** @deprecated since 1.9. Use ConfigModel::MODE_DEFAULT instead */
-    const MODE_DEFAULT = ConfigModel::MODE_DEFAULT;
-    /** @deprecated since 1.9. Use ConfigModel::MODE_HIDDEN instead */
-    const MODE_HIDDEN = ConfigModel::MODE_HIDDEN;
-    /** @deprecated since 1.9. Use ConfigModel::MODE_READONLY instead */
-    const MODE_READONLY = ConfigModel::MODE_READONLY;
-
-    /** @var EntityConfigModel[] [{class name} => EntityConfigModel, ...] */
-    private $entities;
-
-    /** @var bool */
-    private $entitiesAreLoaded = false;
-
+    private ManagerRegistry $doctrine;
+    private LockObject $lockObject;
+    private ConfigDatabaseChecker $databaseChecker;
+    /** @var EntityConfigModel[]|null [{class name} => EntityConfigModel, ...] */
+    private ?array $entities = null;
+    private bool $entitiesAreLoaded = false;
     /** @var array [{class name} => [{field name} => FieldConfigModel, ...], ...] */
-    private $fields = [];
+    private array $fields = [];
 
-    /** @var ServiceLink */
-    protected $emLink;
-
-    /** @var LockObject */
-    protected $lockObject;
-
-    /** @var ConfigDatabaseChecker */
-    private $databaseChecker;
-
-    /**
-     * @param ServiceLink           $emLink          A link to the EntityManager
-     * @param LockObject            $lockObject
-     * @param ConfigDatabaseChecker $databaseChecker
-     */
-    public function __construct(ServiceLink $emLink, LockObject $lockObject, ConfigDatabaseChecker $databaseChecker)
-    {
-        $this->emLink = $emLink;
+    public function __construct(
+        ManagerRegistry $doctrine,
+        LockObject $lockObject,
+        ConfigDatabaseChecker $databaseChecker
+    ) {
+        $this->doctrine = $doctrine;
         $this->lockObject = $lockObject;
         $this->databaseChecker = $databaseChecker;
     }
 
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
+    public function getEntityManager(): EntityManagerInterface
     {
-        return $this->emLink->getService();
+        return $this->doctrine->getManagerForClass(EntityConfigModel::class);
     }
 
-    /**
-     * @return bool
-     */
-    public function checkDatabase()
+    public function checkDatabase(): bool
     {
         return $this->databaseChecker->checkDatabase();
     }
 
-    public function clearCheckDatabase()
+    public function clearCheckDatabase(): void
     {
         $this->databaseChecker->clearCheckDatabase();
     }
 
     /**
-     * Finds a model for an entity
-     *
-     * @param string $className
-     *
-     * @return EntityConfigModel|null An instance of EntityConfigModel or null if a model was not found
+     * Finds a model for an entity.
      */
-    public function findEntityModel($className)
+    public function findEntityModel(string $className): ?EntityConfigModel
     {
         if (empty($className) || ToolConfigHelper::isConfigModelEntity($className)) {
             return null;
@@ -94,7 +67,7 @@ class ConfigModelManager
         $result = null;
 
         // check if a model exists in the local cache
-        if (null !== $this->entities && array_key_exists($className, $this->entities)) {
+        if (null !== $this->entities && \array_key_exists($className, $this->entities)) {
             $result = $this->entities[$className];
             if ($result && $this->isEntityDetached($result)) {
                 if ($this->areAllEntitiesDetached()) {
@@ -122,14 +95,9 @@ class ConfigModelManager
     }
 
     /**
-     * Finds a model for an entity field
-     *
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return FieldConfigModel|null An instance of FieldConfigModel or null if a model was not found
+     * Finds a model for an entity field.
      */
-    public function findFieldModel($className, $fieldName)
+    public function findFieldModel(string $className, string $fieldName): ?FieldConfigModel
     {
         if (empty($className) || empty($fieldName) || ToolConfigHelper::isConfigModelEntity($className)) {
             return null;
@@ -140,7 +108,7 @@ class ConfigModelManager
         $result = null;
 
         // check if a model exists in the local cache
-        if (isset($this->fields[$className]) && array_key_exists($fieldName, $this->fields[$className])) {
+        if (isset($this->fields[$className]) && \array_key_exists($fieldName, $this->fields[$className])) {
             $result = $this->fields[$className][$fieldName];
             if ($result && $this->isEntityDetached($result)) {
                 // the detached model must be reloaded
@@ -155,14 +123,10 @@ class ConfigModelManager
     }
 
     /**
-     * @param string $className
-     *
-     * @return EntityConfigModel
-     *
      * @throws \InvalidArgumentException if $className is empty
      * @throws RuntimeException if a model was not found
      */
-    public function getEntityModel($className)
+    public function getEntityModel(string $className): EntityConfigModel
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -170,28 +134,21 @@ class ConfigModelManager
 
         $model = $this->findEntityModel($className);
         if (!$model) {
-            throw new RuntimeException(
-                sprintf(
-                    'A model for "%s" was not found.%s',
-                    $className,
-                    $this->lockObject->isLocked() ? ' Config models are locked.' : ''
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'A model for "%s" was not found.%s',
+                $className,
+                $this->lockObject->isLocked() ? ' Config models are locked.' : ''
+            ));
         }
 
         return $model;
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return FieldConfigModel
-     *
      * @throws \InvalidArgumentException if $className or $fieldName is empty
      * @throws RuntimeException if a model was not found
      */
-    public function getFieldModel($className, $fieldName)
+    public function getFieldModel(string $className, string $fieldName): FieldConfigModel
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -202,22 +159,20 @@ class ConfigModelManager
 
         $model = $this->findFieldModel($className, $fieldName);
         if (!$model) {
-            throw new RuntimeException(
-                sprintf(
-                    'A model for "%s::%s" was not found.%s',
-                    $className,
-                    $fieldName,
-                    $this->lockObject->isLocked() ? ' Config models are locked.' : ''
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'A model for "%s::%s" was not found.%s',
+                $className,
+                $fieldName,
+                $this->lockObject->isLocked() ? ' Config models are locked.' : ''
+            ));
         }
 
         return $model;
     }
 
     /**
-     * Renames a field
-     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     * Renames a field.
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush().
      *
      * @param string $className
      * @param string $fieldName
@@ -228,7 +183,7 @@ class ConfigModelManager
      * @throws \InvalidArgumentException if $className, $fieldName or $newFieldName is empty
      * @throws RuntimeException if models are locked
      */
-    public function changeFieldName($className, $fieldName, $newFieldName)
+    public function changeFieldName(string $className, string $fieldName, string $newFieldName): bool
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -240,16 +195,14 @@ class ConfigModelManager
             throw new \InvalidArgumentException('$newFieldName must not be empty');
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot change field name for "%s::%s" because config models are locked.',
-                    $className,
-                    $fieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot change field name for "%s::%s" because config models are locked.',
+                $className,
+                $fieldName
+            ));
         }
 
-        $result     = false;
+        $result = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getFieldName() !== $newFieldName) {
             $fieldModel->setFieldName($newFieldName);
@@ -257,15 +210,15 @@ class ConfigModelManager
             unset($this->fields[$className][$fieldName]);
 
             $this->fields[$className][$newFieldName] = $fieldModel;
-            $result                                  = true;
+            $result = true;
         }
 
         return $result;
     }
 
     /**
-     * Changes a type of a field
-     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     * Changes a type of a field.
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush().
      *
      * @param string $className
      * @param string $fieldName
@@ -276,7 +229,7 @@ class ConfigModelManager
      * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
      * @throws RuntimeException if models are locked
      */
-    public function changeFieldType($className, $fieldName, $fieldType)
+    public function changeFieldType(string $className, string $fieldName, string $fieldType): bool
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -288,31 +241,29 @@ class ConfigModelManager
             throw new \InvalidArgumentException('$fieldType must not be empty');
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot change field type for "%s::%s" because config models are locked.',
-                    $className,
-                    $fieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot change field type for "%s::%s" because config models are locked.',
+                $className,
+                $fieldName
+            ));
         }
 
-        $result     = false;
+        $result = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getType() !== $fieldType) {
             $fieldModel->setType($fieldType);
             $this->getEntityManager()->persist($fieldModel);
 
             $this->fields[$className][$fieldName] = $fieldModel;
-            $result                               = true;
+            $result = true;
         }
 
         return $result;
     }
 
     /**
-     * Changes a mode of a field
-     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     * Changes a mode of a field.
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush().
      *
      * @param string $className
      * @param string $fieldName
@@ -323,7 +274,7 @@ class ConfigModelManager
      * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
      * @throws RuntimeException if models are locked
      */
-    public function changeFieldMode($className, $fieldName, $mode)
+    public function changeFieldMode(string $className, string $fieldName, string $mode): bool
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -335,31 +286,29 @@ class ConfigModelManager
             throw new \InvalidArgumentException('$mode must not be empty');
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot change field mode for "%s::%s" because config models are locked.',
-                    $className,
-                    $fieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot change field mode for "%s::%s" because config models are locked.',
+                $className,
+                $fieldName
+            ));
         }
 
-        $result     = false;
+        $result = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getMode() !== $mode) {
             $fieldModel->setMode($mode);
             $this->getEntityManager()->persist($fieldModel);
 
             $this->fields[$className][$fieldName] = $fieldModel;
-            $result                               = true;
+            $result = true;
         }
 
         return $result;
     }
 
     /**
-     * Changes a mode of an entity
-     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     * Changes a mode of an entity.
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush().
      *
      * @param string $className
      * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
@@ -369,7 +318,7 @@ class ConfigModelManager
      * @throws \InvalidArgumentException if $className or $mode is empty
      * @throws RuntimeException if models are locked
      */
-    public function changeEntityMode($className, $mode)
+    public function changeEntityMode(string $className, string $mode): bool
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
@@ -378,22 +327,20 @@ class ConfigModelManager
             throw new \InvalidArgumentException('$mode must not be empty');
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot change entity name for "%s" because config models are locked.',
-                    $className
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot change entity name for "%s" because config models are locked.',
+                $className
+            ));
         }
 
-        $result      = false;
+        $result = false;
         $entityModel = $this->findEntityModel($className);
         if ($entityModel && $entityModel->getMode() !== $mode) {
             $entityModel->setMode($mode);
             $this->getEntityManager()->persist($entityModel);
 
             $this->entities[$className] = $entityModel;
-            $result                     = true;
+            $result = true;
         }
 
         return $result;
@@ -404,7 +351,7 @@ class ConfigModelManager
      *
      * @return ConfigModel[]
      */
-    public function getModels($className = null)
+    public function getModels(string $className = null): array
     {
         $result = [];
 
@@ -428,26 +375,21 @@ class ConfigModelManager
     }
 
     /**
-     * @param string|null $className
-     * @param string|null $mode
-     *
-     * @return EntityConfigModel
-     *
      * @throws \InvalidArgumentException if $mode is invalid
      * @throws RuntimeException if models are locked
      */
-    public function createEntityModel($className = null, $mode = ConfigModel::MODE_DEFAULT)
-    {
+    public function createEntityModel(
+        string $className = null,
+        string $mode = ConfigModel::MODE_DEFAULT
+    ): EntityConfigModel {
         if (!$this->isValidMode($mode)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot create entity model for "%s" because config models are locked.',
-                    $className
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot create entity model for "%s" because config models are locked.',
+                $className
+            ));
         }
 
         $entityModel = new EntityConfigModel($className);
@@ -462,18 +404,15 @@ class ConfigModelManager
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param string $mode
-     *
-     * @return FieldConfigModel
-     *
      * @throws \InvalidArgumentException if $className is empty or $mode is invalid
      * @throws RuntimeException if models are locked
      */
-    public function createFieldModel($className, $fieldName, $fieldType, $mode = ConfigModel::MODE_DEFAULT)
-    {
+    public function createFieldModel(
+        string $className,
+        string $fieldName,
+        string $fieldType,
+        string $mode = ConfigModel::MODE_DEFAULT
+    ): FieldConfigModel {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
         }
@@ -481,13 +420,11 @@ class ConfigModelManager
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
         if ($this->lockObject->isLocked()) {
-            throw new RuntimeException(
-                sprintf(
-                    'Cannot create field model for "%s::%s" because config models are locked.',
-                    $className,
-                    $fieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'Cannot create field model for "%s::%s" because config models are locked.',
+                $className,
+                $fieldName
+            ));
         }
 
         $entityModel = $this->getEntityModel($className);
@@ -505,26 +442,24 @@ class ConfigModelManager
     }
 
     /**
-     * Removes all cached data
+     * Removes all cached data.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        $this->entities          = null;
+        $this->entities = null;
         $this->entitiesAreLoaded = false;
-        $this->fields            = [];
+        $this->fields = [];
 
         $em = $this->getEntityManager();
-        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
-        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel');
+        $em->clear(FieldConfigModel::class);
+        $em->clear(EntityConfigModel::class);
     }
 
     /**
      * Makes sure that an entity model for the given class is loaded
-     * or, if the class name is not specified, make sure that all entity models are loaded
-     *
-     * @param string|null $className
+     * or, if the class name is not specified, make sure that all entity models are loaded.
      */
-    protected function ensureEntityCacheWarmed($className = null)
+    private function ensureEntityCacheWarmed(string $className = null): void
     {
         if ($this->lockObject->isLocked()) {
             return;
@@ -534,7 +469,7 @@ class ConfigModelManager
             $this->entities = [];
         }
         if ($className) {
-            if (!array_key_exists($className, $this->entities)) {
+            if (!\array_key_exists($className, $this->entities)) {
                 $this->entities[$className] = !$this->entitiesAreLoaded
                     ? $this->loadEntityModel($className)
                     : null;
@@ -549,11 +484,9 @@ class ConfigModelManager
     }
 
     /**
-     * Checks $this->fields[$className] and if it is empty loads all fields models at once
-     *
-     * @param string $className
+     * Makes sure that an entity field models for the given class are loaded.
      */
-    protected function ensureFieldCacheWarmed($className)
+    private function ensureFieldCacheWarmed(string $className): void
     {
         if (!isset($this->fields[$className])) {
             $this->fields[$className] = [];
@@ -571,7 +504,7 @@ class ConfigModelManager
     /**
      * @return EntityConfigModel[]
      */
-    protected function loadEntityModels()
+    private function loadEntityModels(): array
     {
         $alreadyLoadedIds = [];
         foreach ($this->entities as $model) {
@@ -582,39 +515,32 @@ class ConfigModelManager
 
         if (empty($alreadyLoadedIds)) {
             return $this->getEntityManager()
-                ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
+                ->getRepository(EntityConfigModel::class)
                 ->findAll();
-        } else {
-            return $this->getEntityManager()
-                ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-                ->createQueryBuilder('e')
-                ->where('e.id NOT IN (:exclusions)')
-                ->setParameter('exclusions', $alreadyLoadedIds)
-                ->getQuery()
-                ->getResult();
         }
+
+        return $this->getEntityManager()
+            ->getRepository(EntityConfigModel::class)
+            ->createQueryBuilder('e')
+            ->where('e.id NOT IN (:exclusions)')
+            ->setParameter('exclusions', $alreadyLoadedIds)
+            ->getQuery()
+            ->getResult();
     }
 
-    /**
-     * @param string $className
-     *
-     * @return EntityConfigModel|null
-     */
-    protected function loadEntityModel($className)
+    private function loadEntityModel(string $className): ?EntityConfigModel
     {
         return $this->getEntityManager()
-            ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
+            ->getRepository(EntityConfigModel::class)
             ->findOneBy(['className' => $className]);
     }
 
     /**
-     * @param string $mode
-     *
-     * @return bool
+     * Determines whether the given string represents a valid mode for entity config model.
      */
-    protected function isValidMode($mode)
+    private function isValidMode(string $mode): bool
     {
-        return in_array(
+        return \in_array(
             $mode,
             [ConfigModel::MODE_DEFAULT, ConfigModel::MODE_HIDDEN, ConfigModel::MODE_READONLY],
             true
@@ -622,9 +548,9 @@ class ConfigModelManager
     }
 
     /**
-     * Determines whether all entities in local cache are detached from an entity manager or not
+     * Determines whether all entities in local cache are detached from an entity manager or not.
      */
-    protected function areAllEntitiesDetached()
+    private function areAllEntitiesDetached(): bool
     {
         $result = false;
         if (!empty($this->entities)) {
@@ -641,18 +567,14 @@ class ConfigModelManager
     }
 
     /**
-     * Determines whether the given entity is managed by an entity manager or not
-     *
-     * @param object $entity
-     *
-     * @return bool
+     * Determines whether the given entity is managed by an entity manager or not.
      */
-    protected function isEntityDetached($entity)
+    private function isEntityDetached(object $entity): bool
     {
         $entityState = $this->getEntityManager()
             ->getUnitOfWork()
             ->getEntityState($entity);
 
-        return $entityState === UnitOfWork::STATE_DETACHED;
+        return UnitOfWork::STATE_DETACHED === $entityState;
     }
 }

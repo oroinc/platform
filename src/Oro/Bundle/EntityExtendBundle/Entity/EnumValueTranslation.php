@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
+use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
+ * Represents Gedmo translation dictionary for EnumValue entity.
+ *
  * @ORM\Table(name="oro_enum_value_trans", indexes={
  *      @ORM\Index(name="oro_enum_value_trans_idx", columns={"locale", "object_class", "field", "foreign_key"})
  * })
@@ -19,13 +21,6 @@ class EnumValueTranslation extends AbstractTranslation
      * @ORM\Column(name="foreign_key", type="string", length=32)
      */
     protected $foreignKey;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $content;
 
     /**
      * @var string

@@ -4,8 +4,11 @@ namespace Oro\Bundle\EmailBundle\Async;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -14,15 +17,16 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Message queue processor that purges emails attachments.
+ */
 class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const LIMIT = 1000;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -41,14 +45,8 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
      */
     private $configManager;
 
-    /**
-     * @param RegistryInterface $doctrine
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param ConfigManager $configManager
-     */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         MessageProducerInterface $producer,
         JobRunner $jobRunner,
         ConfigManager $configManager
@@ -64,13 +62,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $payload = JSON::decode($message->getBody());
-        $payload = array_merge([
-            'size' => null,
-            'all' => false,
-        ], $payload);
-
-        $size = $this->getSize($payload);
+        $size = $this->getSize($message->getBody());
         $emailAttachments = $this->getEmailAttachments($size);
 
         $result = $this->jobRunner->runUnique(
@@ -91,7 +83,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
                             sprintf('%s:%s', 'oro.email.purge_email_attachments_by_ids', md5(implode(',', $ids))),
                             function (JobRunner $jobRunner, Job $child) use ($newMessageData) {
                                 $newMessageData['jobId'] = $child->getId();
-                                $this->producer->send(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, $newMessageData);
+                                $this->producer->send(PurgeEmailAttachmentsByIdsTopic::getName(), $newMessageData);
                             }
                         );
                         $count = 0;
@@ -111,7 +103,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PURGE_EMAIL_ATTACHMENTS];
+        return [PurgeEmailAttachmentsTopic::getName()];
     }
 
     /**

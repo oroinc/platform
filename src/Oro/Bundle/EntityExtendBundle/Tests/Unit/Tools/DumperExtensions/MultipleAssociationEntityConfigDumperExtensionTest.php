@@ -3,29 +3,28 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const ASSOCIATION_SCOPE = 'test_scope';
-    const ATTR_NAME         = 'items';
+    private const ASSOCIATION_SCOPE = 'test_scope';
+    private const ATTR_NAME = 'items';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $associationBuilder;
+    private $associationBuilder;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->associationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->associationBuilder = $this->createMock(AssociationBuilder::class);
     }
 
     public function testSupportsPostUpdate()
@@ -48,10 +47,10 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
-            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+            ->willReturn(self::ASSOCIATION_SCOPE);
         $extension->expects($this->exactly(2))
             ->method('getAssociationAttributeName')
-            ->will($this->returnValue(self::ATTR_NAME));
+            ->willReturn(self::ATTR_NAME);
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
         $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
@@ -72,10 +71,10 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
-            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+            ->willReturn(self::ASSOCIATION_SCOPE);
         $extension->expects($this->once())
             ->method('getAssociationAttributeName')
-            ->will($this->returnValue(self::ATTR_NAME));
+            ->willReturn(self::ATTR_NAME);
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
 
@@ -94,13 +93,13 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
-            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+            ->willReturn(self::ASSOCIATION_SCOPE);
         $extension->expects($this->exactly(3))
             ->method('getAssociationAttributeName')
-            ->will($this->returnValue(self::ATTR_NAME));
+            ->willReturn(self::ATTR_NAME);
         $extension->expects($this->once())
             ->method('getAssociationKind')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
         $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
@@ -123,16 +122,16 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
-            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+            ->willReturn(self::ASSOCIATION_SCOPE);
         $extension->expects($this->exactly(3))
             ->method('getAssociationAttributeName')
-            ->will($this->returnValue(self::ATTR_NAME));
+            ->willReturn(self::ATTR_NAME);
         $extension->expects($this->once())
             ->method('getAssociationKind')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
         $extension->expects($this->once())
             ->method('getAssociationType')
-            ->will($this->returnValue('manyToOne'));
+            ->willReturn('manyToOne');
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
         $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
@@ -152,10 +151,10 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
      *
      * @return MultipleAssociationEntityConfigDumperExtension|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getExtensionMock(array $methods = [])
+    private function getExtensionMock(array $methods = [])
     {
         return $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension',
+            MultipleAssociationEntityConfigDumperExtension::class,
             [$this->configManager, $this->associationBuilder],
             '',
             true,
@@ -165,17 +164,15 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    protected function setTargetEntityConfigsExpectations(array $configs = [])
+    private function setTargetEntityConfigsExpectations(array $configs = [])
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with(self::ASSOCIATION_SCOPE)
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
     }
 }

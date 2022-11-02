@@ -16,30 +16,28 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassToEntityTypeTransformer */
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->transformer = new EntityClassToEntityTypeTransformer(
-            $this->valueNormalizer
-        );
+        $this->transformer = new EntityClassToEntityTypeTransformer($this->valueNormalizer);
     }
 
     /**
      * @dataProvider emptyValueProvider
      */
-    public function testTransformEmptyValue($value)
+    public function testTransformEmptyValue(?string $value)
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         self::assertSame(
             $value,
-            $this->transformer->transform('Test\Class', 'testField', $value, [], [])
+            $this->transformer->transform($value, [], [])
         );
     }
 
-    public function emptyValueProvider()
+    public function emptyValueProvider(): array
     {
         return [
             [null],
@@ -60,13 +58,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $expectedValue,
-            $this->transformer->transform(
-                'Test\Class',
-                'testField',
-                $value,
-                [],
-                [Context::REQUEST_TYPE => $requestType]
-            )
+            $this->transformer->transform($value, [], [Context::REQUEST_TYPE => $requestType])
         );
     }
 }

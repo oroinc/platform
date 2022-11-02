@@ -1,0 +1,62 @@
+data:
+    type: testapientity2
+    id: '{entity21Id}'
+    links:
+        self: '{baseUrl}/testapientity2/{entity21Id}'
+    attributes:
+        name: 'Entity 2 (1)'
+    relationships:
+        biM2OOwners:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/biM2OOwners'
+                related: '{baseUrl}/testapientity2/{entity21Id}/biM2OOwners'
+            data:
+                -
+                    type: testapientity1
+                    id: '{entityId}'
+        biM2MOwners:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/biM2MOwners'
+                related: '{baseUrl}/testapientity2/{entity21Id}/biM2MOwners'
+            data:
+                -
+                    type: testapientity1
+                    id: '{entityId}'
+        biM2MnDOwners:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/biM2MnDOwners'
+                related: '{baseUrl}/testapientity2/{entity21Id}/biM2MnDOwners'
+            data:
+                -
+                    type: testapientity1
+                    id: '{entityId}'
+        biO2MOwner:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/biO2MOwner'
+                related: '{baseUrl}/testapientity2/{entity21Id}/biO2MOwner'
+            data:
+                type: testapientity1
+                id: '{entityId}'
+        biO2MnDOwner:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/biO2MnDOwner'
+                related: '{baseUrl}/testapientity2/{entity21Id}/biO2MnDOwner'
+            data:
+                type: testapientity1
+                id: '{entityId}'
+        testapie1_uniO2M:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/testapie1_uniO2M'
+                related: '{baseUrl}/testapientity2/{entity21Id}/testapie1_uniO2M'
+            data:
+                type: testapientity1
+                id: '{entityId}'
+        testapie1_uniO2MnD:
+            links:
+                self: '{baseUrl}/testapientity2/{entity21Id}/relationships/testapie1_uniO2MnD'
+                related: '{baseUrl}/testapientity2/{entity21Id}/testapie1_uniO2MnD'
+            data:
+                type: testapientity1
+                id: '{entityId}'
+links:
+    self: '{baseUrl}/testapientity1/{entityId}/biM2O'

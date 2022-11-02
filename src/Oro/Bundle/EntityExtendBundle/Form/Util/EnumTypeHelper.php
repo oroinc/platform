@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides utility methods for building forms that contain enums and multi-enums fields.
+ */
 class EnumTypeHelper extends ConfigTypeHelper
 {
     const MULTI_ENUM = 'multiEnum';
@@ -47,7 +50,7 @@ class EnumTypeHelper extends ConfigTypeHelper
     }
 
     /**
-     * Checks if there are any other fields except the given field which use the the given enum
+     * Checks if there are any other fields except the given field which use the given enum.
      *
      * @param string $enumCode
      * @param string $className

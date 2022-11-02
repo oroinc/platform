@@ -1,12 +1,38 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    require('jquery-ui');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const mediator = require('oroui/js/mediator');
+    let config = require('module-config').default(module.id);
+    require('jquery-ui/position');
 
-    var scrollHelper = {
+    config = _.extend({
+        scrollableContainerSelector: 'html'
+    }, config);
+
+    let _scrollTimer;
+
+    const getScrollY = (function(scroller) {
+        if (window.pageYOffset !== undefined) {
+            return function() {
+                return window.pageYOffset;
+            };
+        }
+
+        if (window.scrollTop !== undefined) {
+            return function() {
+                return window.scrollTop;
+            };
+        }
+
+        return function() {
+            return scroller.scrollTop;
+        };
+    })(document.documentElement || document.body.parentNode || document.body);
+
+    const scrollHelper = {
         /**
          * Height of header on mobile devices
          */
@@ -25,7 +51,7 @@ define(function(require) {
         /**
          * Select global scrollable container
          */
-        _scrollableContainerSelector: '#container',
+        _scrollableContainerSelector: config.scrollableContainerSelector,
 
         /**
          * Store scroll position
@@ -33,9 +59,21 @@ define(function(require) {
         _scrollState: null,
 
         /**
+         * Timeout (ms) for stop scrolling
+         */
+        _scrollTimeout: 50,
+
+        /**
+         * Store scroll direction (1 - down, -1 - up, 0 - no scrolling)
+         */
+        _scrollDirection: null,
+
+        /**
          * Disable/Enable scroll state
          */
         _isBodyTouchScrollDisabled: false,
+
+        _passiveEventSupported: void 0,
 
         /**
          * Disable body scroll on touch devices
@@ -46,7 +84,7 @@ define(function(require) {
                 return false;
             }
 
-            this._scrollState = window.scrollY;
+            this._scrollState = this.getScrollY();
 
             $(this._scrollableContainerSelector)
                 .addClass('disable-touch-scrolling')
@@ -54,7 +92,7 @@ define(function(require) {
 
             $(document)
                 .off('touchmove.disableScroll')
-                .on('touchmove.disableScroll', _.bind(this._preventMobileScrolling, this));
+                .on('touchmove.disableScroll', this._preventMobileScrolling.bind(this));
 
             this._isBodyTouchScrollDisabled = true;
         },
@@ -86,8 +124,8 @@ define(function(require) {
          * @private
          */
         _preventMobileScrolling: function(event) {
-            var isTouchMoveAllowed = true;
-            var target = event.target;
+            let isTouchMoveAllowed = true;
+            let target = event.target;
 
             while (target !== null) {
                 if (target.classList && target.classList.contains('disable-scrolling')) {
@@ -107,10 +145,10 @@ define(function(require) {
          * @param {jQueryEvent} event
          */
         removeIOSRubberEffect: function(event) {
-            var element = event.currentTarget;
-            var top = element.scrollTop;
-            var totalScroll = element.scrollHeight;
-            var currentScroll = top + element.offsetHeight;
+            const element = event.currentTarget;
+            const top = element.scrollTop;
+            const totalScroll = element.scrollHeight;
+            const currentScroll = top + element.offsetHeight;
 
             if (top === 0) {
                 element.scrollTop = 1;
@@ -136,12 +174,12 @@ define(function(require) {
             if ($(el).css('overflow') === 'hidden') {
                 return false;
             }
-            var scroll = (a && a === 'left') ? 'scrollLeft' : 'scrollTop';
+            const scroll = (a && a === 'left') ? 'scrollLeft' : 'scrollTop';
             if (el[scroll] > 0) {
                 return true;
             }
             el[scroll] = 1;
-            var has = (el[scroll] > 0);
+            const has = (el[scroll] > 0);
             el[scroll] = 0;
             return has;
         },
@@ -179,13 +217,13 @@ define(function(require) {
                 bottom: 0,
                 right: 0
             });
-            var current = el;
-            var midRect = this.getEditableClientRect(current);
+            let current = el;
+            let midRect = this.getEditableClientRect(current);
             if (onAfterGetClientRect) {
                 onAfterGetClientRect(current, midRect);
             }
-            var borders;
-            var resultRect = {
+            let borders;
+            const resultRect = {
                 top: midRect.top + increments.top,
                 left: midRect.left + increments.left,
                 bottom: midRect.bottom + increments.bottom,
@@ -214,7 +252,7 @@ define(function(require) {
                 midRect = this.getFinalVisibleRect(current, onAfterGetClientRect);
                 borders = $.fn.getBorders(current);
 
-                var style = window.getComputedStyle(current);
+                const style = window.getComputedStyle(current);
                 if (style.overflowX !== 'visible' || style.overflowY !== 'visible') {
                     if (resultRect.top < midRect.top + borders.top) {
                         resultRect.top = midRect.top + borders.top;
@@ -240,26 +278,26 @@ define(function(require) {
         },
 
         getFinalVisibleRect: function(current, onAfterGetClientRect) {
-            var rect = this.getEditableClientRect(current);
+            const rect = this.getEditableClientRect(current);
             if (onAfterGetClientRect) {
                 onAfterGetClientRect(current, rect);
             }
 
-            var border = $.fn.getBorders(current);
-            var verticalScrollIsVisible = (current.offsetWidth - border.left - border.right) > current.clientWidth;
-            var horizontalScrollIsVisible = (current.offsetHeight - border.top - border.bottom) > current.clientHeight;
+            const border = $.fn.getBorders(current);
+            const vScrollIsVisible = (current.offsetWidth - border.left - border.right) > current.clientWidth;
+            const hScrollIsVisible = (current.offsetHeight - border.top - border.bottom) > current.clientHeight;
 
-            if (horizontalScrollIsVisible && current.scrollHeight > current.clientHeight) {
+            if (hScrollIsVisible && current.scrollHeight > current.clientHeight) {
                 rect.bottom -= this.scrollbarWidth();
             }
-            if (verticalScrollIsVisible && current.scrollWidth > current.clientWidth) {
+            if (vScrollIsVisible && current.scrollWidth > current.clientWidth) {
                 rect.right -= this.scrollbarWidth();
             }
             return rect;
         },
 
         getEditableClientRect: function(el) {
-            var rect = el.getBoundingClientRect();
+            const rect = el.getBoundingClientRect();
             return {
                 top: rect.top,
                 left: rect.left,
@@ -269,14 +307,14 @@ define(function(require) {
         },
 
         isCompletelyVisible: function(el, onAfterGetClientRect) {
-            var rect = this.getEditableClientRect(el);
+            const rect = this.getEditableClientRect(el);
             if (onAfterGetClientRect) {
                 onAfterGetClientRect(el, rect);
             }
             if (rect.top === rect.bottom || rect.left === rect.right) {
                 return false;
             }
-            var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
+            const visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
             return visibleRect.top === rect.top &&
                 visibleRect.bottom === rect.bottom &&
                 visibleRect.left === rect.left &&
@@ -288,15 +326,15 @@ define(function(require) {
                 return {vertical: 0, horizontal: 0};
             }
 
-            var rect = this.getEditableClientRect(el);
+            const rect = this.getEditableClientRect(el);
             if (onAfterGetClientRect) {
                 onAfterGetClientRect(el, rect);
             }
             if (rect.top === rect.bottom || rect.left === rect.right) {
                 return {vertical: 0, horizontal: 0};
             }
-            var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
-            var scrolls = {
+            const visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
+            const scrolls = {
                 vertical: rect.top !== visibleRect.top ? visibleRect.top - rect.top
                     : (rect.bottom !== visibleRect.bottom ? visibleRect.bottom - rect.bottom : 0),
                 horizontal: rect.left !== visibleRect.left ? visibleRect.left - rect.left
@@ -323,13 +361,13 @@ define(function(require) {
             scrolls = _.extend({}, scrolls);
 
             $(el).parents().each(function() {
-                var $this = $(this);
+                const $this = $(this);
                 if (scrolls.horizontal !== 0) {
                     switch ($this.css('overflowX')) {
                         case 'auto':
                         case 'scroll':
                             if (this.clientWidth < this.scrollWidth) {
-                                var oldScrollLeft = this.scrollLeft;
+                                const oldScrollLeft = this.scrollLeft;
                                 this.scrollLeft = this.scrollLeft - scrolls.horizontal;
                                 scrolls.horizontal += this.scrollLeft - oldScrollLeft;
                             }
@@ -343,7 +381,7 @@ define(function(require) {
                         case 'auto':
                         case 'scroll':
                             if (this.clientHeight < this.scrollHeight) {
-                                var oldScrollTop = this.scrollTop;
+                                const oldScrollTop = this.scrollTop;
                                 this.scrollTop = this.scrollTop - scrolls.vertical;
                                 scrolls.vertical += this.scrollTop - oldScrollTop;
                             }
@@ -355,6 +393,55 @@ define(function(require) {
             });
 
             return scrolls;
+        },
+
+        getScrollY: getScrollY,
+
+        _setScrollDirection: function() {
+            if (this._isBodyTouchScrollDisabled) {
+                return;
+            }
+
+            clearTimeout(_scrollTimer);
+
+            const scrollY = this.getScrollY();
+            const direction = Math.sign(scrollY - this._scrollState);
+
+            if (direction && direction !== this._scrollDirection) {
+                mediator.trigger('scroll:direction:change', direction);
+            }
+
+            this._scrollDirection = direction;
+            this._scrollState = scrollY;
+
+            _scrollTimer = setTimeout(function() {
+                mediator.trigger('scroll:direction:change', 0);
+            }, this._scrollTimeout);
+        },
+
+        /**
+         * Detects support for the passive option to addEventListener
+         */
+        isPassiveEventSupported: function() {
+            if (this._passiveEventSupported !== void 0) {
+                return this._passiveEventSupported;
+            }
+
+            let support = false;
+
+            try {
+                const opts = Object.defineProperty({}, 'passive', {
+                    get: function() {
+                        support = true;
+                    }
+                });
+                const fn = function() {};
+
+                window.addEventListener('checkPassiveEvent', fn, opts);
+                window.removeEventListener('checkPassiveEvent', fn, opts);
+            } catch (e) {}
+
+            return this._passiveEventSupported = support;
         }
     };
 
@@ -362,6 +449,8 @@ define(function(require) {
     $(window).bindFirst('resize', function() {
         scrollHelper._documentHeight = -1;
     });
+
+    $(window).on('scroll', scrollHelper._setScrollDirection.bind(scrollHelper));
 
     return scrollHelper;
 });

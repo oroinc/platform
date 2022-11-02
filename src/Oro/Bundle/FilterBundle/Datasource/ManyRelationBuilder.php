@@ -7,9 +7,6 @@ class ManyRelationBuilder
     /** @var ManyRelationBuilderInterface[] */
     protected $builders = [];
 
-    /**
-     * @param ManyRelationBuilderInterface $builder
-     */
     public function addBuilder(ManyRelationBuilderInterface $builder)
     {
         $this->builders[] = $builder;

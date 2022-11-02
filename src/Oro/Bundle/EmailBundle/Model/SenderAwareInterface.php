@@ -7,8 +7,5 @@ namespace Oro\Bundle\EmailBundle\Model;
  */
 interface SenderAwareInterface
 {
-    /**
-     * @return From|null
-     */
     public function getSender(): ?From;
 }

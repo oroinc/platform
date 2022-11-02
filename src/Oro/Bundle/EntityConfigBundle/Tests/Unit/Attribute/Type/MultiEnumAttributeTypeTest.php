@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\MultiEnumAttributeType;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 {
@@ -13,11 +13,6 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
     protected function getAttributeType()
     {
         return new MultiEnumAttributeType();
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('multiEnum', $this->getAttributeType()->getType());
     }
 
     /**
@@ -34,8 +29,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSearchableValue()
     {
-        $value1 = new StubEnumValue('id1', 'name1', 101);
-        $value2 = new StubEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('id1', 'name1', 101);
+        $value2 = new TestEnumValue('id2', 'name2', 102);
 
         $this->assertSame(
             'name1 name2',
@@ -43,70 +38,61 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be an array or Traversable, [string] given
-     */
     public function testGetSearchableValueTraversableException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
+
         $this->getAttributeType()->getSearchableValue($this->attribute, '', $this->localization);
     }
 
-    /**
-     * @codingStandardsIgnoreStart
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given
-     *
-     * @codingStandardsIgnoreEnd
-     */
     public function testGetSearchableValueValueException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given'
+        );
+
         $this->getAttributeType()->getSearchableValue($this->attribute, [42], $this->localization);
     }
 
     public function testGetFilterableValue()
     {
-        $value1 = new StubEnumValue('id1', 'name1', 101);
-        $value2 = new StubEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('id1', 'name1', 101);
+        $value2 = new TestEnumValue('id2', 'name2', 102);
 
         $this->assertSame(
             [
-                self::FIELD_NAME . '_id1' => 1,
-                self::FIELD_NAME . '_id2' => 1
+                self::FIELD_NAME . '_enum.id1' => 1,
+                self::FIELD_NAME . '_enum.id2' => 1
             ],
             $this->getAttributeType()->getFilterableValue($this->attribute, [$value1, $value2], $this->localization)
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be an array or Traversable, [string] given
-     */
     public function testGetFilterableValueTraversableException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
+
         $this->getAttributeType()->getFilterableValue($this->attribute, '', $this->localization);
     }
 
-    /**
-     * @codingStandardsIgnoreStart
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given
-     *
-     * @codingStandardsIgnoreEnd
-     */
     public function testGetFilterableValueValueException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given'
+        );
+
         $this->getAttributeType()->getFilterableValue($this->attribute, [42], $this->localization);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValue()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSortableValue($this->attribute, true, $this->localization);
     }
 }

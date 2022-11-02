@@ -1,0 +1,10 @@
+imports:
+    - { workflow: workflow_to_import, as: workflow_with_numeric_array, replace: [] }
+
+workflows:
+    workflow_with_numeric_array:
+        entity: Some\Another\Entity
+        applications: ['application_appended']
+        steps:
+            step_a:
+                allowed_transitions: ['transition_appended']

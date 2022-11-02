@@ -1,30 +1,33 @@
-assets:
-    css:
-        'timepicker':
-            - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
-        'oroui':
-            - 'bundles/components/jstree/dist/themes/default/style.min.css'
+css:
+    inputs:
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
 
-            # Bootstrap port
-            - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
+        # Styles
+        - '~timepicker/jquery.timepicker.css'
 
-            # libraries' styles
-            - 'bundles/bowerassets/font-awesome/css/font-awesome.css'
-            - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
-            - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
-            - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
-            - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
-            - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
-            - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
-            - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
-            - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
+        - '~jstree/dist/themes/default/style.min.css'
 
-            # customized libraries' styles
-            - 'bundles/oroui/css/jquery-ui.grid.css'
-            - 'bundles/oroui/css/jquery-ui.custom.css'
-            - 'bundles/oroui/css/lightgallery/lightgallery.scss'
-            - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar-custome.css'
+        # Bootstrap port
+        - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
-            # custom styles
-            - 'bundles/oroui/css/scss/main.scss'
-            - 'bundles/oroui/css/all.css'
+        # Libraries styles
+        - '~slick-carousel/slick/slick.scss'
+        - 'bundles/oroui/css/scss/font-awesome/_core.scss'
+        - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
+        - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
+        - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
+        - '~overlayscrollbars/css/OverlayScrollbars.css'
+        - '~jquery-ui-multiselect-widget/jquery.multiselect.css'
+        - '~jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
+
+        # customized libraries' styles
+        - 'bundles/oroui/css/jquery-ui.grid.css'
+        - 'bundles/oroui/css/jquery-ui.custom.css'
+
+        # custom styles
+        - 'bundles/oroui/css/scss/main.scss'
+        - 'bundles/oroui/css/all.css'
+    output: css/oro.css
+    auto_rtl_inputs:
+        - 'bundles/oro*/**'

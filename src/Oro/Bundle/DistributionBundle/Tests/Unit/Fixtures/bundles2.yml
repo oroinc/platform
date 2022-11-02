@@ -2,3 +2,5 @@ bundles:
     - { name: Acme\Bundle\TestBundle\AcmeFirstExcludedBundle, priority: 50 }
     - { name: Acme\Bundle\TestBundle\AcmeSecondExcludedBundle, priority: 50 }
     - { name: Acme\Bundle\TestBundle\AcmeThirdExcludedBundle, priority: 50 }
+    - { name: Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub, optional: true }
+    - { name: Acme\Bundle\TestBundle\AcmeThirdExcludedBundle3, optional: true }

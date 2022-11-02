@@ -33,8 +33,8 @@
     &__title {
         background: $primary-300;
         font-size: 17px;
-        font-weight: bold;
-        color: #fff;
+        font-weight: font-weight('bold');
+        color: $primary-inverse;
         text-transform: uppercase;
         display: block;
         margin-bottom: 16px;
@@ -61,11 +61,11 @@
         }
     }
 
-    &__footer {
-        padding-left: 0;
+    &__fieldset {
+        max-width: none;
     }
 
-    &__oauth {
+    &__footer {
         padding-left: 0;
     }
 
@@ -82,6 +82,15 @@
         }
     }
 
+    &.form-signin--forgot {
+        width: $signin-forgot-mobile-width;
+        max-width: 100%;
+        
+        input[type='text'] {
+            width: 100%;
+        }
+    }
+
     .add-on {
         width: auto;
         height: auto;
@@ -89,13 +98,13 @@
         text-align: left;
         padding-right: 0;
 
-        & + input[type="text"],
-        & + input[type="email"],
-        & + input[type="password"] {
+        + input[type='text'],
+        + input[type='email'],
+        + input[type='password'] {
             width: 100%;
         }
 
-        & + select {
+        + select {
             width: 174px;
             height: 36px;
             box-sizing: border-box;
@@ -118,19 +127,32 @@
     .input-prepend {
         display: block;
     }
-}
 
-.form-reset {
-    max-width: 320px !important;
+    &--reset {
+        // stylelint-disable-next-line declaration-no-important
+        max-width: 320px !important;
 
-    .add-on {
-        width: 120px;
-        font-size: 12px;
+        .add-on {
+            width: 120px;
+            font-size: 12px;
 
-        & + input[type="text"],
-        & + input[type="email"],
-        & + input[type="password"] {
-            width: 138px;
+            + input[type='text'],
+            + input[type='email'],
+            + input[type='password'] {
+                width: 138px;
+            }
+        }
+    }
+
+    &--login.form-row-layout {
+        .form-signin__footer {
+            padding-left: 0;
+        }
+    }
+
+    &.form-row-layout {
+        .form-signin__oauth {
+            padding-left: 0;
         }
     }
 }

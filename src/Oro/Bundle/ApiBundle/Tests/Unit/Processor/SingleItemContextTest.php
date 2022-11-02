@@ -17,7 +17,7 @@ class SingleItemContextTest extends \PHPUnit\Framework\TestCase
     /** @var SingleItemContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -29,8 +29,11 @@ class SingleItemContextTest extends \PHPUnit\Framework\TestCase
     {
         self::assertNull($this->context->getId());
 
-        $this->context->setId('test');
-        self::assertEquals('test', $this->context->getId());
-        self::assertEquals('test', $this->context->get(SingleItemContext::ID));
+        $id = 'test';
+        $this->context->setId($id);
+        self::assertSame($id, $this->context->getId());
+
+        $this->context->setId(null);
+        self::assertNull($this->context->getId());
     }
 }

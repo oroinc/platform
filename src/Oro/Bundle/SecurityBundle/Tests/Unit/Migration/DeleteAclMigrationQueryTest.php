@@ -2,29 +2,29 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Migration\DeleteAclMigrationQuery;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclProvider;
+    /** @var MutableAclProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclProvider;
 
     /** @var ObjectIdentityInterface */
-    protected $oid;
+    private $oid;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container   = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->oid         = new ObjectIdentity('entity', 'Test\Class');
-        $this->aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->aclProvider = $this->createMock(MutableAclProvider::class);
+        $this->oid = new ObjectIdentity('entity', 'Test\Class');
     }
 
     public function testGetDescription()
@@ -32,7 +32,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
-            ->will($this->returnValue($this->aclProvider));
+            ->willReturn($this->aclProvider);
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
@@ -47,7 +47,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
@@ -59,11 +59,11 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
-            ->will($this->returnValue($this->aclProvider));
+            ->willReturn($this->aclProvider);
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
-        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
             ->method('info')
             ->with(sprintf('Remove ACL for %s.', (string)$this->oid));
@@ -79,11 +79,11 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
-        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())
             ->method('info');
         $this->aclProvider->expects($this->never())

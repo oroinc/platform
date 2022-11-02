@@ -21,11 +21,6 @@ class RenameActivityAssociations20
     /** @var RenameExtendedManyToManyAssociation20 */
     private $helper;
 
-    /**
-     * @param Connection                      $connection
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param RenameExtension                 $renameExtension
-     */
     public function __construct(
         Connection $connection,
         ExtendDbIdentifierNameGenerator $nameGenerator,
@@ -35,10 +30,6 @@ class RenameActivityAssociations20
         $this->helper = new RenameExtendedManyToManyAssociation20($connection, $nameGenerator, $renameExtension);
     }
 
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     public function rename(Schema $schema, QueryBag $queries)
     {
         $activityClassNames = $this->loadActivityClassNames();

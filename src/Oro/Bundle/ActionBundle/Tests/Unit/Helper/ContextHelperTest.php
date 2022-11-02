@@ -11,46 +11,34 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ContextHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ROUTE = 'test_route';
-    const REQUEST_URI = '/test/request/uri';
+    private const ROUTE = 'test_route';
+    private const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    protected $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var ContextHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
-        $this->helper = new ContextHelper($this->doctrineHelper, $propertyAccessor, $this->requestStack);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->helper, $this->doctrineHelper, $this->requestStack);
+        $this->helper = new ContextHelper(
+            $this->doctrineHelper,
+            PropertyAccess::createPropertyAccessor(),
+            $this->requestStack
+        );
     }
 
     /**
      * @dataProvider getContextDataProvider
-     *
-     * @param Request|null $request
-     * @param array $expected
-     * @param int $calls
      */
-    public function testGetContext($request, array $expected, $calls)
+    public function testGetContext(?Request $request, array $expected, int $calls)
     {
         $this->requestStack->expects($this->exactly($calls))
             ->method('getCurrentRequest')
@@ -59,10 +47,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getContext());
     }
 
-    /**
-     * @return array
-     */
-    public function getContextDataProvider()
+    public function getContextDataProvider(): array
     {
         return [
             [
@@ -115,16 +100,10 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getActionParametersDataProvider
-     *
-     * @param array $context
-     * @param array $expected
      */
     public function testGetActionParameters(array $context, array $expected)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Request $request */
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('get')
             ->with('_route')
@@ -134,7 +113,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::REQUEST_URI);
 
         $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         if (array_key_exists('entity', $context)) {
@@ -147,7 +126,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper->expects($this->any())
                 ->method('isNewEntity')
                 ->with($context['entity'])
-                ->willReturn(is_null($context['entity']->id));
+                ->willReturn(null === $context['entity']->id);
 
             $this->doctrineHelper->expects($context['entity']->id ? $this->once() : $this->never())
                 ->method('getEntityIdentifier')
@@ -158,19 +137,15 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getActionParameters($context));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Master Request is not defined
-     */
     public function testGetActionParametersException()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Master Request is not defined');
+
         $this->helper->getActionParameters([]);
     }
 
-    /**
-     * @return array
-     */
-    public function getActionParametersDataProvider()
+    public function getActionParametersDataProvider(): array
     {
         return [
             'empty context' => [
@@ -178,8 +153,12 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI],
             ],
             'entity_class' => [
-                'context' => ['entity_class' => '\stdClass'],
-                'expected' => ['route' => self::ROUTE, 'entityClass' => '\stdClass', 'fromUrl' => self::REQUEST_URI],
+                'context' => ['entity_class' => \stdClass::class],
+                'expected' => [
+                    'route' => self::ROUTE,
+                    'entityClass' => \stdClass::class,
+                    'fromUrl' => self::REQUEST_URI
+                ],
             ],
             'new entity' => [
                 'context' => ['entity' => $this->getEntity()],
@@ -212,14 +191,13 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getActionDataDataProvider
-     *
-     * @param Request|null $request
-     * @param int $requestStackCalls
-     * @param ActionData $expected
-     * @param array $context
      */
-    public function testGetActionData($request, $requestStackCalls, ActionData $expected, array $context = null)
-    {
+    public function testGetActionData(
+        ?Request $request,
+        int $requestStackCalls,
+        ActionData $expected,
+        array $context = null
+    ) {
         $entity = new \stdClass();
         $entity->id = 42;
 
@@ -252,10 +230,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getActionData($context));
     }
 
-    /**
-     * @return array
-     */
-    public function getActionDataDataProvider()
+    public function getActionDataDataProvider(): array
     {
         $entity = new \stdClass();
         $entityClass = \stdClass::class;
@@ -398,11 +373,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($actionData, $this->helper->getActionData($context2));
     }
 
-    /**
-     * @param int $id
-     * @return \stdClass
-     */
-    protected function getEntity($id = null)
+    private function getEntity(int $id = null): object
     {
         $entity = new \stdClass();
         $entity->id = $id;
@@ -410,8 +381,11 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         return $entity;
     }
 
-    protected function generateOperationToken($entityClass = null, $entityId = null, $datagrid = null)
-    {
+    private function generateOperationToken(
+        string $entityClass = null,
+        mixed $entityId = null,
+        string $datagrid = null
+    ): string {
         $array = [];
 
         $properties = [
@@ -427,6 +401,6 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         }
         ksort($array);
 
-        return md5(json_encode($array, JSON_NUMERIC_CHECK));
+        return md5(json_encode($array, JSON_NUMERIC_CHECK | JSON_THROW_ON_ERROR));
     }
 }

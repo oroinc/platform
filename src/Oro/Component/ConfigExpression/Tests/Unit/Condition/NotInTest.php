@@ -10,7 +10,7 @@ class NotInTest extends \PHPUnit\Framework\Testcase
 {
     protected $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\NotIn();
         $this->condition->setContextAccessor(new ContextAccessor());

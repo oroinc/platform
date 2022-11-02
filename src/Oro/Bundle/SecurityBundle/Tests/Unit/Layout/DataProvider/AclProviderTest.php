@@ -2,236 +2,222 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AclProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var AclProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->provider = new AclProvider(
             $this->authorizationChecker,
-            $this->tokenAccessor,
             $this->doctrine
         );
     }
 
-    public function testIsGrantedByAclAnnotationId()
+    public function testIsGrantedByAclAnnotationId(): void
     {
         $attributes = 'acme_product_view';
         $expectedResult = true;
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($attributes, null)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes));
     }
 
-    public function testIsGrantedByObjectIdentityDescriptor()
-    {
-        $attributes = 'VIEW';
-        $entity = 'entity:Acme/DemoBundle/Entity/AcmeEntity';
-        $expectedResult = true;
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+    /**
+     * @dataProvider getIsGrantedByObjectIdentityDescriptorDataProvider
+     */
+    public function testIsGrantedByObjectIdentityDescriptor(
+        array|string $attributes,
+        string $entity,
+        array $isGrantedCalls,
+        bool $expectedResult
+    ): void {
+        $this->authorizationChecker->expects(self::exactly(count($isGrantedCalls)))
             ->method('isGranted')
-            ->with($attributes, $entity)
-            ->will($this->returnValue($expectedResult));
+            ->willReturnMap($isGrantedCalls);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
 
-    public function testIsGrantedForNotEntityObject()
+    public function getIsGrantedByObjectIdentityDescriptorDataProvider(): array
+    {
+        return [
+            [
+                'attributes' => 'VIEW',
+                'entity' => 'entity:Acme/DemoBundle/Entity/AcmeEntity',
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                ],
+                'expectedResult' => true,
+            ],
+            [
+                'attributes' => ['VIEW', 'EDIT'],
+                'entity' => 'entity:Acme/DemoBundle/Entity/AcmeEntity',
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                    ['EDIT', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true]
+                ],
+                'expectedResult' => true,
+            ],
+            [
+                'attributes' => ['VIEW', 'EDIT'],
+                'entity' => 'entity:Acme/DemoBundle/Entity/AcmeEntity',
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                    ['EDIT', 'entity:Acme/DemoBundle/Entity/AcmeEntity', false]
+                ],
+                'expectedResult' => false,
+            ],
+        ];
+    }
+
+    public function testIsGrantedForNotEntityObject(): void
     {
         $attributes = 'VIEW';
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($attributes, $this->identicalTo($entity))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
 
-    public function testIsGrantedForExistingEntity()
+    public function testIsGrantedForExistingEntity(): void
     {
         $attributes = 'VIEW';
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects(self::once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-        $uow->expects($this->once())
+            ->willReturn($uow);
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($entity)
-            ->will($this->returnValue(false));
-        $uow->expects($this->once())
+            ->willReturn(false);
+        $uow->expects(self::once())
             ->method('isInIdentityMap')
             ->with($entity)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($attributes, $this->identicalTo($entity))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
 
-    public function testIsGrantedForNewEntity()
+    public function testIsGrantedForNewEntity(): void
     {
         $attributes = 'VIEW';
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects(self::once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-        $uow->expects($this->once())
+            ->willReturn($uow);
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($entity)
-            ->will($this->returnValue(true));
-        $uow->expects($this->never())
+            ->willReturn(true);
+        $uow->expects(self::never())
             ->method('isInIdentityMap');
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($attributes, 'entity:' . ClassUtils::getRealClass($entity))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
 
-    public function testIsGrantedForEntityWhichIsNotInUowYet()
+    public function testIsGrantedForEntityWhichIsNotInUowYet(): void
     {
         $attributes = 'VIEW';
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects(self::once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-        $uow->expects($this->once())
+            ->willReturn($uow);
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($entity)
-            ->will($this->returnValue(false));
-        $uow->expects($this->once())
+            ->willReturn(false);
+        $uow->expects(self::once())
             ->method('isInIdentityMap')
             ->with($entity)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($attributes, 'entity:' . ClassUtils::getRealClass($entity))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
+        self::assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
 
-    public function testIsGrantedHasNoUser()
+    public function testIsGrantedHasNoUser(): void
     {
         $attributes = 'acme_product_view';
+        $expectedResult = false;
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(false));
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with($attributes, null)
+            ->willReturn($expectedResult);
 
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
-
-        $this->assertFalse($this->provider->isGranted($attributes));
+        self::assertFalse($this->provider->isGranted($attributes));
     }
 }

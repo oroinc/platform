@@ -20,7 +20,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     private $providerDecorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->createMock(ConstraintsProviderInterface::class);
 
@@ -31,15 +31,12 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     {
         $constraints = [new NameOrOrganization()];
 
-        $this->provider
-            ->expects($this->any())
+        $this->provider->expects($this->any())
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects($this->any())
+        $form->expects($this->any())
             ->method('getParent')
             ->willReturn(null);
 
@@ -50,15 +47,12 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     {
         $constraints = [new NotBlank()];
 
-        $this->provider
-            ->expects($this->any())
+        $this->provider->expects($this->any())
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects($this->any())
+        $form->expects($this->any())
             ->method('getParent')
             ->willReturn($this->createMock(FormInterface::class));
 
@@ -69,19 +63,15 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     {
         $constraints = [new NotBlank(), new NameOrOrganization()];
 
-        $this->provider
-            ->expects($this->any())
+        $this->provider->expects($this->any())
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects($this->any())
+        $form->expects($this->any())
             ->method('getParent')
             ->willReturn($this->createMock(FormInterface::class));
-        $form
-            ->expects($this->any())
+        $form->expects($this->any())
             ->method('getName')
             ->willReturn('parentName');
 

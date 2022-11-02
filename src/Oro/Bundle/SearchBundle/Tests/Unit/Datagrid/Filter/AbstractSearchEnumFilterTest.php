@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEnumFilter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -16,33 +17,22 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /** @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-    protected $filterUtility;
-
     /** @var DictionaryApiEntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $dictionaryManager;
 
     /** @var SearchEnumFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-
-        $this->filterUtility = $this->createMock(FilterUtility::class);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
-
         $this->dictionaryManager = $this->createMock(DictionaryApiEntityManager::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testApplyExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(UnexpectedTypeException::class);
+
         $this->filter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
@@ -56,7 +46,6 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
         $formView = new FormView();
         $formView->children['type'] = $childFormView;
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('createView')
@@ -80,11 +69,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
                 'name' => 'test',
                 'label' => 'Test',
                 'choices' => [],
-                'data_name' => 'field',
-                'ftype' => 'multiselect',
-                'options' => [
-                    'class' => \stdClass::class
-                ],
+                'type' => 'multiselect',
                 'lazy' => false,
                 'class' => 'stdClass',
                 'initialData' => null

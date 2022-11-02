@@ -7,26 +7,18 @@ use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 
 class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entity;
+    /** @var |\PHPUnit\Framework\MockObject\MockObject */
+    private $entity;
 
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldValue;
+    /** @var |\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldValue;
 
-    /**
-     * @var FieldConfigId|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldConfigId;
+    /** @var FieldConfigId|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldConfigId;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->fieldConfigId = $this->getMockBuilder(FieldConfigId::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldConfigId = $this->createMock(FieldConfigId::class);
     }
 
     public function testGetterSetters()

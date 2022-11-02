@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -172,7 +172,7 @@ class DeferredScheduler implements LoggerAwareInterface
             }
 
             while ($lateArguments = array_shift($this->lateArgumentsResolving)) {
-                list($command, $argumentsCallback, $cron) = $lateArguments;
+                [$command, $argumentsCallback, $cron] = $lateArguments;
                 $arguments = call_user_func($argumentsCallback);
                 $schedule = $this->ensureCreate($command, $arguments, $cron);
                 if ($schedule) {
@@ -192,10 +192,6 @@ class DeferredScheduler implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param array $schedules
-     * @param array $arguments
-     */
     private function removeSchedules(array $schedules, array $arguments)
     {
         $schedules = $this->schedulesByArgumentsFilter->filter($schedules, $arguments);

@@ -4,6 +4,10 @@ namespace Oro\Bundle\UserBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * This constraint is used to check that a password against requirements from the constraint
+ * or stored in the system config (if not set).
+ */
 class PasswordComplexity extends Constraint
 {
     /**
@@ -33,12 +37,4 @@ class PasswordComplexity extends Constraint
     public $requireNumbers;
 
     public $requireSpecialCharacter;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'oro_user.validator.password_complexity';
-    }
 }

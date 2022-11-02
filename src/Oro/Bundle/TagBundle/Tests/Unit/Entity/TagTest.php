@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class TagTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Tag
-     */
-    protected $tag;
+    /** @var Tag */
+    private $tag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tag = new Tag();
 
@@ -44,7 +43,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
 
     public function testAuthorAndUpdaterStoring()
     {
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock(User::class);
 
         $this->tag->setOwner($user);
         $this->assertEquals($user, $this->tag->getOwner());
@@ -56,13 +55,13 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $oldUpdatedTime = $this->tag->getUpdated();
         sleep(1);
         $this->tag->doUpdate();
-        $this->assertInstanceOf('\DateTime', $this->tag->getUpdated());
+        $this->assertInstanceOf(\DateTime::class, $this->tag->getUpdated());
         $this->assertNotEquals($oldUpdatedTime, $this->tag->getUpdated());
     }
 
     public function testGetTagging()
     {
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->tag->getTagging());
+        $this->assertInstanceOf(ArrayCollection::class, $this->tag->getTagging());
     }
 
     public function testOwners()
@@ -79,8 +78,8 @@ class TagTest extends \PHPUnit\Framework\TestCase
 
     public function testOrganization()
     {
-        $entity         = $this->tag;
-        $organization   = new Organization();
+        $entity = $this->tag;
+        $organization = new Organization();
 
         $this->assertNull($entity->getOrganization());
         $entity->setOrganization($organization);

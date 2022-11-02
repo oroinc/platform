@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config\Id;
 
+/**
+ * Stores data config identification entity.
+ */
 class EntityConfigId implements ConfigIdInterface
 {
     /** @var string */
@@ -57,7 +60,17 @@ class EntityConfigId implements ConfigIdInterface
      */
     public function unserialize($serialized)
     {
-        list($this->className, $this->scope) = unserialize($serialized);
+        [$this->className, $this->scope] = unserialize($serialized);
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->className, $this->scope];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [$this->className, $this->scope] = $serialized;
     }
 
     /**

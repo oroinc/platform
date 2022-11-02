@@ -1,10 +1,8 @@
-define([
-    'backgrid',
-    'orodatagrid/js/datagrid/formatter/cell-formatter'
-], function(Backgrid, CellFormatter) {
+define(function(require) {
     'use strict';
 
-    var StringCell;
+    const Backgrid = require('backgrid');
+    const CellFormatter = require('orodatagrid/js/datagrid/formatter/cell-formatter');
 
     /**
      * String column cell. Added missing behaviour.
@@ -13,45 +11,60 @@ define([
      * @class   oro.datagrid.cell.StringCell
      * @extends Backgrid.StringCell
      */
-    StringCell = Backgrid.StringCell.extend({
+    const StringCell = Backgrid.StringCell.extend({
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
         formatter: new CellFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function StringCell() {
-            StringCell.__super__.constructor.apply(this, arguments);
+        constructor: function StringCell(options) {
+            StringCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var render = StringCell.__super__.render.apply(this, arguments);
+            const render = StringCell.__super__.render.call(this);
 
+            this._computeLongValueClassName();
             this.enterEditMode();
 
             return render;
         },
 
         /**
-         * @inheritDoc
+         * Add specific classes to cell element if in has a long value
+         * @private
          */
-        enterEditMode: function() {
-            if (this.isEditableColumn()) {
-                StringCell.__super__.enterEditMode.apply(this, arguments);
+        _computeLongValueClassName() {
+            const cellName = this.column.get('name');
+            const value = this.model.get(cellName);
+            const threshold = this.column.get('long_value_threshold');
+
+            if (value && threshold) {
+                this.$el.toggleClass(`grid-body-cell-${cellName}-long-value`, value.length >= threshold);
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
+         */
+        enterEditMode: function() {
+            if (this.isEditableColumn()) {
+                StringCell.__super__.enterEditMode.call(this);
+            }
+        },
+
+        /**
+         * @inheritdoc
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {
-                StringCell.__super__.exitEditMode.apply(this, arguments);
+                StringCell.__super__.exitEditMode.call(this);
             }
         }
     });

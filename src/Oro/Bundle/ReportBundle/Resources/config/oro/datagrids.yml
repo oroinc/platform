@@ -1,6 +1,6 @@
 datagrids:
     reports-grid:
-        extended_entity_name: '%oro_report.report.entity.class%'
+        extended_entity_name: 'Oro\Bundle\ReportBundle\Entity\Report'
         acl_resource: oro_report_view
         features:
             entity_class_name_path: r.entity
@@ -13,7 +13,7 @@ datagrids:
                     - r.entity
                     - type.label as reportType
                 from:
-                    - { table: '%oro_report.report.entity.class%', alias: r }
+                    - { table: 'Oro\Bundle\ReportBundle\Entity\Report', alias: r }
                 join:
                     left:
                         - { join: r.type, alias: type }
@@ -27,6 +27,10 @@ datagrids:
                 type:       url
                 route:      oro_report_update
                 params:     [ id ]
+            clone_link:
+                type:       url
+                route:      oro_report_clone
+                params:     [ id ]
             delete_link:
                 type:       url
                 route:      oro_api_delete_report
@@ -37,7 +41,7 @@ datagrids:
             entity:
                 label: oro.report.entity.label
                 type: twig
-                template: OroEntityBundle:Datagrid:Property/entity.html.twig
+                template: '@OroEntity/Datagrid/Property/entity.html.twig'
                 frontend_type: html
                 context:
                     entity_provider: "@oro_report.entity_provider"
@@ -50,7 +54,7 @@ datagrids:
                 name:
                     data_name: r.name
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                name: DESC
         filters:
             columns:
                 name:
@@ -86,6 +90,14 @@ datagrids:
                 link:          update_link
                 launcherOptions:
                     className: 'no-hash mobile-hide'
+            clone:
+                type:          navigate
+                acl_resource:  oro_report_create
+                label:         oro.report.action.clone.button.label
+                icon:          files-o
+                link:          clone_link
+                launcherOptions:
+                    className: 'no-hash mobile-hide'
             delete:
                 type:          delete
                 acl_resource:  oro_report_delete
@@ -95,4 +107,4 @@ datagrids:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: reports
+            entityHint: oro.report.entity_plural_label

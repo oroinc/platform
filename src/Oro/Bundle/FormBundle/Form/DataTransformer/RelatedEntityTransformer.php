@@ -21,11 +21,6 @@ class RelatedEntityTransformer implements DataTransformerInterface
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param EntityClassNameHelper         $entityClassNameHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassNameHelper $entityClassNameHelper,

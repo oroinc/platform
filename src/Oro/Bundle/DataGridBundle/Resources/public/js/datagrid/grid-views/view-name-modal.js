@@ -1,32 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var __ = require('orotranslation/js/translator');
-    var Modal = require('oroui/js/modal');
-    var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
-    var nameErrorTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html');
+    const __ = require('orotranslation/js/translator');
+    const Modal = require('oroui/js/modal');
+    const contentTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-modal.html');
+    const nameErrorTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-error-modal.html');
 
-    var ViewNameModal = Modal.extend({
+    const ViewNameModal = Modal.extend({
         contentTemplate: contentTemplate,
 
         nameErrorTemplate: nameErrorTemplate,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'keydown [data-role="grid-view-input"]': 'onKeyDown'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ViewNameModal() {
-            ViewNameModal.__super__.constructor.apply(this, arguments);
+        constructor: function ViewNameModal(options) {
+            ViewNameModal.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};
@@ -39,6 +39,7 @@ define(function(require) {
                 defaultChecked: options.defaultChecked || false
             });
             options.okText = __('oro.datagrid.gridView.save_name');
+            options.disposeOnHidden = false;
 
             ViewNameModal.__super__.initialize.call(this, options);
         },
@@ -57,7 +58,9 @@ define(function(require) {
                 error = this.nameErrorTemplate({
                     error: error
                 });
-                this.$('[data-role="grid-view-input"]').after(error);
+                this.$('[data-role="grid-view-input"]')
+                    .addClass('error')
+                    .after(error);
             }
         }
     });

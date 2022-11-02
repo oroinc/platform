@@ -1,0 +1,9 @@
+aliases:
+    oroentityconfig/js/attribute-group-collection-component$: oroentityconfig/js/components/attribute-group-collection-component
+    oroentityconfig/js/attribute-group-tab-content-component$: oroentityconfig/js/components/attribute-group-tab-content-component
+    oroentityconfig/js/attribute-group-tabs-component$: oroentityconfig/js/components/attribute-group-tabs-component
+dynamic-imports:
+    commons:
+        - oroentityconfig/js/attribute-group-collection-component
+        - oroentityconfig/js/attribute-group-tab-content-component
+        - oroentityconfig/js/attribute-group-tabs-component

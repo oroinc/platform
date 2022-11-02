@@ -1,17 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var PasswordGenerateComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
 
-    PasswordGenerateComponent = BaseComponent.extend({
+    const PasswordGenerateComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PasswordGenerateComponent() {
-            PasswordGenerateComponent.__super__.constructor.apply(this, arguments);
+        constructor: function PasswordGenerateComponent(options) {
+            PasswordGenerateComponent.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -20,7 +18,7 @@ define(function(require) {
 
             this.togglePassword();
 
-            this.$el.click(_.bind(this.togglePassword, this));
+            this.$el.click(this.togglePassword.bind(this));
         },
 
         togglePassword: function() {

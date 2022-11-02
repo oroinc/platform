@@ -1,25 +1,23 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
+namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\ImportExport\Serializer\Normalizer\PrimaryItemCollectionNormalizer;
+use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 
 class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    /**
-     * @var PrimaryItemCollectionNormalizer
-     */
-    protected $normalizer;
+    /** @var PrimaryItemCollectionNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serializer = $this->createMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
+        $this->serializer = $this->createMock(Serializer::class);
+
         $this->normalizer = new PrimaryItemCollectionNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -27,111 +25,113 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expectedResult)
+    public function testSupportsNormalization(object|string $data, bool $expectedResult)
     {
-        $this->assertEquals($expectedResult, $this->normalizer->supportsNormalization($data, null));
+        $this->assertEquals($expectedResult, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
         $primaryItem = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        return array(
-            array('stdClass', false),
-            array(new ArrayCollection(), false),
-            array(new ArrayCollection(array($primaryItem, new \stdClass())), false),
-            array(new ArrayCollection(array($primaryItem)), true),
-        );
+
+        return [
+            ['stdClass', false],
+            [new ArrayCollection(), false],
+            [new ArrayCollection([$primaryItem, new \stdClass()]), false],
+            [new ArrayCollection([$primaryItem]), true],
+        ];
     }
 
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($type, $expectedResult)
+    public function testSupportsDenormalization(string $type, bool $expectedResult)
     {
-        $this->assertEquals($expectedResult, $this->normalizer->supportsDenormalization(array(), $type));
+        $this->assertEquals($expectedResult, $this->normalizer->supportsDenormalization([], $type));
     }
 
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
         $primaryItemClass = $this->getMockClass(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        return array(
-            array('stdClass', false),
-            array('ArrayCollection', false),
-            array('Doctrine\\Common\\Collections\\ArrayCollection', false),
-            array('Doctrine\\Common\\Collections\\ArrayCollection<Foo>', false),
-            array("ArrayCollection<$primaryItemClass>", true),
-            array("Doctrine\\Common\\Collections\\ArrayCollection<$primaryItemClass>", true),
-        );
+
+        return [
+            ['stdClass', false],
+            ['ArrayCollection', false],
+            [ArrayCollection::class, false],
+            ['Doctrine\\Common\\Collections\\ArrayCollection<Foo>', false],
+            ["ArrayCollection<$primaryItemClass>", true],
+            ["Doctrine\\Common\\Collections\\ArrayCollection<$primaryItemClass>", true],
+        ];
     }
 
     public function testNormalize()
     {
         $format = null;
-        $context = array('context');
+        $context = ['context'];
 
         $firstItem = $this->getMockPrimaryItem(false);
         $secondPrimaryItem = $this->getMockPrimaryItem(true);
         $thirdItem = $this->getMockPrimaryItem(false);
 
-        $data = new ArrayCollection(array($firstItem, $secondPrimaryItem, $thirdItem));
+        $data = new ArrayCollection([$firstItem, $secondPrimaryItem, $thirdItem]);
         $this->serializer->expects($this->exactly(3))
             ->method('normalize')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array($firstItem, $format, $context, 'first'),
-                        array($secondPrimaryItem, $format, $context, 'second_primary'),
-                        array($thirdItem, $format, $context, 'third'),
-                    )
-                )
-            );
+            ->willReturnMap([
+                [$firstItem, $format, $context, 'first'],
+                [$secondPrimaryItem, $format, $context, 'second_primary'],
+                [$thirdItem, $format, $context, 'third'],
+            ]);
 
         $this->assertEquals(
-            array('second_primary', 'first', 'third'),
+            ['second_primary', 'first', 'third'],
             $this->normalizer->normalize($data, $format, $context)
         );
     }
 
-    protected function getMockPrimaryItem($primary)
+    private function getMockPrimaryItem($primary)
     {
         $result = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        $result->expects($this->once())->method('isPrimary')->will($this->returnValue($primary));
+        $result->expects($this->once())
+            ->method('isPrimary')
+            ->willReturn($primary);
+
         return $result;
     }
-
 
     public function testDenormalizeWithItemType()
     {
         $format = null;
-        $context = array('context');
+        $context = ['context'];
 
         $primaryItemClass = $this->getMockClass(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
 
         $firstElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        $firstElement->expects($this->once())->method('setPrimary')->with(true); // first is primary
+        $firstElement->expects($this->once())
+            ->method('setPrimary')
+            ->with(true); // first is primary
 
         $secondElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        $secondElement->expects($this->once())->method('setPrimary')->with(false);
+        $secondElement->expects($this->once())
+            ->method('setPrimary')
+            ->with(false);
 
         $thirdElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
-        $thirdElement->expects($this->once())->method('setPrimary')->with(false);
+        $thirdElement->expects($this->once())
+            ->method('setPrimary')
+            ->with(false);
 
         $this->serializer->expects($this->exactly(3))
             ->method('denormalize')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('first', $primaryItemClass, $format, $context, $firstElement),
-                        array('second', $primaryItemClass, $format, $context, $secondElement),
-                        array('third', $primaryItemClass, $format, $context, $thirdElement),
-                    )
-                )
-            );
+            ->willReturnMap([
+                ['first', $primaryItemClass, $format, $context, $firstElement],
+                ['second', $primaryItemClass, $format, $context, $secondElement],
+                ['third', $primaryItemClass, $format, $context, $thirdElement],
+            ]);
 
         $this->assertEquals(
-            new ArrayCollection(array($firstElement, $secondElement, $thirdElement)),
+            new ArrayCollection([$firstElement, $secondElement, $thirdElement]),
             $this->normalizer->denormalize(
-                array('first', 'second', 'third'),
+                ['first', 'second', 'third'],
                 "ArrayCollection<$primaryItemClass>",
                 $format,
                 $context

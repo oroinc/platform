@@ -1,12 +1,6 @@
 /* @theme: admin.oro; */
 
 .with-floating-header {
-    .grid-header-cell__link,
-    .grid-header-cell__label-container {
-        display: flex;
-        align-items: center;
-        width: 100%;
-    }
     .grid-header-cell__label {
         text-overflow: ellipsis;
         display: block;
@@ -17,10 +11,6 @@
 .floatThead {
     .thead-sizing {
         display: none;
-    }
-
-    .dropdown-menu {
-        z-index: $zindex-dropdown - 112;
     }
 
     .grid-header:first-child {
@@ -64,7 +54,9 @@
 
             display: block;
 
-            overflow: hidden;
+            // workaround of `overflow: hidden;` to overcome issue in Safari
+            // https://bugs.webkit.org/show_bug.cgi?id=160953
+            clip: rect(-100vh, auto, 100vh, 0);
 
             .grid-header-row {
                 display: block;
@@ -73,8 +65,8 @@
 
         .thead-sizing {
             display: table-header-group;
-
-            visibility: hidden; // Should check why we have double headers for datagrid
+            // Should check why we have double headers for datagrid
+            visibility: hidden;
         }
     }
 }

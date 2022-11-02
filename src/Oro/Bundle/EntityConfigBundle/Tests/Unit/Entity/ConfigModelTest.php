@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -11,9 +10,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 class ConfigModelTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS = 'Oro\Bundle\TestBundle\Entity\TestEntity';
-    const TEST_MODULE = 'OroTestBundle';
-    const TEST_ENTITY = 'TestEntity';
+    private const TEST_CLASS = 'Oro\Bundle\TestBundle\Entity\TestEntity';
+    private const TEST_MODULE = 'OroTestBundle';
+    private const TEST_ENTITY = 'TestEntity';
 
     /**
      * @dataProvider modelProvider
@@ -236,7 +235,7 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($values, $model->toArray('test_scope'));
     }
 
-    public function modelProvider()
+    public function modelProvider(): array
     {
         return [
             [new EntityConfigModel(self::TEST_CLASS)],

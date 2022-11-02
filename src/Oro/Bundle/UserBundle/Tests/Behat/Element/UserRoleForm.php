@@ -11,13 +11,14 @@ class UserRoleForm extends Form
      * @param string $entity Entity name e.g. Account, Business Customer, Comment etc.
      * @param string $action e.g. Create, Delete, Edit, View etc.
      * @param string $accessLevel e.g. System, None, User etc.
+     * @param bool $field is field permission should be changed.
      */
-    public function setPermission($entity, $action, $accessLevel)
+    public function setPermission($entity, $action, $accessLevel, $field = false)
     {
-        $entityRow = $this->getEntityRow($entity);
-        $actionRow = $this->getActionRow($entityRow, $action);
+        $entityRows = $field ? $this->getEntityFieldRows($entity) : $this->getEntityRows($entity);
+        $actionRow = $this->getActionRow($entityRows, $action);
         $this->getDriver()->waitForAjax();
-        $levels = $actionRow->findAll('css', 'ul.dropdown-menu-collection__list li a');
+        $levels = $actionRow->findAll('css', '.dropdown-menu li a');
         $availableLevels = [];
 
         /** @var NodeElement $level */
@@ -48,7 +49,8 @@ class UserRoleForm extends Form
      */
     public function setCheckBoxPermission($name, $check = true)
     {
-        $element = $this->findLabel($name)->find('css', 'input');
+        $label = $this->findVisible('css', $this->selectorManipulator->addContainsSuffix('label', $name));
+        $element = $label->find('css', 'input');
 
         if ($check) {
             $element->check();
@@ -58,15 +60,23 @@ class UserRoleForm extends Form
     }
 
     /**
-     * @param NodeElement $entityRow
+     * @param NodeElement[]|array $entityRows
      * @param string $action
      * @return NodeElement
      */
-    protected function getActionRow(NodeElement $entityRow, $action)
+    protected function getActionRow(array $entityRows, $action)
     {
-        /** @var NodeElement $label */
-        foreach ($entityRow->findAll('css', 'span.action-permissions__label') as $label) {
-            if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
+        foreach ($entityRows as $entityRow) {
+            // Case-insensitive search for action containing given $action text
+            $label = $entityRow->find(
+                'xpath',
+                '//span[@class="action-permissions__label"]' .
+                '[contains(' .
+                    'translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),' .
+                     '"'.strtolower($action).'"' .
+                ')]'
+            );
+            if ($label) {
                 $label->click();
 
                 $dropDown = $this->getPage()->findVisible('css', '.dropdown-menu__permissions-item.show');
@@ -81,20 +91,33 @@ class UserRoleForm extends Form
 
     /**
      * @param string $entity
-     * @return NodeElement
+     * @return NodeElement[]
      */
-    protected function getEntityRow($entity)
+    protected function getEntityRows($entity)
     {
-        $entityTrs = $this->findAll('css', 'div[id*=permission-grid].inner-permissions-grid table.grid tbody tr');
-        self::assertNotCount(0, $entityTrs, 'Can\'t find table with permissions on the page');
+        // Find TR element which contains element div.entity-name with text $entity
+        $entityTrs = $this->findAll('xpath', "//div[contains(@class,'entity-name')][text()='$entity']/ancestor::tr");
+        self::assertNotCount(0, $entityTrs, sprintf('There is no "%s" entity row', $entity));
 
-        /** @var NodeElement $entityTr */
-        foreach ($entityTrs as $entityTr) {
-            if ($entityTr->find('css', 'td div.entity-name')->getText() === $entity) {
-                return $entityTr;
-            }
-        }
+        return $entityTrs;
+    }
 
-        self::fail(sprintf('There is no "%s" entity row', $entity));
+    /**
+     * Find parent div element which contains element div.field-name with text $field.
+     *
+     * @param string $field
+     *
+     * @return NodeElement[]
+     */
+    protected function getEntityFieldRows($field)
+    {
+        $fieldTrs = $this->findAll(
+            'xpath',
+            "//div[contains(@class,'field-name')][text()='$field']"
+            . "/ancestor::div[contains(@class, 'field-permission-container')]"
+        );
+        self::assertNotCount(0, $fieldTrs, sprintf('There is no "%s" field row', $field));
+
+        return $fieldTrs;
     }
 }

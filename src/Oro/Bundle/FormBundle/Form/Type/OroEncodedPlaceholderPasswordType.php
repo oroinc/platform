@@ -28,9 +28,6 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
      */
     private $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     */
     public function __construct(SymmetricCrypterInterface $crypter)
     {
         $this->crypter = $crypter;
@@ -73,8 +70,7 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
         $view->vars['value'] = $this->getPlaceholder($password);
 
         if (false === $options['browser_autocomplete']) {
-            // Use soft merge ("+" operator) to preserve 'autocomplete' value if it was already specified.
-            $view->vars['attr'] += ['autocomplete' => 'new-password'];
+            $view->vars['attr']['autocomplete'] = 'new-password';
         }
     }
 

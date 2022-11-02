@@ -1,58 +1,40 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport;
 
+/**
+ * A Session object is a context for producing and consuming messages.
+ * It is a factory for its Message Producers and Consumers, creates transport Message
+ * and provides a way to create dynamically Queue objects.
+ */
 interface SessionInterface
 {
     /**
-     * @param string $body
-     * @param array  $properties
-     * @param array  $headers
-     *
-     * @return MessageInterface
+     * Creates a transport Message object.
      */
-    public function createMessage($body = null, array $properties = [], array $headers = []);
+    public function createMessage(
+        mixed $body = '',
+        array $properties = [],
+        array $headers = []
+    ): MessageInterface;
 
     /**
-     * @param string $name
-     *
-     * @return QueueInterface
+     * Creates a queue identity given a Queue name.
      */
-    public function createQueue($name);
+    public function createQueue(string $name): QueueInterface;
 
     /**
-     * @param string $name
-     *
-     * @return TopicInterface
+     * Creates a Message consumer for the specified queue.
      */
-    public function createTopic($name);
+    public function createConsumer(QueueInterface $queue): MessageConsumerInterface;
 
     /**
-     * @param DestinationInterface $destination
-     *
-     * @return MessageConsumerInterface
+     * Creates a Message producer to send messages to the specified queue.
      */
-    public function createConsumer(DestinationInterface $destination);
+    public function createProducer(): MessageProducerInterface;
 
     /**
-     * @return MessageProducerInterface
+     * Closes the session.
      */
-    public function createProducer();
-
-    /**
-     * @param DestinationInterface $destination
-     */
-    public function declareTopic(DestinationInterface $destination);
-
-    /**
-     * @param DestinationInterface $destination
-     */
-    public function declareQueue(DestinationInterface $destination);
-
-    /**
-     * @param DestinationInterface $source
-     * @param DestinationInterface $target
-     */
-    public function declareBind(DestinationInterface $source, DestinationInterface $target);
-    
-    public function close();
+    public function close(): void;
 }

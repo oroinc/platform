@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var moment = require('moment');
-    var __ = require('orotranslation/js/translator');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var locale = localeSettings.getLocale();
-    require('jquery-ui');
+    const $ = require('jquery');
+    const moment = require('moment');
+    const __ = require('orotranslation/js/translator');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const locale = localeSettings.getLocale();
+    require('jquery-ui/widgets/datepicker');
 
     $.datepicker.regional[locale] = {
         closeText: __('oro.ui.datepicker.close'), // Display text for close link
@@ -25,6 +25,7 @@ define(function(require) {
         dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
         // ["Su","Mo","Tu","We","Th","Fr","Sa"] Column headings for days starting at Sunday
         dayNamesMin: localeSettings.getCalendarDayOfWeekNames('narrow', true),
+        weekDay: 'dddd Do',
         weekHeader: __('oro.ui.datepicker.wk'), // Column header for week of the year
         // See format options on parseDate
         dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
@@ -33,42 +34,43 @@ define(function(require) {
         // showMonthAfterYear: false, // True if the year select precedes month, false for month then year
         // yearSuffix: "" // Additional text to append to the year in the month headers
         gotoCurrent: true, // True if today link goes back to current selection instead
-        applyTodayDateSelection: true // Select the date on Today button click
+        applyTodayDateSelection: true, // Select the date on Today button click
+        blurInputOnTodaySelection: true // Blur input when select today action
     };
     $.datepicker.setDefaults($.datepicker.regional[locale]);
 
     (function() {
-        var _gotoToday = $.datepicker._gotoToday;
-        var _updateDatepicker = $.datepicker._updateDatepicker;
+        const _gotoToday = $.datepicker.constructor.prototype._gotoToday;
+        const _updateDatepicker = $.datepicker.constructor.prototype._updateDatepicker;
 
         /**
          * Select today Date takes in account system timezone
-         * @inheritDoc
+         * @inheritdoc
          */
-        $.datepicker._gotoToday = function(id) {
-            var inst = this._getInst($(id)[0]);
-            var now = moment.tz(localeSettings.getTimeZone());
+        $.datepicker.constructor.prototype._gotoToday = function(id) {
+            const inst = this._getInst($(id)[0]);
+            const now = moment.tz(localeSettings.getTimeZone());
 
             inst.currentDay = now.date();
             inst.currentMonth = now.month();
             inst.currentYear = now.year();
-            _gotoToday.apply(this, arguments);
+            _gotoToday.call(this, id);
 
             if (this._get(inst, 'applyTodayDateSelection')) {
                 // select current day and close dropdown
                 this._selectDate(id);
-                inst.input.blur();
+                this._get(inst, 'blurInputOnTodaySelection') && inst.input.blur();
             }
         };
 
         /**
          * Today Date highlight takes in account system timezone
-         * @inheritDoc
+         * @inheritdoc
          */
-        $.datepicker._updateDatepicker = function(inst) {
-            var today = moment.tz(localeSettings.getTimeZone());
+        $.datepicker.constructor.prototype._updateDatepicker = function(inst) {
+            const today = moment.tz(localeSettings.getTimeZone());
 
-            _updateDatepicker.apply(this, arguments);
+            _updateDatepicker.call(this, inst);
 
             // clear highlighted date
             inst.dpDiv

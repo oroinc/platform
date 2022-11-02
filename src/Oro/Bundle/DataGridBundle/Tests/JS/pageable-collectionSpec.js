@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    const $ = require('jquery');
+    const PageableCollection = require('orodatagrid/js/pageable-collection');
 
     describe('orodatagrid/js/pageable-collection', function() {
         describe('check state encoding/decoding', function() {
             beforeEach(function() {
-                var state = {
+                const state = {
                     columns: {
                         a: {order: 0, renderable: true},
                         b: {order: 1, renderable: true},
@@ -41,7 +41,7 @@ define(function(require) {
             });
 
             it('have to extract state from hash value', function() {
-                var state = PageableCollection.decodeStateData('i=3&p=17&c=d0.b0.a1.c1.e1&a=board');
+                const state = PageableCollection.decodeStateData('i=3&p=17&c=d0.b0.a1.c1.e1&a=board');
                 expect(state).toEqual({
                     currentPage: '3',
                     pageSize: '17',

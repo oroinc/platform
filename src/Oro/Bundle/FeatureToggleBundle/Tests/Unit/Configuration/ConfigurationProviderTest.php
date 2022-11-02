@@ -2,395 +2,217 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
-use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle4\TestBundle4;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle5\TestBundle5;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testWarmUpCache(array $configuration, array $bundles, array $mergedConfiguration)
+    use TempDirExtension;
+
+    private const CONFIGURATION = [
+        '__features__' => [
+            'feature1' => [
+                'label'         => 'feature1.label',
+                'description'   => 'feature1.description',
+                'toggle'        => 'changed_toggle',
+                'dependencies'  => ['feature2'],
+                'routes'        => ['f1_route1', 'f1_route2', 'f1_route3'],
+                'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
+                'entities'      => [],
+                'commands'      => [],
+                'mq_topics'     => []
+            ],
+            'feature2' => [
+                'label'         => 'feature2.label',
+                'toggle'        => 'toggle2',
+                'dependencies'  => [],
+                'routes'        => ['f1_route3'],
+                'configuration' => ['config_leaf2'],
+                'entities'      => [],
+                'commands'      => [],
+                'mq_topics'     => []
+            ],
+            'feature3' => [
+                'label'         => 'feature3.label',
+                'dependencies'  => ['feature1'],
+                'routes'        => [],
+                'configuration' => [],
+                'entities'      => [],
+                'commands'      => [],
+                'mq_topics'     => []
+            ]
+        ],
+        '__internal__' => [
+            'by_resource'        => [
+                'routes'        => [
+                    'f1_route1' => ['feature1'],
+                    'f1_route2' => ['feature1'],
+                    'f1_route3' => ['feature1', 'feature2']
+                ],
+                'configuration' => [
+                    'config_section1' => ['feature1'],
+                    'config_leaf1'    => ['feature1'],
+                    'config_leaf2'    => ['feature1', 'feature2']
+                ]
+            ],
+            'dependencies'       => [
+                'feature1' => ['feature2'],
+                'feature2' => [],
+                'feature3' => ['feature1', 'feature2']
+            ],
+            'dependent_features' => [
+                'feature1' => ['feature3'],
+                'feature2' => ['feature1', 'feature3'],
+                'feature3' => []
+            ],
+            'toggles'            => [
+                'changed_toggle' => 'feature1',
+                'toggle2'        => 'feature2'
+            ]
+        ]
+    ];
+
+    /** @var ConfigurationExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationExtension;
+
+    private string $cacheFile;
+
+    protected function setUp(): void
     {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
-
-        $cache->expects($this->once())
-            ->method('save')
-            ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
-
-        $configurationProvider->warmUpCache();
+        $this->cacheFile = $this->getTempFile('FeatureToggleConfigurationProvider');
+        $this->configurationExtension = $this->createMock(ConfigurationExtension::class);
     }
 
-    public function testClearCache()
+    private function getConfigurationProvider(
+        array $bundleClasses,
+        bool $skipConfigurationExtensionExpectations = false
+    ): ConfigurationProvider {
+        $bundles = [];
+        foreach ($bundleClasses as $bundleClass) {
+            /** @var BundleInterface $bundle */
+            $bundle = new $bundleClass();
+            $bundles[$bundle->getName()] = $bundleClass;
+        }
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($bundles);
+
+        if (!$skipConfigurationExtensionExpectations) {
+            $this->configurationExtension->expects(self::once())
+                ->method('processConfiguration')
+                ->willReturnArgument(0);
+        }
+
+        return new ConfigurationProvider(
+            $this->cacheFile,
+            false,
+            new FeatureToggleConfiguration($this->configurationExtension),
+            $this->configurationExtension
+        );
+    }
+
+    public function testGetFeaturesConfiguration()
     {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            [],
-            [],
-            $config,
-            $cache
-        );
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
-        $configurationProvider->clearCache();
-    }
-
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testGetFeaturesConfigurationFromCache(
-        array $configuration,
-        array $bundles,
-        array $mergedConfiguration
-    ) {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
-
-        $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('fetch')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn($mergedConfiguration);
-        $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::FEATURES],
-            $configurationProvider->getFeaturesConfiguration($ignoreCache)
+        self::assertEquals(
+            self::CONFIGURATION['__features__'],
+            $configurationProvider->getFeaturesConfiguration()
         );
     }
 
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testGetResourcesConfigurationIgnoreCache(
-        array $configuration,
-        array $bundles,
-        array $mergedConfiguration
-    ) {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
+    public function testGetResourcesConfiguration()
+    {
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
-        $ignoreCache = true;
-        $cache->expects($this->never())
-            ->method($this->anything());
-
-        $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::BY_RESOURCE],
-            $configurationProvider->getResourcesConfiguration($ignoreCache)
+        self::assertEquals(
+            self::CONFIGURATION['__internal__']['by_resource'],
+            $configurationProvider->getResourcesConfiguration()
         );
     }
 
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testGetDependentsConfigurationNotInCache(
-        array $configuration,
-        array $bundles,
-        array $mergedConfiguration
-    ) {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
+    public function testGetDependenciesConfiguration()
+    {
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
-        $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('fetch')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('save')
-            ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
-
-        $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
-            $configurationProvider->getDependentsConfiguration($ignoreCache)
+        self::assertEquals(
+            self::CONFIGURATION['__internal__']['dependencies'],
+            $configurationProvider->getDependenciesConfiguration()
         );
     }
 
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testGetDependentsConfigurationInCache(
-        array $configuration,
-        array $bundles,
-        array $mergedConfiguration
-    ) {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
+    public function testGetDependentsConfiguration()
+    {
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
-        $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('fetch')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn($mergedConfiguration);
-
-        $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENT_FEATURES],
-            $configurationProvider->getDependentsConfiguration($ignoreCache)
-        );
-    }
-
-    /**
-     * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param array $bundles
-     * @param array $mergedConfiguration
-     */
-    public function testGetDependenciesConfigurationNotInCache(
-        array $configuration,
-        array $bundles,
-        array $mergedConfiguration
-    ) {
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
-
-        $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('fetch')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('save')
-            ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
-
-        $this->assertEquals(
-            $mergedConfiguration[ConfigurationProvider::INTERNAL][ConfigurationProvider::DEPENDENCIES],
-            $configurationProvider->getDependenciesConfiguration($ignoreCache)
+        self::assertEquals(
+            self::CONFIGURATION['__internal__']['dependent_features'],
+            $configurationProvider->getDependentsConfiguration()
         );
     }
 
     public function testGetDependenciesConfigurationCircularReferenceTwoLevel()
     {
-        $configuration = [
-            TestBundle1::class => [
-                'feature1' => [
-                    'label' => 'Feature 1',
-                    'toggle' => 'toggle1',
-                    'dependencies' => ['feature2'],
-                ],
-                'feature2' => [
-                    'label' => 'Feature 2',
-                    'toggle' => 'toggle2',
-                    'dependencies' => ['feature3'],
-                ],
-                'feature3' => [
-                    'label' => 'Feature 3',
-                    'toggle' => 'toggle3',
-                    'dependencies' => ['feature1'],
-                ],
-            ],
-        ];
-        $bundles = [TestBundle1::class];
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
 
-        $this->expectException(CircularReferenceException::class);
-
-        $ignoreCache = true;
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
-        $configurationProvider->getDependenciesConfiguration($ignoreCache);
+        $configurationProvider = $this->getConfigurationProvider([TestBundle4::class]);
+        $configurationProvider->getDependenciesConfiguration();
     }
 
     public function testGetDependenciesConfigurationCircularReferenceOneLevel()
     {
-        $configuration = [
-            TestBundle1::class => [
-                'feature1' => [
-                    'label' => 'Feature 1',
-                    'toggle' => 'toggle1',
-                    'dependencies' => ['feature2'],
-                ],
-                'feature2' => [
-                    'label' => 'Feature 2',
-                    'toggle' => 'toggle2',
-                    'dependencies' => ['feature1'],
-                ],
-            ],
-        ];
-        $bundles = [TestBundle1::class];
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
 
-        $this->expectException(CircularReferenceException::class);
-
-        $ignoreCache = true;
-        $config = new FeatureToggleConfiguration();
-        /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(CacheProvider::class);
-        $configurationProvider = new ConfigurationProvider(
-            $configuration,
-            $bundles,
-            $config,
-            $cache
-        );
-        $configurationProvider->getDependenciesConfiguration($ignoreCache);
+        $configurationProvider = $this->getConfigurationProvider([TestBundle3::class]);
+        $configurationProvider->getDependenciesConfiguration();
     }
 
-    /**
-     * @return array
-     */
-    public function configurationDataProvider()
+    public function testGetFeatureByToggle()
     {
-        return [
-            [
-                'configuration' => [
-                    TestBundle1::class => [
-                        'feature1' => [
-                            'label' => 'Feature 1',
-                            'toggle' => 'toggle1',
-                            'description' => 'Description 1',
-                            'dependencies' => ['feature2'],
-                            'routes' => ['f1_route1', 'f1_route2'],
-                            'configuration' => ['config_section1', 'config_leaf1']
-                        ],
-                    ],
-                    TestBundle2::class => [
-                        'feature1' => [
-                            'toggle' => 'changed_toggle',
-                            'routes' => ['f1_route3'],
-                            'configuration' => ['config_leaf2']
-                        ],
-                        'feature2' => [
-                            'label' => 'Feature 2',
-                            'toggle' => 'toggle2',
-                            'routes' => ['f1_route3'],
-                            'configuration' => ['config_leaf2']
-                        ],
-                        'feature3' => [
-                            'label' => 'Feature 3',
-                            'toggle' => 'toggle3',
-                            'dependencies' => ['feature1'],
-                        ],
-                    ],
-                ],
-                'bundles' => [TestBundle1::class, TestBundle2::class],
-                'mergedConfiguration' => [
-                    ConfigurationProvider::FEATURES => [
-                        'feature1' => [
-                            'label' => 'Feature 1',
-                            'toggle' => 'changed_toggle',
-                            'description' => 'Description 1',
-                            'dependencies' => ['feature2'],
-                            'routes' => ['f1_route1', 'f1_route2', 'f1_route3'],
-                            'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
-                            'entities' => [],
-                            'field_configs' => [],
-                            'commands' => []
-                        ],
-                        'feature2' => [
-                            'label' => 'Feature 2',
-                            'toggle' => 'toggle2',
-                            'dependencies' => [],
-                            'routes' => ['f1_route3'],
-                            'configuration' => ['config_leaf2'],
-                            'entities' => [],
-                            'field_configs' => [],
-                            'commands' => []
-                        ],
-                        'feature3' => [
-                            'label' => 'Feature 3',
-                            'toggle' => 'toggle3',
-                            'dependencies' => ['feature1'],
-                            'routes' => [],
-                            'configuration' => [],
-                            'entities' => [],
-                            'field_configs' => [],
-                            'commands' => []
-                        ],
-                    ],
-                    ConfigurationProvider::INTERNAL => [
-                        ConfigurationProvider::BY_RESOURCE => [
-                            'routes' => [
-                                'f1_route1' => ['feature1'],
-                                'f1_route2' => ['feature1'],
-                                'f1_route3' => ['feature1', 'feature2'],
-                            ],
-                            'configuration' => [
-                                'config_section1' => ['feature1'],
-                                'config_leaf1' => ['feature1'],
-                                'config_leaf2' => ['feature1', 'feature2'],
-                            ]
-                        ],
-                        ConfigurationProvider::DEPENDENCIES => [
-                            'feature1' => ['feature2'],
-                            'feature2' => [],
-                            'feature3' => ['feature1', 'feature2'],
-                        ],
-                        ConfigurationProvider::DEPENDENT_FEATURES => [
-                            'feature1' => ['feature3'],
-                            'feature2' => ['feature1', 'feature3'],
-                            'feature3' => [],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
+
+        self::assertEquals(
+            self::CONFIGURATION['__internal__']['toggles'],
+            $configurationProvider->getTogglesConfiguration()
+        );
+    }
+
+    public function testGetFeatureByToggleWhenSameToggleUsedForSeveralFeatures()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'A toggle can be used for one feature only, but the toggle "toggle1" is used for two features,'
+            . ' "feature1" and "feature2".'
+        );
+
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle5::class]);
+        $configurationProvider->getTogglesConfiguration();
+    }
+
+    public function testClearCache()
+    {
+        $this->configurationExtension->expects(self::once())
+            ->method('clearConfigurationCache');
+
+        $configurationProvider = $this->getConfigurationProvider([], true);
+
+        // guard
+        $configurationProvider->getFeaturesConfiguration();
+        self::assertFileExists($this->cacheFile);
+
+        $configurationProvider->clearCache();
+        self::assertFileDoesNotExist($this->cacheFile);
     }
 }

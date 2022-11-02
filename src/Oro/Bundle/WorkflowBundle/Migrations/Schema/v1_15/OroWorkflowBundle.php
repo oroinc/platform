@@ -16,8 +16,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Create oro_workflow_trans_trigger table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowTransTriggerTable(Schema $schema)
     {
@@ -39,11 +37,8 @@ class OroWorkflowBundle implements Migration
         $table->setPrimaryKey(['id']);
     }
 
-
     /**
      * Add oro_workflow_trans_trigger foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowTransTriggerForeignKeys(Schema $schema)
     {

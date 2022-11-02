@@ -8,6 +8,9 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
+/**
+ * Provides methods to set, insert, update or delete ACEs for the given ACL.
+ */
 class AceManipulationHelper
 {
     /**
@@ -28,6 +31,7 @@ class AceManipulationHelper
      *                                  ALL strategy is used for $granting = true
      *                                  ANY strategy is used for $granting = false
      * @return bool True if a permission was updated or created
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function setPermission(
         ACL $acl,

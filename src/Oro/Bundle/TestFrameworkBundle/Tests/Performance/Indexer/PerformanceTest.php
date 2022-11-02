@@ -10,7 +10,7 @@ class PerformanceTest extends WebTestCase
 {
     protected $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->client = self::createClient(array("debug" => false));
         $container = $this->client->getContainer();
@@ -26,7 +26,6 @@ class PerformanceTest extends WebTestCase
 
         $schemaTool->dropDatabase();
         $schemaTool->createSchema($classes);
-
 
         list($msec, $sec) = explode(" ", microtime());
         $stop=$sec + $msec;
@@ -77,7 +76,7 @@ class PerformanceTest extends WebTestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->client);
     }

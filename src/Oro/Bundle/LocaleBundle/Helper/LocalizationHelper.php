@@ -26,10 +26,6 @@ class LocalizationHelper
      */
     protected $currentLocalizationProvider;
 
-    /**
-     * @param LocalizationManager $localizationManager
-     * @param LocalizationProviderInterface $currentLocalizationProvider
-     */
     public function __construct(
         LocalizationManager $localizationManager,
         LocalizationProviderInterface $currentLocalizationProvider
@@ -39,7 +35,7 @@ class LocalizationHelper
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getCurrentLocalization()
     {

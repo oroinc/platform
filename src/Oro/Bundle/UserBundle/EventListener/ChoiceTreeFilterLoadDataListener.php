@@ -2,33 +2,25 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Loads data for a choice tree filter for User entity.
+ */
 class ChoiceTreeFilterLoadDataListener
 {
-    const SUPPORTED_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+    private ManagerRegistry $doctrine;
 
-    /** @var Registry */
-    protected $doctrine;
-
-    /**
-     * IndexerPrepareQueryListener constructor.
-     *
-     * @param Registry $doctrine
-     */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param ChoiceTreeFilterLoadDataEvent $event
-     */
-    public function fillData(ChoiceTreeFilterLoadDataEvent $event)
+    public function fillData(ChoiceTreeFilterLoadDataEvent $event): void
     {
-        if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {
+        if ($event->getClassName() === User::class) {
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id' => $event->getValues()]);
             $data = [];
             /** @var User $entity */

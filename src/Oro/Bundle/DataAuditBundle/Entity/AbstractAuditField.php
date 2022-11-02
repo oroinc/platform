@@ -18,7 +18,7 @@ abstract class AbstractAuditField
     use ArrayFieldTypeTrait;
     use ObjectFieldTypeTrait;
     use CollectionTypeTrait;
-    
+
     /**
      * @var int
      *
@@ -103,9 +103,6 @@ abstract class AbstractAuditField
         return $this->audit;
     }
 
-    /**
-     * @param AbstractAudit $audit
-     */
     public function setAudit(AbstractAudit $audit)
     {
         $this->audit = $audit;

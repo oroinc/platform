@@ -4,337 +4,143 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
+use Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Component\Action\Exception\AssemblerException;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    protected $workflowParameters = [
+    private array $workflowParameters = [
         'name' => 'test_name',
         'label' => 'Test Label'
     ];
 
-    /** @var array */
-    protected $stepConfiguration = [
+    private array $stepConfiguration = [
         'label' => 'Test',
         'name' => 'test'
     ];
 
-    /** @var array */
-    protected $transitionConfiguration = [
+    private array $transitionConfiguration = [
         'label' => 'Test',
         'step_to' => 'test_step',
         'transition_definition' => 'test_transition_definition'
     ];
 
-    /** @var array */
-    protected $transitionDefinition = [
+    private array $transitionDefinition = [
         'test_transition_definition' => []
     ];
 
-    /**
-     * @return Workflow
-     */
-    protected function createWorkflow()
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
+
+    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeAssembler;
+
+    /** @var StepAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepAssembler;
+
+    /** @var TransitionAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $transitionAssembler;
+
+    /** @var RestrictionAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $restrictionAssembler;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
+
+    /** @var WorkflowAssembler */
+    private $workflowAssembler;
+
+    protected function setUp(): void
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflow = $this->createWorkflow();
+        $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
+        $this->stepAssembler = $this->createMock(StepAssembler::class);
+        $this->transitionAssembler = $this->createMock(TransitionAssembler::class);
+        $this->restrictionAssembler = $this->createMock(RestrictionAssembler::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnMap([
+                [Workflow::class, $this->workflow],
+                [AttributeAssembler::class, $this->attributeAssembler],
+                [StepAssembler::class, $this->stepAssembler],
+                [TransitionAssembler::class, $this->transitionAssembler],
+                [RestrictionAssembler::class, $this->restrictionAssembler],
+                [TranslatorInterface::class, $this->translator],
+            ]);
 
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowAssembler = new WorkflowAssembler($this->container);
+    }
+
+    private function createWorkflow(): Workflow
+    {
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $aclManager = $this->createMock(AclManager::class);
+        $restrictionManager = $this->createMock(RestrictionManager::class);
 
         return new Workflow($doctrineHelper, $aclManager, $restrictionManager);
     }
 
     /**
-     * @param array $configuration
-     * @return WorkflowDefinition
-     */
-    protected function createWorkflowDefinition(array $configuration)
-    {
-        $workflowDefinition = new WorkflowDefinition();
-        $workflowDefinition
-            ->setName($this->workflowParameters['name'])
-            ->setLabel($this->workflowParameters['label'])
-            ->setConfiguration($configuration);
-
-        return $workflowDefinition;
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param boolean $expectations
-     * @return ContainerInterface
-     */
-    protected function createContainerMock(Workflow $workflow, $expectations = true)
-    {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('get'))
-            ->getMockForAbstractClass();
-        if ($expectations) {
-            $container->expects($this->once())
-                ->method('get')
-                ->with('oro_workflow.prototype.workflow')
-                ->will($this->returnValue($workflow));
-        }
-
-        return $container;
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @param array $configuration
-     * @param Collection $attributes
-     * @param boolean $expectations
-     * @return AttributeAssembler
-     */
-    protected function createAttributeAssemblerMock(
-        WorkflowDefinition $definition,
-        array $configuration,
-        $attributes,
-        $expectations = true
-    ) {
-        $attributeAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
-        if ($expectations) {
-            $expectedAttributeConfiguration = !empty($configuration[WorkflowConfiguration::NODE_ATTRIBUTES])
-                ? $configuration[WorkflowConfiguration::NODE_ATTRIBUTES]
-                : array();
-            $attributeAssembler->expects($this->once())
-                ->method('assemble')
-                ->with($definition, $expectedAttributeConfiguration)
-                ->will($this->returnValue($attributes));
-        }
-
-        return $attributeAssembler;
-    }
-
-    /**
-     * @param array $configuration
-     * @param Collection $attributes
-     * @param Collection $steps
-     * @param boolean $expectations
-     * @return StepAssembler
-     */
-    protected function createStepAssemblerMock(
-        array $configuration,
-        $attributes,
-        $steps,
-        $expectations = true
-    ) {
-        $stepAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
-        if ($expectations) {
-            $stepAssembler->expects($this->once())
-                ->method('assemble')
-                ->with($configuration[WorkflowConfiguration::NODE_STEPS], $attributes)
-                ->will($this->returnValue($steps));
-        }
-
-        return $stepAssembler;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createTranslatorMock()
-    {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())->method('trans')
-            ->with($this->isType('string'), $this->isType('array'))
-            ->will(
-                $this->returnCallback(
-                    function ($id, array $parameters = []) {
-                        if ($id === 'oro.workflow.transition.start') {
-                            $this->assertArrayHasKey('%workflow%', $parameters);
-                            return $this->getStartTransitionLabel($parameters['%workflow%']);
-                        }
-
-                        return $id;
-                    }
-                )
-            );
-
-        return $translator;
-    }
-
-    /**
-     * @param string $workflowLabel
-     * @return string
-     */
-    protected function getStartTransitionLabel($workflowLabel)
-    {
-        return 'Start ' . $workflowLabel;
-    }
-
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getStepMock($name)
-    {
-        $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $step->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-        return $step;
-    }
-
-    /**
-     * @param string $isStart
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getTransitionMock($isStart, $name)
-    {
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $transition->expects($this->any())
-            ->method('isStart')
-            ->will($this->returnValue($isStart));
-        $transition->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-        return $transition;
-    }
-
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getAttributeMock($name)
-    {
-        $attributeMock = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $attributeMock->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-
-        return $attributeMock;
-    }
-
-    /**
-     * @param array $configuration
-     * @param Collection $steps
-     * @param Collection $transitions
-     * @param boolean $expectations
-     * @param null|array $expectedTransitions
-     * @param null|array $expectedDefinitions
-     * @internal param null|string $startStepName
-     * @return TransitionAssembler
-     */
-    protected function createTransitionAssemblerMock(
-        array $configuration,
-        $steps,
-        $transitions,
-        $expectations = true,
-        $expectedTransitions = null,
-        $expectedDefinitions = null
-    ) {
-        $transitionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
-
-        if ($expectations) {
-            if ($expectedTransitions) {
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS] = $expectedTransitions;
-            }
-            if ($expectedDefinitions) {
-                $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS] = $expectedDefinitions;
-            }
-
-            $transitionAssembler->expects($this->once())
-                ->method('assemble')
-                ->with($configuration, $steps)
-                ->will($this->returnValue($transitions));
-        }
-
-        return $transitionAssembler;
-    }
-
-    /**
-     * @param array $configuration
-     * @param WorkflowStep $startStep
-     * @param array $expectedTransitions
-     * @param array $expectedDefinitions
      * @dataProvider assembleDataProvider
      */
-    public function testAssemble(array $configuration, $startStep, $expectedTransitions, $expectedDefinitions)
+    public function testAssemble(array $configuration, ?WorkflowStep $startStep)
     {
-        // source data
-        $workflow = $this->createWorkflow();
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
         if ($startStep) {
             $workflowDefinition->addStep($startStep);
         }
-        $attributes = new ArrayCollection(array('test' => $this->getAttributeMock('test')));
-        $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock('test_start_step')));
 
-        $transitions = array('test_transition' => $this->getTransitionMock(false, 'test_transition'));
+        $attributes = $this->expectsAttributeAssembleCalls($workflowDefinition, $configuration);
+        $steps = $this->expectStepAssemblerCalls($configuration, $attributes);
+
+        // Assemble transition
+        $transitions = ['test_transition' => $this->getTransitionMock(false, 'test_transition')];
         if (!$startStep) {
             $transitions['test_start_transition'] = $this->getTransitionMock(true, 'test_start_transition');
         } else {
             $transitions['__start__'] = $this->getTransitionMock(true, '__start__');
             $workflowDefinition->setStartStep($startStep);
         }
-        $transitions = new ArrayCollection($transitions);
 
-        // mocks
-        $container = $this->createContainerMock($workflow);
-        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
-        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
-        $transitionAssembler = $this->createTransitionAssemblerMock(
-            $configuration,
-            $steps,
-            $transitions,
-            true,
-            $expectedTransitions,
-            $expectedDefinitions
-        );
-        $translator = $this->createTranslatorMock();
-        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transitions = $this->expectTransitionAssemblerCalls($configuration, $steps, $transitions);
+
+        $this->transitionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with($configuration, $steps)
+            ->willReturn($transitions);
+
+        // Translator
+        $this->expectTranslatorCalls();
 
         // test
-        $workflowAssembler = new WorkflowAssembler(
-            $container,
-            $attributeAssembler,
-            $stepAssembler,
-            $transitionAssembler,
-            $restrictionAssembler,
-            $translator
-        );
-        $actualWorkflow = $workflowAssembler->assemble($workflowDefinition);
+        $actualWorkflow = $this->workflowAssembler->assemble($workflowDefinition);
 
-        $this->assertEquals($workflow, $actualWorkflow);
-        $this->assertEquals($workflowDefinition->getName(), $actualWorkflow->getName());
-        $this->assertEquals($workflowDefinition->getLabel(), $actualWorkflow->getLabel());
+        $this->assertSame($this->workflow, $actualWorkflow);
+        $this->assertSame($workflowDefinition->getName(), $actualWorkflow->getName());
+        $this->assertSame($workflowDefinition->getLabel(), $actualWorkflow->getLabel());
         $this->assertEquals(
             $attributes,
             $actualWorkflow->getAttributeManager()->getAttributes(),
@@ -351,239 +157,263 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
             'Unexpected transitions'
         );
 
-        $this->assertEquals(!empty($startStep), $actualWorkflow->getStepManager()->hasStartStep());
+        $this->assertEquals(null !== $startStep, $actualWorkflow->getStepManager()->hasStartStep());
     }
 
-    /**
-     * @return array
-     */
-    public function assembleDataProvider()
+    public function assembleDataProvider(): array
     {
-        $transitions = array('test_transition' => $this->transitionConfiguration);
-        $fullConfig = array(
-            WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
+        $transitions = ['test_transition' => $this->transitionConfiguration];
+        $fullConfig = [
+            WorkflowConfiguration::NODE_ATTRIBUTES => ['attributes_configuration'],
+            WorkflowConfiguration::NODE_STEPS => ['test_step' => $this->stepConfiguration],
             WorkflowConfiguration::NODE_TRANSITIONS => $transitions,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
-        );
-        $minimalConfig = array(
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
+        ];
+        $minimalConfig = [
+            WorkflowConfiguration::NODE_STEPS => ['test_step' => $this->stepConfiguration],
             WorkflowConfiguration::NODE_TRANSITIONS => $transitions,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
-        );
-        $customStartTransition = array(
-            TransitionManager::DEFAULT_START_TRANSITION_NAME => array(
+        ];
+        $customStartTransition = [
+            TransitionManager::DEFAULT_START_TRANSITION_NAME => [
                 'label' => 'My Label',
                 'step_to' => 'custom_step',
                 'is_start' => true,
                 'transition_definition' => '__start___definition'
-            )
-        );
-        $customStartDefinition = array('__start___definition' => array('conditions' => array()));
+            ]
+        ];
+        $customStartDefinition = ['__start___definition' => ['conditions' => []]];
         $fullConfigWithCustomStart = $minimalConfig;
         $fullConfigWithCustomStart[WorkflowConfiguration::NODE_TRANSITIONS] += $customStartTransition;
         $fullConfigWithCustomStart[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS] += $customStartDefinition;
 
         $label = $this->getStartTransitionLabel($this->workflowParameters['label']);
         $getDefaultTransition = function ($stepName) use ($label) {
-            return array(
-                TransitionManager::DEFAULT_START_TRANSITION_NAME => array(
+            return [
+                TransitionManager::DEFAULT_START_TRANSITION_NAME => [
                     'label' => $label,
                     'step_to' => $stepName,
                     'is_start' => true,
                     'is_hidden' => true,
                     'is_unavailable_hidden' => true,
                     'transition_definition' => '__start___definition'
-                )
-            );
+                ]
+            ];
         };
 
-        return array(
-            'full configuration with start' => array(
-                'configuration' => $fullConfig,
-                'startStep' => $this->getStepEntity('test_start_step'),
-                'expectedTransitions' => $transitions + $getDefaultTransition('test_start_step'),
-                'expectedDefinitions' => $this->transitionDefinition + array('__start___definition' => array())
-            ),
-            'minimal configuration with start' => array(
-                'configuration' => $minimalConfig,
-                'startStep' => $this->getStepEntity('test_start_step'),
-                'expectedTransitions' => $transitions + $getDefaultTransition('test_start_step'),
-                'expectedDefinitions' => $this->transitionDefinition + array('__start___definition' => array())
-            ),
-            'full configuration without start' => array(
-                'configuration' => $fullConfig,
+        return [
+            'full configuration with start' => [
+                'configuration' => array_merge($fullConfig, [
+                    WorkflowConfiguration::NODE_TRANSITIONS
+                        => $transitions + $getDefaultTransition('test_start_step'),
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS
+                        => $this->transitionDefinition + ['__start___definition' => []],
+                ]),
+                'startStep' => (new WorkflowStep())->setName('test_start_step'),
+            ],
+            'minimal configuration with start' => [
+                'configuration' => array_merge($minimalConfig, [
+                    WorkflowConfiguration::NODE_TRANSITIONS
+                        => $transitions + $getDefaultTransition('test_start_step'),
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS
+                        => $this->transitionDefinition + ['__start___definition' => []],
+                ]),
+                'startStep' => (new WorkflowStep())->setName('test_start_step'),
+            ],
+            'full configuration without start' => [
+                'configuration' => array_merge($fullConfig, [
+                    WorkflowConfiguration::NODE_TRANSITIONS => $transitions,
+                ]),
                 'startStep' => null,
-                'expectedTransitions' => $transitions,
-                'expectedDefinitions' => array()
-            ),
-            'minimal configuration without start' => array(
-                'configuration' => $minimalConfig,
+            ],
+            'minimal configuration without start' => [
+                'configuration' => array_merge($minimalConfig, [
+                    WorkflowConfiguration::NODE_TRANSITIONS => $transitions,
+                ]),
                 'startStep' => null,
-                'expectedTransitions' => $transitions,
-                'expectedDefinitions' => array()
-            ),
-            'full configuration with start custom config' => array(
-                'configuration' => $fullConfigWithCustomStart,
-                'startStep' => $this->getStepEntity('test_start_step'),
-                'expectedTransitions' => $transitions + $customStartTransition,
-                'expectedDefinitions' => $this->transitionDefinition + $customStartDefinition
-            ),
-        );
+            ],
+            'full configuration with start custom config' => [
+                'configuration' => array_merge($fullConfigWithCustomStart, [
+                    WorkflowConfiguration::NODE_TRANSITIONS => $transitions + $customStartTransition,
+                    WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS
+                        => $this->transitionDefinition + $customStartDefinition
+                ]),
+                'startStep' => (new WorkflowStep())->setName('test_start_step'),
+            ],
+        ];
     }
 
-    protected function getStepEntity($name)
-    {
-        $step = new WorkflowStep();
-        $step->setName($name);
-
-        return $step;
-    }
-
-    /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
-     * @expectedExceptionMessage Workflow "test_name" does not contains neither start step nor start transitions
-     */
     public function testAssembleStartTransitionException()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
+        $this->expectException(AssemblerException::class);
+        $this->expectExceptionMessage(
+            'Workflow "test_name" does not contains neither start step nor start transitions'
+        );
+
+        $configuration = [
+            WorkflowConfiguration::NODE_ATTRIBUTES => ['attributes_configuration'],
+            WorkflowConfiguration::NODE_STEPS => ['test_step' => $this->stepConfiguration],
             WorkflowConfiguration::NODE_TRANSITIONS => $this->transitionConfiguration,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
-        );
+        ];
 
         // source data
-        $workflow = $this->createWorkflow();
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $attributes = new ArrayCollection(array('test' => $this->getAttributeMock('test')));
-        $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock('test_start_step')));
+        $attributes = $this->expectsAttributeAssembleCalls($workflowDefinition, $configuration);
+        $steps = $this->expectStepAssemblerCalls($configuration, $attributes);
+        $this->expectTransitionAssemblerCalls($configuration, $steps);
+        $this->expectTranslatorCalls();
 
-        $transitions = array('test_transition' => $this->getTransitionMock(false, 'test_transition'));
-
-        // mocks
-        $container = $this->createContainerMock($workflow);
-        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
-        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
-        $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
-        $translator = $this->createTranslatorMock();
-        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // test
-        $workflowAssembler = new WorkflowAssembler(
-            $container,
-            $attributeAssembler,
-            $stepAssembler,
-            $transitionAssembler,
-            $restrictionAssembler,
-            $translator
-        );
-        $workflowAssembler->assemble($workflowDefinition);
+        $this->workflowAssembler->assemble($workflowDefinition);
     }
 
     public function testAssembleWithoutValidation()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
+        $configuration = [
+            WorkflowConfiguration::NODE_ATTRIBUTES => ['attributes_configuration'],
+            WorkflowConfiguration::NODE_STEPS => ['test_step' => $this->stepConfiguration],
             WorkflowConfiguration::NODE_TRANSITIONS => $this->transitionConfiguration,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
-        );
+        ];
 
         // source data
-        $workflow = $this->createWorkflow();
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $attributes = new ArrayCollection(array('test' => $this->getAttributeMock('test')));
-        $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock('test_start_step')));
-        $transitions = new ArrayCollection(
-            array('test_transition' => $this->getTransitionMock(false, 'test_transition'))
-        );
+        $attributes =$this->expectsAttributeAssembleCalls($workflowDefinition, $configuration);
+        $steps = $this->expectStepAssemblerCalls($configuration, $attributes);
+        $transitions = $this->expectTransitionAssemblerCalls($configuration, $steps);
+        $this->expectTranslatorCalls();
 
-        // mocks
-        $container = $this->createContainerMock($workflow);
-        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
-        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
-        $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
-        $translator = $this->createTranslatorMock();
-        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // test
-        $workflowAssembler = new WorkflowAssembler(
-            $container,
-            $attributeAssembler,
-            $stepAssembler,
-            $transitionAssembler,
-            $restrictionAssembler,
-            $translator
-        );
-        $workflow = $workflowAssembler->assemble($workflowDefinition, false);
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
         $this->assertEquals($attributes->toArray(), $workflow->getAttributeManager()->getAttributes()->toArray());
         $this->assertEquals($steps->toArray(), $workflow->getStepManager()->getSteps()->toArray());
         $this->assertEquals($transitions->toArray(), $workflow->getTransitionManager()->getTransitions()->toArray());
     }
 
-    /**
-     * @param array $configuration
-     */
-    protected function assembleWorkflow(array $configuration)
-    {
-        $workflow = $this->createWorkflow();
-        $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $attributes = new ArrayCollection();
-        $steps = new ArrayCollection();
-        $transitions = new ArrayCollection();
-
-        $container = $this->createContainerMock($workflow, false);
-        $attributeAssembler = $this
-            ->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes, false);
-        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps, false);
-        $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions, false);
-        $translator = $this->createTranslatorMock();
-        $restrictionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflowAssembler = new WorkflowAssembler(
-            $container,
-            $attributeAssembler,
-            $stepAssembler,
-            $transitionAssembler,
-            $restrictionAssembler,
-            $translator
-        );
-        $workflowAssembler->assemble($workflowDefinition);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
-     * @expectedExceptionMessage Option "steps" is required
-     */
     public function testAssembleNoStepsConfigurationException()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array(),
-            WorkflowConfiguration::NODE_TRANSITIONS => array('test_transition' => $this->transitionConfiguration),
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array($this->transitionDefinition)
-        );
-        $this->assembleWorkflow($configuration);
+        $configuration = [
+            WorkflowConfiguration::NODE_STEPS => [],
+            WorkflowConfiguration::NODE_TRANSITIONS => ['test_transition' => $this->transitionConfiguration],
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [$this->transitionDefinition]
+        ];
+
+        $this->expectException(AssemblerException::class);
+        $this->expectExceptionMessage('Option "steps" is required');
+        $this->workflowAssembler->assemble($this->createWorkflowDefinition($configuration));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
-     * @expectedExceptionMessage Option "transitions" is required
-     */
     public function testAssembleNoTransitionsConfigurationException()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array('step_one' => $this->stepConfiguration),
-            WorkflowConfiguration::NODE_TRANSITIONS => array(),
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array($this->transitionDefinition)
+        $configuration = [
+            WorkflowConfiguration::NODE_STEPS => ['step_one' => $this->stepConfiguration],
+            WorkflowConfiguration::NODE_TRANSITIONS => [],
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => [$this->transitionDefinition]
+        ];
+
+        $this->expectException(AssemblerException::class);
+        $this->expectExceptionMessage('Option "transitions" is required');
+        $this->workflowAssembler->assemble(
+            $this->createWorkflowDefinition($configuration)
         );
-        $this->assembleWorkflow($configuration);
+    }
+
+    private function createWorkflowDefinition(array $configuration): WorkflowDefinition
+    {
+        return (new WorkflowDefinition())
+            ->setName($this->workflowParameters['name'])
+            ->setLabel($this->workflowParameters['label'])
+            ->setConfiguration($configuration);
+    }
+
+    private function expectsAttributeAssembleCalls(
+        WorkflowDefinition $workflowDefinition,
+        array $configuration
+    ): ArrayCollection {
+        $attributes = new ArrayCollection(['test' => $this->getAttributeMock('test')]);
+
+        $this->attributeAssembler->expects($this->once())
+            ->method('assemble')
+            ->with($workflowDefinition, $configuration[WorkflowConfiguration::NODE_ATTRIBUTES] ?? [])
+            ->willReturn($attributes);
+
+        return $attributes;
+    }
+
+    private function expectStepAssemblerCalls(array $configuration, Collection $attributes): ArrayCollection
+    {
+        $step = $this->createMock(Step::class);
+        $step->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_start_step');
+
+        $steps = new ArrayCollection(['test_start_step' => $step]);
+        $this->stepAssembler->expects($this->once())
+            ->method('assemble')
+            ->with($configuration[WorkflowConfiguration::NODE_STEPS], $attributes)
+            ->willReturn($steps);
+
+        return $steps;
+    }
+
+    private function expectTranslatorCalls(): void
+    {
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->with($this->isType('string'), $this->isType('array'))
+            ->willReturnCallback(function ($id, array $parameters = []) {
+                if ($id === 'oro.workflow.transition.start') {
+                    $this->assertArrayHasKey('%workflow%', $parameters);
+                    return $this->getStartTransitionLabel($parameters['%workflow%']);
+                }
+
+                return $id;
+            });
+    }
+
+    private function getStartTransitionLabel(string $workflowLabel): string
+    {
+        return 'Start ' . $workflowLabel;
+    }
+
+    private function getTransitionMock(string $isStart, string $name): Transition
+    {
+        $transition = $this->createMock(Transition::class);
+        $transition->expects($this->any())
+            ->method('isStart')
+            ->willReturn($isStart);
+        $transition->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+
+        return $transition;
+    }
+
+    private function getAttributeMock(string$name): Attribute
+    {
+        $attributeMock = $this->createMock(Attribute::class);
+        $attributeMock->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+
+        return $attributeMock;
+    }
+
+    private function expectTransitionAssemblerCalls(
+        array $configuration,
+        Collection $steps,
+        array $transitions = []
+    ): ArrayCollection {
+        $transitions = new ArrayCollection(
+            $transitions
+                ?: ['test_transition' => $this->getTransitionMock(false, 'test_transition')]
+        );
+
+        $this->transitionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with($configuration, $steps)
+            ->willReturn($transitions);
+
+        return $transitions;
     }
 }

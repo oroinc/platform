@@ -1,0 +1,85 @@
+features:
+    web_api:
+        routes:
+            - oro_user_apigen
+
+    manage_users:
+        label: oro.user.feature.manage.label
+        description: oro.user.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_user_create
+            - oro_user_update
+            - oro_user_index
+            - oro_user_view
+            - oro_user_widget_info
+            - oro_user_mass_password_reset
+            - oro_user_reset_set_password
+            - oro_user_config
+            - oro_api_get_users
+            - oro_api_get_user
+            - oro_api_post_user
+            - oro_api_put_user
+            - oro_api_delete_user
+            - oro_api_get_user_filter
+            - oro_api_options_users
+            - oro_api_get_user_permissions
+            - oro_api_options_user_permissions
+        operations:
+            - user_enable
+            - user_disable
+        commands:
+            - oro:user:create
+            - oro:user:list
+            - oro:user:update
+        entities:
+            - Oro\Bundle\UserBundle\Entity\User
+        api_resources:
+            - [Oro\Bundle\UserBundle\Entity\User, [create, update, delete, delete_list]]
+        navigation_items:
+            - application_menu.system_tab.users_management.user_list
+
+    manage_user_roles:
+        label: oro.user.roles.feature.manage.label
+        description: oro.user.roles.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_user_role_create
+            - oro_user_role_view
+            - oro_user_role_update
+            - oro_user_role_index
+            - oro_api_get_user_roles
+        operations:
+            - clone_role
+            - oro_user_edit_role
+        entities:
+            - Oro\Bundle\UserBundle\Entity\Role
+        api_resources:
+            - [Oro\Bundle\UserBundle\Entity\Role, [create, update, delete, delete_list]]
+        navigation_items:
+            - application_menu.system_tab.users_management.user_roles
+
+    manage_user_groups:
+        label: oro.user.group.feature.manage.label
+        description: oro.user.group.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_user_group_create
+            - oro_user_group_update
+            - oro_user_group_index
+            - oro_api_get_user_groups
+        entities:
+            - Oro\Bundle\UserBundle\Entity\Group
+        api_resources:
+            - [Oro\Bundle\UserBundle\Entity\Group, [create, update, delete, delete_list]]
+        navigation_items:
+            - application_menu.system_tab.users_management.user_groups
+
+    user_login_attempts:
+        label: oro.user.userloginattempt.feature.manage.label
+        description: oro.user.userloginattempt.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_user_login_attempts
+        navigation_items:
+            - application_menu.system_tab.users_management.login_attempts

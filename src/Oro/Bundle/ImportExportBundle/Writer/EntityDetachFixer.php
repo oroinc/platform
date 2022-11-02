@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Writer;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -33,11 +34,6 @@ class EntityDetachFixer
      */
     protected $propertyAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param FieldHelper $fieldHelper
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FieldHelper $fieldHelper,
@@ -91,6 +87,11 @@ class EntityDetachFixer
      */
     protected function fixCollectionField($collection, $level)
     {
+        // No reason to fix not initialized and not changed collections
+        if ($collection instanceof PersistentCollection && !$collection->isDirty() && !$collection->isInitialized()) {
+            return;
+        }
+
         foreach ($collection as $key => $value) {
             if ($this->isEntityDetached($value)) {
                 $value = $this->reloadEntity($value);

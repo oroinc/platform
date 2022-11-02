@@ -5,41 +5,43 @@ namespace Oro\Bundle\ImportExportBundle\Processor;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
-class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface, EntityNameAwareInterface
+/**
+ * Processes given data by applying a data converter, serializer and an import strategy.
+ */
+class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
 {
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
+    protected ?ContextInterface $context = null;
 
-    /**
-     * @var SerializerInterface
-     */
-    protected $serializer;
+    protected ?SerializerInterface $serializer = null;
 
-    /**
-     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface
-     */
-    protected $dataConverter;
+    /** @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|null */
+    protected ?DataConverterInterface $dataConverter = null;
 
-    /**
-     * @var StrategyInterface|EntityNameAwareInterface|ContextAwareInterface
-     */
-    protected $strategy;
+    /** @var StrategyInterface|EntityNameAwareInterface|ContextAwareInterface|null */
+    protected ?StrategyInterface $strategy = null;
 
-    /**
-     * @var string
-     */
-    protected $entityName;
+    protected string $entityName = '';
 
     /**
      * {@inheritdoc}
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setEntityName(string $entityName): void
+    {
+        $this->entityName = $entityName;
+
+        if ($this->dataConverter && $this->dataConverter instanceof EntityNameAwareInterface) {
+            $this->dataConverter->setEntityName($this->entityName);
+        }
+
+        if ($this->strategy && $this->strategy instanceof EntityNameAwareInterface) {
+            $this->strategy->setEntityName($this->entityName);
+        }
+    }
+
+    public function setImportExportContext(ContextInterface $context): void
     {
         $this->context = $context;
 
@@ -52,26 +54,17 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
 
-    /**
-     * @param DataConverterInterface $dataConverter
-     */
-    public function setDataConverter(DataConverterInterface $dataConverter)
+    public function setDataConverter(DataConverterInterface $dataConverter): void
     {
         $this->dataConverter = $dataConverter;
     }
 
-    /**
-     * @param StrategyInterface $strategy
-     */
-    public function setStrategy(StrategyInterface $strategy)
+    public function setStrategy(StrategyInterface $strategy): void
     {
         $this->strategy = $strategy;
     }
@@ -89,12 +82,7 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
 
         $this->context->setValue('itemData', $item);
 
-        $object = $this->serializer->deserialize(
-            $item,
-            $this->getEntityName(),
-            null,
-            $this->context->getConfiguration()
-        );
+        $object = $this->serializer->denormalize($item, $this->getEntityName(), '', $this->context->getConfiguration());
 
         if ($this->strategy) {
             $object = $this->strategy->process($object);
@@ -103,31 +91,12 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         return $object ?: null;
     }
 
-    /**
-     * @return string
-     */
-    protected function getEntityName()
+    protected function getEntityName(): string
     {
         if ($this->entityName) {
             return $this->entityName;
-        } else {
-            return $this->context->getOption('entityName');
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEntityName($entityName)
-    {
-        $this->entityName = $entityName;
-
-        if ($this->dataConverter && $this->dataConverter instanceof EntityNameAwareInterface) {
-            $this->dataConverter->setEntityName($this->entityName);
         }
 
-        if ($this->strategy && $this->strategy instanceof EntityNameAwareInterface) {
-            $this->strategy->setEntityName($this->entityName);
-        }
+        return $this->context->getOption('entityName');
     }
 }

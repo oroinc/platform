@@ -2,26 +2,25 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 
 class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
 {
     public function testWrite()
     {
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $registry */
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->once())
             ->method('getManager')
             ->willReturn($entityManager);
 
         $entityManager->expects($this->once())
             ->method('clear');
+
         $writer = new DoctrineClearWriter($registry);
-        $writer->write(array());
+        $writer->write([]);
     }
 }

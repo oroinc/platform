@@ -1,0 +1,5 @@
+Extend\Entity\TestApiE1:
+    entity_1:
+        enumField: '@enum1_0'
+    entity_2:
+        enumField: '@enum1_1'

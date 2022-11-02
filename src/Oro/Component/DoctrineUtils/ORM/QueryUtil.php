@@ -2,10 +2,16 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\ParserResult;
 use Doctrine\ORM\Query\QueryException;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
+/**
+ * Provides a set of static methods to work with ORM query.
+ */
 class QueryUtil
 {
     /**
@@ -128,8 +134,8 @@ class QueryUtil
 
         $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
 
-        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
-        list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
+        [$params, $types] = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
+        [$sql, $params, $types] = SQLParserUtils::expandListParameters($sql, $params, $types);
 
         $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
         for ($i = count($paramPos) - 1; $i >= 0; $i--) {
@@ -151,8 +157,58 @@ class QueryUtil
      */
     public static function parseQuery(Query $query)
     {
-        $parser = new Query\Parser($query);
+        // we have to call the private _parse() method to be able to use the query cache
+        // and as result avoid unneeded query parsing when the parse result is already cached
+        $parseClosure = \Closure::bind(
+            fn (Query $query) => $query->parse(),
+            null,
+            $query
+        );
 
-        return $parser->parse();
+        return $parseClosure($query);
+    }
+
+    public static function resetResultSetMapping(Query $query): void
+    {
+        // unfortunately the reflection is the only way to reset the result-set mapping
+        $resultSetMappingProperty = ReflectionUtil::getProperty(
+            new \ReflectionClass($query),
+            '_resultSetMapping'
+        );
+        if (null === $resultSetMappingProperty) {
+            throw new \LogicException(sprintf(
+                'The "_resultSetMapping" property does not exist in %s.',
+                \get_class($query)
+            ));
+        }
+        $resultSetMappingProperty->setAccessible(true);
+        $resultSetMappingProperty->setValue($query, null);
+    }
+
+    /**
+     * Removes parameters from ORM query.
+     * Removes parameter mappings from {@see ParserResult} if any.
+     */
+    public static function resetParameters(Query $query, ParserResult $parserResult = null): void
+    {
+        // Removes parameters and parameter mappings.
+        $query->setParameters(new ArrayCollection());
+
+        if ($parserResult === null) {
+            /** @var Query\ParserResult $parserResult */
+            $parserResult = \Closure::bind(static fn (Query $query) => $query->parserResult, null, $query)($query);
+        }
+
+        if ($parserResult !== null) {
+            $clearMappings = \Closure::bind(
+                static function (Query\ParserResult $parserResult) {
+                    $parserResult->_parameterMappings = [];
+                },
+                null,
+                $parserResult
+            );
+
+            $clearMappings($parserResult);
+        }
     }
 }

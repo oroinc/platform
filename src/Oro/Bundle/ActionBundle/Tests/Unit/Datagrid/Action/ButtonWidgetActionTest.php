@@ -1,39 +1,30 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Unit\Datagrid\Action;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Action;
 
 use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
     /** @var ButtonWidgetAction */
-    protected $action;
+    private $action;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->action = new ButtonWidgetAction($this->translator);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->action, $this->translator);
     }
 
     /**
      * @dataProvider getOptionsProvider
-     *
-     * @param array $config
-     * @param string $link
-     * @param string $title
-     * @param string $translatedTitle
      */
-    public function testGetOptions(array $config, $link, $title, $translatedTitle)
+    public function testGetOptions(array $config, string $link, ?string $title, ?string $translatedTitle)
     {
         $this->action->setOptions(ActionConfiguration::create($config));
 
@@ -41,13 +32,13 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
             $this->translator->expects($this->any())
                 ->method('trans')
                 ->with($title)
-                ->will($this->returnValue($translatedTitle));
+                ->willReturn($translatedTitle);
         }
 
         /** @var \ArrayAccess $options */
         $options = $this->action->getOptions();
 
-        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration', $options);
+        $this->assertInstanceOf(ActionConfiguration::class, $options);
         $this->assertCount(count($config) + 1, $options);
         $this->assertArrayHasKey('link', $options);
         $this->assertEquals($link, $options['link']);
@@ -58,10 +49,7 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getOptionsProvider()
+    public function getOptionsProvider(): array
     {
         $link = 'http://example.com/';
         $title = 'Test Dialog Title';

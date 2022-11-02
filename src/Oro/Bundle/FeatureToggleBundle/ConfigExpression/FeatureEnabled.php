@@ -28,9 +28,6 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
      */
     protected $scopeIdentifier;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

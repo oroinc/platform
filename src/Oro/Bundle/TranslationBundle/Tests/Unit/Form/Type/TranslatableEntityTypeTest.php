@@ -4,19 +4,21 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -26,80 +28,57 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class TranslatableEntityTypeTest extends FormIntegrationTestCase
 {
-    const TEST_CLASS      = 'TestClass';
-    const TEST_IDENTIFIER = 'testId';
-    const TEST_PROPERTY   = 'testProperty';
+    private const TEST_CLASS      = 'TestClass';
+    private const TEST_IDENTIFIER = 'testId';
+    private const TEST_PROPERTY   = 'testProperty';
 
-    /**
-     * @var ClassMetadataInfo
-     */
-    protected $classMetadata;
+    /** @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject */
+    private $classMetadata;
 
-    /**
-     * @var Configuration
-     */
-    protected $ormConfiguration;
+    /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
+    private $ormConfiguration;
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var EntityRepository
-     */
-    protected $entityRepository;
+    /** @var EntityRepository */
+    private $entityRepository;
 
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
+    /** @var QueryBuilder */
+    private $queryBuilder;
 
-    /**
-     * @var Query|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $query;
+    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
+    private $query;
 
-    /**
-     * @var TranslatableEntityType
-     */
-    protected $type;
+    /** @var TranslatableEntityType */
+    private $type;
 
-    /**
-     * @var array
-     */
-    protected $testChoices = array('one', 'two', 'three');
+    /** @var array */
+    private $testChoices = ['one', 'two', 'three'];
 
-    /** @var MockObject */
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->classMetadata = $this->createMock(ClassMetadataInfo::class);
         $this->classMetadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue(self::TEST_IDENTIFIER));
+            ->willReturn(self::TEST_IDENTIFIER);
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array(self::TEST_IDENTIFIER)));
+            ->willReturn([self::TEST_IDENTIFIER]);
         $this->classMetadata->expects($this->any())
             ->method('getTypeOfField')
-            ->will($this->returnValue('integer'));
+            ->willReturn('integer');
         $this->classMetadata->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(self::TEST_CLASS));
+            ->willReturn(self::TEST_CLASS);
 
-        $this->ormConfiguration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->setMethods(array('addCustomHydrationMode'))
-            ->getMock();
+        $this->ormConfiguration = $this->createMock(Configuration::class);
 
         $locale = 'de_DE';
 
@@ -113,49 +92,32 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->method('getListeners')
             ->willReturn([[$translatableListener]]);
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getClassMetadata', 'getConfiguration', 'getEventManager'])
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
         $this->entityManager->expects($this->any())
             ->method('getEventManager')
             ->willReturn($eventManager);
         $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with(self::TEST_CLASS)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->entityManager->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($this->ormConfiguration));
+            ->willReturn($this->ormConfiguration);
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getManager', 'getRepository'))
-            ->getMockForAbstractClass();
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry->expects($this->any())
             ->method('getManager')
-            ->will($this->returnValue($this->entityManager));
+            ->willReturn($this->entityManager);
         $this->registry->expects($this->any())
             ->method('getRepository')
             ->with(self::TEST_CLASS)
-            ->will($this->returnValue($this->getEntityRepository()));
+            ->willReturn($this->getEntityRepository());
 
         $this->aclHelper = $this->createMock(AclHelper::class);
 
         $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory(), $this->aclHelper);
 
         parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->classMetadata);
-        unset($this->ormConfiguration);
-        unset($this->entityManager);
-        unset($this->registry);
-        unset($this->entityRepository);
-        unset($this->queryBuilder);
-        unset($this->type);
     }
 
     /**
@@ -178,63 +140,45 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         $this->assertEquals(ChoiceType::class, $this->type->getParent());
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    private function getQueryBuilder(): QueryBuilder
     {
         $testChoiceEntities = $this->getTestChoiceEntities($this->testChoices);
 
         if (!$this->queryBuilder) {
-            $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-                ->disableOriginalConstructor()
-                ->setMethods(array('execute', 'setHint', 'getSQL'))
-                ->getMockForAbstractClass();
+            $this->query = $this->createMock(AbstractQuery::class);
             $this->query->expects($this->any())
                 ->method('execute')
-                ->will($this->returnValue($testChoiceEntities));
+                ->willReturn($testChoiceEntities);
             $this->query->expects($this->any())
                 ->method('getSQL')
-                ->will($this->returnValue('SQL QUERY'));
+                ->willReturn('SQL QUERY');
 
-            $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getQuery', 'getParameters'))
-                ->getMock();
+            $this->queryBuilder = $this->createMock(QueryBuilder::class);
             $this->queryBuilder->expects($this->any())
                 ->method('getQuery')
-                ->will($this->returnValue($this->query));
+                ->willReturn($this->query);
             $this->queryBuilder->expects($this->any())
                 ->method('getParameters')
-                ->will($this->returnValue(new ArrayCollection()));
+                ->willReturn(new ArrayCollection());
         }
 
         return $this->queryBuilder;
     }
 
-    /**
-     * @return EntityRepository
-     */
-    public function getEntityRepository()
+    private function getEntityRepository(): EntityRepository
     {
         if (!$this->entityRepository) {
-            $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $this->entityRepository = $this->createMock(EntityRepository::class);
             $this->entityRepository->expects($this->any())
                 ->method('createQueryBuilder')
                 ->with('e')
-                ->will($this->returnValue($this->getQueryBuilder()));
+                ->willReturn($this->getQueryBuilder());
         }
 
         return $this->entityRepository;
     }
 
-    /**
-     * @param  array $choices
-     * @return array
-     */
-    protected function getTestChoiceEntities($choices)
+    private function getTestChoiceEntities(array $choices): array
     {
         foreach ($choices as $key => $value) {
             $entity = new TestEntity($key, $value);
@@ -245,68 +189,58 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $options
-     * @param array $expectedCalls
-     *
      * @dataProvider buildFormDataProvider
      */
-    public function testBuildForm($options, array $expectedCalls = array())
+    public function testBuildForm(array $options, array $expectedCalls = [])
     {
-        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $formBuilder */
-        $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('addEventSubscriber', 'addViewTransformer'))
-            ->getMock();
+        $formBuilder = $this->createMock(FormBuilder::class);
 
         foreach ($expectedCalls as $method => $parameters) {
             $mocker = $formBuilder->expects($this->exactly($parameters['count']))
                 ->method($method)
-                ->will($this->returnSelf());
-            call_user_func_array(array($mocker, 'with'), $parameters['with']);
+                ->willReturnSelf();
+            call_user_func_array([$mocker, 'with'], $parameters['with']);
         }
 
         // test
         $this->type->buildForm($formBuilder, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
-        return array(
-            'single' => array(
-                'options' => array(
+        return [
+            'single' => [
+                'options' => [
                     'class'    => self::TEST_CLASS,
                     'multiple' => false,
-                ),
-            ),
-            'multiple' => array(
-                'options'       => array(
+                ],
+            ],
+            'multiple' => [
+                'options'       => [
                     'class'    => self::TEST_CLASS,
                     'multiple' => true,
-                ),
-                'expectedCalls' => array(
-                    'addEventSubscriber' => array(
+                ],
+                'expectedCalls' => [
+                    'addEventSubscriber' => [
                         'count' => 1,
-                        'with'  => array(
+                        'with'  => [
                             $this->isInstanceOf(
-                                'Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener'
+                                MergeDoctrineCollectionListener::class
                             )
-                        )
-                    ),
-                    'addViewTransformer' => array(
+                        ]
+                    ],
+                    'addViewTransformer' => [
                         'count' => 1,
-                        'with'  => array(
+                        'with'  => [
                             $this->isInstanceOf(
-                                'Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer'
+                                CollectionToArrayTransformer::class
                             ),
                             true
-                        )
-                    ),
-                ),
-            ),
-        );
+                        ]
+                    ],
+                ],
+            ],
+        ];
     }
 
     public function testBuildViewWhenChoicesGiven()
@@ -401,12 +335,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(TranslatableEntityType::class, null, ['class' => self::TEST_CLASS]);
 
-        $this->assertArraySubset(
-            [
-                'class' => self::TEST_CLASS,
-                'choice_value' => 'testId'
-            ],
-            $form->getConfig()->getOptions()
-        );
+        $options = $form->getConfig()->getOptions();
+
+        $this->assertSame(self::TEST_CLASS, $options['class']);
+        $this->assertSame('testId', $options['choice_value']);
     }
 }

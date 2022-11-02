@@ -4,39 +4,27 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 
+/**
+ * Delegates returning of owner tree to suitable child provider.
+ */
 class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
 {
-    /** @var OwnerTreeProviderInterface[] */
-    protected $providers = [];
-
-    /** @var OwnerTreeProviderInterface */
-    protected $defaultProvider;
+    /** @var iterable|OwnerTreeProviderInterface[] */
+    private $providers;
 
     /**
-     * @param OwnerTreeProviderInterface $provider
+     * @param iterable|OwnerTreeProviderInterface[] $providers
      */
-    public function addProvider(OwnerTreeProviderInterface $provider)
+    public function __construct(iterable $providers)
     {
-        $this->providers[] = $provider;
-    }
-
-    /**
-     * @param OwnerTreeProviderInterface $defaultProvider
-     */
-    public function setDefaultProvider($defaultProvider)
-    {
-        $this->defaultProvider = $defaultProvider;
+        $this->providers = $providers;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function supports()
+    public function supports(): bool
     {
-        if ($this->defaultProvider) {
-            return true;
-        }
-
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
                 return true;
@@ -46,19 +34,12 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         return false;
     }
 
-    /**
-     * @return OwnerTreeInterface
-     */
-    public function getTree()
+    public function getTree(): OwnerTreeInterface
     {
         foreach ($this->providers as $provider) {
             if ($provider->supports()) {
                 return $provider->getTree();
             }
-        }
-
-        if ($this->defaultProvider) {
-            return $this->defaultProvider->getTree();
         }
 
         throw new UnsupportedOwnerTreeProviderException('Supported provider not found in chain');
@@ -67,28 +48,20 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clearCache(): void
     {
         foreach ($this->providers as $provider) {
-            $provider->clear();
-        }
-
-        if ($this->defaultProvider) {
-            $this->defaultProvider->clear();
+            $provider->clearCache();
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         foreach ($this->providers as $provider) {
             $provider->warmUpCache();
-        }
-
-        if ($this->defaultProvider) {
-            $this->defaultProvider->warmUpCache();
         }
     }
 }

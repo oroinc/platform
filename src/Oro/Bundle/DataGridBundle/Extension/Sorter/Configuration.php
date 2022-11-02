@@ -29,9 +29,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(static::SORTERS_KEY);
 
-        $builder->root(static::SORTERS_KEY)
+        $builder->getRootNode()
             ->children()
                 ->arrayNode(static::COLUMNS_KEY)
                     ->prototype('array')

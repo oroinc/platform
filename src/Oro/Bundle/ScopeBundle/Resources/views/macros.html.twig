@@ -1,6 +1,6 @@
 {% macro renderRestrictionsView(scopeEntities, scopes) %}
     {% import _self as self %}
-    {% if oro_scope_is_empty(scopeEntities, scopes) %}
+    {% if scopes is empty or oro_scope_is_empty(scopeEntities, scopes) %}
         {{ 'N/A'|trans }}
     {% else %}
         {% set gridHtml = self.renderRestrictionsViewGrid(scopeEntities, scopes) %}
@@ -10,7 +10,7 @@
 
 {% macro renderRestrictionsViewGrid(scopeEntities, scopes) %}
     <div class="grid-container">
-        <table class="grid table table-bordered table-condensed">
+        <table class="grid grid-main-container table table-bordered table-condensed table-fixed table-hover">
             <thead>
                 <tr>
                     {% for entityClass in scopeEntities %}

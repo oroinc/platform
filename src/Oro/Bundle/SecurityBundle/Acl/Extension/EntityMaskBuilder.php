@@ -13,29 +13,26 @@ final class EntityMaskBuilder extends MaskBuilder
     /**
      * Determines how many permissions stored in one mask.
      * For service mask is used 32 bit integer value. We use five bits for each permissions in mask to store
-     * all access levels (basic, local, deep, global, system). So 15 bits used for permissions data. The remaining 16
+     * all access levels (basic, local, deep, global, system). 25 bits used for permissions data. The remaining 6
      * bits will be used as service bits (as we know, 31 bits we can use for data and 1 bit is used for sign) and we
-     * have 65536 (2^16) unique combinations of masks.
-     * Current constant value was selected based on optimal numbers of unique masks and better performance.
+     * have 320 ((2^6)*5) unique permissions.
+     * Current constant value was selected based on optimal numbers of unique permissions and better performance.
      */
-    const MAX_PERMISSIONS_IN_MASK = 3;
+    public const MAX_PERMISSIONS_IN_MASK = 5;
 
-    const SERVICE_BITS        = -32768; // 0xFFFF8000
-    const REMOVE_SERVICE_BITS = 32767;  // 0x00007FFF
+    public const SERVICE_BITS        = -33554432; // 0xFE000000
+    public const REMOVE_SERVICE_BITS = 33554431;  // 0x01FFFFFF
 
     /** @var int */
-    protected $identity;
-
-    /** @var array */
-    protected $map;
+    private $identity;
 
     /**
-     * @param int $identity
-     * @param array $permissions
+     * @param int   $identity
+     * @param array $permissions [permission key => permission, ...]
      */
     public function __construct($identity, array $permissions)
     {
-        if (!is_int($identity)) {
+        if (!\is_int($identity)) {
             throw new \InvalidArgumentException(sprintf('Identity should be integer, %s given.', $identity));
         }
 
@@ -51,47 +48,42 @@ final class EntityMaskBuilder extends MaskBuilder
         }
 
         $this->identity = $identity;
+        parent::__construct();
+
         $this->preparePermissions($permissions);
         $this->prepareLevels();
-
-        parent::__construct();
     }
 
     /**
-     * @param array $permissions
+     * @param array $permissions [permission key => permission, ...]
      */
-    protected function preparePermissions(array $permissions)
+    private function preparePermissions(array $permissions)
     {
         $identity = $this->getIdentity();
         $levelsCount = count(AccessLevel::$allAccessLevelNames);
-
         foreach ($permissions as $permissionKey => $permission) {
             $permissionSum = 0;
-
             foreach (AccessLevel::$allAccessLevelNames as $accessLevelKey => $accessLevel) {
-                $name = sprintf('MASK_%s_%s', $permission, $accessLevel);
+                $permissionName = $permission . '_' . $accessLevel;
                 $mask = 1 << ($accessLevelKey + ($permissionKey * $levelsCount));
-
                 $permissionSum += $mask;
-
-                $this->map[$name] = $mask + $identity;
+                $mask += $identity;
+                $this->map->permission[$permissionName] = $mask;
+                $this->map->all['MASK_' . $permissionName] = $mask;
             }
-
-            $this->map['GROUP_' . $permission] = $permissionSum + $identity;
+            $mask = $permissionSum + $identity;
+            $this->map->group[$permission] = $mask;
+            $this->map->all['GROUP_' . $permission] = $mask;
         }
     }
 
-    protected function prepareLevels()
+    private function prepareLevels()
     {
-        $levelSums = array_map(
-            function () {
-                return 0;
-            },
-            array_flip(AccessLevel::$allAccessLevelNames)
-        );
-
+        $levelSums = [];
+        foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
+            $levelSums[$accessLevel] = 0;
+        }
         $levelsCount = count(AccessLevel::$allAccessLevelNames);
-
         for ($i = 0; $i < self::MAX_PERMISSIONS_IN_MASK; $i++) {
             foreach (AccessLevel::$allAccessLevelNames as $accessLevelKey => $accessLevel) {
                 $levelSums[$accessLevel] += (1 << ($accessLevelKey + ($i * $levelsCount)));
@@ -99,14 +91,17 @@ final class EntityMaskBuilder extends MaskBuilder
         }
 
         $identity = $this->getIdentity();
-
-        $this->map['GROUP_NONE'] = $identity;
-        $this->map['GROUP_ALL'] = $identity;
-
+        $this->map->group['NONE'] = $identity;
+        $this->map->all['GROUP_NONE'] = $identity;
+        $allMask = $identity;
         foreach ($levelSums as $level => $sum) {
-            $this->map['GROUP_' . $level] = $sum + $identity;
-            $this->map['GROUP_ALL'] += $sum;
+            $mask = $sum + $identity;
+            $this->map->group[$level] = $mask;
+            $this->map->all['GROUP_' . $level] = $mask;
+            $allMask += $sum;
         }
+        $this->map->group['ALL'] = $allMask;
+        $this->map->all['GROUP_ALL'] = $allMask;
     }
 
     /**
@@ -122,7 +117,7 @@ final class EntityMaskBuilder extends MaskBuilder
      */
     public function reset()
     {
-        $this->mask = $this->getIdentity();
+        $this->mask = $this->identity;
 
         return $this;
     }
@@ -132,14 +127,7 @@ final class EntityMaskBuilder extends MaskBuilder
      */
     public function add($mask)
     {
-        if (is_string($mask)) {
-            $mask = $this->getMask('MASK_' . strtoupper($mask));
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be a string or an integer.');
-        }
-
-        $mask &= self::REMOVE_SERVICE_BITS;
-        $this->mask |= $mask;
+        $this->mask |= $this->parseMask($mask) & self::REMOVE_SERVICE_BITS;
 
         return $this;
     }
@@ -149,41 +137,8 @@ final class EntityMaskBuilder extends MaskBuilder
      */
     public function remove($mask)
     {
-        if (is_string($mask)) {
-            $mask = $this->getMask('MASK_' . strtoupper($mask));
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be a string or an integer.');
-        }
-
-        $this->mask &= ~$mask;
-        $this->mask |= $this->getIdentity();
+        $this->mask = ($this->mask & ~$this->parseMask($mask)) | $this->getIdentity();
 
         return $this;
-    }
-
-    /**
-     * Checks whether a permission with the given name is defined in this mask builder
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function hasMask($name)
-    {
-        return array_key_exists($name, $this->map);
-    }
-
-    /**
-     * Gets permission value by its name
-     *
-     * @param string $name
-     * @return int
-     */
-    public function getMask($name)
-    {
-        if (!array_key_exists($name, $this->map)) {
-            throw new \InvalidArgumentException(sprintf('Undefined mask: %s.', $name));
-        }
-
-        return $this->map[$name];
     }
 }

@@ -11,8 +11,6 @@ interface NameGeneratorAwareInterface
 {
     /**
      * Sets the database identifier name generator
-     *
-     * @param DbIdentifierNameGenerator $nameGenerator
      */
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator);
 }

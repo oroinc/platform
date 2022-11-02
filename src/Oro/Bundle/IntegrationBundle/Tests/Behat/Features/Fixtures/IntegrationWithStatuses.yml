@@ -1,0 +1,28 @@
+Oro\Bundle\IntegrationBundle\Entity\Stub\TestTransport1Settings:
+    itegration1_transport1:
+        transport1Field: 'test'
+
+Oro\Bundle\IntegrationBundle\Entity\Channel:
+    itegration1:
+        type: 'test_channel'
+        name: 'Test Integration'
+        enabled: true
+        organization: '@organization'
+        transport: '@itegration1_transport1'
+
+Oro\Bundle\IntegrationBundle\Entity\Status:
+    itegration1_status1:
+        code: '1'
+        connector: 'connector'
+        message: 'STATUS_COMPLETED'
+        date: '<dateTime()>'
+        data: {  }
+        channel: '@itegration1'
+
+    itegration1_status2:
+        code: '2'
+        connector: 'connector'
+        message: 'STATUS_FAILED'
+        date: '<dateTime()>'
+        data: {  }
+        channel: '@itegration1'

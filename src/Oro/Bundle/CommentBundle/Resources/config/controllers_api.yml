@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    OroCommentBundleRestApiController:
+        namespace: Oro\Bundle\CommentBundle\Controller\Api\Rest\
+        resource: '../../Controller/Api/Rest/*Controller.php'
+        calls:
+            - [setContainer, ['@service_container']]

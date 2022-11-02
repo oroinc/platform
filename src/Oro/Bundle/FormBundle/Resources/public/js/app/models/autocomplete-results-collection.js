@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var AutocompleteResultsCollection;
-    var RoutingCollection = require('oroui/js/app/models/base/routing-collection');
+    const RoutingCollection = require('oroui/js/app/models/base/routing-collection');
 
-    AutocompleteResultsCollection = RoutingCollection.extend({
+    const AutocompleteResultsCollection = RoutingCollection.extend({
         routeDefaults: {
             routeName: 'oro_form_autocomplete_search',
             routeQueryParameterNames: ['page', 'per_page', 'name', 'query', 'search_by_id']
@@ -16,10 +15,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AutocompleteResultsCollection() {
-            AutocompleteResultsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function AutocompleteResultsCollection(options) {
+            AutocompleteResultsCollection.__super__.constructor.call(this, options);
         },
 
         parse: function(response) {

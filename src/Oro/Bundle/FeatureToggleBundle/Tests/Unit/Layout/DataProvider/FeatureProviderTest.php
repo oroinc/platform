@@ -7,21 +7,16 @@ use Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider;
 
 class FeatureProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var FeatureProvider
-     */
-    protected $dataProvider;
+    /** @var FeatureProvider */
+    private $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->dataProvider = new FeatureProvider($this->featureChecker);
     }
 

@@ -5,7 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreSetRequireUpdateEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 
@@ -15,7 +17,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'NEW', owner - Custom)
      *  Nothing should be persisted
      */
-    public function testNewFieldNewEntity()
+    public function testNewFieldNewEntity(): void
     {
         $entityConfig = $this->getEntityConfig();
         $fieldConfig = $this->getEventConfigNewField();
@@ -37,7 +39,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new EntityConfigListener();
+        $listener = new EntityConfigListener($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(
@@ -50,7 +52,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testNewFieldActiveEntity()
+    public function testNewFieldActiveEntityUpdateRequired(): void
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -72,7 +74,19 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new EntityConfigListener();
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager),
+                Events::PRE_SET_REQUIRE_UPDATE
+            )
+            ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
+                $event->setUpdateRequired(true);
+
+                return $event;
+            });
+
+        $listener = new EntityConfigListener($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->configManager->calculateConfigChangeSet($entityConfig);
@@ -83,11 +97,54 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         );
     }
 
+    public function testNewFieldActiveEntityUpdateNotRequired(): void
+    {
+        $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $fieldConfig = $this->getEventConfigNewField();
+
+        $this->configCache->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturnOnConsecutiveCalls($entityConfig);
+        $this->configManager->getEntityConfig(
+            $entityConfig->getId()->getScope(),
+            $entityConfig->getId()->getClassName()
+        );
+
+        $this->configManager->persist($entityConfig);
+        $this->configManager->persist($fieldConfig);
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+        $this->configManager->calculateConfigChangeSet($fieldConfig);
+
+        $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager),
+                Events::PRE_SET_REQUIRE_UPDATE
+            )
+            ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
+                $event->setUpdateRequired(false);
+
+                return $event;
+            });
+
+        $listener = new EntityConfigListener($this->eventDispatcher);
+        $listener->preFlush($event);
+
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+
+        $this->assertEquals(
+            [],
+            $this->configManager->getConfigChangeSet($entityConfig)
+        );
+    }
+
     /**
      *  Test flush new field (entity state is 'Active')
      *  The entity state should not be changed
      */
-    public function testSavingNewFieldActiveEntity()
+    public function testSavingNewFieldActiveEntity(): void
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -110,7 +167,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new EntityConfigListener();
+        $listener = new EntityConfigListener($this->eventDispatcher);
         $listener->preFlush($event);
 
         $this->assertEquals(
@@ -128,7 +185,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *
      * @return Config
      */
-    protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend')
+    protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend'): Config
     {
         $resultValues = [
             'owner'      => ExtendScope::OWNER_CUSTOM,
@@ -155,7 +212,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      * @param string $scope
      * @return Config
      */
-    protected function getEntityConfig($values = [], $scope = 'extend')
+    protected function getEntityConfig($values = [], $scope = 'extend'): Config
     {
         $resultValues = [
             'owner'       => ExtendScope::OWNER_CUSTOM,

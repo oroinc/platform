@@ -12,31 +12,23 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OperationTypeTest extends FormIntegrationTestCase
 {
-    /** @var RequiredAttributesListener */
-    protected $requiredAttributesListener;
-
     /** @var OperationType */
-    protected $formType;
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->requiredAttributesListener = new RequiredAttributesListener();
-
         $this->formType = new OperationType(
-            $this->requiredAttributesListener,
+            new RequiredAttributesListener(),
             new ContextAccessor()
         );
         parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->formType, $this->operationManager, $this->requiredAttributesListener);
     }
 
     /**
@@ -56,16 +48,9 @@ class OperationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param mixed $defaultData
-     * @param array $inputOptions
-     * @param array $submittedData
-     * @param ActionData $expectedData
-     * @param array $expectedChildrenOptions
-     * @param ActionData $expectedDefaultData
      */
     public function testSubmit(
-        $defaultData,
+        mixed $defaultData,
         array $inputOptions,
         array $submittedData,
         ActionData $expectedData,
@@ -90,14 +75,14 @@ class OperationTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'existing data' => [
@@ -244,13 +229,8 @@ class OperationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider exceptionDataProvider
-     *
-     * @param array $options
-     * @param string $exception
-     * @param string $message
-     * @param ActionData $data
      */
-    public function testException(array $options, $exception, $message, ActionData $data = null)
+    public function testException(array $options, string $exception, string $message, ActionData $data = null)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -258,10 +238,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         $this->factory->create(OperationType::class, $data, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function exceptionDataProvider()
+    public function exceptionDataProvider(): array
     {
         return [
             [
@@ -273,20 +250,20 @@ class OperationTypeTest extends FormIntegrationTestCase
                         ]
                     ],
                 ],
-                'exception' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
+                'exception' => MissingOptionsException::class,
                 'message' => 'The required option "data" is missing.',
                 'context' => null
             ],
             [
                 'options' => [
-                    'operation' => $this->createOperation([]),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field'  => [
                             'form_type' => TextType::class,
                         ]
                     ],
                 ],
-                'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid reference to unknown attribute "field" of operation "test_operation".',
                 'context' => $this->createOperationData()
             ],
@@ -297,7 +274,7 @@ class OperationTypeTest extends FormIntegrationTestCase
                         'field' => null
                     ],
                 ],
-                'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Parameter "form_type" must be defined for attribute "field" ' .
                     'in operation "test_operation".',
                 'context' => $this->createOperationData()
@@ -305,15 +282,9 @@ class OperationTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param array $data
-     * @param bool $modified
-     * @return ActionData
-     */
-    protected function createOperationData(array $data = [], $modified = false)
+    private function createOperationData(array $data = [], bool $modified = false): ActionData
     {
         $actionData = new ActionData($data);
-
         if ($modified) {
             $actionData->setModified(true);
         }
@@ -321,46 +292,32 @@ class OperationTypeTest extends FormIntegrationTestCase
         return $actionData;
     }
 
-    /**
-     * @param array $attributes
-     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createOperation(array $attributes = [])
+    private function createOperation(array $attributes = []): Operation
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeManager $attributeManager */
-        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManager = $this->createMock(AttributeManager::class);
         $attributeManager->expects($this->any())
             ->method('getAttribute')
-            ->willReturnCallback(
-                function ($attributeName) use ($attributes) {
-                    if (!isset($attributes[$attributeName])) {
-                        return null;
-                    }
-
-                    $attributeDefinition = $attributes[$attributeName];
-
-                    $attribute = new Attribute();
-                    $attribute
-                        ->setName($attributeName)
-                        ->setLabel(ucfirst($attributeName) . ' Label')
-                        ->setType(isset($attributeDefinition['type']) ? $attributeDefinition['type'] : TextType::class)
-                        ->setPropertyPath(
-                            isset($attributeDefinition['property_path']) ? $attributeDefinition['property_path'] : null
-                        );
-
-                    return $attribute;
+            ->willReturnCallback(function ($attributeName) use ($attributes) {
+                if (!isset($attributes[$attributeName])) {
+                    return null;
                 }
-            );
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Operation $operation */
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-            ->disableOriginalConstructor()
-            ->getMock();
+                $attributeDefinition = $attributes[$attributeName];
+
+                $attribute = new Attribute();
+                $attribute
+                    ->setName($attributeName)
+                    ->setLabel(ucfirst($attributeName) . ' Label')
+                    ->setType($attributeDefinition['type'] ?? TextType::class)
+                    ->setPropertyPath($attributeDefinition['property_path'] ?? null);
+
+                return $attribute;
+            });
+
+        $operation = $this->createMock(Operation::class);
         $operation->expects($this->any())
             ->method('getAttributeManager')
-            ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'))
+            ->with($this->isInstanceOf(ActionData::class))
             ->willReturn($attributeManager);
         $operation->expects($this->any())
             ->method('getName')

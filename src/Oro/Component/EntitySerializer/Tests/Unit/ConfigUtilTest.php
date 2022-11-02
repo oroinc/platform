@@ -4,6 +4,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetArrayValueWhenConfigDoesNotContainsKey()
@@ -44,12 +47,11 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['key' => 'val'], ConfigUtil::getArrayValue($config, $key));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected value of type "array, string or nothing", "integer" given.
-     */
     public function testGetArrayValueWhenConfigValueIsUnexpectedType()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected value of type "array, string or nothing", "integer" given.');
+
         $key = 'testKey';
         $config = [
             $key => 123

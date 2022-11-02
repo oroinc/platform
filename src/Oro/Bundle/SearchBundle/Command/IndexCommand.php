@@ -1,49 +1,65 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\SearchBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class IndexCommand extends ContainerAwareCommand
+/**
+ * Updates search index for specified entities.
+ */
+class IndexCommand extends Command
 {
-    const NAME = 'oro:search:index';
+    /** @var string */
+    protected static $defaultName = 'oro:search:index';
 
-    /**
-     * {@inheritdoc}
-     */
+    private ManagerRegistry $registry;
+    private IndexerInterface $asyncIndexer;
+
+    public function __construct(ManagerRegistry $registry, IndexerInterface $asyncIndexer)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->asyncIndexer = $asyncIndexer;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Update search index for specified entities with the same type')
-            ->addArgument(
-                'class',
-                InputArgument::REQUIRED,
-                'Full or compact class name of indexed entities ' .
-                '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
-            )
+        $this
+            ->addArgument('class', InputArgument::REQUIRED, 'Entity to reindex (FQCN or short name)')
             ->addArgument(
                 'identifiers',
                 InputArgument::REQUIRED|InputArgument::IS_ARRAY,
-                'Identifiers of indexed entities (f.e. 42)'
-            );
+                'IDs of the entities to reindex'
+            )
+            ->setDescription('Updates search index for specified entities.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates search index for specified entities.
+
+  <info>php %command.full_name% <entity> <id1> [<id2> ...]</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $class = $input->getArgument('class');
         $identifiers = $input->getArgument('identifiers');
 
         /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass($class);
+        $em = $this->registry->getManagerForClass($class);
         if (null === $em) {
             throw new \LogicException(sprintf('Entity manager was not found for class: "%s"', $class));
         }
@@ -53,24 +69,10 @@ class IndexCommand extends ContainerAwareCommand
             $entities[] = $em->getReference($class, $id);
         }
 
-        $this->getSearchIndexer()->save($entities);
+        $this->asyncIndexer->save($entities);
 
         $output->writeln('Started index update for entities.');
-    }
 
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getDoctrine()
-    {
-        return $this->getContainer()->get('doctrine');
-    }
-
-    /**
-     * @return IndexerInterface
-     */
-    protected function getSearchIndexer()
-    {
-        return $this->getContainer()->get('oro_search.async.indexer');
+        return 0;
     }
 }

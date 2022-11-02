@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Event;
 
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PrepareResultItemEvent extends Event
 {

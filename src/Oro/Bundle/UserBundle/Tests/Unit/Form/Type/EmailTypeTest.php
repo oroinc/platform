@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Form\Type\EmailType;
@@ -9,9 +9,9 @@ class EmailTypeTest extends FormIntegrationTestCase
 {
     public function testBindValidData()
     {
-        $formData = array(
+        $formData = [
             'email' => 'test@example.com',
-        );
+        ];
 
         $form = $this->factory->create(EmailType::class);
 

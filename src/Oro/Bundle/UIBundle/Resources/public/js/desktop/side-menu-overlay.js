@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var SideMenuOverlayView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroui/templates/side-menu-overlay.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroui/templates/side-menu-overlay.html');
 
-    var ESCAPE_KEY_CODE = 27;
+    const ESCAPE_KEY_CODE = 27;
 
-    SideMenuOverlayView = BaseView.extend({
+    const SideMenuOverlayView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'side-menu-overlay',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="overlay-close"]': 'close',
@@ -31,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'page:beforeChange mediator': 'onBeforeChange',
@@ -45,22 +44,22 @@ define(function(require) {
         timeout: 100,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SideMenuOverlayView() {
+        constructor: function SideMenuOverlayView(options) {
             this.onSearch = _.debounce(this.onSearch, this.timeout);
-            SideMenuOverlayView.__super__.constructor.apply(this, arguments);
+            SideMenuOverlayView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             SideMenuOverlayView.__super__.render.call(this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function(events) {
             SideMenuOverlayView.__super__.delegateEvents.call(this, events);
@@ -74,15 +73,22 @@ define(function(require) {
                 }
             }.bind(this));
 
+            $(window).on('resize' + this.eventNamespace(), _.debounce(function() {
+                if (this.isOpen) {
+                    this.setTitleWidth();
+                }
+            }.bind(this), this.timeout));
+
             return this;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         undelegateEvents: function() {
             SideMenuOverlayView.__super__.undelegateEvents.call(this);
             $(document).off(this.eventNamespace());
+            $(window).off(this.eventNamespace());
             return this;
         },
 
@@ -93,7 +99,7 @@ define(function(require) {
         updateContent: function($menu) {
             this.searchContent = $menu.children().filter(':not(.divider)');
 
-            var $menuItem = $('<li/>', {
+            const $menuItem = $('<li/>', {
                 'class': 'menu-item ui-helper'
             }).append(this.$('[data-role="overlay-design-helper"]'));
 
@@ -112,31 +118,63 @@ define(function(require) {
         },
 
         /**
-         * @param title
+         * @param {String} title
          */
         setTitle: function(title) {
-            this.$('[data-role="overlay-title"]').text(title);
+            this.$('[data-role="overlay-title"]').text(title).attr('title', title);
 
             return this;
+        },
+
+        /**
+         * @param {Boolean|Undefined} [undoComputedWidth]
+         */
+        setTitleWidth: function(undoComputedWidth) {
+            if (!this.searchContent) {
+                return;
+            }
+
+            const $title = this.$('[data-role="overlay-title"]');
+            const $last = this.searchContent.filter(':visible').last();
+
+            if (undoComputedWidth || $last.length === 0 || $last.position().left === 0) {
+                $title.css('width', '');
+            } else {
+                $title.width(
+                    _.isRTL()
+                        ? $title.position().left + $title.width() - $last.position().left
+                        : $last.position().left + $last.width() - ($title.position().left / 2)
+                );
+            }
         },
 
         /**
          * Action fot open
          */
         open: function() {
-            this.isOpen = true;
-            this.$el.addClass('open');
+            if (!this.isOpen) {
+                this.isOpen = true;
+                this.$el.addClass('open');
+                this.trigger('open');
+            }
+
             this.clearSearch();
             this.setFocus();
+            this.setTitleWidth();
         },
 
         /**
          *  Action for close
          */
         close: function() {
-            this.isOpen = false;
-            this.$el.removeClass('open');
+            if (this.isOpen) {
+                this.isOpen = false;
+                this.$el.removeClass('open');
+                this.trigger('close');
+            }
+
             this.$('[data-role="search"]').trigger('blur');
+            this.setTitleWidth(true);
         },
 
         /**
@@ -157,7 +195,7 @@ define(function(require) {
                 return;
             }
 
-            var value = $(event.target).val();
+            const value = $(event.target).val();
 
             if (event.keyCode === ESCAPE_KEY_CODE) {
                 if (value.length !== 0) {
@@ -177,6 +215,7 @@ define(function(require) {
             }
 
             this.toggleNoResult();
+            this.setTitleWidth();
         },
 
         clearSearch: function() {
@@ -184,13 +223,30 @@ define(function(require) {
             this.toggleClearButton(false);
         },
 
-        clearSearchContent: function() {
-            $.each(this.searchContent, function() {
-                var $this = $(this);
-                var $title = $this.find('.title');
+        updateSearchContent: function($element, modifyContentFn) {
+            const $title = $element.find('.title');
+            const $icon = $title.find('.menu-icon').clone();
+            let content = $element.data('original-text');
 
-                $title.html($this.data('original-text'));
-                $this.show();
+            if (typeof modifyContentFn === 'function') {
+                content = modifyContentFn(content);
+            }
+
+            if ($icon.length) {
+                content = $icon[0].outerHTML + content;
+            }
+
+            $title.html(content);
+
+            return this;
+        },
+
+        clearSearchContent: function() {
+            $.each(this.searchContent, (i, el) => {
+                const $el = $(el);
+
+                this.updateSearchContent($el);
+                $el.show();
             });
         },
 
@@ -198,33 +254,50 @@ define(function(require) {
          * @param {String} value
          */
         search: function(value) {
-            var regex = tools.safeRegExp(value, 'ig');
-            var highlight = '<span class="highlight">$&</span>';
-            var testValue = function(string) {
-                return regex.test(string);
-            };
+            value = value.trim();
+
+            const regex = tools.safeRegExp(value, 'ig');
+            const testValue = string => regex.test(string);
 
             this.searchContent.hide();
+            this.searchContent.each((i, el) => {
+                const $el = $(el);
 
-            $.each(this.searchContent, function() {
-                var $this = $(this);
-                var $title = $this.find('.title');
+                if (testValue($el.text().trim())) {
+                    const highlightContent = content => {
+                        const highlight = '<span class="highlight">$&</span>';
 
-                if (testValue($this.text().trim())) {
-                    $title.html(
-                        $this.data('original-text').replace(regex, highlight)
-                    );
+                        return content.replace(regex, highlight);
+                    };
 
-                    $this.show();
+                    this.updateSearchContent($el, highlightContent);
+                    $el.show();
 
-                    var groups = $this.data('related-groups');
+                    // Show all headings for a group which include current element
+                    let groups = $el.data('related-groups');
                     if (groups) {
                         groups = groups.split(';');
 
                         $.each(groups, function(index, group) {
-                            $this.prevAll('[data-index="'+ group +'"]').show();
+                            $el.prevAll('[data-index="' + group + '"]').show();
                         });
                     }
+                }
+            });
+            // Visible items with heading
+            this.searchContent.filter((i, el) => {
+                return $(el).is(':visible') && $(el).find('.unclickable').length > 0;
+            }).each((i, el) => {
+                const $groupEls = $(el).nextAll(`[data-related-groups*="${$(el).data('index')};"]`);
+                const $allHidden = $groupEls.filter((i, el) => $(el).is(':hidden'));
+
+                // Show all related elements for group if all of them are hidden
+                if ($groupEls.length === $allHidden.length) {
+                    $groupEls.each((i, groupEl) => {
+                        // Eliminate outdated highlight
+                        this.updateSearchContent($(groupEl));
+                        $(groupEl).show();
+                    });
                 }
             });
         },
@@ -251,7 +324,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

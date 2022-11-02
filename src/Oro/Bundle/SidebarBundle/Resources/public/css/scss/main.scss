@@ -1,9 +1,4 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/mixins";
-
-@import "variables";
-
-@import "sidebar";
-@import "modal";
+@import 'sidebar';
+@import 'modal';

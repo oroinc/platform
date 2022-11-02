@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Model;
 
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\Proxy;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
@@ -11,6 +11,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
+ * Abstract implementation of workflow data storage.
+ *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Countable
@@ -30,9 +32,6 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     protected $propertyAccessor;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data = [])
     {
         $this->data = $data;
@@ -67,7 +66,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * @param string $name
      * @param mixed $value
      * @param bool $changeModified
-     * @return AbstractStorage
+     * @return $this
      */
     public function set($name, $value, $changeModified = true)
     {
@@ -229,7 +228,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
@@ -237,7 +236,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }
@@ -245,7 +244,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
@@ -253,7 +252,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
@@ -261,7 +260,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }
@@ -277,7 +276,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->data);
     }

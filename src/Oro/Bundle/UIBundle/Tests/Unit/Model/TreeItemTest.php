@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Model;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Model;
 
 use Oro\Bundle\UIBundle\Model\TreeItem;
 
@@ -30,17 +30,13 @@ class TreeItemTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getParentsProvider
-     *
-     * @param TreeItem $item
-     * @param bool $includeRoot
-     * @param TreeItem[] $expectedParents
      */
-    public function testGetParents($item, $includeRoot, array $expectedParents)
+    public function testGetParents(TreeItem $item, bool $includeRoot, array $expectedParents)
     {
         $this->assertEquals($expectedParents, $item->getParents($includeRoot));
     }
 
-    public function getParentsProvider()
+    public function getParentsProvider(): array
     {
         $bazItem = new TreeItem('baz');
 

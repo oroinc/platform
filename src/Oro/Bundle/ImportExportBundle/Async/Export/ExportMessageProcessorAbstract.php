@@ -1,15 +1,19 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Base abstract export message processor.
+ */
 abstract class ExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -20,25 +24,20 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     /**
      * @var LoggerInterface
      */
-    protected $jobStorage;
-
-    /**
-     * @var LoggerInterface
-     */
     protected $logger;
 
     /**
-     * @param JobRunner $jobRunner
-     * @param JobStorage $jobStorage
-     * @param LoggerInterface $logger
+     * @var FileManager
      */
+    protected $fileManager;
+
     public function __construct(
         JobRunner $jobRunner,
-        JobStorage $jobStorage,
+        FileManager $fileManager,
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
-        $this->jobStorage = $jobStorage;
+        $this->fileManager = $fileManager;
         $this->logger = $logger;
     }
 
@@ -82,15 +81,25 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         };
     }
 
-    /**
-     * @param Job $job
-     * @param array $data
-     */
-    protected function saveJobResult(Job $job, array $data)
+    protected function saveJobResult(Job $job, array $data): void
     {
-        $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
-            $job->setData($data);
-        });
+        if (!empty($data['errors'])) {
+            $errorLogFile = $this->saveToStorageErrorLog($data['errors']);
+            if ($errorLogFile) {
+                $data['errorLogFile'] = $errorLogFile;
+            }
+        }
+
+        $job->setData($data);
+    }
+
+    protected function saveToStorageErrorLog(array $errors): string
+    {
+        $fileName = str_replace('.', '', uniqid('export', true)) . '.json';
+
+        $this->fileManager->writeToStorage(json_encode($errors), $fileName);
+
+        return $fileName;
     }
 
     /**

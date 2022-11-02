@@ -1,15 +1,17 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 
 {% set gridName = 'attributes-grid' %}
 {% set pageTitle = attributesLabel|trans %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_attribute_create') and is_granted('oro_attribute_update') %}
-        {% include 'OroImportExportBundle:ImportExport:buttons_from_configuration.html.twig' with {
+        {% include '@OroImportExport/ImportExport/buttons_from_configuration.html.twig' with {
             'alias': 'oro_field_config_model_attribute',
-            'options': {'entity_id': entity.id, 'check_attributes' : true}
+            'options': {'entity_id': entity.id}
         } %}
     {% endif %}
 

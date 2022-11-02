@@ -3,39 +3,45 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass;
+use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer;
+use Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class BlockViewSerializerNormalizersPassTest extends \PHPUnit\Framework\TestCase
 {
+    private BlockViewSerializerNormalizersPass $compiler;
+
+    protected function setUp(): void
+    {
+        $this->compiler = new BlockViewSerializerNormalizersPass();
+    }
+
     public function testProcess()
     {
-        $container = $this->createMock(ContainerBuilder::class);
-        $serializerServiceDef = $this->createMock(Definition::class);
-        $expressionNormalizerServiceId = 'oro_layout.block_view_serializer.expression_normalizer';
-        $normalizerTags = [$expressionNormalizerServiceId => []];
+        $container = new ContainerBuilder();
+        $serializerDef = $container->register('oro_layout.block_view_serializer')
+            ->addArgument([]);
+        $typeNameConverterDef = $container->register('oro_layout.block_view_serializer.type_name_converter')
+            ->addArgument([]);
+        $container->setParameter('normalizer.class', ExpressionNormalizer::class);
 
-        $container->expects($this->at(0))
-            ->method('has')
-            ->with(BlockViewSerializerNormalizersPass::BLOCK_VIEW_SERIALIZER_SERVICE_ID)
-            ->willReturn(true);
+        $container->register('normalizer_1', BlockViewVarsNormalizer::class)
+            ->addTag('layout.block_view_serializer.normalizer');
+        $container->register('normalizer_2', ExpressionNormalizer::class)
+            ->addTag('layout.block_view_serializer.normalizer');
+        $container->register('normalizer_3', '%normalizer.class%')
+            ->addTag('layout.block_view_serializer.normalizer');
 
-        $container->expects($this->at(1))
-            ->method('findTaggedServiceIds')
-            ->with(BlockViewSerializerNormalizersPass::BLOCK_VIEW_SERIALIZER_NORMALIZER_TAG)
-            ->will($this->returnValue($normalizerTags));
+        $this->compiler->process($container);
 
-        $container->expects($this->at(2))
-            ->method('findDefinition')
-            ->with(BlockViewSerializerNormalizersPass::BLOCK_VIEW_SERIALIZER_SERVICE_ID)
-            ->will($this->returnValue($serializerServiceDef));
-
-        $serializerServiceDef->expects($this->once())
-            ->method('replaceArgument')
-            ->with(0, [new Reference($expressionNormalizerServiceId)]);
-
-        $compilerPass = new BlockViewSerializerNormalizersPass();
-        $compilerPass->process($container);
+        $this->assertEquals(
+            [new Reference('normalizer_1'), new Reference('normalizer_2'), new Reference('normalizer_3')],
+            $serializerDef->getArgument(0)
+        );
+        $this->assertEquals(
+            [new Reference('normalizer_2'), new Reference('normalizer_3')],
+            $typeNameConverterDef->getArgument(0)
+        );
     }
 }

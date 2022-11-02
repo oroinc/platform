@@ -9,25 +9,23 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmbedFormControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
             LoadEmbeddedFormData::class,
         ]);
+        $this->getContainer()
+            ->get('oro_embedded_form.manager')
+            ->addFormType(EmbeddedFormStub::class);
     }
 
     public function testSubmit()
     {
-        $this->markTestSkipped('BAP-15985: Unstable test');
-
         /** @var EmbeddedForm $feedbackForm */
         $feedbackForm = $this->getReference(LoadEmbeddedFormData::EMBEDDED_FORM);
 
-        $this->getContainer()->get('oro_embedded_form.manager')->addFormType(EmbeddedFormStub::class);
-
         $this->client->followRedirects(true);
-
         $this->client->request(
             'POST',
             $this->getUrl('oro_embedded_form_submit', ['id' => $feedbackForm->getId()]),
@@ -37,7 +35,7 @@ class EmbedFormControllerTest extends WebTestCase
                     'css' => 'input { color: red; }',
                     'successMessage' => 'Test success message',
                     'formType' => EmbeddedFormStub::class,
-                    '_token' => $this->getContainer()->get('security.csrf.token_manager')->getToken('embedded_form')
+                    '_token' => $this->getCsrfToken('embedded_form')->getValue()
                 ],
             ]
         );
@@ -45,7 +43,7 @@ class EmbedFormControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains($feedbackForm->getSuccessMessage(), $result->getContent());
+        self::assertStringContainsString($feedbackForm->getSuccessMessage(), $result->getContent());
     }
 
     public function testSubmitPageIsRenderedSuccessfully()

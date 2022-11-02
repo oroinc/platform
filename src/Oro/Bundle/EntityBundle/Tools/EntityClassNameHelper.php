@@ -5,14 +5,15 @@ namespace Oro\Bundle\EntityBundle\Tools;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * The utility class to resolve a class name by url-safe class name, alias or plural alias of the entity
+ * and convert a class name to url-safe class name.
+ */
 class EntityClassNameHelper
 {
     /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;
@@ -28,17 +29,17 @@ class EntityClassNameHelper
      */
     public function resolveEntityClass($entityName, $isPluralAlias = false)
     {
-        if (!empty($entityName) && false === strpos($entityName, '\\')) {
+        if (!empty($entityName) && !str_contains($entityName, '\\')) {
             if (strtolower($entityName[0]) === $entityName[0]) {
                 $entityName = $this->getEntityClassByAlias($entityName, $isPluralAlias);
             } else {
                 $className = str_replace('_', '\\', $entityName);
-                if (strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0) {
+                if (str_starts_with($className, ExtendHelper::ENTITY_NAMESPACE)) {
                     // a custom entity can contain _ in class name
                     $className = ExtendHelper::ENTITY_NAMESPACE
                         . substr($entityName, strlen(ExtendHelper::ENTITY_NAMESPACE));
                 }
-                $entityName = false === strpos($className, '\\')
+                $entityName = !str_contains($className, '\\')
                     ? $this->getEntityClassByAlias($className, $isPluralAlias)
                     : $className;
             }

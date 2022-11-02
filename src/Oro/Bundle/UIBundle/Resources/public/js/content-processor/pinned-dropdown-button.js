@@ -1,4 +1,5 @@
-define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persistentStorage) {
+define(['./dropdown-button', 'oroui/js/mediator', 'oroui/js/persistent-storage'
+], function($, mediator, persistentStorage) {
     'use strict';
 
     $.widget('oroui.pinnedDropdownButtonProcessor', $.oroui.dropdownButtonProcessor, {
@@ -25,7 +26,7 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
          * @private
          */
         _collectButtons: function($element) {
-            var $buttons = this._super($element);
+            const $buttons = this._super($element);
             $buttons.filter(':not(.divider)').each(function(i) {
                 $(this).attr('data-button-index', '').data('button-index', i);
             });
@@ -40,11 +41,11 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
          * @private
          */
         _mainButtons: function($buttons) {
-            var key = this._getStorageKey();
-            var index = key ? persistentStorage.getItem(key) || 0 : 0;
-            var result = $buttons.get(index);
+            const key = this._getStorageKey();
+            const index = key ? persistentStorage.getItem(key) || 0 : 0;
+            const result = $buttons.get(index);
 
-            return result ? $(result) : this._superApply(arguments);
+            return result ? $(result) : this._super($buttons);
         },
 
         /**
@@ -54,10 +55,11 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
          * @private
          */
         _onButtonClick: function(e) {
-            var key = this._getStorageKey();
+            const key = this._getStorageKey();
             if (key) {
                 persistentStorage.setItem(key, $(e.target).data('button-index') || 0);
             }
+            mediator.trigger('dropdown-button:click');
         },
 
         /**

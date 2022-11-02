@@ -18,8 +18,6 @@ class OroSidebarBundle implements Migration
 
     /**
      * Adds organization_id into oro_sidebar_widget
-     *
-     * @param Schema $schema
      */
     public static function addOrganization(Schema $schema)
     {

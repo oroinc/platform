@@ -1,0 +1,137 @@
+{% block _oro_digital_asset_sourceFile_widget %}
+    {{ block('oro_file_widget') }}
+
+    {%- if value is not empty and value.id and oro_type_is_image(value.mimeType) -%}
+        {% set pictureSources = oro_filtered_picture_sources(value, 'digital_asset_large') %}
+        <div class="preview">
+            <a class="view-image no-hash"
+               tabindex="-1"
+               data-gallery="image{{ value.id }}"
+               data-sources="{{ pictureSources.sources|json_encode }}"
+               href="{{ pictureSources.src }}"
+            >
+                {% include '@OroAttachment/Twig/picture.html.twig' with {
+                    file: value,
+                    filter: 'digital_asset_medium',
+                    img_attrs: {
+                        class: 'thumbnail',
+                        alt: value.originalFilename,
+                    }
+                } %}
+            </a>
+        </div>
+    {%- endif -%}
+{% endblock %}
+
+{% block _oro_digital_asset_sourceFile_file_errors %}
+    {%- apply spaceless -%}
+        {% if errors|length > 0 %}
+            {% set combinedError = '' %}
+            {% set newErrors = [] %}
+            {% for error in errors %}
+                {% if error.message not in newErrors %}
+                    {% set newErrors = newErrors|merge([error.message]) %}
+                {% endif %}
+            {% endfor %}
+            {% set combinedError = newErrors|join('; ') %}
+            <span class="validation-failed"><span><span>{{ combinedError|oro_html_sanitize }}</span></span></span>
+        {% endif %}
+    {%- endapply -%}
+{% endblock %}
+
+{% block oro_file_with_digital_asset_widget %}
+    {%- apply spaceless -%}
+        {% import '@OroUI/macros.html.twig' as UI %}
+
+        <div class="digital-asset-item fields-row"
+            {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/view-component',
+                options: {
+                    view: 'orodigitalasset/js/app/views/digital-asset-choose-form-view',
+                    isImageType: dam_widget.is_image_type,
+                    isSet: (value is not empty and value.id) or form.digitalAsset.vars.data is not empty,
+                    widgetOptions: {
+                        title: (dam_widget.is_image_type
+                            ? 'oro.digitalasset.dam.dialog.select_image'
+                            : 'oro.digitalasset.dam.dialog.select_file')|trans,
+                        url: path(dam_widget.route|default('oro_digital_asset_widget_choose'), dam_widget.parameters),
+                        dialogOptions: {
+                            modal: true,
+                            dialogClass: 'digital-asset-dialog'
+                        }
+                    },
+                    selectors: {
+                        digitalAssetInput: '#' ~ form.digitalAsset.vars.id,
+                        emptyFileInput: (form.emptyFile is defined ? '#' ~ form.emptyFile.vars.id : null),
+                    }
+                }
+            }) }}
+        >
+            <div class="digital-asset-value" data-role="digital-asset-value">
+                {%- if dam_widget.is_valid_digital_asset -%}
+                    {% if dam_widget.preview_metadata %}
+                        <a href="{{ dam_widget.preview_metadata.download }}" class="no-hash digital-asset-filename"
+                        title="{{ dam_widget.preview_metadata.title }}" data-role="digital-asset-filename">
+                            <span class="digital-asset-filename__preview">
+                                {% if dam_widget.is_image_type and dam_widget.preview_metadata.preview %}
+                                    {% if dam_widget.preview_metadata.preview_webp is defined %}
+                                        {% set sources = [{
+                                            srcset: dam_widget.preview_metadata.preview_webp,
+                                            type: 'image/webp',
+                                        }] %}
+                                    {% endif %}
+                                    {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                        sources: sources|default([]),
+                                        img_attrs: {
+                                            src: dam_widget.preview_metadata.preview,
+                                            alt: dam_widget.preview_metadata.title,
+                                        }
+                                    } %}
+                                {% else %}
+                                    <span class="{{ dam_widget.preview_metadata.icon }}" aria-hidden="true"></span>
+                                {% endif %}
+                            </span>
+                            <span class="digital-asset-filename__text">{{- dam_widget.preview_metadata.filename -}}</span>
+                        </a>
+                    {% endif %}
+                {%- else -%}
+                    <a href="#" class="no-hash digital-asset-filename" data-role="digital-asset-filename">
+                        <span class="digital-asset-filename__preview">
+                            <span class="fa-file-o" aria-hidden="true"></span>
+                        </span>
+                        <span class="digital-asset-filename__text">{{- 'oro.digitalasset.dam.form.invalid_digital_asset'|trans -}}</span>
+                    </a>
+                {%- endif -%}
+            </div>
+
+            <div class="digital-asset-controls hide" data-role="digital-asset-controls">
+                <a href="#" role="button" data-role="digital-asset-update" class="btn btn-icon btn-square-lighter"
+                   title="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}"
+                   aria-label="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}">
+                    <span class="fa-edit" aria-hidden="true"></span>
+                </a>
+
+                {% if form.emptyFile is defined %}
+                    {{ form_row(form.emptyFile) }}
+
+                    <a href="#" role="button" data-role="digital-asset-remove" class="btn btn-icon btn-square-lighter"
+                       title="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}"
+                       aria-label="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}">
+                        <span class="fa-close" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
+            </div>
+
+            <a href="#" class="btn digital-asset-choose hide" role="button" data-role="digital-asset-choose">
+                {{ (dam_widget.is_image_type
+                    ? 'oro.digitalasset.dam.form.choose_image.label'
+                    : 'oro.digitalasset.dam.form.choose_file.label')|trans }}
+            </a>
+
+            {{ form_row(form.digitalAsset) }}
+        </div>
+
+        {{ form_errors(form.file) }}
+        {{ form_errors(form.digitalAsset) }}
+    {%- endapply -%}
+{% endblock %}

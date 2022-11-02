@@ -1,61 +1,43 @@
-parameters:
-    oro_action.configuration.config.operation_list.class: Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration
-    oro_action.configuration.config.action_group_list.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupListConfiguration
-    oro_action.configuration.validator.action_group.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator
-    oro_action.configuration.validator.operation.class: Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator
-    oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
-
 services:
-    oro_action.configuration.config.operation_list:
-        class: '%oro_action.configuration.config.operation_list.class%'
-
-    oro_action.configuration.config.action_group_list:
-        class: '%oro_action.configuration.config.action_group_list.class%'
+    oro_action.configuration.provider:
+        class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/actions.php'
+            - '%kernel.debug%'
+            - '@service_container'
 
     oro_action.configuration.validator.action_group:
-        class: '%oro_action.configuration.validator.action_group.class%'
+        class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator
 
-    oro_action.configuration.validator.operation:
-        class: '%oro_action.configuration.validator.operation.class%'
+    oro_action.configuration.validator.operations:
+        class: Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator
         arguments:
-            - '@router'
+            - '@oro_ui.controller_class_provider'
             - '@twig.loader'
             - '@oro_entity.doctrine_helper'
             - '@logger'
             - '%kernel.debug%'
 
     oro_action.configuration.provider.operations:
-        class: '%oro_action.configuration.provider.class%'
+        class: Oro\Bundle\ActionBundle\Configuration\SectionConfigurationProvider
         arguments:
-            - '@oro.cache.configuration_loader'
-            - '@oro_action.configuration.config.operation_list'
-            - '@oro_action.configuration.validator.operation'
-            - '@oro_action.cache.provider.operations'
-            - []
-            - '%kernel.bundles%'
+            - '@oro_action.configuration.provider'
             - 'operations'
-        tags:
-            - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
     oro_action.configuration.provider.action_groups:
-        class: '%oro_action.configuration.provider.class%'
+        class: Oro\Bundle\ActionBundle\Configuration\SectionConfigurationProvider
         arguments:
-            - '@oro.cache.configuration_loader'
-            - '@oro_action.configuration.config.action_group_list'
-            - '@oro_action.configuration.validator.action_group'
-            - '@oro_action.cache.provider.action_groups'
-            - []
-            - '%kernel.bundles%'
+            - '@oro_action.configuration.provider'
             - 'action_groups'
-        tags:
-            - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
     oro_action.configuration_pass.replace_property_path:
-        class: 'Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath'
+        class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
         arguments:
             - "data"
 
     oro_action.config_extension.feature:
-        class: 'Oro\Bundle\ActionBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\ActionBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }

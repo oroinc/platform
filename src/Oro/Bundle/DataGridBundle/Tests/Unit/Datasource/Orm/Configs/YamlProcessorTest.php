@@ -2,32 +2,29 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm\Configs;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
+use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
 class YamlProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var YamlProcessor */
-    protected $processor;
+    private $processor;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->processor = new YamlProcessor($this->registry);
     }
@@ -39,10 +36,9 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->with($entity1)
             ->willReturn($this->em);
-        $qb = new QueryBuilder($this->em);
 
-        $this->em
-            ->expects($this->once())
+        $qb = new QueryBuilder($this->em);
+        $this->em->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
@@ -84,26 +80,25 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($queryBuilder, $qb);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\DatasourceException
-     * @expectedExceptionMessage Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor expects to be configured with query or repository method
-     */
-    // @codingStandardsIgnoreEnd
     public function testNoQueryAndRepositoryConfigsShouldThrowException()
     {
+        $this->expectException(DatasourceException::class);
+        $this->expectExceptionMessage(\sprintf(
+            '%s expects to be configured with query or repository method',
+            YamlProcessor::class
+        ));
+
         $configs      = [
             'type'  => 'orm',
         ];
         $this->processor->processQuery($configs);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\DatasourceException
-     * @expectedExceptionMessage Doctrine\ORM\EntityRepository has no method notExistedMethod
-     */
     public function testEntityRepositoryDoesNotHasMethodShouldThrowException()
     {
+        $this->expectException(DatasourceException::class);
+        $this->expectExceptionMessage('Doctrine\ORM\EntityRepository has no method notExistedMethod');
+
         $entity1 = 'EntityTest1';
 
         $configs = [
@@ -128,8 +123,8 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             'entity'            => $entity1,
             'repository_method' => 'methodNotReturnQB'
         ];
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->setMethods(['methodNotReturnQB'])
+        $repo = $this->getMockBuilder(EntityRepository::class)
+            ->addMethods(['methodNotReturnQB'])
             ->disableOriginalConstructor()
             ->getMock();
         $repo->expects($this->once())
@@ -141,7 +136,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($entity1)
             ->willReturn($repo);
 
-        $this->expectException('Oro\Bundle\DataGridBundle\Exception\DatasourceException');
+        $this->expectException(DatasourceException::class);
         $this->expectExceptionMessage(
             sprintf(
                 '%s::methodNotReturnQB() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
@@ -161,11 +156,11 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             'query_builder' => $qb,
         ];
 
-        $this->expectException('Oro\Bundle\DataGridBundle\Exception\DatasourceException');
+        $this->expectException(DatasourceException::class);
         $this->expectExceptionMessage(
             sprintf(
                 '%s configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
-                'Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor',
+                YamlProcessor::class,
                 gettype($qb)
             )
         );
@@ -179,10 +174,9 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->with($entity1)
             ->willReturn($this->em);
-        $qb = new QueryBuilder($this->em);
 
-        $this->em
-            ->expects($this->once())
+        $qb = new QueryBuilder($this->em);
+        $this->em->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 

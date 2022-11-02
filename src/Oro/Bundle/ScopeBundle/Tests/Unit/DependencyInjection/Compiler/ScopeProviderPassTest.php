@@ -3,118 +3,80 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScopeProviderPass
-     */
-    protected $compilerPass;
+    /** @var ScopeProviderPass */
+    private $compiler;
 
-    /**
-     * @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $containerBuilder;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->containerBuilder = $this
-            ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->getMock();
-
-        $this->compilerPass = new ScopeProviderPass();
+        $this->compiler = new ScopeProviderPass();
     }
 
-    public function tearDown()
+    public function testProcessNoProviders()
     {
-        unset($this->compilerPass, $this->containerBuilder);
+        $container = new ContainerBuilder();
+        $managerDef = $container->setDefinition(
+            'oro_scope.scope_manager',
+            new Definition(ScopeManager::class, [[], null])
+        );
+
+        $this->compiler->process($container);
+
+        self::assertEquals([], $managerDef->getArgument(0));
+
+        $managerServiceLocatorRef = $managerDef->getArgument(1);
+        self::assertInstanceOf(Reference::class, $managerServiceLocatorRef);
+        $managerServiceLocatorDef = $container->getDefinition((string)$managerServiceLocatorRef);
+        self::assertEquals(ServiceLocator::class, $managerServiceLocatorDef->getClass());
+        self::assertEquals([], $managerServiceLocatorDef->getArgument(0));
     }
 
-    public function testProcessRegistryDoesNotExist()
+    public function testProcess()
     {
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with(ScopeProviderPass::SCOPE_MANAGER)
-            ->willReturn(false);
+        $container = new ContainerBuilder();
+        $managerDef = $container->setDefinition(
+            'oro_scope.scope_manager',
+            new Definition(ScopeManager::class, [[], null])
+        );
 
-        $this->containerBuilder
-            ->expects($this->never())
-            ->method('getDefinition');
+        $container->register('service.name.1')
+            ->addTag('oro_scope.provider', ['scopeType' => 'scope', 'priority' => 100])
+            ->addTag('oro_scope.provider', ['scopeType' => 'scope2']);
+        $container->register('service.name.2')
+            ->addTag('oro_scope.provider', ['scopeType' => 'scope', 'priority' => 1])
+            ->addTag('oro_scope.provider', ['scopeType' => 'scope2', 'priority' => 100]);
+        $container->register('service.name.3')
+            ->addTag('oro_scope.provider', ['scopeType' => 'scope', 'priority' => 200]);
 
-        $this->containerBuilder
-            ->expects($this->never())
-            ->method('findTaggedServiceIds');
+        $this->compiler->process($container);
 
-        $this->compilerPass->process($this->containerBuilder);
-    }
-
-    public function testProcessNoTaggedServicesFound()
-    {
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with(ScopeProviderPass::SCOPE_MANAGER)
-            ->willReturn(true);
-
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->willReturn([]);
-
-        $this->containerBuilder
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $this->compilerPass->process($this->containerBuilder);
-    }
-
-    public function testProcessWithTaggedServices()
-    {
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with(ScopeProviderPass::SCOPE_MANAGER)
-            ->willReturn(true);
-
-        $registryServiceDefinition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
-
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('getDefinition')
-            ->with(ScopeProviderPass::SCOPE_MANAGER)
-            ->willReturn($registryServiceDefinition);
-
-        $taggedServices = [
-            'service.name.1' => [
-                ['scopeType' => 'scope', 'priority' => 100],
-                ['scopeType' => 'scope2', 'priority' => 1],
+        self::assertEquals(
+            [
+                'scope'  => ['service.name.3', 'service.name.1', 'service.name.2'],
+                'scope2' => ['service.name.2', 'service.name.1']
             ],
-            'service.name.2' => [
-                ['scopeType' => 'scope', 'priority' => 1],
-                ['scopeType' => 'scope2', 'priority' => 100]
+            $managerDef->getArgument(0)
+        );
+
+        $managerServiceLocatorRef = $managerDef->getArgument(1);
+        self::assertInstanceOf(Reference::class, $managerServiceLocatorRef);
+        $managerServiceLocatorDef = $container->getDefinition((string)$managerServiceLocatorRef);
+        self::assertEquals(ServiceLocator::class, $managerServiceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'service.name.1' => new ServiceClosureArgument(new Reference('service.name.1')),
+                'service.name.2' => new ServiceClosureArgument(new Reference('service.name.2')),
+                'service.name.3' => new ServiceClosureArgument(new Reference('service.name.3'))
             ],
-            'service.name.3' => [['scopeType' => 'scope', 'priority' => 200]],
-        ];
-
-        $this->containerBuilder
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->willReturn($taggedServices);
-
-        $registryServiceDefinition
-            ->expects($this->exactly(5))
-            ->method('addMethodCall')
-            ->withConsecutive(
-                ['addProvider', ['scope', new Reference('service.name.3')]],
-                ['addProvider', ['scope', new Reference('service.name.1')]],
-                ['addProvider', ['scope', new Reference('service.name.2')]],
-                ['addProvider', ['scope2', new Reference('service.name.2')]],
-                ['addProvider', ['scope2', new Reference('service.name.1')]]
-            );
-
-        $this->compilerPass->process($this->containerBuilder);
+            $managerServiceLocatorDef->getArgument(0)
+        );
     }
 }

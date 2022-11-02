@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents a collection of Data API sub-resources for a specific entity.
+ * Represents a collection of API sub-resources for a specific entity.
  */
 class ApiResourceSubresources
 {
@@ -13,9 +13,6 @@ class ApiResourceSubresources
     /** @var ApiSubresource[] */
     private $subresources = [];
 
-    /**
-     * @param $entityClass
-     */
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;

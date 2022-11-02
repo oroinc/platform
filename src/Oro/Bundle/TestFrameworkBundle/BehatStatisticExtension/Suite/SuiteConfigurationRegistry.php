@@ -212,9 +212,6 @@ class SuiteConfigurationRegistry
         }
     }
 
-    /**
-     * @param SuiteGenerator $generator
-     */
     public function addSuiteGenerator(SuiteGenerator $generator)
     {
         array_unshift($this->suiteGenerators, $generator);
@@ -233,7 +230,9 @@ class SuiteConfigurationRegistry
         foreach ($iterators as $iterator) {
             /** @var FeatureNode $featureNode */
             foreach ($iterator as $featureNode) {
-                $features[$featureNode->getFile()] = null;
+                $absolutePath = $featureNode->getFile();
+                $relativePath = $this->featurePathLocator->getRelativePath($absolutePath);
+                $features[$relativePath] = null;
             }
         }
 

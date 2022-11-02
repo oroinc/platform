@@ -4,40 +4,34 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Condition;
 
 use Oro\Bundle\ActionBundle\Condition\ServiceExists;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ServiceExistsTest extends \PHPUnit\Framework\TestCase
 {
-    const PROPERTY_PATH_NAME = 'testPropertyPath';
+    private const PROPERTY_PATH_NAME = 'testPropertyPath';
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var ServiceExists
-     */
-    protected $serviceExists;
+    /** @var PropertyPathInterface */
+    private $propertyPath;
 
-    /**
-     * @var PropertyPathInterface
-     */
-    protected $propertyPath;
+    /** @var ServiceExists */
+    private $serviceExists;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->propertyPath = $this->getMockBuilder(PropertyPathInterface::class)
-            ->getMock();
+        $this->propertyPath = $this->createMock(PropertyPathInterface::class);
         $this->propertyPath->expects($this->any())
             ->method('__toString')
-            ->will($this->returnValue(self::PROPERTY_PATH_NAME));
+            ->willReturn(self::PROPERTY_PATH_NAME);
         $this->propertyPath->expects($this->any())
             ->method('getElements')
-            ->will($this->returnValue([self::PROPERTY_PATH_NAME]));
+            ->willReturn([self::PROPERTY_PATH_NAME]);
 
         $this->serviceExists = new ServiceExists($this->container);
     }
@@ -63,44 +57,34 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->serviceExists->compile('$factoryAccessor');
 
-        $this->assertContains('$factoryAccessor->create(\'service_exists\'', $result);
+        self::assertStringContainsString('$factoryAccessor->create(\'service_exists\'', $result);
     }
 
     public function testSetContextAccessor()
     {
-        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
-        $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contextAccessor = $this->createMock(ContextAccessorInterface::class);
 
         $this->serviceExists->setContextAccessor($contextAccessor);
 
-        $reflection = new \ReflectionProperty(get_class($this->serviceExists), 'contextAccessor');
-        $reflection->setAccessible(true);
-
-        $this->assertInstanceOf(get_class($contextAccessor), $reflection->getValue($this->serviceExists));
+        $this->assertInstanceOf(
+            get_class($contextAccessor),
+            ReflectionUtil::getPropertyValue($this->serviceExists, 'contextAccessor')
+        );
     }
-
-
 
     /**
      * @dataProvider dataProvider
-     * @param bool $hasService
-     * @param bool $expected
      */
-    public function testEvaluates($hasService, $expected)
+    public function testEvaluates(bool $hasService, bool $expected)
     {
         $this->container->expects($this->any())
             ->method('has')
             ->willReturn($hasService);
 
-        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
-        $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contextAccessor = $this->createMock(ContextAccessorInterface::class);
         $contextAccessor->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue('oro_bundle.service'));
+            ->willReturn('oro_bundle.service');
 
         $this->serviceExists->initialize([$this->propertyPath])->setContextAccessor($contextAccessor);
 
@@ -110,10 +94,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'route exists' => [

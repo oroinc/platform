@@ -7,55 +7,10 @@
 
     font-size: $oro-datagrid-font-size;
 
-    border-collapse: collapse;
+    border-collapse: separate;
     border-spacing: 0;
 
     overflow: hidden;
-}
-
-.grid-scrollable-container {
-    margin: 0;
-    padding: 0;
-
-    overflow: auto;
-}
-
-.grid-header,
-.grid-footer {
-    text-transform: uppercase;
-    font-size: $oro-datagrid-header-font-size;
-
-    .caret {
-        display: none;
-        height: $oro-datagrid-caret-size * 2;
-        margin-#{$start}: $oro-datagrid-caret-size;
-
-        border: none;
-        border-right: $oro-datagrid-caret-size solid transparent;
-        border-left: $oro-datagrid-caret-size solid transparent;
-    }
-
-    .ascending {
-        .caret {
-            display: inline-block;
-            margin-top: -$oro-datagrid-caret-offset;
-
-            border-top: $oro-datagrid-caret-size solid transparent;
-            border-bottom: $oro-datagrid-caret-size solid transparent;
-            border-bottom-color: inherit;
-        }
-    }
-
-    .descending {
-        .caret {
-            display: inline-block;
-            margin-top: ($oro-datagrid-caret-offset / 2);
-
-            border-bottom: $oro-datagrid-caret-size solid transparent;
-            border-top: $oro-datagrid-caret-size solid transparent;
-            border-top-color: inherit;
-        }
-    }
 }
 
 .grid-header.thead-sizing {
@@ -69,54 +24,133 @@
 .grid-cell {
     display: table-cell;
 
-    text-align: #{$start};
+    text-align: left;
+
+    position: relative;
+
+    .cell-link {
+        display: flex;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        user-select: all;
+
+        .cell-link-inner {
+            width: 100%;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        ~ * {
+            position: relative;
+            // Make elements invisible for events due to pass event to .cell-link
+            pointer-events: none;
+
+            $focusable-selectors: get-focusable-selectors();
+            // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+            #{$focusable-selectors} {
+                pointer-events: auto;
+            }
+        }
+
+        $focusable-selectors-after-link: get-focusable-selectors($whole-list: false, $part-before: '~ ');
+        // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+        #{$focusable-selectors-after-link} {
+            pointer-events: auto;
+        }
+    }
 }
 
 .grid-header-cell {
+    background-color: $oro-datagrid-header-background;
     padding: $oro-datagrid-header-cell-inner-offset;
+    box-shadow: 1px 0 $oro-datagrid-header-background;
 
     white-space: nowrap;
 
     &__label,
     &__link {
+        line-height: $oro-datagrid-label-line-height;
+
         color: $oro-datagrid-label-color;
     }
 
+    &__link,
+    &__label-container {
+        display: inline-flex;
+        align-items: center;
+    }
+
     &:first-child {
-        border-top-#{$start}-radius: $oro-datagrid-header-cell-radius;
-        border-bottom-#{$start}-radius: $oro-datagrid-header-cell-radius;
+        border-top-left-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-left-radius: $oro-datagrid-header-cell-radius;
     }
 
     &:last-child {
-        border-top-#{$end}-radius: $oro-datagrid-header-cell-radius;
-        border-bottom-#{$end}-radius: $oro-datagrid-header-cell-radius;
+        border-top-right-radius: $oro-datagrid-header-cell-radius;
+        border-bottom-right-radius: $oro-datagrid-header-cell-radius;
+        box-shadow: none;
+    }
+
+    &:first-of-type {
+        padding-left: $oro-grid-first-cell-offset;
     }
 }
 
 .grid-body-cell {
     padding: $oro-datagrid-body-cell-inner-offset;
 
-    border-bottom: $oro-datagrid-body-cell-border;
+    line-height: $oro-datagrid-body-cell-line-height;
+
+    border-bottom: $oro-datagrid-body-cell-border-bottom;
 
     vertical-align: top;
+
+    &-productSku,
+    &-poNumber,
+    &-identifier,
+    &-primaryEmail,
+    &-sku,
+    &-email,
+    &-zip,
+    &.direction-ltr {
+        /* rtl:ignore */
+        direction: ltr;
+    }
+}
+
+.grid-body-cell-contexts {
+    padding: $oro-datagrid-body-cell-wide-inner-offset;
 }
 
 .grid-footer-cell {
     padding: $oro-datagrid-footer-cell-inner-offset;
 
-    color: $oro-datagrid-label-color;
+    font-weight: $oro-datagrid-footer-cell-font-weight;
+
+    background-color: $oro-datagrid-footer-cell-background-color;
+    color: $oro-datagrid-footer-cell-color;
+
+    @at-root tr:first-child .grid-footer-cell {
+        padding-top: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    @at-root tr:last-child .grid-footer-cell {
+        padding-bottom: $oro-datagrid-footer-cell-outer-inner-offset;
+    }
+
+    &.number-cell,
+    &.integer-cell {
+        font-size: $oro-datagrid-footer-cell-numeric-font-size;
+    }
 }
 
-.grid-header-cell,
-.grid-footer-cell {
-    background-color: $oro-datagrid-background;
-}
-
-.grid-header-cell,
 .grid-body-cell,
 .grid-footer-cell {
     &:first-of-type {
-        padding-#{$start}: $oro-grid-first-cell-offset;
+        padding-left: $oro-grid-first-cell-offset;
     }
 }
 
@@ -129,8 +163,29 @@
         }
     }
 
+    &.row-disabled {
+        opacity: $oro-datagrid-row-disabled-opacity;
+    }
+
+    &.row-new {
+        background-color: $cell-success-background;
+
+        &:hover {
+            background-color: darken($cell-success-background, 5%);
+        }
+    }
+
+    &.row-edit-mode,
     &:hover {
         background-color: $oro-datagrid-cell-background-hover;
+    }
+}
+
+.ascending,
+.descending {
+    .grid-header-cell__link,
+    .grid-header-cell__label {
+        color: $oro-datagrid-label-active-color;
     }
 }
 
@@ -146,15 +201,38 @@
 .time-cell,
 .datetime-cell,
 .boolean-cell {
-    text-align: #{$start};
+    text-align: left;
+}
+
+.string-cell {
+    ul.unstyled {
+        margin-bottom: 0;
+
+        @include list-unstyled();
+    }
+}
+
+.boolean-cell {
+    input {
+        &[type='checkbox'],
+        &[type='radio'] {
+            vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
+        }
+    }
 }
 
 .number-cell,
 .integer-cell {
-    text-align: #{$end};
+    text-align: right;
 
-    .grid-header-cell__label {
-        margin-#{$start}: auto;
+    &:first-child {
+        text-align: left;
+    }
+
+    &:not(:first-child) {
+        .grid-header-cell__label {
+            margin-left: auto;
+        }
     }
 }
 
@@ -165,21 +243,46 @@
 .multi-select-cell,
 .multi-relation-cell {
     .value-item {
-        &:after {
+        &::after {
             content: ', ';
         }
 
-        &:last-child:after {
+        &:last-child::after {
             content: '';
         }
     }
 }
 
-.ascending,
-.descending {
-    .grid-header-cell__link,
-    .grid-header-cell__label {
-        color: $oro-datagrid-label-active-color;
+.grid-header {
+    will-change: width, height, top, right, bottom, left, margin;
+}
+
+.grid-header,
+.grid-footer {
+    text-transform: uppercase;
+    font-size: $oro-datagrid-header-font-size;
+
+    .sortable-icon {
+        display: none;
+        margin-left: $oro-datagrid-base-offset;
+    }
+
+    .ascending {
+        .sortable-icon {
+            display: inline-block;
+
+            transform: translateY(.5px);
+
+            @include fa-icon($oro-datagrid-caret-ascending-icon);
+        }
+    }
+
+    .descending {
+        .sortable-icon {
+            display: inline-block;
+
+            @include fa-icon($oro-datagrid-caret-descending-icon);
+        }
     }
 }
 

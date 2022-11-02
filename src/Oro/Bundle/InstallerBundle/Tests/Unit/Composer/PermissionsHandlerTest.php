@@ -3,57 +3,40 @@
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
 use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
-use Symfony\Component\Filesystem\Filesystem;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Process\Process;
 
 class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PermissionsHandler
-     */
-    protected $handler;
+    use TempDirExtension;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $process;
+    /** @var Process|\PHPUnit\Framework\MockObject\MockObject */
+    private $process;
 
-    /**
-     * @var string
-     */
-    protected $directory;
+    /** @var string */
+    private $directory;
 
-    protected function setUp()
+    /** @var PermissionsHandler */
+    private $handler;
+
+    protected function setUp(): void
     {
-        $this->process = $this
-            ->getMockBuilder('Symfony\Component\Process\Process')
-            ->disableOriginalConstructor()
+        $this->process = $this->createMock(Process::class);
+        $this->directory = $this->getTempDir('permissions_handler');
+
+        $this->handler = $this->getMockBuilder(PermissionsHandler::class)
+            ->onlyMethods(['getProcess'])
             ->getMock();
-
-        $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . time();
-
-        $fs = new Filesystem();
-        $fs->mkdir($this->directory);
-
-        $this->handler = new PermissionsHandler();
-        $this->handler->setProcess($this->process);
     }
 
-    protected function tearDown()
+    public function testSetPermissionsSetFACL()
     {
-        $fs = new Filesystem();
-        $fs->remove($this->directory);
-    }
-
-    public function testSetPermissionsSetfacl()
-    {
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->process
-            ->expects($this->any())
-            ->method('setCommandLine')
+        $this->handler->expects($this->exactly(3))
+            ->method('getProcess')
             ->with(
                 $this->callback(
                     function ($argument) {
@@ -74,34 +57,29 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
                                     ],
                                     PermissionsHandler::SETFACL
                                 )
-                            ]
+                            ],
+                            true
                         );
                     }
                 )
-            );
+            )
+            ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->exactly(3))
-            ->method('setCommandLine');
-
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $this->handler->setPermissionsSetfacl($this->directory);
     }
 
     public function testSetPermissionsChmod()
     {
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->process
-            ->expects($this->any())
-            ->method('setCommandLine')
+        $this->handler->expects($this->exactly(3))
+            ->method('getProcess')
             ->with(
                 $this->callback(
                     function ($argument) {
@@ -114,35 +92,34 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
                                     [PermissionsHandler::USER, $this->directory],
                                     PermissionsHandler::CHMOD
                                 )
-                            ]
+                            ],
+                            true
                         );
                     }
                 )
-            );
+            )
+            ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->exactly(3))
-            ->method('setCommandLine');
-
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $this->handler->setPermissionsChmod($this->directory);
     }
 
     public function testSetPermissions()
     {
-        $this->process
-            ->expects($this->atLeastOnce())
-            ->method('isSuccessful')
-            ->will($this->returnValue(false));
+        $this->handler->expects($this->any())
+            ->method('getProcess')
+            ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
+            ->method('isSuccessful')
+            ->willReturn(false);
+
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $result = $this->handler->setPermissions($this->directory);
 

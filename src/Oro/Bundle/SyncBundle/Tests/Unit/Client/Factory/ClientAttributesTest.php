@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
+namespace Oro\Bundle\SyncBundle\Tests\Unit\Client\Factory;
 
 use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
 

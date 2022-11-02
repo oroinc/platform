@@ -1,7 +1,6 @@
 services:
     oro_api.get_subresource.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresourceProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - get_subresource
@@ -36,27 +35,6 @@ services:
     #
     # load_data
     #
-
-    oro_api.get_subresource.load_extended_association:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation
-        arguments:
-            - '@oro_api.entity_serializer'
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_id_helper'
-            - '@oro_entity_extend.association_manager'
-            - '@oro_api.entity_title_provider'
-        tags:
-            - { name: oro.api.processor, action: get_subresource, group: load_data }
-
-    oro_api.get_subresource.load_nested_association:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadNestedAssociation
-        arguments:
-            - '@oro_api.entity_serializer'
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_id_helper'
-            - '@oro_api.entity_title_provider'
-        tags:
-            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }
 
     #
     # data_security_check

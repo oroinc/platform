@@ -6,6 +6,10 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provide select role
+ * create select field
+ */
 class WidgetRoleSelectType extends AbstractType
 {
     const NAME = 'oro_type_widget_role_select';
@@ -22,7 +26,6 @@ class WidgetRoleSelectType extends AbstractType
                 'autocomplete_alias' => 'widget_owner_roles',
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'placeholder' => 'oro.user.form.choose_role',
                     'allowClear'  => true,
                 ]

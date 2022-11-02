@@ -2,20 +2,26 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Component\DoctrineUtils\ORM\ArrayKeyTrueHydrator;
 
-class LanguageRepository extends EntityRepository
+/**
+ * The repository for Language entity.
+ */
+class LanguageRepository extends ServiceEntityRepository
 {
     /**
-     * @param bool $onlyEnabled
-     *
-     * @return array
+     * Returns all (or only enabled if $onlyEnabled is true) language codes as an array,
+     * where the language codes are used as keys, and all values are set to boolean true:
+     * <code>
+     * ['en_US' => true, 'de_DE' => true, 'fr_FR' => true, ...]
+     * </code>
      */
-    public function getAvailableLanguageCodes($onlyEnabled = false)
+    public function getAvailableLanguageCodesAsArrayKeys(bool $onlyEnabled = false): array
     {
         $qb = $this->createQueryBuilder('language')->select('language.code');
 
@@ -23,9 +29,13 @@ class LanguageRepository extends EntityRepository
             $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
         }
 
-        $data = $qb->getQuery()->getArrayResult();
+        $query = $qb->getQuery();
+        $query
+            ->getEntityManager()
+            ->getConfiguration()
+            ->addCustomHydrationMode(ArrayKeyTrueHydrator::NAME, ArrayKeyTrueHydrator::class);
 
-        return array_column($data, 'code');
+        return $query->getResult(ArrayKeyTrueHydrator::NAME);
     }
 
     /**
@@ -52,6 +62,8 @@ class LanguageRepository extends EntityRepository
         if ($onlyEnabled) {
             $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
         }
+
+        $qb->orderBy('language.id');
 
         return $qb->getQuery()->getResult();
     }

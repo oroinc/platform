@@ -5,9 +5,9 @@
 #}
 {% macro activity_contexts(entity, target, checkTarget, component) %}
     <script type="text/template" id="activity-context-activity-list">
-        <div class="context-item" style="border: none" data-cid="<%- entity.cid %>">
+        <div class="context-item" data-cid="<%- entity.cid %>">
                 <span data-id="<%- entity.get('targetId') %>">
-                    <span class="<%- entity.get('icon') %>"></span>
+                    <span class="context-icon <%- entity.get('icon') %>" aria-hidden="true"></span>
                     <% if (entity.get('link')) { %>
                         <a href="<%- entity.get('link') %>">
                             <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
@@ -16,7 +16,7 @@
                         <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
                     <% }  %>
                     {% if  is_granted('EDIT', entity) %}
-                        <i class="fa-close"></i>
+                        <span class="fa-close" aria-hidden="true" data-role="delete-item"></span>
                     {% endif %}
                 </span>
         </div>
@@ -63,14 +63,15 @@
 {% endmacro %}
 
 {% macro activity_context_link(hideText) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <a href="#" role="button" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <a href="#" role="button" title="{{ 'oro.activity.contexts.placeholder'|trans|e('html_attr') }}"
        class="dropdown-item"
-       data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
-        {{ UI.renderWidgetDataAttributes({
+       data-url="<%- routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
+        {{ UI.renderWidgetAttributes({
             'type' : 'dialog',
             'multiple' : true,
             'refresh-widget-alias': 'activity-list-widget',
+            'createOnEvent' : 'click',
             'options' : {
                 'alias': 'activity-context-dialog',
                 'dialogOptions' : {
@@ -81,19 +82,20 @@
                     'dblclick': 'maximize',
                     'maximizedHeightDecreaseBy': 'minimize-bar',
                     'width': 1000,
+                    'minWidth': 'expanded',
                     'height': 600
                 }
             }
         }) }}>
-        <span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</span>
-        {{ hideText ? '' : 'oro.activity.contexts.placeholder'|trans|raw }}
+        <span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans }}</span>
+        {{ hideText ? '' : 'oro.activity.contexts.placeholder'|trans }}
     </a>
 {% endmacro %}
 
 {# Button for add context on the activity list item view page #}
 {% macro addContextButton(entity, parameters) -%}
     {% if is_granted('EDIT', entity) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(
             'oro_activity_context', {
@@ -118,6 +120,7 @@
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
                         'width': 1000,
+                        'minWidth': 'expanded',
                         'height': 600
                     }
                 }

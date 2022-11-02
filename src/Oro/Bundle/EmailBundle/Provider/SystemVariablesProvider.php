@@ -3,39 +3,42 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides the following system variables for email templates:
+ * * appURL
+ * * currentDateTime
+ * * currentDate
+ * * currentTime
+ */
 class SystemVariablesProvider implements SystemVariablesProviderInterface
 {
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
-    /** @var DateTimeFormatter */
-    protected $dateTimeFormatter;
+    /** @var DateTimeFormatterInterface */
+    private $dateTimeFormatter;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager       $configManager
-     * @param DateTimeFormatter   $dateTimeFormatter
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatterInterface $dateTimeFormatter
     ) {
-        $this->translator        = $translator;
-        $this->configManager     = $configManager;
+        $this->translator = $translator;
+        $this->configManager = $configManager;
         $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions()
+    public function getVariableDefinitions(): array
     {
         return $this->getVariables(false);
     }
@@ -43,7 +46,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableValues()
+    public function getVariableValues(): array
     {
         return $this->getVariables(true);
     }
@@ -53,49 +56,17 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
      *
      * @return array
      */
-    protected function getVariables($addValue)
+    private function getVariables(bool $addValue): array
     {
         $result = [];
 
-        $this->addApplicationShortName($result, $addValue);
-        $this->addApplicationFullName($result, $addValue);
         $this->addApplicationUrl($result, $addValue);
         $this->addCurrentDateAndTime($result, $addValue);
 
         return $result;
     }
 
-    /**
-     * @deprecated since 1.4 Avoid usage of "{{ system.appShortName }}" in email templates
-     *
-     * @param array $result
-     * @param bool  $addValue
-     */
-    protected function addApplicationShortName(array &$result, $addValue)
-    {
-        if ($addValue) {
-            $result['appShortName'] = '';
-        }
-    }
-
-    /**
-     * @deprecated since 1.4 Avoid usage of "{{ system.appFullName }}" in email templates
-     *
-     * @param array $result
-     * @param bool  $addValue
-     */
-    protected function addApplicationFullName(array &$result, $addValue)
-    {
-        if ($addValue) {
-            $result['appFullName'] = '';
-        }
-    }
-
-    /**
-     * @param array $result
-     * @param bool  $addValue
-     */
-    protected function addApplicationUrl(array &$result, $addValue)
+    private function addApplicationUrl(array &$result, bool $addValue): void
     {
         if ($addValue) {
             $val = $this->configManager->get('oro_ui.application_url');
@@ -108,21 +79,17 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
         $result['appURL'] = $val;
     }
 
-    /**
-     * @param array $result
-     * @param bool  $addValue
-     */
-    protected function addCurrentDateAndTime(array &$result, $addValue)
+    private function addCurrentDateAndTime(array &$result, bool $addValue): void
     {
         if ($addValue) {
             $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-            $dateTimeVal = $dateTime;
+            $dateTimeVal = $this->dateTimeFormatter->format($dateTime);
             $dateVal     = $this->dateTimeFormatter->formatDate($dateTime);
             $timeVal     = $this->dateTimeFormatter->formatTime($dateTime);
         } else {
             $dateTimeVal = [
-                'type'  => 'datetime',
+                'type'  => 'string',
                 'label' => $this->translator->trans('oro.email.emailtemplate.current_datetime')
             ];
             $dateVal     = [
@@ -134,9 +101,8 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
                 'label' => $this->translator->trans('oro.email.emailtemplate.current_time')
             ];
         }
-        // @todo: the datetime object cannot be added due __toString of DateTime is not allowed error
-        //        this code can be uncommented after validation and formatting are fixed
-        //$result['currentDateTime'] = $dateTimeVal;
+
+        $result['currentDateTime'] = $dateTimeVal;
         $result['currentDate'] = $dateVal;
         $result['currentTime'] = $timeVal;
     }

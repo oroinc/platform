@@ -17,16 +17,11 @@ class AclProtectedQueryResolver extends QueryResolver
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param QueryHintResolverInterface $queryHintResolver
-     * @param AclHelper                  $aclHelper
-     */
     public function __construct(QueryHintResolverInterface $queryHintResolver, AclHelper $aclHelper)
     {
         parent::__construct($queryHintResolver);
         $this->aclHelper = $aclHelper;
     }
-
 
     /**
      * {@inheritdoc}

@@ -2,29 +2,28 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid\Filter;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by a workflow.
+ */
 class WorkflowFilter extends EntityFilter
 {
     /** @var WorkflowTranslationHelper */
-    protected $translationHelper;
+    private $translationHelper;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param WorkflowTranslationHelper $translationHelper
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        ManagerRegistry $doctrine,
         WorkflowTranslationHelper $translationHelper
     ) {
-        parent::__construct($factory, $util);
-
+        parent::__construct($factory, $util, $doctrine);
         $this->translationHelper = $translationHelper;
     }
 
@@ -46,19 +45,12 @@ class WorkflowFilter extends EntityFilter
     protected function getFieldOptions()
     {
         return [
-            'class' => WorkflowDefinition::class,
-            'multiple' => true,
-            'choice_label' => [$this, 'getLabel'],
+            'class'                => WorkflowDefinition::class,
+            'multiple'             => true,
+            'choice_label'         => function (WorkflowDefinition $definition) {
+                return $this->translationHelper->findTranslation($definition->getLabel());
+            },
             'translatable_options' => false
         ];
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return string
-     */
-    public function getLabel(WorkflowDefinition $definition)
-    {
-        return $this->translationHelper->findTranslation($definition->getLabel());
     }
 }

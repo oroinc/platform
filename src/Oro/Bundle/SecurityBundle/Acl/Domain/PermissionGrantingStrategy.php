@@ -75,17 +75,12 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * Sets the audit logger
-     *
-     * @param AuditLoggerInterface $auditLogger
      */
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {
         $this->auditLogger = $auditLogger;
     }
 
-    /**
-     * @param ServiceLink $securityMetadataProviderLink
-     */
     public function setSecurityMetadataProvider(ServiceLink $securityMetadataProviderLink)
     {
         $this->securityMetadataProviderLink = $securityMetadataProviderLink;
@@ -152,7 +147,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
@@ -162,14 +156,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $type = $acl->getObjectIdentity()->getType();
         $securityMetadataProvider = $this->getSecurityMetadataProvider();
         if ($securityMetadataProvider->isProtectedEntity($type)) {
-            $entityMetadata = $securityMetadataProvider->getMetadata($type);
-            $entityFieldsMetadata = $entityMetadata->getFields();
-            if (isset($entityFieldsMetadata[$field])) {
-                $fieldAlias = $entityFieldsMetadata[$field]->getAlias();
-                if ($fieldAlias) {
-                    $field = $fieldAlias;
-                }
-            }
+            $field = $securityMetadataProvider->getProtectedFieldName($type, $field);
         }
 
         // check object ACEs
@@ -291,7 +278,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                             $triggeredMask = $requiredMask;
                         }
                     } elseif (null !== $isAceApplicable && null === $triggeredAce) {
-                        $permissionGroupMask = $this->getPermissionGroupMask($requiredMask, $extension);
+                        $permissionGroupMask = $extension->getPermissionGroupMask($requiredMask);
                         if (null !== $permissionGroupMask && 0 === ($permissionGroupMask & $ace->getMask())) {
                             $triggeredAce = $ace;
                             $triggeredMask = $requiredMask;
@@ -361,36 +348,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      */
     protected function hasRequiredPermission($requiredMask, $aceMask, AclExtensionInterface $extension)
     {
-        $requiredPermissionMask = $this->getPermissionGroupMask($requiredMask, $extension);
+        $permissionGroupMask = $extension->getPermissionGroupMask($requiredMask);
 
-        return null !== $requiredPermissionMask && 0 !== ($aceMask & $requiredPermissionMask);
-    }
-
-    /**
-     * Determines a permission for the given mask and
-     * returns a mask with turned-on bits for all possible access levels allowed for this permission.
-     *
-     * @param int                   $mask
-     * @param AclExtensionInterface $extension
-     *
-     * @return int|null The mask or NULL if it is not possible to determine the permission
-     *                  or this permission does not support access levels (e.g. EXECUTE permission
-     *                  for a capability (see ActionAclExtension) has only 2 state, allowed or denied)
-     */
-    protected function getPermissionGroupMask($mask, AclExtensionInterface $extension)
-    {
-        $permissionGroupMask = null;
-        $permissions = $extension->getPermissions($mask, true);
-        foreach ($permissions as $permission) {
-            $maskBuilder = $extension->getMaskBuilder($permission);
-            $permissionGroup = 'GROUP_' . $permission;
-            if ($maskBuilder->hasMask($permissionGroup)) {
-                $permissionGroupMask = $maskBuilder->getMask($permissionGroup);
-                break;
-            }
-        }
-
-        return $permissionGroupMask;
+        return null !== $permissionGroupMask && 0 !== ($permissionGroupMask & $aceMask);
     }
 
     /**

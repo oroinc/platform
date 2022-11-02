@@ -1,0 +1,17 @@
+data:
+    type: users
+    attributes:
+        username: testapiuser
+        firstName: Bob
+        lastName: Doo
+        password: '123123123123'
+        email: test2341@test.com
+    relationships:
+        owner:
+            data:
+                type: businessunits
+                id: '<toString(@business_unit_1->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'

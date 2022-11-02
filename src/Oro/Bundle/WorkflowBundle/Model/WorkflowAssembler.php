@@ -10,68 +10,23 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowAssembler extends BaseAbstractAssembler
+/**
+ * Builds instance of Workflow model based on the related Workflow definition.
+ */
+class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscriberInterface
 {
     /**
      * @var ContainerInterface
      */
-    protected $container;
+    private $container;
 
-    /**
-     * @var WorkflowConfiguration
-     */
-    protected $configurationTree;
-
-    /**
-     * @var AttributeAssembler
-     */
-    protected $attributeAssembler;
-
-    /**
-     * @var StepAssembler
-     */
-    protected $stepAssembler;
-
-    /**
-     * @var TransitionAssembler
-     */
-    protected $transitionAssembler;
-
-    /**
-     * @var RestrictionAssembler
-     */
-    protected $restrictionAssembler;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @param ContainerInterface   $container
-     * @param AttributeAssembler   $attributeAssembler
-     * @param StepAssembler        $stepAssembler
-     * @param TransitionAssembler  $transitionAssembler
-     * @param RestrictionAssembler $restrictionAssembler
-     * @param TranslatorInterface  $translator
-     */
-    public function __construct(
-        ContainerInterface $container,
-        AttributeAssembler $attributeAssembler,
-        StepAssembler $stepAssembler,
-        TransitionAssembler $transitionAssembler,
-        RestrictionAssembler $restrictionAssembler,
-        TranslatorInterface $translator
-    ) {
-        $this->container            = $container;
-        $this->attributeAssembler   = $attributeAssembler;
-        $this->stepAssembler        = $stepAssembler;
-        $this->transitionAssembler  = $transitionAssembler;
-        $this->restrictionAssembler = $restrictionAssembler;
-        $this->translator           = $translator;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -89,7 +44,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
             $configuration,
             [
                 WorkflowConfiguration::NODE_STEPS,
-                WorkflowConfiguration::NODE_TRANSITIONS
+                WorkflowConfiguration::NODE_TRANSITIONS,
             ]
         );
 
@@ -123,8 +78,6 @@ class WorkflowAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param Workflow $workflow
-     *
      * @throws AssemblerException
      */
     protected function validateWorkflow(Workflow $workflow)
@@ -178,9 +131,10 @@ class WorkflowAssembler extends BaseAbstractAssembler
                     [];
             }
 
-            $label = $this->translator->trans(
+            $translator = $this->container->get(TranslatorInterface::class);
+            $label = $translator->trans(
                 'oro.workflow.transition.start',
-                ['%workflow%' => $this->translator->trans(
+                ['%workflow%' => $translator->trans(
                     $workflowDefinition->getLabel(),
                     [],
                     WorkflowTranslationHelper::TRANSLATION_DOMAIN
@@ -212,7 +166,8 @@ class WorkflowAssembler extends BaseAbstractAssembler
         $attributesConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_ATTRIBUTES, []);
         $transitionConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_TRANSITIONS);
 
-        return $this->attributeAssembler->assemble($definition, $attributesConfiguration, $transitionConfiguration);
+        return $this->container->get(AttributeAssembler::class)
+            ->assemble($definition, $attributesConfiguration, $transitionConfiguration);
     }
 
     /**
@@ -225,7 +180,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
     {
         $stepsConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_STEPS, []);
 
-        return $this->stepAssembler->assemble($stepsConfiguration, $attributes);
+        return $this->container->get(StepAssembler::class)->assemble($stepsConfiguration, $attributes);
     }
 
     /**
@@ -237,7 +192,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
      */
     protected function assembleTransitions(array $configuration, Collection $steps, Collection $attributes)
     {
-        return $this->transitionAssembler->assemble($configuration, $steps, $attributes);
+        return $this->container->get(TransitionAssembler::class)->assemble($configuration, $steps, $attributes);
     }
 
     /**
@@ -249,14 +204,29 @@ class WorkflowAssembler extends BaseAbstractAssembler
      */
     protected function assembleRestrictions(array $configuration, Collection $steps, Collection $attributes)
     {
-        return $this->restrictionAssembler->assemble($configuration, $steps, $attributes);
+        return $this->container->get(RestrictionAssembler::class)->assemble($configuration, $steps, $attributes);
     }
 
     /**
-     * @return Workflow
+     * Workflow service not shared, new instance created for each call
      */
-    protected function createWorkflow()
+    protected function createWorkflow(): Workflow
     {
-        return $this->container->get('oro_workflow.prototype.workflow');
+        return $this->container->get(Workflow::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            Workflow::class,
+            AttributeAssembler::class,
+            StepAssembler::class,
+            TransitionAssembler::class,
+            RestrictionAssembler::class,
+            TranslatorInterface::class,
+        ];
     }
 }

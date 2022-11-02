@@ -10,6 +10,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
+/**
+ * Dashboard configuration converter for User select values.
+ */
 class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 {
     /** @var OwnerHelper */
@@ -62,8 +65,9 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 
         $qb = $this->entityManager->getRepository($this->entityClass)->createQueryBuilder('e');
         $qb->where(
-            $qb->expr()->in(sprintf('e.%s', $identityField), $value)
+            $qb->expr()->in(sprintf('e.%s', $identityField), ':ids')
         );
+        $qb->setParameter('ids', $value);
 
         $qb->leftJoin('e.organizations', 'org')
             ->andWhere('org.id = :org')
@@ -72,9 +76,6 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;

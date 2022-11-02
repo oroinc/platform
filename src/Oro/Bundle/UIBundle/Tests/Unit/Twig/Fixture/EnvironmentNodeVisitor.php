@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
-class EnvironmentNodeVisitor implements \Twig_NodeVisitorInterface
+use Twig\Environment;
+use Twig\Node\Node;
+use Twig\NodeVisitor\NodeVisitorInterface;
+
+class EnvironmentNodeVisitor implements NodeVisitorInterface
 {
-    public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    public function enterNode(Node $node, Environment $env): Node
     {
         return $node;
     }
 
-    public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    public function leaveNode(Node $node, Environment $env): Node
     {
         return $node;
     }

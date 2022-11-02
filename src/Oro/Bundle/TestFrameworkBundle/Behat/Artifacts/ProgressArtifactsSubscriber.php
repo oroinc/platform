@@ -59,9 +59,6 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ArtifactsHandlerInterface $artifactsHandler
-     */
     public function addArtifactHandler(ArtifactsHandlerInterface $artifactsHandler)
     {
         $this->artifactsHandlers[] = $artifactsHandler;

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email Body
@@ -15,15 +14,12 @@ use JMS\Serializer\Annotation as JMS;
  */
 class EmailBody
 {
-    const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailBody';
-
     /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -31,7 +27,6 @@ class EmailBody
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
-     * @JMS\Type("dateTime")
      */
     protected $created;
 
@@ -39,7 +34,6 @@ class EmailBody
      * @var string
      *
      * @ORM\Column(name="body", type="text")
-     * @JMS\Type("string")
      */
     protected $bodyContent;
 
@@ -47,7 +41,6 @@ class EmailBody
      * @var bool
      *
      * @ORM\Column(name="body_is_text", type="boolean")
-     * @JMS\Type("boolean")
      */
     protected $bodyIsText;
 
@@ -62,7 +55,6 @@ class EmailBody
      * @var bool
      *
      * @ORM\Column(name="has_attachments", type="boolean")
-     * @JMS\Type("boolean")
      */
     protected $hasAttachments;
 
@@ -70,7 +62,6 @@ class EmailBody
      * @var bool
      *
      * @ORM\Column(name="persistent", type="boolean")
-     * @JMS\Type("boolean")
      */
     protected $persistent;
 
@@ -79,7 +70,6 @@ class EmailBody
      *
      * @ORM\OneToMany(targetEntity="EmailAttachment", mappedBy="emailBody",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
-     * @JMS\Exclude
      */
     protected $attachments;
 
@@ -87,7 +77,6 @@ class EmailBody
      * @var Email
      *
      * @ORM\OneToOne(targetEntity="Email", mappedBy="emailBody")
-     * @JMS\Exclude
      */
     protected $email;
 

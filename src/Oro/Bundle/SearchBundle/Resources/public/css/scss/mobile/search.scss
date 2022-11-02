@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .search-header .search-form {
-    input[type="text"] {
+    input[type='text'] {
         width: 218px;
     }
 }
@@ -22,13 +22,5 @@
     .search-header .search-form {
         clear: both;
         width: 100%;
-
-        .input-append {
-            width: 100%;
-        }
-
-        input[type="text"] {
-            width: calc(100% - 88px);
-        }
     }
 }

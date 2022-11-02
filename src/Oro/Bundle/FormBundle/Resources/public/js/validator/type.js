@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var defaultParam = {
+    const __ = require('orotranslation/js/translator');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const defaultParam = {
         message: 'This value should be of type {{ type }}.'
     };
 
@@ -14,10 +13,10 @@ define(function(require) {
     return [
         'Type',
         function(value, element, param) {
-            var result;
+            let result;
             switch (param.type) {
                 case 'integer':
-                    var valueNumber = Number(value).toFixed();
+                    const valueNumber = Number(value).toFixed();
                     result = String(valueNumber) === value;
                     break;
                 case 'float':
@@ -30,7 +29,7 @@ define(function(require) {
             return this.optional(element) || result;
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.message, {type: param.type});
         }
     ];

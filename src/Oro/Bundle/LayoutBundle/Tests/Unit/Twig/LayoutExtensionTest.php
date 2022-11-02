@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -14,46 +16,25 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $renderer;
+    private $renderer;
 
     /** @var TextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $textHelper;
+    private $textHelper;
 
     /** @var LayoutExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->renderer = $this->createMock(TwigRendererInterface::class);
-        $this->textHelper = $this->getMockBuilder(TextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->textHelper = $this->createMock(TextHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_layout.twig.renderer', $this->renderer)
             ->add('oro_layout.text.helper', $this->textHelper)
             ->getContainer($this);
 
-        $this->extension = new LayoutExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('layout', $this->extension->getName());
-    }
-
-    public function testInitRuntime()
-    {
-        /** @var \Twig_Environment $environment */
-        $environment = $this->getMockBuilder('\Twig_Environment')
-            ->getMock();
-
-        $this->renderer->expects($this->once())
-            ->method('setEnvironment')
-            ->with($this->identicalTo($environment));
-
-        $this->extension->initRuntime($environment);
-        self::assertSame($this->renderer, $this->extension->renderer);
+        $this->extension = new LayoutExtension($container, (new InflectorFactory())->build());
     }
 
     public function testGetTokenParsers()
@@ -62,10 +43,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $tokenParsers);
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser',
-            $tokenParsers[0]
-        );
+        $this->assertInstanceOf(BlockThemeTokenParser::class, $tokenParsers[0]);
     }
 
     public function testMergeContext()
@@ -85,7 +63,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'merge_context', [$parent, [$name => $value]])
         );
 
-        /** @var BlockView $view */
         foreach ([$parent, $firstChild, $secondChild] as $view) {
             $this->assertArrayHasKey($name, $view->vars);
             $this->assertEquals($value, $view->vars[$name]);
@@ -93,13 +70,9 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $attr
-     * @param array $defaultAttr
-     * @param array $expected
-     *
      * @dataProvider attributeProvider
      */
-    public function testDefaultAttributes($attr, $defaultAttr, $expected)
+    public function testDefaultAttributes(array $attr, array $defaultAttr, array $expected)
     {
         $this->assertEquals(
             $expected,
@@ -107,10 +80,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function attributeProvider()
+    public function attributeProvider(): array
     {
         return [
             'attributes with tilde' => [
@@ -212,25 +182,20 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->setClassPrefixToForm($formView, 'foo');
 
-        $this->assertEquals($formView->vars['class_prefix'], 'foo');
-        $this->assertEquals($childView->vars['class_prefix'], 'foo');
-        $this->assertEquals($prototypeView->vars['class_prefix'], 'foo');
+        $this->assertEquals('foo', $formView->vars['class_prefix']);
+        $this->assertEquals('foo', $childView->vars['class_prefix']);
+        $this->assertEquals('foo', $prototypeView->vars['class_prefix']);
     }
 
     /**
      * @dataProvider convertValueToStringDataProvider
-     * @param $value
-     * @param $expectedConvertedValue
      */
-    public function testConvertValueToString($value, $expectedConvertedValue)
+    public function testConvertValueToString(mixed $value, string $expectedConvertedValue)
     {
         $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
     }
 
-    /**
-     * @return array
-     */
-    public function convertValueToStringDataProvider()
+    public function convertValueToStringDataProvider(): array
     {
         return [
             'object conversion' => [
@@ -250,5 +215,29 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
                 'some string'
             ]
         ];
+    }
+
+    public function testCloneFormViewWithUniqueId(): void
+    {
+        $formView = new FormView();
+        $formView->vars['id'] = 'root-view';
+        $formView->vars['additionalField'] = 'value1';
+        $childFormView = new FormView($formView);
+        $childFormView->vars['id'] = 'child-view';
+        $childFormView->vars['extraField'] = 'value2';
+        $formView->children['child'] = $childFormView;
+
+        $newFormView = $this->extension->cloneFormViewWithUniqueId($formView, 'foo');
+
+        $formView->setRendered();
+        $formView->offsetGet('child')->setRendered();
+
+        $this->assertEquals('root-view-foo', $newFormView->vars['id']);
+        $this->assertEquals('value1', $newFormView->vars['additionalField']);
+        $this->assertFalse($newFormView->isRendered());
+        $this->assertEquals('child-view-foo', $newFormView->offsetGet('child')->vars['id']);
+        $this->assertEquals('value2', $newFormView->offsetGet('child')->vars['extraField']);
+        $this->assertEquals($newFormView, $newFormView->offsetGet('child')->parent);
+        $this->assertFalse($newFormView->offsetGet('child')->isRendered());
     }
 }

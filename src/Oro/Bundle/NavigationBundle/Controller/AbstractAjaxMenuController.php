@@ -9,12 +9,23 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
+use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractAjaxMenuController extends Controller
+/**
+ * Ajax Abstract Menu Controller
+ */
+abstract class AbstractAjaxMenuController extends AbstractController
 {
     /**
      * @param string  $menuName
@@ -27,7 +38,7 @@ abstract class AbstractAjaxMenuController extends Controller
         $context = $this->getContextFromRequest($request);
         $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
-        $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
+        $scope = $this->getScopeManager()->find($manager->getScopeType(), $context);
         if (null === $scope) {
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
@@ -52,7 +63,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $menuName
      * @param string  $parentKey
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function createAction(Request $request, $menuName, $parentKey)
     {
@@ -60,20 +71,22 @@ abstract class AbstractAjaxMenuController extends Controller
         $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
         $menu = $this->getMenu($menuName, $context);
+        $scope = $this->getScopeManager()->find($manager->getScopeType(), $context);
         $menuUpdate = $manager->createMenuUpdate(
             $menu,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
                 'isDivider' => $request->get('isDivider'),
-                'custom' => true
+                'custom' => true,
+                'scope' => $scope
             ]
         );
-        $errors = $this->get('validator')->validate($menuUpdate);
+        $errors = $this->getValidator()->validate($menuUpdate);
         if (count($errors)) {
-            $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
-
-            return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse([
+                'message' => $this->getValidationErrorMessage($errors)
+            ], Response::HTTP_BAD_REQUEST);
         }
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menuUpdate->setScope($scope);
@@ -92,7 +105,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function deleteAction($menuName, $key, Request $request)
@@ -101,7 +114,7 @@ abstract class AbstractAjaxMenuController extends Controller
         $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
 
-        $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
+        $scope = $this->getScopeManager()->find($manager->getScopeType(), $context);
 
         if (!$scope) {
             throw $this->createNotFoundException();
@@ -134,7 +147,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function showAction($menuName, $key, Request $request)
     {
@@ -156,7 +169,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param string  $key
      * @param Request $request
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function hideAction($menuName, $key, Request $request)
     {
@@ -202,12 +215,12 @@ abstract class AbstractAjaxMenuController extends Controller
             $position
         );
         foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($update);
+            $errors = $this->getValidator()->validate($update);
 
             if (count($errors)) {
-                $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
-
-                return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+                return new JsonResponse([
+                    'message' => $this->getValidationErrorMessage($errors)
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $entityManager->persist($update);
@@ -226,9 +239,9 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     protected function dispatchMenuUpdateScopeChangeEvent($menuName, array $context)
     {
-        $this->get('event_dispatcher')->dispatch(
-            MenuUpdateChangeEvent::NAME,
-            new MenuUpdateChangeEvent($menuName, $context)
+        $this->get(EventDispatcherInterface::class)->dispatch(
+            new MenuUpdateChangeEvent($menuName, $context),
+            MenuUpdateChangeEvent::NAME
         );
     }
 
@@ -240,12 +253,12 @@ abstract class AbstractAjaxMenuController extends Controller
     {
         $manager = $this->getMenuUpdateManager();
 
-        $context = $this->get('oro_scope.context_request_helper')->getFromRequest(
+        $context = $this->get(ContextRequestHelper::class)->getFromRequest(
             $request,
             $this->getAllowedContextKeys()
         );
 
-        return $this->get('oro_scope.context_normalizer')->denormalizeContext($manager->getScopeType(), $context);
+        return $this->getScopeNormalizer()->denormalizeContext($manager->getScopeType(), $context);
     }
 
     /**
@@ -255,9 +268,9 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     protected function findOrCreateScope($context, $scopeType)
     {
-        $context = $this->get('oro_scope.context_normalizer')->denormalizeContext($scopeType, $context);
+        $context = $this->getScopeNormalizer()->denormalizeContext($scopeType, $context);
 
-        return $this->get('oro_scope.scope_manager')->findOrCreate($scopeType, $context);
+        return $this->getScopeManager()->findOrCreate($scopeType, $context);
     }
 
     /**
@@ -272,7 +285,7 @@ abstract class AbstractAjaxMenuController extends Controller
             MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $context,
             BuilderChainProvider::IGNORE_CACHE_OPTION => true
         ];
-        $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
+        $menu = $this->get(BuilderChainProvider::class)->get($menuName, $options);
 
         if (!count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
@@ -290,7 +303,6 @@ abstract class AbstractAjaxMenuController extends Controller
     }
 
     /**
-     * @param array $context
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     protected function checkAcl(array $context)
@@ -305,6 +317,56 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     protected function getMenuUpdateManager()
     {
-        return $this->get('oro_navigation.manager.menu_update');
+        return $this->get(MenuUpdateManager::class);
+    }
+
+    private function getScopeManager(): ScopeManager
+    {
+        return $this->get(ScopeManager::class);
+    }
+
+    private function getValidationErrorMessage(ConstraintViolationList $errors): string
+    {
+        $translator = $this->get(TranslatorInterface::class);
+        if ($errors->count()) {
+            $errorArr = $errors->getIterator()->getArrayCopy();
+            $returnMessages = array_map(function (ConstraintViolationInterface $violation) use ($translator) {
+                return $translator->trans($violation->getMessageTemplate(), $violation->getParameters());
+            }, $errorArr);
+
+            return implode("\n", $returnMessages);
+        }
+
+        return $translator->trans('oro.navigation.menuupdate.validation_error_message');
+    }
+
+    private function getScopeNormalizer(): ContextNormalizer
+    {
+        return $this->get(ContextNormalizer::class);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getValidator()
+    {
+        return $this->get(ValidatorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            EventDispatcherInterface::class,
+            ContextRequestHelper::class,
+            BuilderChainProvider::class,
+            MenuUpdateManager::class,
+            ScopeManager::class,
+            TranslatorInterface::class,
+            ContextNormalizer::class,
+            ValidatorInterface::class,
+        ]);
     }
 }

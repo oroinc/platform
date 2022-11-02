@@ -1,15 +1,16 @@
 oro:
     navigation:
-        help:
-            title: How To Use Pinbar
-            message: Use pin icon on the right top corner of page to create fast access link in the pinbar.
         menu:
             pinbar.label: Pinbar
+            how_to_use_pinbar: Learn how to use this space
             recent_pages.label: Recent pages
             history.label: History
             favorite.label: Favorites
             mostviewed.label: Most Viewed
             menu_list_default.label: Menus
+            feature:
+                label: Back-Office Menu
+                description: Enables managing the back-office menus of the Oro application, such as the main menu, personal menu of the logged-in user, shortcuts and calendar menus.
         messages:
             no_items: You have no items yet
         shortcuts:
@@ -18,6 +19,7 @@ oro:
             see_all: See full list
             most_used: Most Used Actions
             placeholder: Enter shortcut action
+            aria_label: Search shortcuts
         favorites:
             button: Favorites
             button.title: Mark/unmark the page as favorite
@@ -25,6 +27,7 @@ oro:
             button: Minimize
             button.title: Pin/unpin the page
             more_tabs.label: More pintabs
+            help_message: Use the %pinIcon% icon in the top right corner of the page to create a pin, so that you can come back to it at any time in one click.
         menuitem:
             name.label: Name
         menuupdate:
@@ -38,6 +41,7 @@ oro:
             reset_title: Reset Confirmation
             entity_label: Menu Item
             entity_plural_label: Menu Item
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key

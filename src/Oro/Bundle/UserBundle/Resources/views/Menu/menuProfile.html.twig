@@ -1,21 +1,8 @@
+{% import '@OroUI/macros.html.twig' as UI %}
 {% if app.user %}
-    <li class="dropdown user-menu-dropdown" id="user-menu">
-        {% set togglerId = 'dropdown-'|uniqid %}
-        <button id="{{ togglerId }}"
-                class="dropdown-toggle{% if isMobileVersion() %} dropdown-toggle--no-caret{% endif %}"
-                data-toggle="dropdown"
-                aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false"
-        >
-            {% if isMobileVersion() %}
-                <span class="fa-user-circle" aria-hidden="true"></span>
-            {% else %}
-                {{ app.user|oro_format_name|escape }}
-                {% if app.user.avatar %}
-                    <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
-                {%  endif %}
-            {% endif %}
-        </button>
-        {{ oro_menu_render('usermenu', {togglerId: togglerId, class:'dropdown-menu-right'}) }}
+    <li class="dropdown user-menu-dropdown" id="user-menu"
+        {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
+        {{ oro_menu_render('usermenu', {class:'dropdown-menu-right'}) }}
     </li>
 {% else %}
     <li><a href="{{ path('oro_user_security_login') }}">{{ 'Login'|trans }}</a></li>

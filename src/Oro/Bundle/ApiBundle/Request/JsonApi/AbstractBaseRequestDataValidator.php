@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * The base class for the JSON.API request data validators.
+ * The base class for the JSON:API request data validators.
  */
 abstract class AbstractBaseRequestDataValidator
 {
@@ -34,10 +34,27 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $section
-     */
+    protected function validateJsonApiSection(array $data): void
+    {
+        if (\array_key_exists(JsonApiDoc::JSONAPI, $data)) {
+            $this->validateArray($data, JsonApiDoc::JSONAPI, self::ROOT_POINTER, false, true);
+        }
+    }
+
+    protected function validateMetaSection(array $data, string $pointer = self::ROOT_POINTER): void
+    {
+        if (\array_key_exists(JsonApiDoc::META, $data)) {
+            $this->validateArray($data, JsonApiDoc::META, $pointer, false, true);
+        }
+    }
+
+    protected function validateLinksSection(array $data, string $pointer = self::ROOT_POINTER): void
+    {
+        if (\array_key_exists(JsonApiDoc::LINKS, $data)) {
+            $this->validateArray($data, JsonApiDoc::LINKS, $pointer, false, true);
+        }
+    }
+
     protected function validateSectionNotExist(array $data, string $section): void
     {
         if (\array_key_exists($section, $data)) {
@@ -48,12 +65,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateTypeAndIdAreRequiredNotBlankString(array $data, string $pointer): bool
     {
         $isValid = true;
@@ -67,13 +78,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateRequired(array $data, string $property, string $pointer): bool
     {
         $isValid = true;
@@ -88,13 +92,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateRequiredNotBlankString(array $data, string $property, string $pointer): bool
     {
         return
@@ -102,13 +99,6 @@ abstract class AbstractBaseRequestDataValidator
             && $this->validateNotBlankString($data, $property, $pointer);
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateNotBlankString(array $data, string $property, string $pointer): bool
     {
         $isValid = true;
@@ -138,15 +128,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     * @param bool   $notEmpty
-     * @param bool   $associative
-     *
-     * @return bool
-     */
     protected function validateArray(
         array $data,
         string $property,
@@ -168,7 +149,7 @@ abstract class AbstractBaseRequestDataValidator
                 \sprintf('The \'%s\' property should not be empty', $property)
             );
             $isValid = false;
-        } elseif ($associative && !ArrayUtil::isAssoc($value)) {
+        } elseif ($associative && !empty($value) && !ArrayUtil::isAssoc($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 \sprintf('The \'%s\' property should be an associative array', $property)
@@ -179,21 +160,11 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param string $parentPath
-     * @param string $property
-     *
-     * @return string
-     */
-    protected function buildPointer(string $parentPath, string $property): string
+    protected function buildPointer(string $parentPointer, string $property): string
     {
-        return $parentPath . '/' . $property;
+        return $parentPointer . '/' . $property;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $message
-     */
     protected function addError(string $pointer, string $message): void
     {
         $this->addErrorObject(
@@ -202,9 +173,6 @@ abstract class AbstractBaseRequestDataValidator
         );
     }
 
-    /**
-     * @param Error $error
-     */
     protected function addErrorObject(Error $error): void
     {
         $this->errors[] = $error;

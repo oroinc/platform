@@ -1,56 +1,41 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser;
+use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-/**
- * Class MultiSelectGuesserTest
- * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption
- */
 class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $choiceHelper;
+    /** @var ChoiceFieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $choiceHelper;
 
     /** @var MultiSelectGuesser */
-    protected $guesser;
+    private $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->choiceHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
 
         $this->guesser = new MultiSelectGuesser($this->doctrineHelper, $this->choiceHelper);
     }
 
     public function testRelationGuessHasNotAssociation()
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')
@@ -69,25 +54,17 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $column
-     * @param array $expected
-     * @param bool $invokes
-     *
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess($column, $expected, $invokes)
+    public function testRelationGuess(array $column, array $expected, bool $invokes)
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')
@@ -126,7 +103,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $guessed);
     }
 
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
         return [
             'empty' => [
@@ -200,7 +177,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')
@@ -257,7 +234,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->any())
             ->method('getClassMetadata')

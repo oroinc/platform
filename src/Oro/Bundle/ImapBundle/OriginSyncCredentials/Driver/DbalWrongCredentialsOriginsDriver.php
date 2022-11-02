@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
@@ -20,10 +20,6 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param LoggerInterface $logger
-     */
     public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;

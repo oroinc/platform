@@ -5,22 +5,21 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityListPreQueryBuildListener */
-    protected $listener;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    public function setUp()
+    /** @var ActivityListPreQueryBuildListener */
+    private $listener;
+
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->listener = new ActivityListPreQueryBuildListener($this->doctrineHelper);
     }
@@ -38,12 +37,10 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPrepareIdsForEmailThreadWithoutThreadsEvent()
     {
-        $targetClass = Email::ENTITY_CLASS;
+        $targetClass = Email::class;
         $targetId = 1;
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email = $this->createMock(Email::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntity')
@@ -57,23 +54,15 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPrepareIdsForEmailThreadWithThreadsEvent()
     {
-        $targetClass = Email::ENTITY_CLASS;
+        $targetClass = Email::class;
         $targetId = 1;
         $expectedResult = [2, 3];
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $thread = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailThread')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email = $this->createMock(Email::class);
+        $thread = $this->createMock(EmailThread::class);
 
-        $email1 = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $email2 = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email1 = $this->createMock(Email::class);
+        $email2 = $this->createMock(Email::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntity')

@@ -3,27 +3,23 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension;
+use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Symfony\Component\Yaml\Yaml;
 
 class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddTreeGeneratorExtension
-     */
-    protected $extension;
+    /** @var AddTreeGeneratorExtension */
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AddTreeGeneratorExtension();
     }
 
     /**
      * @dataProvider prepareDataProvider
-     *
-     * @param array $source
-     * @param array $expectedSource
      */
     public function testPrepare(array $source, array $expectedSource)
     {
@@ -36,13 +32,11 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSource, $data->getSource());
     }
 
-    /**
-     * @return array
-     */
-    public function prepareDataProvider()
+    public function prepareDataProvider(): array
     {
         $source = Yaml::parse(file_get_contents(__DIR__.'/data/layout.yml'))['layouts'];
         $sourceMultiple = Yaml::parse(file_get_contents(__DIR__.'/data/layout_multiple_add_tree.yml'))['layouts'];
+
         return [
             'tree' => [
                 'source' => $source,
@@ -139,22 +133,16 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prepareExceptionDataProvider
-     *
-     * @param array $source
-     * @param string $message
      */
-    public function testPrepareExceptions(array $source, $message)
+    public function testPrepareExceptions(array $source, string $message)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\SyntaxException');
+        $this->expectException(SyntaxException::class);
         $this->expectExceptionMessage($message);
         $visitorCollection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $visitorCollection);
     }
 
-    /**
-     * @return array
-     */
-    public function prepareExceptionDataProvider()
+    public function prepareExceptionDataProvider(): array
     {
         return [
             '@addTree with invalid structure' => [

@@ -5,32 +5,32 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Routing;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver;
+use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 
 class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dictionaryProvider;
+    /** @var ChainDictionaryValueListProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $dictionaryProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /** @var SortableRouteCollection */
-    protected $routeCollection;
+    /** @var EnhancedRouteCollection */
+    private $routeCollection;
 
     /** @var RouteCollectionAccessor */
-    protected $routeCollectionAccessor;
+    private $routeCollectionAccessor;
 
     /** @var DictionaryEntityRouteOptionsResolver */
-    protected $routeOptionsResolver;
+    private $routeOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
@@ -42,7 +42,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
             $this->logger
         );
 
-        $this->routeCollection         = new SortableRouteCollection();
+        $this->routeCollection = new EnhancedRouteCollection();
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
@@ -107,7 +107,6 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
             $route->getRequirements()
         );
 
-        $this->routeCollection->sortByPriority();
         $this->assertEquals(
             [
                 'first_route',

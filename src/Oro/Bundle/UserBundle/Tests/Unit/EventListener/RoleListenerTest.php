@@ -2,116 +2,138 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\EventListener\RoleListener;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\RoleStub;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 class RoleListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ServiceLink
-     */
-    protected $serviceLink;
+    /** @var AclSidManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclSidManager;
 
-    /**
-     * @var RoleListener
-     */
-    protected $listener;
+    /** @var RoleListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serviceLink = $this->createMock(ServiceLink::class);
+        $this->aclSidManager = $this->createMock(AclSidManager::class);
 
-        $this->listener = new RoleListener($this->serviceLink);
+        $this->listener = new RoleListener($this->aclSidManager);
     }
 
-    protected function tearDown()
+    public function testPreUpdate()
     {
-        unset($this->serviceLink, $this->listener);
+        $role = new RoleStub();
+        $sid = $this->createMock(SecurityIdentityInterface::class);
+
+        $this->aclSidManager->expects($this->once())
+            ->method('getSid')
+            ->with('new')
+            ->willReturn($sid);
+        $this->aclSidManager->expects($this->once())
+            ->method('updateSid')
+            ->with($this->identicalTo($sid), 'old');
+
+        $this->listener->preUpdate(
+            $role,
+            $this->getPreUpdateEvent($role, ['role' => ['old', 'new']])
+        );
     }
 
-    public function testPrePersistNotSupportedEntity()
+    public function testPreUpdateWhenRoleFieldNotChanged()
     {
-        $entity = new \stdClass();
+        $role = new RoleStub();
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|LifecycleEventArgs $event */
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
-        $event->expects($this->never())
-            ->method('getEntityManager');
+        $this->aclSidManager->expects($this->never())
+            ->method($this->anything());
 
-        $this->listener->prePersist($event);
+        $this->listener->preUpdate(
+            $role,
+            $this->getPreUpdateEvent($role, ['another' => ['old', 'new']])
+        );
     }
 
-    /**
-     * Test prePersist role that to generate new value of "role" field
-     */
-    public function testPrePersistValid()
+    private function getPreUpdateEvent(AbstractRole $role, array $changeSet): PreUpdateEventArgs
     {
-        $role = new Role();
+        return new PreUpdateEventArgs($role, $this->createMock(EntityManagerInterface::class), $changeSet);
+    }
 
-        $this->assertEmpty($role->getId());
-        $this->assertEmpty($role->getRole());
+    public function testPrePersistWhenRoleFieldIsNotEmpty()
+    {
+        $roleName = 'ROLE_123';
+        $role = new RoleStub();
+        $role->setRole($roleName, false);
 
-        $this->listener->prePersist($this->getPrePersistEvent($role));
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())
+            ->method('getRepository');
+
+        $this->listener->prePersist($role, new LifecycleEventArgs($role, $em));
+
+        $this->assertEquals($roleName, $role->getRole());
+    }
+
+    public function testPrePersistWhenRoleFieldIsEmpty()
+    {
+        $role = new RoleStub();
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ObjectRepository::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Role::class)
+            ->willReturn($repository);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn(null);
+
+        $this->listener->prePersist($role, new LifecycleEventArgs($role, $em));
 
         $this->assertNotEmpty($role->getRole());
     }
 
-    /**
-     * Test prePersist role that generate exception \LogicException
-     *
-     * @expectedException \LogicException
-     * @expectedExceptionMessage 10 attempts to generate unique role are failed.
-     */
-    public function testPrePersistInValid()
+    public function testPrePersistWhenRoleFieldIsEmptyAndWhenFirstAttemptToGenerateUniqueRoleNameFailed()
     {
-        $entity = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Role')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $role = new RoleStub();
 
-        $this->listener->prePersist($this->getPrePersistEvent($entity, true));
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ObjectRepository::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Role::class)
+            ->willReturn($repository);
+        $repository->expects($this->exactly(2))
+            ->method('findOneBy')
+            ->willReturnOnConsecutiveCalls(new RoleStub(), null);
+
+        $this->listener->prePersist($role, new LifecycleEventArgs($role, $em));
+
+        $this->assertNotEmpty($role->getRole());
     }
 
-    /**
-     * @param object $entity
-     * @param bool $duplicate
-     * @return \PHPUnit\Framework\MockObject\MockObject|LifecycleEventArgs
-     */
-    protected function getPrePersistEvent($entity, $duplicate = false)
+    public function testPrePersistWhenRoleFieldIsEmptyAndWhenAttemptsToGenerateUniqueRoleNameExceeded()
     {
-        $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('10 attempts to generate unique role are failed.');
 
-        if ($duplicate) {
-            $repository->expects($this->any())
-                ->method('findOneBy')
-                ->will($this->returnValue($entity));
-        }
-
-        $em->expects($this->any())
+        $role = new RoleStub();
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ObjectRepository::class);
+        $em->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($repository));
+            ->with(Role::class)
+            ->willReturn($repository);
+        $repository->expects($this->exactly(10))
+            ->method('findOneBy')
+            ->willReturn(new RoleStub());
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
-
-        return $event;
+        $this->listener->prePersist($role, new LifecycleEventArgs($role, $em));
     }
 }

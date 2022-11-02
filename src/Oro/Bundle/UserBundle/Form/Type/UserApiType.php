@@ -16,9 +16,6 @@ class UserApiType extends UserType
     /** ConfigManager */
     protected $userConfigManager;
 
-    /**
-     * @param ConfigManager $userConfigManager
-     */
     public function setUserConfigManager(ConfigManager $userConfigManager)
     {
         $this->userConfigManager = $userConfigManager;
@@ -89,8 +86,6 @@ class UserApiType extends UserType
 
     /**
      * Add Invite user fields
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function addInviteUserField(FormBuilderInterface $builder)
     {

@@ -20,8 +20,6 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
     /**
      * Adds all providers that marked by tag: oro_soap.metadata_provider
-     *
-     * @param MetadataProviderInterface $provider
      */
     public function addProvider(MetadataProviderInterface $provider)
     {

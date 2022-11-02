@@ -18,9 +18,6 @@ class WorkflowReplacementType extends AbstractType
     /** @var WorkflowDeactivationHelper */
     protected $helper;
 
-    /**
-     * @param WorkflowDeactivationHelper $helper
-     */
     public function __construct(WorkflowDeactivationHelper $helper)
     {
         $this->helper = $helper;

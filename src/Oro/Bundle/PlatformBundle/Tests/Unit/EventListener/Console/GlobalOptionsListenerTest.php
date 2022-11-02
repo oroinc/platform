@@ -22,7 +22,7 @@ class GlobalOptionsListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(GlobalOptionsProviderRegistry::class);
         $this->listener = new GlobalOptionsListener($this->registry);

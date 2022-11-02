@@ -3,21 +3,20 @@ parameters:
     oro_embedded_form.session_id_field_name: ~
     oro_embedded_form.csrf_token_lifetime: ~
 
-    oro.embedded_form.form_type.available_form.class:        Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
-    oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
-    oro_embedded_form.form_type.class:                       Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
-    oro_embedded_form.embed_form_layout_manager.class:       Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
-
 services:
     oro_embedded_form.form_type.available_embedded_form:
-        class: '%oro.embedded_form.form_type.available_form.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
         arguments:
             - '@oro_embedded_form.manager'
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
 
+    Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager:
+        alias: oro_embedded_form.manager
+
     oro_embedded_form.manager:
-        class: '%oro_embedded_form.manager.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+        public: true
         arguments:
             - '@form.registry'
             - '@form.factory'
@@ -26,12 +25,12 @@ services:
         class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_embedded_form.form_type:
-        class: '%oro_embedded_form.form_type.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
         tags:
             - { name: form.type, alias: embedded_form }
 
@@ -41,11 +40,14 @@ services:
     oro_embedded_form.layout_manager:
         synthetic: true
 
+    Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager:
+        alias: oro_embedded_form.embed_form_layout_manager
+
     oro_embedded_form.embed_form_layout_manager:
-        class: '%oro_embedded_form.embed_form_layout_manager.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
+        public: true
         arguments:
             - '@oro_embedded_form.layout_manager'
-            - '@oro_embedded_form.manager'
         calls:
             - [setSessionIdProvider, ['@oro_embedded_form.session_id_provider']]
             - [setSessionIdFieldName, ['%oro_embedded_form.session_id_field_name%']]
@@ -55,12 +57,10 @@ services:
         public: false
         decorates: security.csrf.token_storage
         arguments:
-            - '@oro_embedded_form.csrf_token_storage.decorator.inner'
+            - '@.inner'
             - '@oro_embedded_form.csrf_token_storage'
             - '@request_stack'
-            - '%session.storage.options%'
             - 'oro_embedded_form_submit'
-            - '%oro_embedded_form.session_id_field_name%'
 
     oro_embedded_form.csrf_token_storage:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage
@@ -85,14 +85,6 @@ services:
         tags:
              - { name: layout.block_type, alias: embed_form_success }
 
-    oro_embedded_form.layout.block_type.default_form:
-        parent: oro_layout.block_type.abstract_configurable
-        calls:
-            - [setOptionsConfig, [{form: {default: null}, form_layout: {default: null}}]]
-            - [setName, ['embed_form_legacy_form']]
-        tags:
-             - { name: layout.block_type, alias: embed_form_legacy_form }
-
     oro_embedded_form.form_layout_builder:
         class: Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder
         calls:
@@ -104,3 +96,10 @@ services:
             - '@service_container'
         tags:
             - { name: layout.context_configurator, priority: -100 }
+
+    oro_embedded_form.csrf_token_cache:
+        class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
+        arguments:
+            - ''
+            - '%oro_embedded_form.csrf_token_lifetime%'
+            - '%kernel.cache_dir%/security/embedded_form'

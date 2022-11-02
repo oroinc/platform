@@ -6,7 +6,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 
 /**
  * actions:
- *    - @save_fields_changes:
+ *    - '@save_fields_changes':
  *        entity: $.data
  *        changeSet: $.changeSet
  */

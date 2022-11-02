@@ -25,7 +25,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateFilter = $this->createMock(DateRangeFilter::class);
         $this->modifier = $this->createMock(DateFilterModifier::class);
@@ -36,7 +36,6 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
 
         $this->dateFilter->expects($this->once())
@@ -47,10 +46,10 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('modify')
             ->with(
                 [
-                    'a' => 'b',
+                    'a'     => 'b',
                     'value' => [
                         'start' => 'start_value',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ]
                 ],
                 ['start', 'end'],
@@ -71,10 +70,10 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('modify')
             ->with(
                 [
-                    'a' => 'b',
+                    'a'     => 'b',
                     'value' => [
                         'start' => 'start_value',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ]
                 ],
                 ['start', 'end'],
@@ -116,7 +115,6 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getTimeZone')
             ->willReturn('UTC');
 
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('andWhere')
@@ -133,7 +131,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => '2016-01-01 13:00:00',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ]
                 ],
                 ['start', 'end'],
@@ -143,9 +141,9 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => '2016-01-01 13:00:00',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ],
-                    'type' => AbstractDateFilterType::TYPE_MORE_THAN
+                    'type'  => AbstractDateFilterType::TYPE_MORE_THAN
                 ]
             );
 
@@ -162,7 +160,6 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getTimeZone')
             ->willReturn('UTC');
 
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('andWhere')
@@ -179,7 +176,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => 'start_value',
-                        'end' => '2016-01-01 13:00:00'
+                        'end'   => '2016-01-01 13:00:00'
                     ]
                 ],
                 ['start', 'end'],
@@ -189,9 +186,9 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => 'start_value',
-                        'end' => '2016-01-01 13:00:00'
+                        'end'   => '2016-01-01 13:00:00'
                     ],
-                    'type' => AbstractDateFilterType::TYPE_LESS_THAN
+                    'type'  => AbstractDateFilterType::TYPE_LESS_THAN
                 ]
             );
 
@@ -204,7 +201,6 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyDateRangeFilterToQueryAllTime()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->never())
             ->method($this->anything());
@@ -215,7 +211,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => 'start_value',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ]
                 ],
                 ['start', 'end'],
@@ -225,9 +221,9 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => 'start_value',
-                        'end' => 'end_value'
+                        'end'   => 'end_value'
                     ],
-                    'type' => AbstractDateFilterType::TYPE_ALL_TIME
+                    'type'  => AbstractDateFilterType::TYPE_ALL_TIME
                 ]
             );
 
@@ -240,23 +236,20 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getTimeZone')
             ->willReturn('UTC');
 
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->at(0))
+        $qb->expects($this->exactly(2))
             ->method('andWhere')
-            ->with('alias >= :start')
+            ->withConsecutive(
+                ['alias >= :start'],
+                ['alias <= :end']
+            )
             ->willReturnSelf();
-        $qb->expects($this->at(1))
+        $qb->expects($this->exactly(2))
             ->method('setParameter')
-            ->with('start', new \DateTime('2016-01-01 13:00:00', new \DateTimeZone('UTC')))
-            ->willReturnSelf();
-        $qb->expects($this->at(2))
-            ->method('andWhere')
-            ->with('alias <= :end')
-            ->willReturnSelf();
-        $qb->expects($this->at(3))
-            ->method('setParameter')
-            ->with('end', new \DateTime('2017-01-01 13:00:00', new \DateTimeZone('UTC')))
+            ->withConsecutive(
+                ['start', new \DateTime('2016-01-01 13:00:00', new \DateTimeZone('UTC'))],
+                ['end', new \DateTime('2017-01-01 13:00:00', new \DateTimeZone('UTC'))]
+            )
             ->willReturnSelf();
 
         $this->modifier->expects($this->once())
@@ -265,7 +258,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => '2016-01-01 13:00:00',
-                        'end' => '2017-01-01 13:00:00'
+                        'end'   => '2017-01-01 13:00:00'
                     ]
                 ],
                 ['start', 'end'],
@@ -275,9 +268,9 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'value' => [
                         'start' => '2016-01-01 13:00:00',
-                        'end' => '2017-01-01 13:00:00'
+                        'end'   => '2017-01-01 13:00:00'
                     ],
-                    'type' => 'unknown'
+                    'type'  => 'unknown'
                 ]
             );
 

@@ -14,10 +14,6 @@ class EmailThreadManager
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param EmailThreadProvider $emailThreadProvider
-     * @param EntityManager $em
-     */
     public function __construct(EmailThreadProvider $emailThreadProvider, EntityManager $em)
     {
         $this->emailThreadProvider = $emailThreadProvider;
@@ -67,9 +63,6 @@ class EmailThreadManager
 
     /**
      * Updates email references' threadId
-     *
-     * @param EntityManager $entityManager
-     * @param Email $entity
      */
     protected function updateRefs(EntityManager $entityManager, Email $entity)
     {

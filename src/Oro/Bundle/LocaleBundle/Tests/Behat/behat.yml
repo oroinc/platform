@@ -29,8 +29,10 @@ oro_behat_extension:
       OroLocaleBundle:
         contexts:
           - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-          - OroDataGridBundle::GridContext
-          - OroFormBundle::FormContext
-          - OroConfigBundle::FeatureContext
+          - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+          - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+          - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+          - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
+          - Oro\Bundle\ReportBundle\Tests\Behat\Context\FeatureContext
         paths:
           - '@OroLocaleBundle/Tests/Behat/Features'

@@ -5,25 +5,24 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\AttachmentBundle\Api\Processor\AddFileContentFormListener;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AddFileContentFormListenerTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
     /** @var AddFileContentFormListener */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fileManager = $this->createMock(FileManager::class);
 
         $this->processor = new AddFileContentFormListener($this->fileManager);
     }

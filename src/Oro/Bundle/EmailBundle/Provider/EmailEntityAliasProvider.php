@@ -11,9 +11,6 @@ class EmailEntityAliasProvider implements EntityAliasProviderInterface
     /** @var string */
     protected $emailAddressProxyClass;
 
-    /**
-     * @param EmailAddressManager $emailAddressManager
-     */
     public function __construct(EmailAddressManager $emailAddressManager)
     {
         $this->emailAddressProxyClass = $emailAddressManager->getEmailAddressProxyClass();

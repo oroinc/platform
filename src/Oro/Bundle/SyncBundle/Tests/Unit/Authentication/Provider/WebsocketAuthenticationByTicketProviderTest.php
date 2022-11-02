@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Provider;
 
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\QueryString;
-use Guzzle\Http\Url;
 use Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -22,22 +21,16 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
     private const NONCE = 'sampleNonce';
     private const CREATED = '2018-01-01T100:00:00+00:00';
 
-    /**
-     * @var AuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketAuthenticationProvider;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $providerKey;
 
-    /**
-     * @var WebsocketAuthenticationByTicketProvider
-     */
+    /** @var WebsocketAuthenticationByTicketProvider */
     private $websocketAuthenticationByTicketProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ticketAuthenticationProvider = $this->createMock(AuthenticationProviderInterface::class);
         $this->providerKey = 'sample-provider-key';
@@ -49,21 +42,18 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
 
     public function testAuthenticate(): void
     {
-        $connection = $this->mockWebSocketRequest(self::TICKET);
+        $connection = $this->getConnection(self::TICKET);
 
         $usernamePasswordToken = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, $this->providerKey);
         $usernamePasswordToken->setAttributes(['nonce' => self::NONCE, 'created' => self::CREATED]);
 
         $expectedToken = $this->createMock(TokenInterface::class);
-        $this
-            ->ticketAuthenticationProvider
-            ->expects(self::once())
+        $this->ticketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($usernamePasswordToken)
             ->willReturn($expectedToken);
 
-        $expectedToken
-            ->expects(self::never())
+        $expectedToken->expects(self::never())
             ->method('setUser');
 
         $actualToken = $this->websocketAuthenticationByTicketProvider->authenticate($connection);
@@ -73,21 +63,18 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
 
     public function testAuthenticateAnonymous(): void
     {
-        $connection = $this->mockWebSocketRequest(self::TICKET);
+        $connection = $this->getConnection(self::TICKET);
 
         $usernamePasswordToken = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, $this->providerKey);
         $usernamePasswordToken->setAttributes(['nonce' => self::NONCE, 'created' => self::CREATED]);
 
         $expectedToken = $this->createMock(AnonymousTicketToken::class);
-        $this
-            ->ticketAuthenticationProvider
-            ->expects(self::once())
+        $this->ticketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($usernamePasswordToken)
             ->willReturn($expectedToken);
 
-        $expectedToken
-            ->expects(self::once())
+        $expectedToken->expects(self::once())
             ->method('setUser')
             ->with('anonymous-'.self::WAMP_SESSION_ID);
 
@@ -98,12 +85,10 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
 
     /**
      * @dataProvider authenticateWithInvalidTicketDataProvider
-     *
-     * @param string|null $ticket
      */
-    public function testAuthenticateWithInvalidTicket($ticket): void
+    public function testAuthenticateWithInvalidTicket(?string $ticket): void
     {
-        $connection = $this->mockWebSocketRequest($ticket);
+        $connection = $this->getConnection($ticket);
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Authentication ticket has invalid format');
@@ -111,9 +96,6 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
         $this->websocketAuthenticationByTicketProvider->authenticate($connection);
     }
 
-    /**
-     * @return array
-     */
     public function authenticateWithInvalidTicketDataProvider(): array
     {
         return [
@@ -131,7 +113,6 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
 
     public function testAuthenticateWithoutWebSocketRequest(): void
     {
-        /** @var ConnectionInterface $connection */
         $connection = $this->createMock(ConnectionInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -140,35 +121,20 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
         $this->websocketAuthenticationByTicketProvider->authenticate($connection);
     }
 
-    /**
-     * @param string|null $ticket
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConnectionInterface
-     */
-    private function mockWebSocketRequest(?string $ticket)
+    private function getConnection(?string $ticket): ConnectionInterface
     {
-        $query = $this->createMock(QueryString::class);
-        $query
-            ->expects(self::once())
-            ->method('get')
-            ->with('ticket')
-            ->willReturn($ticket);
-
-        $url = $this->createMock(Url::class);
-        $url
-            ->expects(self::once())
+        $uri = $this->createMock(UriInterface::class);
+        $uri->expects(self::once())
             ->method('getQuery')
-            ->willReturn($query);
+            ->willReturn('ticket=' . $ticket);
 
         $request = $this->createMock(RequestInterface::class);
-        $request
-            ->expects(self::once())
-            ->method('getUrl')
-            ->with(true)
-            ->willReturn($url);
+        $request->expects(self::once())
+            ->method('getUri')
+            ->willReturn($uri);
 
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WebSocket = (object) ['request' => $request];
+        $connection->httpRequest = $request;
         $connection->WAMP = (object) ['sessionId' => self::WAMP_SESSION_ID];
 
         return $connection;

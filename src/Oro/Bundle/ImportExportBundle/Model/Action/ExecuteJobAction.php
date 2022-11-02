@@ -38,10 +38,6 @@ class ExecuteJobAction extends AbstractAction
     /** @var JobExecutor */
     protected $jobExecutor;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param JobExecutor $jobExecutor
-     */
     public function __construct(ContextAccessor $contextAccessor, JobExecutor $jobExecutor)
     {
         parent::__construct($contextAccessor);

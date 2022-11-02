@@ -17,12 +17,10 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var AttributeFamilyType
-     */
-    protected $type;
+    /** @var AttributeFamilyType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new AttributeFamilyType($this->getTranslator());
         parent::setUp();
@@ -58,11 +56,11 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
      */
     public function getExtensions()
     {
-        $attributeManagerMock = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManagerMock = $this->createMock(AttributeManager::class);
 
-        $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeManagerMock->expects($this->any())
+            ->method('getActiveAttributesByClass')
+            ->willReturn([]);
 
         return [
             new PreloadedExtension(
@@ -70,7 +68,10 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
                     AttributeFamilyType::class => $this->type,
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
                     ImageType::class => new ImageTypeStub(),
-                    AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock),
+                    AttributeMultiSelectType::class => new AttributeMultiSelectType(
+                        $attributeManagerMock,
+                        $this->getTranslator()
+                    ),
                 ],
                 [
                     FormType::class => [

@@ -2,78 +2,60 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Disables all optional listeners (except list of required listeners) before loading data fixtures and enables them
- * again after loading data completed. It will increase performance of data fixtures, because many listeners don't
- * required during data loading (like data audit listener).
+ * - Disables all optional listeners (except required listeners),
+ * - loads data fixtures,
+ * - and enables listeners back after completion.
+ * It increases the performance of data fixtures load because many listeners
+ * are not required during data loading (like data audit listener)
  */
 class DoctrineIsolator implements IsolatorInterface
 {
-    /**
-     * @var KernelInterface
-     */
+    /** @var KernelInterface */
     protected $kernel;
 
-    /**
-     * @var FixtureLoader
-     */
+    /** @var FixtureLoader */
     protected $fixtureLoader;
 
-    /**
-     * @var ReferenceRepositoryInitializerInterface[]
-     */
+    /** @var ReferenceRepositoryInitializerInterface[] */
     protected $initializers = [];
 
-    /**
-     * @var OroAliceLoader
-     */
+    /** @var AliceFixtureLoader */
     protected $aliceLoader;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $requiredListeners = [];
 
-    /**
-     * @param KernelInterface $kernel
-     * @param FixtureLoader $fixtureLoader
-     * @param OroAliceLoader $aliceLoader
-     */
     public function __construct(
         KernelInterface $kernel,
         FixtureLoader $fixtureLoader,
-        OroAliceLoader $aliceLoader
+        AliceFixtureLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
         $this->fixtureLoader = $fixtureLoader;
         $this->aliceLoader = $aliceLoader;
     }
 
-    /**
-     * @param ReferenceRepositoryInitializerInterface $initializer
-     */
     public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
     {
         $this->initializers[] = $initializer;
     }
 
-    /**
-     * @param array $requiredListeners
-     */
     public function setRequiredListeners(array $requiredListeners)
     {
         $this->requiredListeners = $requiredListeners;
@@ -82,29 +64,35 @@ class DoctrineIsolator implements IsolatorInterface
     public function initReferences()
     {
         $doctrine = $this->kernel->getContainer()->get('doctrine');
-        $this->aliceLoader->setDoctrine($doctrine);
 
         $referenceRepository = $this->aliceLoader->getReferenceRepository();
         $referenceRepository->clear();
 
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $doctrine->getManager();
         $restrictListener = new RestrictFlushInitializerListener();
         $em->getEventManager()->addEventListener([Events::preFlush], $restrictListener);
 
         foreach ($this->initializers as $initializer) {
+            if ($initializer instanceof ContainerAwareInterface) {
+                $initializer->setContainer($this->kernel->getContainer());
+            }
             $initializer->init($doctrine, $referenceRepository);
         }
 
         $em->getEventManager()->removeEventListener([Events::preFlush], $restrictListener);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function start(BeforeStartTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $manager = $this->kernel->getContainer()->get('oro_platform.optional_listeners.manager');
@@ -131,77 +119,78 @@ class DoctrineIsolator implements IsolatorInterface
         }
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
         $this->kernel->getContainer()->get('doctrine')->resetManager();
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function restoreState(RestoreStateEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function isOutdatedState()
     {
         return false;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'Doctrine';
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getTag()
     {
         return 'doctrine';
     }
 
-    /**
-     * @param array $tags
-     * @return array
-     */
-    public function getFixtureFiles(array $tags)
+    public function getFixtureFiles(array $tags): array
     {
         if (!$tags) {
             return [];
         }
 
-        $fixturesFileNames = array_filter(
-            array_map(
-                function ($tag) {
-                    if (strpos($tag, 'fixture-') === 0) {
-                        return substr($tag, 8);
-                    }
-
-                    return null;
-                },
-                $tags
-            )
-        );
-
-        return $fixturesFileNames;
+        return array_filter(array_map(
+            function ($tag) {
+                return str_starts_with($tag, 'fixture-')
+                    ? substr($tag, 8)
+                    : null;
+            },
+            $tags
+        ));
     }
 
-    /**
-     * @param BeforeIsolatedTestEvent $event
-     */
-    private function loadFixtures(BeforeIsolatedTestEvent $event)
+    private function loadFixtures(BeforeIsolatedTestEvent $event): void
     {
         $fixtureFiles = $this->getFixtureFiles($event->getTags());
 

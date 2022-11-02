@@ -6,7 +6,10 @@
         {%- if label is empty -%}
             {% set label = id|humanize %}
         {%- endif -%}
-        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}</label>
+        {%- if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}{% if required %}<em aria-hidden="true">*</em>{% endif %}</label>
     {%- endif %}
 {%- endblock %}
 
@@ -24,22 +27,26 @@
 {%- endblock %}
 
 {% block block_attributes_base -%}
-    {%- if attr.class is defined -%}
-        {% set attr = attr|merge({
-        class: attr.class|replace({'{{ class_prefix }}': class_prefix})
-        }) %}
-    {%- endif -%}
     {%- if hidden -%}
         {% set attr = attr|merge({
             class: attr.class|default('') ~ ' hidden'
         }) %}
     {%- endif -%}
+    {%- if attr.class is defined -%}
+        {% set attr = attr|merge({
+            class: attr.class|replace({'{{ class_prefix }}': class_prefix})
+        }) %}
+        {% set attr = attr|merge({
+            class: attr.class|split(' ')|array_unique|join(' ')
+        }) %}
+    {%- endif -%}
     {% set attributesThatContainsUri = ['src', 'href', 'action', 'cite', 'data', 'poster'] %}
+    {% set attributesThatNeedToTranslate = ['title', 'aria-label'] %}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
             {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
-        {%- if attrname is same as('title') -%}
+        {%- if attrname in attributesThatNeedToTranslate -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain)|e('html_attr') }}"
         {% elseif attrname in attributesThatContainsUri %}
             {{- ' ' ~ attrname }}="{{ attrvalue|e('html')|replace({'&amp;': '&'})|raw }}"
@@ -91,18 +98,20 @@
         }) %}
     {% endif %}
 
-    {% if type == 'password' %}
+    {% if type == 'password' and attr.autocomplete is not defined %}
         {% set attr = attr|merge({
             autocomplete: 'off'
         }) %}
     {% endif %}
 
-    <input{{ block('block_attributes') }}/>
+    <input{{ block('block_attributes') }}>
 {%- endblock %}
 
 {% block container_widget -%}
-    {% for child in block if child.vars.visible -%}
-        {{ block_widget(child) }}
+    {% for child in block -%}
+        {% if child.vars.visible %}
+            {{ block_widget(child) }}
+        {% endif %}
     {%- endfor %}
 {%- endblock %}
 
@@ -120,24 +129,30 @@
 {% endblock %}
 
 {% block title_widget -%}
-    {% spaceless %}
+    {% apply spaceless %}
         <title>{{ value|block_text(translation_domain) }}</title>
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block page_title_widget -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set value = value|block_text(translation_domain) %}
         {% if value|length %}
             {{ value }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block meta_widget %}
     {% if charset is defined %}
         {% set attr = attr|merge({
             charset: charset
+        }) %}
+    {% endif %}
+
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
         }) %}
     {% endif %}
 
@@ -153,15 +168,9 @@
         }) %}
     {% endif %}
 
-    {% if name is defined %}
-        {% set attr = attr|merge({
-            name: name
-        }) %}
-    {% endif %}
-
-    {% spaceless %}
-        <meta{{ block('block_attributes') }}/>
-    {% endspaceless %}
+    {% apply spaceless %}
+        <meta{{ block('block_attributes') }}>
+    {% endapply %}
 {% endblock %}
 
 {% block script_widget %}
@@ -193,7 +202,7 @@
         }) %}
     {% endif %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         {%- if attr.src is defined and attr.src is not empty -%}
             <script{{ block('block_attributes') }}></script>
         {% else %}
@@ -201,23 +210,25 @@
                 {{ content|raw }}
             </script>
         {%- endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block style_widget %}
-    {% set attr = attr|merge({
-        type: type,
-    }) %}
-
-    {% if src is defined %}
+    {% if type is defined %}
         {% set attr = attr|merge({
-            href: src
+            type: type,
         }) %}
     {% endif %}
 
     {% if media is defined %}
         {% set attr = attr|merge({
             media: media
+        }) %}
+    {% endif %}
+
+    {% if disabled is defined %}
+        {% set attr = attr|merge({
+            disabled: 'disabled'
         }) %}
     {% endif %}
 
@@ -233,15 +244,16 @@
         }) %}
     {% endif %}
 
-    {% spaceless %}
-        {%- if attr.href is defined and attr.href is not empty -%}
-            <link rel="stylesheet"{{ block('block_attributes') }}/>
+    {% apply spaceless %}
+        {%- if src is defined and src is not empty -%}
+            {% import '@OroAsset/Asset.html.twig' as Asset %}
+            {{ Asset.css(src, block('block_attributes')) }}
         {% else %}
             <style{{ block('block_attributes') }}>
                 {{ content|raw }}
             </style>
         {%- endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block body_widget %}
@@ -257,10 +269,12 @@
             id: form.vars.id
         }) %}
     {% endif %}
-    {%- for attrname, attrvalue in attr if attrvalue is iterable -%}
-        {% set attr = attr|merge({
-            (attrname): attrvalue|json_encode
-        }) %}
+    {%- for attrname, attrvalue in attr -%}
+        {%- if attrvalue is iterable -%}
+            {% set attr = attr|merge({
+                (attrname): attrvalue|json_encode
+            }) %}
+        {%- endif -%}
     {%- endfor -%}
 
     {% set options = {attr: attr} %}
@@ -282,12 +296,15 @@
 
     {{ form_start(form, options) }}
     {%- if form_method is defined -%}
-        <input type="hidden" name="_method" value="{{ method }}" />
+        <input type="hidden" name="_method" value="{{ method }}">
     {%- endif -%}
 {% endblock %}
 
 {% block form_fields_widget %}
     {{ form_widget(form) }}
+    {% if render_rest %}
+        {{ form_rest(form) }}
+    {% endif %}
 {% endblock %}
 
 {% block form_end_widget %}
@@ -322,12 +339,12 @@
 {%- endblock %}
 
 {% block link_widget -%}
-    {% spaceless %}
+    {% apply spaceless %}
         <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
             {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
             {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
         </a>
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block button_widget -%}
@@ -339,25 +356,24 @@
 {%- endblock %}
 
 {% block button_widget_input -%}
-    {% spaceless %}
+    {% apply spaceless %}
         <input{{ block('block_attributes') }}
             type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
             {%- if name is defined %} name="{{ name }}"{% endif %}
-            {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
-    {% endspaceless %}
+            {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}>
+    {% endapply %}
 {%- endblock %}
 
 {% block button_widget_button -%}
-    {% spaceless %}
+    {% apply spaceless %}
         <button{{ block('block_attributes') }}
                 type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
-            {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
             {%- if name is defined %} name="{{ name }}"{% endif %}
             {%- if value is defined %} value="{{ value }}"{% endif %}>
             {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
             {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
         </button>
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block external_resource_widget %}
@@ -378,21 +394,23 @@
         }) %}
     {% endif %}
 
-    <link{{ block('block_attributes') }}/>
+    <link{{ block('block_attributes') }}>
 {% endblock %}
 
 {% block list_widget -%}
-    {% spaceless %}
+    {% apply spaceless %}
         <ul{{ block('block_attributes') }}>
-        {% for child in block if child.vars.visible -%}
-            {% if child.vars.own_template is defined and child.vars.own_template -%}
-                {{ block_widget(child) }}
-            {%- else %}
-                <li>{{ block_widget(child) }}</li>
-            {%- endif %}
+        {% for child in block -%}
+            {% if child.vars.visible %}
+                {% if child.vars.own_template is defined and child.vars.own_template -%}
+                    {{ block_widget(child) }}
+                {%- else %}
+                    <li>{{ block_widget(child) }}</li>
+                {%- endif %}
+            {% endif %}
         {%- endfor %}
         </ul>
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block ordered_list_widget -%}
@@ -408,17 +426,19 @@
         }) %}
     {% endif %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         <ol{{ block('block_attributes') }}>
-        {% for child in block if child.vars.visible -%}
-            {% if child.vars.own_template is defined and child.vars.own_template -%}
-                {{ block_widget(child) }}
-            {%- else %}
-                <li>{{ block_widget(child) }}</li>
-            {%- endif %}
+        {% for child in block -%}
+            {% if child.vars.visible %}
+                {% if child.vars.own_template is defined and child.vars.own_template -%}
+                    {{ block_widget(child) }}
+                {%- else %}
+                    <li>{{ block_widget(child) }}</li>
+                {%- endif %}
+            {% endif %}
         {%- endfor %}
         </ol>
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock %}
 
 {% block list_item_widget -%}

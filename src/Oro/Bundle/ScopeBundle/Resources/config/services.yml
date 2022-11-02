@@ -1,33 +1,42 @@
-parameters:
-    oro_scope.entity.scope.class: Oro\Bundle\ScopeBundle\Entity\Scope
 services:
-    oro_scope.entity_storage:
-        class: Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage
-        public: false
-        arguments:
-            - '@doctrine'
+    oro_scope.new_scope_collection:
+        class: Oro\Bundle\ScopeBundle\Manager\ScopeCollection
 
     oro_scope.context_request_helper:
         class: 'Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper'
+        public: true
+
+    Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper:
+        alias: oro_scope.context_request_helper
 
     oro_scope.scope_manager:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeManager
+        public: true
         arguments:
-            - '@oro_scope.entity_storage'
-            - '@oro_entity.entity_field_provider.link'
+            - [] # providers. They are set by Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass
+            - ~ # service locator. It is set by Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass
+            - '@doctrine'
+            - '@oro_scope.scope_data_accessor'
+            - '@oro_scope.new_scope_collection'
+            - '@property_accessor'
 
-    oro_scope.scope_repository.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_scope_repository' ] ]
+    Oro\Bundle\ScopeBundle\Manager\ScopeManager:
+        alias: oro_scope.scope_manager
 
-    oro_scope.repository.country:
-        class: Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository
-        parent: oro_entity.abstract_repository
+    oro_scope.scope_data_accessor:
+        class: Oro\Bundle\ScopeBundle\Manager\ScopeDataAccessor
         arguments:
-            - '%oro_scope.entity.scope.class%'
-        calls:
-            - [ setScopeRepositoryCache, [ '@oro_scope.scope_repository.cache' ] ]
+            - '@oro_entity.doctrine_helper'
+            - '@oro_scope.scope_cache'
+            - '@oro_scope.scope_cache_key_builder'
+
+    oro_scope.scope_cache_key_builder:
+        class: Oro\Bundle\ScopeBundle\Manager\ScopeCacheKeyBuilder
+
+    oro_scope.scope_cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_scope' }
 
     oro_scope.migration.extension.scope:
         class: 'Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtension'
@@ -37,18 +46,23 @@ services:
     oro_scope.event_listener.doctrine_event_listener:
         class: Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener
         arguments:
-            - '@oro_scope.entity_storage'
-            - '@oro_scope.scope_repository.cache'
+            - '@oro_scope.new_scope_collection'
+            - '@oro_scope.scope_cache'
         tags:
             - { name: doctrine.event_listener, event: preFlush }
+            - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 
     oro_scope.context_normalizer:
         class: Oro\Bundle\ScopeBundle\Manager\ContextNormalizer
+        public: true
         arguments:
             - '@oro_scope.scope_manager'
             - '@doctrine'
+
+    Oro\Bundle\ScopeBundle\Manager\ContextNormalizer:
+        alias: oro_scope.context_normalizer
 
     oro_scope.twig.extension.scope:
         class: Oro\Bundle\ScopeBundle\Twig\ScopeExtension
@@ -57,3 +71,23 @@ services:
             - '@property_accessor'
         tags:
             - { name: twig.extension }
+
+    oro_scope.migration.post_up.listener:
+        class: Oro\Bundle\ScopeBundle\EventListener\PostUpMigrationListener
+        arguments:
+            - '@oro_scope.migration.add_comment_to_row_hash_manager'
+            - '@oro_distribution.handler.application_status'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -260 }
+
+    oro_scope.event_listener.row_hash_column_metadata_listener:
+        class: Oro\Bundle\ScopeBundle\EventListener\RowHashCommentMetadataListener
+        arguments:
+            - '@oro_scope.migration.add_comment_to_row_hash_manager'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }
+
+    oro_scope.migration.add_comment_to_row_hash_manager:
+        class: Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager
+        arguments:
+            - '@doctrine'

@@ -4,40 +4,28 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\MergeModesListener;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeModesListener
-     */
-    protected $listener;
+    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityMetadata;
+    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldMetadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldMetadata;
+    /** @var MergeModesListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityMetadata = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityMetadata = $this->createMock(EntityMetadata::class);
+        $this->fieldMetadata = $this->createMock(FieldMetadata::class);
 
-        $this->fieldMetadata = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityMetadata
-            ->expects($this->any())
+        $this->entityMetadata->expects($this->any())
             ->method('getFieldsMetadata')
-            ->will($this->returnValue([$this->fieldMetadata]));
+            ->willReturn([$this->fieldMetadata]);
 
         $this->listener = new MergeModesListener();
     }
@@ -46,11 +34,9 @@ class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = new EntityMetadataEvent($this->entityMetadata);
 
-        $this->fieldMetadata
-            ->expects($this->atLeastOnce())
+        $this->fieldMetadata->expects($this->atLeastOnce())
             ->method('addMergeMode')
-            ->will($this->returnValue([$this->fieldMetadata]));
-
+            ->willReturn([$this->fieldMetadata]);
 
         $this->listener->onCreateMetadata($event);
     }
@@ -59,15 +45,13 @@ class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = new EntityMetadataEvent($this->entityMetadata);
 
-        $this->fieldMetadata
-            ->expects($this->atLeastOnce())
+        $this->fieldMetadata->expects($this->atLeastOnce())
             ->method('addMergeMode')
-            ->will($this->returnValue([$this->fieldMetadata]));
+            ->willReturn([$this->fieldMetadata]);
 
-        $this->fieldMetadata
-            ->expects($this->atLeastOnce())
+        $this->fieldMetadata->expects($this->atLeastOnce())
             ->method('isCollection')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->listener->onCreateMetadata($event);
     }

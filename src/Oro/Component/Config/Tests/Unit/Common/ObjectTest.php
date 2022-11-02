@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
+namespace Oro\Component\Config\Tests\Unit\Common;
 
 use Oro\Component\Config\Common\ConfigObject;
 

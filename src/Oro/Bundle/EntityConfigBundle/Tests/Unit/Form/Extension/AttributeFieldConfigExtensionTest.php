@@ -15,23 +15,17 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class AttributeFieldConfigExtensionTest extends TypeTestCase
 {
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeConfigProvider;
 
-    /**
-     * @var AttributeFieldConfigExtension
-     */
-    protected $extension;
+    /** @var AttributeFieldConfigExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->extension = new AttributeFieldConfigExtension($this->attributeConfigProvider);
     }
@@ -45,16 +39,15 @@ class AttributeFieldConfigExtensionTest extends TypeTestCase
         $this->extension->buildForm($this->builder, []);
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        $this->assertEquals(FieldType::class, $this->extension->getExtendedType());
+        $this->assertEquals([FieldType::class], AttributeFieldConfigExtension::getExtendedTypes());
     }
 
     public function testOnPostSetData()
     {
         $fieldConfigModel = $this->getFieldConfigModel();
-        $config = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $config = $this->createMock(ConfigInterface::class);
         $config->expects($this->once())
             ->method('is')
             ->with('has_attributes')
@@ -64,8 +57,7 @@ class AttributeFieldConfigExtensionTest extends TypeTestCase
             ->with($fieldConfigModel->getEntity()->getClassName())
             ->willReturn($config);
 
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('remove')
             ->with('is_serialized');
@@ -73,10 +65,7 @@ class AttributeFieldConfigExtensionTest extends TypeTestCase
         $this->extension->onPostSetData($event);
     }
 
-    /**
-     * @return FieldConfigModel
-     */
-    protected function getFieldConfigModel()
+    private function getFieldConfigModel(): FieldConfigModel
     {
         $entityConfigModel = new EntityConfigModel('class');
         $fieldConfigModel = new FieldConfigModel('test', 'string');

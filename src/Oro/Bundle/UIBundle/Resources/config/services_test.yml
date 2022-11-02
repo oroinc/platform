@@ -1,0 +1,8 @@
+services:
+    Oro\Bundle\UIBundle\Tests\Functional\Stub\PlaceholderConfigurationProviderDecorator:
+        decorates: 'oro_ui.placeholder.configuration.provider'
+        arguments: ['@.inner']
+
+    test.oro_ui.placeholder.configuration.provider:
+        alias: 'oro_ui.placeholder.configuration.provider'
+        public: true

@@ -3,19 +3,18 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commandExecutor;
+    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
+    private $commandExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->commandExecutor = $this->createMock(CommandExecutor::class);
     }
 
     public function testGetDescription()
@@ -31,25 +30,16 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $logger = new ArrayLogger();
 
-        $this->commandExecutor
-            ->expects($this->once())
+        $this->commandExecutor->expects($this->once())
             ->method('runCommand')
-            ->with(
-                'oro:entity-config:update',
-                [],
-                $logger
-            )
-            ->will(
-                $this->returnCallback(
-                    function ($command, $params, $logger) {
-                        if ($logger instanceof LoggerInterface) {
-                            $logger->info('ok');
-                        }
+            ->with('oro:entity-config:update', [], $logger)
+            ->willReturnCallback(function ($command, $params, $logger) {
+                if ($logger instanceof LoggerInterface) {
+                    $logger->info('ok');
+                }
 
-                        return 0;
-                    }
-                )
-            );
+                return 0;
+            });
 
         $migrationQuery = new UpdateEntityConfigMigrationQuery($this->commandExecutor);
 

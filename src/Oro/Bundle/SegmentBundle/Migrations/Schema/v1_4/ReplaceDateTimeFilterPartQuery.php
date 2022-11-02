@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_4;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +23,7 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
             $definition = $segment['definition'];
             $needUpdate = false;
             if ($definition) {
-                $definition = $this->connection->convertToPHPValue($definition, Type::JSON_ARRAY);
+                $definition = $this->connection->convertToPHPValue($definition, Types::JSON_ARRAY);
                 if (!empty($definition['filters'])) {
                     $updated = $this->processFilters($definition['filters'], $needUpdate);
                     if ($needUpdate) {
@@ -42,8 +42,8 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
                     'definition' => $definitionToUpdate
                 ],
                 [
-                    'id' => Type::INTEGER,
-                    'definition' => Type::JSON_ARRAY
+                    'id' => Types::INTEGER,
+                    'definition' => Types::JSON_ARRAY
                 ]
             );
         }

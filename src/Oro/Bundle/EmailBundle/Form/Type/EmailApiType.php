@@ -169,8 +169,6 @@ class EmailApiType extends AbstractType
 
     /**
      * POST_SET_DATA event handler
-     *
-     * @param FormEvent $event
      */
     public function postSetData(FormEvent $event)
     {
@@ -213,8 +211,6 @@ class EmailApiType extends AbstractType
 
     /**
      * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {

@@ -3,20 +3,25 @@
 namespace Oro\Bundle\ReminderBundle\Twig;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class ReminderExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve reminders data for the current user:
+ *   - oro_reminder_get_requested_reminders_data
+ */
+class ReminderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -27,7 +32,7 @@ class ReminderExtension extends \Twig_Extension
      */
     protected function getSecurityTokenStorage()
     {
-        return $this->container->get('security.token_storage');
+        return $this->container->get(TokenStorageInterface::class);
     }
 
     /**
@@ -43,7 +48,7 @@ class ReminderExtension extends \Twig_Extension
      */
     protected function getEntityManager()
     {
-        return $this->container->get('doctrine')->getManagerForClass(Reminder::class);
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass(Reminder::class);
     }
 
     /**
@@ -52,7 +57,7 @@ class ReminderExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_reminder_get_requested_reminders_data',
                 [$this, 'getRequestedRemindersData']
             )
@@ -62,7 +67,7 @@ class ReminderExtension extends \Twig_Extension
     /**
      * Get requested reminders
      *
-     * @return string
+     * @return array
      */
     public function getRequestedRemindersData()
     {
@@ -87,8 +92,12 @@ class ReminderExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_reminder.subscriber';
+        return [
+            'oro_reminder.web_socket.message_params_provider' => MessageParamsProvider::class,
+            TokenStorageInterface::class,
+            ManagerRegistry::class,
+        ];
     }
 }

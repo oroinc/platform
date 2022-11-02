@@ -11,7 +11,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
 
 /**
- * Segment
+ * Main segment entity.
  *
  * @ORM\Table(name="oro_segment")
  * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
@@ -30,9 +30,6 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true
@@ -55,9 +52,17 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=255, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     protected $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_lowercase", type="string", unique=true, length=255, nullable=false)
+     * @ConfigField(mode="hidden")
+     */
+    protected $nameLowercase;
 
     /**
      * @var string
@@ -143,10 +148,18 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
      */
     protected $recordsLimit;
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->lastRun = null;
+        $this->createdAt = null;
+        $this->updatedAt = null;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getGridPrefix()
+    public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
     }
@@ -180,8 +193,19 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function setName($name)
     {
         $this->name = $name;
+        $this->nameLowercase = $this->name
+            ? mb_strtolower($this->name)
+            : $this->name;
 
         return $this;
+    }
+
+    /**
+     * Get name in lowercase
+     */
+    public function getNameLowercase(): ?string
+    {
+        return $this->nameLowercase;
     }
 
     /**
@@ -375,7 +399,8 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
      */
     public function beforeSave()
     {
-        $this->createdAt = $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
     }
 
     /**

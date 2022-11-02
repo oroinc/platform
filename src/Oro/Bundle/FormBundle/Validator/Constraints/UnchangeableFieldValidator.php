@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
-use Doctrine\ORM\Query;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * The validator for UnchangeableField constraint.
+ */
 class UnchangeableFieldValidator extends ConstraintValidator
 {
-    const OBJECT_ALIAS = 'o';
-
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -28,100 +26,103 @@ class UnchangeableFieldValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $associations = $this->getManager()->getClassMetadata($this->context->getClassName())->getAssociationMappings();
+        $entityClass = $this->context->getClassName();
+        $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
+        $metadata = $em->getClassMetadata($entityClass);
 
-        $current = $this->findExistingObject($associations);
-
-        if ($current === null) {
-            return;
+        if ($metadata->hasAssociation($this->context->getPropertyName())) {
+            if ((null === $value || is_object($value)) && $this->isAssociationValueChanged($value, $em, $metadata)) {
+                $this->context->addViolation($constraint->message);
+            }
+        } elseif ($this->isFieldValueChanged($value, $em)) {
+            $this->context->addViolation($constraint->message);
         }
-
-        if (is_object($value) && array_key_exists($this->context->getPropertyName(), $associations)) {
-            $value = $this->getIdentifierFromObject($value, $associations);
-            $current = (string)$current; //Just make sure that keys are the same type
-        }
-
-        if ($current === $value) {
-            return;
-        }
-
-        $this->context->addViolation($constraint->message);
     }
 
     /**
-     * @return array|null
+     * @param mixed                  $value
+     * @param EntityManagerInterface $em
+     *
+     * @return bool
      */
-    private function findExistingObject(array $associations)
+    private function isFieldValueChanged($value, EntityManagerInterface $em): bool
     {
-        $identifier = $this->getIdentifier($this->context->getClassName(), $this->context->getObject());
+        $existingValue = $this->getExistingValue($em);
 
-        if (empty($identifier)) {
-            return null;
-        }
-
-        $qb = $this->getManager()->getRepository($this->context->getClassName())
-            ->createQueryBuilder(self::OBJECT_ALIAS);
-
-        if (array_key_exists($this->context->getPropertyName(), $associations)) {
-            $qb->select(sprintf('IDENTITY(%s.%s)', self::OBJECT_ALIAS, $this->context->getPropertyName()));
-        } else {
-            $qb->select(sprintf('%s.%s', self::OBJECT_ALIAS, $this->context->getPropertyName()));
-        }
-
-
-        foreach ($identifier as $name => $identifierValue) {
-            QueryBuilderUtil::checkIdentifier($name);
-            $qb->andWhere(sprintf('%s.%s = :%s', self::OBJECT_ALIAS, $name, $name));
-        }
-
-        $qb->setParameters($identifier);
-
-        return $qb->getQuery()->getSingleScalarResult();
+        return
+            null !== $existingValue
+            && $existingValue !== $value;
     }
 
     /**
-     * @param string $className
-     * @param object $object
-     * @return array
+     * @param object|null            $value
+     * @param EntityManagerInterface $em
+     * @param ClassMetadata          $metadata
+     *
+     * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function getIdentifier($className, $object)
+    private function isAssociationValueChanged($value, EntityManagerInterface $em, ClassMetadata $metadata): bool
     {
-        $manager = $this->doctrineHelper->getEntityManagerForClass($className);
-
-        return $manager->getClassMetadata($className)
-            ->getIdentifierValues($object);
-    }
-
-    /**
-     * @param object $value
-     * @param array $associations
-     * @return string
-     */
-    private function getIdentifierFromObject($value, $associations): string
-    {
-        $identifier = $this->getIdentifier(
-            $associations[$this->context->getPropertyName()]['targetEntity'],
-            $value
-        );
-
-        if (count($identifier) > 1) {
-            throw new \LogicException(
-                sprintf(
-                    '%s is not allowed to be used in relational fields, where relation has identifier '
-                    . 'created from more than one property.',
-                    self::class
-                )
-            );
+        $targetEntityClass = $metadata->getAssociationTargetClass($this->context->getPropertyName());
+        if (is_object($value) && !is_a($value, $targetEntityClass)) {
+            return false;
         }
 
-        return (string)array_shift($identifier);
+        $targetMetadata = $em->getClassMetadata($targetEntityClass);
+        if ($targetMetadata->isIdentifierComposite) {
+            throw new \LogicException(sprintf(
+                '%s is not allowed to be used for %s::%s'
+                . ' because the target entity %s has composite identifier.',
+                self::class,
+                $this->context->getClassName(),
+                $this->context->getPropertyName(),
+                $targetEntityClass
+            ));
+        }
+
+        $existingValue = $this->getExistingValue($em);
+        if (null === $existingValue || !is_object($existingValue) || !is_a($existingValue, $targetEntityClass)) {
+            return false;
+        }
+
+        $existingValueId = $this->getSingleIdentifierValue($existingValue, $targetMetadata);
+        if (null === $value) {
+            return null !== $existingValueId;
+        }
+        if (null === $existingValueId) {
+            return false;
+        }
+
+        $valueId = $this->getSingleIdentifierValue($value, $targetMetadata);
+
+        return
+            null === $valueId
+            || (string)$valueId !== (string)$existingValueId;
     }
 
     /**
-     * @return \Doctrine\ORM\EntityManager|null
+     * @param EntityManagerInterface $em
+     *
+     * @return mixed
      */
-    private function getManager()
+    private function getExistingValue(EntityManagerInterface $em)
     {
-        return $this->doctrineHelper->getEntityManagerForClass($this->context->getClassName());
+        $originalData = $em->getUnitOfWork()->getOriginalEntityData($this->context->getObject());
+
+        return $originalData[$this->context->getPropertyName()] ?? null;
+    }
+
+    /**
+     * @param object        $object
+     * @param ClassMetadata $metadata
+     *
+     * @return mixed
+     */
+    private function getSingleIdentifierValue($object, ClassMetadata $metadata)
+    {
+        $objectId = $metadata->getIdentifierValues($object);
+
+        return !empty($objectId) ? reset($objectId) : null;
     }
 }

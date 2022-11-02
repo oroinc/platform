@@ -1,0 +1,34 @@
+services:
+    oro_maintenance.driver.factory:
+        class: Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory
+        arguments:
+            - '%oro_maintenance.driver%'
+
+    oro_maintenance.maintenance_listener:
+        class: Oro\Bundle\MaintenanceBundle\EventListener\MaintenanceListener
+        arguments:
+            - '@oro_maintenance.driver.factory'
+            - '@router_listener'
+            - '%oro_maintenance.authorized.path%'
+            - '%oro_maintenance.authorized.host%'
+            - '%oro_maintenance.authorized.ips%'
+            - '%oro_maintenance.authorized.query%'
+            - '%oro_maintenance.authorized.cookie%'
+            - '%oro_maintenance.authorized.route%'
+            - '%oro_maintenance.authorized.attributes%'
+            - '%oro_maintenance.response.http_code%'
+            - '%oro_maintenance.response.http_status%'
+            - '%oro_maintenance.response.exception_message%'
+            - '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 512 }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_maintenance.maintenance:
+        class: Oro\Bundle\MaintenanceBundle\Maintenance\Mode
+        arguments:
+            - "@oro_maintenance.driver.factory"
+            - "@event_dispatcher"
+
+    Oro\Bundle\MaintenanceBundle\Maintenance\Mode:
+        alias: oro_maintenance.maintenance

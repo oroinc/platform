@@ -1,5 +1,0 @@
-oro:
-    activity:
-        contexts.tooltip: Context is any record or records that have meaningful relation to an activity. When you add context of a record to the activity, it will be displayed in the Activity list of that record.
-        entity_config:
-            activity.entity.items.activities.tooltip: To be able to add records of this entity as contexts for activities, configure it for search. Otherwise it won't appear in autocomplete results of the context selector.

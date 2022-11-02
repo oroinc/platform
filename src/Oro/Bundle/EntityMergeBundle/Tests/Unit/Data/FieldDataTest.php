@@ -2,35 +2,36 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class FieldDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityData;
+    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityData;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldMetadata;
+    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldMetadata;
 
-    /**
-     * @var FieldData
-     */
-    protected $fieldData;
+    /** @var FieldData */
+    private $fieldData;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityData = $this->createMock(EntityData::class);
+        $this->fieldMetadata = $this->createMock(FieldMetadata::class);
+
         $this->fieldData = new FieldData($this->entityData, $this->fieldMetadata);
+    }
+
+    private function createTestEntity(int $id): \stdClass
+    {
+        $result = new \stdClass();
+        $result->id = $id;
+
+        return $result;
     }
 
     public function testGetMetadata()
@@ -63,15 +64,8 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'test';
         $this->fieldMetadata->expects($this->once())
             ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
         $this->assertEquals($fieldName, $this->fieldData->getFieldName());
-    }
-
-    protected function createTestEntity($id)
-    {
-        $result = new \stdClass();
-        $result->id = $id;
-        return $result;
     }
 }

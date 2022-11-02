@@ -11,8 +11,8 @@ class SpecificationDividerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider divideSuiteProvider
      *
-     * @param int $featureCount
-     * @param int $divider
+     * @param array $array
+     * @param int   $divider
      * @param array $expectedResult
      */
     public function testDivide($array, $divider, array $expectedResult)

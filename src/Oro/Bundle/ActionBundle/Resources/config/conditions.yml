@@ -1,8 +1,16 @@
 services:
+    oro_action.condition_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # conditions
+        tags:
+            - { name: container.service_locator }
+
     oro_action.expression.extension:
         class: 'Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension'
         arguments:
-            - '@service_container'
+            - '@oro_action.condition_locator'
             - {}
 
     oro_action.expression.context_accessor:
@@ -90,6 +98,8 @@ services:
 
     oro_action.expression.has_property:
         class: Oro\Component\ConfigExpression\Condition\HasProperty
+        arguments:
+            - '@property_accessor'
         tags:
             - { name: oro_action.condition, alias: has_property }
 
@@ -173,16 +183,29 @@ services:
         tags:
             - { name: oro_action.condition, alias: action_available }
 
-    oro_action.condition.route_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
-        arguments:
-            - '@router'
-        tags:
-            - { name: oro_action.condition, alias: 'route_exists' }
-
     oro_action.condition.service_exists:
         class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
         arguments:
             - '@service_container'
         tags:
             - { name: oro_action.condition, alias: 'service_exists' }
+
+    oro_action.condition.contains:
+        class: Oro\Component\ConfigExpression\Condition\Contains
+        tags:
+            - { name: oro_action.condition, alias: contains }
+
+    oro_action.condition.not_contains:
+        class: Oro\Component\ConfigExpression\Condition\NotContains
+        tags:
+            - { name: oro_action.condition, alias: not_contains }
+
+    oro_action.condition.start_with:
+        class: Oro\Component\ConfigExpression\Condition\StartWith
+        tags:
+            - { name: oro_action.condition, alias: start_with }
+
+    oro_action.condition.end_with:
+        class: Oro\Component\ConfigExpression\Condition\EndWith
+        tags:
+            - { name: oro_action.condition, alias: end_with }

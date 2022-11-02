@@ -1,7 +1,7 @@
-{% extends 'OroConfigBundle::configPage.html.twig' %}
+{% extends '@OroConfig/configPage.html.twig' %}
 
-{% import 'OroEmailBundle::macros.html.twig' as emailUI %}
-{% import 'OroConfigBundle::macros.html.twig' as configUI %}
+{% import '@OroEmail/macros.html.twig' as emailUI %}
+{% import '@OroConfig/macros.html.twig' as configUI %}
 
 {% if form.vars.data.id %}
     {% set mailboxTitle = form.vars.data.label %}
@@ -32,11 +32,11 @@
 {% set routeName = 'oro_config_configuration_system' %}
 {% set routeParameters = {} %}
 
-{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
-{% import 'OroConfigBundle::macros.html.twig' as configUI %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroSync/Include/contentTags.html.twig' as syncMacro %}
+{% import '@OroConfig/macros.html.twig' as configUI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig', '@OroLocale/Form/fields.html.twig'] %}
 
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%label%": form.vars.value.label} }) %}
@@ -47,10 +47,12 @@
         { label: 'oro.config.menu.system_configuration.label'|trans },
         { label: 'oro.email.system_configuration.email_configuration'|trans }
     ] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
 {% block content %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set buttons = '' %}
     {% set html = '' %}
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
@@ -66,10 +68,13 @@
             'entity_label': 'oro.email.mailbox.entity_label'|trans
         }) %}
         {% set buttons = buttons ~ UI.buttonSeparator() %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.saveAndStayButton({'route': 'oro_email_mailbox_update', 'params': {'id': '$id'}}) %}
     {% endif %}
 
-    {% set html = html ~ UI.saveAndCloseButton() %}
+    {% set html = html ~ UI.saveAndCloseButton({
+        'route': 'oro_config_configuration_system',
+        'params': {'activeGroup': 'platform', 'activeSubGroup': 'email_configuration'}
+    }) %}
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     {% set options = {
@@ -88,7 +93,7 @@
             {% set mailboxId = form.vars.value.id %}
             <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
                 <div class="auto-response-rule-header">
-                    <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
+                    <h5 class="user-fieldset">{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
                     {{ UI.clientLink({
                         'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
                         'aCss': 'pull-right no-hash btn btn-primary',
@@ -112,7 +117,7 @@
                         },
                     }) }}
                 </div>
-                {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+                {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
                 {{ dataGrid.renderGrid('email-auto-response-rules', {mailbox: mailboxId}) }}
             </fieldset>
         {% endset %}

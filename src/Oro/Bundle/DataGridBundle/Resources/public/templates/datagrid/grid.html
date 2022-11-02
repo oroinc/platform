@@ -3,7 +3,7 @@
     <div class="other-scroll"><div></div></div>
     <div class="grid-scrollable-container">
         <div class="grid-container">
-            <<%= tableTagName %> class="grid grid-main-container"></<%= tableTagName %>>
+            <<%- tableTagName %> class="grid grid-main-container<% if(tableClassName) { %> <%- tableClassName %><% } %>"></<%- tableTagName %>>
         </div>
     </div>
     <div class="no-data"></div>

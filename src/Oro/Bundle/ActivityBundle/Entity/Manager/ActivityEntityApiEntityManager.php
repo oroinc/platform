@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Query;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
@@ -12,10 +11,6 @@ class ActivityEntityApiEntityManager extends ApiEntityManager
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
-     */
     public function __construct(ObjectManager $om, ActivityManager $activityManager)
     {
         parent::__construct(null, $om);

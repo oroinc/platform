@@ -7,10 +7,12 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Extracts descriptions in English for entities and fields from entity configs.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityDescriptionProvider
 {
@@ -54,12 +56,6 @@ class EntityDescriptionProvider
      */
     private $cache = [];
 
-    /**
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param ConfigManager                    $configManager
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param TranslatorInterface              $translator
-     */
     public function __construct(
         EntityClassNameProviderInterface $entityClassNameProvider,
         ConfigManager $configManager,
@@ -74,10 +70,6 @@ class EntityDescriptionProvider
 
     /**
      * Returns the human-readable description in English of the given entity type.
-     *
-     * @param string $entityClass
-     *
-     * @return string|null
      */
     public function getEntityDescription(string $entityClass): ?string
     {
@@ -86,6 +78,9 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassName($entityClass);
+        if (null === $result) {
+            $result = $this->trans(EntityLabelBuilder::getEntityLabelTranslationKey($entityClass));
+        }
         $this->cache[$entityClass][self::DESCRIPTION] = $result;
 
         return $result;
@@ -93,10 +88,6 @@ class EntityDescriptionProvider
 
     /**
      * Returns the human-readable plural description in English of the given entity type.
-     *
-     * @param string $entityClass
-     *
-     * @return string|null
      */
     public function getEntityPluralDescription(string $entityClass): ?string
     {
@@ -105,6 +96,9 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
+        if (null === $result) {
+            $result = $this->trans(EntityLabelBuilder::getEntityPluralLabelTranslationKey($entityClass));
+        }
         $this->cache[$entityClass][self::PLURAL_DESCRIPTION] = $result;
 
         return $result;
@@ -112,10 +106,6 @@ class EntityDescriptionProvider
 
     /**
      * Returns the detailed documentation in English of the given entity type.
-     *
-     * @param string $entityClass
-     *
-     * @return string|null
      */
     public function getEntityDocumentation(string $entityClass): ?string
     {
@@ -131,11 +121,6 @@ class EntityDescriptionProvider
 
     /**
      * Returns the human-readable description in English of the given entity field.
-     *
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return string|null
      */
     public function getFieldDescription(string $entityClass, string $propertyPath): ?string
     {
@@ -144,16 +129,15 @@ class EntityDescriptionProvider
         }
 
         $result = null;
-        if ($this->isManageableEntity($entityClass) && $this->isConfigurableEntity($entityClass)) {
+        if ($this->isManageableEntity($entityClass)) {
             $result = $this->findFieldDescription($entityClass, $propertyPath);
         }
-        if (!$result && false === \strpos($propertyPath, '.')) {
+        if (!$result && !str_contains($propertyPath, '.')) {
             $result = $this->humanizePropertyName($propertyPath);
         }
         if ($result) {
             $result = \strtolower($result);
         }
-
         $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION] = $result;
 
         return $result;
@@ -161,11 +145,6 @@ class EntityDescriptionProvider
 
     /**
      * Returns the detailed documentation in English of the given entity field.
-     *
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return string|null
      */
     public function getFieldDocumentation(string $entityClass, string $propertyPath): ?string
     {
@@ -174,10 +153,9 @@ class EntityDescriptionProvider
         }
 
         $result = null;
-        if ($this->isManageableEntity($entityClass) && $this->isConfigurableEntity($entityClass)) {
+        if ($this->isManageableEntity($entityClass)) {
             $result = $this->findFieldDocumentation($entityClass, $propertyPath);
         }
-
         $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DOCUMENTATION] = $result;
 
         return $result;
@@ -185,83 +163,76 @@ class EntityDescriptionProvider
 
     /**
      * Returns the human-readable description in English of the given association name.
-     *
-     * @param string $associationName
-     *
-     * @return string
      */
     public function humanizeAssociationName(string $associationName): string
     {
         return $this->humanizePropertyName($associationName);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string|null
-     */
     private function findEntityDocumentation(string $entityClass): ?string
     {
-        return $this->transConfigAttribute(
-            self::ATTR_DESCRIPTION,
-            $this->getEntityConfig($entityClass)
-        );
+        $entityConfig = $this->getEntityConfig($entityClass);
+        if (null !== $entityConfig) {
+            return $this->transConfigAttribute(self::ATTR_DESCRIPTION, $entityConfig);
+        }
+
+        return $this->trans(EntityLabelBuilder::getEntityDescriptionTranslationKey($entityClass));
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return string|null
-     */
     private function findFieldDescription(string $entityClass, string $propertyPath): ?string
     {
-        return $this->transConfigAttribute(
-            self::ATTR_LABEL,
-            $this->findFieldConfig($entityClass, $propertyPath)
-        );
+        $fieldInfo = $this->getFieldInfo($entityClass, $propertyPath);
+        if (null === $fieldInfo) {
+            return null;
+        }
+        [$entityClass, $propertyPath] = $fieldInfo;
+
+        $fieldConfig = $this->getFieldConfig($entityClass, $propertyPath);
+        if (null !== $fieldConfig) {
+            return $this->transConfigAttribute(self::ATTR_LABEL, $fieldConfig);
+        }
+
+        return $this->trans(EntityLabelBuilder::getFieldLabelTranslationKey($entityClass, $propertyPath));
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return string|null
-     */
     private function findFieldDocumentation(string $entityClass, string $propertyPath): ?string
     {
-        return $this->transConfigAttribute(
-            self::ATTR_DESCRIPTION,
-            $this->findFieldConfig($entityClass, $propertyPath)
-        );
+        $fieldInfo = $this->getFieldInfo($entityClass, $propertyPath);
+        if (null === $fieldInfo) {
+            return null;
+        }
+        [$entityClass, $propertyPath] = $fieldInfo;
+
+        $fieldConfig = $this->getFieldConfig($entityClass, $propertyPath);
+        if (null !== $fieldConfig) {
+            return $this->transConfigAttribute(self::ATTR_DESCRIPTION, $fieldConfig);
+        }
+
+        return $this->trans(EntityLabelBuilder::getFieldDescriptionTranslationKey($entityClass, $propertyPath));
     }
 
     /**
      * @param string $entityClass
      * @param string $propertyPath
      *
-     * @return ConfigInterface|null
+     * @return array|null [entity class, field name]
      */
-    private function findFieldConfig(string $entityClass, string $propertyPath): ?ConfigInterface
+    private function getFieldInfo(string $entityClass, string $propertyPath): ?array
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
         if (\count($path) === 1) {
-            return $this->getFieldConfig($entityClass, \reset($path));
+            return [$entityClass, reset($path)];
         }
 
         $linkedProperty = array_pop($path);
         $classMetadata = $this->doctrineHelper->findEntityMetadataByPath($entityClass, $path);
+        if (null === $classMetadata) {
+            return null;
+        }
 
-        return null !== $classMetadata
-            ? $this->getFieldConfig($classMetadata->name, $linkedProperty)
-            : null;
+        return [$classMetadata->name, $linkedProperty];
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ConfigInterface|null
-     */
     private function getEntityConfig(string $entityClass): ?ConfigInterface
     {
         return $this->isConfigurableEntity($entityClass)
@@ -269,12 +240,6 @@ class EntityDescriptionProvider
             : null;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return ConfigInterface|null
-     */
     private function getFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
     {
         if (!$this->isConfigurableEntity($entityClass)
@@ -287,25 +252,24 @@ class EntityDescriptionProvider
         return $this->configManager->getFieldConfig(self::SCOPE_ENTITY, $entityClass, $fieldName);
     }
 
-    /**
-     * @param string $propertyPath
-     *
-     * @return string
-     */
     private function humanizePropertyName(string $propertyPath): string
     {
-        return \preg_replace(
-            '/(?<=[^A-Z])([A-Z])/',
-            ' $1',
-            \strtr($propertyPath, ['_' => ' ', '-' => ' '])
+        $result = strtr($propertyPath, ['_' => ' ', '-' => ' ']);
+        $result = ' ' . preg_replace('/(?<=[^A-Z ])([A-Z])/', ' $1', $result);
+        $result = preg_replace_callback(
+            '/([A-Z])([A-Z])([a-z])/',
+            static fn (array $matches) => $matches[1] . ' ' . strtolower($matches[2]) . $matches[3],
+            $result
         );
+        $result = preg_replace_callback(
+            '/ ([A-Z])([^A-Z])/',
+            static fn (array $matches) => ' ' . strtolower($matches[1]) . $matches[2],
+            $result
+        );
+
+        return ltrim($result, ' ');
     }
 
-    /**
-     * @param string $label
-     *
-     * @return string|null
-     */
     private function trans(string $label): ?string
     {
         $translated = $this->translator->trans($label);
@@ -315,18 +279,8 @@ class EntityDescriptionProvider
             : null;
     }
 
-    /**
-     * @param string               $attributeName
-     * @param ConfigInterface|null $config
-     *
-     * @return string|null
-     */
-    private function transConfigAttribute(string $attributeName, ConfigInterface $config = null): ?string
+    private function transConfigAttribute(string $attributeName, ConfigInterface $config): ?string
     {
-        if (null === $config) {
-            return null;
-        }
-
         $label = $config->get($attributeName);
         if (!$label) {
             return null;
@@ -335,11 +289,6 @@ class EntityDescriptionProvider
         return $this->trans($label);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
     private function isManageableEntity(string $entityClass): bool
     {
         if ($this->hasEntityAttribute($entityClass, self::MANAGEABLE)) {
@@ -352,11 +301,6 @@ class EntityDescriptionProvider
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
     private function isConfigurableEntity(string $entityClass): bool
     {
         if ($this->hasEntityAttribute($entityClass, self::CONFIGURABLE)) {
@@ -369,12 +313,6 @@ class EntityDescriptionProvider
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $attributeName
-     *
-     * @return bool
-     */
     private function hasEntityAttribute(string $entityClass, string $attributeName): bool
     {
         return
@@ -382,13 +320,6 @@ class EntityDescriptionProvider
             && \array_key_exists($attributeName, $this->cache[$entityClass]);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $propertyPath
-     * @param string $attributeName
-     *
-     * @return bool
-     */
     private function hasFieldAttribute(string $entityClass, string $propertyPath, string $attributeName): bool
     {
         return

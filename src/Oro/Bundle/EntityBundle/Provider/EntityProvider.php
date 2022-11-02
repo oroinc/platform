@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about entities.
@@ -35,12 +35,6 @@ class EntityProvider
 
     /**
      * Constructor
-     *
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param TranslatorInterface $translator
-     * @param FeatureChecker      $featureChecker
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -58,8 +52,6 @@ class EntityProvider
 
     /**
      * Sets exclusion provider
-     *
-     * @param ExclusionProviderInterface $exclusionProvider
      */
     public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
     {
@@ -214,7 +206,7 @@ class EntityProvider
      *
      * @return bool
      */
-    protected function isIgnoredEntity($className)
+    public function isIgnoredEntity($className)
     {
         return $this->exclusionProvider->isIgnoredEntity($className);
     }
@@ -233,8 +225,8 @@ class EntityProvider
     {
         $result[] = [
             'name'         => $name,
-            'label'        => $translate ? $this->translator->trans($label) : $label,
-            'plural_label' => $translate ? $this->translator->trans($pluralLabel) : $pluralLabel,
+            'label'        => $translate ? $this->translator->trans((string) $label) : $label,
+            'plural_label' => $translate ? $this->translator->trans((string) $pluralLabel) : $pluralLabel,
             'icon'         => $icon
         ];
     }

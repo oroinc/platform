@@ -7,50 +7,38 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverterInterface;
-use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Log\Processor\AddConsumerStateProcessor;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\ExtensionProxy;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConsumerState */
-    private $consumerState;
+    /** Simple test message */
+    private const MESSAGE = ['message' => 'test', 'extra' => []];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProcessorClassProvider */
-    private $messageProcessorClassProvider;
+    private ConsumerState|\PHPUnit\Framework\MockObject\MockObject $consumerState;
 
-    /** @var AddConsumerStateProcessor */
-    private $processor;
+    private AddConsumerStateProcessor $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
 
-        $this->messageProcessorClassProvider = $this->createMock(MessageProcessorClassProvider::class);
-        /** @var MessageToArrayConverterInterface|\PHPUnit\Framework\MockObject\MockObject $messageToArrayConverter */
         $messageToArrayConverter = $this->createMock(MessageToArrayConverterInterface::class);
 
-        $messageToArrayConverter->expects(self::any())
+        $messageToArrayConverter
+            ->expects(self::any())
             ->method('convert')
-            ->willReturnCallback(function (MessageInterface $message) {
-                return ['id' => $message->getMessageId()];
-            });
+            ->willReturnCallback(static fn (MessageInterface $message) => ['id' => $message->getMessageId()]);
 
-        $this->processor = new AddConsumerStateProcessor(
-            $this->consumerState,
-            $this->messageProcessorClassProvider,
-            $messageToArrayConverter
-        );
+        $this->processor = new AddConsumerStateProcessor($this->consumerState, $messageToArrayConverter);
     }
 
-    /**
-     * @param string $messageId
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
-     */
-    private function getMessageMock($messageId)
+    private function getMessageMock(string $messageId): MessageInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::any())
@@ -60,43 +48,52 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         return $message;
     }
 
-    public function testConsumerWasNotStarted()
+    public function testConsumerWasNotStarted(): void
     {
-        $this->assertArraySubset(
-            ['message' => 'test', 'extra' => []],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [],
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertSame($expectedRecord['extra'], $record['extra']);
     }
 
-    public function testOnEmptyConsumerState()
+    public function testOnEmptyConsumerState(): void
     {
         $this->consumerState->startConsumption();
 
-        $this->assertArraySubset(
-            ['message' => 'test', 'extra' => []],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [],
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertSame($expectedRecord['extra'], \array_diff_key($record['extra'], ['memory_usage' => 'x']));
     }
 
-    public function testAddExtensionInfo()
+    public function testAddExtensionInfo(): void
     {
         $extension = $this->createMock(ExtensionInterface::class);
 
         $this->consumerState->startConsumption();
         $this->consumerState->setExtension($extension);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'extension' => get_class($extension)
-                ]
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'extension' => \get_class($extension),
             ],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals($expectedRecord['extra']['extension'], $record['extra']['extension']);
     }
 
-    public function testAddExtensionInfoForLazyService()
+    public function testAddExtensionInfoForLazyService(): void
     {
         /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);
@@ -105,90 +102,94 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->consumerState->startConsumption();
         $this->consumerState->setExtension($extensionProxy);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'extension' => get_class($extension)
-                ]
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'extension' => get_class($extension),
             ],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals($expectedRecord['extra']['extension'], $record['extra']['extension']);
     }
 
-    public function testAddMessageProcessorInfo()
+    public function testAddMessageProcessorInfo(): void
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $messageProcessorClass = get_class($messageProcessor);
 
         $this->consumerState->startConsumption();
-        $this->consumerState->setMessageProcessor($messageProcessor);
+        $this->consumerState->setMessageProcessorClass($messageProcessorClass);
         $message = $this->getMessageMock('1');
         $this->consumerState->setMessage($message);
 
-        $this->messageProcessorClassProvider->expects(self::once())
-            ->method('getMessageProcessorClass')
-            ->with(self::identicalTo($messageProcessor), self::identicalTo($message))
-            ->willReturn($messageProcessorClass);
+        $record = call_user_func($this->processor, self::MESSAGE);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'processor'  => $messageProcessorClass,
-                    'message_id' => '1'
-                ]
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'processor' => $messageProcessorClass,
+                'message_id' => '1',
             ],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals($expectedRecord['extra']['processor'], $record['extra']['processor']);
+        self::assertEquals($expectedRecord['extra']['message_id'], $record['extra']['message_id']);
     }
 
-    public function testAddMessageInfo()
+    public function testAddMessageInfo(): void
     {
         $message = $this->getMessageMock('1');
 
         $this->consumerState->startConsumption();
         $this->consumerState->setMessage($message);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'message_id' => '1'
-                ]
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'message_id' => '1',
             ],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals($expectedRecord['extra']['message_id'], $record['extra']['message_id']);
     }
 
-    public function testMoveMemoryUsageInfoFromContext()
+    public function testMoveMemoryUsageInfoFromContext(): void
     {
         $message = $this->getMessageMock('1');
 
         $this->consumerState->startConsumption();
         $this->consumerState->setMessage($message);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'message_id' => '1',
-                    'peak_memory' => '10.0 MB',
-                    'memory_taken' => '8.0 MB',
-                ],
-                'context' => [
-                    'test_memory' => '11.0 MB',
-                ]
+        $record = call_user_func($this->processor, [
+            'message' => 'test',
+            'extra' => [],
+            'context' => ['peak_memory' => '10.0 MB', 'memory_taken' => '8.0 MB', 'test_memory' => '11.0 MB'],
+        ]);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'message_id' => '1',
+                'peak_memory' => '10.0 MB',
+                'memory_taken' => '8.0 MB',
             ],
-            call_user_func($this->processor, [
-                'message' => 'test',
-                'extra' => [],
-                'context' => ['peak_memory' => '10.0 MB', 'memory_taken' => '8.0 MB', 'test_memory' => '11.0 MB'],
-            ])
+            'context' => [
+                'test_memory' => '11.0 MB',
+            ],
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals(
+            $expectedRecord['extra'],
+            \array_diff_key($record['extra'], ['memory_usage' => 'x', 'elapsed_time' => 'x'])
         );
+        self::assertEquals($expectedRecord['context'], $record['context']);
     }
 
-    public function testAddJobInfo()
+    public function testAddJobInfo(): void
     {
         $job = new Job();
         $job->setId(12);
@@ -198,53 +199,54 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->consumerState->startConsumption();
         $this->consumerState->setJob($job);
 
-        $this->assertArraySubset(
-            [
-                'message' => 'test',
-                'extra'   => [
-                    'job_id'   => 12,
-                    'job_name' => 'oro.test',
-                    'job_data' => ['a' => 'b']
-                ]
+        $record = call_user_func($this->processor, self::MESSAGE);
+
+        $expectedRecord = [
+            'message' => 'test',
+            'extra' => [
+                'job_id' => 12,
+                'job_name' => 'oro.test',
+                'job_data' => ['a' => 'b'],
             ],
-            call_user_func($this->processor, ['message' => 'test', 'extra' => []])
-        );
+        ];
+        self::assertEquals($expectedRecord['message'], $record['message']);
+        self::assertEquals($expectedRecord['extra'], \array_diff_key($record['extra'], ['memory_usage' => 'x']));
     }
 
-    public function testMemoryUsage()
+    public function testMemoryUsage(): void
     {
         $this->consumerState->startConsumption();
 
-        $record = call_user_func($this->processor, ['message' => 'test', 'extra' => []]);
+        $record = call_user_func($this->processor, self::MESSAGE);
 
-        $this->assertArraySubset(
-            [
-                'extra' => [
-                    'memory_usage' => BytesFormatter::format($this->consumerState->getPeakMemory())
-                ]
+        $expectedRecord = [
+            'extra' => [
+                'memory_usage' => BytesFormatter::format($this->consumerState->getPeakMemory()),
             ],
-            $record
-        );
+        ];
+        foreach ($expectedRecord as $key => $expectedValue) {
+            self::assertEquals($expectedValue, $record[$key]);
+        }
     }
 
-    public function testElapsedTimeWithoutMessage()
+    public function testElapsedTimeWithoutMessage(): void
     {
         $this->consumerState->startConsumption();
 
-        $record = call_user_func($this->processor, ['message' => 'test', 'extra' => []]);
+        $record = call_user_func($this->processor, self::MESSAGE);
 
-        $this->assertArrayNotHasKey('elapsed_time', $record['extra']);
+        self::assertArrayNotHasKey('elapsed_time', $record['extra']);
     }
 
-    public function testElapsedTime()
+    public function testElapsedTime(): void
     {
         $this->consumerState->startConsumption();
         $this->consumerState->setMessage();
 
-        $record = call_user_func($this->processor, ['message' => 'test', 'extra' => []]);
+        $record = call_user_func($this->processor, self::MESSAGE);
 
-        $this->assertArrayHasKey('elapsed_time', $record['extra']);
-        $this->assertInternalType('string', $record['extra']['elapsed_time']);
-        $this->assertContains(' ms', $record['extra']['elapsed_time']);
+        self::assertArrayHasKey('elapsed_time', $record['extra']);
+        self::assertIsString($record['extra']['elapsed_time']);
+        static::assertStringContainsString(' ms', $record['extra']['elapsed_time']);
     }
 }

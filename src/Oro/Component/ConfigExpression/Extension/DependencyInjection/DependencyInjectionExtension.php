@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Extension\DependencyInjection;
 
 use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class DependencyInjectionExtension implements ExtensionInterface
 {

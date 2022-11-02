@@ -5,56 +5,68 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Symfony\Component\Form\Form;
 
+/**
+ * Represents a filter.
+ */
 interface FilterInterface
 {
     /**
-     * Initialize current filter by config
+     * Initializes the filter.
      *
      * @param string $name
      * @param array  $params
-     *
-     * @return void
      */
     public function init($name, array $params);
 
     /**
-     * Returns filter frontend name
+     * Returns the filter name.
      *
      * @return string
      */
     public function getName();
 
     /**
-     * Returns form for validation of current submitted filter data
+     * Returns a form to be used to validate and normalize the filter data.
      *
      * @return Form
      */
     public function getForm();
 
     /**
-     * Returns metadata for frontend
+     * Returns the filter metadata.
      *
      * @return array
      */
     public function getMetadata();
 
     /**
-     * Resolves lazy options
+     * Resolves lazy options.
      */
     public function resolveOptions();
 
     /**
-     * Applies a filter restrictions to a data source
+     * Applies the filter restrictions to a data source.
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param mixed        $data
+     * @param mixed                            $data
      *
      * @return bool true if a filter successfully applied; otherwise, false.
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data);
 
     /**
-     * Set state of filter
+     * Prepares data to be ready to pass to {@see apply()} method.
+     * This method does a filter value normalization the similar as an appropriate filter form,
+     * but without data validation.
+     * This method is used instead of the form when the data are already valid,
+     * e.g. when loading a segment or a report data.
+     *
+     * @throw \Throwable if a filter value normalization failed
+     */
+    public function prepareData(array $data): array;
+
+    /**
+     * Sets a state of the filter.
      *
      * @param $state
      *
@@ -63,7 +75,7 @@ interface FilterInterface
     public function setFilterState($state);
 
     /**
-     * Get state of filter
+     * Returns a state of the filter.
      *
      * @return mixed
      */

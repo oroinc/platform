@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * Collects statistic about sent messages
+ */
 class MessageQueueCollector extends DataCollector
 {
     /**
@@ -15,23 +18,17 @@ class MessageQueueCollector extends DataCollector
      */
     private $messageProducer;
 
-    /**
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(MessageProducerInterface $messageProducer)
     {
         $this->messageProducer = $messageProducer;
+        $this->reset();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->data = [
-            'sent_messages' => [],
-        ];
-        
         if ($this->messageProducer instanceof TraceableMessageProducer) {
             $this->data['sent_messages'] = $this->messageProducer->getTraces();
         }
@@ -85,5 +82,15 @@ class MessageQueueCollector extends DataCollector
     public function getName()
     {
         return 'message_queue';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = [
+            'sent_messages' => [],
+        ];
     }
 }

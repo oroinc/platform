@@ -15,27 +15,17 @@ class NullComparison implements ExpressionInterface
     /** @var Path */
     private $expression;
 
-    /**
-     * @param Path $expression
-     * @param bool $not
-     */
     public function __construct(Path $expression, bool $not = false)
     {
         $this->expression = $expression;
         $this->not = $not;
     }
 
-    /**
-     * @return bool
-     */
     public function isNot(): bool
     {
         return $this->not;
     }
 
-    /**
-     * @return Path
-     */
     public function getExpression(): Path
     {
         return $this->expression;

@@ -6,12 +6,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
@@ -20,9 +20,9 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EntityTypeTest extends FormIntegrationTestCase
 {
-    protected $type;
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $validator = new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),
@@ -61,9 +61,9 @@ class EntityTypeTest extends FormIntegrationTestCase
 
     public function testType()
     {
-        $formData = array(
+        $formData = [
             'className' => 'NewEntityClassName'
-        );
+        ];
 
         $form = $this->factory->create(EntityType::class);
         $form->submit($formData);

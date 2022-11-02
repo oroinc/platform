@@ -1,5 +1,12 @@
 <% if (id !== null) { %>
-    <img src="<% if (avatar) { %><%= avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|e('html_attr')|raw }}<% } %>" width="16" height="16" />&nbsp;<%= highlight(_.escape(fullName)) %> - <%= highlight(_.escape(email)) %> (<%= highlight(_.escape(username)) %>)
+    <span class="select2-result-label-icon">
+        <picture>
+            <% _.each(avatar.sources, function(source) { %>
+            <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+            <% }); %>
+            <img src="<% if (avatar.src) { %><%- avatar.src %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|e('html_attr') }}<% } %>" width="16" height="16">
+        </picture>
+    </span><span class="select2-result-label-title"><%= highlight(_.escape(fullName)) %> - <%= highlight(_.escape(email)) %> (<%= highlight(_.escape(username)) %>)</span>
 <% } else { %>
-    <%= highlight(_.escape(email)) %>
+    <span class="select2-result-label-title"><%= highlight(_.escape(email)) %></span>
 <% } %>

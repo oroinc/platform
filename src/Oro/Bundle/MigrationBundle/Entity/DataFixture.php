@@ -5,8 +5,10 @@ namespace Oro\Bundle\MigrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Data fixture migration log entity
+ *
  * @ORM\Table("oro_migrations_data")
- * @ORM\Entity(repositoryClass="Oro\Bundle\MigrationBundle\Entity\Repository\DataFixtureRepository")
+ * @ORM\Entity()
  */
 class DataFixture
 {

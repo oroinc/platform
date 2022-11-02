@@ -8,32 +8,22 @@ use Symfony\Component\Asset\Packages;
 class AssetProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
-    protected $packages;
+    private $packages;
 
     /** @var AssetProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->packages = $this->getMockBuilder('Symfony\Component\Asset\Packages')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->packages = $this->createMock(Packages::class);
 
         $this->provider = new AssetProvider($this->packages);
     }
 
     /**
-     * @param string      $path
-     * @param string|null $packageName
-     * @param string|null $normalizedPath
-     * @param string|null $expected
-     *
      * @dataProvider getUrlDataProvider
      */
-    public function testGetUrl($path, $packageName, $normalizedPath, $expected)
+    public function testGetUrl(string $path, ?string $packageName, ?string $normalizedPath, ?string $expected)
     {
         $this->packages->expects($this->once())
             ->method('getUrl')
@@ -43,10 +33,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getUrl($path, $packageName));
     }
 
-    /**
-     * @return array
-     */
-    public function getUrlDataProvider()
+    public function getUrlDataProvider(): array
     {
         return [
             'with_path_only'             => [
@@ -84,24 +71,22 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->provider->getUrl(null));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected a string value for the path, got "array".
-     */
     public function testAddErrorForInvalidPathType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a string value for the path, got "array".');
+
         $this->packages->expects($this->never())
             ->method('getUrl');
 
         $this->provider->getUrl(['test']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected null or a string value for the package name, got "array".
-     */
     public function testAddErrorForInvalidPackageNameType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected null or a string value for the package name, got "array".');
+
         $this->packages->expects($this->never())
             ->method('getUrl');
 

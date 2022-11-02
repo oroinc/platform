@@ -22,14 +22,13 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
      */
     public function __construct($propertyName)
     {
-        parent::__construct();
         $this->propertyName = $propertyName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return sprintf(
             'getter %s for property %s returns the default value',
@@ -40,7 +39,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return sprintf(
             'getter %s for property %s of class %s returns the default value',
@@ -53,7 +52,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         $this->getterName = 'get' . ucfirst($this->propertyName);
         if (!method_exists($other, $this->getterName)) {

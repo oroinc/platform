@@ -23,10 +23,6 @@ class EmailFlagManager implements LoggerAwareInterface
     /** @var EmailFlagManagerLoaderSelector */
     protected $selectorEmailFlagManager;
 
-    /**
-     * @param EmailFlagManagerLoaderSelector $selectorEmailTagManager
-     * @param EntityManager                  $em
-     */
     public function __construct(
         EmailFlagManagerLoaderSelector $selectorEmailTagManager,
         EntityManager $em

@@ -5,7 +5,6 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This extension signals (by calling the tick method) that a consumer did not fail and continue to work normally
@@ -16,26 +15,34 @@ class ConsumerHeartbeatExtension extends AbstractExtension
     /** @var int */
     private $updateHeartbeatPeriod;
 
-    /** @var ContainerInterface */
-    private $container;
-
     /** @var \DateTime */
-    private $lastUpdatedTime;
+    private static $lastUpdatedTime;
+
+    /** @var ConsumerHeartbeat */
+    private $consumerHeartbeat;
 
     /**
-     * @param integer            $updateHeartbeatPeriod
-     * @param ContainerInterface $container
+     * @param integer $updateHeartbeatPeriod
+     * @param ConsumerHeartbeat $consumerHeartbeat
      */
-    public function __construct($updateHeartbeatPeriod, ContainerInterface $container)
+    public function __construct($updateHeartbeatPeriod, ConsumerHeartbeat $consumerHeartbeat)
     {
         $this->updateHeartbeatPeriod = $updateHeartbeatPeriod;
-        $this->container = $container;
+        $this->consumerHeartbeat = $consumerHeartbeat;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onStart(Context $context)
+    {
+        self::$lastUpdatedTime = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context): void
     {
         // do nothing if the check was disabled with 0 config option value
         if ($this->updateHeartbeatPeriod === 0) {
@@ -43,23 +50,15 @@ class ConsumerHeartbeatExtension extends AbstractExtension
         }
 
         $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
-        if (!$this->lastUpdatedTime
+        if (!self::$lastUpdatedTime
             || (
-                ($currentTime->getTimestamp() - $this->lastUpdatedTime->getTimestamp())/60
+                ($currentTime->getTimestamp() - self::$lastUpdatedTime->getTimestamp())/60
                 >= $this->updateHeartbeatPeriod
             )
         ) {
             $context->getLogger()->info('Update the consumer state time.');
-            $this->getConsumerHeartbeat()->tick();
-            $this->lastUpdatedTime = $currentTime;
+            $this->consumerHeartbeat->tick();
+            self::$lastUpdatedTime = $currentTime;
         }
-    }
-
-    /**
-     * @return ConsumerHeartbeat
-     */
-    private function getConsumerHeartbeat()
-    {
-        return $this->container->get('oro_message_queue.consumption.consumer_heartbeat');
     }
 }

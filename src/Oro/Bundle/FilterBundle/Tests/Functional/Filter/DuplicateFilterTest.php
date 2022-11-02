@@ -17,21 +17,25 @@ use Oro\Bundle\UserBundle\Entity\User;
 class DuplicateFilterTest extends WebTestCase
 {
     /** @var DuplicateFilter */
-    protected $filter;
+    private $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->filter = $this->getContainer()->get('oro_filter.duplicate_filter');
+        $this->filter = self::getContainer()->get('oro_filter.duplicate_filter');
+    }
+
+    private function createQueryBuilder(string $alias): QueryBuilder
+    {
+        $doctrine = self::getContainer()->get('doctrine');
+
+        return $doctrine->getRepository(User::class)->createQueryBuilder($alias);
     }
 
     /**
      * @dataProvider duplicateDataProvider
-     *
-     * @param int $filterType
-     * @param array $expected
      */
-    public function testDuplicateField($filterType, array $expected)
+    public function testDuplicateField(int $filterType, array $expected)
     {
         $this->loadFixtures([LoadDuplicateUserData::class]);
 
@@ -40,33 +44,30 @@ class DuplicateFilterTest extends WebTestCase
             ->orderBy('u.username')
             ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init('duplicate', ['data_name' => 'u.firstName']);
 
         $filterForm = $this->filter->getForm();
         $filterForm->submit(['value' => $filterType]);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
-        $this->assertTrue($filterForm->isValid());
-
-        $this->filter->init('duplicate', ['data_name' => 'u.firstName']);
+        $ds = new OrmFilterDatasourceAdapter($qb);
         $this->filter->apply($ds, $filterForm->getData());
 
         $qb = $ds->getQueryBuilder();
 
         $actualData = $qb->getQuery()->getResult();
-        $this->assertEquals($expected, array_map('current', $actualData));
+        self::assertEquals($expected, array_map('current', $actualData));
 
         $dql = $qb->getDQL();
-        $this->assertNotContains('EXISTS(', $dql);
-        $this->assertContains('GROUP BY ', $dql);
+        self::assertStringNotContainsString('EXISTS(', $dql);
+        self::assertStringContainsString('GROUP BY ', $dql);
     }
 
     /**
      * @dataProvider duplicateDataProvider
-     *
-     * @param int $filterType
-     * @param array $expected
      */
-    public function testDuplicateRelation($filterType, array $expected)
+    public function testDuplicateRelation(int $filterType, array $expected)
     {
         $this->loadFixtures([LoadDuplicateUserRelationData::class]);
 
@@ -76,52 +77,36 @@ class DuplicateFilterTest extends WebTestCase
             ->orderBy('u.username')
             ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init('duplicate', ['data_name' => 'e.email']);
 
         $filterForm = $this->filter->getForm();
         $filterForm->submit(['value' => $filterType]);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
-        $this->assertTrue($filterForm->isValid());
-
-        $this->filter->init('duplicate', ['data_name' => 'e.email']);
+        $ds = new OrmFilterDatasourceAdapter($qb);
         $this->filter->apply($ds, $filterForm->getData());
 
         $qb = $ds->getQueryBuilder();
 
         $actualData = $qb->getQuery()->getResult();
-        $this->assertEquals($expected, array_map('current', $actualData));
+        self::assertEquals($expected, array_map('current', $actualData));
         $dql = $qb->getDQL();
-        $this->assertContains('EXISTS(', $dql);
-        $this->assertContains('GROUP BY ', $dql);
+        self::assertStringContainsString('EXISTS(', $dql);
+        self::assertStringContainsString('GROUP BY ', $dql);
     }
 
-    /**
-     * @return array
-     */
     public function duplicateDataProvider()
     {
         return [
-            'has duplicate' => [
+            'has duplicate'    => [
                 'filterType' => BooleanFilterType::TYPE_YES,
-                'expected' => ['u1', 'u2']
+                'expected'   => ['u1', 'u2']
             ],
             'has no duplicate' => [
                 'filterType' => BooleanFilterType::TYPE_NO,
-                'expected' => ['u3']
+                'expected'   => ['u3']
             ]
         ];
-    }
-
-    /**
-     * @param string $alias
-     * @return QueryBuilder
-     */
-    protected function createQueryBuilder($alias)
-    {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $objectManager = $doctrine->getManagerForClass(User::class);
-        $repository = $objectManager->getRepository(User::class);
-
-        return $repository->createQueryBuilder($alias);
     }
 }

@@ -11,7 +11,7 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 use Oro\Bundle\SearchBundle\Migration\MysqlVersionCheckTrait;
 use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -19,12 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class OroSearchBundleInstaller implements Installation, ContainerAwareInterface, DatabasePlatformAwareInterface
 {
+    use ContainerAwareTrait;
     use MysqlVersionCheckTrait;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
 
     /**
      * @var AbstractPlatform
@@ -36,15 +32,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
+        return 'v1_9';
     }
 
     /**
@@ -77,8 +65,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_index_decimal table
-     *
-     * @param Schema $schema
      */
     protected function createOroSearchIndexDecimalTable(Schema $schema)
     {
@@ -95,8 +81,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_index_integer table
-     *
-     * @param Schema $schema
      */
     protected function createOroSearchIndexIntegerTable(Schema $schema)
     {
@@ -113,8 +97,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_query table
-     *
-     * @param Schema $schema
      */
     protected function createOroSearchQueryTable(Schema $schema)
     {
@@ -129,8 +111,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_index_datetime table
-     *
-     * @param Schema $schema
      */
     protected function createOroSearchIndexDatetimeTable(Schema $schema)
     {
@@ -147,8 +127,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_item table
-     *
-     * @param Schema $schema
      */
     protected function createOroSearchItemTable(Schema $schema)
     {
@@ -157,8 +135,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->addColumn('entity', 'string', ['length' => 255]);
         $table->addColumn('alias', 'string', ['length' => 255]);
         $table->addColumn('record_id', 'integer', ['notnull' => false]);
-        $table->addColumn('title', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('weight', 'decimal', ['precision' => 21, 'scale' => 8, 'default' => 1]);
+        $table->addColumn('weight', 'decimal', ['precision' => 8, 'scale' => 4, 'default' => 1]);
         $table->addColumn('changed', 'boolean', []);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
@@ -170,9 +147,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Create oro_search_index_text table
-     *
-     * @param Schema $schema
-     * @param QueryBag $queries
      */
     protected function createOroSearchIndexTextTable(Schema $schema, QueryBag $queries)
     {
@@ -197,8 +171,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Add oro_search_index_decimal foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSearchIndexDecimalForeignKeys(Schema $schema)
     {
@@ -213,8 +185,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Add oro_search_index_integer foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSearchIndexIntegerForeignKeys(Schema $schema)
     {
@@ -229,8 +199,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Add oro_search_index_datetime foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSearchIndexDatetimeForeignKeys(Schema $schema)
     {
@@ -245,8 +213,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
 
     /**
      * Add oro_search_index_text foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSearchIndexTextForeignKeys(Schema $schema)
     {

@@ -2,18 +2,15 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Model\ExtendTag;
 use Oro\Bundle\TagBundle\Model\ExtendTaxonomy;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Taxonomy
+ * Tag Taxonomy Entity
  *
  * @ORM\Table(
  *    name="oro_tag_taxonomy",
@@ -48,9 +45,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "comment"={
  *              "immutable"=true

@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\SSOBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SSOBundle\Security\OAuthProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures HWIOAuthBundle services.
+ */
 class HwiConfigurationPass implements CompilerPassInterface
 {
     /**
@@ -13,25 +17,12 @@ class HwiConfigurationPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $resourceOwners = [
-            'google',
-        ];
-
-        foreach ($resourceOwners as $owner) {
-            $id = sprintf('hwi_oauth.resource_owner.%s', $owner);
-            if (!$container->hasDefinition($id)) {
-                continue;
-            }
-
-            $definition = $container->findDefinition($id);
-            $definition->addMethodCall('configureCredentials', [
-                new Reference('oro_config.global'),
-            ]);
-        }
-
-        if ($container->hasDefinition('hwi_oauth.authentication.provider.oauth')) {
-            $definition = $container->getDefinition('hwi_oauth.authentication.provider.oauth');
-            $definition->addMethodCall('setTokenFactory', [new Reference('oro_sso.token.factory.oauth')]);
-        }
+        $container->getDefinition('hwi_oauth.authentication.provider.oauth')
+            ->setClass(OAuthProvider::class)
+            ->addMethodCall('setTokenFactory', [new Reference('oro_sso.token.factory.oauth')])
+            ->addMethodCall(
+                'setOrganizationGuesser',
+                [new Reference('oro_security.authentication.organization_guesser')]
+            );
     }
 }

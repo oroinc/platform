@@ -5,41 +5,60 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
 use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BoardExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var BoardProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $processor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $restrictionManager;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
+    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $restrictionManager;
 
     /** @var BoardExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
+        $this->processor = $this->createMock(BoardProcessorInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->restrictionManager = $this->createMock(RestrictionManager::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->restrictionManager = $this->createMock(RestrictionManager::class);
         $configuration = new Configuration();
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
 
+        $processorContainer = TestContainerBuilder::create()
+            ->add('default', $this->processor)
+            ->getContainer($this);
+
         $this->extension = new BoardExtension(
+            $processorContainer,
             $this->authorizationChecker,
+            $this->requestStack,
             $this->translator,
             $this->restrictionManager,
             $configuration,
@@ -73,7 +92,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
             ->with($config)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->assertFalse($this->extension->isApplicable($config));
         $this->assertArrayNotHasKey('board', $config->offsetGet(AppearanceExtension::APPEARANCE_CONFIG_PATH));
     }
@@ -110,27 +129,22 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->assertTrue($this->extension->isApplicable($config));
 
-        $processor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface');
-        $processor->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('default'));
-        $processor->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getBoardOptions')
-            ->will($this->returnValue(['options']));
-        $this->extension->addProcessor($processor);
+            ->willReturn(['options']);
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('board label')
-            ->will($this->returnValue('translated board label'));
+            ->willReturn('translated board label');
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('update_acl_resource')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $data = MetadataObject::create([]);
         $this->extension->visitMetadata($config, $data);
@@ -187,9 +201,9 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->isApplicable($config);
-        $this->expectException('Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException');
+        $this->expectException(RuntimeException::class);
         $data = MetadataObject::create([]);
         $this->extension->visitMetadata($config, $data);
     }
@@ -211,19 +225,13 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $processor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface');
-        $processor->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('default'));
         $options = [
             ['ids' => ['in_progress']],
             ['ids' => ['lost']]
         ];
-        $processor->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getBoardOptions')
-            ->will($this->returnValue($options));
-        $this->extension->addProcessor($processor);
-
+            ->willReturn($options);
 
         $appearanceData = [
             'id' => 'board-id',
@@ -233,13 +241,13 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             'property' => 'group_field'
         ];
-        $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
-        $processor->expects($this->once())
+        $dataSource = $this->createMock(DatasourceInterface::class);
+        $this->processor->expects($this->once())
             ->method('processDatasource')
             ->with($dataSource, $appearanceData, $config);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->isApplicable($config);
 
         $this->extension->visitDatasource($config, $dataSource);

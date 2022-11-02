@@ -27,8 +27,6 @@ class Path implements ExpressionInterface
 
     /**
      * Sets the object alias.
-     *
-     * @param string $alias
      */
     public function setAlias(string $alias): void
     {
@@ -37,8 +35,6 @@ class Path implements ExpressionInterface
 
     /**
      * Returns the alias of the object in the query.
-     *
-     * @return string|null
      */
     public function getAlias(): ?string
     {
@@ -47,8 +43,6 @@ class Path implements ExpressionInterface
 
     /**
      * Returns the object field name.
-     *
-     * @return string
      */
     public function getField(): string
     {

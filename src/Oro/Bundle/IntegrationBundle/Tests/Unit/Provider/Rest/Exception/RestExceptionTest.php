@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Exception;
 
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
 class RestExceptionTest extends \PHPUnit\Framework\TestCase
@@ -10,47 +11,47 @@ class RestExceptionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider exceptionDataProvider
      */
     public function testCreateFromResponseWorks(
-        $expectedMessage,
-        $message,
-        $isClientError,
-        $isServerError,
-        $statusCode,
-        $reasonPhrase
+        string $expectedMessage,
+        ?string $message,
+        bool $isClientError,
+        bool $isServerError,
+        int $statusCode,
+        string $reasonPhrase
     ) {
         $previous = new \Exception();
 
-        $response = $this->createMock('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\RestResponseInterface');
+        $response = $this->createMock(RestResponseInterface::class);
 
         if ($isClientError) {
             $response->expects($this->once())
                 ->method('isClientError')
-                ->will($this->returnValue(true));
+                ->willReturn(true);
         }
 
         if ($isServerError) {
             $response->expects($this->once())
                 ->method('isServerError')
-                ->will($this->returnValue(true));
+                ->willReturn(true);
         }
 
         $response->expects($this->atLeastOnce())
             ->method('getStatusCode')
-            ->will($this->returnValue($statusCode));
+            ->willReturn($statusCode);
 
         $response->expects($this->once())
             ->method('getReasonPhrase')
-            ->will($this->returnValue($reasonPhrase));
+            ->willReturn($reasonPhrase);
 
         $exception = RestException::createFromResponse($response, $message, $previous);
 
-        $this->assertInstanceOf('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Exception\\RestException', $exception);
+        $this->assertInstanceOf(RestException::class, $exception);
         $this->assertSame($previous, $exception->getPrevious());
         $this->assertSame($response, $exception->getResponse());
         $this->assertEquals($statusCode, $exception->getCode());
         $this->assertEquals($expectedMessage, $exception->getMessage());
     }
 
-    public function exceptionDataProvider()
+    public function exceptionDataProvider(): array
     {
         return [
             'client error' => [

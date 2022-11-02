@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
@@ -11,27 +11,18 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 /**
- * Provides datagrid columns for given import-export context from either:
- * 1) datagrid columns stored in context;
- * 2) columns from datagrid configuration;
- *
+ * Provides datagrid columns for given import-export context by gridName and gridParameters
  * - applies formatting;
  * - sorts columns according to their "order";
  * - excludes non-renderable columns.
  */
 class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextProviderInterface
 {
-    /** @var Manager */
-    private $datagridManager;
+    private DatagridManager $datagridManager;
 
-    /** @var DatagridStateProviderInterface */
-    private $columnsStateProvider;
+    private DatagridStateProviderInterface $columnsStateProvider;
 
-    /**
-     * @param Manager $datagridManager
-     * @param DatagridStateProviderInterface $columnsStateProvider
-     */
-    public function __construct(Manager $datagridManager, DatagridStateProviderInterface $columnsStateProvider)
+    public function __construct(DatagridManager $datagridManager, DatagridStateProviderInterface $columnsStateProvider)
     {
         $this->datagridManager = $datagridManager;
         $this->columnsStateProvider = $columnsStateProvider;
@@ -42,22 +33,18 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
      */
     public function getColumnsFromContext(ContextInterface $context): array
     {
-        // Get columns from import-export context.
-        $columns = $context->getValue('columns');
-
-        // Try to get columns from datagrid configuration.
-        if (!$columns && $context->hasOption('gridName')) {
-            $gridConfig = $this->getDatagridConfiguration($context);
-            $columns = $gridConfig->offsetGet(Configuration::COLUMNS_KEY);
-        }
-
-        if (!$columns) {
+        if (!$context->hasOption('gridName')) {
             throw new InvalidConfigurationException(
-                'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
+                'Configuration of datagrid export processor must contain "gridName" option.'
             );
         }
 
-        return $this->applyState($columns, $context);
+        $datagrid = $this->getDatagrid($context);
+        $datagridConfiguration = $datagrid->getConfig();
+        $columns = $datagridConfiguration->offsetGet(Configuration::COLUMNS_KEY);
+        $columnsState = $this->columnsStateProvider->getState($datagridConfiguration, $datagrid->getParameters());
+
+        return $this->applyState($columns, $columnsState);
     }
 
     /**
@@ -65,52 +52,28 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
      * - updates properties of columns with actual values taken from state - "order" and "renderable";
      * - sorts columns by "order" property;
      * - excludes non-renderable columns;
-     *
-     * @param array $columns
-     * @param ContextInterface $context
-     *
-     * @return array
      */
-    private function applyState(array $columns, ContextInterface $context): array
+    private function applyState(array $columns, array $state): array
     {
-        if (!$context->hasOption('gridName') || !$context->hasOption('gridParameters')) {
-            return $columns;
-        }
-
-        // We need datagrid configuration to get state from columnsStateProvider.
-        $datagridConfiguration = $this->getDatagridConfiguration($context);
-        // We override columns configuration because datagrid manager returns initial configuration which is not
-        // altered by listeners or extensions, while we assume that "$columnsConfig" is the latest columns
-        // configuration.
-        $datagridConfiguration->offsetSet(Configuration::COLUMNS_KEY, $columns);
-
-        $columnsState = $this->columnsStateProvider
-            ->getState($datagridConfiguration, $context->getOption('gridParameters'));
-
-        // Gets columns orders.
-        $orders = array_column($columnsState, ColumnsStateProvider::ORDER_FIELD_NAME);
+        // Gets columns orders from columns state.
+        $orders = array_column($state, ColumnsStateProvider::ORDER_FIELD_NAME);
 
         // Sorts columns according to orders.
         array_multisort($orders, $columns);
 
-        // Updates properties of columns with actual values taken from state.
-        $columns = array_replace_recursive($columns, $columnsState);
-
         // Excludes non-renderable columns.
-        return array_filter($columns, function (array $column) {
-            return $column[ColumnsStateProvider::RENDER_FIELD_NAME];
-        });
+        return array_filter(
+            $columns,
+            static fn (string $name) => $state[$name][ColumnsStateProvider::RENDER_FIELD_NAME],
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
-    /**
-     * @param ContextInterface $context
-     *
-     * @return DatagridConfiguration
-     */
-    private function getDatagridConfiguration(ContextInterface $context): DatagridConfiguration
+    private function getDatagrid(ContextInterface $context): DatagridInterface
     {
-        $gridName = $context->getOption('gridName');
-
-        return $this->datagridManager->getConfigurationForGrid($gridName);
+        return $this->datagridManager->getDatagrid(
+            $context->getOption('gridName'),
+            $context->getOption('gridParameters', [])
+        );
     }
 }

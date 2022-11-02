@@ -9,10 +9,5 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 interface TicketProviderInterface
 {
-    /**
-     * @param null|UserInterface $user
-     *
-     * @return string
-     */
     public function generateTicket(?UserInterface $user = null): string;
 }

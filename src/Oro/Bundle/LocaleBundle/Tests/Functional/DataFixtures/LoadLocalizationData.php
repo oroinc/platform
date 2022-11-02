@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -13,38 +13,36 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Adds test localization
+ */
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
+    public const DEFAULT_LOCALIZATION_CODE = 'en_US';
+    public const EN_CA_LOCALIZATION_CODE = 'en_CA';
+    public const ES_LOCALIZATION_CODE = 'es';
+
     use ContainerAwareTrait;
 
     /** @var array */
-    protected static $languages = ['en', 'en_CA', 'en_US', 'es', 'es_ES', 'es_MX'];
+    protected static $languages = ['en', 'en_CA', 'es', 'es_ES', 'es_MX'];
 
     /** @var array */
     protected static $localizations = [
         [
-            'language' => 'en_US',
-            'formatting' => 'en_US',
-            'parent' => null,
-            'title' => 'English (United States)',
-        ],
-        [
-            'language' => 'en_CA',
+            'language' => self::EN_CA_LOCALIZATION_CODE,
             'formatting' => 'en_CA',
-            'parent' => 'en_US',
+            'parent' => self::DEFAULT_LOCALIZATION_CODE,
             'title' => 'English (Canada)',
         ],
         [
-            'language' => 'es',
+            'language' => self::ES_LOCALIZATION_CODE,
             'formatting' => 'es',
             'parent' => null,
             'title' => 'Spanish',
         ]
     ];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         // Preload all required Languages
@@ -52,10 +50,16 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
             $this->processLanguage($item, $manager);
         }
 
-        /* @var $repository LocalizationRepository */
+        /* @var LocalizationRepository $repository */
         $repository = $manager->getRepository(Localization::class);
+        $defaultEnUsLocalization = $repository->findOneBy(['formattingCode' => self::DEFAULT_LOCALIZATION_CODE]);
+        if (!$defaultEnUsLocalization) {
+            throw new \LogicException('No default localization found in the system with formatting code - '
+                . self::DEFAULT_LOCALIZATION_CODE);
+        }
+        $this->addReference(self::DEFAULT_LOCALIZATION_CODE, $defaultEnUsLocalization);
 
-        $registry = [];
+        $registry[self::DEFAULT_LOCALIZATION_CODE] = $defaultEnUsLocalization;
 
         foreach (self::$localizations as $item) {
             $code = $item['language'];
@@ -96,7 +100,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function processLanguage($langCode, ObjectManager $manager)
     {
-        /* @var $repository LanguageRepository */
+        /* @var LanguageRepository $repository */
         $repository = $manager->getRepository(Language::class);
         $language = $repository->findOneBy(['code' => $langCode]);
         if (!$language) {
@@ -114,15 +118,12 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     protected function updateEnabledLocalizations(ObjectManager $manager)
     {
-        /* @var $configManager ConfigManager */
+        /* @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
 
-        /* @var $localizations Localization[] */
+        /* @var Localization[] $localizations */
         $localizations = $manager->getRepository(Localization::class)->findAll();
 
         $enabledLocalizations = [];

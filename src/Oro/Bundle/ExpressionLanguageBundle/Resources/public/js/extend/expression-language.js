@@ -1,39 +1,23 @@
-define(function(require) {
-    'use strict';
+import OriginalExpressionLanguage from 'oroexpressionlanguage/js/library/expression-language';
+import Lexer from './lexer';
+import Parser from './parser';
 
-    var OriginalExpressionLanguage = require('oroexpressionlanguage/js/library/expression-language');
-    var Lexer = require('oroexpressionlanguage/js/extend/lexer');
-    var Parser = require('oroexpressionlanguage/js/extend/parser');
+class ExpressionLanguage extends OriginalExpressionLanguage {
+    getLexer() {
+        if (null === this.lexer) {
+            this.lexer = new Lexer();
+        }
 
-    /**
-     * @inheritDoc
-     */
-    function ExpressionLanguage(cache, providers) {
-        ExpressionLanguage.__super__.constructor.call(this, cache, providers);
+        return this.lexer;
     }
 
-    ExpressionLanguage.prototype = Object.create(OriginalExpressionLanguage.prototype);
-    ExpressionLanguage.__super__ = OriginalExpressionLanguage.prototype;
-
-    Object.assign(ExpressionLanguage.prototype, {
-        constructor: ExpressionLanguage,
-
-        getLexer: function() {
-            if (null === this.lexer) {
-                this.lexer = new Lexer();
-            }
-
-            return this.lexer;
-        },
-
-        getParser: function() {
-            if (null === this.parser) {
-                this.parser = new Parser(this.functions);
-            }
-
-            return this.parser;
+    getParser() {
+        if (null === this.parser) {
+            this.parser = new Parser(this.functions);
         }
-    });
 
-    return ExpressionLanguage;
-});
+        return this.parser;
+    }
+}
+
+export default ExpressionLanguage;

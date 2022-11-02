@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -13,12 +14,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
-    const NAME = 'oro:workflow:definitions:load';
+    private const NAME = 'oro:workflow:definitions:load';
 
     /** @var WorkflowConfigFinderBuilder */
-    protected $configFinderBuilder;
+    private $configFinderBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -29,11 +30,6 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $expectedMessages
-     * @param array $expectedDefinitions
-     * @param array $expectedEventTriggers
-     * @param array $expectedCronTriggers
      */
     public function testExecute(
         array $expectedMessages,
@@ -41,9 +37,9 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         array $expectedEventTriggers,
         array $expectedCronTriggers
     ) {
-        $repositoryWorkflow = $this->getRepository('OroWorkflowBundle:WorkflowDefinition');
-        $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
-        $repositoryTrigger = $this->getRepository('OroWorkflowBundle:BaseTransitionTrigger');
+        $repositoryWorkflow = $this->getRepository(WorkflowDefinition::class);
+        $repositoryProcess = $this->getRepository(ProcessDefinition::class);
+        $repositoryTrigger = $this->getRepository(BaseTransitionTrigger::class);
 
         $definitionsBefore = $repositoryWorkflow->findAll();
         $processesBefore = $repositoryProcess->findAll();
@@ -81,10 +77,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         $this->assertCount(count($triggersBefore), $repositoryTrigger->findAll(), 'triggers should match');
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [
@@ -111,64 +104,54 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @dataProvider invalidExecuteDataProvider
-     *
-     * @param $expectedMessages $messages
-     * @param string $configDirectory
      */
-    public function testExecuteErrors(array $expectedMessages, $configDirectory)
+    public function testExecuteErrors(array $expectedMessages, string $configDirectory)
     {
         $this->configFinderBuilder->setSubDirectory($configDirectory);
 
         $this->assertCommandExecuted($expectedMessages);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function invalidExecuteDataProvider()
+    public function invalidExecuteDataProvider(): array
     {
-        yield 'invalid cron expression' => [
-            'expectedMessages' => [
-                'In WorkflowConfigurationProvider.php',
-                'Invalid configuration for path "workflows.first_workflow',
-                'invalid cron expression is not',
-                'a valid CRON expression'
+        return [
+            'invalid cron expression' => [
+                'expectedMessages' => [
+                    'In WorkflowConfigurationProvider.php',
+                    'Invalid configuration for path "workflows.first_workflow',
+                    'invalid cron expression is not',
+                    'a valid CRON expression'
+                ],
+                'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
             ],
-            'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
-        ];
-
-        yield 'invalid filter expression' => [
-            'expectedMessages' => ['Expected =, <, <=, <>, >, >=, !=, got end of string'],
-            'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
-        ];
-
-        yield 'empty start step' => [
-            'expectedMessages' => ['does not contains neither start step nor start transitions'],
-            'configDirectory' => '/Tests/Functional/Command/DataFixtures/WithoutStartStep'
+            'invalid filter expression' => [
+                'expectedMessages' => ['Unexpected query syntax error'],
+                'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
+            ],
+            'empty start step' => [
+                'expectedMessages' => ['does not contains neither start step nor start transitions'],
+                'configDirectory' => '/Tests/Functional/Command/DataFixtures/WithoutStartStep'
+            ]
         ];
     }
 
-    /**
-     * @param array $messages
-     */
-    protected function assertCommandExecuted(array $messages)
+    private function assertCommandExecuted(array $messages)
     {
         $result = $this->runCommand(self::NAME);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {
-            $this->assertContains($message, $result);
+            self::assertStringContainsString($message, $result);
         }
     }
 
     /**
-     * @param array|WorkflowDefinition[] $definitions
+     * @param WorkflowDefinition[] $definitions
      * @param string $name
      */
-    protected function assertDefinitionLoaded(array $definitions, $name)
+    private function assertDefinitionLoaded(array $definitions, string $name): void
     {
         $found = false;
-
         foreach ($definitions as $definition) {
             if ($definition->getName() === $name) {
                 $found = true;
@@ -180,32 +163,13 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     }
 
     /**
-     * @param array|ProcessDefinition[] $processDefinitions
-     * @param string $name
-     */
-    protected function assertProcessLoaded(array $processDefinitions, $name)
-    {
-        $found = false;
-
-        foreach ($processDefinitions as $definition) {
-            if (strpos($definition->getName(), $name) !== false) {
-                $found = true;
-                break;
-            }
-        }
-
-        $this->assertTrue($found);
-    }
-
-    /**
-     * @param array|TransitionEventTrigger[] $triggers
+     * @param TransitionEventTrigger[] $triggers
      * @param string $event
-     * @param string $field
+     * @param string|null $field
      */
-    protected function assertTransitionEventTriggerLoaded(array $triggers, $event, $field)
+    private function assertTransitionEventTriggerLoaded(array $triggers, string $event, ?string $field): void
     {
         $found = false;
-
         foreach ($triggers as $trigger) {
             if ($trigger instanceof TransitionEventTrigger &&
                 $trigger->getEvent() === $event &&
@@ -220,13 +184,12 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     }
 
     /**
-     * @param array|TransitionCronTrigger[] $triggers
+     * @param TransitionCronTrigger[] $triggers
      * @param string $cron
      */
-    protected function assertTransitionCronTriggerLoaded(array $triggers, $cron)
+    private function assertTransitionCronTriggerLoaded(array $triggers, string $cron): void
     {
         $found = false;
-
         foreach ($triggers as $trigger) {
             if ($trigger instanceof TransitionCronTrigger && $trigger->getCron() === $cron) {
                 $found = true;
@@ -237,15 +200,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         $this->assertTrue($found);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ObjectRepository
-     */
-    protected function getRepository($entityClass)
+    private function getRepository(string $entityClass): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')
-            ->getManagerForClass($entityClass)
-            ->getRepository($entityClass);
+        return $this->getContainer()->get('doctrine')->getRepository($entityClass);
     }
 }

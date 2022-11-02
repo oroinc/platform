@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -18,8 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("email")
- * @NamePrefix("oro_api_")
+ * REST API controller for the email related functionality.
  */
 class EmailController extends RestController
 {
@@ -73,8 +68,6 @@ class EmailController extends RestController
      *
      * @param string $id
      *
-     * @Get("/emails/{id}", requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get email",
      *      resource=true
@@ -99,7 +92,7 @@ class EmailController extends RestController
      * @AclAncestor("oro_email_email_user_edit")
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -125,7 +118,7 @@ class EmailController extends RestController
      */
     protected function getEmailCacheManager()
     {
-        return $this->container->get('oro_email.email.cache.manager');
+        return $this->container->get(EmailCacheManager::class);
     }
 
     /**

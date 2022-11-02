@@ -16,13 +16,18 @@ class GridFilterStringItem extends AbstractGridFilterItem
         /* Try find select and choice filterType */
         $typeSelect = $this->find('css', 'div.choice-filter select[data-choice-value-select]');
 
-        if (!is_null($typeSelect)) {
+        if (null !== $typeSelect) {
             $typeSelect->selectOption($filterType);
             return;
         }
 
         /* Else try choice filterType in bootstrap dropdown */
-        $this->find('css', 'div.choice-filter div.btn-group .dropdown-toggle')->click();
+        $typeSelect = $this->find('css', 'div.choice-filter div.btn-group .dropdown-toggle');
+        if (null === $typeSelect) {
+            return;
+        }
+
+        $typeSelect->click();
         /** @var NodeElement[] $types */
         $types = $this->findAll('css', 'ul.dropdown-menu li a.choice-value');
 
@@ -37,13 +42,35 @@ class GridFilterStringItem extends AbstractGridFilterItem
     }
 
     /**
+     * Get type of filter e.g. Contains, Ends With etc.
+     *
+     * @return string
+     */
+    public function getSelectedType()
+    {
+        $elem = $this->getElement('Chosen Select Option');
+
+        return $elem->getText();
+    }
+
+    /**
      * Set value to input field
      *
      * @param string $value
      */
     public function setFilterValue($value)
     {
-        $this->find('css', 'div.value-field-frame input')->setValue($value);
+        $this->getInputField()->setValue($value);
+    }
+
+    /**
+     * Get field input element
+     *
+     * @return NodeElement|null
+     */
+    public function getInputField()
+    {
+        return $this->find('css', 'div.value-field-frame input');
     }
 
     /**

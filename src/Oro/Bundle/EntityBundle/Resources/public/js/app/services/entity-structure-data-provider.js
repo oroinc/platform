@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EntityStructureDataProvider;
-    var _ = require('underscore');
-    var EntityError = require('oroentity/js/entity-error');
-    var errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
-    var EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
+    const _ = require('underscore');
+    const EntityError = require('oroentity/js/entity-error');
+    const errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
+    const EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
     /** @type {Registry} */
-    var registry = require('oroui/js/app/services/registry');
-    var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
-    var fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
-    var BaseClass = require('oroui/js/base-class');
+    const registry = require('oroui/js/app/services/registry');
+    const EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
+    const fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
+    const BaseClass = require('oroui/js/base-class');
 
     /**
      * Filter function for entity fields
@@ -100,7 +99,7 @@ define(function(require) {
      * @typedef {string} propertyPath
      */
 
-    EntityStructureDataProvider = BaseClass.extend(/** @lends EntityStructureDataProvider.prototype */{
+    const EntityStructureDataProvider = BaseClass.extend(/** @lends EntityStructureDataProvider.prototype */{
         cidPrefix: 'esdp',
 
         /**
@@ -215,14 +214,14 @@ define(function(require) {
         fieldsFilterer: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityStructureDataProvider(options) {
             EntityStructureDataProvider.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param {Object} options
          * @param {EntityStructuresCollection} options.collection
          * @param {string} [options.rootEntity] class name of root entity
@@ -261,7 +260,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             delete this.collection;
@@ -273,7 +272,7 @@ define(function(require) {
          * Handles collection sync action and updates the provider
          */
         onCollectionSync: function() {
-            var className = this.rootEntityClassName;
+            const className = this.rootEntityClassName;
             if (!this.disposed && className && (!this.rootEntity || this.rootEntity.get('className') !== className)) {
                 this.setRootEntityClassName(className);
             }
@@ -315,7 +314,7 @@ define(function(require) {
             if (!(presetName in EntityStructureDataProvider._filterPresets)) {
                 throw new TypeError('Filter preset `' + presetName + '` is not defined');
             }
-            var filterConfig = EntityStructureDataProvider._filterPresets[presetName];
+            const filterConfig = EntityStructureDataProvider._filterPresets[presetName];
             this._configureFilter(_.defaults(filterConfig, EntityStructureDataProvider._filterConfigDefaults));
         },
 
@@ -328,7 +327,7 @@ define(function(require) {
          */
         setOptionsFilter: function(optionsFilter) {
             this.optionsFilter = optionsFilter || {};
-            var specialOptions = ['exclude', 'unidirectional', 'auditable', 'relation'];
+            const specialOptions = ['exclude', 'unidirectional', 'auditable', 'relation'];
             this.regularOptionsFilter = _.omit(this.optionsFilter, specialOptions);
             this._toggleFilterer('options', !_.isEmpty(this.regularOptionsFilter));
             _.each(specialOptions, function(option) {
@@ -399,7 +398,7 @@ define(function(require) {
          * @protected
          */
         _filterEntityFields: function(entityData) {
-            var entityClassName = entityData.className;
+            const entityClassName = entityData.className;
             if (!_.isEmpty(this.fieldFilterers)) {
                 entityData.fields = _.filter(entityData.fields, function(field) {
                     return this._isWhitelistedField(entityClassName, field) ||
@@ -460,7 +459,7 @@ define(function(require) {
          * @protected
          */
         _extractEntityData: function(entityModel) {
-            var entityData = entityModel.getAttributes();
+            const entityData = entityModel.getAttributes();
             entityData.fields = entityData.fields.map(this._extractFieldData.bind(this, entityData));
             this._filterEntityFields(entityData);
             this._applyEntityFieldsUpdates(entityData);
@@ -484,6 +483,9 @@ define(function(require) {
         _extractFieldData: function(entityData, fieldData) {
             fieldData = _.clone(fieldData);
             fieldData.parentEntity = entityData;
+            if (entityData.className) {
+                fieldData.entityClassName = entityData.className;
+            }
             if (fieldData.relationType && _.contains(['enum', 'multiEnum'], fieldData.type)) {
                 // @todo, should be fixed in API
                 // `enum` or `multiEnum` field has to be with empty relationType
@@ -492,7 +494,7 @@ define(function(require) {
             }
             Object.defineProperty(fieldData, 'relatedEntity', {
                 get: _.partial(function(provider) {
-                    var relatedEntityModel;
+                    let relatedEntityModel;
                     if (this.relatedEntityName && this.relationType) {
                         relatedEntityModel = provider.collection.getEntityModelByClassName(this.relatedEntityName);
                     }
@@ -515,14 +517,14 @@ define(function(require) {
          * @protected
          */
         _applyEntityFieldsUpdates: function(entityData) {
-            var fields = entityData.fields;
-            var fieldsDataUpdate = _.result(this.fieldsDataUpdate, entityData.className);
+            const fields = entityData.fields;
+            const fieldsDataUpdate = _.result(this.fieldsDataUpdate, entityData.className);
             if (!fieldsDataUpdate) {
                 return;
             }
             _.each(fieldsDataUpdate, function(fieldUpdate, fieldName) {
                 fieldUpdate = _.defaults({name: fieldName}, _.omit(fieldUpdate, 'entity', 'relatedEntity'));
-                var field = _.findWhere(fields, {name: fieldName});
+                const field = _.findWhere(fields, {name: fieldName});
                 if (field) {
                     _.extend(field, fieldUpdate);
                 } else {
@@ -540,12 +542,12 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid fieldId
          */
         pathToEntityChain: function(fieldId) {
-            var entityModel;
+            let entityModel;
             if (!this.rootEntity) {
                 return [];
             }
 
-            var chain = [{
+            const chain = [{
                 entity: this._extractEntityData(this.rootEntity),
                 path: '',
                 basePath: ''
@@ -557,9 +559,9 @@ define(function(require) {
 
             try {
                 _.each(fieldId.split('+'), function(part, i) {
-                    var fieldName;
-                    var entityClassName;
-                    var pos;
+                    let fieldName;
+                    let entityClassName;
+                    let pos;
 
                     if (i === 0) {
                         // first item is always just a field name
@@ -607,7 +609,7 @@ define(function(require) {
          * @return {EntityFieldChain}
          */
         pathToEntityChainSafely: function(fieldId) {
-            var chain;
+            let chain;
 
             try {
                 chain = this.pathToEntityChain(fieldId);
@@ -625,7 +627,7 @@ define(function(require) {
          * @return {boolean}
          */
         validatePath: function(fieldId) {
-            var isValid = true;
+            let isValid = true;
 
             try {
                 this.pathToEntityChain(fieldId);
@@ -645,7 +647,7 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid fieldId
          */
         pathToEntityChainExcludeTrailingField: function(fieldId) {
-            var chain = this.pathToEntityChain(fieldId);
+            const chain = this.pathToEntityChain(fieldId);
             // if last item in the chain is a field -- trim it
             return _.last(chain).entity === void 0 ? chain.slice(0, -1) : chain;
         },
@@ -658,7 +660,7 @@ define(function(require) {
          * @return {EntityFieldChain}
          */
         pathToEntityChainExcludeTrailingFieldSafely: function(fieldId) {
-            var chain;
+            let chain;
 
             try {
                 chain = this.pathToEntityChainExcludeTrailingField(fieldId);
@@ -678,11 +680,9 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid chain
          */
         entityChainToPath: function(chain) {
-            var path;
-
             try {
                 chain = _.map(chain.slice(1), function(part) {
-                    var result = part.field.name;
+                    let result = part.field.name;
                     if (part.entity) {
                         result += '+' + part.entity.className;
                     }
@@ -692,7 +692,7 @@ define(function(require) {
                 throw new EntityError('Can not build field path from given chain');
             }
 
-            path = chain.join('::');
+            const path = chain.join('::');
 
             return path;
         },
@@ -705,7 +705,7 @@ define(function(require) {
          * @return {fieldId}
          */
         entityChainToPathSafely: function(chain) {
-            var path;
+            let path;
 
             try {
                 path = this.entityChainToPath(chain);
@@ -724,9 +724,8 @@ define(function(require) {
          * @return {FieldSignature|null}
          */
         getFieldSignatureSafely: function(fieldId) {
-            var signature = null;
-            var chain;
-            var part;
+            let signature = null;
+            let chain;
 
             if (!fieldId) {
                 return signature;
@@ -739,7 +738,7 @@ define(function(require) {
                 return signature;
             }
 
-            part = _.last(chain);
+            const part = _.last(chain);
             if (part && part.field) {
                 signature = _.pick(part.field, 'type', 'relationType', 'relatedEntityName');
                 if (_.result(part.field.options, 'identifier')) {
@@ -762,9 +761,9 @@ define(function(require) {
          * @return {propertyPath}
          */
         getRelativePropertyPathByPath: function(fieldId) {
-            var fields = [];
+            const fields = [];
             _.each(fieldId.split('+'), function(part, i) {
-                var field;
+                let field;
                 if (i === 0) {
                     // first item is always just a field name
                     fields.push(part);
@@ -791,13 +790,13 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid property path
          */
         getPathByRelativePropertyPath: function(propertyPath) {
-            var parts;
-            var properties = propertyPath.split('.');
-            var entityModel = this.rootEntity;
+            let parts;
+            const properties = propertyPath.split('.');
+            let entityModel = this.rootEntity;
             try {
                 parts = _.map(properties.slice(0, properties.length - 1), function(fieldName) {
-                    var part = fieldName;
-                    var fieldData = _.find(entityModel.get('fields'), {name: fieldName});
+                    let part = fieldName;
+                    const fieldData = _.find(entityModel.get('fields'), {name: fieldName});
                     if (fieldData.relatedEntityName) {
                         entityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
                         part += '+' + fieldData.relatedEntityName;
@@ -820,7 +819,7 @@ define(function(require) {
          * @return {fieldId}
          */
         getPathByRelativePropertyPathSafely: function(propertyPath) {
-            var fieldId;
+            let fieldId;
 
             try {
                 fieldId = this.getPathByRelativePropertyPath(propertyPath);
@@ -838,11 +837,11 @@ define(function(require) {
          * @protected
          */
         _getEntityTree: function() {
-            var entityTree = {};
-            var properties = {};
+            const entityTree = {};
+            const properties = {};
 
             this.collection.each(function(entityModel) {
-                var entityName = entityModel.get('alias') || entityModel.get('className');
+                const entityName = entityModel.get('alias') || entityModel.get('className');
                 properties[entityName] = {
                     get: this._getEntityTreeNode.bind(this, entityModel),
                     enumerable: true
@@ -863,7 +862,7 @@ define(function(require) {
          * @protected
          */
         _getEntityTreeNode: function(entityModel, fieldName) {
-            var properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
+            const properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
             return new EntityTreeNode(properties);
         },
 
@@ -876,13 +875,13 @@ define(function(require) {
          * @protected
          */
         _getEntityTreeNodeProperties: function(entityModel, fieldName) {
-            var properties = {};
-            var entityData = this._extractEntityData(entityModel);
+            const properties = {};
+            const entityData = this._extractEntityData(entityModel);
 
             if (fieldName) {
-                var fieldData = _.find(entityData.fields, {name: fieldName});
+                const fieldData = _.find(entityData.fields, {name: fieldName});
                 if (fieldData.relatedEntityName) {
-                    var relatedEntityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
+                    const relatedEntityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
                     if (relatedEntityModel) {
                         _.extend(properties, this._getEntityTreeNodeProperties(relatedEntityModel));
                     }
@@ -890,7 +889,7 @@ define(function(require) {
                 _.extend(properties, {
                     __field: {
                         get: function() {
-                            var entityData = this._extractEntityData(entityModel);
+                            const entityData = this._extractEntityData(entityModel);
                             return _.find(entityData.fields, {name: fieldName});
                         }.bind(this)
                     }
@@ -924,18 +923,16 @@ define(function(require) {
          * @return {Object|undefined}
          */
         getEntityTreeNodeByPropertyPath: function(propertyPath) {
-            var fieldName;
-            var fieldData;
-            var entityModel;
-            var entity;
-            var path;
+            let fieldName;
+            let fieldData;
+            let entityModel;
 
             if (!propertyPath) {
                 return;
             }
 
-            path = propertyPath.split('.');
-            entity = path.shift();
+            const path = propertyPath.split('.');
+            const entity = path.shift();
             entityModel = this.collection.getEntityModelByClassName(entity);
             if (!entityModel) {
                 entityModel = this.collection.find({alias: entity});
@@ -1007,13 +1004,13 @@ define(function(require) {
          * @static
          */
         createDataProvider: function(options, applicant) {
-            var collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
+            let collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
             if (!collection) {
                 collection = new EntityStructuresCollection();
                 registry.put(collection, applicant);
             }
 
-            var provider = new EntityStructureDataProvider(_.defaults({
+            const provider = new EntityStructureDataProvider(_.defaults({
                 collection: collection
             }, options));
             provider.listenToOnce(applicant, 'dispose', provider.dispose);

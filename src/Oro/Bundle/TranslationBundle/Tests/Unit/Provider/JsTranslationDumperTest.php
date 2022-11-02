@@ -2,133 +2,183 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\TranslationBundle\Controller\Controller;
+use Gaufrette\Filesystem;
+use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
+use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
+use Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\Constraint\IsEqual;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Controller|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationControllerMock;
+    use TempDirExtension;
 
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routerMock;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var JsTranslationGenerator|\PHPUnit\Framework\MockObject\MockObject */
+    private $generator;
 
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageProvider;
+    private $languageProvider;
+
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private static $fileManager;
 
     /** @var JsTranslationDumper */
-    protected $dumper;
+    private $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translationControllerMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Controller\Controller')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->routerMock = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->generator = $this->createMock(JsTranslationGenerator::class);
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
+        self::$fileManager = new FileManager('js_trans_dumper');
+        self::$fileManager->setProtocol('gaufrette');
+        self::$fileManager->setFilesystemMap(new FilesystemMap([
+            'js_trans_dumper' => new Filesystem(new LocalAdapter($this->getTempDir('js_trans_dumper'))),
+        ]));
 
         $this->dumper = new JsTranslationDumper(
-            $this->translationControllerMock,
-            $this->routerMock,
-            [],
-            '',
-            $this->languageProvider
-        );
-        $this->dumper->setLogger($this->logger);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->translationControllerMock,
-            $this->routerMock,
-            $this->logger,
+            $this->generator,
             $this->languageProvider,
-            $this->dumper
+            self::$fileManager
         );
     }
 
-    public function testDumpTranslations()
+    public static function assertFileExists(string $filename, string $message = ''): void
     {
-        $routeMock = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $routeMock->expects($this->once())
-            ->method('getPath')
-            ->will($this->returnValue('/tmp/test{_locale}'));
+        static::assertTrue(self::$fileManager->hasFile($filename), $message);
+    }
 
-        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
-        $routeCollectionMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($routeMock));
+    public static function assertStringEqualsFile(
+        string $expectedFile,
+        string $actualString,
+        string $message = ''
+    ): void {
+        static::assertFileExists($expectedFile, $message);
 
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollectionMock));
+        $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
 
-        $this->logger->expects($this->once())
-            ->method('info');
+        static::assertThat($actualString, $constraint, $message);
+    }
 
-        $this->translationControllerMock->expects($this->once())
-            ->method('renderJsTranslationContent')
-            ->with([], 'en')
-            ->will($this->returnValue('test'));
+    public function testGetAllLocales(): void
+    {
+        $locales = ['en', 'en_US'];
+
+        $this->languageProvider->expects(self::once())
+            ->method('getAvailableLanguageCodes')
+            ->willReturn($locales);
+
+        self::assertEquals($locales, $this->dumper->getAllLocales());
+    }
+
+    public function testDumpTranslations(): void
+    {
+        $translationFileName = 'translation/en.json';
+        $translationFileContent = 'test';
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['en' => 'en']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en']);
+
+        $this->generator->expects($this->once())
+            ->method('generateJsTranslations')
+            ->with('en')
+            ->willReturn($translationFileContent);
 
         $this->dumper->dumpTranslations();
+
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
     }
 
-    public function testDumpTranslationsWithLocales()
+    public function testDumpTranslationsWithLocales(): void
     {
-        $routeMock = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $routeMock->expects($this->once())
-            ->method('getPath')
-            ->will($this->returnValue('/tmp/test{_locale}'));
+        $translationFileName = 'translation/en_US.json';
+        $translationFileContent = 'test';
 
-        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
-        $routeCollectionMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($routeMock));
+        $this->languageProvider->expects($this->never())
+            ->method('getAvailableLanguageCodes');
 
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollectionMock));
-
-        $this->logger->expects($this->once())
-            ->method('info');
-
-        $this->translationControllerMock->expects($this->once())
-            ->method('renderJsTranslationContent')
-            ->with([], 'en_US')
-            ->will($this->returnValue('test'));
-
-        $this->languageProvider->expects($this->never())->method('getAvailableLanguages');
+        $this->generator->expects($this->once())
+            ->method('generateJsTranslations')
+            ->with('en_US')
+            ->willReturn($translationFileContent);
 
         $this->dumper->dumpTranslations(['en_US']);
+
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
+    }
+
+    public function testDumpTranslationFile(): void
+    {
+        $translationFileName = 'translation/en_US.json';
+        $translationFileContent = 'test';
+
+        $this->generator->expects(self::once())
+            ->method('generateJsTranslations')
+            ->with('en_US')
+            ->willReturn($translationFileContent);
+
+        $this->dumper->dumpTranslationFile('en_US');
+
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
+    }
+
+    public function testDumpTranslationFileWhenItIsFailed(): void
+    {
+        $translationFileName = 'translation/en.json';
+        $translationFileContent = 'test';
+
+        $exception = new \Exception('Authentication failed.');
+        $ioExceptionMessage = sprintf(
+            'An error occurred while dumping content to %s, %s',
+            $translationFileName,
+            $exception->getMessage()
+        );
+
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en']);
+
+        $fileManager = $this->createMock(FileManager::class);
+
+        $fileManager->expects($this->once())
+            ->method('writeToStorage')
+            ->willThrowException($exception);
+
+        $this->generator->expects($this->once())
+            ->method('generateJsTranslations')
+            ->with('en')
+            ->willReturn($translationFileContent);
+
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage($ioExceptionMessage);
+
+        $dumper = new JsTranslationDumper(
+            $this->generator,
+            $this->languageProvider,
+            $fileManager
+        );
+        $dumper->dumpTranslations();
+    }
+
+    public function testIsTranslationFileExistForExistingFile(): void
+    {
+        $translationFileName = 'translation/en_GB.json';
+        $translationFileContent = 'test';
+
+        self::$fileManager->writeToStorage($translationFileContent, $translationFileName);
+
+        self::assertTrue($this->dumper->isTranslationFileExist('en_GB'));
+    }
+
+    public function testIsTranslationFileExistWhenFileDoesNotExist(): void
+    {
+        self::assertFalse($this->dumper->isTranslationFileExist('en_AU'));
     }
 }

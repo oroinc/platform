@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "./thread-view";
-    @import "./user-emails";
+    @import 'variables';
+    @import 'thread-view';
+    @import 'user-emails';
+    @import 'styles';
 }

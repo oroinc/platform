@@ -1,0 +1,54 @@
+<div class="choice-filter number-range-filter" data-number-range-filter-template>
+    <div class="filter-select-oro-wrapper">
+        <select name="<%- name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s" data-choice-value-select
+            <% if (_.isMobile()) { %>
+                data-skip-input-widgets
+            <% } %>
+            aria-label="<%- choiceAriaLabel %>"
+        >
+            <% _.each(choices, function (option) { %>
+                <option value="<%- option.value %>"
+
+                    <% if (option.value == selectedChoice) { %>
+                        selected="selected"
+                    <% } %>
+                >
+                    <%- option.label %>
+                </option>
+            <% }); %>
+        </select>
+    </div>
+    <div class="value-field-frame">
+        <div class="filter-value">
+            <div class="filter-value-range">
+                <div class="filter-start">
+                    <input class="input input--size-s input--full"
+                       type="number"
+                       value="<%- value.value %>"
+                       name="value"
+                       aria-label="<%- rangeStartFieldAriaLabel %>"
+                    >
+                </div>
+                <span class="filter-separator" aria-hidden="true">-</span>
+                <div class="filter-end">
+                    <input class="input input--size-s input--full"
+                       type="number"
+                       value="<%- value.value_end %>"
+                       name="value_end"
+                       aria-label="<%- rangeEndFieldAriaLabel %>"
+                    >
+                </div>
+            </div>
+        </div>
+        <input class="name_input" type="hidden" name="<%- name %>" id="<%- name %>" value="<%- selectedChoice %>">
+
+        <% if (renderMode !== 'toggle-mode') { %>
+            <div class="filter-action-row">
+                <button type="button"
+                    class="btn btn--action btn--size-s filter-update"
+                    aria-label="<%- updateButtonAriaLabel %>"
+                ><%- _.__("oro.filter.updateButton.text") %></button>
+            </div>
+        <% } %>
+    </div>
+</div>

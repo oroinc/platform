@@ -1,18 +1,17 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var FuzzySearch;
-    var Fuse = require('Fuse');
-    var _ = require('underscore');
+    const Fuse = require('Fuse');
+    const _ = require('underscore');
 
-    var config = _.extend({
+    const config = _.extend({
         checkScore: 0.49,
         engineOptions: {
             includeScore: true
         }
-    }, require('module').config() || {});
+    }, require('module-config').default(module.id) || {});
 
-    FuzzySearch = {
+    const FuzzySearch = {
         engineOptions: config.engineOptions,
 
         checkScore: config.checkScore,
@@ -28,7 +27,7 @@ define(function(require) {
         },
 
         getMatches: function(str, query) {
-            var cache = this._cache[str];
+            let cache = this._cache[str];
             if (!cache) {
                 cache = this._cache[str] = {
                     searchEngine: this._newSearchEngine(str),
@@ -37,7 +36,7 @@ define(function(require) {
             }
 
             if (cache.queries[query] === undefined) {
-                var matches = cache.searchEngine.search(query);
+                const matches = cache.searchEngine.search(query);
                 cache.queries[query] = this._filterMatches(matches);
             }
 

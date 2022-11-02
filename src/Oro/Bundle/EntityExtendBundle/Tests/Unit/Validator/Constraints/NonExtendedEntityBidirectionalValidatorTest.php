@@ -6,35 +6,28 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintValidatorTest
+class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var Form|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $rootMock;
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
+    private $rootMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         parent::setUp();
 
-        $this->rootMock = $this->getMockBuilder(Form::class)->disableOriginalConstructor()->getMock();
+        $this->rootMock = $this->createMock(Form::class);
         $this->constraint = new NonExtendedEntityBidirectional();
         $this->context->setConstraint($this->constraint);
         $this->setRoot($this->rootMock);
@@ -61,7 +54,8 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
         $config = new Config(new EntityConfigId('extend', $className));
         $config->set('is_extend', $isExtended);
 
-        $this->configManager->method('getEntityConfig')
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
             ->with('extend', $className)
             ->willReturn($config);
 
@@ -80,10 +74,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
         }
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
             'is extend entity' => [
@@ -125,7 +116,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
     }
 
     /**
-     * @return NonExtendedEntityBidirectionalValidator
+     * {@inheritDoc}
      */
     protected function createValidator()
     {
@@ -133,24 +124,18 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
      * @param string $type
      */
-    protected function configureRootFormFieldType($type)
+    private function configureRootFormFieldType($type)
     {
         $fieldConfigModel = new FieldConfigModel('whatever', $type);
-        $formConfig = $this->getMockBuilder(FormConfigInterface::class)->getMock();
-        $formConfig->expects($this->once())->method('getOption')->willReturn($fieldConfigModel);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig->expects($this->once())
+            ->method('getOption')
+            ->willReturn($fieldConfigModel);
 
-        $this->rootMock->expects($this->once())->method('getConfig')->willReturn($formConfig);
+        $this->rootMock->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
     }
 }

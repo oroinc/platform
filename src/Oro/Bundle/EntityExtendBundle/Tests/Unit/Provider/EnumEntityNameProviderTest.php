@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EnumEntityNameProvider
-     */
-    protected $enumEntityNameProvider;
+    /** @var EnumEntityNameProvider */
+    private $enumEntityNameProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->enumEntityNameProvider = new EnumEntityNameProvider();
     }
@@ -29,12 +28,12 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getNameProvider()
+    public function getNameProvider(): array
     {
         return [
             'full version of enum' => [
                 [
-                    EnumEntityNameProvider::FULL,
+                    EntityNameProviderInterface::FULL,
                     null,
                     new TestEnumValue('idValue', 'nameValue'),
                 ],
@@ -42,7 +41,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'short version of enum' => [
                 [
-                    EnumEntityNameProvider::SHORT,
+                    EntityNameProviderInterface::SHORT,
                     null,
                     new TestEnumValue('idValue', 'nameValue'),
                 ],
@@ -50,7 +49,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'ful version of unsupported class' => [
                 [
-                    EnumEntityNameProvider::FULL,
+                    EntityNameProviderInterface::FULL,
                     null,
                     new TestClass(),
                 ],
@@ -58,7 +57,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'short version of unsupported class' => [
                 [
-                    EnumEntityNameProvider::SHORT,
+                    EntityNameProviderInterface::SHORT,
                     null,
                     new TestClass(),
                 ],
@@ -78,12 +77,12 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getNameDQLProvider()
+    public function getNameDQLProvider(): array
     {
         return [
             'full version of enum' => [
                 [
-                    EnumEntityNameProvider::FULL,
+                    EntityNameProviderInterface::FULL,
                     null,
                     TestEnumValue::class,
                     't',
@@ -92,7 +91,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'short version of enum' => [
                 [
-                    EnumEntityNameProvider::SHORT,
+                    EntityNameProviderInterface::SHORT,
                     null,
                     TestEnumValue::class,
                     'e',
@@ -101,7 +100,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'ful version of unsupported class' => [
                 [
-                    EnumEntityNameProvider::FULL,
+                    EntityNameProviderInterface::FULL,
                     null,
                     TestClass::class,
                     't',
@@ -110,7 +109,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'short version of unsupported class' => [
                 [
-                    EnumEntityNameProvider::SHORT,
+                    EntityNameProviderInterface::SHORT,
                     null,
                     TestClass::class,
                     'e',

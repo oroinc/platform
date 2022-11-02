@@ -6,7 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
+ * Provides a set of methods to configure (modify) an ORM query.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OrmQueryConfiguration
 {
@@ -42,9 +46,6 @@ class OrmQueryConfiguration
     /** @var array */
     private $generatedJoinAliases = [];
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     public function __construct(DatagridConfiguration $config)
     {
         $this->config = $config;
@@ -251,7 +252,7 @@ class OrmQueryConfiguration
      *
      * For example, the following method
      * <code>
-     *  $query->convertAssociationJoinToSubquery('g', 'groupName', 'AcmeBundle:UserGroup');
+     *  $query->convertAssociationJoinToSubquery('g', 'groupName', UserGroup::class);
      * </code>
      * converts the query
      * <code>
@@ -259,7 +260,7 @@ class OrmQueryConfiguration
      *      select:
      *          - g.name as groupName
      *      from:
-     *          - { table: AcmeBundle:User, alias: u }
+     *          - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
      *      join:
      *          left:
      *              - { join: u.group, alias: g }
@@ -268,9 +269,9 @@ class OrmQueryConfiguration
      * <code>
      *  query:
      *      select:
-     *          - (SELECT g.name FROM AcmeBundle:UserGroup AS g WHERE g = u.group) as groupName
+     *          - (SELECT g.name FROM Acme\Bundle\AppBundle\Entity\UserGroup AS g WHERE g = u.group) as groupName
      *      from:
-     *          - { table: AcmeBundle:User, alias: u }
+     *          - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
      * </code>
      *
      * @param string $joinAlias
@@ -279,12 +280,12 @@ class OrmQueryConfiguration
      */
     public function convertAssociationJoinToSubquery($joinAlias, $columnAlias, $joinEntityClass)
     {
-        list(
+        [
             $join,
             $joinPath,
             $selectExpr,
             $selectPath
-            ) = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+            ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
         if (!$join || !$selectExpr) {
             return;
         }
@@ -318,18 +319,22 @@ class OrmQueryConfiguration
      *      select:
      *          - g.name as groupName
      *      from:
-     *          - { table: AcmeBundle:User, alias: u }
+     *          - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
      *      join:
      *          left:
-     *              - { join: AcmeBundle:UserGroup, alias: g, conditionType: WITH, condition: g = u.group }
+     *              -
+     *                  join: Acme\Bundle\AppBundle\Entity\UserGroup
+     *                  alias: g
+     *                  conditionType: WITH
+     *                  condition: g = u.group
      * </code>
      * to
      * <code>
      *  query:
      *      select:
-     *          - (SELECT g.name FROM AcmeBundle:UserGroup AS g WHERE g = u.group) as groupName
+     *          - (SELECT g.name FROM Acme\Bundle\AppBundle\Entity\UserGroup AS g WHERE g = u.group) as groupName
      *      from:
-     *          - { table: AcmeBundle:User, alias: u }
+     *          - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
      * </code>
      *
      * @param string $joinAlias
@@ -337,12 +342,12 @@ class OrmQueryConfiguration
      */
     public function convertEntityJoinToSubquery($joinAlias, $columnAlias)
     {
-        list(
+        [
             $join,
             $joinPath,
             $selectExpr,
             $selectPath
-            ) = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+            ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
         if (!$join || !$selectExpr || empty($join[self::CONDITION_KEY])) {
             return;
         }
@@ -924,14 +929,14 @@ class OrmQueryConfiguration
      */
     private function findJoinAndSelectByAliases($joinAlias, $columnAlias)
     {
-        list($join, $joinPath) = $this->findJoinByAlias($joinAlias, self::INNER_JOIN_PATH);
+        [$join, $joinPath] = $this->findJoinByAlias($joinAlias, self::INNER_JOIN_PATH);
         if (null === $join) {
-            list($join, $joinPath) = $this->findJoinByAlias($joinAlias, self::LEFT_JOIN_PATH);
+            [$join, $joinPath] = $this->findJoinByAlias($joinAlias, self::LEFT_JOIN_PATH);
         }
         $selectExpr = null;
         $selectPath = null;
         if (null !== $join) {
-            list($selectExpr, $selectPath) = $this->findSelectExprByAlias($columnAlias);
+            [$selectExpr, $selectPath] = $this->findSelectExprByAlias($columnAlias);
         }
 
         return [$join, $joinPath, $selectExpr, $selectPath];

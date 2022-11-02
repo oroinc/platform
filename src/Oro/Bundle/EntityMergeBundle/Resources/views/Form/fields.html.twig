@@ -22,7 +22,7 @@
                         </label>
                     </div>
                     <a class="entity-merge-select-all" data-entity-key="{{ child.vars.value }}"
-                       href="javascript:void(0);">
+                       href="#">
                         {{ "oro.entity_merge.form.select_all"|trans }}
                     </a>
                 </td>
@@ -39,7 +39,7 @@
 {% endblock %}
 
 {% block oro_entity_merge_javascript %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: 'oroentitymerge/js/merge-view',
@@ -93,7 +93,7 @@
 {% endblock %}
 
 {% block oro_entity_merge_field_label %}
-    {% if label is not sameas(false) %}
+    {% if label is not same as(false) %}
         {% if required %}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {% endif %}

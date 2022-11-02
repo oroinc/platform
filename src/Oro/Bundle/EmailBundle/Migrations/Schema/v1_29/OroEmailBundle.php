@@ -3,11 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailBodyTopic;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Adds `text_body` field to the `oro_email_body` table if needed and sends migration message to queue.
+ */
 class OroEmailBundle implements Migration, ContainerAwareInterface
 {
     /** @var ContainerInterface */
@@ -36,12 +40,9 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
 
         // send migration message to queue
         $this->container->get('oro_message_queue.message_producer')
-            ->send(UpgradeEmailBodyMessageProcessor::TOPIC_NAME, '');
+            ->send(UpdateEmailBodyTopic::getName(), []);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addTextBodyFieldToEmailBodyTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_body');

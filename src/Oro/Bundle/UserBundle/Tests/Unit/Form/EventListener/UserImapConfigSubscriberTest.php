@@ -14,22 +14,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventMock;
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventMock;
 
-    /** @var  UserImapConfigSubscriber */
-    protected $subscriber;
+    /** @var UserImapConfigSubscriber */
+    private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->requestStack = new RequestStack();
@@ -44,25 +44,10 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 FormEvents::PRE_SET_DATA => 'preSetData',
-                FormEvents::POST_SUBMIT => 'postSubmit',
                 FormEvents::PRE_SUBMIT => 'preSubmit',
             ],
             $this->subscriber->getSubscribedEvents()
         );
-    }
-
-    public function testPostSubmit()
-    {
-        $user = new User();
-
-        $this->eventMock->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($user));
-
-        $this->manager->expects($this->once())->method('persist')->with($this->equalTo($user));
-        $this->manager->expects($this->once())->method('flush');
-
-        $this->subscriber->postSubmit($this->eventMock);
     }
 
     public function testPreSetDataForUserConfig()
@@ -85,8 +70,10 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->manager->expects($this->once())->method('find')->with('OroUserBundle:User', $id)
-            ->will($this->returnValue($user));
+        $this->manager->expects($this->once())
+            ->method('find')
+            ->with('OroUserBundle:User', $id)
+            ->willReturn($user);
 
         $this->eventMock->expects($this->once())
             ->method('setData')
@@ -107,7 +94,8 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $this->requestStack->push($request);
 
-        $this->manager->expects($this->never())->method('find');
+        $this->manager->expects($this->never())
+            ->method('find');
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -135,7 +123,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->eventMock->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($eventData));
+            ->willReturn($eventData);
         $this->eventMock->expects($this->once())
             ->method('setData')
             ->with($this->equalTo(

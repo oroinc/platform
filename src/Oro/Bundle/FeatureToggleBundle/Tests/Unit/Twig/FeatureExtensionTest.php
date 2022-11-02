@@ -11,27 +11,20 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
     /** @var FeatureExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
+            ->add(FeatureChecker::class, $this->featureChecker)
             ->getContainer($this);
 
         $this->extension = new FeatureExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_featuretoggle_extension', $this->extension->getName());
     }
 
     public function testIsFeatureEnabled()

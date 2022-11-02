@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SoapBundle\Event;
 
 use Doctrine\Common\Collections\Criteria;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class GetListBefore extends Event
 {
@@ -37,9 +37,6 @@ class GetListBefore extends Event
         return $this->criteria;
     }
 
-    /**
-     * @param Criteria $criteria
-     */
     public function setCriteria(Criteria $criteria)
     {
         $this->criteria = $criteria;

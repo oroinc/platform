@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
@@ -14,21 +14,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
-    /** @var ExceptionTextExtractorInterface */
-    protected $exceptionTextExtractor;
+    /** @var ErrorTitleOverrideProvider */
+    private $errorTitleOverrideProvider;
 
-    /**
-     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
-     */
-    public function __construct(ExceptionTextExtractorInterface $exceptionTextExtractor)
-    {
+    /** @var ExceptionTextExtractorInterface */
+    private $exceptionTextExtractor;
+
+    public function __construct(
+        ErrorTitleOverrideProvider $errorTitleOverrideProvider,
+        ExceptionTextExtractorInterface $exceptionTextExtractor
+    ) {
+        $this->errorTitleOverrideProvider = $errorTitleOverrideProvider;
         $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
-    /**
-     * @param Error $error
-     */
-    protected function completeStatusCode(Error $error)
+    protected function completeStatusCode(Error $error): void
     {
         if (null === $error->getStatusCode() && null !== $error->getInnerException()) {
             $statusCode = $this->exceptionTextExtractor->getExceptionStatusCode($error->getInnerException());
@@ -38,10 +38,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
-    protected function completeCode(Error $error)
+    protected function completeCode(Error $error): void
     {
         if (null === $error->getCode() && null !== $error->getInnerException()) {
             $code = $this->exceptionTextExtractor->getExceptionCode($error->getInnerException());
@@ -52,9 +49,9 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     }
 
     /**
-     * @param Error $error
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function completeTitle(Error $error)
+    protected function completeTitle(Error $error): void
     {
         if (null === $error->getTitle()) {
             if ($this->isConfigFilterConstraintViolation($error)) {
@@ -67,17 +64,20 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
             }
             if (null === $error->getTitle()) {
                 $statusCode = $error->getStatusCode();
-                if (null !== $statusCode && array_key_exists($statusCode, Response::$statusTexts)) {
-                    $error->setTitle(Response::$statusTexts[$statusCode]);
+                if (null !== $statusCode && \array_key_exists($statusCode, Response::$statusTexts)) {
+                    $error->setTitle(strtolower(Response::$statusTexts[$statusCode]));
                 }
+            }
+        }
+        if ($error->getTitle()) {
+            $title = $this->errorTitleOverrideProvider->getSubstituteErrorTitle($error->getTitle());
+            if ($title) {
+                $error->setTitle($title);
             }
         }
     }
 
-    /**
-     * @param Error $error
-     */
-    protected function completeDetail(Error $error)
+    protected function completeDetail(Error $error): void
     {
         if (null === $error->getDetail()) {
             if ($this->isConfigFilterConstraintViolation($error)) {
@@ -91,12 +91,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return bool
-     */
-    protected function isConfigFilterConstraintViolation(Error $error)
+    protected function isConfigFilterConstraintViolation(Error $error): bool
     {
         if (null === $error->getInnerException()) {
             return false;

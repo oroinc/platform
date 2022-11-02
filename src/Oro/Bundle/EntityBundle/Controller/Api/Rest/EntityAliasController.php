@@ -2,27 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("entity_alias")
- * @NamePrefix("oro_api_")
+ * REST API controller for entity aliases.
  */
-class EntityAliasController extends FOSRestController implements ClassResourceInterface
+class EntityAliasController extends AbstractFOSRestController
 {
     /**
      * Get entity aliases.
-     *
-     * @Get("/entities/aliases")
      *
      * @ApiDoc(
      *      description="Get entity aliases",
@@ -57,6 +49,6 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
             ];
         }
 
-        return $this->handleView($this->view($result, Codes::HTTP_OK));
+        return $this->handleView($this->view($result, Response::HTTP_OK));
     }
 }

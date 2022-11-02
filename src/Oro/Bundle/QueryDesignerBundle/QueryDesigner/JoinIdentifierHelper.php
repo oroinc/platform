@@ -45,14 +45,12 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  *      order.products|left|WITH|products.orderId = order AND products.active = true
  *          - represents "order -> products" join with custom condition and forces to use LEFT JOIN
  * The join identifier for the root table is empty string.
- * @todo: need to think how to reduce the complexity of this class
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JoinIdentifierHelper
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $rootEntity;
 
     /**
@@ -99,13 +97,14 @@ class JoinIdentifierHelper
     /**
      * Returns the join identifier for the given column
      *
-     * @param string $columnName
+     * @param string      $columnName
+     * @param string|null $entityClass
      *
      * @return string
      */
-    public function buildColumnJoinIdentifier($columnName)
+    public function buildColumnJoinIdentifier($columnName, $entityClass = null)
     {
-        return sprintf('%s::%s', $this->rootEntity, $columnName);
+        return sprintf('%s::%s', $entityClass ?? $this->rootEntity, $columnName);
     }
 
     /**
@@ -142,7 +141,7 @@ class JoinIdentifierHelper
     public function explodeJoinIdentifier($joinId)
     {
         $joinIds = [];
-        $items   = explode('+', $joinId);
+        $items = $this->splitJoinIdentifier($joinId);
         foreach ($items as $item) {
             $joinIds[] = empty($joinIds)
                 ? $item
@@ -150,6 +149,30 @@ class JoinIdentifierHelper
         }
 
         return $joinIds;
+    }
+
+    /**
+     * Gets parts the the given join identifier consists
+     *
+     * @param string $joinId
+     *
+     * @return string[]
+     */
+    public function splitJoinIdentifier($joinId)
+    {
+        return explode('+', $joinId);
+    }
+
+    /**
+     * Gets parts the the given join identifier consists
+     *
+     * @param string[] $joinIds
+     *
+     * @return string
+     */
+    public function mergeJoinIdentifier($joinIds)
+    {
+        return implode('+', $joinIds);
     }
 
     /**
@@ -168,11 +191,10 @@ class JoinIdentifierHelper
         }
 
         $lastDelimiter = strrpos($joinId, '+');
-        if (false === $lastDelimiter) {
-            return '';
-        }
 
-        return substr($joinId, 0, $lastDelimiter);
+        return false !== $lastDelimiter
+            ? substr($joinId, 0, $lastDelimiter)
+            : '';
     }
 
     /**
@@ -194,13 +216,13 @@ class JoinIdentifierHelper
             return sprintf('%s::%s', substr($joinId, 0, strpos($joinId, '::')), $joinByFieldName);
         }
 
-        $entityClassName = substr(
+        $entityClass = substr(
             $joinId,
-            strlen($parentJoinId) + 1,
-            strpos($joinId, '::', strlen($parentJoinId) + 1) - strlen($parentJoinId) - 1
+            \strlen($parentJoinId) + 1,
+            strpos($joinId, '::', \strlen($parentJoinId) + 1) - \strlen($parentJoinId) - 1
         );
 
-        return sprintf('%s+%s::%s', $parentJoinId, $entityClassName, $joinByFieldName);
+        return sprintf('%s+%s::%s', $parentJoinId, $entityClass, $joinByFieldName);
     }
 
     /**
@@ -213,14 +235,10 @@ class JoinIdentifierHelper
     public function getEntityClassName($columnNameOrJoinId)
     {
         $startDelimiter = $this->getStartPosition($columnNameOrJoinId, '+');
-        $endDelimiter   = strpos($columnNameOrJoinId, '|', $startDelimiter);
-
-        $lastJoinPart  = false === $endDelimiter
-            ? substr($columnNameOrJoinId, $startDelimiter)
-            : substr($columnNameOrJoinId, $startDelimiter, $endDelimiter - $startDelimiter);
+        $lastJoinPart = $this->getLastJoinPart($columnNameOrJoinId, $startDelimiter);
         $lastDelimiter = strrpos($lastJoinPart, '::');
         if (false === $lastDelimiter) {
-            return 0 === $startDelimiter && false === strpos($lastJoinPart, '.')
+            return 0 === $startDelimiter && !str_contains($lastJoinPart, '.')
                 ? $this->rootEntity
                 : null;
         }
@@ -246,12 +264,7 @@ class JoinIdentifierHelper
      */
     public function getFieldName($columnNameOrJoinId)
     {
-        $startDelimiter = $this->getStartPosition($columnNameOrJoinId, '+');
-        $endDelimiter   = strpos($columnNameOrJoinId, '|', $startDelimiter);
-
-        $lastJoinPart  = false === $endDelimiter
-            ? substr($columnNameOrJoinId, $startDelimiter)
-            : substr($columnNameOrJoinId, $startDelimiter, $endDelimiter - $startDelimiter);
+        $lastJoinPart = $this->getLastJoinPart($columnNameOrJoinId, $this->getStartPosition($columnNameOrJoinId, '+'));
         $lastDelimiter = $this->getStartPosition($lastJoinPart, '::');
         if ($lastDelimiter > 0) {
             return substr($lastJoinPart, $lastDelimiter);
@@ -273,8 +286,7 @@ class JoinIdentifierHelper
      */
     public function isUnidirectionalJoin($joinId)
     {
-        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
-        $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
+        $startDelimiter = strpos($joinId, '::', $this->getStartPosition($joinId, '+'));
         if (false === $startDelimiter) {
             return false;
         }
@@ -292,10 +304,9 @@ class JoinIdentifierHelper
      */
     public function isUnidirectionalJoinWithCondition($joinId)
     {
-        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
-        $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
-
-        return (false === $startDelimiter) && (false === strpos($this->getUnidirectionalJoinEntityName($joinId), '.'));
+        return
+            false === strpos($joinId, '::', $this->getStartPosition($joinId, '+'))
+            && !str_contains($this->getUnidirectionalJoinEntityName($joinId), '.');
     }
 
     /**
@@ -307,13 +318,7 @@ class JoinIdentifierHelper
      */
     public function getUnidirectionalJoinEntityName($joinId)
     {
-        $startDelimiter = $this->getStartPosition($joinId, '+');
-        $endDelimiter   = strpos($joinId, '|', $startDelimiter);
-
-        $lastJoinPart = false === $endDelimiter
-            ? substr($joinId, $startDelimiter)
-            : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
-
+        $lastJoinPart = $this->getLastJoinPart($joinId, $this->getStartPosition($joinId, '+'));
         $lastDelimiter = $this->getStartPosition($lastJoinPart, '::');
 
         return $lastDelimiter > 0 ? substr($lastJoinPart, $lastDelimiter) : $lastJoinPart;
@@ -322,113 +327,77 @@ class JoinIdentifierHelper
     /**
      * Extracts the join part from the given join identifier
      *
-     * @param $joinId
+     * @param string $joinId
      *
      * @return string
      */
     public function getJoin($joinId)
     {
-        $startDelimiter = $this->getStartPosition($joinId, '+');
-        $endDelimiter   = strpos($joinId, '|', $startDelimiter);
-
-        return false === $endDelimiter
-            ? substr($joinId, $startDelimiter)
-            : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
+        return $this->getLastJoinPart($joinId, $this->getStartPosition($joinId, '+'));
     }
 
     /**
      * Extracts the join type from the given join identifier
      *
-     * @param $joinId
+     * @param string $joinId
      *
-     * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
+     * @return string|null NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     public function getJoinType($joinId)
     {
-        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
-        $startDelimiter    = strpos($joinId, '|', $lastItemDelimiter);
+        $startDelimiter = strpos($joinId, '|', $this->getStartPosition($joinId, '+'));
         if (false === $startDelimiter) {
             return null;
         }
 
-        $endDelimiter = strpos($joinId, '|', $startDelimiter + 1);
-        $result       = false === $endDelimiter
-            ? substr($joinId, $startDelimiter + 1)
-            : substr($joinId, $startDelimiter + 1, $endDelimiter - $startDelimiter - 1);
-
-        if (empty($result)) {
-            $result = null;
-        }
-
-        return $result;
+        return $this->getLastJoinPart($joinId, $startDelimiter + 1) ?: null;
     }
 
     /**
      * Extracts the join condition type from the given join identifier
      *
-     * @param $joinId
+     * @param string $joinId
      *
-     * @return null|string NULL if not specified
+     * @return string|null NULL if not specified
      *                     or a string represents the join condition type, for example 'WITH' or 'ON'
      */
     public function getJoinConditionType($joinId)
     {
-        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
-        $startDelimiter    = strpos($joinId, '|', $lastItemDelimiter);
+        $startDelimiter = strpos($joinId, '|', $this->getStartPosition($joinId, '+'));
+        if (false === $startDelimiter) {
+            return null;
+        }
+        $startDelimiter = strpos($joinId, '|', $startDelimiter + 1);
         if (false === $startDelimiter) {
             return null;
         }
 
-        $result       = null;
-        $endDelimiter = strpos($joinId, '|', $startDelimiter + 1);
-        if (false !== $endDelimiter) {
-            $startDelimiter = $endDelimiter;
-            $endDelimiter   = strpos($joinId, '|', $endDelimiter + 1);
-            $result         = false === $endDelimiter
-                ? substr($joinId, $startDelimiter + 1)
-                : substr($joinId, $startDelimiter + 1, $endDelimiter - $startDelimiter - 1);
-        }
-
-        if (empty($result)) {
-            $result = null;
-        }
-
-        return $result;
+        return $this->getLastJoinPart($joinId, $startDelimiter + 1) ?: null;
     }
 
     /**
      * Extracts the join condition from the given join identifier
      *
-     * @param $joinId
+     * @param string $joinId
      *
-     * @return null|string NULL if not specified, or a string represents the join condition
+     * @return string|null NULL if not specified, or a string represents the join condition
      */
     public function getJoinCondition($joinId)
     {
-        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
-        $startDelimiter    = strpos($joinId, '|', $lastItemDelimiter);
+        $startDelimiter = strpos($joinId, '|', $this->getStartPosition($joinId, '+'));
+        if (false === $startDelimiter) {
+            return null;
+        }
+        $startDelimiter = strpos($joinId, '|', $startDelimiter + 1);
+        if (false === $startDelimiter) {
+            return null;
+        }
+        $startDelimiter = strpos($joinId, '|', $startDelimiter + 1);
         if (false === $startDelimiter) {
             return null;
         }
 
-        $result       = null;
-        $endDelimiter = strpos($joinId, '|', $startDelimiter + 1);
-        if (false !== $endDelimiter) {
-            $endDelimiter = strpos($joinId, '|', $endDelimiter + 1);
-            if (false !== $endDelimiter) {
-                $startDelimiter = $endDelimiter;
-                $endDelimiter   = strpos($joinId, '|', $endDelimiter + 1);
-                $result         = false === $endDelimiter
-                    ? substr($joinId, $startDelimiter + 1)
-                    : substr($joinId, $startDelimiter + 1, $endDelimiter - $startDelimiter - 1);
-            }
-        }
-
-        if (empty($result)) {
-            $result = null;
-        }
-
-        return $result;
+        return $this->getLastJoinPart($joinId, $startDelimiter + 1) ?: null;
     }
 
     /**
@@ -437,12 +406,27 @@ class JoinIdentifierHelper
      *
      * @return int
      */
-    protected function getStartPosition($str, $needle)
+    private function getStartPosition($str, $needle)
     {
         $startDelimiter = strrpos($str, $needle);
 
         return false === $startDelimiter
             ? 0
             : $startDelimiter + strlen($needle);
+    }
+
+    /**
+     * @param string   $columnNameOrJoinId
+     * @param int|bool $startDelimiter
+     *
+     * @return string
+     */
+    private function getLastJoinPart($columnNameOrJoinId, $startDelimiter)
+    {
+        $endDelimiter = strpos($columnNameOrJoinId, '|', $startDelimiter);
+
+        return false === $endDelimiter
+            ? substr($columnNameOrJoinId, $startDelimiter)
+            : substr($columnNameOrJoinId, $startDelimiter, $endDelimiter - $startDelimiter);
     }
 }

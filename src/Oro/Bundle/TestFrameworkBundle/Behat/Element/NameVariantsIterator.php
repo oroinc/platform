@@ -4,6 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Transformers\NamePartsTransformerInterface;
 
+/**
+ * Iterates over Behat element name variants
+ */
 class NameVariantsIterator implements \IteratorAggregate
 {
     /** @var array|string[] */
@@ -27,9 +30,6 @@ class NameVariantsIterator implements \IteratorAggregate
         }
     }
 
-    /**
-     * @param NamePartsTransformerInterface $transformer
-     */
     public function addPartsTransformer(NamePartsTransformerInterface $transformer)
     {
         $this->transformers[] = $transformer;
@@ -78,7 +78,7 @@ class NameVariantsIterator implements \IteratorAggregate
     /**
      * @return \Generator
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         yield $this->name;
 

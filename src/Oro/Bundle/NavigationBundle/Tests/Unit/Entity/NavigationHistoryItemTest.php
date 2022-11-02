@@ -14,16 +14,16 @@ class NavigationHistoryItemTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setEmail('some@email.com');
 
-        $values = array(
+        $values = [
             'title'           => 'Some Title',
             'url'             => 'Some Url',
             'user'            => $user,
             'organization'    => $organization,
             'route'           => 'test_route',
-            'routeParameters' => array('key' => 'value'),
+            'routeParameters' => ['key' => 'value'],
             'entityId'        => 1,
 
-        );
+        ];
 
         $item = new NavigationHistoryItem($values);
         $this->assertEquals($values['title'], $item->getTitle());
@@ -51,7 +51,7 @@ class NavigationHistoryItemTest extends \PHPUnit\Framework\TestCase
         $item->doPrePersist();
 
         $this->assertInstanceOf('DateTime', $item->getVisitedAt());
-        $this->assertEquals($item->getVisitCount(), 0);
+        $this->assertEquals(0, $item->getVisitCount());
     }
 
     public function testDoUpdate()

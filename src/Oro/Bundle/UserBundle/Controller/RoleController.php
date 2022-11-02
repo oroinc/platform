@@ -3,19 +3,25 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClient;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * This controller covers CRUD functionality for Role entity.
  * @Route("/role")
  */
-class RoleController extends Controller
+class RoleController extends AbstractController
 {
     /**
      * @Acl(
@@ -25,11 +31,11 @@ class RoleController extends Controller
      *      permission="CREATE"
      * )
      * @Route("/create", name="oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
+     * @Template("@OroUser/Role/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Role());
+        return $this->update(new Role(), $request);
     }
 
     /**
@@ -50,21 +56,16 @@ class RoleController extends Controller
     {
         return [
             'entity' => $role,
+            'entity_class' => ClassUtils::getRealClass($role),
             'tabsOptions' => [
-                'data' => $this->getTabListOptions()
+                'data' => $this->getRolePrivilegeCategoryProvider()->getTabs()
             ],
             'capabilitySetOptions' => [
                 'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
-                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
+                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabIds(),
                 'readonly' => true
             ],
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete a role and un-assign it from all users or reassign users to another role before
-            'allow_delete' =>
-                $role->getId() &&
-                !$this->get('doctrine.orm.entity_manager')
-                    ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($role)
+            'allow_delete' => $role->getId() && !$this->hasAssignedUsers($role)
         ];
     }
 
@@ -82,9 +83,9 @@ class RoleController extends Controller
      *
      * @return array
      */
-    public function updateAction(Role $entity)
+    public function updateAction(Role $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -105,39 +106,38 @@ class RoleController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
+            'entity_class' => Role::class
         ];
     }
 
     /**
      * @param Role $role
+     * @param Request $request
      *
      * @return array
      */
-    protected function update(Role $role)
+    protected function update(Role $role, Request $request)
     {
-        $categoryProvider = $this->get('oro_user.provider.role_privilege_category_provider');
-
         /** @var AclRoleHandler $aclRoleHandler */
-        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler = $this->get(AclRoleHandler::class);
         $aclRoleHandler->createForm($role);
 
         if ($aclRoleHandler->process($role)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.role.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.role.message.saved')
             );
 
-            if ($this->get('oro_sync.client.connection_checker')->checkConnection()) {
-                $publisher = $this->get('oro_sync.websocket_client');
+            if ($this->get(ConnectionChecker::class)->checkConnection()) {
+                $publisher = $this->get(WebsocketClient::class);
                 $publisher->publish('oro/outdated_user_page', ['role' => $role->getRole()]);
             }
 
-            return $this->get('oro_ui.router')->redirect($role);
+            return $this->get(Router::class)->redirect($role);
         }
 
         $form = $aclRoleHandler->createView();
-        $tabs = $categoryProvider->getTabs();
+        $tabs = $this->getRolePrivilegeCategoryProvider()->getTabs();
 
         return [
             'entity' => $role,
@@ -145,48 +145,45 @@ class RoleController extends Controller
             'tabsOptions' => [
                 'data' => $tabs
             ],
-            'capabilitySetOptions' =>
-                $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
-            'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete a role and un-assign it from all users or reassign users to another role before
-            'allow_delete' =>
-                $role->getId() &&
-                !$this->get('doctrine.orm.entity_manager')
-                    ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($role)
+            'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()->getCapabilitySetOptions($role),
+            'privilegesConfig' => $this->getParameter('oro_user.privileges'),
+            'allow_delete' => $role->getId() && !$this->hasAssignedUsers($role)
         ];
     }
 
-    /**
-     * @return RolePrivilegeCategoryProvider
-     */
-    protected function getRolePrivilegeCategoryProvider()
+    protected function getRolePrivilegeCategoryProvider(): RolePrivilegeCategoryProvider
     {
-        return $this->get('oro_user.provider.role_privilege_category_provider');
+        return $this->get(RolePrivilegeCategoryProvider::class);
+    }
+
+    protected function getRolePrivilegeCapabilityProvider(): RolePrivilegeCapabilityProvider
+    {
+        return $this->get(RolePrivilegeCapabilityProvider::class);
+    }
+
+    protected function hasAssignedUsers(Role $role): bool
+    {
+        return $this->get('doctrine')->getManagerForClass(Role::class)
+            ->getRepository(Role::class)
+            ->hasAssignedUsers($role);
     }
 
     /**
-     * @return RolePrivilegeCapabilityProvider
+     * {@inheritdoc}
      */
-    protected function getRolePrivilegeCapabilityProvider()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_user.provider.role_privilege_capability_provider');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getTabListOptions()
-    {
-        return array_map(
-            function (PrivilegeCategory $tab) {
-                return [
-                    'id' => $tab->getId(),
-                    'label' => $this->get('translator')->trans($tab->getLabel())
-                ];
-            },
-            $this->getRolePrivilegeCategoryProvider()->getTabbedCategories()
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                RolePrivilegeCategoryProvider::class,
+                RolePrivilegeCapabilityProvider::class,
+                AclRoleHandler::class,
+                ConnectionChecker::class,
+                WebsocketClient::class,
+            ]
         );
     }
 }

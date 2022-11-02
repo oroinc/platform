@@ -2,91 +2,30 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
-use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class LocalizationRepositoryTest extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var LocalizationRepository
-     */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadLocalizationData::class]);
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroLocaleBundle:Localization');
-        $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
     }
 
-    public function testFindRootsWithChildren()
+    private function getRepository(): LocalizationRepository
     {
-        $localizations = [$this->getCurrentLocalization(), $this->getReference('en_US'), $this->getReference('es')];
-        $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());
-
-        $prevLogger = $this->em->getConnection()->getConfiguration()->getSQLLogger();
-        $this->em->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
-
-        /** @var Localization[] $result */
-        $result = $this->repository->findRootsWithChildren();
-
-        $this->assertEquals(array_values($localizations), array_values($result));
-
-        foreach ($result as $root) {
-            $this->visitChildren($root);
-        }
-
-        $queries = $queryAnalyzer->getExecutedQueries();
-
-        $this->assertCount(count($localizations) + 2, $queries);
-
-        $this->em->getConnection()->getConfiguration()->setSQLLogger($prevLogger);
-    }
-
-    /**
-     * @param Localization $localization
-     */
-    protected function visitChildren(Localization $localization)
-    {
-        $localization->getLanguageCode();
-        foreach ($localization->getChildLocalizations() as $child) {
-            $this->visitChildren($child);
-        }
-    }
-
-    /**
-     * @return object|Localization
-     */
-    protected function getCurrentLocalization()
-    {
-        /* @var $localeSettings LocaleSettings */
-        $localeSettings = $this->getContainer()->get('oro_locale.settings');
-
-        /* @var Language $language */
-        $language = $this->getReference('language.' . $localeSettings->getLocale());
-        $this->assertInstanceOf(Language::class, $language);
-
-        return $this->repository->findOneBy(['language' => $language]);
+        return self::getContainer()->get('doctrine')->getRepository(Localization::class);
     }
 
     public function testGetLocalizationsCount()
     {
-        $result = $this->repository->getLocalizationsCount();
+        $result = $this->getRepository()->getLocalizationsCount();
 
-        $this->assertInternalType('int', $result);
-        $this->assertEquals(4, $result);
+        $this->assertIsInt($result);
+        $this->assertEquals(3, $result);
     }
 
     public function testGetBatchIterator()
@@ -97,25 +36,50 @@ class LocalizationRepositoryTest extends WebTestCase
         }
 
         $localizations = [];
-        foreach ($this->repository->getBatchIterator() as $localization) {
+        foreach ($this->getRepository()->getBatchIterator() as $localization) {
             $localizations[] = $localization->getTitle();
         }
 
         $this->assertEquals($expectedLocalizations, $localizations);
     }
 
-    /**
-     * @return object|Localization
-     */
-    protected function getDefaultLocalization()
+    public function testFindOneByLanguageCodeAndFormattingCode()
+    {
+        $this->assertTrue(null === $this->getRepository()->findOneByLanguageCodeAndFormattingCode('mx', 'mx'));
+
+        $localization = $this->getRepository()->findOneByLanguageCodeAndFormattingCode('en_CA', 'en_CA');
+
+        $this->assertFalse(null === $localization);
+        $this->assertEquals('English (Canada)', $localization->getDefaultTitle());
+    }
+
+    private function getDefaultLocalization(): Localization
     {
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
         $locale = $localeSettings->getLocale();
-        list($language) = explode('_', $locale);
+        [$language] = explode('_', $locale);
 
-        return $this->repository->findOneBy([
+        return $this->getRepository()->findOneBy([
             'language' => $this->getReference('language.' . $language),
             'formattingCode' => $locale
         ]);
+    }
+
+    public function testFindAllIndexedById(): void
+    {
+        $result = $this->getRepository()->findAllIndexedById();
+
+        $localizationEnCa = $this->getReference('en_CA');
+        $localizationDefault = $this->getReference(LoadLocalizationData::DEFAULT_LOCALIZATION_CODE);
+        $localizationEs = $this->getReference('es');
+
+        $this->assertSame(
+            [
+                $localizationEnCa->getId() => $localizationEnCa,
+                $localizationDefault->getId() => $localizationDefault,
+                $localizationEs->getId() => $localizationEs
+            ],
+            $result
+        );
     }
 }

@@ -37,10 +37,6 @@ class RunActionGroup extends AbstractAction
     /** @var PropertyPathInterface */
     private $errorsPath;
 
-    /**
-     * @param ActionGroupRegistry $actionGroupRegistry
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(ActionGroupRegistry $actionGroupRegistry, ContextAccessor $contextAccessor)
     {
         parent::__construct($contextAccessor);

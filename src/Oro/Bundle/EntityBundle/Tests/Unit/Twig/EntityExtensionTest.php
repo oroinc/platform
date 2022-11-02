@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -11,62 +13,59 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Twig\EntityExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityIdAccessor;
+    /** @var EntityIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityIdAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityRoutingHelper;
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRoutingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
+
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
+    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityFallbackResolver;
 
     /** @var EntityExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityIdAccessor = $this->getMockBuilder(EntityIdAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityRoutingHelper = $this->getMockBuilder(EntityRoutingHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityAliasResolver = $this->getMockBuilder(EntityAliasResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);
+        $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityFallbackResolver = $this->createMock(EntityFallbackResolver::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity.entity_identifier_accessor', $this->entityIdAccessor)
-            ->add('oro_entity.routing_helper', $this->entityRoutingHelper)
-            ->add('oro_entity.entity_name_resolver', $this->entityNameResolver)
-            ->add('oro_entity.entity_alias_resolver', $this->entityAliasResolver)
+            ->add(EntityIdAccessor::class, $this->entityIdAccessor)
+            ->add(EntityRoutingHelper::class, $this->entityRoutingHelper)
+            ->add(EntityNameResolver::class, $this->entityNameResolver)
+            ->add(EntityAliasResolver::class, $this->entityAliasResolver)
+            ->add(DoctrineHelper::class, $this->doctrineHelper)
+            ->add(EntityFallbackResolver::class, $this->entityFallbackResolver)
             ->getContainer($this);
 
         $this->extension = new EntityExtension($container);
     }
 
-    protected function tearDown()
-    {
-        unset($this->extension);
-    }
-
     /**
-     * @param string $expectedClass
-     * @param mixed  $object
-     *
      * @dataProvider getClassNameDataProvider
      */
-    public function testGetClassName($expectedClass, $object)
+    public function testGetClassName(?string $expectedClass, mixed $object)
     {
         $this->entityRoutingHelper->expects($this->never())
             ->method('getUrlSafeClassName');
@@ -77,38 +76,38 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getClassNameDataProvider()
+    public function getClassNameDataProvider(): array
     {
         return [
-            'null'          => [
+            'null' => [
                 'expectedClass' => null,
-                'object'        => null,
+                'object' => null,
             ],
             'not an object' => [
                 'expectedClass' => null,
-                'object'        => 'string',
+                'object' => 'string',
             ],
-            'object'        => [
-                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-                'object'        => new ItemStub(),
+            'object' => [
+                'expectedClass' => ItemStub::class,
+                'object' => new ItemStub(),
             ],
-            'proxy'         => [
+            'proxy' => [
                 'expectedClass' => 'ItemStubProxy',
-                'object'        => new ItemStubProxy(),
+                'object' => new ItemStubProxy(),
             ],
         ];
     }
 
     public function testGetClassNameEscaped()
     {
-        $object        = new ItemStub();
-        $class         = get_class($object);
+        $object = new ItemStub();
+        $class = get_class($object);
         $expectedClass = str_replace('\\', '_', $class);
 
         $this->entityRoutingHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->with($class)
-            ->will($this->returnValue($expectedClass));
+            ->willReturn($expectedClass);
 
         $this->assertEquals(
             $expectedClass,
@@ -134,27 +133,27 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActionParams()
     {
-        $object        = new ItemStub();
-        $class         = get_class($object);
+        $object = new ItemStub();
+        $class = get_class($object);
         $expectedClass = str_replace('\\', '_', $class);
-        $objectId      = 123;
-        $action        = 'test';
+        $objectId = 123;
+        $action = 'test';
 
         $expected = ['some_val' => 'val'];
 
         $this->entityIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($object))
-            ->will($this->returnValue($objectId));
+            ->willReturn($objectId);
 
         $this->entityRoutingHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->with($class)
-            ->will($this->returnValue($expectedClass));
+            ->willReturn($expectedClass);
         $this->entityRoutingHelper->expects($this->once())
             ->method('getRouteParameters')
             ->with($expectedClass, $objectId, $action)
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
@@ -164,24 +163,19 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityName()
     {
-        $entity         = new \stdClass();
-        $locale         = 'fr_CA';
+        $entity = new \stdClass();
+        $locale = 'fr_CA';
         $expectedResult = 'John Doe';
 
         $this->entityNameResolver->expects($this->once())
             ->method('getName')
             ->with($this->identicalTo($entity), null, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
             self::callTwigFilter($this->extension, 'oro_format_name', [$entity, $locale])
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_entity', $this->extension->getName());
     }
 
     public function testGetUrlClassName()
@@ -197,6 +191,55 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $urlSafeClass,
             self::callTwigFunction($this->extension, 'oro_url_class_name', [$originalClass])
+        );
+    }
+
+    public function testGetFallbackValue()
+    {
+        $className = ItemStub::class;
+        $fieldName = 'test';
+
+        $this->entityFallbackResolver->expects($this->once())
+            ->method('getFallbackValue')
+            ->with($className, $fieldName)
+            ->willReturn('value');
+
+        $this->assertEquals(
+            'value',
+            self::callTwigFunction($this->extension, 'oro_entity_fallback_value', [$className, $fieldName])
+        );
+    }
+
+    public function testGetFallbackType()
+    {
+        $className = ItemStub::class;
+        $fieldName = 'test';
+
+        $this->entityFallbackResolver->expects($this->once())
+            ->method('getType')
+            ->with($className, $fieldName)
+            ->willReturn('integer');
+
+        $this->assertEquals(
+            'integer',
+            self::callTwigFunction($this->extension, 'oro_entity_fallback_type', [$className, $fieldName])
+        );
+    }
+
+    public function testGetEntityReference()
+    {
+        $className = ItemStub::class;
+        $id = 1;
+        $reference =  new ItemStub();
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityReference')
+            ->with($className, $id)
+            ->willReturn($reference);
+
+        $this->assertEquals(
+            $reference,
+            self::callTwigFunction($this->extension, 'oro_entity_reference', [$className, $id])
         );
     }
 }

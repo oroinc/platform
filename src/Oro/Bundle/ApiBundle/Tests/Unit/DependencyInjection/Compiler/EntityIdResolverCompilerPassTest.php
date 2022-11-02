@@ -4,39 +4,45 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityIdResolverCompilerPass */
-    private $compiler;
+    private EntityIdResolverCompilerPass $compiler;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $registry;
+    private Definition $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new EntityIdResolverCompilerPass();
 
         $this->registry = $this->container->setDefinition(
             'oro_api.entity_id_resolver_registry',
-            new Definition(EntityIdTransformerRegistry::class, [[]])
+            new Definition(EntityIdTransformerRegistry::class, [[], null])
         );
     }
 
-    public function testProcessWhenNoEntityIdTransformers()
+    public function testProcessWhenNoEntityIdTransformers(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->registry->getArgument(0));
+        self::assertEquals([], $this->registry->getArgument('$resolvers'));
+
+        $serviceLocatorReference = $this->registry->getArgument('$container');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $resolver1 = $this->container->setDefinition('resolver1', new Definition());
         $resolver1->addTag(
@@ -56,7 +62,7 @@ class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
         $resolver4 = $this->container->setDefinition('resolver4', new Definition());
         $resolver4->addTag(
             'oro.api.entity_id_resolver',
-            ['id' => 'id2', 'class' => 'Class2']
+            ['id' => 'id2', 'class' => 'Class2', 'priority' => -20]
         );
 
         $this->compiler->process($this->container);
@@ -78,7 +84,21 @@ class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$resolvers')
+        );
+
+        $serviceLocatorReference = $this->registry->getArgument('$container');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'resolver1' => new ServiceClosureArgument(new Reference('resolver1')),
+                'resolver2' => new ServiceClosureArgument(new Reference('resolver2')),
+                'resolver3' => new ServiceClosureArgument(new Reference('resolver3')),
+                'resolver4' => new ServiceClosureArgument(new Reference('resolver4'))
+            ],
+            $serviceLocatorDef->getArgument(0)
         );
     }
 }

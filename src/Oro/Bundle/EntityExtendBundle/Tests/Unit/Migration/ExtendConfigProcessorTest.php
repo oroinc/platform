@@ -4,30 +4,31 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Test\ExtendConfigProcessorTestBundle\Entity\SomeClass';
+    private const CLASS_NAME = 'Test\ExtendConfigProcessorTestBundle\Entity\SomeClass';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ExtendConfigProcessor */
-    protected $generator;
+    private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->generator     = new ExtendConfigProcessor($this->configManager);
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $this->generator = new ExtendConfigProcessor($this->configManager);
     }
 
     public function testGeneratorWithEmptyConfigs()
@@ -38,12 +39,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs([]);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
-     */
     public function testModificationOfNonConfigurableEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
+
         $configs = [
             self::CLASS_NAME => [
                 'configs' => ['entity' => ['icon' => 'icon1']]
@@ -52,13 +52,9 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, false]
+            ]);
 
         $this->generator->processConfigs($configs);
     }
@@ -93,13 +89,9 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, false]
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('flush');
@@ -107,12 +99,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs($configs);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
-     */
     public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
+
         $configs = [
             self::CLASS_NAME => [
                 'configs' => [],
@@ -126,13 +117,9 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, false]
+            ]);
 
         $this->generator->processConfigs($configs);
     }
@@ -171,57 +158,37 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $appendConfigEntity->set('attr2', ['existingItem']);
 
         // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $entityConfigProvider = $this->getConfigProviderMock();
-        $appendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $appendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['entity', $entityConfigProvider],
-                        ['append', $appendConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider],
+                ['append', $appendConfigProvider],
+            ]);
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, true]
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $extendConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $extendConfigEntity]
+            ]);
         $entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $entityConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $entityConfigEntity]
+            ]);
         $appendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $appendConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $appendConfigEntity]
+            ]);
 
         $this->configManager->expects($this->once())
             ->method('flush');
@@ -267,46 +234,30 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $entityConfigEntity = $this->createConfig('entity', $testClassName);
 
         // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $entityConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['entity', $entityConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider],
+            ]);
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$testClassName, null, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$testClassName, null, false]
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$testClassName, null, $extendConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$testClassName, null, $extendConfigEntity]
+            ]);
         $entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$testClassName, null, $entityConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$testClassName, null, $entityConfigEntity]
+            ]);
 
         $this->configManager->expects($this->once())
             ->method('flush');
@@ -327,12 +278,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage An extend field "field1" cannot be added to non extend entity
-     */
     public function testAddExtendFieldToNonExtendEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('An extend field "field1" cannot be added to non extend entity');
+
         $testFieldName = 'field1';
         $configs       = [
             self::CLASS_NAME => [
@@ -352,35 +302,23 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
 
         // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+            ]);
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, true]
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $extendConfigEntity],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $extendConfigEntity]
+            ]);
 
         $this->generator->processConfigs($configs);
     }
@@ -412,48 +350,32 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
 
         // config providers configuration
-        $extendConfigProvider   = $this->getConfigProviderMock();
-        $datagridConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider   = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                        [self::CLASS_NAME, $testFieldName, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, true],
+                [self::CLASS_NAME, $testFieldName, false],
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $extendConfigEntity],
-                        [self::CLASS_NAME, $testFieldName, $extendConfigField],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $extendConfigEntity],
+                [self::CLASS_NAME, $testFieldName, $extendConfigField],
+            ]);
         $datagridConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, $testFieldName, $datagridConfigField],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, $testFieldName, $datagridConfigField]
+            ]);
 
         $this->configManager->expects($this->any())
             ->method('createConfigFieldModel')
@@ -505,55 +427,39 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $configFieldModel    = new FieldConfigModel($testFieldName, 'string');
 
         // config providers configuration
-        $extendConfigProvider   = $this->getConfigProviderMock();
-        $datagridConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider   = $this->createMock(ConfigProvider::class);
+        $datagridConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                        [self::CLASS_NAME, $testFieldName, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, true],
+                [self::CLASS_NAME, $testFieldName, true],
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $extendConfigEntity],
-                        [self::CLASS_NAME, $testFieldName, $extendConfigField],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $extendConfigEntity],
+                [self::CLASS_NAME, $testFieldName, $extendConfigField],
+            ]);
         $datagridConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, $testFieldName, $datagridConfigField],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, $testFieldName, $datagridConfigField]
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('createConfigFieldModel');
         $this->configManager->expects($this->once())
             ->method('getConfigFieldModel')
             ->with(self::CLASS_NAME, $testFieldName)
-            ->will($this->returnValue($configFieldModel));
+            ->willReturn($configFieldModel);
         $this->configManager->expects($this->once())
             ->method('changeFieldType')
             ->with(self::CLASS_NAME, $testFieldName, 'integer');
@@ -618,7 +524,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $configFieldModel  = new FieldConfigModel($testFieldName, 'string');
 
         // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->with('extend')
@@ -626,31 +532,23 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         // hasConfig/getConfig expectations
         $this->configManager->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                        [self::CLASS_NAME, $testFieldName, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, true],
+                [self::CLASS_NAME, $testFieldName, true],
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, $extendConfigEntity],
-                        [self::CLASS_NAME, $testFieldName, $extendConfigField],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [self::CLASS_NAME, null, $extendConfigEntity],
+                [self::CLASS_NAME, $testFieldName, $extendConfigField],
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('createConfigFieldModel');
         $this->configManager->expects($this->once())
             ->method('getConfigFieldModel')
             ->with(self::CLASS_NAME, $testFieldName)
-            ->will($this->returnValue($configFieldModel));
+            ->willReturn($configFieldModel);
         $this->configManager->expects($this->once())
             ->method('changeFieldType')
             ->with(self::CLASS_NAME, $testFieldName, 'integer');
@@ -680,30 +578,16 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string      $scope
-     * @param string      $className
-     * @param string|null $fieldName
-     * @param string|null $fieldType
-     *
-     * @return Config
-     */
-    protected function createConfig($scope, $className, $fieldName = null, $fieldType = null)
-    {
+    private function createConfig(
+        string $scope,
+        string $className,
+        string $fieldName = null,
+        string $fieldType = null
+    ): Config {
         $configId = $fieldName
             ? new FieldConfigId($scope, $className, $fieldName, $fieldType)
             : new EntityConfigId($scope, $className);
 
         return new Config($configId);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

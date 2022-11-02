@@ -25,13 +25,13 @@ class Product
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     **/
+     */
     protected $category;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     **/
+     */
     protected $owner;
 
     /**
@@ -124,9 +124,6 @@ class Product
         return $this->updatedAt;
     }
 
-    /**
-     * @param \DateTime $updatedAt
-     */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
@@ -154,6 +151,33 @@ class Product
         $this->price = $price;
         $this->priceValue = $this->price->getValue();
         $this->priceCurrency = $this->price->getCurrency();
+
+        return $this;
+    }
+
+    /**
+     * @return ProductPrice|null
+     */
+    public function getNullablePrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param ProductPrice|null $price
+     *
+     * @return self
+     */
+    public function setNullablePrice(?ProductPrice $price)
+    {
+        $this->price = $price;
+        if (null === $this->price) {
+            $this->priceValue = null;
+            $this->priceCurrency = null;
+        } else {
+            $this->priceValue = $this->price->getValue();
+            $this->priceCurrency = $this->price->getCurrency();
+        }
 
         return $this;
     }

@@ -11,7 +11,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
- * Class Email
+ * Email model.
+ * Contains data required to create and send email message.
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -394,9 +395,9 @@ class Email implements OrganizationAwareInterface
     /**
      * Get email body
      *
-     * @return string
+     * @return string|null
      */
-    public function getBody()
+    public function getBody(): ?string
     {
         return $this->body;
     }
@@ -467,17 +468,11 @@ class Email implements OrganizationAwareInterface
         return $this->attachments;
     }
 
-    /**
-     * @param EmailAttachment $attachment
-     */
     public function addAttachment(EmailAttachment $attachment)
     {
         $this->attachments->add($attachment);
     }
 
-    /**
-     * @param EmailAttachment $attachment
-     */
     public function removeAttachment(EmailAttachment $attachment)
     {
         if ($this->attachments->contains($attachment)) {

@@ -12,20 +12,22 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
     /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $nameStrategy;
+    private $nameStrategy;
 
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject  */
-    protected $manager;
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +41,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->nameStrategy->expects($this->once())
             ->method('buildGridFullName')
             ->with('test-grid', 'test-scope')
-            ->will($this->returnValue('test-grid-test-scope'));
+            ->willReturn('test-grid-test-scope');
 
         $view = $this->getBlockView(
             new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker),
@@ -96,12 +98,13 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals([], $view->vars['grid_render_parameters']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "grid_name" is missing.
-     */
     public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve options for the block "datagrid_id". Reason: The required option "grid_name" is missing.'
+        );
+
         $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker));
     }
 
@@ -110,37 +113,31 @@ class DatagridTypeTest extends BlockTypeTestCase
      */
     public function testBuildBlock()
     {
-        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfig */
-        $gridConfig = $this
-            ->createMock('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration');
-
+        $gridConfig = $this->createMock(DatagridConfiguration::class);
         $gridConfig->expects($this->once())
             ->method('getAclResource')
-            ->will($this->returnValue('acl_resource'));
-
+            ->willReturn('acl_resource');
         $gridConfig->expects($this->once())
             ->method('offsetGet')
             ->with('columns')
-            ->will($this->returnValue(['column_1' => true]));
+            ->willReturn(['column_1' => true]);
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('acl_resource')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->manager
-            ->expects($this->any())
+        $this->manager->expects($this->any())
             ->method('getConfigurationForGrid')
             ->with('test-grid')
-            ->will($this->returnValue($gridConfig));
+            ->willReturn($gridConfig);
 
-        /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('test_grid'));
+            ->willReturn('test_grid');
 
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
         $builder->expects($this->exactly(5))
             ->method('getLayoutManipulator')
             ->willReturn($layoutManipulator);
@@ -237,7 +234,6 @@ class DatagridTypeTest extends BlockTypeTestCase
             'block_prefixes' => ['block', 'datagrid_toolbar', '_product_datagrid_toolbar'],
         ];
 
-        /** @var BlockView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(BlockView::class);
         $view->vars = [
             'block_type' => 'datagrid',
@@ -246,7 +242,6 @@ class DatagridTypeTest extends BlockTypeTestCase
         ];
         $view->children = [$childView];
 
-        /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
         $block = $this->createMock(BlockInterface::class);
         $block->expects($this->any())
             ->method('getId')
@@ -262,8 +257,6 @@ class DatagridTypeTest extends BlockTypeTestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(array $options, array $expectedOptions)
     {
@@ -275,10 +268,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals($expectedOptions, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'default' => [

@@ -14,9 +14,6 @@ interface BlockTypeExtensionInterface
      * and can be used to further modify the block and prepare block options.
      *
      * @see BlockTypeInterface::buildForm()
-     *
-     * @param BlockBuilderInterface $builder
-     * @param Options               $options
      */
     public function buildBlock(BlockBuilderInterface $builder, Options $options);
 
@@ -27,10 +24,6 @@ interface BlockTypeExtensionInterface
      * and can be used to further modify the view.
      *
      * @see FormTypeInterface::buildView()
-     *
-     * @param BlockView      $view
-     * @param BlockInterface $block
-     * @param Options        $options
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options);
 
@@ -41,9 +34,6 @@ interface BlockTypeExtensionInterface
      * and can be used to further modify the view.
      *
      * @see FormTypeInterface::finishView()
-     *
-     * @param BlockView      $view
-     * @param BlockInterface $block
      */
     public function finishView(BlockView $view, BlockInterface $block);
 

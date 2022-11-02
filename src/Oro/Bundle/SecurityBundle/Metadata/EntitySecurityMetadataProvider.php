@@ -2,327 +2,313 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class EntitySecurityMetadataProvider
+/**
+ * The provider for entity related security metadata.
+ */
+class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
-    const ACL_SECURITY_TYPE = 'ACL';
-    const ALL_PERMISSIONS = 'All';
-    const PERMISSIONS_DELIMITER = ';';
+    public const ACL_SECURITY_TYPE = 'ACL';
 
-    /** @var ConfigProvider */
-    protected $securityConfigProvider;
+    private const ALL_PERMISSIONS       = 'All';
+    private const PERMISSIONS_DELIMITER = ';';
 
-    /**  @var ConfigProvider */
-    protected $entityConfigProvider;
+    private const FULL_CACHE_KEY_PREFIX  = 'full-';
+    private const SHORT_CACHE_KEY_PREFIX = 'short-';
 
-    /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
+    private CacheItemPoolInterface $cache;
+    private EventDispatcherInterface $eventDispatcher;
+    private AclGroupProviderInterface $aclGroupProvider;
+    /** [security type => [class name => EntitySecurityMetadata, ...], ...] */
+    private array $localCache = [];
+    /** [security type => [class name => [group, [field name => field alias, ...]], ...], ...] */
+    private array $shortLocalCache = [];
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /**  @var CacheProvider */
-    protected $cache;
-
-    /**
-     * @var array
-     *     key = security type
-     *     value = array
-     *         key = class name
-     *         value = EntitySecurityMetadata
-     */
-    protected $localCache = [];
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /**
-     * @param ConfigProvider      $securityConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param ManagerRegistry     $doctrine
-     * @param TranslatorInterface $translator
-     * @param CacheProvider|null  $cache
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
-        ConfigProvider $securityConfigProvider,
-        ConfigProvider $entityConfigProvider,
-        ConfigProvider $extendConfigProvider,
+        ConfigManager $configManager,
         ManagerRegistry $doctrine,
-        TranslatorInterface $translator,
-        CacheProvider  $cache = null,
-        EventDispatcherInterface $eventDispatcher
+        CacheItemPoolInterface $cache,
+        EventDispatcherInterface $eventDispatcher,
+        AclGroupProviderInterface $aclGroupProvider
     ) {
-        $this->securityConfigProvider = $securityConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->extendConfigProvider = $extendConfigProvider;
+        $this->configManager = $configManager;
         $this->doctrine = $doctrine;
-        $this->translator = $translator;
         $this->cache = $cache;
         $this->eventDispatcher = $eventDispatcher;
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
-     * Checks whether an entity is protected using the given security type.
-     *
-     * @param string $className    The entity class name
-     * @param string $securityType The security type. Defaults to ACL.
-     *
-     * @return bool
+     * Checks whether an entity is protected using the given security type
      */
-    public function isProtectedEntity($className, $securityType = self::ACL_SECURITY_TYPE)
+    public function isProtectedEntity(string $className, string $securityType = self::ACL_SECURITY_TYPE): bool
     {
-        $this->ensureMetadataLoaded($securityType);
+        $this->ensureShortMetadataLoaded($securityType);
 
-        return isset($this->localCache[$securityType][$className]);
+        if (isset($this->shortLocalCache[$securityType][$className])) {
+            $group = $this->aclGroupProvider->getGroup();
+
+            return !$group || $this->shortLocalCache[$securityType][$className][0] === $group;
+        }
+
+        return false;
     }
 
     /**
-     * Gets metadata for all entities marked with the given security type.
-     *
-     * @param string $securityType The security type. Defaults to ACL.
-     *
-     * @return EntitySecurityMetadata[]
+     * Checks if the given field has an alias and if so, returns it instead of the given field name
      */
-    public function getEntities($securityType = self::ACL_SECURITY_TYPE)
+    public function getProtectedFieldName(
+        string $className,
+        string $fieldName,
+        string $securityType = self::ACL_SECURITY_TYPE
+    ): string {
+        $this->ensureShortMetadataLoaded($securityType);
+
+        if (isset($this->shortLocalCache[$securityType][$className])) {
+            $fields = $this->shortLocalCache[$securityType][$className][1];
+            if (isset($fields[$fieldName])) {
+                $fieldName = $fields[$fieldName];
+            }
+        }
+
+        return $fieldName;
+    }
+
+    /**
+     * Gets metadata for all entities marked with the given security type
+     */
+    public function getEntities(string $securityType = self::ACL_SECURITY_TYPE): array
     {
         $this->ensureMetadataLoaded($securityType);
 
         return array_values($this->localCache[$securityType]);
     }
 
-    /**
-     * Warms up the cache.
-     */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $securityTypes = [];
-        foreach ($this->securityConfigProvider->getConfigs() as $securityConfig) {
+        $securityConfigs = $this->configManager->getConfigs('security', null, true);
+        foreach ($securityConfigs as $securityConfig) {
             $securityType = $securityConfig->get('type');
             if ($securityType && !in_array($securityType, $securityTypes, true)) {
                 $securityTypes[] = $securityType;
             }
         }
         foreach ($securityTypes as $securityType) {
-            $this->loadMetadata($securityType);
+            $this->loadMetadata($securityType, null, null);
         }
     }
 
-    /**
-     * Clears the cache by security type.
-     *
-     * If the $securityType is not specified, clear all cached data
-     *
-     * @param string|null $securityType The security type.
-     */
-    public function clearCache($securityType = null)
+    public function clearCache(): void
     {
-        if ($this->cache) {
-            if ($securityType !== null) {
-                $this->cache->delete($securityType);
-            } else {
-                $this->cache->deleteAll();
-            }
-        }
-        if ($securityType !== null) {
-            unset($this->localCache[$securityType]);
-        } else {
-            $this->localCache = [];
-        }
+        $this->localCache = [];
+        $this->shortLocalCache = [];
+        $this->cache->clear();
     }
 
     /**
-     * Get entity metadata.
-     *
-     * @param string $className
-     * @param string $securityType
-     *
-     * @return EntitySecurityMetadata
+     * Get entity metadata
      */
-    public function getMetadata($className, $securityType = self::ACL_SECURITY_TYPE)
-    {
+    public function getMetadata(
+        string $className,
+        string $securityType = self::ACL_SECURITY_TYPE
+    ): EntitySecurityMetadata {
         $this->ensureMetadataLoaded($securityType);
 
-        $result = $this->localCache[$securityType][$className];
-        if ($result === true) {
-            return new EntitySecurityMetadata();
+        if (!isset($this->localCache[$securityType][$className])) {
+            throw new \LogicException(
+                sprintf('The entity "%s" must be %s protected.', $className, $securityType)
+            );
         }
 
-        return $result;
+        return $this->localCache[$securityType][$className];
     }
 
     /**
-     * Makes sure that metadata for the given security type are loaded and cached.
-     *
-     * @param string $securityType The security type.
+     * Makes sure that metadata for the given security type are loaded and cached
      */
-    protected function ensureMetadataLoaded($securityType)
+    private function ensureMetadataLoaded(string $securityType): void
     {
         if (!isset($this->localCache[$securityType])) {
-            $data = null;
-            if ($this->cache) {
-                $data = $this->cache->fetch($securityType);
-            }
-            if ($data) {
-                $this->localCache[$securityType] = $data;
+            $fullCacheItem = $this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
+            if ($fullCacheItem->isHit()) {
+                $this->localCache[$securityType] = $fullCacheItem->get();
             } else {
-                $this->loadMetadata($securityType);
+                $this->loadMetadata($securityType, $fullCacheItem, null);
             }
         }
     }
 
     /**
-     * Loads metadata for the given security type and save them in cache.
-     *
-     * @param $securityType
+     * Makes sure that metadata for the given security type are loaded and cached
      */
-    protected function loadMetadata($securityType)
+    private function ensureShortMetadataLoaded($securityType): void
     {
+        if (!isset($this->shortLocalCache[$securityType])) {
+            $shortCacheItem = $this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
+            if ($shortCacheItem->isHit()) {
+                $this->shortLocalCache[$securityType] = $shortCacheItem->get();
+            } else {
+                $this->loadMetadata($securityType, null, $shortCacheItem);
+            }
+        }
+    }
+
+    /**
+     * Loads metadata for the given security type and save them in cache
+     */
+    private function loadMetadata(
+        string $securityType,
+        ?CacheItemInterface $fullCacheItem,
+        ?CacheItemInterface $shortCacheItem
+    ): void {
         $data = [];
-
-        $securityConfigs = $this->securityConfigProvider->getConfigs(null, true);
-
+        $shortData = [];
+        $securityConfigs = $this->configManager->getConfigs('security', null, true);
         foreach ($securityConfigs as $securityConfig) {
             $className = $securityConfig->getId()->getClassName();
+            if ($this->isEntityApplicable($securityConfig, $className, $securityType)) {
+                $metadata = $this->getEntityMetadata($securityConfig, $className, $securityType);
+                $data[$className] = $metadata;
 
-            if ($securityConfig->get('type') === $securityType
-                && $this->extendConfigProvider->getConfig($className)->in(
-                    'state',
-                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-                )
-            ) {
-                $label = $this->entityConfigProvider->getConfig($className)->get('label');
-                if ($label) {
-                    $label = $this->translator->trans($label);
+                $fieldAliases = [];
+                foreach ($metadata->getFields() as $fieldName => $field) {
+                    $fieldAlias = $field->getAlias();
+                    if ($fieldAlias) {
+                        $fieldAliases[$fieldName] = $fieldAlias;
+                    }
                 }
-
-                $description = $securityConfig->get('description');
-                if ($description) {
-                    $description = $this->translator->trans($description);
-                }
-                $permissions = $this->getPermissionsList($securityConfig);
-
-                $data[$className] = new EntitySecurityMetadata(
-                    $securityType,
-                    $className,
-                    $securityConfig->get('group_name'),
-                    $label,
-                    $permissions,
-                    $description,
-                    $securityConfig->get('category'),
-                    $this->getFields($securityConfig, $className)
-                );
+                $shortData[$className] = [$metadata->getGroup(), $fieldAliases];
             }
         }
 
-        if ($this->cache) {
-            $this->cache->save($securityType, $data);
+        $fullCacheItem ??=$this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
+        $fullCacheItem->set($data);
+        $this->cache->save($fullCacheItem);
+        $shortCacheItem ??=$this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
+        $shortCacheItem->set($shortData);
+        $this->cache->save($shortCacheItem);
+        $this->localCache[$securityType] = $data;
+        $this->shortLocalCache[$securityType] = $shortData;
+    }
+
+    private function isEntityApplicable(ConfigInterface $securityConfig, string $className, string $securityType): bool
+    {
+        if ($securityConfig->get('type') !== $securityType) {
+            return false;
         }
 
-        $this->localCache[$securityType] = $data;
+        return $this->configManager
+            ->getEntityConfig('extend', $className)
+            ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
+    }
+
+    private function getEntityMetadata(
+        ConfigInterface $securityConfig,
+        string $className,
+        string $securityType
+    ): EntitySecurityMetadata {
+        $description = $securityConfig->get('description');
+        if ($description) {
+            $description = new Label($description);
+        }
+
+        return new EntitySecurityMetadata(
+            $securityType,
+            $className,
+            $securityConfig->get('group_name'),
+            new Label($this->configManager->getEntityConfig('entity', $className)->get('label')),
+            $this->getPermissionsList($securityConfig),
+            $description,
+            $securityConfig->get('category'),
+            $this->getFields($securityConfig, $className)
+        );
     }
 
     /**
-     * Gets an array of fields metadata.
-     *
-     * @param $securityConfig
-     * @param string $className
-     *
-     * @return array|FieldSecurityMetadata[]
+     * Gets an array of fields metadata
      */
-    protected function getFields(ConfigInterface $securityConfig, $className)
+    private function getFields(ConfigInterface $securityConfig, string $className): array
     {
         $fields = [];
         if ($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled')) {
-            $fieldsConfig = $this->securityConfigProvider->getConfigs($className);
-            $classMetadata = $this->doctrine
-                ->getManagerForClass($className)
-                ->getMetadataFactory()
-                ->getMetadataFor($className);
-
+            $classMetadata = $this->getClassMetadata($className);
+            $fieldsConfig = $this->configManager->getConfigs('security', $className);
             foreach ($fieldsConfig as $fieldConfig) {
                 $fieldName = $fieldConfig->getId()->getFieldName();
                 if ($classMetadata->isIdentifier($fieldName)) {
                     // we should not limit access to identifier fields.
                     continue;
                 }
-                $permissions = $this->getPermissionsList($fieldConfig);
 
                 $fields[$fieldName] = new FieldSecurityMetadata(
                     $fieldName,
-                    $this->translator->trans($this->getFieldLabel($classMetadata, $fieldName)),
-                    $permissions
+                    new Label($this->getFieldLabel($classMetadata, $fieldName)),
+                    $this->getPermissionsList($fieldConfig)
                 );
             }
 
             $event = new LoadFieldsMetadata($className, $fields);
-            $this->eventDispatcher->dispatch(LoadFieldsMetadata::NAME, $event);
+            $this->eventDispatcher->dispatch($event, LoadFieldsMetadata::NAME);
             $fields = $event->getFields();
-
-            uasort($fields, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
-                return strcmp($a->getLabel(), $b->getLabel());
-            });
         }
 
         return $fields;
     }
 
     /**
-     * Gets a label of a field.
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return string
+     * Gets a label of a field
      */
-    protected function getFieldLabel(ClassMetadata $metadata, $fieldName)
+    private function getFieldLabel(ClassMetadata $metadata, string $fieldName): string
     {
+        $label = null;
         $className = $metadata->getName();
-        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
-            // virtual field or relation
-            return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        if ($this->configManager->hasConfig($className, $fieldName)) {
+            $label = $this->configManager->getFieldConfig('entity', $className, $fieldName)->get('label');
+        }
+        if (!$label) {
+            $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
         }
 
-        $label = $this->entityConfigProvider->hasConfig($className, $fieldName)
-            ? $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
-            : null;
-
-        return !empty($label)
-            ? $label
-            : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        return $label;
     }
 
     /**
-     * Returns array with supported permissions.
-     *
-     * @param ConfigInterface $securityConfig
-     *
-     * @return array|null Array with permissions, f.e. ['VIEW', 'CREATE']
+     * Returns array with supported permissions
      */
-    protected function getPermissionsList(ConfigInterface $securityConfig)
+    private function getPermissionsList(ConfigInterface $securityConfig): array #e.g. ['VIEW', 'CREATE']
     {
         $permissions = $securityConfig->get('permissions');
 
-        if (!$permissions || $permissions === self::ALL_PERMISSIONS) {
-            $permissions = [];
-        } else {
-            $permissions = explode(self::PERMISSIONS_DELIMITER, $permissions);
+        return $permissions && self::ALL_PERMISSIONS !== $permissions
+            ? explode(self::PERMISSIONS_DELIMITER, $permissions)
+            : [];
+    }
+
+    private function getClassMetadata(string $className): ClassMetadata
+    {
+        $manager = $this->doctrine
+            ->getManagerForClass($className);
+        if ($manager === null) {
+            throw new \LogicException(sprintf('There is no manager for %s', $className));
         }
 
-        return $permissions;
+        return $manager->getMetadataFactory()
+            ->getMetadataFor($className);
     }
 }

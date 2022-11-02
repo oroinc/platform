@@ -11,7 +11,7 @@ class GreaterThanOrEqualTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\GreaterThanOrEqual */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\GreaterThanOrEqual();
         $this->condition->setContextAccessor(new ContextAccessor());

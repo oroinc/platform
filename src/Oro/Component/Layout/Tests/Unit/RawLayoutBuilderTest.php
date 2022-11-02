@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
@@ -9,13 +10,15 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RawLayoutBuilderTest extends LayoutTestCase
 {
     /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
+    private $rawLayoutBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayoutBuilder = new RawLayoutBuilder();
     }
@@ -130,12 +133,13 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot get block type for "unknown" item. Reason: The "unknown" item does not exist.
-     */
     public function testGetTypeWithException()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot get block type for "unknown" item. Reason: The "unknown" item does not exist.'
+        );
+
         $this->rawLayoutBuilder->getType('unknown');
     }
 
@@ -153,7 +157,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,
@@ -161,27 +165,28 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: . SiblingId: . Reason: The block type name must not be empty.
      */
-    // @codingStandardsIgnoreEnd
     public function testAddWithEmptyBlockType($blockType)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "root" item to the layout. ParentId: . BlockType: . SiblingId: .'
+            . ' Reason: The block type name must not be empty.'
+        );
+
         $this->rawLayoutBuilder->add('root', null, $blockType);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: 123. SiblingId: . Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddWithInvalidBlockType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "root" item to the layout. ParentId: . BlockType: 123. SiblingId: .'
+            . ' Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.'
+        );
+
         $this->rawLayoutBuilder->add('root', null, 123);
     }
 
@@ -190,7 +195,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
      */
     public function testAddWithInvalidBlockTypeName($blockType)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\LogicException');
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'Cannot add "root" item to the layout. ParentId: . BlockType: %1$s. SiblingId: . Reason: '
@@ -204,56 +209,56 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->add('root', null, $blockType);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "test" item to the layout. ParentId: root. BlockType: root. SiblingId: . Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddToUnknownParent()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "test" item to the layout. ParentId: root. BlockType: root. SiblingId: .'
+            . ' Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->add('test', 'root', 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot remove "root" item from the layout. Reason: The "root" item does not exist.
-     */
     public function testRemoveUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot remove "root" item from the layout. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->remove('root');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot move "root" item. ParentId: destination. SiblingId: . Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testMoveUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot move "root" item. ParentId: destination. SiblingId: . Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->move('root', 'destination');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "test" alias for "root" item. Reason: The "root" item does not exist.
-     */
     public function testAddAliasForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "test" alias for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->addAlias('test', 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot remove "test" alias. Reason: The "test" item alias does not exist.
-     */
     public function testRemoveUnknownAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot remove "test" alias. Reason: The "test" item alias does not exist.');
+
         $this->rawLayoutBuilder
             ->removeAlias('test');
     }
@@ -261,25 +266,26 @@ class RawLayoutBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot set a value for "" option for "root" item. Reason: The option name must not be empty.
      */
     // @codingStandardsIgnoreEnd
     public function testSetOptionWithEmptyName($name)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot set a value for "" option for "root" item. Reason: The option name must not be empty.'
+        );
+
         $this->rawLayoutBuilder
             ->setOption('root', $name, 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot set a value for "test" option for "root" item. Reason: Cannot change already resolved options.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetOptionForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot set a value for "test" option for "root" item. Reason: Cannot change already resolved options.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -288,40 +294,38 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->setOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot set a value for "test" option for "root" item. Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetOptionForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot set a value for "test" option for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->setOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot append a value for "" option for "root" item. Reason: The option name must not be empty.
      */
-    // @codingStandardsIgnoreEnd
     public function testAppendOptionWithEmptyName($name)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot append a value for "" option for "root" item. Reason: The option name must not be empty.'
+        );
+
         $this->rawLayoutBuilder
             ->appendOption('root', $name, 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot append a value for "test" option for "root" item. Reason: Cannot change already resolved options.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAppendOptionForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot append a value for "test" option for "root" item. Reason: Cannot change already resolved options.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -330,40 +334,38 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->appendOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot append a value for "test" option for "root" item. Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAppendOptionForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot append a value for "test" option for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->appendOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot subtract a value for "" option for "root" item. Reason: The option name must not be empty.
      */
-    // @codingStandardsIgnoreEnd
     public function testSubtractOptionWithEmptyName($name)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot subtract a value for "" option for "root" item. Reason: The option name must not be empty.'
+        );
+
         $this->rawLayoutBuilder
             ->subtractOption('root', $name, 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot subtract a value for "test" option for "root" item. Reason: Cannot change already resolved options.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSubtractOptionForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot subtract a value for "test" option for "root" item. Reason: Cannot change already resolved options.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -372,40 +374,38 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->subtractOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot subtract a value for "test" option for "root" item. Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSubtractOptionForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot subtract a value for "test" option for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->subtractOption('root', 'test', 123);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot replace a value for "" option for "root" item. Reason: The option name must not be empty.
      */
-    // @codingStandardsIgnoreEnd
     public function testReplaceOptionWithEmptyName($name)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot replace a value for "" option for "root" item. Reason: The option name must not be empty.'
+        );
+
         $this->rawLayoutBuilder
             ->replaceOption('root', $name, 123, 456);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot replace a value for "test" option for "root" item. Reason: Cannot change already resolved options.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReplaceOptionForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot replace a value for "test" option for "root" item. Reason: Cannot change already resolved options.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -414,38 +414,38 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->replaceOption('root', 'test', 123, 456);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot replace a value for "test" option for "root" item. Reason: The "root" item does not exist.
-     */
-    // @codingStandardsIgnoreEnd
     public function testReplaceOptionForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot replace a value for "test" option for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->replaceOption('root', 'test', 123, 456);
     }
 
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot remove "" option for "root" item. Reason: The option name must not be empty.
      */
     public function testRemoveOptionWithEmptyName($name)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot remove "" option for "root" item. Reason: The option name must not be empty.'
+        );
+
         $this->rawLayoutBuilder
             ->removeOption('root', $name);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot remove "test" option for "root" item. Reason: Cannot change already resolved options.
-     */
-    // @codingStandardsIgnoreEnd
     public function testRemoveOptionForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot remove "test" option for "root" item. Reason: Cannot change already resolved options.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -454,12 +454,13 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', 'test');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot remove "test" option for "root" item. Reason: The "root" item does not exist.
-     */
     public function testRemoveOptionForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot remove "test" option for "root" item. Reason: The "root" item does not exist.'
+        );
+
         $this->rawLayoutBuilder
             ->removeOption('root', 'test');
     }
@@ -500,7 +501,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,
@@ -508,14 +509,14 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Cannot change the block type if options are already resolved.
-     */
-    // @codingStandardsIgnoreEnd
     public function testChangeBlockTypeForAlreadyResolvedItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot change block type to "my_root" for "root" item.'
+            . ' Reason: Cannot change the block type if options are already resolved.'
+        );
+
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
         $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
@@ -524,28 +525,28 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->changeBlockType('root', 'my_root');
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot change block type to "" for "root" item. Reason: The block type name must not be empty.
      */
-    // @codingStandardsIgnoreEnd
     public function testChangeBlockTypeWithEmptyBlockType($blockType)
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot change block type to "" for "root" item. Reason: The block type name must not be empty.'
+        );
+
         $this->rawLayoutBuilder->add('root', null, 'root');
         $this->rawLayoutBuilder->changeBlockType('root', $blockType);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot change block type to "123" for "root" item. Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testChangeBlockTypeWithInvalidBlockType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot change block type to "123" for "root" item.'
+            . ' Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.'
+        );
+
         $this->rawLayoutBuilder->add('root', null, 'root');
         $this->rawLayoutBuilder->changeBlockType('root', 123);
     }
@@ -555,7 +556,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
      */
     public function testChangeBlockTypeWithInvalidBlockTypeName($blockType)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\LogicException');
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'Cannot change block type to "%1$s" for "root" item. Reason: '
@@ -570,36 +571,34 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->changeBlockType('root', $blockType);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Invalid "optionsCallback" argument type. Expected "callable", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testChangeBlockTypeWithInvalidOptionCallback()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot change block type to "my_root" for "root" item.'
+            . ' Reason: Invalid "optionsCallback" argument type. Expected "callable", "integer" given.'
+        );
+
         $this->rawLayoutBuilder->add('root', null, 'root');
         $this->rawLayoutBuilder->changeBlockType('root', 'my_root', 123);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.
-     */
     public function testSetBlockThemeForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.');
+
         $this->rawLayoutBuilder
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'root');
+            ->setBlockTheme('@My/Layout/my_theme.html.twig', 'root');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot set theme(s) for "" item. Reason: The root item does not exist.
-     */
     public function testSetRootBlockThemeForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot set theme(s) for "" item. Reason: The root item does not exist.');
+
         $this->rawLayoutBuilder
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig');
+            ->setBlockTheme('@My/Layout/my_theme.html.twig');
     }
 
     public function testGetOptions()
@@ -618,12 +617,11 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot get options for "root" item. Reason: The "root" item does not exist.
-     */
     public function testGetOptionsForUnknownItem()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot get options for "root" item. Reason: The "root" item does not exist.');
+
         $this->rawLayoutBuilder
             ->getOptions('root');
     }

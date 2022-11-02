@@ -1,6 +1,6 @@
 <?php
 
-namespace EntityExtendBundle\Tests\Unit\Form\Util;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -16,12 +16,12 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'MockClass';
-    const FIELD_NAME = 'mockField';
+    private const CLASS_NAME = 'MockClass';
+    private const FIELD_NAME = 'mockField';
 
     /** @var DynamicFieldsHelper */
     private $helper;
@@ -41,27 +41,13 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->router = $this->getMockBuilder(RouterInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->helper = new DynamicFieldsHelper(
             $this->configManager,
@@ -88,17 +74,12 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig */
-        $formConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(ConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
         $formView->children[self::FIELD_NAME] = 'MOCK';
 
         $this->assertTrue($this->helper->shouldBeInitialized(self::CLASS_NAME, $formConfig, $formView));
@@ -120,17 +101,12 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig */
-        $formConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(ConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
 
         $this->assertFalse($this->helper->shouldBeInitialized(self::CLASS_NAME, $formConfig, $formView));
     }
@@ -151,17 +127,12 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig */
-        $formConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(ConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
 
         $this->assertFalse($this->helper->shouldBeInitialized(self::CLASS_NAME, $formConfig, $formView));
     }
@@ -182,29 +153,21 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig */
-        $formConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(ConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
         $formView->children[self::FIELD_NAME] = 'MOCK';
 
         $this->assertFalse($this->helper->shouldBeInitialized(self::CLASS_NAME, $formConfig, $formView));
     }
 
     /**
-     * @param string $relationType
-     * @param array $values
-     * @param bool $expected
      * @dataProvider isApplicableFieldDataProvider
      */
-    public function testIsApplicableField($relationType, array $values, $expected)
+    public function testIsApplicableField(string $relationType, array $values, bool $expected)
     {
         $fieldConfigId = $this->getFieldConfigId($relationType);
 
@@ -226,39 +189,31 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity();
         $entity->setId(1)
-            ->setMockField('mockedValue');
+            ->setMockField([]);
 
         $fieldConfigId = $this->getFieldConfigId(RelationType::MANY_TO_MANY);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
-        $form->expects($this->any())
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
             ->method('getData')
             ->willReturn($entity);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
 
-        /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig */
-        $formConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(ConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId);
+
+        $formView->children[self::FIELD_NAME] = $this->createMock(FormInterface::class);
 
         $this->helper->addInitialElements($formView, $form, $formConfig);
     }
 
     /**
-     * @param array $pkColumns
-     * @param bool $hasConfig
-     * @param string $expected
      * @dataProvider addInitialElementsDataProvider
      */
-    public function testGetIdColumnName($pkColumns, $hasConfig, $expected)
+    public function testGetIdColumnName(?array $pkColumns, bool $hasConfig, string $expected)
     {
         $entity = new Entity();
         $entity->setId(1)
@@ -288,10 +243,7 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function isApplicableFieldDataProvider()
+    public function isApplicableFieldDataProvider(): array
     {
         return [
             'is applicable' => [
@@ -327,10 +279,7 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function addInitialElementsDataProvider()
+    public function addInitialElementsDataProvider(): array
     {
         return [
             'has config with id field' => [
@@ -346,14 +295,11 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $fieldType
      * @return FieldConfigId|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getFieldConfigId($fieldType)
+    private function getFieldConfigId(string $fieldType)
     {
-        $fieldConfigId = $this->getMockBuilder(FieldConfigId::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
         $fieldConfigId->expects($this->any())
             ->method('getFieldName')
             ->willReturn(self::FIELD_NAME);
@@ -368,23 +314,18 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param FieldConfigId $fieldConfigId
-     * @param array $values
-     * @param string $fieldName
-     * @return ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getExtendConfigProvider(FieldConfigId $fieldConfigId, array $values, $fieldName = self::FIELD_NAME)
-    {
-        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    private function getExtendConfigProvider(
+        FieldConfigId $fieldConfigId,
+        array $values,
+        ?string $fieldName = self::FIELD_NAME
+    ) {
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::CLASS_NAME, $fieldName)
-            ->willReturn(new Config(
-                $fieldConfigId,
-                $values
-            ));
+            ->willReturn(new Config($fieldConfigId, $values));
 
         return $extendConfigProvider;
     }

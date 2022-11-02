@@ -3,12 +3,52 @@ oro_dataaudit_bundle:
     type:         annotation
     prefix:       /audit
 
-oro_dataaudit_api_history:
-    resource:     "@OroDataAuditBundle/Controller/Api/Rest/AuditController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_audits:
+    path: '/api/rest/{version}/audits.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_audit:
+    path: '/api/rest/{version}/audits/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_audit_fields:
+    path: '/api/rest/{version}/audit/fields.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController::getFieldsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_options_audits:
+    path: '/api/rest/{version}/audits.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

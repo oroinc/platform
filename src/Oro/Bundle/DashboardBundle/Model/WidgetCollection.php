@@ -19,10 +19,6 @@ class WidgetCollection extends AbstractLazyCollection
      */
     private $factory;
 
-    /**
-     * @param Dashboard $dashboard
-     * @param Factory $factory
-     */
     public function __construct(Dashboard $dashboard, Factory $factory)
     {
         $this->dashboard = $dashboard;

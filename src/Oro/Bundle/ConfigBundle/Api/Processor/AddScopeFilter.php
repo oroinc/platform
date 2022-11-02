@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddScopeFilter implements ProcessorInterface
 {
-    const FILTER_KEY = 'scope';
+    public const FILTER_KEY = 'scope';
 
     /**
      * {@inheritdoc}

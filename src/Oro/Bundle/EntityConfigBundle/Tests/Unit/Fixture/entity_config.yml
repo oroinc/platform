@@ -21,8 +21,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -62,8 +62,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -83,8 +83,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid search"
@@ -104,8 +104,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid filter"

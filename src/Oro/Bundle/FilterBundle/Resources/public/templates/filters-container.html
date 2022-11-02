@@ -1,16 +1,16 @@
 <% if (!_.isEmpty(filters)) { %>
     <% if (_.isMobile()) { %>
-    <div class="filter-box oro-clearfix-width">
+    <div class="filter-box clearfix">
         <div class="dropdown">
-            <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-name="filters-dropdown">
-                <%= _.__('oro.filter.filter_results_trigger') %>
+            <a href="#" class="btn btn-large dropdown-toggle" data-name="filters-dropdown">
+                <%- _.__('oro.filter.filter_results_trigger') %>
                 <span data-role="reset-all-filters" class="reset-all-filter"></span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <div class="filter-container">
-                        <a class="reset-filter-button" href="javascript:void(0);">
-                            <%= _.__('oro.filter.filter_reset') %>
+                        <a class="reset-filter-button" href="#">
+                            <%- _.__('oro.filter.filter_reset') %>
                         </a>
                         <span class="filter-items"></span>
                         <div class="filter-items-hint"></div>
@@ -20,12 +20,12 @@
         </div>
     </div>
     <% } else { %>
-    <div class="filter-box oro-clearfix-width">
+    <div class="filter-box clearfix">
         <div class="filter-container">
             <span class="filter-items"></span>
             <div class="filter-items-hint">
-                <a class="reset-filter-button" href="javascript:void(0);">
-                    <%= _.__('oro.filter.reset.label') %>
+                <a class="reset-filter-button" href="#">
+                    <%- _.__('oro.filter.reset.label') %>
                 </a>
             </div>
         </div>

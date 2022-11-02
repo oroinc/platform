@@ -4,8 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KeyTemplateParametersResolver
 {
@@ -15,9 +14,6 @@ class KeyTemplateParametersResolver
     /** @var TranslationKeyTemplateInterface[] */
     protected $templates;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -46,11 +42,6 @@ class KeyTemplateParametersResolver
         return $resolved;
     }
 
-    /**
-     * @param TranslationKeyTemplateInterface $template
-     * @param array $resolved
-     * @param array $parameters
-     */
     protected function resolveParameter(TranslationKeyTemplateInterface $template, array &$resolved, array $parameters)
     {
         if (!empty(array_diff($template->getRequiredKeys(), array_keys($parameters)))) {

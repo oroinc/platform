@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 /**
  * Applies sorters to datasource.
@@ -26,15 +27,20 @@ abstract class AbstractSorterExtension extends AbstractExtension
     public const DIRECTION_ASC = 'ASC';
     public const DIRECTION_DESC = 'DESC';
 
-    /** @var DatagridStateProviderInterface */
-    private $sortersStateProvider;
+    /**
+     * @var DatagridStateProviderInterface
+     */
+    protected $sortersStateProvider;
 
     /**
-     * @param DatagridStateProviderInterface $sortersStateProvider
+     * @var SystemAwareResolver
      */
-    public function __construct(DatagridStateProviderInterface $sortersStateProvider)
+    protected $resolver;
+
+    public function __construct(DatagridStateProviderInterface $sortersStateProvider, SystemAwareResolver $resolver)
     {
         $this->sortersStateProvider = $sortersStateProvider;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -73,9 +79,15 @@ abstract class AbstractSorterExtension extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $sortersConfig = $this->getSorters($config);
+        try {
+            $gridName = $config->getName();
+        } catch (\LogicException $e) {
+            $gridName = null;
+        }
+        $resolvedSortersConfig = $this->resolver->resolve($gridName, $sortersConfig);
         $sortersState = $this->sortersStateProvider->getStateFromParameters($config, $this->getParameters());
         foreach ($sortersState as $sorterName => $direction) {
-            $sorter = $sortersConfig[$sorterName];
+            $sorter = $resolvedSortersConfig[$sorterName];
 
             // if need customized behavior, just pass closure under "apply_callback" node
             if (isset($sorter['apply_callback']) && \is_callable($sorter['apply_callback'])) {
@@ -114,10 +126,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
         $this->setMetadataStates($config, $data);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param MetadataObject        $data
-     */
     protected function processColumns(DatagridConfiguration $config, MetadataObject $data)
     {
         $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
@@ -148,10 +156,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param MetadataObject        $data
-     */
     protected function setMetadataStates(DatagridConfiguration $config, MetadataObject $data)
     {
         $sortersState = $this->sortersStateProvider->getState($config, $this->getParameters());

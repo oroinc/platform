@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper;
+use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 
 class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,7 +14,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridParametersHelper */
     private $datagridParametersHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagridParameters = $this->createMock(ParameterBag::class);
 
@@ -24,21 +25,15 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = 'sampleParameterName', false);
 
-        $this->datagridParameters
-            ->expects(self::never())
+        $this->datagridParameters->expects(self::never())
             ->method('get');
 
         self::assertNull($this->datagridParametersHelper->getFromParameters($this->datagridParameters, $parameterName));
     }
 
-    /**
-     * @param string $parameterName
-     * @param bool $exists
-     */
     private function mockParameterExists(string $parameterName, bool $exists): void
     {
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('has')
             ->with($parameterName)
             ->willReturn($exists);
@@ -48,8 +43,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = 'sampleParameterName', true);
 
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('get')
             ->with($parameterName)
             ->willReturn($parameterValue = 'parameterValue');
@@ -64,8 +58,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = ParameterBag::MINIFIED_PARAMETERS, false);
 
-        $this->datagridParameters
-            ->expects(self::never())
+        $this->datagridParameters->expects(self::never())
             ->method('get');
 
         self::assertNull($this->datagridParametersHelper->getFromParameters($this->datagridParameters, $parameterName));
@@ -73,10 +66,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider minifiedParametersDataProvider
-     *
-     * @param array $minifiedParameters
-     * @param string $parameterName
-     * @param string|null $expectedParameterValue
      */
     public function testGetFromMinifiedParameters(
         array $minifiedParameters,
@@ -85,8 +74,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->mockParameterExists(ParameterBag::MINIFIED_PARAMETERS, true);
 
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('get')
             ->with(ParameterBag::MINIFIED_PARAMETERS)
             ->willReturn($minifiedParameters);
@@ -97,9 +85,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function minifiedParametersDataProvider(): array
     {
         return [
@@ -114,5 +99,123 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
                 'expectedParameterValue' => 'sampleParameterValue',
             ],
         ];
+    }
+
+    /**
+     * @dataProvider filterParametersDataProvider
+     */
+    public function testResetFilter(string $filterName, array $originalParameters, array $expectedParameters): void
+    {
+        $parameters = new ParameterBag($originalParameters);
+        $this->datagridParametersHelper->resetFilter($parameters, $filterName);
+
+        self::assertEquals(new ParameterBag($expectedParameters), $parameters);
+    }
+
+    public function filterParametersDataProvider(): array
+    {
+        return [
+            'check that filter value is removed from root param' => [
+                'filterName' => 'some_filter',
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => []
+                ]
+            ],
+            'check that filter value is removed from minified param' => [
+                'filterName' => 'some_filter',
+                'originalParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => []
+                    ]
+                ]
+            ],
+            'check that parameters are not changed if no such filter' => [
+                'filterName' => 'some_other_filter',
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ],
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ],
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider resetFiltersDataProvider
+     */
+    public function testResetFilters(array $originalParameters, array $expectedParameters): void
+    {
+        $parameters = new ParameterBag($originalParameters);
+        $this->datagridParametersHelper->resetFilters($parameters);
+
+        self::assertEquals(new ParameterBag($expectedParameters), $parameters);
+    }
+
+    public function resetFiltersDataProvider(): array
+    {
+        return [
+            'all filters removed from root param' => [
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => []
+                ]
+            ],
+            'all filters removed from minified param' => [
+                'originalParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => []
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function testDatagridSkipExtensionParam()
+    {
+        $parameterBag = new ParameterBag();
+        $this->datagridParametersHelper->setDatagridExtensionSkipped($parameterBag);
+        self::assertTrue($parameterBag->get(DatagridParametersHelper::DATAGRID_SKIP_EXTENSION_PARAM));
+        self::assertTrue($this->datagridParametersHelper->isDatagridExtensionSkipped($parameterBag));
+
+        $this->datagridParametersHelper->setDatagridExtensionSkipped($parameterBag, false);
+        self::assertFalse($this->datagridParametersHelper->isDatagridExtensionSkipped($parameterBag));
     }
 }

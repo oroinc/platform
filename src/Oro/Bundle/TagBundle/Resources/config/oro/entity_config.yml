@@ -1,40 +1,18 @@
 entity_config:
     tag:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#tag
         entity:
             items:
-                # indicates whether the entity can have tags or not
-                enabled: # boolean
+                enabled:
                     options:
                         require_schema_update: false
                         priority:              250
-                        default_value:         false
                     form:
                         type:               Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
                         options:
                             block:          other
                             required:       true
                             label:          oro.tag.config.enabled
-
-                # this attribute can be used to prohibit changing the tag state (no matter whether it is enabled or not)
-                # for the entity if TRUE than the current state cannot be changed
-                immutable: # boolean
+                immutable:
                     options:
                         auditable:          false
-
-                # indicates whether column with tags should appear by default on the grid
-                # if FALSE it does not appear on the grid, and can be enabled from the grid settings
-                enableGridColumn:
-                    options:
-                        default_value:      true
-
-                # indicates whether tags filter should appear by default on the grid
-                # if FALSE it does not appear on the grid, and can be enabled from the filter manager
-                enableGridFilter:
-                    options:
-                        default_value:      true
-
-                # indicates whether to use default rendering of tags in entity view pages
-                # if FALSE tags will not be rendered automatically and allows to use custom rendering logic
-                enableDefaultRendering:
-                    options:
-                        default_value:      true

@@ -8,13 +8,16 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds UniqueEntity constraint to the class metadata.
+ */
 class UniqueEntityExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var ValidatorInterface */
     protected $validator;
 
@@ -27,12 +30,6 @@ class UniqueEntityExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ValidatorInterface  $validator
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider      $entityConfigProvider
-     * @param DoctrineHelper      $doctrineHelper
-     */
     public function __construct(
         ValidatorInterface $validator,
         TranslatorInterface $translator,
@@ -75,7 +72,7 @@ class UniqueEntityExtension extends AbstractTypeExtension
 
             $labels = array_map(
                 function ($fieldName) use ($className) {
-                    $label = $this
+                    $label = (string) $this
                         ->entityConfigProvider
                         ->getConfig($className, $fieldName)
                         ->get('label');
@@ -91,10 +88,9 @@ class UniqueEntityExtension extends AbstractTypeExtension
                     'errorPath' => '',
                     'message'   => $this
                         ->translator
-                        ->transChoice(
+                        ->trans(
                             'oro.entity.validation.unique_field',
-                            sizeof($fields),
-                            ['%field%' => implode(', ', $labels)]
+                            ['%count%' => sizeof($fields), '%field%' => implode(', ', $labels)]
                         ),
                 ]
             );

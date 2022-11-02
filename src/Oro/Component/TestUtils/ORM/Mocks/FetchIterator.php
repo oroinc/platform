@@ -2,6 +2,9 @@
 
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
+/**
+ * Iterates over \Doctrine\DBAL\Driver\Statement->fetch()
+ */
 class FetchIterator implements \Iterator
 {
     /** @var StatementMock */
@@ -15,8 +18,6 @@ class FetchIterator implements \Iterator
 
     /**
      * FetchIterator constructor.
-     *
-     * @param StatementMock $statement
      */
     public function __construct(StatementMock $statement)
     {
@@ -26,7 +27,7 @@ class FetchIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->row;
     }
@@ -34,7 +35,7 @@ class FetchIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->row = $this->statement->fetch();
         $this->key++;
@@ -43,7 +44,7 @@ class FetchIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->key;
     }
@@ -51,7 +52,7 @@ class FetchIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return false !== $this->row;
     }
@@ -59,7 +60,7 @@ class FetchIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->next();
     }

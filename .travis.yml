@@ -1,4 +1,4 @@
-sudo: false
+dist: bionic
 
 language: php
 
@@ -8,7 +8,10 @@ branches:
     - /^\d+\.\d+$/
 
 php:
-    - 7.1
+    - 8.0.2
+
+env:
+  - COMPOSER=travis.json
 
 cache:
   directories:
@@ -17,12 +20,12 @@ cache:
 before_script:
   - phpenv config-rm xdebug.ini
   - phpenv config-add travis.php.ini
-  - composer self-update
+  - cp dev.json travis.json # avoid dev.lock file and composer.json with a stable version
   - travis_retry travis_wait composer install --prefer-dist --optimize-autoloader --no-interaction  --no-suggest
   - set +e; DIFF=$(git diff --name-only --diff-filter=ACMR $TRAVIS_COMMIT_RANGE | grep -e ".*\.php$"); set -e;
 
 script:
   - ./vendor/bin/phpunit
-  - ./vendor/bin/phpcs ./src -p --encoding=utf-8 --extensions=php --standard=./build/phpcs.xml
+  - ./vendor/bin/phpcs ./src -p --encoding=utf-8 --extensions=php --standard=PSR2
   - ./vendor/bin/php-cs-fixer fix --dry-run --config=./build/.php_cs --path-mode=intersection ./src
   - if [[ $DIFF ]]; then ./vendor/bin/phpmd ${DIFF//$'\n'/,} text ./build/phpmd.xml --suffixes php; fi

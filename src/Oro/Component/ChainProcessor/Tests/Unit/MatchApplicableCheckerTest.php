@@ -5,8 +5,8 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\MatchApplicableChecker;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,6 +21,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         $context->set('type', 'test');
         $context->set('feature', ['feature1', 'feature3']);
         $context->set('featureObj', new TestArrayObject(['feature1', 'feature3']));
+        $context->set('nullAttr', null);
 
         $processors = [
             [
@@ -211,13 +212,37 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 'processor47',
                 ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature2']]]
             ],
+            [
+                'processor50',
+                ['feature' => null] // !exists
+            ],
+            [
+                'processor51',
+                ['feature' => ['!' => null]] // exists
+            ],
+            [
+                'processor52',
+                ['notExistAttr' => null] // !exists
+            ],
+            [
+                'processor53',
+                ['notExistAttr' => ['!' => null]] // exists
+            ],
+            [
+                'processor54',
+                ['nullAttr' => null] // !exists
+            ],
+            [
+                'processor55',
+                ['nullAttr' => ['!' => null]] // exists
+            ]
         ];
 
         $iterator = new ProcessorIterator(
             $processors,
             $context,
             $this->getApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $expected = [
@@ -248,6 +273,8 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             'processor45',
             'processor46',
             'processor47',
+            'processor51',
+            'processor52'
         ];
         $this->assertProcessors($expected, $iterator);
         // test that iterator state is not changed
@@ -368,7 +395,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             [
                 'processor13_disabled',
                 ['disabled' => true, 'class' => 'TestCls', 'type' => 'another', 'another' => 'val']
-            ],
+            ]
         ];
 
         $applicableChecker = $this->getApplicableChecker();
@@ -377,7 +404,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             $applicableChecker,
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertProcessors(
@@ -388,7 +415,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 'processor4',
                 'processor5',
                 'processor7',
-                'processor10',
+                'processor10'
             ],
             $iterator
         );
@@ -406,12 +433,12 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface
+     * @return ProcessorRegistryInterface
      */
-    protected function getProcessorFactory()
+    protected function getProcessorRegistry()
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -419,7 +446,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        return $factory;
+        return $processorRegistry;
     }
 
     /**

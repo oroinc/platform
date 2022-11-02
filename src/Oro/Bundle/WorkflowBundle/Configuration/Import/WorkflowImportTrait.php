@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Contains common methods for import processors.
+ */
 trait WorkflowImportTrait
 {
     /** @var string */
@@ -27,9 +30,6 @@ trait WorkflowImportTrait
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getResource(): string
     {
         return $this->resource;
@@ -46,9 +46,6 @@ trait WorkflowImportTrait
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTarget(): string
     {
         return $this->target;
@@ -65,49 +62,29 @@ trait WorkflowImportTrait
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getReplacements(): array
     {
         return $this->replacements;
     }
 
-    /**
-     * @param array $content
-     * @return bool
-     */
     private function isResourcePresent(array $content): bool
     {
         return isset($content[WorkflowListConfiguration::NODE_WORKFLOWS][$this->getResource()]);
     }
 
-    /**
-     * @param array $content
-     * @return array
-     */
     private function getResourceData(array $content): array
     {
         return (array)$content[WorkflowListConfiguration::NODE_WORKFLOWS][$this->getResource()];
     }
 
-    /**
-     * @param array $resourceData
-     * @param array $content
-     * @return array
-     */
-    private function mergeConfigs(array $resourceData, array $content): array
+    private function mergeImports(array $content, array $importedContent): array
     {
         return ArrayUtil::arrayMergeRecursiveDistinct(
-            [WorkflowListConfiguration::NODE_WORKFLOWS => [$this->getTarget() => $resourceData]],
-            $content
+            $content,
+            [WorkflowListConfiguration::NODE_WORKFLOWS => [$this->getTarget() => $importedContent]]
         );
     }
 
-    /**
-     * @param array $resourceData
-     * @return array
-     */
     private function applyReplacements(array $resourceData): array
     {
         foreach ($this->getReplacements() as $path) {

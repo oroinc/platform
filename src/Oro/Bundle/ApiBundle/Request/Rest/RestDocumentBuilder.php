@@ -3,18 +3,26 @@
 namespace Oro\Bundle\ApiBundle\Request\Rest;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\LinkCollectionMetadataInterface;
+use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The document builder for plain REST API response.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RestDocumentBuilder extends AbstractDocumentBuilder
 {
     public const OBJECT_TYPE = 'entity';
+    public const LINKS       = 'links';
+    public const HREF        = 'href';
 
     private const ERROR_CODE   = 'code';
     private const ERROR_TITLE  = 'title';
@@ -24,12 +32,12 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    public function getDocument()
+    public function getDocument(): array
     {
         $result = null;
-        if (array_key_exists(self::DATA, $this->result)) {
+        if (\array_key_exists(self::DATA, $this->result)) {
             $result = $this->result[self::DATA];
-        } elseif (array_key_exists(self::ERRORS, $this->result)) {
+        } elseif (\array_key_exists(self::ERRORS, $this->result)) {
             $result = $this->result[self::ERRORS];
         }
         if (null === $result) {
@@ -42,11 +50,14 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertCollectionToArray($collection, RequestType $requestType, EntityMetadata $metadata = null)
-    {
+    protected function convertCollectionToArray(
+        $collection,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): array {
         $result = [];
         foreach ($collection as $object) {
-            $result[] = null === $object || is_scalar($object)
+            $result[] = null === $object || \is_scalar($object)
                 ? $object
                 : $this->convertObjectToArray($object, $requestType, $metadata);
         }
@@ -57,23 +68,44 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
-    {
+    protected function convertObjectToArray(
+        $object,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): array {
+        $data = $this->objectAccessor->toArray($object);
         if (null === $metadata) {
-            $result = $this->objectAccessor->toArray($object);
-            if (!array_key_exists(self::OBJECT_TYPE, $result)) {
+            if (!\array_key_exists(self::OBJECT_TYPE, $data)) {
                 $objectClass = $this->objectAccessor->getClassName($object);
                 if ($objectClass) {
-                    $result[self::OBJECT_TYPE] = $objectClass;
+                    $data[self::OBJECT_TYPE] = $objectClass;
                 }
             }
+            $result = $data;
         } else {
+            $metadata = $this->getTargetMetadataProvider()->getTargetMetadata($object, $metadata);
+            $objectClass = $this->objectAccessor->getClassName($object);
+            if (!$objectClass) {
+                $objectClass = $metadata->getClassName();
+            }
+            $objectAlias = $this->getEntityAlias($objectClass, $requestType);
+
+            $entityData = $data;
+            $entityData[DataAccessorInterface::ENTITY_CLASS] = $objectClass;
+            if ($objectAlias) {
+                $entityData[DataAccessorInterface::ENTITY_TYPE] = $objectAlias;
+            }
+            if ($metadata->hasIdentifierFields()) {
+                $entityData[DataAccessorInterface::ENTITY_ID] = $this->getEntityId($object, $requestType, $metadata);
+            }
+            $this->resultDataAccessor->setEntity($entityData);
+
             $result = [];
-            $data = $this->objectAccessor->toArray($object);
             if ($metadata->hasMetaProperty(ConfigUtil::CLASS_NAME)) {
                 $result[self::OBJECT_TYPE] = $this->getEntityTypeForObject($object, $requestType, $metadata);
             }
             $this->addMeta($result, $data, $metadata);
+            $this->addLinks($result, $metadata->getLinks());
             $this->addAttributes($result, $data, $metadata);
             $this->addRelationships($result, $data, $requestType, $metadata);
         }
@@ -84,7 +116,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertErrorToArray(Error $error)
+    protected function convertErrorToArray(Error $error): array
     {
         $result = [];
 
@@ -114,65 +146,113 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true)
+    protected function convertToEntityType(string $entityClass, RequestType $requestType): string
     {
         return $entityClass;
     }
 
     /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
+     * {@inheritdoc}
      */
-    protected function addMeta(array &$result, array $data, EntityMetadata $metadata)
+    protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string
+    {
+        return $entityClass;
+    }
+
+    protected function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
             if (!$property->isOutput()) {
                 continue;
             }
+            $propertyPath = $property->getPropertyPath();
+            if (!$propertyPath || $this->isIgnoredMeta($propertyPath, $metadata)) {
+                continue;
+            }
             $resultName = $property->getResultName();
-            if (array_key_exists($name, $data)) {
+            if (\array_key_exists($name, $data)) {
                 $result[$resultName] = $data[$name];
+            } else {
+                $value = null;
+                if ($this->resultDataAccessor->tryGetValue($propertyPath, $value)) {
+                    $result[$resultName] = $value;
+                }
             }
         }
     }
 
     /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
+     * @param array                   $result
+     * @param LinkMetadataInterface[] $links
      */
-    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata)
+    protected function addLinks(array &$result, array $links): void
+    {
+        foreach ($links as $name => $link) {
+            $this->addLinkToResult($result, $name, $link);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void
+    {
+        $href = $this->getLinkHref($link);
+        if ($href) {
+            $result[self::LINKS][$name] = $this->getLinkObject($href, $this->getLinkMeta($link));
+        }
+        if ($link instanceof LinkCollectionMetadataInterface) {
+            $this->addLinks($result, $link->getLinks($this->resultDataAccessor));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addMetaToCollectionResult(array &$result, string $name, $value): void
+    {
+        // not supported
+    }
+
+    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
             if (!$field->isOutput()) {
                 continue;
             }
-            $result[$name] = array_key_exists($name, $data)
-                ? $data[$name]
-                : null;
+            $result[$name] = $data[$name] ?? null;
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     */
     protected function addRelationships(
         array &$result,
         array $data,
         RequestType $requestType,
         EntityMetadata $metadata
-    ) {
+    ): void {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             if (!$association->isOutput()) {
                 continue;
             }
+
+            if (DataType::isAssociationAsField($association->getDataType())) {
+                $result[$name] = $this->getRelationshipValue(
+                    $data,
+                    $requestType,
+                    $name,
+                    $association
+                );
+                continue;
+            }
+
+            $this->resultDataAccessor->setAssociation(
+                $name,
+                $this->getRelationshipData($requestType, $association)
+            );
+
             $result[$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }
@@ -185,26 +265,32 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         RequestType $requestType,
         AssociationMetadata $associationMetadata
     ) {
-        if (is_scalar($object)) {
+        if (\is_scalar($object)) {
             return $object;
         }
 
-        $targetMetadata = $associationMetadata->getTargetMetadata();
-        if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
-            $data = $this->objectAccessor->toArray($object);
+        $this->resultDataAccessor->addEntity();
+        try {
+            $targetMetadata = $this->getTargetMetadataProvider()
+                ->getAssociationTargetMetadata($object, $associationMetadata);
+            if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
+                $data = $this->objectAccessor->toArray($object);
 
-            return count($data) === 1
-                ? reset($data)
-                : $data;
+                return count($data) === 1
+                    ? reset($data)
+                    : $data;
+            }
+
+            return $this->convertObjectToArray($object, $requestType, $targetMetadata);
+        } finally {
+            $this->resultDataAccessor->removeLastEntity();
         }
-
-        return $this->convertObjectToArray($object, $requestType, $targetMetadata);
     }
 
     /**
-     * @param array $object
+     * {@inheritdoc}
      */
-    protected function addRelatedObject(array $object)
+    protected function addRelatedObject(array $object): void
     {
         throw new \LogicException('The included objects are not supported by this document.');
     }
@@ -212,12 +298,27 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)
+    protected function hasIdentifierFieldsOnly(EntityMetadata $metadata): bool
     {
         if (count($metadata->getMetaProperties()) > 0) {
             return false;
         }
 
         return parent::hasIdentifierFieldsOnly($metadata);
+    }
+
+    /**
+     * @param string     $href
+     * @param array|null $properties
+     *
+     * @return array|string
+     */
+    protected function getLinkObject(string $href, ?array $properties)
+    {
+        if (empty($properties)) {
+            return $href;
+        }
+
+        return \array_merge([self::HREF => $href], $properties);
     }
 }

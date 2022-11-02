@@ -1,8 +1,10 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as ui %}
 {% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
@@ -31,6 +33,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as ui %}
+
     {% set id = 'embedded-form-get-code' %}
 
     {% block stats %}
@@ -48,11 +52,11 @@
                         <label class="control-label">{{ 'oro.embeddedform.css.label'|trans }}</label>
 
                         <div class="controls" style="overflow-y: scroll; height: 180px;">
-                            {{ entity.css|nl2br }}
+                            <bdo dir="ltr">{{ entity.css|nl2br }}</bdo>
                         </div>
                     </div>
 
-                    {{ ui.renderProperty('oro.embeddedform.success_message.label'|trans, entity.successMessage) }}
+                    {{ ui.renderProperty('oro.embeddedform.success_message.label'|trans, entity.successMessage, null, null, {'dir': 'ltr'}) }}
                     {{ ui.renderHtmlProperty('oro.embeddedform.allowed_domains.label'|trans, entity.allowedDomains|nl2br|oro_html_sanitize) }}
                 </div>
             </div>
@@ -70,11 +74,11 @@
     {% endset %}
 
     {% set getCodeIframe %}
-        <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px">
+        <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px" dir="ltr">
 {%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
-<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
-<script type="text/javascript">
+<script src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script>
     new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
@@ -91,11 +95,11 @@
 
     {% set getCodeInline %}
         <div class="alert alert-warning" role="alert">{{ 'oro.embeddedform.tabs.inline.description'|trans|raw }}</div>
-        <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px">
+        <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px" dir="ltr">
 {%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
-<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
-<script type="text/javascript">
+<script src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script>
     new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         xhr: {
