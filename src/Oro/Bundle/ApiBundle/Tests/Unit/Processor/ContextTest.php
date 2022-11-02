@@ -62,7 +62,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * keys of request headers should be are case insensitive
+     * keys of request headers should be case insensitive
      */
     public function testRequestHeaders()
     {
@@ -121,7 +121,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * keys of response headers should be are case sensitive
+     * keys of response headers should be case sensitive
      */
     public function testResponseHeaders()
     {
@@ -858,7 +858,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
 
-        // test remove of non existing extra
+        // test remove of not existing extra
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
 
@@ -1165,7 +1165,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 
-        // test remove of non existing extra
+        // test remove of not existing extra
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
 

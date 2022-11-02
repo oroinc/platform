@@ -58,8 +58,6 @@
     &::-webkit-search-cancel-button,
     &::-webkit-search-results-button,
     &::-webkit-search-results-decoration,
-    // Disable platform styles of "date" input
-    &::-webkit-calendar-picker-indicator,
     // Disable platform styles of "time" input
     &::-webkit-inner-spin-button {
         display: none;

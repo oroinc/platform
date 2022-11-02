@@ -38,9 +38,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
      *
      * In the PHP >= 7.3 updated DOM component.
      * Now DOMDocument::saveHTML return html in different formatting than PHP < 7.3.
-     * We removing new lines in actual parsed data so that check to work on all supported PHP versions.
-     *
-     * @throws \ReflectionException
+     * We remove new lines in actual parsed data so that check to work on all supported PHP versions.
      */
     private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void
     {

@@ -294,7 +294,7 @@
             $content: '#{$icon}';
         }
 
-        &:#{$state} {
+        &::#{$state} {
             content: $content;
             font-family: $fa-font-family, $font-family-sans-serif;
 

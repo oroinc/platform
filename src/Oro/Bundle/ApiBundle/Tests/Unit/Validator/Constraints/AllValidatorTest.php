@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AllValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): AllValidator
     {
         return new AllValidator();
     }
@@ -70,7 +70,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidArguments()
+    public function getValidArguments(): array
     {
         return [
             [[5, 6, 7]],

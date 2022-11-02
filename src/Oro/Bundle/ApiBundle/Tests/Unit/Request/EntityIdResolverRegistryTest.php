@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Container\ContainerInterface;
 
 class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,9 +25,6 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
     private $resolver5;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
     /** @var EntityIdResolverRegistry */
     private $registry;
 
@@ -39,7 +35,8 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
         $this->resolver3 = $this->createMock(EntityIdResolverInterface::class);
         $this->resolver4 = $this->createMock(EntityIdResolverInterface::class);
         $this->resolver5 = $this->createMock(EntityIdResolverInterface::class);
-        $this->container = TestContainerBuilder::create()
+
+        $container = TestContainerBuilder::create()
             ->add('resolver1', $this->resolver1)
             ->add('resolver2', $this->resolver2)
             ->add('resolver3', $this->resolver3)
@@ -65,7 +62,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $this->container,
+            $container,
             new RequestExpressionMatcher()
         );
     }

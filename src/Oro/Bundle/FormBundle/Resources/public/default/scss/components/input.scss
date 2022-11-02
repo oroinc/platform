@@ -23,6 +23,12 @@
         display: none;
     }
 
+    &[type='date'],
+    &[type='time'] {
+        display: flex;
+        align-items: center;
+    }
+
     &[type='date'] {
         min-height: $input-date-height;
 
@@ -31,21 +37,23 @@
         }
 
         &::-webkit-calendar-picker-indicator {
-            display: none;
+            opacity: 0;
         }
 
-        // Fix height Shadow DOM elements
+        // Fix height and text-align Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
             line-height: 1;
+            text-align: left;
         }
     }
 
     &[type='time'] {
-        // Fix height Shadow DOM elements
+        // Fix height and text-align Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
             line-height: 1;
+            text-align: left;
         }
     }
 
@@ -117,6 +125,7 @@
             &::before {
                 content: attr(placeholder);
                 color: $input-time-placeholder-color;
+                text-align: left;
                 flex: 1 1 0%;
             }
         }
