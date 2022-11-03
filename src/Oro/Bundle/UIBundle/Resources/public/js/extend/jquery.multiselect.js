@@ -20,7 +20,7 @@ define(function(require) {
         _create(...args) {
             this._uniqueName = _.uniqueId(this.widgetName);
             this.$outerTrigger = $(this.options.outerTrigger);
-            this.initialValue = this.element.val();
+            this.initialValue = this.options.initialValue || this.element.val();
 
             const superResult = this._superApply(args);
             const labelledby = [];
@@ -159,8 +159,12 @@ define(function(require) {
         open(...args) {
             if (!this.hasBeenOpened) {
                 this.hasBeenOpened = true;
-                // Actualize initial value when dropdown will be opened first time because
-                this.initialValue = this.element.val();
+                // Actualize initial value when dropdown will be opened first time,
+                // because in runtime some options might get disabled
+                const options = this.element.children(':enabled');
+                if (this.initialValue instanceof Array) {
+                    this.initialValue = this.initialValue.filter(name => options.is(`[value="${name}"]`));
+                }
                 this.refresh();
             }
             this._superApply(args);
