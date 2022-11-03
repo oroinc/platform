@@ -148,9 +148,9 @@ define(function(require, exports, module) {
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
-            'click .reset-filter-button': '_onReset',
+            'click .reset-filter-button, [data-role="reset-all-filters"]': '_onReset',
             'click a[data-name="filters-dropdown"]': '_onDropdownToggle',
-            'click [data-role="reset-filters"], [data-role="reset-all-filters"]': '_onReset'
+            'click [data-role="reset-filters"]': '_onResetFiltersSelection'
         },
 
         /**
@@ -743,7 +743,8 @@ define(function(require, exports, module) {
                     close: () => {
                         this.selectWidget.onClose();
                     },
-                    appendTo: this.dropdownContainer
+                    appendTo: this.dropdownContainer,
+                    initialValue: this._defaultFiltersNames()
                 },
                 this.multiselectParameters
             );
@@ -840,7 +841,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * Reset button click handler
+         * Reset filters value button click handler
          * @param {jQuery.Event} e
          */
         _onReset: function(e) {
@@ -848,6 +849,28 @@ define(function(require, exports, module) {
             this.collection.state.filters = {};
             this.collection.trigger('updateState', this.collection);
             mediator.trigger('datagrid:doRefresh:' + this.collection.inputName, true);
+        },
+
+        /**
+         * Reset active filters selection button click handler
+         * @param {jQuery.Event} e
+         */
+        _onResetFiltersSelection: function(e) {
+            e.stopPropagation();
+            const defaultFilters = this._defaultFiltersNames();
+            this.selectWidget.element.val(defaultFilters).trigger('change');
+        },
+
+        /**
+         * Fetches filters names, that are rendered by default
+         *
+         * @returns {Array.<string>}
+         * @protected
+         */
+        _defaultFiltersNames() {
+            return Object.values(this.filters)
+                .filter(filter => filter.renderableByDefault === true)
+                .map(filter => filter.name);
         },
 
         /**
