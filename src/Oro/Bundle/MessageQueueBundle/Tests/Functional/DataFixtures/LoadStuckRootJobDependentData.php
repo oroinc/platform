@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
+use Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageTestTopic;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -80,7 +81,7 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
                     'timestamp' => 1536316085,
                 ],
                 'properties' => [
-                    'oro.message_queue.client.topic_name' => 'oro.message_queue.test_topic',
+                    'oro.message_queue.client.topic_name' => DependentMessageTestTopic::getName(),
                     'oro.message_queue.client.queue_name' => 'oro.default',
                 ],
                 'redelivered' => false,

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Async;
 
+use Oro\Bundle\AttachmentBundle\Async\Topic\AttachmentRemoveImageTopic;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
@@ -9,7 +10,6 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
 use Symfony\Component\OptionsResolver\Options;
@@ -39,7 +39,7 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ATTACHMENT_REMOVE_IMAGE];
+        return [AttachmentRemoveImageTopic::getName()];
     }
 
     /**
@@ -48,8 +48,8 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
     public function process(MessageInterface $message, SessionInterface $session)
     {
         //array<array{id: int, fileName: string, originalFileName: string}}>
-        $images = JSON::decode($message->getBody());
-        foreach ($images as $imageData) {
+        $messageBody = $message->getBody();
+        foreach ($messageBody as $imageData) {
             try {
                 try {
                     $imageData = $this->getOptionsResolver()->resolve($imageData);

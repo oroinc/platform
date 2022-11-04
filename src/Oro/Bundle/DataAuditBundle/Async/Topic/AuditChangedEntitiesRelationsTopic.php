@@ -28,7 +28,20 @@ class AuditChangedEntitiesRelationsTopic extends AbstractAuditTopic
             ->setRequired([
                 'collections_updated',
             ])
+            ->setDefined([
+                'entities_inserted',
+                'entities_updated',
+                'entities_deleted',
+            ])
+            ->setDefaults([
+                'entities_inserted' => [],
+                'entities_updated' => [],
+                'entities_deleted' => [],
+            ])
             ->addAllowedTypes('collections_updated', 'array')
+            ->addAllowedTypes('entities_inserted', 'array')
+            ->addAllowedTypes('entities_updated', 'array')
+            ->addAllowedTypes('entities_deleted', 'array')
             ->addAllowedValues('collections_updated', static function ($value) {
                 if (!count($value)) {
                     throw new InvalidOptionsException('The "collections_updated" was expected to be not empty.');

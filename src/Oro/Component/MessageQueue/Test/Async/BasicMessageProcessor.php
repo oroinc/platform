@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Test\Async;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
@@ -27,6 +28,6 @@ class BasicMessageProcessor implements MessageProcessorInterface, TopicSubscribe
      */
     public static function getSubscribedTopics()
     {
-        return [self::TEST_TOPIC];
+        return [BasicMessageTestTopic::getName()];
     }
 }

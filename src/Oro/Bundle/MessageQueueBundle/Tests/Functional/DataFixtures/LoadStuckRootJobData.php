@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Test\Async\Topic\UniqueJobTestTopic;
 use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -80,7 +81,7 @@ class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInte
                     'timestamp' => 1536316085,
                 ],
                 'properties' => [
-                    'oro.message_queue.client.topic_name' => 'oro.message_queue.unique_test_topic',
+                    'oro.message_queue.client.topic_name' => UniqueJobTestTopic::getName(),
                     'oro.message_queue.client.queue_name' => 'oro.default',
                 ],
                 'redelivered' => false,
