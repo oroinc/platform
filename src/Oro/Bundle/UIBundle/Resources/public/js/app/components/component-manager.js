@@ -68,13 +68,16 @@ define(function(require) {
          */
         _bindContainerChangesEvents() {
             // if the container catches content changed event -- updates its layout
-            this.$el.on('content:changed' + this.eventNamespace, event => {
+            this.$el.on('content:changed' + this.eventNamespace, (event, onInitialized) => {
                 if (event.isDefaultPrevented()) {
                     return;
                 }
                 event.preventDefault();
                 this.init(this.initOptions).done(() => {
                     $(event.target).trigger('content:initialized');
+                    if (onInitialized) {
+                        onInitialized();
+                    }
                 });
             });
 

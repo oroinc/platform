@@ -294,19 +294,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         }
 
         const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
+        const {htmlProcessor = html => html} = e;
+        $listContainer.append(htmlProcessor(rowsHtml)).trigger('content:changed');
 
-        $listContainer.append(rowsHtml).trigger('content:changed');
-
-        $listContainer.find('input.position-input').each(function(i, el) {
-            $(el).val(i);
-        });
+        $listContainer.find('input.position-input').each((i, el) => $(el).val(i));
 
         if ($(this).data('validate-collection') !== false) {
             validateContainer($listContainer);
         }
     });
-
-    // TODO: implement clone row
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();
