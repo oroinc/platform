@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Async;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\ChangeConfigTestTopic;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -13,9 +14,8 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const TEST_TOPIC = 'oro.test.change_config';
-    const COMMAND_NOOP = 'noop';
-    const COMMAND_CHANGE_CACHE = 'change';
+    public const COMMAND_NOOP = 'noop';
+    public const COMMAND_CHANGE_CACHE = 'change';
 
     /**
      * @var ConfigManager
@@ -33,7 +33,8 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
     public function process(MessageInterface $message, SessionInterface $session)
     {
         usleep(2000000); // Remove after BAP-16453 is fixed
-        if ($message->getBody() !== self::COMMAND_NOOP) {
+        $messageBody = $message->getBody();
+        if ($messageBody['message'] !== self::COMMAND_NOOP) {
             $this->configManager->set('oro_locale.timezone', 'Europe/London');
             $this->configManager->flush();
         }
@@ -46,6 +47,6 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
      */
     public static function getSubscribedTopics()
     {
-        return [self::TEST_TOPIC];
+        return [ChangeConfigTestTopic::getName()];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -18,9 +20,18 @@ class BuildTopicMetaRegistryPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $metaRegistryId = 'oro_message_queue.client.meta.topic_meta_registry';
-        if (!$container->hasDefinition($metaRegistryId)) {
+        $topicRegistryId = 'oro_message_queue.topic.registry';
+        if (!$container->hasDefinition($metaRegistryId) || !$container->hasDefinition($topicRegistryId)) {
             return;
         }
+
+        $topicServices = $this->findAndSortTaggedServices(
+            new TaggedIteratorArgument('oro_message_queue.topic', 'topicName', 'getName', true),
+            $container
+        );
+
+        $topicRegistry = $container->getDefinition($topicRegistryId);
+        $topicRegistry->replaceArgument(0, new ServiceLocatorArgument($topicServices));
 
         $messageProcessorsMetadata = $this->findMessageProcessorsMetadata(
             $container,
@@ -30,6 +41,14 @@ class BuildTopicMetaRegistryPass implements CompilerPassInterface
         $messageProcessorsByTopicAndQueue = [];
         $queuesByTopic = [];
         foreach ($messageProcessorsMetadata as [$serviceId, $topicName, $queueName]) {
+            if (!array_key_exists($topicName, $topicServices)) {
+                throw new \LogicException(
+                    sprintf(
+                        'Topic "%s" should be declared as MQ topic.',
+                        $topicName
+                    )
+                );
+            }
             if (isset($messageProcessorsByTopicAndQueue[$topicName][$queueName])) {
                 throw new \LogicException(
                     sprintf(

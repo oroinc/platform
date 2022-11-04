@@ -5,16 +5,15 @@ namespace Oro\Component\MessageQueue\Test\Async;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Test\Async\Topic\UniqueJobTestTopic;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * Unique message processor for test purposes.
  */
 class UniqueMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    private const TEST_TOPIC = 'oro.message_queue.unique_test_topic';
     public const TEST_JOB_NAME = 'test_job_unique|123456789';
 
     /** @var JobRunner */
@@ -30,7 +29,7 @@ class UniqueMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageBody = JSON::decode($message->getBody());
+        $messageBody = $message->getBody();
 
         if (false === is_array($messageBody)) {
             return self::REJECT;
@@ -61,6 +60,6 @@ class UniqueMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     public static function getSubscribedTopics(): array
     {
-        return [self::TEST_TOPIC];
+        return [UniqueJobTestTopic::getName()];
     }
 }

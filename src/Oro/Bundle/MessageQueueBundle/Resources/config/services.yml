@@ -187,4 +187,4 @@ services:
     oro_message_queue.topic.registry:
         class: Oro\Component\MessageQueue\Topic\TopicRegistry
         arguments:
-            - !tagged_locator { tag: oro_message_queue.topic, index_by: topicName, default_index_method: getName }
+            - ~ # Service locator for topics. It sets by Oro\Bundle\MessageQueueBundle\DependencyInjection\BuildTopicMetaRegistryPass

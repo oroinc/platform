@@ -8,6 +8,8 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageDependentJobTestTopic;
+use Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageTestTopic;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
@@ -16,8 +18,6 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class DependentMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    private const TEST_TOPIC = 'oro.message_queue.test_topic';
-    private const TEST_DEPENDENT_JOB_TOPIC = 'oro.message_queue.dependent_test_topic';
     public const TEST_JOB_NAME = 'test_job_dependent|123456789';
 
     /** @var JobRunner */
@@ -37,7 +37,7 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        if ($message->getProperty(Config::PARAMETER_TOPIC_NAME) === self::TEST_DEPENDENT_JOB_TOPIC) {
+        if ($message->getProperty(Config::PARAMETER_TOPIC_NAME) === DependentMessageDependentJobTestTopic::getName()) {
             return self::ACK;
         }
 
@@ -57,7 +57,7 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $closure = function (JobRunner $jobRunner, Job $job) {
             $context = $this->dependentJobService->createDependentJobContext($job->getRootJob());
             $context->addDependentJob(
-                self::TEST_DEPENDENT_JOB_TOPIC,
+                DependentMessageDependentJobTestTopic::getName(),
                 [
                     'rootJobId' => $job->getRootJob()->getId(),
                 ]
@@ -75,6 +75,6 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics(): array
     {
-        return [self::TEST_TOPIC, self::TEST_DEPENDENT_JOB_TOPIC];
+        return [DependentMessageTestTopic::getName(), DependentMessageDependentJobTestTopic::getName()];
     }
 }

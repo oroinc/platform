@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Parser;
 
+/**
+ * This is the class that loads and manages AttachmentBundle service configuration
+ */
 class OroAttachmentExtension extends Extension implements PrependExtensionInterface
 {
     private const IMAGINE_DATA_ROOT = '%kernel.project_dir%/public';
@@ -30,6 +33,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
+        $loader->load('mq_processors.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
