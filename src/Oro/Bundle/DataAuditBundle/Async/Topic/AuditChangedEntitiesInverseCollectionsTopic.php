@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async\Topic;
 
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -17,6 +18,11 @@ class AuditChangedEntitiesInverseCollectionsTopic extends AbstractAuditTopic
     public static function getDescription(): string
     {
         return 'Create audit entries for entity inverse collections relations';
+    }
+
+    public function getDefaultPriority(string $queueName): string
+    {
+        return MessagePriority::VERY_LOW;
     }
 
     public function configureMessageBody(OptionsResolver $resolver): void

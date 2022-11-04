@@ -10,8 +10,6 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -99,12 +97,20 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
             return self::REQUEUE;
         }
 
-        $nextMessage = new Message($body, MessagePriority::VERY_LOW);
         if ($body['collections_updated']) {
-            $this->messageProducer->send(AuditChangedEntitiesRelationsTopic::getName(), $nextMessage);
+            $auditChangedEntitiesRelationsTopicBody = $body;
+            unset(
+                $auditChangedEntitiesRelationsTopicBody['entities_inserted'],
+                $auditChangedEntitiesRelationsTopicBody['entities_updated'],
+                $auditChangedEntitiesRelationsTopicBody['entities_deleted']
+            );
+            $this->messageProducer->send(
+                AuditChangedEntitiesRelationsTopic::getName(),
+                $auditChangedEntitiesRelationsTopicBody
+            );
         }
-        $this->messageProducer->send(AuditChangedEntitiesInverseRelationsTopic::getName(), $nextMessage);
-        $this->messageProducer->send(AuditChangedEntitiesInverseCollectionsTopic::getName(), $nextMessage);
+        $this->messageProducer->send(AuditChangedEntitiesInverseRelationsTopic::getName(), $body);
+        $this->messageProducer->send(AuditChangedEntitiesInverseCollectionsTopic::getName(), $body);
 
         return self::ACK;
     }

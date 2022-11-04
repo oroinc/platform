@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Async\Topic;
 
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesRelationsTopic;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -101,5 +102,10 @@ class AuditChangedEntitiesRelationsTopicTest extends AbstractTopicTestCase
                 'exceptionMessage' => '/The "collections_updated" was expected to be not empty./',
             ],
         ];
+    }
+
+    public function testDefaultPriority(): void
+    {
+        self::assertEquals(MessagePriority::VERY_LOW, $this->getTopic()->getDefaultPriority('queueName'));
     }
 }

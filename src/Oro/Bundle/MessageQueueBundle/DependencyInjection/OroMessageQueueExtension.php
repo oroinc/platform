@@ -93,6 +93,7 @@ class OroMessageQueueExtension extends Extension
 
         if ('test' === $environment) {
             $loader->load('services_test.yml');
+            $loader->load('mq_topics_test.yml');
             $this->configureTestEnvironment($container);
         }
     }
