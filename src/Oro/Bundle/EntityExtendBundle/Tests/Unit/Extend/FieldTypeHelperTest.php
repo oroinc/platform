@@ -23,7 +23,7 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUnderlyingTypeProvider
      */
-    public function testGetUnderlyingType($type, $expectedType)
+    public function testGetUnderlyingType(string $type, string $expectedType)
     {
         $this->assertEquals(
             $expectedType,
@@ -31,7 +31,7 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getUnderlyingTypeProvider()
+    public function getUnderlyingTypeProvider(): array
     {
         return [
             ['ref-one', 'ref-one'],
@@ -47,12 +47,12 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider relationCHeckTestProvider
      */
-    public function testIsRelation($fieldType, $expected)
+    public function testIsRelation(string $fieldType, bool $expected)
     {
         $this->assertSame($expected, FieldTypeHelper::isRelation($fieldType));
     }
 
-    public function relationCHeckTestProvider()
+    public function relationCHeckTestProvider(): array
     {
         return [
             ['ref-one', true],

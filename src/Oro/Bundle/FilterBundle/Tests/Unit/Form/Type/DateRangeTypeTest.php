@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class DateRangeTypeTest extends AbstractTypeTestCase
@@ -34,7 +35,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -42,7 +43,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             [
@@ -63,7 +64,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'custom format' => [

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\OneToManyAttributeType;
 
 class OneToManyAttributeTypeTest extends ManyToManyAttributeTypeTest
@@ -10,7 +11,7 @@ class OneToManyAttributeTypeTest extends ManyToManyAttributeTypeTest
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())

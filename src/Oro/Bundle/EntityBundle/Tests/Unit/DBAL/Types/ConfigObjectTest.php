@@ -27,12 +27,8 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider testConvertToPHPValueDataProvider
-     *
-     * @param mixed       $inputData
-     * @param null|string $expectedResult
-     * @param bool        $exception
      */
-    public function testConvertToPHPValue($inputData, $expectedResult, $exception = false)
+    public function testConvertToPHPValue(?bool $inputData, ?bool $expectedResult, bool $exception = false)
     {
         if ($exception) {
             $this->expectException(ConversionException::class);
@@ -57,11 +53,8 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider testConvertToDatabaseValueDataProvider
-     *
-     * @param mixed       $inputData
-     * @param null|string $expectedResult
      */
-    public function testConvertToDatabaseValue($inputData, $expectedResult)
+    public function testConvertToDatabaseValue(mixed $inputData, ?string $expectedResult)
     {
         $this->assertSame(
             $expectedResult,

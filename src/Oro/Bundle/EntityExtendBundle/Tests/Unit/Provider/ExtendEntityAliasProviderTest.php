@@ -250,7 +250,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dictionaryDataProvider
      */
-    public function testGetEntityAliasForDictionary($entityClass, $expectedAlias)
+    public function testGetEntityAliasForDictionary(string $entityClass, ?string $expectedAlias)
     {
         $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
         $groupingConfig = new Config(
@@ -273,7 +273,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEntityAlias($expectedAlias, $result);
     }
 
-    public function dictionaryDataProvider()
+    public function dictionaryDataProvider(): array
     {
         return [
             'dictionary'                   => [

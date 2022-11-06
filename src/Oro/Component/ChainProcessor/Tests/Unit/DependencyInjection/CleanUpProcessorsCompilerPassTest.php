@@ -64,7 +64,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function processorWithSimpleArgumentsDataProvider()
+    public function processorWithSimpleArgumentsDataProvider(): array
     {
         return [
             ['arguments' => [null]],
@@ -95,7 +95,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $simpleRegistryDef->getArgument(0));
     }
 
-    public function processorWithNotSimpleArgumentsDataProvider()
+    public function processorWithNotSimpleArgumentsDataProvider(): array
     {
         return [
             ['arguments' => [['value']]],

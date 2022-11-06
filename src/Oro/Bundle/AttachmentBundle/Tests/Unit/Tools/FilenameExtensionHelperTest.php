@@ -165,9 +165,6 @@ class FilenameExtensionHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider canonicalizeExtensionDataProvider
-     *
-     * @param string $extension
-     * @param string $expectedExtension
      */
     public function testCanonicalizeExtension(string $extension, string $expectedExtension): void
     {

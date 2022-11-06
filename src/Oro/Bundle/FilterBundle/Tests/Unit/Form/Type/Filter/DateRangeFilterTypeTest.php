@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeFilterTypeTest extends AbstractTypeTestCase
@@ -22,7 +23,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     {
         $translator = $this->createMockTranslator();
 
-        $subscriber = $this->getMockSubscriber(DateFilterSubscriber::class);
+        $subscriber = $this->getSubscriber(DateFilterSubscriber::class);
 
         $localeSettings = $this->createMock(LocaleSettings::class);
         $localeSettings->expects($this->any())
@@ -44,7 +45,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -64,7 +65,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             [
@@ -99,7 +100,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'empty' => [

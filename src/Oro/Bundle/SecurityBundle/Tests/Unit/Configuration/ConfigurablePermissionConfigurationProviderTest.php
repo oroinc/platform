@@ -15,13 +15,11 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework
 
     /**
      * @dataProvider bundlesProvider
-     *
-     * @param Bundle[] $bundles
-     * @param array $expected
      */
     public function testGetConfiguration(array $bundles, array $expected)
     {
         $resourceBundles = [];
+        /** @var Bundle $bundle */
         foreach ($bundles as $bundle) {
             $resourceBundles[$bundle->getName()] = get_class($bundle);
         }
@@ -38,60 +36,58 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework
         $this->assertEquals($expected, $provider->getConfiguration());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function bundlesProvider()
+    public function bundlesProvider(): array
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        yield 'first bundle' => [
-            'bundles' => [$bundle1],
-            'expected' => [
-                'commerce' => [
-                    'default' => true,
-                    'entities' => [
-                        'TestEntity' => [
-                            'UPDATE' => true
+        return [
+            'first bundle' => [
+                'bundles' => [$bundle1],
+                'expected' => [
+                    'commerce' => [
+                        'default' => true,
+                        'entities' => [
+                            'TestEntity' => [
+                                'UPDATE' => true
+                            ]
+                        ],
+                        'workflows' => [
+                            'TestWorkflow' => [
+                                'TRANSIT' => false
+                            ]
+                        ],
+                        'capabilities' => [
+                            'action1' => true
                         ]
-                    ],
-                    'workflows' => [
-                        'TestWorkflow' => [
-                            'TRANSIT' => false
-                        ]
-                    ],
-                    'capabilities' => [
-                        'action1' => true
                     ]
-                ]
+                ],
             ],
-        ];
-
-        yield 'second bundle' => [
-            'bundles' => [$bundle1, $bundle2],
-            'expected' => [
-                'commerce' => [
-                    'default' => true,
-                    'entities' => [
-                        'TestEntity' => [
-                            'UPDATE' => false,
-                            'DELETE' => true,
+            'second bundle' => [
+                'bundles' => [$bundle1, $bundle2],
+                'expected' => [
+                    'commerce' => [
+                        'default' => true,
+                        'entities' => [
+                            'TestEntity' => [
+                                'UPDATE' => false,
+                                'DELETE' => true,
+                            ]
+                        ],
+                        'workflows' => [
+                            'TestWorkflow' => [
+                                'VIEW' => false,
+                                'DELETE' => true,
+                                'TRANSIT' => false,
+                            ]
+                        ],
+                        'capabilities' => [
+                            'action1' => false,
+                            'action2' => true
                         ]
-                    ],
-                    'workflows' => [
-                        'TestWorkflow' => [
-                            'VIEW' => false,
-                            'DELETE' => true,
-                            'TRANSIT' => false,
-                        ]
-                    ],
-                    'capabilities' => [
-                        'action1' => false,
-                        'action2' => true
                     ]
-                ]
-            ],
+                ],
+            ]
         ];
     }
 }

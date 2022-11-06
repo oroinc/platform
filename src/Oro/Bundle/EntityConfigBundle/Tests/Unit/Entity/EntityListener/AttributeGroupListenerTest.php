@@ -13,16 +13,17 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints\AttributeGrou
 
 class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AttributeGroupListener */
-    private $listener;
-
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
+    /** @var AttributeGroupListener */
+    private $listener;
+
     protected function setUp(): void
     {
-        $this->listener = new AttributeGroupListener(new SlugGenerator());
         $this->em = $this->createMock(EntityManagerInterface::class);
+
+        $this->listener = new AttributeGroupListener(new SlugGenerator());
     }
 
     public function testPrePersistCodeExist()
@@ -39,17 +40,12 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prePersistDataProvider
-     *
-     * @param AttributeGroup $group
-     * @param array          $repositoryArgs
-     * @param array          $repositoryResults
-     * @param string         $expectedCodeSlug
      */
     public function testPrePersist(
         AttributeGroup $group,
         array $repositoryArgs,
         array $repositoryResults,
-        $expectedCodeSlug
+        string $expectedCodeSlug
     ) {
         $eventArgs = new LifecycleEventArgs($group, $this->em);
 

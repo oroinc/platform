@@ -8,25 +8,21 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $formatter;
 
-    /**
-     * @var MultiCurrencyNormalizer
-     */
+    /** @var MultiCurrencyNormalizer */
     private $normalizer;
 
     protected function setUp(): void
     {
-        $this->formatter  = $this->createMock(NumberFormatter::class);
+        $this->formatter = $this->createMock(NumberFormatter::class);
         $this->normalizer = new MultiCurrencyNormalizer($this->formatter);
     }
 
     public function testSupportsNormalization()
     {
-        $multiCurrency = new MultiCurrency('100', 'USD');
+        $multiCurrency = new MultiCurrency();
         $isNormalizationSupports = $this->normalizer->supportsNormalization($multiCurrency);
         $this->assertTrue($isNormalizationSupports);
     }
@@ -40,14 +36,11 @@ class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getNormalizerData
-     *
-     * @param string $value
-     * @param string $currency
      */
-    public function testNormalizeShouldGenerateCorrectString($value, $currency)
+    public function testNormalizeShouldGenerateCorrectString(string $value, string $currency)
     {
-        $multiCurrency  = new MultiCurrency($value, $currency);
-        $formattedValue = $currency.$value;
+        $multiCurrency = new MultiCurrency();
+        $formattedValue = $currency . $value;
         $this->formatter->expects($this->once())
             ->method('formatCurrency')
             ->willReturn($formattedValue);
@@ -55,10 +48,7 @@ class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formattedValue, $this->normalizer->normalize($multiCurrency));
     }
 
-    /**
-     * @return array
-     */
-    public function getNormalizerData()
+    public function getNormalizerData(): array
     {
         return [
             ['100.00', 'USD']

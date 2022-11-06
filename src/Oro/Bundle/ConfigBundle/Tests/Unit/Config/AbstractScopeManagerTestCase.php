@@ -121,12 +121,8 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getInfoLoadedWithNormalizationProvider
-     *
-     * @param string $rawValue
-     * @param string $dataType
-     * @param mixed $expectedValue
      */
-    public function testGetInfoLoadedWithNormalization(string $rawValue, string $dataType, $expectedValue)
+    public function testGetInfoLoadedWithNormalization(string $rawValue, string $dataType)
     {
         /** @var ConfigValue $configValue1 */
         $configValue1 = $this->getEntity(
@@ -415,11 +411,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertSame($oldScopeId, $this->manager->getScopeId());
     }
 
-    /**
-     * @param Config $config
-     * @param int $scopeId
-     */
-    protected function prepareSave(Config $config, $scopeId)
+    protected function prepareSave(Config $config, ?int $scopeId): void
     {
         $configValue1 = new ConfigValue();
         $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
@@ -442,12 +434,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->method('flush');
     }
 
-    /**
-     * @param Config $config
-     *
-     * @return array
-     */
-    protected function getCachedConfig(Config $config)
+    protected function getCachedConfig(Config $config): array
     {
         $cachedConfig = [];
 
@@ -474,40 +461,22 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         return $cachedConfig;
     }
 
-    /**
-     * @return object|null
-     */
-    protected function getScopedEntity()
+    protected function getScopedEntity(): ?object
     {
         return null;
     }
 
-    /**
-     * @param object $entity
-     * @return mixed
-     */
-    protected function getEntityId($entity)
+    protected function getEntityId(?object $entity): mixed
     {
         return $entity && method_exists($entity, 'getId') ? $entity->getId() : null;
     }
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param CacheInterface $cache
-     * @param EventDispatcher $eventDispatcher
-     * @param ConfigBag $configBag
-     *
-     * @return AbstractScopeManager
-     */
     abstract protected function createManager(
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
         ConfigBag $configBag
-    );
+    ): AbstractScopeManager;
 
-    /**
-     * @return string
-     */
-    abstract protected function getScopedEntityName();
+    abstract protected function getScopedEntityName(): string;
 }

@@ -92,7 +92,7 @@ class UserProfileTest extends RestJsonApiTestCase
     /**
      * @dataProvider getNotAllowedMethods
      */
-    public function testNotAllowedMethods($method)
+    public function testNotAllowedMethods(string $method)
     {
         $response = $this->request(
             $method,
@@ -101,10 +101,7 @@ class UserProfileTest extends RestJsonApiTestCase
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
-    /**
-     * @return array
-     */
-    public function getNotAllowedMethods()
+    public function getNotAllowedMethods(): array
     {
         return [
             ['HEAD'],

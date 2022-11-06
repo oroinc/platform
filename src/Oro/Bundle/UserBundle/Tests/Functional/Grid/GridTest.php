@@ -9,9 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GridTest extends WebTestCase
 {
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->initClient(
@@ -22,10 +19,8 @@ class GridTest extends WebTestCase
 
     /**
      * @dataProvider userSubGridNotContainActionsAndMassActionsProvider
-     *
-     * @param string $gridName
      */
-    public function testUserSubGridNotContainActionsAndMassActions($gridName)
+    public function testUserSubGridNotContainActionsAndMassActions(string $gridName)
     {
         /** @var Manager $datagridManager */
         $datagridManager = $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
@@ -59,10 +54,7 @@ class GridTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function userSubGridNotContainActionsAndMassActionsProvider()
+    public function userSubGridNotContainActionsAndMassActionsProvider(): array
     {
         return [
             "Grid 'role-view-users-grid'" => [

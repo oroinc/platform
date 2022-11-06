@@ -80,7 +80,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertEquals($expected, $this->rawLayoutBuilder->isParentFor($parentId, $id));
     }
 
-    public function isParentForDataProvider()
+    public function isParentForDataProvider(): array
     {
         return [
             [true, 'header', 'logo'],
@@ -626,7 +626,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->getOptions('root');
     }
 
-    public function emptyStringDataProvider()
+    public function emptyStringDataProvider(): array
     {
         return [
             [null],
@@ -634,7 +634,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         ];
     }
 
-    public function invalidBlockTypeNameDataProvider()
+    public function invalidBlockTypeNameDataProvider(): array
     {
         return [
             ['-test'],

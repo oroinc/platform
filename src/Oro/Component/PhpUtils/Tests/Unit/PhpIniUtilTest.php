@@ -14,7 +14,7 @@ class PhpIniUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValue, PhpIniUtil::parseBytes($value));
     }
 
-    public function parseBytesProvider()
+    public function parseBytesProvider(): array
     {
         return [
             ['-1', -1.0],

@@ -14,7 +14,7 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AddressFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $formatter;
 
     /** @var AddressExtension */
@@ -114,8 +114,6 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array[]
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function formatAddressHtmlDataProvider(): array

@@ -10,22 +10,23 @@ use Oro\Bundle\EmailBundle\Provider\ParentMessageIdProvider;
 
 class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private ParentMessageIdProvider $provider;
+    /** @var EmailRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    private EmailRepository|\PHPUnit\Framework\MockObject\MockObject $repository;
+    /** @var ParentMessageIdProvider */
+    private $provider;
 
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-
-        $this->provider = new ParentMessageIdProvider($managerRegistry);
-
         $this->repository = $this->createMock(EmailRepository::class);
-        $managerRegistry
-            ->expects(self::any())
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->with(Email::class)
             ->willReturn($this->repository);
+
+        $this->provider = new ParentMessageIdProvider($doctrine);
     }
 
     public function testGetParentMessageIdToReplyReturnsNullWhenNoParentEmailId(): void
@@ -33,8 +34,7 @@ class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
         $emailModel = (new EmailModel())
             ->setMailType(EmailModel::MAIL_TYPE_REPLY);
 
-        $this->repository
-            ->expects(self::never())
+        $this->repository->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($this->provider->getParentMessageIdToReply($emailModel));
@@ -45,8 +45,7 @@ class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
         $emailModel = (new EmailModel())
             ->setMailType(EmailModel::MAIL_TYPE_REPLY);
 
-        $this->repository
-            ->expects(self::never())
+        $this->repository->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($this->provider->getParentMessageIdToReply($emailModel));
@@ -54,8 +53,6 @@ class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getParentMessageIdToReplyDataProvider
-     *
-     * @param string|null $messageId
      */
     public function testGetParentMessageIdToReply(?string $messageId): void
     {
@@ -64,8 +61,7 @@ class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
             ->setParentEmailId($parentEmailId)
             ->setMailType(EmailModel::MAIL_TYPE_REPLY);
 
-        $this->repository
-            ->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findMessageIdByEmailId')
             ->with($parentEmailId)
             ->willReturn($messageId);

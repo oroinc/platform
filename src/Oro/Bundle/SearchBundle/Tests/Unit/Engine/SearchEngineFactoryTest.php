@@ -5,59 +5,62 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\EngineParameters;
 use Oro\Bundle\SearchBundle\Engine\SearchEngineFactory;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SearchEngineFactoryTest extends TestCase
+class SearchEngineFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    private EngineParameters $engineParametersBagMock;
+    /** @var EngineParameters|\PHPUnit\Framework\MockObject\MockObject */
+    private $engineParametersBag;
 
-    private ServiceLocator $locatorMock;
+    /** @var ServiceLocator|\PHPUnit\Framework\MockObject\MockObject */
+    private $locator;
 
     protected function setUp(): void
     {
-        $this->engineParametersBagMock = self::createMock(EngineParameters::class);
-        $this->engineParametersBagMock->method('getEngineName')
-            ->willReturn('search_engine_name');
+        $this->engineParametersBag = $this->createMock(EngineParameters::class);
+        $this->locator = $this->createMock(ServiceLocator::class);
 
-        $this->locatorMock = self::createMock(ServiceLocator::class);
+        $this->engineParametersBag->expects($this->any())
+            ->method('getEngineName')
+            ->willReturn('search_engine_name');
     }
 
     public function testSearchEngineInstanceReturned()
     {
-        $searchEngineMock = self::createMock(EngineInterface::class);
-        $this->locatorMock->expects(self::once())
+        $searchEngineMock = $this->createMock(EngineInterface::class);
+        $this->locator->expects(self::once())
             ->method('get')
-            ->with($this->engineParametersBagMock->getEngineName())
+            ->with($this->engineParametersBag->getEngineName())
             ->willReturn($searchEngineMock);
 
         self::assertEquals(
             $searchEngineMock,
-            SearchEngineFactory::create($this->locatorMock, $this->engineParametersBagMock)
+            SearchEngineFactory::create($this->locator, $this->engineParametersBag)
         );
     }
 
     /**
      * @dataProvider wrongEngineInstancesProvider
      */
-    public function testWrongSearchEngineInstanceTypeReturned($engine)
+    public function testWrongSearchEngineInstanceTypeReturned(mixed $engine)
     {
-        $this->locatorMock->expects(self::once())
+        $this->locator->expects(self::once())
             ->method('get')
-            ->with($this->engineParametersBagMock->getEngineName())
+            ->with($this->engineParametersBag->getEngineName())
             ->willReturn($engine);
 
         $this->expectException(UnexpectedTypeException::class);
 
-        SearchEngineFactory::create($this->locatorMock, $this->engineParametersBagMock);
+        SearchEngineFactory::create($this->locator, $this->engineParametersBag);
     }
 
-    /**
-     * @return array
-     */
     public function wrongEngineInstancesProvider(): array
     {
-        return ['scalar' => ['test string'], 'array' => [[]], 'object' => [new \StdClass()]];
+        return [
+            'scalar' => ['test string'],
+            'array' => [[]],
+            'object' => [new \stdClass()]
+        ];
     }
 }

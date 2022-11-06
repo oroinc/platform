@@ -84,8 +84,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider webpStrategyDataProvider
-     *
-     * @param string $webpStrategy
      */
     public function testProcessConfigurationWhenWebpStrategy(string $webpStrategy): void
     {

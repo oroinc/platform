@@ -37,30 +37,17 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         return $this->bundleDir;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPath($path)
+    private function getPath(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    /**
-     * @param string   $relativeFolderPath
-     * @param string[] $fileNamePatterns
-     * @param int      $maxNestingLevel
-     * @param bool     $plainResultStructure
-     *
-     * @return FolderContentCumulativeLoader
-     */
     private function getLoader(
-        $relativeFolderPath,
-        $fileNamePatterns,
-        $maxNestingLevel = -1,
-        $plainResultStructure = true
-    ) {
+        string $relativeFolderPath,
+        array $fileNamePatterns,
+        int $maxNestingLevel = -1,
+        bool $plainResultStructure = true
+    ): FolderContentCumulativeLoader {
         return new FolderContentCumulativeLoader(
             $relativeFolderPath,
             $maxNestingLevel,
@@ -69,13 +56,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param CumulativeResource $resource
-     * @param string             $bundleClass
-     *
-     * @return int
-     */
-    private function getLastChangeTime(CumulativeResource $resource, $bundleClass)
+    private function getLastChangeTime(CumulativeResource $resource, string $bundleClass): int
     {
         $lastChangeTime = 0;
         foreach ($resource->getFound($bundleClass) as $file) {
@@ -111,19 +92,13 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loadFlatModeDataProvider
-     *
-     * @param array|null $expectedResult
-     * @param array      $expectedRegisteredResources
-     * @param string     $path
-     * @param int        $nestingLevel
-     * @param string[]   $fileNamePatterns
      */
     public function testLoadInFlatMode(
-        $expectedResult,
-        $expectedRegisteredResources,
-        $path,
-        $nestingLevel = -1,
-        $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
+        ?array $expectedResult,
+        array $expectedRegisteredResources,
+        string $path,
+        int $nestingLevel = -1,
+        array $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
     ) {
         $loader = $this->getLoader($path, $fileNamePatterns, $nestingLevel);
 
@@ -154,10 +129,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRegisteredResources, $foundResources, 'expected registered resources');
     }
 
-    /**
-     * @return array
-     */
-    public function loadFlatModeDataProvider()
+    public function loadFlatModeDataProvider(): array
     {
         $bundleDir = $this->getBundleDir();
 
@@ -229,19 +201,13 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loadFlatModeDataProviderWithAppRootDirectory
-     *
-     * @param array|null $expectedResult
-     * @param array      $expectedRegisteredResources
-     * @param string     $path
-     * @param int        $nestingLevel
-     * @param string[]   $fileNamePatterns
      */
     public function testLoadInFlatModeWithAppRootDirectory(
-        $expectedResult,
-        $expectedRegisteredResources,
-        $path,
-        $nestingLevel = -1,
-        $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
+        ?array $expectedResult,
+        array $expectedRegisteredResources,
+        string $path,
+        int $nestingLevel = -1,
+        array $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
     ) {
         $loader = $this->getLoader($path, $fileNamePatterns, $nestingLevel);
 
@@ -277,10 +243,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRegisteredResources, $foundResources, 'expected registered resources');
     }
 
-    /**
-     * @return array
-     */
-    public function loadFlatModeDataProviderWithAppRootDirectory()
+    public function loadFlatModeDataProviderWithAppRootDirectory(): array
     {
         $bundleDir = dirname((new \ReflectionClass(new TestBundle1()))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');
@@ -436,7 +399,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isResourceFreshDataProvider
      */
-    public function testIsResourceFresh($assertion)
+    public function testIsResourceFresh(callable $assertion)
     {
         $loader = $this->getLoader('Resources/folder_to_track/', ['/\.yml$/', '/\.xml$/']);
 
@@ -456,7 +419,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function isResourceFreshDataProvider()
+    public function isResourceFreshDataProvider(): array
     {
         return [
             'file was added'                                      => [

@@ -22,22 +22,13 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
-    /**
-     * @param AbstractType      $type
-     * @param ConfigIdInterface $configId
-     * @param bool              $immutable
-     * @param array             $options
-     * @param array             $expectedOptions
-     *
-     * @return array
-     */
     protected function doTestConfigureOptions(
         AbstractType $type,
         ConfigIdInterface $configId,
-        $immutable,
+        bool $immutable,
         array $options = [],
         array $expectedOptions = []
-    ) {
+    ): array {
         $this->setIsReadOnlyExpectations($configId, $immutable);
 
         $resolver = $this->getOptionsResolver();
@@ -55,14 +46,8 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         return $resolvedOptions;
     }
 
-    /**
-     * @param ConfigIdInterface $configId
-     * @param bool              $immutable
-     */
-    protected function setIsReadOnlyExpectations(
-        ConfigIdInterface $configId,
-        $immutable
-    ) {
+    protected function setIsReadOnlyExpectations(ConfigIdInterface $configId, bool $immutable): void
+    {
         $className = $configId->getClassName();
         if (empty($className)) {
             $this->typeHelper->expects($this->never())
@@ -83,27 +68,19 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         }
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    protected function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(
-            [
-                'config_id'         => null,
-                'disabled'          => false,
-                'validation_groups' => true
-            ]
-        );
+        $resolver->setDefaults([
+            'config_id'         => null,
+            'disabled'          => false,
+            'validation_groups' => true
+        ]);
 
         return $resolver;
     }
 
-    /**
-     * @return array
-     */
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             [

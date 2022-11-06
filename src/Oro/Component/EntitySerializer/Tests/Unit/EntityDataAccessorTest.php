@@ -18,7 +18,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityDataAccessor = new EntityDataAccessor();
     }
 
-    public function accessibleFieldsProvider()
+    public function accessibleFieldsProvider(): array
     {
         return [
             ['publicProperty'],
@@ -35,7 +35,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function notAccessibleFieldsProvider()
+    public function notAccessibleFieldsProvider(): array
     {
         return [
             ['undefinedProperty'],

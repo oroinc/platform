@@ -34,10 +34,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function themeDefinitionDataProvider()
+    public function themeDefinitionDataProvider(): array
     {
         $minimalDefinition = new Theme('base');
 

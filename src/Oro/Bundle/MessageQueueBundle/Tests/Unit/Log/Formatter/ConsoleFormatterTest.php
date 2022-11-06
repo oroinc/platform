@@ -9,21 +9,15 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider recordsProvider
-     *
-     * @param array $record
-     * @param string $expectedResult
      */
-    public function testFormat(array $record, $expectedResult)
+    public function testFormat(array $record, string $expectedResult)
     {
         $formatter = new ConsoleFormatter();
 
         self::assertEquals($expectedResult, $formatter->format($record));
     }
 
-    /**
-     * @return array
-     */
-    public function recordsProvider()
+    public function recordsProvider(): array
     {
         return [
             'with context and extra' => [

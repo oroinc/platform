@@ -24,19 +24,13 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider canAssembleData
-     *
-     * @param bool $expected
-     * @param array $options
      */
-    public function testCanAssemble($expected, array $options)
+    public function testCanAssemble(bool $expected, array $options)
     {
         $this->assertEquals($expected, $this->assembler->canAssemble($options));
     }
 
-    /**
-     * @return array
-     */
-    public function canAssembleData()
+    public function canAssembleData(): array
     {
         return [
             'can' => [

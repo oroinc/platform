@@ -56,11 +56,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param Config $extendConfig
-     * @param bool   $expected
      */
-    public function testSupports(Config $extendConfig, $expected)
+    public function testSupports(Config $extendConfig, bool $expected)
     {
         $this->assertEquals(
             $expected,
@@ -68,10 +65,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             [
@@ -87,10 +81,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider statesToSkipDataProvider
-     *
-     * @param string $state
      */
-    public function testShouldSkipBuildForSpecifiedStateOfTargetEntity($state)
+    public function testShouldSkipBuildForSpecifiedStateOfTargetEntity(string $state)
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -134,10 +126,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($metadataBuilder->getClassMetadata()->hasAssociation($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function statesToSkipDataProvider()
+    public function statesToSkipDataProvider(): array
     {
         return [
             [ExtendScope::STATE_NEW],

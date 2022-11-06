@@ -48,15 +48,13 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $data
-     *
      * @dataProvider getHandleWithMailboxDataProvider
      */
-    public function testHandleWithMailboxData($data)
+    public function testHandleWithMailboxData(mixed $data)
     {
         $this->mockForm($data);
 
-        $this->assertNull($this->handler->handle($this->configManager, $this->changeSet, $this->form));
+        $this->handler->handle($this->configManager, $this->changeSet, $this->form);
     }
 
     public function getHandleWithMailboxDataProvider(): array
@@ -97,18 +95,12 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($this->configManager, $this->changeSet, $this->form);
     }
 
-    /**
-     * @return string
-     */
-    private function getConfigKey()
+    private function getConfigKey(): string
     {
         return Configuration::getConfigKeyByName('user_mailbox', ConfigManager::SECTION_VIEW_SEPARATOR);
     }
 
-    /**
-     * @param mixed $data
-     */
-    private function mockForm($data)
+    private function mockForm(mixed $data): void
     {
         $mailboxForm = $this->createMock(FormInterface::class);
         $mailboxForm->expects($this->once())

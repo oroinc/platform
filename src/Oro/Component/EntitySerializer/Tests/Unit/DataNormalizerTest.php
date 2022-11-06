@@ -26,7 +26,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
         return [
             'excluded fields should be removed'      => [

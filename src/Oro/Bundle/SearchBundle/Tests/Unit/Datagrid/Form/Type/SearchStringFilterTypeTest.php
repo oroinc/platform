@@ -8,12 +8,11 @@ use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\AbstractType;
 
 class SearchStringFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var SearchStringFilterType
-     */
+    /** @var SearchStringFilterType */
     private $type;
 
     protected function setUp(): void
@@ -35,7 +34,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -53,7 +52,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             [
@@ -71,7 +70,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'simple text' => [

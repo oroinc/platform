@@ -31,7 +31,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
         unset($this->collectionCalculator);
     }
 
-    public function calculateProgressProvider()
+    public function calculateProgressProvider(): array
     {
         return [
             [[Job::STATUS_NEW, Job::STATUS_NEW], 0],
@@ -60,7 +60,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedStatusProgress, $statusProgress);
     }
 
-    public function statusCalculateProvider()
+    public function statusCalculateProvider(): array
     {
         return [
             [[Job::STATUS_NEW, Job::STATUS_NEW], Job::STATUS_NEW],

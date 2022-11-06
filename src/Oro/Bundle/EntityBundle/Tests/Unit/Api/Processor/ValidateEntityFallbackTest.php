@@ -41,12 +41,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    /**
-     * @param EntityFieldFallbackValue $fallbackValue
-     *
-     * @return FormInterface
-     */
-    private function getEntityFieldFallbackValueForm(EntityFieldFallbackValue $fallbackValue)
+    private function getEntityFieldFallbackValueForm(EntityFieldFallbackValue $fallbackValue): FormInterface
     {
         $formBuilder = $this->createFormBuilder()->create(
             '',
@@ -63,18 +58,11 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         return $formBuilder->getForm();
     }
 
-    /**
-     * @param object                   $primaryEntity
-     * @param EntityMetadata           $primaryEntityMetadata
-     * @param EntityFieldFallbackValue $fallbackValue
-     *
-     * @return IncludedEntityCollection
-     */
     private function getIncludedEntityCollection(
-        $primaryEntity,
+        object $primaryEntity,
         EntityMetadata $primaryEntityMetadata,
         EntityFieldFallbackValue $fallbackValue
-    ) {
+    ): IncludedEntityCollection {
         $includedEntities = new IncludedEntityCollection();
         $includedEntities->setPrimaryEntityId(get_class($primaryEntity), null);
         $includedEntities->setPrimaryEntity($primaryEntity, $primaryEntityMetadata);
@@ -95,14 +83,12 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertTrue($form->isValid());
     }
 
-    /**
-     * @param object $entity
-     * @param string $associationName
-     * @param string $valueType
-     * @param string $requiredFieldType
-     */
-    private function expectRequiredFallbackFieldByType($entity, $associationName, $valueType, $requiredFieldType)
-    {
+    private function expectRequiredFallbackFieldByType(
+        object $entity,
+        string $associationName,
+        string $valueType,
+        string $requiredFieldType
+    ): void {
         $this->fallbackResolver->expects(self::once())
             ->method('getType')
             ->with(self::identicalTo($entity), $associationName)

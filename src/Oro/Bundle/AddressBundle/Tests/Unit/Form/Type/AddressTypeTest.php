@@ -13,9 +13,7 @@ class AddressTypeTest extends AddressFormExtensionTestCase
 {
     use EntityTrait;
 
-    /**
-     * @var AddressType
-     */
+    /** @var AddressType */
     private $type;
 
     protected function setUp(): void
@@ -46,12 +44,9 @@ class AddressTypeTest extends AddressFormExtensionTestCase
     }
 
     /**
-     * @param mixed $defaultData
-     * @param array $submittedData
-     * @param mixed $expectedData
      * @dataProvider submitProvider
      */
-    public function testSubmit($defaultData, $submittedData, $expectedData)
+    public function testSubmit(mixed $defaultData, array $submittedData, mixed $expectedData)
     {
         $form = $this->factory->create(AddressType::class, $defaultData);
 

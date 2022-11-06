@@ -28,11 +28,9 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object|null $object
-     *
      * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumber($object)
+    public function testGetPhoneNumber(?object $object)
     {
         $expectedPhone = '123-456-789';
 
@@ -50,11 +48,9 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object|null $object
-     *
      * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumbers($object)
+    public function testGetPhoneNumbers(?object $object)
     {
         $sourcePhones = [
             ['123-456-789', new \stdClass],

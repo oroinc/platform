@@ -76,10 +76,8 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validationGroupsDataProvider
-     * @param bool $isNew
-     * @param array $validationGroups
      */
-    public function testProcessValidationErrorsWithAttributesGroup($isNew, array $validationGroups)
+    public function testProcessValidationErrorsWithAttributesGroup(bool $isNew, array $validationGroups)
     {
         $this->fieldTypeProvider->expects($this->any())
             ->method('getFieldProperties')

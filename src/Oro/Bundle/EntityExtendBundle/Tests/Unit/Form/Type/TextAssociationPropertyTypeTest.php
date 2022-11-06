@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
@@ -12,7 +13,7 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): AbstractType
     {
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects($this->any())
@@ -25,11 +26,11 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
         $this->assertEquals(
             'oro_entity_extend_association_property_text',
-            $this->getFormType()->getName()
+            $this->getFormType()->getBlockPrefix()
         );
     }
 

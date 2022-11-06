@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Helper;
 
-use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
@@ -20,11 +19,11 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $groupProvider;
 
-    /** @var EntityConfigHelper */
-    private $helper;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
     private $config;
+
+    /** @var EntityConfigHelper */
+    private $helper;
 
     protected function setUp(): void
     {
@@ -34,8 +33,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->helper = new EntityConfigHelper(
             $this->configProvider,
-            $this->groupProvider,
-            (new InflectorFactory())->build()
+            $this->groupProvider
         );
     }
 
@@ -66,12 +64,9 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param mixed $expectedData
-     *
      * @dataProvider getConfigValueProvider
      */
-    public function testGetConfigValue(array $inputData, $expectedData)
+    public function testGetConfigValue(array $inputData, mixed $expectedData)
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -87,11 +82,9 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $strict
-     *
      * @dataProvider strictParamProvider
      */
-    public function testGetConfigValueStrictParam($strict)
+    public function testGetConfigValueStrictParam(bool $strict)
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -195,15 +188,9 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $class
-     * @param array $routes
-     * @return EntityMetadata
-     */
-    private function getEntityMetadata($class, array $routes)
+    private function getEntityMetadata(string $class, array $routes): EntityMetadata
     {
         $meta = new EntityMetadata($class);
-
         $meta->routes = $routes;
 
         return $meta;

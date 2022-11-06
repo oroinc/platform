@@ -121,7 +121,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                     [
                         'isOwningSide' => true,
                         'targetEntity' => File::class,
-                        'fieldName' => $fieldNameToMany = 'files',
+                        'fieldName' => 'files',
                         'type' => ClassMetadata::ONE_TO_MANY,
                     ],
                 ],
@@ -145,7 +145,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                     [
                         'isOwningSide' => false,
                         'targetEntity' => FileItem::class,
-                        'fieldName' => $fieldNameToMany = 'files',
+                        'fieldName' => 'files',
                         'type' => ClassMetadata::ONE_TO_MANY,
                     ],
                 ]
@@ -163,7 +163,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $fileToInsert->getParentEntityFieldName());
         self::assertEquals($id, $fileToInsert2->getParentEntityId());
         self::assertEquals(get_class($entityToUpdate), $fileToInsert2->getParentEntityClass());
-        self::assertEquals($fieldNameToMany, $fileToInsert2->getParentEntityFieldName());
+        self::assertEquals('files', $fileToInsert2->getParentEntityFieldName());
         self::assertEquals($parentEntityClass, $fileNotForUpdate->getParentEntityClass());
     }
 
@@ -319,7 +319,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                 [
                     'isOwningSide' => true,
                     'targetEntity' => File::class,
-                    'fieldName' => $fieldNameToMany = 'files',
+                    'fieldName' => 'files',
                     'type' => ClassMetadata::ONE_TO_MANY,
                 ],
                 [
@@ -358,7 +358,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($id, $fileToInsert2->getParentEntityId());
         self::assertEquals(get_class($entityToInsert), $fileToInsert2->getParentEntityClass());
-        self::assertEquals($fieldNameToMany, $fileToInsert2->getParentEntityFieldName());
+        self::assertEquals('files', $fileToInsert2->getParentEntityFieldName());
 
         self::assertEquals($id, $fileToInsert3->getParentEntityId());
         self::assertEquals(get_class($entityToInsert), $fileToInsert3->getParentEntityClass());
@@ -498,16 +498,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postPersist($eventPostPersist);
     }
 
-    /**
-     * @param EventArgs|\PHPUnit\Framework\MockObject\MockObject $event
-     *
-     * @return array
-     *  [
-     *      EntityManager|\PHPUnit\Framework\MockObject\MockObject,
-     *      UnitOfWork|\PHPUnit\Framework\MockObject\MockObject
-     *  ]
-     */
-    private function mockEntityManager(\PHPUnit\Framework\MockObject\MockObject $event): array
+    private function mockEntityManager(EventArgs|\PHPUnit\Framework\MockObject\MockObject $event): array
     {
         $event->expects($this->any())
             ->method('getEntityManager')
@@ -520,12 +511,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         return [$entityManager, $unitOfWork];
     }
 
-    /**
-     * @param object $entity
-     *
-     * @return LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockLifecycleEvent(object $entity): LifecycleEventArgs
+    private function mockLifecycleEvent(object $entity): LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
     {
         $eventPostPersist = $this->createMock(LifecycleEventArgs::class);
         $eventPostPersist->expects($this->any())

@@ -27,7 +27,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'not_empty_string' => [
@@ -99,7 +99,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -141,7 +141,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

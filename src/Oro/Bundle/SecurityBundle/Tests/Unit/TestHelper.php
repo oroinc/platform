@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -133,8 +133,7 @@ class TestHelper
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
             ]);
 
-        $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->testCase->getMockBuilder(EntityManagerInterface::class)->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')->willReturn($config);
 
@@ -230,9 +229,7 @@ class TestHelper
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
             ]);
 
-        $em = $this->testCase->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->testCase->getMockBuilder(EntityManagerInterface::class)->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')
             ->willReturn($config);

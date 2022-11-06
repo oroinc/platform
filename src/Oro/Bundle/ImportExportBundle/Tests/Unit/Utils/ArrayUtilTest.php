@@ -14,10 +14,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, ArrayUtil::filterEmptyArrays($data));
     }
 
-    /**
-     * @return array
-     */
-    public function filterEmptyArraysDataProvider()
+    public function filterEmptyArraysDataProvider(): array
     {
         return [
             'One-level array data' => [

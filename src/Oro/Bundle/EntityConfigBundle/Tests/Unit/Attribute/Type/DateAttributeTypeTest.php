@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\DateAttributeType;
 
 class DateAttributeTypeTest extends AttributeTypeTestCase
@@ -9,7 +10,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         return new DateAttributeType();
     }
@@ -17,12 +18,10 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurationMethodsDataProvider()
+    public function configurationMethodsDataProvider(): array
     {
-        yield [
-            'isSearchable' => false,
-            'isFilterable' => false,
-            'isSortable' => true
+        return [
+            ['isSearchable' => false, 'isFilterable' => false, 'isSortable' => true]
         ];
     }
 
@@ -48,8 +47,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
 
         $this->assertEquals(
             $date,
-            $this->getAttributeType()
-                ->getSortableValue($this->attribute, $date, $this->localization)
+            $this->getAttributeType()->getSortableValue($this->attribute, $date, $this->localization)
         );
     }
 

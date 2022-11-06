@@ -29,7 +29,7 @@ class ItemControllerTest extends WebTestCase
         $this->assertCount(0, $crawler->filter('[operation-name="DELETE"]'));
 
         // default datagrid UPDATE and DELETE operations and DELETE mass action, it's index page for 'items-grid'
-        $data = $this->assertDataGrid($crawler, 'items-grid');
+        $data = $this->assertDatagrid($crawler, 'items-grid');
 
         $this->assertCount(3, $data['data']);
 
@@ -118,12 +118,7 @@ class ItemControllerTest extends WebTestCase
         $this->assertIsArray($data['metadata']['massActions']['delete']);
     }
 
-    /**
-     * @param Crawler $crawler
-     * @param string $gridName
-     * @return array
-     */
-    private function assertDataGrid(Crawler $crawler, $gridName)
+    private function assertDatagrid(Crawler $crawler, string $gridName): array
     {
         self::assertStringContainsString($gridName, $crawler->html());
 

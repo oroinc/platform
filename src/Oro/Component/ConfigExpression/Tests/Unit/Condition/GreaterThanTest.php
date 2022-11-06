@@ -26,7 +26,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];
 
@@ -62,7 +62,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -106,7 +106,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

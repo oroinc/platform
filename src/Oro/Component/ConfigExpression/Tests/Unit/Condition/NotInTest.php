@@ -25,7 +25,7 @@ class NotInTest extends \PHPUnit\Framework\Testcase
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];
 

@@ -28,9 +28,6 @@ class AjaxControllerTest extends WebTestCase
     /** @var PhpArrayConfigCacheModifier */
     private $configModifier;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -43,9 +40,6 @@ class AjaxControllerTest extends WebTestCase
             ->setMessage(self::MESSAGE_DEFAULT);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         $this->configModifier->resetCache();
@@ -53,29 +47,17 @@ class AjaxControllerTest extends WebTestCase
 
     /**
      * @dataProvider executeActionDataProvider
-     *
-     * @param array $config
-     * @param string $route
-     * @param string $datagrid
-     * @param bool $entityId
-     * @param string $entityClass
-     * @param int $statusCode
-     * @param string $message
-     * @param string $redirectRoute
-     * @param array $flashMessages
-     * @param array $headers
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function testExecuteAction(
         array $config,
-        $route,
-        $datagrid,
-        $entityId,
-        $entityClass,
-        $statusCode,
-        $message,
-        $redirectRoute = '',
+        ?string $route,
+        ?string $datagrid,
+        ?bool $entityId,
+        string $entityClass,
+        int $statusCode,
+        string $message,
+        string $redirectRoute = '',
         array $flashMessages = [],
         array $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
     ) {
@@ -125,11 +107,9 @@ class AjaxControllerTest extends WebTestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function executeActionDataProvider()
+    public function executeActionDataProvider(): array
     {
         $label = 'oro.action.test.label';
 
@@ -153,7 +133,7 @@ class AjaxControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_action' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', self::MESSAGE_DEFAULT]],
                         ],
                     ]
@@ -161,7 +141,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'datagrid' => '',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_NEW,
             ],
@@ -170,7 +150,7 @@ class AjaxControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_action' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::PRECONDITIONS => [
                                 '@equal' => [
                                     'message' => 'Expected error message',
@@ -183,19 +163,23 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'datagrid' => '',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_FORBIDDEN,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'unknown entity' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['entities' => ['Oro\Bundle\TestFrameworkBundle\Enti\UnknownEntity']]]
+                    [
+                        'oro_action_test_action' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\UnknownEntity']
+                        ]
+                    ]
                 ),
                 'route' => 'oro_action_test_route',
                 'datagrid' => '',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
@@ -207,7 +191,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'datagrid' => '',
                 'entityId' => false,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
@@ -216,7 +200,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'datagrid' => '',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
@@ -228,7 +212,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'datagrid' => 'test_datagrid',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
@@ -237,7 +221,7 @@ class AjaxControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_action' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::ACTIONS => [
                                 [
                                     '@redirect' => [
@@ -251,7 +235,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => null,
                 'datagrid' => null,
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_FOUND,
                 'message' => self::MESSAGE_DEFAULT,
                 'redirectRoute' => 'oro_action_widget_buttons',
@@ -263,7 +247,7 @@ class AjaxControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_action' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::ACTIONS => [
                                 [
                                     '@redirect' => [
@@ -277,7 +261,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => null,
                 'datagrid' => null,
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
@@ -286,7 +270,7 @@ class AjaxControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_action' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::PRECONDITIONS => [
                                 '@equal' => [
                                     'message' => 'Expected error message',
@@ -299,7 +283,7 @@ class AjaxControllerTest extends WebTestCase
                 'route' => 'oro_action_widget_buttons',
                 'datagrid' => '',
                 'entityId' => null,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'statusCode' => Response::HTTP_FORBIDDEN,
                 'message' => self::MESSAGE_DEFAULT,
                 'redirectRoute' => 'oro_action_widget_buttons',
@@ -333,7 +317,7 @@ class AjaxControllerTest extends WebTestCase
         );
     }
 
-    private function setOperationsConfig(array $operations)
+    private function setOperationsConfig(array $operations): void
     {
         $config = $this->configProvider->getConfiguration();
         $config['operations'] = $operations;

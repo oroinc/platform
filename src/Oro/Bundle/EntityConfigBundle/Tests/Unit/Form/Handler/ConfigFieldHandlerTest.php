@@ -43,11 +43,7 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param bool $isFormValid
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsFormCreationSubmissionAndValidation($isFormValid)
+    private function expectsFormCreationSubmissionAndValidation(bool $isFormValid): FormInterface
     {
         $form = $this->createMock(FormInterface::class);
         $this->configHelperHandler->expects($this->once())

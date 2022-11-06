@@ -51,10 +51,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResults, $this->provider->getPaths([]));
     }
 
-    /**
-     * @return array
-     */
-    public function pathsDataProvider()
+    public function pathsDataProvider(): array
     {
         return [
             [

@@ -110,8 +110,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array[]
      */
     public function testGetDatagridFiltersCombinedProvider(): array
     {
@@ -250,8 +248,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider testGetDatagridFiltersCombinedProvider
-     * @param array $configData
-     * @param array $expectedFilters
      */
     public function testGetDatagridFiltersCombined(array $configData, array $expectedFilters): void
     {

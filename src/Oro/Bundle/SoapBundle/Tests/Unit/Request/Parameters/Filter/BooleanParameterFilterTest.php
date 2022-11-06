@@ -16,7 +16,7 @@ class BooleanParameterFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $filter->filter($rawValue, null));
     }
 
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         return [
             [false, 'false'],
