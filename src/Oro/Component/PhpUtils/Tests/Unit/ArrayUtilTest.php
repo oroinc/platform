@@ -18,7 +18,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, ArrayUtil::interpose($separator, $array));
     }
 
-    public function interposeDataProvider()
+    public function interposeDataProvider(): array
     {
         return [
             [
@@ -65,7 +65,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, ArrayUtil::isAssoc($array));
     }
 
-    public function isAssocDataProvider()
+    public function isAssocDataProvider(): array
     {
         return [
             [[1, 2, 3], false],
@@ -491,7 +491,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, ArrayUtil::some($callback, $array));
     }
 
-    public function someProvider()
+    public function someProvider(): array
     {
         return [
             [
@@ -533,7 +533,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, ArrayUtil::find($callback, $array));
     }
 
-    public function findProvider()
+    public function findProvider(): array
     {
         return [
             [
@@ -575,7 +575,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, ArrayUtil::dropWhile($callback, $array));
     }
 
-    public function dropWhileProvider()
+    public function dropWhileProvider(): array
     {
         return [
             [
@@ -618,7 +618,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedShiftedUniqueInts, $sortedUniqueInts);
     }
 
-    public function shiftRangeProvider()
+    public function shiftRangeProvider(): array
     {
         return [
             'empty' => [
@@ -662,7 +662,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, ArrayUtil::intRanges($ints));
     }
 
-    public function intRangesProvider()
+    public function intRangesProvider(): array
     {
         return [
             [
@@ -694,7 +694,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, ArrayUtil::unsetPath($array, $path));
     }
 
-    public function unsetPathDataProvider()
+    public function unsetPathDataProvider(): array
     {
         return [
             'unset with empty path' => [
@@ -764,7 +764,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, ArrayUtil::getIn($array, $path, $defaultValue));
     }
 
-    public function getInDataProvider()
+    public function getInDataProvider(): array
     {
         return [
             'reading non existing key from empty array' => [
@@ -808,10 +808,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, ArrayUtil::arrayMergeRecursiveDistinct($first, $second));
     }
 
-    /**
-     * @return array
-     */
-    public function mergeDataProvider()
+    public function mergeDataProvider(): array
     {
         return [
             [

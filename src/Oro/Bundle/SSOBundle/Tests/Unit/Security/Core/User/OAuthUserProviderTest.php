@@ -28,8 +28,8 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = self::createMock(OAuthUserProviderInterface::class);
-        $this->userChecker = self::createMock(UserCheckerInterface::class);
+        $this->userProvider = $this->createMock(OAuthUserProviderInterface::class);
+        $this->userChecker = $this->createMock(UserCheckerInterface::class);
 
         $userProviders = TestContainerBuilder::create()
             ->add('test_resource_owner', $this->userProvider)
@@ -43,7 +43,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         string $email = 'username@example.com',
         string $resourceOwner = 'test_resource_owner'
     ): UserResponseInterface {
-        $userResponse = self::createMock(UserResponseInterface::class);
+        $userResponse = $this->createMock(UserResponseInterface::class);
         $userResponse->expects(self::any())
             ->method('getUsername')
             ->willReturn($username);
@@ -51,7 +51,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEmail')
             ->willReturn($email);
 
-        $resourceOwnerInstance = self::createMock(ResourceOwnerInterface::class);
+        $resourceOwnerInstance = $this->createMock(ResourceOwnerInterface::class);
         $userResponse->expects(self::any())
             ->method('getResourceOwner')
             ->willReturn($resourceOwnerInstance);

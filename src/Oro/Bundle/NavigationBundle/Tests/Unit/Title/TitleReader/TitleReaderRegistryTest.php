@@ -9,22 +9,15 @@ class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider titleReaderProvider
-     *
-     * @param TitleReaderStub[] $readers
-     * @param string            $routeName
-     * @param string            $expectedTitle
      */
-    public function testGetTitleByRoute(array $readers, $routeName, $expectedTitle)
+    public function testGetTitleByRoute(array $readers, string $routeName, ?string $expectedTitle)
     {
         $registry = new TitleReaderRegistry($readers);
 
         $this->assertEquals($expectedTitle, $registry->getTitleByRoute($routeName));
     }
 
-    /**
-     * @return array
-     */
-    public function titleReaderProvider()
+    public function titleReaderProvider(): array
     {
         return [
             'no readers' => [

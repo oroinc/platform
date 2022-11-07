@@ -39,7 +39,7 @@ class EntityRelationGridListenerTest extends WebTestCase
         $this->assertEquals(count($testEntities), $json['options']['totalRecords']);
     }
 
-    public function relationsProvider()
+    public function relationsProvider(): array
     {
         return [
             'unidirectional many-to-one'                 => ['uniM2OTarget'],

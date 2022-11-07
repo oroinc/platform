@@ -16,9 +16,9 @@ class ChainDraftableFieldsExclusionProviderTest extends \PHPUnit\Framework\TestC
 
     public function testGetExcludedFields(): void
     {
-        $provider1 = $this->getProviderMock(\stdClass::class, true, 1, ['field_1']);
-        $provider2 = $this->getProviderMock(\stdClass::class, false, 0, ['field_2']);
-        $provider3 = $this->getProviderMock(\stdClass::class, true, 1, ['field_3']);
+        $provider1 = $this->getProvider(\stdClass::class, true, 1, ['field_1']);
+        $provider2 = $this->getProvider(\stdClass::class, false, 0, ['field_2']);
+        $provider3 = $this->getProvider(\stdClass::class, true, 1, ['field_3']);
 
         $chainProvider = new ChainDraftableFieldsExclusionProvider([
             $provider1,
@@ -31,7 +31,7 @@ class ChainDraftableFieldsExclusionProviderTest extends \PHPUnit\Framework\TestC
 
     public function testGetExcludedFieldsWhenAllProvidersDidNotReturnFields(): void
     {
-        $provider1 = $this->getProviderMock(\stdClass::class, true, 1, []);
+        $provider1 = $this->getProvider(\stdClass::class, true, 1, []);
 
         $chainProvider = new ChainDraftableFieldsExclusionProvider([
             $provider1,
@@ -40,19 +40,12 @@ class ChainDraftableFieldsExclusionProviderTest extends \PHPUnit\Framework\TestC
         $this->assertEquals([], $chainProvider->getExcludedFields(\stdClass::class));
     }
 
-    /**
-     * @param string $className
-     * @param bool $isSupport
-     * @param int $getExcludedFieldsCalls
-     * @param array $excludedFields
-     * @return DraftableFieldsExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getProviderMock(
+    private function getProvider(
         string $className,
         bool $isSupport,
         int $getExcludedFieldsCalls,
         array $excludedFields
-    ) {
+    ): DraftableFieldsExclusionProviderInterface {
         $provider = $this->createMock(DraftableFieldsExclusionProviderInterface::class);
         $provider->expects($this->once())
             ->method('isSupport')

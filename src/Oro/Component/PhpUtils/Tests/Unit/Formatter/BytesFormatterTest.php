@@ -17,10 +17,7 @@ class BytesFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, BytesFormatter::format($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatBytesProvider()
+    public function formatBytesProvider(): array
     {
         return [
             ['-1.00 MB', -pow(1000, 2)],

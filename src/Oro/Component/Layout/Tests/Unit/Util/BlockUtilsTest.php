@@ -34,7 +34,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function normalizeTransValueDataProvider()
+    public function normalizeTransValueDataProvider(): array
     {
         return [
             [null, null, null],

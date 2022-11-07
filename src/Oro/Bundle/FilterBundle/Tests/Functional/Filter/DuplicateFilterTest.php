@@ -16,8 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DuplicateFilterTest extends WebTestCase
 {
-    /** @var DuplicateFilter */
-    private $filter;
+    private DuplicateFilter $filter;
 
     protected function setUp(): void
     {
@@ -96,7 +95,7 @@ class DuplicateFilterTest extends WebTestCase
         self::assertStringContainsString('GROUP BY ', $dql);
     }
 
-    public function duplicateDataProvider()
+    public function duplicateDataProvider(): array
     {
         return [
             'has duplicate'    => [

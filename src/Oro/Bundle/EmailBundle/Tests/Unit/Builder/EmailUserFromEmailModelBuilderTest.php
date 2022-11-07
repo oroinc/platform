@@ -31,17 +31,23 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    private EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject $emailEntityBuilder;
+    /** @var EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailEntityBuilder;
 
-    private EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject $emailOriginHelper;
+    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailOriginHelper;
 
-    private ParentMessageIdProvider|\PHPUnit\Framework\MockObject\MockObject $parentMessageIdProvider;
+    /** @var ParentMessageIdProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $parentMessageIdProvider;
 
-    private EmailActivityManager|\PHPUnit\Framework\MockObject\MockObject $emailActivityManager;
+    /** @var EmailActivityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailActivityManager;
 
-    private EmailUserFromEmailModelBuilder $emailUserFromEmailModelBuilder;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    /** @var EmailUserFromEmailModelBuilder */
+    private $emailUserFromEmailModelBuilder;
 
     protected function setUp(): void
     {
@@ -69,10 +75,6 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider createFromEmailModelDataProvider
-     *
-     * @param string $type
-     * @param bool $isHtml
-     * @param string $messageId
      */
     public function testCreateFromEmailModel(
         string $type,
@@ -248,8 +250,6 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setEmailOriginWhenInternalEmailOriginDataProvider
-     *
-     * @param EmailOrigin $emailOrigin
      */
     public function testSetEmailOriginWhenInternalEmailOrigin(EmailOrigin $emailOrigin): void
     {
@@ -328,8 +328,6 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setEmailOriginWhenEmailUserOriginWithoutFolderDataProvider
-     *
-     * @param EmailOrigin|null $internalEmailOrigin
      */
     public function testSetEmailOriginWhenEmailUserOriginWithoutFolder(?EmailOrigin $internalEmailOrigin): void
     {

@@ -13,13 +13,11 @@ class EngineParametersTest extends TestCase
      */
     public function testInvalidSearchEngineDsnProcessing($dsn)
     {
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new EngineParameters($dsn);
     }
 
     /**
-     * @param string $dsn
-     * @param array $expectedParams
      * @dataProvider properSearchEngineDsnProvider
      */
     public function testProperSearchEngineDsnProcessing(string $dsn, array $expectedProcessedDsnResults)
@@ -42,7 +40,6 @@ class EngineParametersTest extends TestCase
 
     /**
      * @dataProvider engineNameAliasProvider
-     * @return void
      */
     public function testEngineNameAlias(string $dsn, string $expectedEngineName)
     {
@@ -52,9 +49,6 @@ class EngineParametersTest extends TestCase
         self::assertEquals($expectedEngineName, $engineParametersBag->getEngineName());
     }
 
-    /**
-     * @return array
-     */
     public function invalidSearchEngineDsnProvider(): array
     {
         return [
@@ -64,9 +58,6 @@ class EngineParametersTest extends TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function properSearchEngineDsnProvider(): array
     {
         return [

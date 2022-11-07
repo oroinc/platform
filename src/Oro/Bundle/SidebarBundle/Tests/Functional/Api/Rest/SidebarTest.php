@@ -8,20 +8,20 @@ class SidebarTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateWsseAuthHeader());
     }
 
     /**
      * @dataProvider positionsPostProvider
      */
-    public function testGetInitialPositions($position)
+    public function testGetInitialPositions(array $position)
     {
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', ['position' => $position['position']])
         );
         $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        self::assertEmptyResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 
@@ -29,7 +29,7 @@ class SidebarTest extends WebTestCase
      * @depends testGetInitialPositions
      * @dataProvider positionsPostProvider
      */
-    public function testPostPosition($position)
+    public function testPostPosition(array $position)
     {
         $this->client->jsonRequest(
             'POST',
@@ -37,15 +37,15 @@ class SidebarTest extends WebTestCase
             $position
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 201);
         $this->assertGreaterThan(0, $result['id']);
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', ['position' => $position['position']])
         );
 
-        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $actualResult = self::getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEquals(array_merge($result, $position), $actualResult);
     }
 
@@ -53,79 +53,82 @@ class SidebarTest extends WebTestCase
      * @depends testPostPosition
      * @dataProvider positionsPutProvider
      */
-    public function testPutPositions($position)
+    public function testPutPositions(array $position)
     {
         // get sidebar id
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', ['position' => $position['position']])
         );
 
-        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $position = array_merge(array('id' => $actualResult['id']), $position);
+        $actualResult = self::getJsonResponseContent($this->client->getResponse(), 200);
+        $position = array_merge(['id' => $actualResult['id']], $position);
         $this->assertNotEquals($position, $actualResult);
 
         $this->client->jsonRequest(
             'PUT',
-            $this->getUrl('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
+            $this->getUrl('oro_api_put_sidebars', ['stateId' => $position['id']]),
             $position
         );
 
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        self::assertJsonResponseStatusCodeEquals($result, 200);
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', ['position' => $position['position']])
         );
 
-        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $actualResult = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEquals($position, $actualResult);
     }
 
-    public function positionsPostProvider()
+    public function positionsPostProvider(): array
     {
-        return array(
-            array(
-          'left-maximized' => array(
-              'position' => 'SIDEBAR_LEFT',
-              'state' => 'SIDEBAR_MAXIMIZED'
-            )),
-            array(
-            'right-maximized' => array(
-                'position' => 'SIDEBAR_RIGHT',
-                'state' => 'SIDEBAR_MAXIMIZED'
-            ))
-        );
+        return [
+            [
+                'left-maximized' => [
+                    'position' => 'SIDEBAR_LEFT',
+                    'state'    => 'SIDEBAR_MAXIMIZED'
+                ]
+            ],
+            [
+                'right-maximized' => [
+                    'position' => 'SIDEBAR_RIGHT',
+                    'state'    => 'SIDEBAR_MAXIMIZED'
+                ]
+            ]
+        ];
     }
-    public function positionsPutProvider()
+
+    public function positionsPutProvider(): array
     {
-        return array(
-            array(
-                'left-minimized' => array(
+        return [
+            [
+                'left-minimized' => [
                     'position' => 'SIDEBAR_LEFT',
-                    'state' => 'SIDEBAR_MINIMIZED'
-                )
-            ),
-            array(
-                'left-maximized' => array(
+                    'state'    => 'SIDEBAR_MINIMIZED'
+                ]
+            ],
+            [
+                'left-maximized' => [
                     'position' => 'SIDEBAR_LEFT',
-                    'state' => 'SIDEBAR_MAXIMIZED'
-                )
-            ),
-            array(
-                'right-minimized' => array(
+                    'state'    => 'SIDEBAR_MAXIMIZED'
+                ]
+            ],
+            [
+                'right-minimized' => [
                     'position' => 'SIDEBAR_RIGHT',
-                    'state' => 'SIDEBAR_MINIMIZED'
-                )
-            ),
-            array(
-                'right-maximized' => array(
+                    'state'    => 'SIDEBAR_MINIMIZED'
+                ]
+            ],
+            [
+                'right-maximized' => [
                     'position' => 'SIDEBAR_RIGHT',
-                    'state' => 'SIDEBAR_MAXIMIZED'
-                )
-            ),
-        );
+                    'state'    => 'SIDEBAR_MAXIMIZED'
+                ]
+            ],
+        ];
     }
 }

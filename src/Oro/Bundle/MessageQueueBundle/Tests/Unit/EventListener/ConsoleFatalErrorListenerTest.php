@@ -88,9 +88,6 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array|\string[][]
-     */
     public function commandDataProvider(): array
     {
         return [

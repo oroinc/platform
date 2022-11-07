@@ -17,12 +17,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(ManagerRegistry::class);
     }
 
-    /**
-     * @param AttributeBlockTypeMapperInterface[] $mappers
-     *
-     * @return ChainAttributeBlockTypeMapper
-     */
-    private function getChainMapper(array $mappers = [])
+    private function getChainMapper(array $mappers = []): ChainAttributeBlockTypeMapper
     {
         $chainMapper = new ChainAttributeBlockTypeMapper($this->registry, $mappers);
         $chainMapper->setDefaultBlockType('default_block_type');

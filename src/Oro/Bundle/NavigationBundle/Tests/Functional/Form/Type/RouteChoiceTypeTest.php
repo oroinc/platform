@@ -6,6 +6,7 @@ use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * @dbIsolationPerTest
@@ -15,9 +16,6 @@ class RouteChoiceTypeTest extends WebTestCase
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -37,10 +35,7 @@ class RouteChoiceTypeTest extends WebTestCase
         $this->assertEquals($expectedChoices, $formView->vars['choices']);
     }
 
-    /**
-     * @return array
-     */
-    public function createViewDataProvider()
+    public function createViewDataProvider(): array
     {
         return [
             'with name filter' => [
@@ -86,7 +81,7 @@ class RouteChoiceTypeTest extends WebTestCase
                     'menu_name' => 'application_menu',
                     'name_filter' => '/^oro_navigation\w+$/',
                     'options_filter' => [
-                        'compiler_class' => 'Symfony\Component\Routing\RouteCompiler'
+                        'compiler_class' => RouteCompiler::class
                     ],
                     'add_titles' => false
                 ],
@@ -140,13 +135,7 @@ class RouteChoiceTypeTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $routeName
-     * @param string $label
-     *
-     * @return ChoiceView
-     */
-    private function getChoiceView($routeName, $label)
+    private function getChoiceView(string $routeName, string $label): ChoiceView
     {
         return new ChoiceView($routeName, $routeName, $label);
     }

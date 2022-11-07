@@ -25,7 +25,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testGet($options, $code, $expectedValue)
+    public function testGet(array $options, string $code, mixed $expectedValue)
     {
         $metadata = new Metadata($options);
         $this->assertEquals($expectedValue, $metadata->get($code));
@@ -55,8 +55,14 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testMethods($options, $code, $expectedValue, $hasMethod, $isMethod, $isNotExpected = 'assertFalse')
-    {
+    public function testMethods(
+        array $options,
+        string $code,
+        mixed $expectedValue,
+        string $hasMethod,
+        string $isMethod,
+        string $isNotExpected = 'assertFalse'
+    ) {
         $metadata = new Metadata($options);
         $metadata->set($code, $expectedValue);
         $this->$hasMethod($metadata->has($code));
@@ -67,7 +73,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array_merge($options, [$code => $expectedValue]), $metadata->all());
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'string'  => [

@@ -37,7 +37,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function normalizeConfigProvider()
+    public function normalizeConfigProvider(): array
     {
         return [
             'order_by'                                                => [

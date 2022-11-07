@@ -19,9 +19,6 @@ class MessageIdHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider unwrapMessageIdDataProvider
-     *
-     * @param string $messageId
-     * @param string $expectedMessageId
      */
     public function testUnwrapMessageId(string $messageId, string $expectedMessageId): void
     {

@@ -17,10 +17,6 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormDataProvider
-     *
-     * @param string $data
-     * @param array $viewData
-     * @param array $options
      */
     public function testBuildForm(
         string $data,
@@ -36,9 +32,6 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function buildFormDataProvider(): array
     {
         return [
@@ -62,9 +55,6 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider configureOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testConfigureOptions(array $options, array $expected): void
     {

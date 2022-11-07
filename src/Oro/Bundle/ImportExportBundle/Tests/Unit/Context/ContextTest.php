@@ -111,14 +111,13 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForConfiguration
-     *
-     * @param array $configuration
-     * @param array $getOptionArguments
-     * @param bool $hasOption
-     * @param bool $value
      */
-    public function testConfiguration(array $configuration, array $getOptionArguments, $hasOption, $value)
-    {
+    public function testConfiguration(
+        array $configuration,
+        array $getOptionArguments,
+        bool $hasOption,
+        ?int $value
+    ) {
         $context = new Context($configuration);
 
         $this->assertEquals($hasOption, $context->hasOption($getOptionArguments[0]));
@@ -128,10 +127,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->hasOption($getOptionArguments[0]));
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForConfiguration()
+    public function dataProviderForConfiguration(): array
     {
         return [
             [[], ['option_1', null], false, null],

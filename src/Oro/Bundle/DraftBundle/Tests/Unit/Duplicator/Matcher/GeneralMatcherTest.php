@@ -19,11 +19,9 @@ class GeneralMatcherTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $value
-     *
      * @dataProvider typeDataProvider
      */
-    public function testMatches($value): void
+    public function testMatches(mixed $value): void
     {
         $matches = $this->matcher->matches($value, '');
         $this->assertTrue($matches);

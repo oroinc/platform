@@ -50,11 +50,7 @@ class CreateTest extends RestJsonApiTestCase
         });
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $entityType
-     */
-    public function createWithNullValueForReadOnlyTimestampableFields($entityClass, $entityType)
+    public function createWithNullValueForReadOnlyTimestampableFields(string $entityClass, string $entityType): void
     {
         $entityConfig = $this->getApiConfig($entityClass, ApiAction::CREATE);
         if (null === $entityConfig) {

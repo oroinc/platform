@@ -4,6 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Func;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -21,13 +22,13 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, string|bool $expectedResult)
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'get'                                         => [
@@ -70,7 +71,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
 
         $this->function->initialize([]);
@@ -78,7 +79,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenTooManyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
 
         $this->function->initialize([1, 2, 3]);
@@ -87,7 +88,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -97,7 +98,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -153,7 +154,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -163,7 +164,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

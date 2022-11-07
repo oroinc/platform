@@ -68,7 +68,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::getExclusionPolicy($config));
     }
 
-    public function getExclusionPolicyProvider()
+    public function getExclusionPolicyProvider(): array
     {
         return [
             'no exclusion_policy'   => [
@@ -94,7 +94,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::isExcludeAll($config));
     }
 
-    public function isExcludeAllProvider()
+    public function isExcludeAllProvider(): array
     {
         return [
             'no exclusion_policy'   => [
@@ -120,7 +120,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::isExclude($config));
     }
 
-    public function isExcludeProvider()
+    public function isExcludeProvider(): array
     {
         return [
             'no exclude'    => [
@@ -146,7 +146,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::isPartialAllowed($config));
     }
 
-    public function isPartialAllowedProvider()
+    public function isPartialAllowedProvider(): array
     {
         return [
             'no disable_partial_load'    => [
@@ -172,7 +172,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::hasFieldConfig($config, $fieldName));
     }
 
-    public function hasFieldConfigProvider()
+    public function hasFieldConfigProvider(): array
     {
         return [
             'no fields'               => [
@@ -206,7 +206,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::getFieldConfig($config, $fieldName));
     }
 
-    public function getFieldConfigProvider()
+    public function getFieldConfigProvider(): array
     {
         return [
             'no fields'               => [
@@ -240,7 +240,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, ConfigUtil::explodePropertyPath($propertyPath));
     }
 
-    public function explodePropertyPathProvider()
+    public function explodePropertyPathProvider(): array
     {
         return [
             'null'                 => [

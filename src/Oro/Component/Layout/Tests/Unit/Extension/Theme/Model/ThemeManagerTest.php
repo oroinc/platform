@@ -24,18 +24,11 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->factory = $this->createMock(ThemeFactoryInterface::class);
     }
 
-    /**
-     * @param array                      $definitions
-     * @param ThemeFactoryInterface|null $factory
-     * @param array                      $enabledThemes
-     *
-     * @return ThemeManager
-     */
     private function createManager(
         array $definitions = [],
         ThemeFactoryInterface $factory = null,
         array $enabledThemes = []
-    ) {
+    ): ThemeManager {
         $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
         $themeDefinitionBag->expects($this->any())
             ->method('getThemeNames')
@@ -207,17 +200,12 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pageTemplatesDataProvider
-     *
-     * @param string          $childThemeKey
-     * @param array           $themesDefinitions
-     * @param ArrayCollection $expectedResult
-     * @param array           $expectedTitlesResult
      */
     public function testGetThemeMergingPageTemplates(
-        $childThemeKey,
-        $themesDefinitions,
-        $expectedResult,
-        $expectedTitlesResult
+        string $childThemeKey,
+        array $themesDefinitions,
+        ArrayCollection $expectedResult,
+        array $expectedTitlesResult
     ) {
         $manager = $this->createManager(
             $themesDefinitions,
@@ -229,10 +217,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTitlesResult, $theme->getPageTemplateTitles());
     }
 
-    /**
-     * @return array
-     */
-    public function pageTemplatesDataProvider()
+    public function pageTemplatesDataProvider(): array
     {
         $childThemeDefinition = $this->getThemeDefinition('Oro Child Theme', 'parent_theme', [
             'templates' => [
@@ -318,13 +303,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $label
-     * @param string $key
-     * @param string $routeName
-     * @return array
-     */
-    private function getPageTemplateDefinition($label, $key, $routeName)
+    private function getPageTemplateDefinition(string $label, string $key, string $routeName): array
     {
         return [
             'label' => $label,
@@ -333,13 +312,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $label
-     * @param string $parent
-     * @param array  $pageTemplates
-     * @return array
-     */
-    private function getThemeDefinition($label, $parent, $pageTemplates)
+    private function getThemeDefinition(string $label, ?string $parent, array $pageTemplates): array
     {
         return [
             'label' => $label,

@@ -37,8 +37,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider parseOneArgumentRequiredDataProvider
-     *
-     * @param string $expression
      */
     public function testParseOneArgumentRequired(string $expression): void
     {
@@ -52,9 +50,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse($lexer->tokenize($expression));
     }
 
-    /**
-     * @return array
-     */
     public function parseOneArgumentRequiredDataProvider(): array
     {
         return [
@@ -65,10 +60,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getParseData
-     *
-     * @param Node\Node $expectedNode
-     * @param string $expression
-     * @param array $names
      */
     public function testParse(Node\Node $expectedNode, string $expression, array $names = []): void
     {
@@ -79,8 +70,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function getParseData(): array
     {
@@ -279,13 +268,10 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getInvalidPostfixData
-     *
-     * @param string $expr
-     * @param array $names
      */
     public function testParseWithInvalidPostfixData(string $expr, array $names = []): void
     {
-        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
+        $this->expectException(SyntaxError::class);
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize($expr), $names);

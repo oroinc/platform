@@ -10,9 +10,6 @@ class AttributeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param string|array $value
      */
     public function testGettersAndSetters(string $property, string|array $value): void
     {

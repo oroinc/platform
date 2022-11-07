@@ -11,9 +11,9 @@ class EvaluateExpressionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationForEvaluateDataProvider
      */
-    public function testAssembleWithEvaluateResult($yaml, $context, $expected)
+    public function testAssembleWithEvaluateResult(string $yaml, ItemStub $context, bool $expected)
     {
-        $language      = new ConfigExpressions();
+        $language = new ConfigExpressions();
         $configuration = Yaml::parse($yaml);
 
         $this->assertEquals(
@@ -21,7 +21,7 @@ class EvaluateExpressionTest extends \PHPUnit\Framework\TestCase
             $language->evaluate($configuration, $context)
         );
 
-        $expr                    = $language->getExpression($configuration);
+        $expr = $language->getExpression($configuration);
         $normalizedConfiguration = $expr->toArray();
         $this->assertEquals(
             $expected,
@@ -29,7 +29,7 @@ class EvaluateExpressionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function configurationForEvaluateDataProvider()
+    public function configurationForEvaluateDataProvider(): array
     {
         $conditionWithFunc = <<<YAML
 "@empty":
@@ -39,24 +39,14 @@ YAML;
         return [
             [
                 $conditionWithFunc,
-                $this->createObject(['name' => '  ']),
+                new ItemStub(['name' => '  ']),
                 true
             ],
             [
                 $conditionWithFunc,
-                $this->createObject(['name' => ' test ']),
+                new ItemStub(['name' => ' test ']),
                 false
             ]
         ];
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return ItemStub
-     */
-    protected function createObject(array $data = [])
-    {
-        return new ItemStub($data);
     }
 }

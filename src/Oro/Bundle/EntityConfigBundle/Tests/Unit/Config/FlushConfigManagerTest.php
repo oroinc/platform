@@ -328,11 +328,13 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $em
-     * @param ConfigModel[]                            $models
+     * @param EntityManager|\PHPUnit\Framework\MockObject\MockObject $em
+     * @param ConfigModel[]                                          $models
      */
-    private function setFlushExpectations($em, array $models): void
-    {
+    private function setFlushExpectations(
+        EntityManager|\PHPUnit\Framework\MockObject\MockObject $em,
+        array $models
+    ): void {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())

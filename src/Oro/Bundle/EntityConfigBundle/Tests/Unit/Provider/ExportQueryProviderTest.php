@@ -14,11 +14,11 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const DEFAULT_FIELD = 'fieldName';
 
-    /** @var ExportQueryProvider */
-    private $exportQueryProvider;
-
     /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigManager;
+
+    /** @var ExportQueryProvider */
+    private $exportQueryProvider;
 
     protected function setUp(): void
     {
@@ -56,9 +56,6 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurableFieldDataProvider
-     *
-     * @param bool $isExcluded
-     * @param bool $isExportable
      */
     public function testConfigurableField(bool $isExcluded, bool $isExportable): void
     {

@@ -15,15 +15,13 @@ class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
 
     /**
      * {@inheritdoc}
-     *
-     * @return GlobalScopeManager
      */
     protected function createManager(
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
         ConfigBag $configBag
-    ) {
+    ): GlobalScopeManager {
         return new GlobalScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
     }
 

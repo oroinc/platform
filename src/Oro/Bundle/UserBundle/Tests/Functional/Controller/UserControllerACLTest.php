@@ -15,13 +15,9 @@ class UserControllerACLTest extends WebTestCase
     }
 
     /**
-     * @dataProvider ACLProvider
-     *
-     * @param string $resource
-     * @param string $user
-     * @param int $status
+     * @dataProvider aclProvider
      */
-    public function testACLInfoAction($resource, $user, $status)
+    public function testACLInfoAction(string $resource, string $user, int $status)
     {
         $this->loginUser($user);
         /* @var User $resource */
@@ -39,10 +35,7 @@ class UserControllerACLTest extends WebTestCase
         self::assertHtmlResponseStatusCodeEquals($response, $status);
     }
 
-    /**
-     * @return array
-     */
-    public function ACLProvider()
+    public function aclProvider(): array
     {
         return [
             'VIEW (user from same business unit: VIEW_LOCAL)' => [

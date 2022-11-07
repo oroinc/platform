@@ -11,19 +11,13 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([
-            LoadNotificationAlertData::class
-        ]);
+        $this->loadFixtures([LoadNotificationAlertData::class]);
     }
 
     /**
      * @dataProvider paramProvider
-     *
-     * @param string $expectedContent
-     * @param array  $params
-     * @param        $rowsCount
      */
-    public function testCommandOutput(string $expectedContent, array $params, $rowsCount)
+    public function testCommandOutput(string $expectedContent, array $params, int $rowsCount)
     {
         $result = $this->runCommand('oro:notification:alerts:cleanup', $params);
 
@@ -35,20 +29,17 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
         $this->assertCount($rowsCount, $totalRows);
     }
 
-    /**
-     * @return array
-     */
-    public function paramProvider()
+    public function paramProvider(): array
     {
         return [
             'should show help' => [
-                '$expectedContent' => "Help: The oro:notification:alerts:cleanup command deletes notification alert",
+                '$expectedContent' => 'Help: The oro:notification:alerts:cleanup command deletes notification alert',
                 '$params'          => ['--help'],
                 '$rowsCount'       => 4
             ],
             'should warn if given user is not found'       => [
                 '$expectedContent' => "In ConsoleContextGlobalOptionsProvider.php line 81: Can't find user with "
-                    . "identifier 999 oro:notification:alerts:cleanup",
+                    . 'identifier 999 oro:notification:alerts:cleanup',
                 '$params'          => [
                     '--current-user'         => '999',
                     '--current-organization' => '1'
@@ -56,12 +47,12 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
                 '$rowsCount'       => 4
             ],
             'should show success deleted message'           => [
-                '$expectedContent' => "4 notification alert(s) was successfully deleted.",
+                '$expectedContent' => '4 notification alert(s) was successfully deleted.',
                 '$params'          => [],
                 '$rowsCount'       => 0
             ],
             'should notify there is no notification alerts' => [
-                '$expectedContent' => "There are no notification alerts.",
+                '$expectedContent' => 'There are no notification alerts.',
                 '$params'          => [
                     '--current-user'         => 'simple_user',
                     '--current-organization' => '1'

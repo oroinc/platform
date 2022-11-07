@@ -21,11 +21,8 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param string $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, string|array $value)
     {
         $obj = new Layout([]);
 
@@ -36,11 +33,8 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param string $value
      */
-    public function testConstructor($property, $value)
+    public function testConstructor(string $property, string|array $value)
     {
         $obj = new Layout([$property => $value]);
 
@@ -48,7 +42,7 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['blockThemes', ['blockTheme1', 'blockTheme2']],

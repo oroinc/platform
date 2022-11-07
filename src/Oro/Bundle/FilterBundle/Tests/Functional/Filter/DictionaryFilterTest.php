@@ -16,8 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DictionaryFilterTest extends WebTestCase
 {
-    /** @var DictionaryFilter */
-    private $filter;
+    private DictionaryFilter $filter;
 
     protected function setUp(): void
     {
@@ -33,13 +32,7 @@ class DictionaryFilterTest extends WebTestCase
         return $doctrine->getRepository(User::class)->createQueryBuilder($alias);
     }
 
-    /**
-     * @param string|int  $type
-     * @param string|null $reference
-     *
-     * @return \Closure
-     */
-    private function getFilterDataCallback($type, $reference): \Closure
+    private function getFilterDataCallback(string|int $type, ?string $reference): callable
     {
         return function () use ($type, $reference) {
             return [
@@ -96,7 +89,7 @@ class DictionaryFilterTest extends WebTestCase
         self::assertSame($expectedResult, $result);
     }
 
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'Filter "is any of" for toOne relation' => [

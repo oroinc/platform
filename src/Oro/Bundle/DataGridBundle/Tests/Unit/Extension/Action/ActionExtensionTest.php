@@ -44,9 +44,6 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->actionProvider = $this->createMock(DatagridActionProviderInterface::class);
@@ -527,12 +524,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         ReflectionUtil::setPropertyValue($this->extension, 'isMetadataVisited', true);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return mixed
-     */
-    private function getActionConfigurationOption(DatagridConfiguration $config)
+    private function getActionConfigurationOption(DatagridConfiguration $config): mixed
     {
         return $config->offsetGetByPath('[properties][action_configuration]');
     }

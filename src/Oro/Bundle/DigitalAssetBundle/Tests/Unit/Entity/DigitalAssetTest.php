@@ -54,12 +54,7 @@ class DigitalAssetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$secondTitle], array_values($this->entity->getTitles()->toArray()));
     }
 
-    /**
-     * @param bool $default
-     *
-     * @return LocalizedFallbackValue
-     */
-    private function createLocalizedValue($default = false): LocalizedFallbackValue
+    private function createLocalizedValue(bool $default = false): LocalizedFallbackValue
     {
         $localized = (new LocalizedFallbackValue())->setString('sample_title');
 

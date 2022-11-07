@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToManyAttributeType;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
@@ -26,7 +27,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
@@ -40,12 +41,10 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurationMethodsDataProvider()
+    public function configurationMethodsDataProvider(): array
     {
-        yield [
-            'isSearchable' => true,
-            'isFilterable' => true,
-            'isSortable' => false
+        return [
+            ['isSearchable' => true, 'isFilterable' => true, 'isSortable' => false]
         ];
     }
 
@@ -120,7 +119,8 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
-        $this->metadata->expects($this->never())->method($this->anything());
+        $this->metadata->expects($this->never())
+            ->method($this->anything());
 
         $value = new LocalizedFallbackValue();
         $value->setString('test')->setLocalization($this->localization);
@@ -180,7 +180,8 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
-        $this->metadata->expects($this->never())->method($this->anything());
+        $this->metadata->expects($this->never())
+            ->method($this->anything());
 
         $value = new LocalizedFallbackValue();
         $value->setString('test')->setLocalization($this->localization);
@@ -251,7 +252,8 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
 
         $this->attribute->fromArray('extend', ['target_entity' => \stdClass::class]);
 
-        $this->metadata->expects($this->never())->method($this->anything());
+        $this->metadata->expects($this->never())
+            ->method($this->anything());
 
         $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization);
     }

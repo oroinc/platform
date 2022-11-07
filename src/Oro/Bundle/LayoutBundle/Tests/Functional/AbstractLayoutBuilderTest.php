@@ -20,9 +20,6 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     /** @var ThemeResourceProvider */
     private $resourcesProvider;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -47,12 +44,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         $this->resourcesProvider->warmUpCache();
     }
 
-    /**
-     * @param BlockView $blockView
-     *
-     * @return array
-     */
-    protected function getBlockViewTree(BlockView $blockView)
+    protected function getBlockViewTree(BlockView $blockView): array
     {
         $tree = [];
         foreach ($blockView->children as $name => $child) {
@@ -62,12 +54,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         return $tree;
     }
 
-    /**
-     * @param string $theme
-     *
-     * @return Layout
-     */
-    protected function getLayout($theme)
+    protected function getLayout(string $theme): Layout
     {
         $bundle = new TestBundle();
         CumulativeResourceManager::getInstance()
@@ -85,15 +72,8 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         return $layoutBuilder->getLayout($context);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return CumulativeResourceInfo
-     */
-    protected function getResource($path)
+    protected function getResource(string $path): CumulativeResourceInfo
     {
-        $loader = new FolderContentCumulativeLoader('./', -1, false);
-
-        return $loader->load('TestBundle', $path);
+        return (new FolderContentCumulativeLoader('./', -1, false))->load('TestBundle', $path);
     }
 }

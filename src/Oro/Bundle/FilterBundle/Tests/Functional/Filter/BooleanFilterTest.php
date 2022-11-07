@@ -14,8 +14,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class BooleanFilterTest extends WebTestCase
 {
-    /** @var BooleanFilter */
-    private $filter;
+    private BooleanFilter $filter;
 
     protected function setUp(): void
     {
@@ -77,7 +76,7 @@ class BooleanFilterTest extends WebTestCase
         self::assertSame($expectedResult, $result);
     }
 
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'True as numeric string'  => [

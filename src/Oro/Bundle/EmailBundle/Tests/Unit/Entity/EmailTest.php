@@ -13,10 +13,6 @@ use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * Class EmailTest
- *
- * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
- *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -117,10 +113,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider refsDataProvider
-     * @param string $set
-     * @param array $get
      */
-    public function testRefsGetterAndSetter($set, $get)
+    public function testRefsGetterAndSetter(?string $set, array $get)
     {
         $entity = new Email();
         $entity->setRefs($set);
@@ -129,10 +123,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new Email();
 

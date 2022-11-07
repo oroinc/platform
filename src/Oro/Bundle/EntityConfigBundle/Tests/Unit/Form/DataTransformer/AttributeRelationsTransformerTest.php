@@ -43,10 +43,8 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transformDataProvider
-     * @param Collection|null $collection
-     * @param array $expectation
      */
-    public function testTransform($collection, array $expectation): void
+    public function testTransform(?Collection $collection, array $expectation): void
     {
         $this->assertEquals($expectation, $this->dataTransformer->transform($collection));
     }
@@ -109,12 +107,12 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformDataProvider
-     * @param \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup|null $attributeGroup
-     * @param array $selectedAttributes
-     * @param Collection $expectation
      */
-    public function testReverseTransform($attributeGroup, array $selectedAttributes, Collection $expectation): void
-    {
+    public function testReverseTransform(
+        ?AttributeGroup $attributeGroup,
+        array $selectedAttributes,
+        Collection $expectation
+    ): void {
         $transformer = new AttributeRelationsTransformer($attributeGroup);
         $this->assertEquals($expectation, $transformer->reverseTransform($selectedAttributes));
     }

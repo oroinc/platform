@@ -39,19 +39,14 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @param array $expectedItems
-     * @param callable $listener
-     * @param Expression|null $condition
-     * @param array $orderings
-     *
      * @dataProvider searchWeightDataProvider
      */
     public function testSearchWeight(
         array $expectedItems,
-        $listener,
+        callable $listener,
         Expression $condition = null,
         array $orderings = [],
-        $engine = null
+        ?string $engine = null
     ) {
         $engineName = static::getContainer()
             ->get('oro_search.engine.parameters')
@@ -98,11 +93,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function searchWeightDataProvider()
+    public function searchWeightDataProvider(): array
     {
         return [
             'ascending without fulltext search without orderings' => [

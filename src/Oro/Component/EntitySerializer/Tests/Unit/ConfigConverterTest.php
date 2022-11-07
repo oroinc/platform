@@ -22,11 +22,9 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function convertConfigProvider()
+    public function convertConfigProvider(): array
     {
         return [
             'with all fields'                => [

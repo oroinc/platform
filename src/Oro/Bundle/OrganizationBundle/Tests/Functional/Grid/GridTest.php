@@ -22,11 +22,8 @@ class GridTest extends WebTestCase
 
     /**
      * @dataProvider userSubGridNotContainActionsAndMassActionsProvider
-     *
-     * @param string $gridName
-     * @param array $gridParams
      */
-    public function testUserSubGridNotContainActionsAndMassActions($gridName, array $gridParams)
+    public function testUserSubGridNotContainActionsAndMassActions(string $gridName, array $gridParams)
     {
         /** @var Manager $datagridManager */
         $datagridManager = $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
@@ -60,10 +57,7 @@ class GridTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function userSubGridNotContainActionsAndMassActionsProvider()
+    public function userSubGridNotContainActionsAndMassActionsProvider(): array
     {
         return [
             "Grid 'bu-update-users-grid'" => [

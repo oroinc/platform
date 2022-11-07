@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
@@ -46,32 +47,23 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /**
      * @return ExtensionInterface[]
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [];
     }
 
     /**
      * Returns a block type by its name
-     *
-     * @param string $blockType
-     *
-     * @return BlockTypeInterface
      */
-    protected function getBlockType($blockType)
+    protected function getBlockType(string $blockType): BlockTypeInterface
     {
         return $this->layoutFactory->getType($blockType);
     }
 
     /**
      * Asks the given block type to resolve options
-     *
-     * @param string|BlockTypeInterface $blockType
-     * @param array                     $options
-     *
-     * @return array The resolved options
      */
-    protected function resolveOptions($blockType, array $options)
+    protected function resolveOptions(string|BlockTypeInterface $blockType, array $options): array
     {
         $blockOptionsResolver = new BlockOptionsResolver($this->layoutFactory->getRegistry());
 
@@ -80,13 +72,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
 
     /**
      * Creates a view for the given block type
-     *
-     * @param string|BlockTypeInterface $blockType
-     * @param array                     $options
-     *
-     * @return BlockView
      */
-    protected function getBlockView($blockType, array $options = [])
+    protected function getBlockView(string|BlockTypeInterface $blockType, array $options = []): BlockView
     {
         $layoutBuilder = $this->layoutFactory->createLayoutBuilder();
         $layoutBuilder->add(
@@ -95,22 +82,18 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
             $blockType,
             $options
         );
-        $layout = $layoutBuilder->getLayout($this->context);
 
-        return $layout->getView();
+        return $layoutBuilder->getLayout($this->context)->getView();
     }
 
     /**
      * Creates a builder which can be used to build block hierarchy
-     *
-     * @param string $blockType
-     * @param array  $options
-     * @param string $id
-     *
-     * @return TestBlockBuilder
      */
-    protected function getBlockBuilder($blockType, array $options = [], $id = null)
-    {
+    protected function getBlockBuilder(
+        string|AbstractType $blockType,
+        array $options = [],
+        ?string $id = null
+    ): TestBlockBuilder {
         return new TestBlockBuilder(
             $this->layoutFactory->createLayoutBuilder(),
             $this->context,

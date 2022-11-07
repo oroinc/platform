@@ -52,9 +52,9 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    public function getExtensions()
+    protected function getExtensions(): array
     {
         $attributeManagerMock = $this->createMock(AttributeManager::class);
 

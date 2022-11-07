@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -14,7 +14,6 @@ use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @dbIsolationPerTest
@@ -23,24 +22,15 @@ class AssociationManagerTest extends WebTestCase
 {
     use MessageQueueAssertTrait;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var AssociationManager */
-    private $manager;
-
-    /** @var array */
-    private $dispatched = [];
+    private array $dispatched = [];
+    private AssociationManager $manager;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([
-            LoadEmailData::class,
-        ]);
+        $this->loadFixtures([LoadEmailData::class]);
 
-        $this->eventDispatcher = $this->getContainer()->get('event_dispatcher');
-        $this->eventDispatcher->addListener(
+        $this->getContainer()->get('event_dispatcher')->addListener(
             Events::ADD_ACTIVITY,
             function (ActivityEvent $event) {
                 $this->dispatched[] = sprintf('%d-%d', $event->getActivity()->getId(), $event->getTarget()->getId());
@@ -50,9 +40,6 @@ class AssociationManagerTest extends WebTestCase
         $this->manager = $this->getContainer()->get('oro_email.async.manager.association_manager');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function tearDown(): void
     {
         $this->dispatched = [];
@@ -178,19 +165,12 @@ class AssociationManagerTest extends WebTestCase
         return $emails;
     }
 
-    /**
-     * @return ActivityManager
-     */
-    private function getActivityManager()
+    private function getActivityManager(): ActivityManager
     {
         return $this->getContainer()->get('oro_activity.manager');
     }
 
-    /**
-     * @param string $className
-     * @return EntityManager
-     */
-    private function getManagerForClass($className)
+    private function getManagerForClass(string $className): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }

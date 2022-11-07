@@ -7,15 +7,15 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 class ContentDecoderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param string $str
-     * @param string $contentTransferEncoding
-     * @param string $fromEncode
-     * @param string $toEncode
-     * @param string $expected
      * @dataProvider dataProvider
      */
-    public function testDecode($str, $contentTransferEncoding, $fromEncode, $toEncode, $expected)
-    {
+    public function testDecode(
+        string $str,
+        ?string $contentTransferEncoding,
+        ?string $fromEncode,
+        ?string $toEncode,
+        string $expected
+    ) {
         $decoder = new ContentDecoder();
         $str = $decoder->decode($str, $contentTransferEncoding, $fromEncode, $toEncode);
 

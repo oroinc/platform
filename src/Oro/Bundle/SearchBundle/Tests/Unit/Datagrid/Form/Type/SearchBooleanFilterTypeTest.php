@@ -8,13 +8,12 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var SearchBooleanFilterType
-     */
+    /** @var SearchBooleanFilterType */
     private $type;
 
     protected function setUp(): void
@@ -27,8 +26,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
                 new ChoiceFilterType($translator),
                 new FilterType($translator),
                 $this->type
-            ],
-            []
+            ]
         );
         parent::setUp();
     }
@@ -36,7 +34,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -55,7 +53,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [];
     }
@@ -63,7 +61,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'yes' => [

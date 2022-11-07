@@ -32,7 +32,7 @@ class SearchControllerTest extends SearchBundleWebTestCase
             $engine = $this->getContainer()
                 ->get('oro_search.engine.parameters')
                 ->getEngineName();
-            if (!in_array($engine, $request['supported_engines'])) {
+            if (!in_array($engine, $request['supported_engines'], true)) {
                 $this->markTestIncomplete('Test should not be executed on this engine');
             }
             unset($request['supported_engines']);
@@ -55,10 +55,7 @@ class SearchControllerTest extends SearchBundleWebTestCase
         self::assertThat($actualContent['data'], new ArrayContainsConstraint($response['rest']['data'], false));
     }
 
-    /**
-     * @return array
-     */
-    public function searchDataProvider()
+    public function searchDataProvider(): array
     {
         return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }

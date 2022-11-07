@@ -30,11 +30,6 @@ class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getFilteredImageUrlDataProvider
-     *
-     * @param string $path
-     * @param string $filterName
-     * @param string $format
-     * @param string $expectedPath
      */
     public function testGetFilteredImageUrl(
         string $path,

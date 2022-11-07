@@ -20,13 +20,13 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
 
     /**
      * @dataProvider configureOptionsProvider
-     * @param ConfigIdInterface $configId
-     * @param boolean $immutable
-     * @param array $options
-     * @param array $expectedOptions
      */
-    public function testConfigureOptions($configId, $immutable, array $options, array $expectedOptions)
-    {
+    public function testConfigureOptions(
+        ConfigIdInterface $configId,
+        bool $immutable,
+        array $options,
+        array $expectedOptions
+    ) {
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 

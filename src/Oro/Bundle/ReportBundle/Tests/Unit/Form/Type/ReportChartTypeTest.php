@@ -22,9 +22,9 @@ class ReportChartTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())
@@ -40,7 +40,7 @@ class ReportChartTypeTest extends FormIntegrationTestCase
         $childType = new ChartType($configProvider);
         $childType->setEventListener($eventListener);
 
-        $collectionType       = new ChartSettingsCollectionType();
+        $collectionType = new ChartSettingsCollectionType();
         $schemaCollectionType = new ReportChartSchemaCollectionType($configProvider);
 
         return [

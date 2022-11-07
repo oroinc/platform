@@ -7,20 +7,19 @@ use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\ImportExport\Serializer\EntityFieldFallbackValueNormalizer;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EntityFieldFallbackValueNormalizer */
-    private $normalizer;
-
-    /** @var EntityFallbackResolver|MockObject */
+    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $resolver;
 
-    /** @var LocaleSettings|MockObject */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
+
+    /** @var EntityFieldFallbackValueNormalizer */
+    private $normalizer;
 
     protected function setUp(): void
     {
@@ -31,10 +30,8 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider normalizeDataProvider
-     * @param object $object
-     * @param array|null $expected
      */
-    public function testNormalize($object, array $expected = null)
+    public function testNormalize(object $object, ?array $expected = null)
     {
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
@@ -72,12 +69,8 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeDataProvider
-     *
-     * @param string $value
-     * @param bool $isFallbackConfigure
-     * @param object $expected
      */
-    public function testDenormalize($value, $isFallbackConfigure, $expected)
+    public function testDenormalize(string $value, bool $isFallbackConfigure, object $expected)
     {
         $this->localeSettings->expects($this->never())
             ->method('getLocale');
@@ -116,13 +109,8 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeDecimalValueDataProvider
-     *
-     * @param mixed $value
-     * @param string $type
-     * @param string $locale
-     * @param mixed $expected
      */
-    public function testDenormalizeDecimalValue($value, string $type, string $locale, $expected)
+    public function testDenormalizeDecimalValue(mixed $value, string $type, string $locale, mixed $expected)
     {
         $this->resolver->expects($this->once())
             ->method('getType')

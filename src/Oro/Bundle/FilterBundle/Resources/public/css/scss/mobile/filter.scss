@@ -251,8 +251,7 @@
     }
 
     .filter-item {
-        // stylelint-disable-next-line declaration-no-important
-        display: $mobile-filter-item-display !important;
+        display: $mobile-filter-item-display;
         margin: $mobile-filter-item-offset;
 
         > .btn {

@@ -5,7 +5,6 @@ namespace Oro\Bundle\FilterBundle\Tests\Functional\Form\Type\Filter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Form\FormFactoryInterface;
 
 class DateRangeFilterTypeTest extends WebTestCase
 {
@@ -20,7 +19,7 @@ class DateRangeFilterTypeTest extends WebTestCase
      */
     public function testFormSubmitValidData(array $submittedData, array $expectedData)
     {
-        $form = $this->getFormFactory()->create(DateRangeFilterType::class, null, [
+        $form = self::getContainer()->get('form.factory')->create(DateRangeFilterType::class, null, [
             'csrf_protection' => false,
         ]);
 
@@ -31,7 +30,7 @@ class DateRangeFilterTypeTest extends WebTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             'edge days' => [
@@ -90,10 +89,5 @@ class DateRangeFilterTypeTest extends WebTestCase
                 ],
             ],
         ];
-    }
-
-    private function getFormFactory(): FormFactoryInterface
-    {
-        return $this->getContainer()->get('form.factory');
     }
 }
