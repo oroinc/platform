@@ -9,6 +9,10 @@
         height: auto;
         box-shadow: none;
         border: $border-width solid $primary-750;
+        // ignore fixed value that is set for all select2
+        width: 100%;
+        // ignore fixed value that is set for all select2
+        max-width: 100%;
 
         &.select2-container-active {
             border-color: $input-focus-border-color;
