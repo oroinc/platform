@@ -6,6 +6,7 @@ use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\InterruptConsumptionExtensionTrait;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Checks if cache was cleared and interrupt consumer.
@@ -13,6 +14,8 @@ use Oro\Component\MessageQueue\Consumption\Context;
 class InterruptConsumptionExtension extends AbstractExtension
 {
     use InterruptConsumptionExtensionTrait;
+
+    public const CACHE_KEY = 'is_actual';
 
     /**
      * @var int
@@ -31,6 +34,8 @@ class InterruptConsumptionExtension extends AbstractExtension
      */
     protected $cacheState;
 
+    private ?CacheItemPoolInterface $interruptConsumptionCache = null;
+
     /**
      * @param string $filePath
      * @param CacheState $cacheState
@@ -42,6 +47,17 @@ class InterruptConsumptionExtension extends AbstractExtension
         $this->filePath = $filePath;
         $this->timestamp = filemtime($filePath);
         $this->cacheState = $cacheState;
+    }
+
+    public function setInterruptConsumptionCache(?CacheItemPoolInterface $interruptConsumptionCache = null): void
+    {
+        $this->interruptConsumptionCache = $interruptConsumptionCache;
+
+        $interruptConsumptionCache = $this->interruptConsumptionCache->getItem(self::CACHE_KEY);
+        if (!$interruptConsumptionCache->isHit()) {
+            $interruptConsumptionCache->set(true);
+            $this->interruptConsumptionCache->save($interruptConsumptionCache);
+        }
     }
 
     /**
@@ -57,17 +73,24 @@ class InterruptConsumptionExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context): void
     {
-        if (!file_exists($this->filePath)) {
-            $this->interruptExecution($context, 'The cache was cleared.');
+        if ($this->interruptConsumptionCache instanceof CacheItemPoolInterface) {
+            $interruptConsumptionCache = $this->interruptConsumptionCache->getItem(self::CACHE_KEY);
+            if (!$interruptConsumptionCache->isHit()) {
+                $this->interruptExecution($context, 'The cache has changed.');
+            }
+        } else {
+            if (!file_exists($this->filePath)) {
+                $this->interruptExecution($context, 'The cache was cleared.');
 
-            return;
-        }
+                return;
+            }
 
-        clearstatcache(true, $this->filePath);
-        if (filemtime($this->filePath) > $this->timestamp) {
-            $this->interruptExecution($context, 'The cache was invalidated.');
+            clearstatcache(true, $this->filePath);
+            if (filemtime($this->filePath) > $this->timestamp) {
+                $this->interruptExecution($context, 'The cache was invalidated.');
 
-            return;
+                return;
+            }
         }
 
         $cacheChangeDate = $this->cacheState->getChangeDate();

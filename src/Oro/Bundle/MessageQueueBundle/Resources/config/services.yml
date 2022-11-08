@@ -47,8 +47,10 @@ services:
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
             - '@oro_message_queue.consumption.cache_state'
+        calls:
+            - [setInterruptConsumptionCache, ['@oro_message_queue.interrupt_consumption.cache']]
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }
 
     oro_message_queue.consumption.consumer_heartbeat_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'
@@ -120,6 +122,8 @@ services:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
+        calls:
+            - [setInterruptConsumptionCache, ['@oro_message_queue.interrupt_consumption.cache']]
         tags:
             - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
 
@@ -188,3 +192,8 @@ services:
         class: Oro\Component\MessageQueue\Topic\TopicRegistry
         arguments:
             - !tagged_locator { tag: oro_message_queue.topic, index_by: topicName, default_index_method: getName }
+
+    oro_message_queue.interrupt_consumption.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_message_queue_interrupt_consumption' }
