@@ -5,159 +5,185 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\Testing\TempDirExtension;
-use Psr\Log\LoggerInterface;
+use Oro\Component\Testing\Logger\BufferingLogger;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    use TempDirExtension;
-
-    /** @var string */
-    private $filePath;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheState */
-    private $cacheState;
+    private CacheState|\PHPUnit\Framework\MockObject\MockObject $cacheState;
 
     protected function setUp(): void
     {
-        $this->filePath = $this->getTempDir('InterruptConsumptionExtensionTest')
-            . DIRECTORY_SEPARATOR
-            . 'interrupt.tmp';
-
         $this->cacheState = $this->createMock(CacheState::class);
     }
 
-    protected function tearDown(): void
+    public function testShouldSaveCacheItemIfItNotExist(): void
     {
-        $directory = dirname($this->filePath);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(false);
+        $cacheItem->expects(self::once())
+            ->method('set')
+            ->with(true);
 
-        @\unlink($this->filePath);
-        @\rmdir($directory);
+        $interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);
+        $interruptConsumptionCache->expects(self::once())
+            ->method('getItem')
+            ->with(InterruptConsumptionExtension::CACHE_KEY)
+            ->willReturn($cacheItem);
+        $interruptConsumptionCache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem);
 
-        $this->assertDirectoryNotExists($directory);
+        new InterruptConsumptionExtension($interruptConsumptionCache, $this->cacheState);
     }
 
-    public function testShouldCreateFileIfItNotExist(): void
+    public function testShouldNotSaveCacheIfItExistsOnConstruct(): void
     {
-        $this->assertFileDoesNotExist($this->filePath);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $cacheItem->expects(self::never())
+            ->method('set')
+            ->withAnyParameters();
 
-        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);
+        $interruptConsumptionCache->expects(self::once())
+            ->method('getItem')
+            ->with(InterruptConsumptionExtension::CACHE_KEY)
+            ->willReturn($cacheItem);
+        $interruptConsumptionCache->expects(self::never())
+            ->method('save')
+            ->withAnyParameters();
 
-        $this->assertFileExists($this->filePath);
+        new InterruptConsumptionExtension($interruptConsumptionCache, $this->cacheState);
     }
 
-    public function testShouldNotChangeFileMetadataIfItExistsOnConstruct(): void
+    public function testShouldInterruptConsumptionIfCacheIsEmpty(): void
     {
-        touch($this->filePath, time() - 1);
-        $timestamp = filemtime($this->filePath);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::exactly(2))
+            ->method('isHit')
+            ->willReturn(false);
+        $cacheItem->expects(self::once())
+            ->method('set')
+            ->with(true);
 
-        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);
+        $interruptConsumptionCache->expects(self::exactly(2))
+            ->method('getItem')
+            ->with(InterruptConsumptionExtension::CACHE_KEY)
+            ->willReturn($cacheItem);
+        $interruptConsumptionCache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem);
 
-        clearstatcache(true, $this->filePath);
+        $logger = new BufferingLogger();
 
-        $this->assertEquals($timestamp, filemtime($this->filePath));
-    }
-
-    public function testShouldInterruptConsumptionIfFileWasDeleted(): void
-    {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
-
-        unlink($this->filePath);
-
-        $context = $this->createContextMock();
-
-        $logger = $this->createLoggerMock();
-        $logger->expects($this->once())
-            ->method('info')
-            ->with(
-                'Execution interrupted: The cache was cleared.',
-                ['context' => $context]
-            );
-
-        $context->expects($this->once())
+        $context = $this->createMock(Context::class);
+        $context->expects(self::once())
             ->method('getLogger')
             ->willReturn($logger);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('setExecutionInterrupted')
-            ->with($this->isTrue());
-        $context->expects($this->once())
+            ->with(true);
+        $context->expects(self::once())
             ->method('setInterruptedReason')
-            ->with('The cache was cleared.');
+            ->with('The cache has changed.');
 
+        $extension = new InterruptConsumptionExtension($interruptConsumptionCache, $this->cacheState);
         $extension->onBeforeReceive($context);
+
+        self::assertEquals(
+            [
+                [
+                    'info',
+                    'Execution interrupted: The cache has changed.',
+                    ['context' => $context],
+                ]
+            ],
+            $logger->cleanLogs()
+        );
     }
 
-    public function testShouldInterruptConsumptionIfFileMetadataIncreased(): void
+    public function testShouldNotInterruptIfCacheExists(): void
     {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::exactly(2))
+            ->method('isHit')
+            ->willReturn(true);
+        $cacheItem->expects(self::never())
+            ->method('set')
+            ->withAnyParameters();
 
-        touch($this->filePath, time() + 1);
+        $interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);
+        $interruptConsumptionCache->expects(self::exactly(2))
+            ->method('getItem')
+            ->with(InterruptConsumptionExtension::CACHE_KEY)
+            ->willReturn($cacheItem);
+        $interruptConsumptionCache->expects(self::never())
+            ->method('save')
+            ->withAnyParameters();
 
-        $context = $this->createContextMock();
+        $extension = new InterruptConsumptionExtension($interruptConsumptionCache, $this->cacheState);
 
-        $logger = $this->createLoggerMock();
-        $logger->expects($this->once())
-            ->method('info')
-            ->with(
-                'Execution interrupted: The cache was invalidated.',
-                ['context' => $context]
-            );
+        $logger = new BufferingLogger();
 
-        $context->expects($this->once())
+        $context = $this->createMock(Context::class);
+        $context->expects(self::never())
             ->method('getLogger')
-            ->willReturn($logger);
-        $context->expects($this->once())
+            ->withAnyParameters();
+        $context->expects(self::never())
             ->method('setExecutionInterrupted')
-            ->with($this->isTrue());
-        $context->expects($this->once())
+            ->withAnyParameters();
+        $context->expects(self::never())
             ->method('setInterruptedReason')
-            ->with('The cache was invalidated.');
+            ->withAnyParameters();
 
         $extension->onStart($context);
         $extension->onBeforeReceive($context);
-    }
 
-    public function testShouldNotInterruptIfFileExistAndMetadataNotChanged(): void
-    {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
-
-        $context = $this->createContextMock();
-
-        $context->expects($this->never())
-            ->method('getLogger');
-        $context->expects($this->never())
-            ->method('setExecutionInterrupted');
-        $context->expects($this->never())
-            ->method('setInterruptedReason');
-
-        $extension->onStart($context);
-        $extension->onBeforeReceive($context);
+        self::assertEmpty($logger->cleanLogs());
     }
 
     public function testShouldInterruptInCaseIfCacheWasChanged(): void
     {
-        // set the cache change date in future,
+        // set the cache change date in the future,
         // the case when consumer works for 30 days and after that the cache was changed
         $changeStateDate = new \DateTime('now+30days', new \DateTimeZone('UTC'));
 
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
-        $context = $this->createContextMock();
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::exactly(2))
+            ->method('isHit')
+            ->willReturn(true);
+        $cacheItem->expects(self::never())
+            ->method('set')
+            ->withAnyParameters();
 
-        $logger = $this->createLoggerMock();
-        $logger->expects($this->once())
-            ->method('info')
-            ->with(
-                'Execution interrupted: The cache has changed.',
-                ['context' => $context]
-            );
+        $interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);
+        $interruptConsumptionCache->expects(self::exactly(2))
+            ->method('getItem')
+            ->with(InterruptConsumptionExtension::CACHE_KEY)
+            ->willReturn($cacheItem);
+        $interruptConsumptionCache->expects(self::never())
+            ->method('save')
+            ->withAnyParameters();
 
-        $context->expects($this->once())
+        $extension = new InterruptConsumptionExtension($interruptConsumptionCache, $this->cacheState);
+
+        $logger = new BufferingLogger();
+
+        $context = $this->createMock(Context::class);
+        $context->expects(self::once())
             ->method('getLogger')
             ->willReturn($logger);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('setExecutionInterrupted')
-            ->with($this->isTrue());
-        $context->expects($this->once())
+            ->with(true);
+        $context->expects(self::once())
             ->method('setInterruptedReason')
             ->with('The cache has changed.');
 
@@ -167,21 +193,16 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension->onStart($context);
         $extension->onBeforeReceive($context);
-    }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Context
-     */
-    private function createContextMock()
-    {
-        return $this->createMock(Context::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
+        self::assertEquals(
+            [
+                [
+                    'info',
+                    'Execution interrupted: The cache has changed.',
+                    ['context' => $context],
+                ]
+            ],
+            $logger->cleanLogs()
+        );
     }
 }
