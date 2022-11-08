@@ -407,7 +407,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'oro_message_queue.maintenance.idle_time',
-            'oro_message_queue.consumption.interrupt_filepath',
             'oro_message_queue.job.unique_job_table_name',
             'oro_message_queue.client.noop_status',
             'oro_message_queue.dbal.pid_file_dir',
