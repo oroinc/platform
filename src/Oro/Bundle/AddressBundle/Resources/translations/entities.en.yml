@@ -9,23 +9,26 @@ country:
     AI: Anguilla
     AL: Albania
     AM: Armenia
+    AN: 'Netherlands Antilles'
     AO: Angola
     AR: Argentina
     AS: 'American Samoa'
     AT: Austria
     AU: Australia
+    AW: Aruba
     AX: 'Aland Islands'
     AZ: Azerbaijan
-    BA: Bosnia-Herzegovina
+    BA: 'Bosnia and Herzegovina'
     BB: Barbados
     BD: Bangladesh
     BE: Belgium
-    BF: Burkina-Faso
+    BF: 'Burkina Faso'
     BG: Bulgaria
     BH: Bahrain
     BI: Burundi
     BJ: Benin
     BL: 'Saint Barthelemy'
+    BM: Bermuda
     BN: 'Brunei Darussalam'
     BO: Bolivia
     BR: Brazil
@@ -40,7 +43,7 @@ country:
     CF: 'Central African Republic'
     CG: 'Republic of the Congo'
     CH: Switzerland
-    CI: 'Cote D''ivoire'
+    CI: "Cote D'Ivoire"
     CL: Chile
     CM: Cameroon
     CN: China
@@ -48,6 +51,7 @@ country:
     CR: 'Costa Rica'
     CU: Cuba
     CV: 'Cape Verde'
+    CW: Curacao
     CY: Cyprus
     CZ: 'Czech Republic'
     DE: Germany
@@ -64,22 +68,28 @@ country:
     ET: Ethiopia
     FI: Finland
     FJ: Fiji
+    FK: 'Falkland Islands (Malvinas)'
     FM: 'Federated States of Micronesia'
+    FO: 'Faroe Islands'
     FR: France
     GA: Gabon
     GB: 'United Kingdom'
     GD: Grenada
     GE: Georgia
+    GF: 'French Guiana'
     GG: Guernsey
     GH: Ghana
     GL: Greenland
     GM: Gambia
     GN: Guinea
+    GP: Guadeloupe
     GQ: 'Equatorial Guinea'
     GR: Greece
     GT: Guatemala
+    GU: Guam
     GW: Guinea-Bissau
     GY: Guyana
+    HK: 'Hong Kong'
     HN: Honduras
     HR: Croatia
     HT: Haiti
@@ -90,7 +100,7 @@ country:
     IM: 'Isle of Man'
     IN: India
     IQ: Iraq
-    IR: Iran
+    IR: 'Iran (Islamic Republic of)'
     IS: Iceland
     IT: Italy
     JE: Jersey
@@ -98,17 +108,19 @@ country:
     JO: Jordan
     JP: Japan
     KE: Kenya
-    KG: Kyrgystan
+    KG: Kyrgyzstan
     KH: Cambodia
     KI: Kiribati
-    KM: Comorros
+    KM: Comoros
     KN: 'Saint Kitts and Nevis'
     KP: 'North Korea'
     KR: 'South Korea'
     KW: Kuwait
+    KY: 'Cayman Islands'
     KZ: Kazakhstan
     LA: Laos
     LB: Lebanon
+    LC: 'Saint Lucia'
     LI: Liechtenstein
     LK: 'Sri Lanka'
     LR: Liberia
@@ -132,12 +144,15 @@ country:
     MR: Mauritania
     MT: Malta
     MU: Mauritius
+    MP: 'Northern Mariana Islands'
+    MQ: Martinique
     MV: Maldives
     MW: Malawi
     MX: Mexico
     MY: Malaysia
     MZ: Mozambique
     NA: Namibia
+    NC: 'New Caledonia'
     NE: Niger
     NG: Nigeria
     NI: Nicaragua
@@ -149,15 +164,18 @@ country:
     OM: Oman
     PA: Panama
     PE: Peru
+    PF: 'French Polynesia'
     PG: 'Papua New Guinea'
-    PH: Phillipines
+    PH: Philippines
     PK: Pakistan
     PL: Poland
+    PR: 'Puerto Rico'
     PS: 'Palestinian Territory'
     PT: Portugal
     PW: Palau
     PY: Paraguay
     QA: Qatar
+    RE: Reunion
     RO: Romania
     RS: Serbia
     RU: Russia
@@ -178,8 +196,9 @@ country:
     SR: Suriname
     ST: 'Sao Tome and Principe'
     SV: 'El Salvador'
-    SY: Syria
+    SY: 'Syrian Arab Republic'
     SZ: Swaziland
+    TC: 'Turks & Caicos Islands'
     TD: Chad
     TG: Togo
     TH: Thailand
@@ -201,10 +220,14 @@ country:
     UZ: Uzbekistan
     VC: 'Saint Vincent and the Grenadines'
     VE: Venezuela
+    VG: 'British Virgin Islands'
+    VI: 'US Virgin Islands'
     VN: 'Viet Nam'
     VU: Vanuatu
+    WF: 'Wallis and Futuna Islands'
     WS: Samoa
     YE: Yemen
+    YT: 'Comoros and Mayotte Island'
     ZA: 'South Africa'
     ZM: Zambia
     ZW: Zimbabwe
@@ -216,7 +239,7 @@ region:
     AD-06: 'Sant Julià de Lòria'
     AD-07: 'Andorra la Vella'
     AD-08: Escaldes-Engordany
-    AE-AJ: '''Ajmān'
+    AE-AJ: "'Ajmān"
     AE-AZ: 'Abū Ȥaby [Abu Dhabi]'
     AE-DU: Dubayy
     AE-FU: 'Al Fujayrah'
@@ -317,11 +340,11 @@ region:
     AM-AR: Ararat
     AM-AV: Armavir
     AM-ER: Erevan
-    AM-GR: 'Gegarkunik'''
-    AM-KT: 'Kotayk'''
+    AM-GR: "Geġark'unik'"
+    AM-KT: 'Kotayk'
     AM-LO: Lory
     AM-SH: Sirak
-    AM-SU: 'Syunik'''
+    AM-SU: "Syunik'"
     AM-TV: Tavus
     AM-VD: 'Vayoc Jor'
     AO-BGO: Bengo
@@ -814,18 +837,32 @@ region:
     CA-QC: Quebec
     CA-SK: Saskatchewan
     CA-YT: 'Yukon Territory'
-    CD-BC: Bas-Congo
-    CD-BN: Bandundu
+    CD-BC: 'Kongo Central'
+    CD-BU: Bas-Uélé
     CD-EQ: Équateur
-    CD-HC: Haut-Congo
-    CD-KA: Katanga
-    CD-KE: Kasai-Oriental
+    CD-HK: Haut-Katanga
+    CD-HL: Haut-Lomami
+    CD-HU: Haut-Uélé
+    CD-IT: Ituri
+    CD-KC: 'Kasaï Central'
+    CD-KE: 'Kasaï Oriental'
+    CD-KG: Kwango
+    CD-KL: Kwilu
     CD-KN: Kinshasa
-    CD-KW: Kasai-Occidental
+    CD-KS: Kasaï
+    CD-LO: Lomami
+    CD-LU: Lualaba
     CD-MA: Maniema
+    CD-MN: Mai-Ndombe
+    CD-MO: Mongala
     CD-NK: Nord-Kivu
-    CD-OR: Orientale
+    CD-NU: Nord-Ubangi
+    CD-SA: Sankuru
     CD-SK: Sud-Kivu
+    CD-SU: Sud-Ubangi
+    CD-TA: Tanganyika
+    CD-TO: Tshopo
+    CD-TU: Tshuapa
     CF-AC: Ouham
     CF-BB: Bamingui-Bangoran
     CF-BGF: Bangui
@@ -880,25 +917,20 @@ region:
     CH-VS: Valais
     CH-ZG: Zug
     CH-ZH: Zürich
-    CI-01: 'Lagunes (Région des)'
-    CI-02: 'Haut-Sassandra (Région du)'
-    CI-03: 'Savanes (Région des)'
-    CI-04: 'Vallée du Bandama (Région de la)'
-    CI-05: 'Moyen-Comoé (Région du)'
-    CI-06: '18 Montagnes (Région des)'
-    CI-07: 'Lacs (Région des)'
-    CI-08: 'Zanzan (Région du)'
-    CI-09: 'Bas-Sassandra (Région du)'
-    CI-10: 'Denguélé (Région du)'
-    CI-11: 'Nzi-Comoé (Région)'
-    CI-12: 'Marahoué (Région de la)'
-    CI-13: 'Sud-Comoé (Région du)'
-    CI-14: 'Worodouqou (Région du)'
-    CI-15: 'Sud-Bandama (Région du)'
-    CI-16: 'Agnébi (Région de l'')'
-    CI-17: 'Bafing (Région du)'
-    CI-18: 'Fromager (Région du)'
-    CI-19: 'Moyen-Cavally (Région du)'
+    CI-AB: Abidjan
+    CI-BS: Bas-Sassandra
+    CI-CM: Comoé
+    CI-DN: Denguélé
+    CI-GD: Gôh-Djiboua
+    CI-LC: Lacs
+    CI-LG: Lagunes
+    CI-MG: Montagnes
+    CI-SM: Sassandra-Marahoué
+    CI-SV: Savanes
+    CI-VB: 'Vallée du Bandama'
+    CI-WR: Woroba
+    CI-YM: Yamoussoukro
+    CI-ZZ: Zanzan
     CL-AI: 'Aisén del General Carlos Ibáñez del Campo'
     CL-AN: Antofagasta
     CL-AP: 'Arica y Parinacota'
@@ -2508,6 +2540,16 @@ region:
     LB-JA: Liban-Sud
     LB-JL: Mont-Liban
     LB-NA: Nabatîyé
+    LC-01: 'Anse la Raye'
+    LC-02: Castries
+    LC-03: Choiseul
+    LC-05: Dennery
+    LC-06: 'Gros Islet'
+    LC-07: Laborie
+    LC-08: Micoud
+    LC-10: Soufrière
+    LC-11: 'Vieux Fort'
+    LC-12: Canaries
     LI-01: Balzers
     LI-02: Eschen
     LI-03: Gamprin
@@ -2920,6 +2962,7 @@ region:
     MM-15: Mon
     MM-16: Rakhine
     MM-17: Shan
+    MM-18: 'Nay Pyi Taw'
     MN-035: Orhon
     MN-037: 'Darhan uul'
     MN-039: Hentiy
@@ -4034,7 +4077,7 @@ region:
     SK-BC: 'Banskobystrický kraj'
     SK-BL: 'Bratislavský kraj'
     SK-KI: 'Košický kraj'
-    SK-NJ: 'Nitriansky kraj'
+    SK-NI: 'Nitriansky kraj'
     SK-PV: 'Prešovský kraj'
     SK-TA: 'Trnavský kraj'
     SK-TC: 'Trenčiansky kraj'
@@ -4094,8 +4137,13 @@ region:
     SR-SA: Saramacca
     SR-SI: Sipaliwini
     SR-WA: Wanica
+    ST-01: 'Água Grande'
+    ST-02: Cantagalo
+    ST-03: Caué
+    ST-04: Lembá
+    ST-05: Lobata
+    ST-06: Mé-Zóchi
     ST-P: Príncipe
-    ST-S: 'São Tomé'
     SV-AH: Ahuachapán
     SV-CA: Cabañas
     SV-CH: Chalatenango
@@ -4557,12 +4605,6 @@ region:
     UM-86: 'Jarvis Island'
     UM-89: 'Kingman Reef'
     UM-95: 'Palmyra Atoll'
-    US-AA: Armed Forces Americas
-    US-AP: Armed Forces Pacific
-    US-AF: Armed Forces Africa
-    US-AC: Armed Forces Canada
-    US-AE: Armed Forces Europe
-    US-AM: Armed Forces Middle East
     US-AK: Alaska
     US-AL: Alabama
     US-AR: Arkansas
@@ -4611,7 +4653,7 @@ region:
     US-SD: 'South Dakota'
     US-TN: Tennessee
     US-TX: Texas
-    US-UM: 'United States Minor Outlying Islands'
+    US-UM: 'Minor Outlying Islands'
     US-UT: Utah
     US-VA: Virginia
     US-VI: 'Virgin Islands'
@@ -4693,13 +4735,12 @@ region:
     VN-07: 'Tuyên Quang'
     VN-09: 'Lạng Sơn'
     VN-13: 'Quảng Ninh'
-    VN-14: 'Hoà Bình'
-    VN-15: 'Hà Tây'
+    VN-14: 'Hòa Bình'
     VN-18: 'Ninh Bình'
     VN-20: 'Thái Bình'
     VN-21: 'Thanh Hóa'
     VN-22: 'Nghệ An'
-    VN-23: 'Hà Tỉnh'
+    VN-23: 'Hà Tĩnh'
     VN-24: 'Quảng Bình'
     VN-25: 'Quảng Trị'
     VN-26: 'Thừa Thiên-Huế'
@@ -4709,7 +4750,7 @@ region:
     VN-30: 'Gia Lai'
     VN-31: 'Bình Định'
     VN-32: 'Phú Yên'
-    VN-33: 'Đắc Lắk'
+    VN-33: 'Đắk Lắk'
     VN-34: 'Khánh Hòa'
     VN-35: 'Lâm Đồng'
     VN-36: 'Ninh Thuận'
@@ -4721,8 +4762,7 @@ region:
     VN-44: 'An Giang'
     VN-45: 'Đồng Tháp'
     VN-46: 'Tiền Giang'
-    VN-47: 'Kiên Giang'
-    VN-48: 'Cần Thơ'
+    VN-47: 'Kiến Giang'
     VN-49: 'Vĩnh Long'
     VN-50: 'Bến Tre'
     VN-51: 'Trà Vinh'
@@ -4734,12 +4774,8 @@ region:
     VN-57: 'Bình Dương'
     VN-58: 'Bình Phước'
     VN-59: 'Cà Mau'
-    VN-60: 'Đà Nẵng, thành phố'
-    VN-61: 'Hải Duong'
-    VN-62: 'Hải Phòng, thành phố'
+    VN-61: 'Hải Dương'
     VN-63: 'Hà Nam'
-    VN-64: 'Hà Nội, thủ đô'
-    VN-65: 'Hồ Chí Minh, thành phố [Sài Gòn]'
     VN-66: 'Hưng Yên'
     VN-67: 'Nam Định'
     VN-68: 'Phú Thọ'
@@ -4748,12 +4784,20 @@ region:
     VN-71: 'Điện Biên'
     VN-72: 'Đắk Nông'
     VN-73: 'Hậu Giang'
+    VN-CT: 'Cần Thơ'
+    VN-DN: 'Đà Nẵng'
+    VN-HN: 'Hà Nội'
+    VN-HP: 'Hải Phòng'
+    VN-SG: 'Hồ Chí Minh'
     VU-MAP: Malampa
     VU-PAM: Pénama
     VU-SAM: Sanma
     VU-SEE: Shéfa
     VU-TAE: Taféa
     VU-TOB: Torba
+    WF-AL: Alo
+    WF-SG: Sigave
+    WF-UV: Uvea
     WS-AA: 'A''ana'
     WS-AL: Aiga-i-le-Tai
     WS-AT: Atua
