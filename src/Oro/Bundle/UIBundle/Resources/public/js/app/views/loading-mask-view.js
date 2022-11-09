@@ -7,6 +7,10 @@ define(function(require) {
     const _ = require('underscore');
 
     const LoadingMaskView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'extraClassName'
+        ]),
+
         autoRender: true,
 
         /** @property {string|Function} */
@@ -17,6 +21,9 @@ define(function(require) {
 
         /** @property {string} */
         className: 'loader-mask',
+
+        /** @property {string} */
+        extraClassName: '',
 
         /** @property {string} */
         loadingHint: 'Loading...',
@@ -90,7 +97,7 @@ define(function(require) {
             if (!this.isShown()) {
                 this.$parent = this.$el.parent();
                 this.$parent.addClass('loading');
-                this.$el.addClass('shown');
+                this.$el.addClass(`shown ${this.extraClassName}`);
             }
         },
 
