@@ -8,5 +8,6 @@ define(function(require) {
     require('oroui/js/extend/bootstrap/bootstrap-tooltip');
     require('oroui/js/extend/bootstrap/bootstrap-typeahead');
     require('oroui/js/extend/bootstrap/bootstrap-tabs');
+    require('oroui/js/extend/bootstrap/bootstrap-collapse');
     require('bootstrap');
 });
