@@ -84,12 +84,6 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($tokenUser);
 
         $this->emailAttributeProvider->expects(self::never())
-            ->method('getAttributes');
-
-        $this->entityFieldProvider->expects(self::never())
-            ->method('getRelations');
-
-        $this->emailAttributeProvider->expects(self::never())
             ->method('createEmailsFromAttributes');
 
         $this->emailRecipientsHelper->expects(self::never())
@@ -154,10 +148,11 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function testGetRecipients(
-        object$object,
+        object $object,
         int $depth,
         bool $ignoreAcl,
         Organization $organization,
+        int $permissionsChecksNumberOfCalls,
         array $relations,
         array $attributes,
         array $attributesFromRelations,
@@ -165,12 +160,12 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
         array $recipientsFromEmails,
         array $expected
     ) {
-        $this->emailRecipientsHelper->expects(self::once())
+        $this->emailRecipientsHelper->expects(self::exactly($permissionsChecksNumberOfCalls))
             ->method('isObjectAllowedForOrganization')
             ->with($object, $organization)
             ->willReturn(true);
 
-        $this->authorizationChecker->expects(self::once())
+        $this->authorizationChecker->expects(self::exactly($permissionsChecksNumberOfCalls))
             ->method('isGranted')
             ->with('VIEW', $object)
             ->willReturn(true);
@@ -219,6 +214,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'depth' => 2,
                 'ignoreAcl' => false,
                 'organization' => new Organization(),
+                'permissionsChecksNumberOfCalls' => 0,
                 'relations' => [],
                 'attributes' => [],
                 'attributesFromRelations' => [],
@@ -231,6 +227,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'depth' => 2,
                 'ignoreAcl' => false,
                 'organization' => new Organization(),
+                'permissionsChecksNumberOfCalls' => 1,
                 'relations' => [],
                 'attributes' => [
                     new EmailAttribute('email'),
@@ -260,6 +257,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'depth' => 1,
                 'ignoreAcl' => false,
                 'organization' => new Organization(),
+                'permissionsChecksNumberOfCalls' => 1,
                 'relations' => [
                     'owner' => [
                         'name' => 'owner',

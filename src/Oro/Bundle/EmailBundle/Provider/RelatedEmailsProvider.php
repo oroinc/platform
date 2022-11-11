@@ -58,10 +58,19 @@ class RelatedEmailsProvider
      *
      * @return Recipient[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
     {
         $recipients = [];
+
+        $className = ClassUtils::getClass($object);
+        $attributes = $this->emailAttributeProvider->getAttributes($className);
+        $relations = $this->entityFieldProvider->getRelations($className);
+
+        if (empty($attributes) && empty($relations)) {
+            return $recipients;
+        }
 
         if ($this->isAccessDenyForOrganization($object, $ignoreAcl, $organization)) {
             return $recipients;
@@ -72,11 +81,6 @@ class RelatedEmailsProvider
                 return $recipients;
             }
         }
-
-        $className = ClassUtils::getClass($object);
-
-        $attributes = $this->emailAttributeProvider->getAttributes($className);
-        $relations = $this->entityFieldProvider->getRelations($className);
 
         if ($depth > 1) {
             foreach ($relations as $relation) {
