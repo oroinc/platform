@@ -71,7 +71,7 @@ class OroSelenium2Driver extends Selenium2Driver
         }
 
         if ('input' === $elementName) {
-            if ('text' === $element->attribute('type')) {
+            if (in_array($element->attribute('type'), ['text', 'range'])) {
                 $this->setTextInputElement($element, $value);
                 $this->triggerEvent($xpath, 'keyup');
                 $this->triggerEvent($xpath, 'change');
