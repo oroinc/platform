@@ -86,6 +86,7 @@ define(function(require) {
             }
 
             this.$button.off();
+            this.$button.data('disposed', true);
 
             if (this.buttonManager && _.isFunction(this.buttonManager.dispose)) {
                 this.buttonManager.dispose();
