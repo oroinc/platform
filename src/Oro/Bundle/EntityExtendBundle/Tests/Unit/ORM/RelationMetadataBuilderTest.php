@@ -59,7 +59,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupports(Config $extendConfig, bool $expected)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->builder->supports($extendConfig)
         );
@@ -91,7 +91,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $targetEntityClass = TestClass2::class;
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::atLeastOnce())
             ->method('getEntityConfig')
             ->willReturn($this->getEntityConfig($entityClass, ['state' => $state]));
 
@@ -183,7 +183,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -277,7 +277,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -369,7 +369,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -424,13 +424,13 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $targetEntityClass = TestClass2::class;
 
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
             ->willReturnMap([
                 [$targetEntityClass, null, false],
                 [$entityClass, $fieldName, true]
             ]);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -475,7 +475,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -529,7 +529,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_ONE;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -574,7 +574,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -596,7 +596,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -614,7 +614,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_ONE;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -661,7 +661,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -683,7 +683,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -701,7 +701,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_ONE;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -747,7 +747,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -769,7 +769,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -790,7 +790,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_ONE;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -835,7 +835,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -857,7 +857,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -910,7 +910,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_ONE;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('getFieldConfig');
 
         $targetEntityConfig = $this->getEntityConfig(
@@ -953,7 +953,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -975,7 +975,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -983,7 +983,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToMany()
+    public function testBuildManyToMany(): void
     {
         $entityClass = TestClass::class;
 
@@ -997,7 +997,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_MANY;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -1042,7 +1042,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'               => $entityClass,
                 'targetEntity'               => $targetEntityClass,
@@ -1099,7 +1099,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -1121,7 +1121,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_MANY;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -1168,7 +1168,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'               => $entityClass,
                 'targetEntity'               => $targetEntityClass,
@@ -1225,7 +1225,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -1247,7 +1247,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $targetFieldType = RelationType::MANY_TO_MANY;
         $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -1292,7 +1292,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'               => $entityClass,
                 'targetEntity'               => $targetEntityClass,
@@ -1349,7 +1349,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
@@ -1446,7 +1446,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -1469,7 +1469,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -1532,7 +1532,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'     => $entityClass,
                 'targetEntity'     => $targetEntityClass,
@@ -1555,7 +1555,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
@@ -1563,7 +1563,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToManyWhenOwningSiteAndInverseSideEntitiesAreEqual()
+    public function testBuildManyToManyWhenOwningSiteAndInverseSideEntitiesAreEqual(): void
     {
         $entityClass = TestClass::class;
 
@@ -1587,7 +1587,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityConfig')
             ->willReturn($targetEntityConfig);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
@@ -1621,7 +1621,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->build($metadataBuilder, $extendConfig);
 
         $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'sourceEntity'               => $entityClass,
                 'targetEntity'               => $entityClass,
@@ -1678,7 +1678,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-        $this->assertFalse(
+        self::assertFalse(
             $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
         );
     }
