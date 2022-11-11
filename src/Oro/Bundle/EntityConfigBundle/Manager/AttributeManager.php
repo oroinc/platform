@@ -56,6 +56,8 @@ class AttributeManager
     /** @var AttributeFamily[] */
     private $familiesByAttributeId = [];
 
+    private array $sortableOrFilterableAttributesByClass = [];
+
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
@@ -196,6 +198,19 @@ class AttributeManager
         }
 
         return $this->nonSystemAttributesByClass[$className];
+    }
+
+    public function getSortableOrFilterableAttributesByClass(string $className, array $families): array
+    {
+        if (!isset($this->sortableOrFilterableAttributesByClass[$className])) {
+            $this->checkDatabase();
+
+            $ids = $this->getAttributeGroupRelationRepository()->getAttributesIdsByFamilies($families);
+            $attributes = $this->getRepository()->getSortableOrFilterableAttributes($className, $ids);
+            $this->sortableOrFilterableAttributesByClass[$className] = $attributes;
+        }
+
+        return $this->sortableOrFilterableAttributesByClass[$className];
     }
 
     /**
