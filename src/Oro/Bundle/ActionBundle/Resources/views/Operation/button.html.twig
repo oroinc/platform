@@ -32,6 +32,9 @@
            {% if not button.buttonContext.enabled %}
                disabled="disabled"
            {% endif %}
+            {% if (params.name is defined) %}
+                data-action-name="{{ params.name }}"
+            {% endif %}
         >
             {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
                 <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
