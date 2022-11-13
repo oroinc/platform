@@ -28,21 +28,9 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class TranslatableEntityTypeTest extends FormIntegrationTestCase
 {
-    private const TEST_CLASS      = 'TestClass';
+    private const TEST_CLASS = 'TestClass';
     private const TEST_IDENTIFIER = 'testId';
-    private const TEST_PROPERTY   = 'testProperty';
-
-    /** @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
-
-    /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
-    private $ormConfiguration;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private const TEST_PROPERTY = 'testProperty';
 
     /** @var EntityRepository */
     private $entityRepository;
@@ -64,21 +52,19 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
 
     protected function setUp(): void
     {
-        $this->classMetadata = $this->createMock(ClassMetadataInfo::class);
-        $this->classMetadata->expects($this->any())
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->willReturn(self::TEST_IDENTIFIER);
-        $this->classMetadata->expects($this->any())
+        $classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->willReturn([self::TEST_IDENTIFIER]);
-        $this->classMetadata->expects($this->any())
+        $classMetadata->expects($this->any())
             ->method('getTypeOfField')
             ->willReturn('integer');
-        $this->classMetadata->expects($this->any())
+        $classMetadata->expects($this->any())
             ->method('getName')
             ->willReturn(self::TEST_CLASS);
-
-        $this->ormConfiguration = $this->createMock(Configuration::class);
 
         $locale = 'de_DE';
 
@@ -92,38 +78,38 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->method('getListeners')
             ->willReturn([[$translatableListener]]);
 
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->entityManager->expects($this->any())
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
             ->method('getEventManager')
             ->willReturn($eventManager);
-        $this->entityManager->expects($this->any())
+        $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with(self::TEST_CLASS)
-            ->willReturn($this->classMetadata);
-        $this->entityManager->expects($this->any())
+            ->willReturn($classMetadata);
+        $entityManager->expects($this->any())
             ->method('getConfiguration')
-            ->willReturn($this->ormConfiguration);
+            ->willReturn($this->createMock(Configuration::class));
 
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManager')
-            ->willReturn($this->entityManager);
-        $this->registry->expects($this->any())
+            ->willReturn($entityManager);
+        $doctrine->expects($this->any())
             ->method('getRepository')
             ->with(self::TEST_CLASS)
             ->willReturn($this->getEntityRepository());
 
         $this->aclHelper = $this->createMock(AclHelper::class);
 
-        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory(), $this->aclHelper);
+        $this->type = new TranslatableEntityType($doctrine, new DefaultChoiceListFactory(), $this->aclHelper);
 
         parent::setUp();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([$this->type], [])
@@ -196,13 +182,12 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         $formBuilder = $this->createMock(FormBuilder::class);
 
         foreach ($expectedCalls as $method => $parameters) {
-            $mocker = $formBuilder->expects($this->exactly($parameters['count']))
+            $formBuilder->expects($this->exactly($parameters['count']))
                 ->method($method)
+                ->with(...$parameters['with'])
                 ->willReturnSelf();
-            call_user_func_array([$mocker, 'with'], $parameters['with']);
         }
 
-        // test
         $this->type->buildForm($formBuilder, $options);
     }
 
