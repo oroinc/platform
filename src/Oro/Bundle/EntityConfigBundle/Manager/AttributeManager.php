@@ -292,10 +292,9 @@ class AttributeManager
         $attributes = $this->getAttributesByFamily($attributeFamily);
 
         $data = [];
-        /** @var AttributeGroup $group */
         foreach ($groups as $group) {
             $item = ['group' => $group, 'attributes' => []];
-            /** @var AttributeGroupRelation$attributeRelation */
+            /** @var AttributeGroupRelation $attributeRelation */
             foreach ($group->getAttributeRelations() as $attributeRelation) {
                 $item['attributes'][] = $attributes[$attributeRelation->getEntityConfigFieldId()];
             }

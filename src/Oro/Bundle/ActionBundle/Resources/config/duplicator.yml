@@ -1,9 +1,9 @@
 services:
     oro_action.factory.duplicator_factory:
         class: 'Oro\Component\Duplicator\DuplicatorFactory'
-        calls:
-            - [setFilterFactory,  ['@oro_action.factory.duplicator_filter_factory']]
-            - [setMatcherFactory,  ['@oro_action.factory.duplicator_matcher_factory']]
+        arguments:
+            - '@oro_action.factory.duplicator_matcher_factory'
+            - '@oro_action.factory.duplicator_filter_factory'
 
     oro_action.factory.duplicator_filter_factory:
         class: 'Oro\Component\Duplicator\Filter\FilterFactory'

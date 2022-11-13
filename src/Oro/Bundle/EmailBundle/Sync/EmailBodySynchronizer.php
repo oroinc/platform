@@ -171,7 +171,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     /**
      * @return array [$bodyLoaded, $emailBodyChanged, $notifications]
      */
-    protected function loadBody(Email $email, bool$forceSync, EmailOrigin $origin, EmailFolder $folder): array
+    protected function loadBody(Email $email, bool $forceSync, EmailOrigin $origin, EmailFolder $folder): array
     {
         $notifications = [];
         $bodyLoaded = false;
