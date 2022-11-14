@@ -106,17 +106,16 @@ class TestHelper
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
+        $treeProvider = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $treeProviderMock->expects($this->testCase->any())
+        $treeProvider->expects($this->testCase->any())
             ->method('getTree')
             ->willReturn($ownerTree);
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
-                $treeProviderMock,
+                $treeProvider,
                 $idAccessor,
                 new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build()),
                 $metadataProvider,
@@ -200,11 +199,10 @@ class TestHelper
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
+        $treeProvider = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $treeProviderMock->expects($this->testCase->any())
+        $treeProvider->expects($this->testCase->any())
             ->method('getTree')
             ->willReturn($ownerTree);
 
@@ -212,7 +210,7 @@ class TestHelper
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
-                $treeProviderMock,
+                $treeProvider,
                 $idAccessor,
                 $entityOwnerAccessor,
                 $metadataProvider,
@@ -298,11 +296,11 @@ class TestHelper
      */
     private function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
     {
-        $mock = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
-        $mock->expects($testCase->any())
+        $aclGroupProvider = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
+        $aclGroupProvider->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
-        return $mock;
+        return $aclGroupProvider;
     }
 }

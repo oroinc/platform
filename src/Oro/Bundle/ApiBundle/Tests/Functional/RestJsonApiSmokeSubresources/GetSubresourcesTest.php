@@ -13,7 +13,7 @@ class GetSubresourcesTest extends RestJsonApiTestCase
 {
     public function testGetSubresource()
     {
-        $this->runForSubresources(function (string $entityClass, string $associationName, ApiSubresource$subresource) {
+        $this->runForSubresources(function (string $entityClass, string $associationName, ApiSubresource $subresource) {
             $entityId = $this->findEntityId($entityClass);
             if (null === $entityId) {
                 return;

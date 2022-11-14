@@ -10,16 +10,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class PropertyMapperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $mockContextAccessor;
+    private $contextAccessor;
 
     /** @var PropertyMapper */
     private $propertyMapper;
 
     protected function setUp(): void
     {
-        $this->mockContextAccessor = $this->createMock(ContextAccessor::class);
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
 
-        $this->propertyMapper = new PropertyMapper($this->mockContextAccessor);
+        $this->propertyMapper = new PropertyMapper($this->contextAccessor);
     }
 
     public function testMapToArgs()
@@ -27,7 +27,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         $pp1 = new PropertyPath('contextParam1');
         $pp2 = new PropertyPath('contextParam2');
 
-        $this->mockContextAccessor->expects(self::exactly(2))
+        $this->contextAccessor->expects(self::exactly(2))
             ->method('getValue')
             ->withConsecutive(
                 [[], $pp1],
@@ -38,8 +38,8 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
                 'val2'
             );
 
-        $mockExecutionArgs = $this->createMock(ActionGroupExecutionArgs::class);
-        $mockExecutionArgs->expects(self::exactly(3))
+        $executionArgs = $this->createMock(ActionGroupExecutionArgs::class);
+        $executionArgs->expects(self::exactly(3))
             ->method('addParameter')
             ->withConsecutive(
                 ['arg1', 'val1'],
@@ -48,7 +48,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->propertyMapper->toArgs(
-            $mockExecutionArgs,
+            $executionArgs,
             [
                 'arg1' => new PropertyPath('contextParam1'),
                 'arg2' => [
@@ -79,12 +79,12 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
 
         $sourcePropertyPath = new PropertyPath('source');
 
-        $this->mockContextAccessor->expects(self::once())
+        $this->contextAccessor->expects(self::once())
             ->method('getValue')
             ->with($from, $sourcePropertyPath)
             ->willReturn('data');
 
-        $this->mockContextAccessor->expects(self::once())
+        $this->contextAccessor->expects(self::once())
             ->method('setValue')
             ->with($to, 'target', 'data');
 

@@ -124,20 +124,16 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
 
     private function getDuplicateFactory(): DuplicatorFactory
     {
-        $duplicatorFactory = new DuplicatorFactory();
-
         $filterFactory = $this->createMock(FilterFactory::class);
         $filterFactory->expects($this->any())
             ->method('create')
             ->willReturn($this->createMock(Filter::class));
-        $duplicatorFactory->setFilterFactory($filterFactory);
 
         $matcherFactory = $this->createMock(MatcherFactory::class);
         $matcherFactory->expects($this->any())
             ->method('create')
             ->willReturn($this->createMock(Matcher::class));
-        $duplicatorFactory->setMatcherFactory($matcherFactory);
 
-        return $duplicatorFactory;
+        return new DuplicatorFactory($matcherFactory, $filterFactory);
     }
 }

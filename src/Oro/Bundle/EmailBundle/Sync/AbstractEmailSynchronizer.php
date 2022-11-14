@@ -400,7 +400,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     protected function changeOriginSyncState(
         EmailOrigin $origin,
         int $syncCode,
-        ?\DateTime$synchronizedAt = null,
+        ?\DateTime $synchronizedAt = null,
         bool $disableSync = false
     ): bool {
         $repo = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
