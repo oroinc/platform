@@ -195,10 +195,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->generator->processConfigs($configs);
 
-        $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATE],
-            $extendConfigEntity->all()
-        );
+        $this->assertEquals([], $extendConfigEntity->all());
         $this->assertEquals(
             ['icon' => 'icon1'],
             $entityConfigEntity->all()

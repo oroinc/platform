@@ -133,7 +133,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $pointerPrefix = [];
         $normalizedPropertyPath = $propertyPath;
         $path = explode(ConfigUtil::PATH_DELIMITER, $propertyPath);
-        if (count($path) > 1 && is_numeric($path[0])) {
+        if (\count($path) > 1 && is_numeric($path[0])) {
             $normalizedPropertyPath = substr($propertyPath, \strlen($path[0]) + 1);
             $pointerPrefix[] = array_shift($path);
         }
@@ -147,6 +147,8 @@ class ErrorCompleter extends AbstractErrorCompleter
      * @param string[]       $path
      *
      * @return string[]
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getPointer(EntityMetadata $metadata, string $normalizedPropertyPath, array $path): array
     {
@@ -158,6 +160,12 @@ class ErrorCompleter extends AbstractErrorCompleter
                 $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
             } else {
                 $pointer = [$normalizedPropertyPath];
+            }
+        } elseif (\count($path) > 1 && $metadata->hasField($path[0])) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = array_merge([JsonApiDoc::ATTRIBUTES], $path);
+            } else {
+                $pointer = $path;
             }
         } elseif ($metadata->hasAssociation($path[0])) {
             if ($metadata->hasIdentifierFields()) {
@@ -187,7 +195,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $pointer = DataType::isAssociationAsField($association->getDataType())
             ? [JsonApiDoc::ATTRIBUTES, $path[0]]
             : [JsonApiDoc::RELATIONSHIPS, $path[0], JsonApiDoc::DATA];
-        if (count($path) > 1) {
+        if (\count($path) > 1) {
             $pointer[] = $path[1];
             if (!$association->isCollapsed() && DataType::isAssociationAsField($association->getDataType())) {
                 $pointer = array_merge($pointer, \array_slice($path, 2));
