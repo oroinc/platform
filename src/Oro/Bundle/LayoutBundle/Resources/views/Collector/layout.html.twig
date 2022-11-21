@@ -644,7 +644,7 @@
                     {% for argName, argValue in action.args %}
                         <div>
                             <strong>{{ argName }}:</strong>
-                            {% if argName == 'options' %}
+                            {% if argValue is iterable %}
                                 {% for name, option in argValue %}
                                     {{ tree.option(name, option, 0) }}
                                 {% endfor %}
