@@ -252,6 +252,19 @@ services:
             - '@doctrine'
             - '@oro_email.email_address_visibility.manager'
             - '@oro_activity_list.provider.chain'
+        calls:
+            - [setJobRunner, ['@oro_message_queue.job.runner']]
+            - [setProducer, ['@oro_message_queue.client.message_producer']]
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.recalculate_email_visibility_chunk:
+        class: Oro\Bundle\EmailBundle\Async\RecalculateEmailVisibilityChunkProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email_address_visibility.manager'
+            - '@oro_activity_list.provider.chain'
+            - '@oro_message_queue.job.runner'
         tags:
             - { name: oro_message_queue.client.message_processor }
 
