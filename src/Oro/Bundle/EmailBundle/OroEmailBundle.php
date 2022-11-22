@@ -64,7 +64,9 @@ class OroEmailBundle extends Bundle
             ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
             ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
             ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
-            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids');
+            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids')
+            ->add(Topics::RECALCULATE_EMAIL_VISIBILITY, 'Recalculates visibility of emails by given email')
+            ->add(Topics::RECALCULATE_EMAIL_VISIBILITY_CHUNK, 'Recalculates visibility of emails chunk by given email');
 
         $container->addCompilerPass($addTopicPass);
     }
