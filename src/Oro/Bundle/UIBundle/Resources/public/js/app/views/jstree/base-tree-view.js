@@ -18,6 +18,7 @@ define(function(require) {
      * Options:
      * - data - tree structure in jstree json format
      * - nodeId - identifier of selected node
+     * - disabled - disable the whole tree
      *
      * @export oroui/js/app/views/jstree/base-tree-view
      * @extends oroui.app.views.base.View
@@ -153,6 +154,11 @@ define(function(require) {
         autohideNeighbors: false,
 
         /**
+         * @property {Boolean}
+         */
+        disabled: false,
+
+        /**
          * @inheritdoc
          */
         constructor: function BaseTreeView(options) {
@@ -192,6 +198,7 @@ define(function(require) {
             };
 
             this.nodeId = options.nodeId;
+            this.disabled = options.disabled || false;
 
             this.jsTreeConfig = this.customizeTreeConfig(options, config);
 
@@ -237,6 +244,15 @@ define(function(require) {
             }
 
             this.openSelectedNode();
+
+            if (this.disabled) {
+                this.disableSearchField(true);
+
+                this.$tree.find('li').each((i, element) => {
+                    this.jsTreeInstance.disable_node(element, true);
+                    $(element).find('.jstree-wholerow').addClass('jstree-wholerow-disabled');
+                });
+            }
 
             this._resolveDeferredRender();
         },
