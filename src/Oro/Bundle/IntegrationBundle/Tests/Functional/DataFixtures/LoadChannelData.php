@@ -3,24 +3,16 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadChannelData extends AbstractFixture implements ContainerAwareInterface
+class LoadChannelData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var array
-     */
-    protected $data = [
+    private array $data = [
         [
             'name' => 'Foo Integration',
             'type' => 'foo',
@@ -59,38 +51,35 @@ class LoadChannelData extends AbstractFixture implements ContainerAwareInterface
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadUser::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $userManager = $this->container->get('oro_user.manager');
-        $admin = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
-
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         foreach ($this->data as $data) {
             $transport = new TestIntegrationTransport();
             $manager->persist($transport);
 
             $integration = new Integration();
-
             $integration->setName($data['name']);
             $integration->setType($data['type']);
             $integration->setEnabled($data['enabled']);
             $integration->setConnectors($data['connectors']);
-            $integration->setDefaultUserOwner($admin);
-            $integration->setOrganization($admin->getOrganization());
+            $integration->setDefaultUserOwner($user);
+            $integration->setOrganization($user->getOrganization());
             $integration->setTransport($transport);
+            $manager->persist($integration);
 
             $this->setReference($data['reference'], $integration);
-
-            $manager->persist($integration);
         }
 
         $manager->flush();
