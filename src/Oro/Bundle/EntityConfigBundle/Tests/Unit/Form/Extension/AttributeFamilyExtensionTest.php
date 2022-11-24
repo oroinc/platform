@@ -146,9 +146,8 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider preSetDataProvider
-     * @param null|TestActivityTarget $entity
      */
-    public function testOnPreSetData($entity)
+    public function testOnPreSetData(?TestActivityTarget $entity)
     {
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())

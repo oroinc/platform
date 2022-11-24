@@ -34,7 +34,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
             $engine = $this->getContainer()
                 ->get('oro_search.engine.parameters')
                 ->getEngineName();
-            if (!in_array($engine, $request['supported_engines'])) {
+            if (!in_array($engine, $request['supported_engines'], true)) {
                 $this->markTestIncomplete(sprintf('Test should not be executed on "%s" engine', $engine));
             }
             unset($request['supported_engines']);
@@ -58,21 +58,15 @@ class RestSearchApiTest extends SearchBundleWebTestCase
 
         // remove ID references and data
         foreach (array_keys($result['data']) as $key) {
-            unset($result['data'][$key]['record_id']);
-            unset($result['data'][$key]['selected_data']);
+            unset($result['data'][$key]['record_id'], $result['data'][$key]['selected_data']);
         }
 
         $this->assertResultHasItems($response['rest']['data'], $result['data']);
     }
 
-    /**
-     * @return array
-     */
-    public function searchDataProvider()
+    public function searchDataProvider(): array
     {
-        return $this->getApiRequestsData(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests'
-        );
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests');
     }
 
     private function assertResultHasItems(array $items, array $result): void

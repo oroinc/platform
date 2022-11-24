@@ -8,12 +8,7 @@ use Oro\Component\Layout\BlockViewCollection;
 
 class LayoutTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array     $expected
-     * @param BlockView $actual
-     * @param bool      $ignoreAuxiliaryVariables
-     */
-    protected function assertBlockView(array $expected, BlockView $actual, $ignoreAuxiliaryVariables = true)
+    protected function assertBlockView(array $expected, BlockView $actual, bool $ignoreAuxiliaryVariables = true): void
     {
         $views = [];
         $collectViews = function (BlockView $view) use (&$collectViews, &$views) {
@@ -36,11 +31,7 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actualArray);
     }
 
-    /**
-     * @param array $view
-     * @param array $vars
-     */
-    protected function completeView(array &$view, $vars)
+    protected function completeView(array &$view, array $vars): void
     {
         $this->setDefaultValue($view['vars'], []);
         $this->setDefaultValue($view['vars']['id'], '');
@@ -61,24 +52,14 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param mixed $value
-     * @param mixed $defaultValue
-     */
-    protected function setDefaultValue(&$value, $defaultValue)
+    protected function setDefaultValue(mixed &$value, mixed $defaultValue): void
     {
         if (!isset($value)) {
             $value = $defaultValue;
         }
     }
 
-    /**
-     * @param BlockView $view
-     * @param bool      $removeAuxiliaryVariables
-     *
-     * @return array
-     */
-    protected function convertBlockViewToArray(BlockView $view, $removeAuxiliaryVariables = true)
+    protected function convertBlockViewToArray(BlockView $view, bool $removeAuxiliaryVariables = true): array
     {
         $children = [];
         foreach ($view->children as $childView) {
@@ -107,12 +88,7 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param array $view
-     *
-     * @return array
-     */
-    protected function getViewHierarchy(array $view)
+    protected function getViewHierarchy(array $view): array
     {
         $id     = $view['vars']['id'];
         $result = [$id => null];
@@ -136,12 +112,7 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param array $addViews
-     * @param bool $root
-     * @return array
-     */
-    protected function setLayoutBlocks($addViews, $root = true)
+    protected function setLayoutBlocks(array $addViews, bool $root = true): array
     {
         $views = $addViews;
         foreach ($views as $view) {

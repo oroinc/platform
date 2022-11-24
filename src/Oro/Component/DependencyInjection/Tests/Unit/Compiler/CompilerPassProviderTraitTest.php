@@ -42,10 +42,7 @@ class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->stub->getStdClassCompilerPass($container));
     }
 
-    /**
-     * @return array
-     */
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         $object = new \stdClass();
 

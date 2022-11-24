@@ -308,8 +308,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider testVisitMetadataDisabledProvider
-     * @param array $configColumns
-     * @param array $expectedColumns
      */
     public function testVisitMetadataDisabled(array $configColumns, array $expectedColumns)
     {

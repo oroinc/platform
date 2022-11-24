@@ -42,9 +42,6 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCas
         self::assertEquals($expected, $this->decoratorProcessor->process($message, $session));
     }
 
-    /**
-     * @return array
-     */
     public function resultDataProvider(): array
     {
         return [

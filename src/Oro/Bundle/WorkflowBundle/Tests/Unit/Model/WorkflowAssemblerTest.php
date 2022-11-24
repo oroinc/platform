@@ -64,9 +64,6 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
     /** @var WorkflowAssembler */
     private $workflowAssembler;
 
@@ -79,8 +76,8 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->restrictionAssembler = $this->createMock(RestrictionAssembler::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->any())
             ->method('get')
             ->willReturnMap([
                 [Workflow::class, $this->workflow],
@@ -91,7 +88,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
                 [TranslatorInterface::class, $this->translator],
             ]);
 
-        $this->workflowAssembler = new WorkflowAssembler($this->container);
+        $this->workflowAssembler = new WorkflowAssembler($container);
     }
 
     private function createWorkflow(): Workflow
@@ -117,11 +114,11 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $steps = $this->expectStepAssemblerCalls($configuration, $attributes);
 
         // Assemble transition
-        $transitions = ['test_transition' => $this->getTransitionMock(false, 'test_transition')];
+        $transitions = ['test_transition' => $this->getTransition(false, 'test_transition')];
         if (!$startStep) {
-            $transitions['test_start_transition'] = $this->getTransitionMock(true, 'test_start_transition');
+            $transitions['test_start_transition'] = $this->getTransition(true, 'test_start_transition');
         } else {
-            $transitions['__start__'] = $this->getTransitionMock(true, '__start__');
+            $transitions['__start__'] = $this->getTransition(true, '__start__');
             $workflowDefinition->setStartStep($startStep);
         }
 
@@ -330,7 +327,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         WorkflowDefinition $workflowDefinition,
         array $configuration
     ): ArrayCollection {
-        $attributes = new ArrayCollection(['test' => $this->getAttributeMock('test')]);
+        $attributes = new ArrayCollection(['test' => $this->getAttribute('test')]);
 
         $this->attributeAssembler->expects($this->once())
             ->method('assemble')
@@ -376,7 +373,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         return 'Start ' . $workflowLabel;
     }
 
-    private function getTransitionMock(string $isStart, string $name): Transition
+    private function getTransition(string $isStart, string $name): Transition
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
@@ -389,7 +386,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         return $transition;
     }
 
-    private function getAttributeMock(string$name): Attribute
+    private function getAttribute(string $name): Attribute
     {
         $attributeMock = $this->createMock(Attribute::class);
         $attributeMock->expects($this->any())
@@ -406,7 +403,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
     ): ArrayCollection {
         $transitions = new ArrayCollection(
             $transitions
-                ?: ['test_transition' => $this->getTransitionMock(false, 'test_transition')]
+                ?: ['test_transition' => $this->getTransition(false, 'test_transition')]
         );
 
         $this->transitionAssembler->expects($this->once())

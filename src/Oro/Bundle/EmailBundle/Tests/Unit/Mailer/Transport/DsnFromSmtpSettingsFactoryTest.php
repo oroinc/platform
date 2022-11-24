@@ -17,9 +17,6 @@ class DsnFromSmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider createReturnsDsnWithSmtpsWhenEncryptionTlsDataProvider
-     *
-     * @param string|null $smtpEncryption
-     * @param Dsn $expectedDsn
      */
     public function testCreateReturnsDsnWithSmtpsWhenEncryptionTls(?string $smtpEncryption, Dsn $expectedDsn): void
     {

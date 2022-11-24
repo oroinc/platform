@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData;
+use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData;
+use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
@@ -20,9 +23,9 @@ class EntityDataControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
-            'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData',
-            'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData',
-            'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData'
+            LoadUserData::class,
+            LoadRoleData::class,
+            LoadBusinessUnitData::class
         ]);
     }
 
@@ -192,15 +195,14 @@ class EntityDataControllerTest extends WebTestCase
     }
 
     /**
-     * @param string $className
-     * @param string $field
-     * @param mixed $reference
-     * @param int $responseCode
-     *
      * @dataProvider setAssociationDataProvider
      */
-    public function testAssociationFieldPatch($className, $field, $reference, $responseCode)
-    {
+    public function testAssociationFieldPatch(
+        string $className,
+        string $field,
+        string|array $reference,
+        int $responseCode
+    ) {
         /** @var User $user */
         $user = $this->getReference('simple_user');
         $classNameSafe = $this->getContainer()
@@ -241,7 +243,7 @@ class EntityDataControllerTest extends WebTestCase
             $accessor = PropertyAccess::createPropertyAccessor();
 
             if (is_array($reference)) {
-                $this->assertEquals(count($reference), count($accessor->getValue($object, $field)));
+                $this->assertSameSize($reference, $accessor->getValue($object, $field));
             } else {
                 $this->assertEquals($reference->getId(), $accessor->getValue($object, $field)->getId());
             }
@@ -255,41 +257,30 @@ class EntityDataControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @param string $url
-     * @param string $content
-     */
-    private function sendPatch($url, $content)
+    private function sendPatch(string $url, string $content): void
     {
         $this->client->request('PATCH', $url, [], [], [], $content);
     }
 
-    /**
-     * @param object $entity
-     */
-    private function refreshEntity($entity)
+    private function refreshEntity(object  $entity): void
     {
-        /** @var ManagerRegistry $registry */
-        $registry = $this->getContainer()->get('doctrine');
-
-        $registry->getManager()->clear();
-        $registry->getManager()->find(get_class($entity), $entity->getId());
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine->getManager()->clear();
+        $doctrine->getManager()->find(get_class($entity), $entity->getId());
     }
 
-    /**
-     * @return array
-     */
-    public function setAssociationDataProvider()
+    public function setAssociationDataProvider(): array
     {
         return [
             'entity many to many' => [
-                'Oro\Bundle\UserBundle\Entity\User',
+                User::class,
                 'userRoles',
                 ['ROLE_TEST_1', 'ROLE_TEST_2'],
                 Response::HTTP_OK
             ],
             'entity many to one' => [
-                'Oro\Bundle\UserBundle\Entity\User',
+                User::class,
                 'owner',
                 'TestBusinessUnit',
                 Response::HTTP_OK

@@ -109,13 +109,9 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @param mixed  $expected
-     *
      * @dataProvider targetJoinAliasProvider
      */
-    public function testGetTargetJoinAlias($className, $fieldName, $expected)
+    public function testGetTargetJoinAlias(string $className, string $fieldName, mixed $expected)
     {
         if (is_array($expected)) {
             [$exception, $message] = $expected;

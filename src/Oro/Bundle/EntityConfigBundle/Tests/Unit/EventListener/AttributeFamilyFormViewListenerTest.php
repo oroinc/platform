@@ -11,9 +11,6 @@ use Twig\Environment;
 
 class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
     /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $environment;
 
@@ -22,8 +19,8 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($id) {
                 return $id . '.trans';
@@ -31,7 +28,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->environment = $this->createMock(Environment::class);
 
-        $this->listener = new AttributeFamilyFormViewListener($this->translator);
+        $this->listener = new AttributeFamilyFormViewListener($translator);
     }
 
     public function onEditDataProvider(): array
@@ -60,11 +57,8 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onEditDataProvider
-     *
-     * @param string $templateData
-     * @param array $expectedScrollData
      */
-    public function testOnEdit($templateData, array $expectedScrollData)
+    public function testOnEdit(string $templateData, array $expectedScrollData)
     {
         $formView = new FormView();
         $this->environment->expects($this->once())

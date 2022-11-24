@@ -18,10 +18,7 @@ class OptionValueBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $optionValueBag->buildValue());
     }
 
-    /**
-     * @return array
-     */
-    public function buildValueProvider()
+    public function buildValueProvider(): array
     {
         return [
             'empty value' => [

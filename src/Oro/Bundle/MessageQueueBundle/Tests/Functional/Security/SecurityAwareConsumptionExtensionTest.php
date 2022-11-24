@@ -8,7 +8,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor;
+use Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic;
 
 class SecurityAwareConsumptionExtensionTest extends WebTestCase
 {
@@ -31,7 +31,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     public function testWithValidToken(): void
     {
         $serializedToken = 'organizationId=1;userId=1;userClass=Oro\\Bundle\\UserBundle\\Entity\\User;roles=';
-        $sentMessage = self::sendMessage(BasicMessageProcessor::TEST_TOPIC, $this->createMessage($serializedToken));
+        $sentMessage = self::sendMessage(BasicMessageTestTopic::getName(), $this->createMessage($serializedToken));
 
         self::consume();
 
@@ -40,11 +40,11 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
 
     public function testWithInvalidToken(): void
     {
-        self::sendMessage(BasicMessageProcessor::TEST_TOPIC, $this->createMessage('Invalid token;'));
+        self::sendMessage(BasicMessageTestTopic::getName(), $this->createMessage('Invalid token;'));
 
         // This message stop consumer using an extension LimitConsumedMessagesExtension
         // and checks whether the consumer continues to work after an unsuccessful deserialization of the token
-        self::sendMessage(BasicMessageProcessor::TEST_TOPIC, 'message');
+        self::sendMessage(BasicMessageTestTopic::getName(), ['message' => 'message']);
 
         $this->expectException(InvalidSecurityTokenException::class);
         $this->expectExceptionMessage('Security token is invalid');
@@ -58,6 +58,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     {
         $message = new Message();
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
+        $message->setBody([]);
 
         return $message;
     }

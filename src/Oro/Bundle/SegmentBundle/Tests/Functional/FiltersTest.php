@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Tests\Functional\Fixtures\Filters\FixtureInterface;
 use Oro\Bundle\SegmentBundle\Tests\Functional\Fixtures\Filters\ToManyToManyContainsAndContains;
@@ -25,7 +24,7 @@ class FiltersTest extends WebTestCase
      */
     public function testCases(FixtureInterface $case)
     {
-        $em = $this->getEntityManager();
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(Segment::class);
         $case->createData($em);
         $segment = $case->createSegment($em);
         $em->flush();
@@ -40,21 +39,12 @@ class FiltersTest extends WebTestCase
         $case->assert($this, $result['data']);
     }
 
-    public function casesProvider()
+    public function casesProvider(): array
     {
         return [
             [new ToManyToManyContainsAndContains()],
             [new ToManyToManyContainsAndNotAnyOf()],
             [new ToManyToOneEqualAndEqual()],
         ];
-    }
-
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
-    {
-        return self::getContainer()->get('doctrine')
-            ->getManagerForClass(Segment::class);
     }
 }

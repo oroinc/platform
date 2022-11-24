@@ -27,7 +27,7 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         parent::setUp();
     }
 
-    public function testFormShouldBeSubmittendAndViewShouldContainsRouteParameters(): void
+    public function testFormShouldBeSubmittedAndViewShouldContainsRouteParameters(): void
     {
         $email = new Email();
         $email->setEntityClass('entityClass_param');
@@ -83,9 +83,9 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $emailAddressRecipients = new EmailAddressRecipientsType($this->configManager);
 

@@ -35,12 +35,9 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Price $price
-     * @param array $options
-     * @param string $expected
      * @dataProvider formatCurrencyDataProvider
      */
-    public function testFormatCurrency(Price $price, array $options, $expected)
+    public function testFormatCurrency(Price $price, array $options, string $expected)
     {
         $this->formatter->expects($this->once())
             ->method('formatCurrency')
@@ -64,7 +61,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             '$1,234.5' => [
-                'price' => new Price(1234.5, 'USD'),
+                'price' => new Price(),
                 'options' => [
                     'attributes' => ['grouping_size' => 3],
                     'textAttributes' => ['grouping_separator_symbol' => ','],

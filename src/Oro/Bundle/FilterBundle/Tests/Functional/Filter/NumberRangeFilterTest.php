@@ -15,8 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class NumberRangeFilterTest extends WebTestCase
 {
-    /** @var NumberRangeFilter */
-    private $filter;
+    private NumberRangeFilter $filter;
 
     protected function setUp(): void
     {
@@ -78,7 +77,7 @@ class NumberRangeFilterTest extends WebTestCase
         self::assertSame($expectedResult, $result);
     }
 
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'BETWEEN x AND y'        => [

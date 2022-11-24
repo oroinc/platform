@@ -95,9 +95,8 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        $treeProviderMock = $this->createMock(OwnerTreeProvider::class);
-
-        $treeProviderMock->expects($this->any())
+        $treeProvider = $this->createMock(OwnerTreeProvider::class);
+        $treeProvider->expects($this->any())
             ->method('getTree')
             ->willReturn($this->tree);
 
@@ -105,7 +104,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
-            $treeProviderMock,
+            $treeProvider,
             new ObjectIdAccessor($this->doctrineHelper),
             $entityOwnerAccessor,
             $this->metadataProvider,
@@ -704,8 +703,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->expects(self::once())
             ->method('get')
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
         $this->assertEquals(
             [
@@ -1215,8 +1213,8 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         bool $isProtectedEntity,
         bool $expected
     ) {
-        $entityClassResolverMock = $this->createMock(EntityClassResolver::class);
-        $entityClassResolverMock->expects($isEntity ? $this->once() : $this->never())
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $entityClassResolver->expects($isEntity ? $this->once() : $this->never())
             ->method('getEntityClass')
             ->with($class)
             ->willReturn($class);
@@ -1230,7 +1228,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($this->doctrineHelper),
-            $entityClassResolverMock,
+            $entityClassResolver,
             $entityMetadataProvider,
             $this->metadataProvider,
             new EntityOwnerAccessor($this->metadataProvider, $this->inflector),
@@ -1358,8 +1356,8 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function getPermissionManager(): PermissionManager
     {
-        $mock = $this->createMock(PermissionManager::class);
-        $mock->expects($this->any())
+        $permissionManager = $this->createMock(PermissionManager::class);
+        $permissionManager->expects($this->any())
             ->method('getPermissionsMap')
             ->willReturn([
                 'VIEW'   => 1,
@@ -1370,7 +1368,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'PERMIT' => 6
             ]);
 
-        return $mock;
+        return $permissionManager;
     }
 
     private function buildTree()

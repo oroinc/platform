@@ -45,7 +45,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testGetDescription($key, $value)
+    public function testGetDescription(string $key, mixed $value)
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
@@ -82,7 +82,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testUpdateCascadeValue($key, $value)
+    public function testUpdateCascadeValue(string $key, mixed $value)
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
@@ -112,7 +112,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testNoRelationAlert($key, $value)
+    public function testNoRelationAlert(string $key, mixed $value)
     {
         $this->initializeQuery($key, $value);
         $this->connection->expects($this->once())
@@ -150,12 +150,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->execute($logger);
     }
 
-    /**
-     * @param $key
-     * @param $value
-     * @return Statement|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function setUpConnection($key, $value)
+    private function setUpConnection(string $key, mixed $value): Statement|\PHPUnit\Framework\MockObject\MockObject
     {
         $this->connection->expects($this->once())
             ->method('convertToPHPValue')
@@ -193,10 +188,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         return $statement;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return [
             [
@@ -210,11 +202,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
-    private function initializeQuery($key, $value)
+    private function initializeQuery(string $key, mixed $value): void
     {
         $this->query = new UpdateEntityConfigQuery(
             TestEntity1::class,

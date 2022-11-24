@@ -217,7 +217,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getItem')
             ->with('test1.2rest')
             ->willReturn($this->cacheItem);
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('set')
             ->with([null, $data]);
         $this->cache->expects(self::once())
@@ -241,7 +241,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getItem')
             ->with('test1.2rest')
             ->willReturn($this->cacheItem);
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('set')
             ->with([$timestamp, $data]);
         $this->cache->expects(self::once())

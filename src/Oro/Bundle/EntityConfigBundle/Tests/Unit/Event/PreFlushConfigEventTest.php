@@ -53,7 +53,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFieldConfigDataProvider
      */
-    public function testIsFieldConfig($configId, $expectedResult)
+    public function testIsFieldConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult)
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);
@@ -74,7 +74,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $event->isFieldConfig());
     }
 
-    public function isFieldConfigDataProvider()
+    public function isFieldConfigDataProvider(): array
     {
         return [
             [new EntityConfigId('scope1', 'Test\Entity'), false],
@@ -85,7 +85,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityConfigDataProvider
      */
-    public function testIsEntityConfig($configId, $expectedResult)
+    public function testIsEntityConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult)
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);
@@ -106,7 +106,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $event->isEntityConfig());
     }
 
-    public function isEntityConfigDataProvider()
+    public function isEntityConfigDataProvider(): array
     {
         return [
             [new EntityConfigId('scope1', 'Test\Entity'), true],

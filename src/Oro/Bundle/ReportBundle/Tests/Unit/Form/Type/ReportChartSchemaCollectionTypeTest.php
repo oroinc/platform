@@ -16,9 +16,6 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
     /** @var ReportChartSchemaCollectionType */
     private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
     protected function setUp(): void
     {
         $chartConfigs = [
@@ -33,17 +30,17 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
             ]
         ];
 
-        $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->configProvider->expects($this->any())
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects($this->any())
             ->method('getChartNames')
             ->willReturn(array_keys($chartConfigs));
-        $this->configProvider->expects($this->any())
+        $configProvider->expects($this->any())
             ->method('getChartConfig')
             ->willReturnCallback(function ($name) use ($chartConfigs) {
                 return $chartConfigs[$name];
             });
 
-        $this->type = new ReportChartSchemaCollectionType($this->configProvider);
+        $this->type = new ReportChartSchemaCollectionType($configProvider);
 
         parent::setUp();
     }
@@ -54,9 +51,9 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $manager = $this->createMock(QueryDesignerManager::class);
         $translator = $this->createMock(TranslatorInterface::class);

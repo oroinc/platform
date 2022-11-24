@@ -40,7 +40,7 @@ class EntitiesControllerTest extends WebTestCase
         $this->assertResponseStatusCodeEquals($response, 200);
     }
 
-    public function relationsProvider()
+    public function relationsProvider(): array
     {
         return [
             'unidirectional many-to-many'                => ['uniM2MNDTargets'],

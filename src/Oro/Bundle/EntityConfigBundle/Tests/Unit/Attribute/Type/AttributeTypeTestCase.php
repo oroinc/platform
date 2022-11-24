@@ -52,19 +52,12 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
             );
     }
 
-    /**
-     * @return AttributeTypeInterface
-     */
-    abstract protected function getAttributeType();
+    abstract protected function getAttributeType(): AttributeTypeInterface;
 
     /**
      * @dataProvider configurationMethodsDataProvider
-     *
-     * @param bool $isSearchable
-     * @param bool $isFilterable
-     * @param bool $isSortable
      */
-    public function testConfigurationMethods($isSearchable, $isFilterable, $isSortable)
+    public function testConfigurationMethods(bool $isSearchable, bool $isFilterable, bool $isSortable)
     {
         $type = $this->getAttributeType();
 
@@ -73,8 +66,5 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isSortable, $type->isSortable($this->attribute));
     }
 
-    /**
-     * @return array|\Generator
-     */
-    abstract public function configurationMethodsDataProvider();
+    abstract public function configurationMethodsDataProvider(): array;
 }

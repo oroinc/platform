@@ -16,7 +16,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadManager */
+    /** @var EmailThreadManager */
     private $emailThreadManager;
 
     /** @var array */
@@ -221,10 +221,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param object $entity
-     */
-    private function getThreadEmails($entity)
+    private function getThreadEmails(object $entity): array
     {
         return array_merge(
             [$entity],
@@ -234,13 +231,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $value
-     * @param string $key
-     *
-     * @return mixed
-     */
-    private function findFixtureBy($value, $key)
+    private function findFixtureBy(?string $value, string $key): mixed
     {
         if (array_key_exists($key, $this->fixtures) && array_key_exists($value, $this->fixtures[$key])) {
             return $this->fixtures[$key][$value];

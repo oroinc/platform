@@ -237,12 +237,7 @@ class ExtendConfigProcessor
         $this->configManager->persist($extendConfig);
     }
 
-    /**
-     * @param string $className
-     * @param array  $configs
-     * @throws \LogicException
-     */
-    protected function updateEntityModel($className, array $configs)
+    protected function updateEntityModel(string $className, array $configs): void
     {
         $this->logger->info(
             sprintf('Update entity "%s".', $className),
@@ -252,9 +247,8 @@ class ExtendConfigProcessor
         $hasChanges = $this->updateConfigs($configs, $className);
 
         if ($hasChanges) {
-            $extendConfigProvider = $this->configManager->getProvider('extend');
-            $extendConfig         = $extendConfigProvider->getConfig($className);
-            if (!$extendConfig->is('state', ExtendScope::STATE_UPDATE)) {
+            $extendConfig = $this->configManager->getProvider('extend')->getConfig($className);
+            if ($extendConfig->is('is_extend') && !$extendConfig->is('state', ExtendScope::STATE_UPDATE)) {
                 $extendConfig->set('state', ExtendScope::STATE_UPDATE);
                 $this->configManager->persist($extendConfig);
             }

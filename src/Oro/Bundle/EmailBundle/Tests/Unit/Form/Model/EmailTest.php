@@ -12,11 +12,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expectedValue
      */
-    public function testSettersAndGetters($property, $value, $expectedValue = null)
+    public function testSettersAndGetters(string $property, mixed $value, mixed $expectedValue = null)
     {
         if (!$expectedValue) {
             $expectedValue = $value;

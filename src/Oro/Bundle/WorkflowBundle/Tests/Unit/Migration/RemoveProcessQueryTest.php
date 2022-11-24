@@ -21,11 +21,9 @@ class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|string[] $names
-     * @param mixed $expectedParams
-     * @dataProvider testCases
+     * @dataProvider dataProvider
      */
-    public function testUp($names, $expectedParams)
+    public function testUp(string|array $names, array $expectedParams)
     {
         $this->connector->expects($this->once())
             ->method('executeQuery')
@@ -41,10 +39,7 @@ class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
         $removeProcessQuery->execute($this->logger);
     }
 
-    /**
-     * @return array
-     */
-    public function testCases()
+    public function dataProvider(): array
     {
         return [
             [

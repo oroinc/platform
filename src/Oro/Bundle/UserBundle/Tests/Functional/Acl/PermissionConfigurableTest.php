@@ -3,13 +3,11 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Acl;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
 class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -22,113 +20,112 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurablePermissionCapabilitiesProvider()
+    public function configurablePermissionCapabilitiesProvider(): array
     {
-        yield 'default false' => [
-            'config' => [
-                'default' => [
-                    'default' => false
-                ]
-            ],
-            'action' => 'action:test_action',
-            'expected' => false
-        ];
-
-        yield 'allow configure permission on test_action' => [
-            'config' => [
-                'default' => [
-                    'default' => false,
-                    'capabilities' => [
-                        'test_action' => true
+        return [
+            'default false' => [
+                'config' => [
+                    'default' => [
+                        'default' => false
                     ]
-                ]
+                ],
+                'action' => 'action:test_action',
+                'expected' => false
             ],
-            'action' => 'action:test_action',
-            'expected' => true
-        ];
-
-        yield 'disallow configure permission on test_action' => [
-            'config' => [
-                'default' => [
-                    'default' => true,
-                    'capabilities' => [
-                        'test_action' => false
+            'allow configure permission on test_action' => [
+                'config' => [
+                    'default' => [
+                        'default' => false,
+                        'capabilities' => [
+                            'test_action' => true
+                        ]
                     ]
-                ]
+                ],
+                'action' => 'action:test_action',
+                'expected' => true
             ],
-            'action' => 'action:test_action',
-            'expected' => false
+            'disallow configure permission on test_action' => [
+                'config' => [
+                    'default' => [
+                        'default' => true,
+                        'capabilities' => [
+                            'test_action' => false
+                        ]
+                    ]
+                ],
+                'action' => 'action:test_action',
+                'expected' => false
+            ]
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function configurablePermissionEntitiesProvider()
+    public function configurablePermissionEntitiesProvider(): array
     {
-        yield 'default false' => [
-            'config' => [
-                'default' => [
-                    'default' => false
-                ]
+        return [
+            'default false' => [
+                'config' => [
+                    'default' => [
+                        'default' => false
+                    ]
+                ],
+                'assertGridData' => function (array $gridData) {
+                    $this->assertEmpty($gridData);
+                }
             ],
-            'assertGridData' => function (array $gridData) {
-                $this->assertEmpty($gridData);
-            }
-        ];
-
-        yield 'default true' => [
-            'config' => [
-                'default' => [
-                    'default' => true
-                ]
+            'default true' => [
+                'config' => [
+                    'default' => [
+                        'default' => true
+                    ]
+                ],
+                'assertGridData' => function (array $gridData) {
+                    $this->assertNotEmpty($gridData);
+                }
             ],
-            'assertGridData' => function (array $gridData) {
-                $this->assertNotEmpty($gridData);
-            }
-        ];
-
-        yield 'enable create permission' => [
-            'config' => [
-                'default' => [
-                    'default' => false,
-                    'entities' => [
-                        TestActivity::class => [
-                            'CREATE' => true
+            'enable create permission' => [
+                'config' => [
+                    'default' => [
+                        'default' => false,
+                        'entities' => [
+                            TestActivity::class => [
+                                'CREATE' => true
+                            ]
                         ]
                     ]
-                ]
+                ],
+                'assertGridData' => function (array $gridData) {
+                    $this->assertCount(1, $gridData);
+                    $this->assertHasEntityPermission($gridData, TestActivity::class, 'CREATE');
+                    $this->assertNotHasEntityPermission($gridData, TestActivity::class, 'VIEW');
+                }
             ],
-            'assertGridData' => function (array $gridData) {
-                $this->assertCount(1, $gridData);
-                $this->assertHasEntityPermission($gridData, TestActivity::class, 'CREATE');
-                $this->assertNotHasEntityPermission($gridData, TestActivity::class, 'VIEW');
-            }
-        ];
-
-        yield 'disable create permission' => [
-            'config' => [
-                'default' => [
-                    'default' => true,
-                    'entities' => [
-                        TestActivity::class => [
-                            'CREATE' => false
+            'disable create permission' => [
+                'config' => [
+                    'default' => [
+                        'default' => true,
+                        'entities' => [
+                            TestActivity::class => [
+                                'CREATE' => false
+                            ]
                         ]
                     ]
-                ]
-            ],
-            'assertGridData' => function (array $gridData) {
-                $this->assertNotEmpty($gridData);
-                $this->assertHasEntityPermission($gridData, TestActivity::class, 'VIEW');
-                $this->assertNotHasEntityPermission($gridData, TestActivity::class, 'CREATE');
-            }
+                ],
+                'assertGridData' => function (array $gridData) {
+                    $this->assertNotEmpty($gridData);
+                    $this->assertHasEntityPermission($gridData, TestActivity::class, 'VIEW');
+                    $this->assertNotHasEntityPermission($gridData, TestActivity::class, 'CREATE');
+                }
+            ]
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getRole()
+    protected function getRole(): AbstractRole
     {
         return $this->getReference(LoadUserACLData::ROLE_SYSTEM);
     }
@@ -136,7 +133,7 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getGridName()
+    protected function getGridName(): string
     {
         return 'role-permission-grid';
     }
@@ -144,7 +141,7 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getRouteName()
+    protected function getRouteName(): string
     {
         return 'oro_user_role_view';
     }

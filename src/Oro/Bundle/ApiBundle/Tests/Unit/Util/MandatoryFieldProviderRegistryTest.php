@@ -7,13 +7,9 @@ use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderInterface;
 use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Container\ContainerInterface;
 
 class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|MandatoryFieldProviderInterface */
     private $provider1;
 
@@ -28,7 +24,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->provider1 = $this->createMock(MandatoryFieldProviderInterface::class);
         $this->provider2 = $this->createMock(MandatoryFieldProviderInterface::class);
 
-        $this->container = TestContainerBuilder::create()
+        $container = TestContainerBuilder::create()
             ->add('provider1', $this->provider1)
             ->add('provider2', $this->provider2)
             ->getContainer($this);
@@ -38,7 +34,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
                 ['provider1', 'json_api'],
                 ['provider2', null]
             ],
-            $this->container,
+            $container,
             new RequestExpressionMatcher()
         );
     }

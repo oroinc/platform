@@ -82,12 +82,7 @@ class QueryExecutorTest extends OrmTestCase
         self::assertEquals([['id' => 1, 'name' => 'test']], $result);
     }
 
-    /**
-     * @param Query $query
-     *
-     * @return mixed
-     */
-    public function executeQuery(Query $query)
+    public function executeQuery(Query $query): mixed
     {
         return $query->execute();
     }

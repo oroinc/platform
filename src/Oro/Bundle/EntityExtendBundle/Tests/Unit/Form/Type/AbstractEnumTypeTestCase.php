@@ -269,23 +269,14 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    /**
-     * @param AbstractEnumType $type
-     * @param OptionsResolver $resolver
-     * @param $enumCode
-     * @param bool $multiple
-     * @param bool $expanded
-     * @param array $options
-     * @return array
-     */
     protected function doTestConfigureOptions(
         AbstractEnumType $type,
         OptionsResolver $resolver,
-        $enumCode,
-        $multiple = false,
-        $expanded = false,
+        string $enumCode,
+        bool $multiple = false,
+        bool $expanded = false,
         array $options = []
-    ) {
+    ): array {
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
         // AbstractEnumType require class to be instance of AbstractEnumValue
@@ -335,59 +326,21 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         return $resolvedOptions;
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    protected function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(
-            [
-                'multiple' => false,
-                'expanded' => false
-            ]
-        );
+        $resolver->setDefaults([
+            'multiple' => false,
+            'expanded' => false
+        ]);
 
         return $resolver;
     }
 
-    /**
-     * @param mixed                                         $entity
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEventMock($entity = null, $form = null)
-    {
-        if (!$form) {
-            $form = $this->createMock(FormInterface::class);
-        }
-        $rootForm = $this->createMock(FormInterface::class);
-
-        $form->expects($this->once())
-            ->method('getRoot')
-            ->willReturn($rootForm);
-        $rootForm->expects($this->once())
-            ->method('getData')
-            ->willReturn($entity);
-
-        $event = $this->createMock(FormEvent::class);
-        $event->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form);
-
-        return $event;
-    }
-
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $parentForm
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
     protected function expectFormWillReturnParentForm(
-        \PHPUnit\Framework\MockObject\MockObject $form,
-        \PHPUnit\Framework\MockObject\MockObject $parentForm = null
-    ) {
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject $parentForm = null
+    ): FormInterface|\PHPUnit\Framework\MockObject\MockObject {
         if (!$parentForm) {
             $parentForm = $this->createMock(FormInterface::class);
         }
@@ -399,26 +352,19 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         return $parentForm;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     * @param mixed $data
-     */
-    protected function expectFormWillReturnData(\PHPUnit\Framework\MockObject\MockObject $form, $data)
-    {
+    protected function expectFormWillReturnData(
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
+        mixed $data
+    ): void {
         $form->expects($this->once())
             ->method('getData')
             ->willReturn($data);
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $formConfig
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
     protected function expectFormWillReturnFormConfig(
-        \PHPUnit\Framework\MockObject\MockObject $form,
-        \PHPUnit\Framework\MockObject\MockObject $formConfig = null
-    ) {
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
+        FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig = null
+    ): FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject {
         if (!$formConfig) {
             $formConfig = $this->createMock(FormConfigInterface::class);
         }
@@ -433,13 +379,13 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     protected function expectFormConfigWillReturnOptions(
         \PHPUnit\Framework\MockObject\MockObject $formConfig,
         array $optionsValueMap
-    ) {
+    ): void {
         $formConfig->expects($this->atLeastOnce())
             ->method('getOption')
             ->willReturnMap($optionsValueMap);
     }
 
-    protected function setExpectationsForLoadDefaultEnumValues(string $enumValueClassName, array $defaultValues)
+    protected function setExpectationsForLoadDefaultEnumValues(string $enumValueClassName, array $defaultValues): void
     {
         $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects($this->once())

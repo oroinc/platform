@@ -54,16 +54,11 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider formRenderDataProvider
-     * @param array $groupsData
-     * @param array $scrollData
-     * @param string $templateHtml
-     * @param array $expectedData
-     * @param array $formViewChildren
      */
     public function testFormRender(
         array $groupsData,
         array $scrollData,
-        $templateHtml,
+        string $templateHtml,
         array $expectedData,
         array $formViewChildren
     ) {
@@ -119,7 +114,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $data = [
+        return [
             'empty group not added' => [
                 'groupsData' => [
                     ['group' => $group1, 'attributes' => []]
@@ -285,21 +280,15 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
                 'formViewChildren' => ['someField' => (new FormView())->setRendered()],
             ]
         ];
-
-        return $data;
     }
 
     /**
      * @dataProvider viewListDataProvider
-     * @param array $groupsData
-     * @param array $scrollData
-     * @param string $templateHtml
-     * @param array $expectedData
      */
     public function testViewList(
         array $groupsData,
         array $scrollData,
-        $templateHtml,
+        string $templateHtml,
         array $expectedData
     ) {
         $entity = $this->getEntity(TestActivityTarget::class, [

@@ -46,10 +46,7 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($container->getDefinition('oro_theme.twig.extension'));
     }
 
-    /**
-     * @return array
-     */
-    public function loadDataProvider()
+    public function loadDataProvider(): array
     {
         return [
             'basic' => [

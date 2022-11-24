@@ -52,7 +52,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function onNavigationConfigureProvider()
+    public function onNavigationConfigureProvider(): array
     {
         $factory = $this->createMock(FactoryInterface::class);
 
@@ -61,170 +61,163 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
                 new ConfigureMenuEvent(
                     $factory,
                     $this->addChildren(
-                        new MenuItem('root', $factory),
+                        $this->getMenuItem('root', $factory),
                         [
-                            new MenuItem('child1', $factory),
+                            $this->getMenuItem('child1', $factory),
                             // unclickable menu with enabled item
                             $this->addChildren(
-                                (new MenuItem('child2', $factory))
-                                    ->setUri('#'),
+                                $this->getMenuItem('child2', $factory, '#'),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('enabled', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('enabled', $factory),
                                 ]
                             ),
                             // unclickable menu with enabled item with ' > ' delimiter
                             $this->addChildren(
-                                (new MenuItem('child2_1', $factory))
-                                    ->setUri('#'),
+                                $this->getMenuItem('child2_1', $factory, '#'),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('enabled', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('enabled', $factory),
                                 ]
                             ),
                             // clickable menu with enabled item
                             $this->addChildren(
-                                new MenuItem('child2_2', $factory),
+                                $this->getMenuItem('child2_2', $factory),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('enabled', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('enabled', $factory),
                                 ]
                             ),
                             // clickable menu with enabled item with ' > ' delimiter
                             $this->addChildren(
-                                new MenuItem('child2_3', $factory),
+                                $this->getMenuItem('child2_3', $factory),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('enabled', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('enabled', $factory),
                                 ]
                             ),
                             // unclickable menu without enabled item
                             $this->addChildren(
-                                (new MenuItem('child3', $factory))
-                                    ->setUri('#'),
+                                $this->getMenuItem('child3', $factory, '#'),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('disabled2', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('disabled2', $factory),
                                 ]
                             ),
                             // unclickable menu without enabled item with ' > ' delimiter
                             $this->addChildren(
-                                (new MenuItem('child3_1', $factory))
-                                    ->setUri('#'),
+                                $this->getMenuItem('child3_1', $factory, '#'),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('disabled2', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('disabled2', $factory),
                                 ]
                             ),
                             // clickable menu without enabled item
                             $this->addChildren(
-                                new MenuItem('child3_2', $factory),
+                                $this->getMenuItem('child3_2', $factory),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('disabled2', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('disabled2', $factory),
                                 ]
                             ),
                             // clickable menu without enabled item with ' > ' delimiter
                             $this->addChildren(
-                                new MenuItem('child3_3', $factory),
+                                $this->getMenuItem('child3_3', $factory),
                                 [
-                                    new MenuItem('disabled', $factory),
-                                    new MenuItem('disabled2', $factory),
+                                    $this->getMenuItem('disabled', $factory),
+                                    $this->getMenuItem('disabled2', $factory),
                                 ]
                             )
                         ]
                     )
                 ),
                 $this->addChildren(
-                    new MenuItem('root', $factory),
+                    $this->getMenuItem('root', $factory),
                     [
-                        new MenuItem('child1', $factory),
+                        $this->getMenuItem('child1', $factory),
                         // unclickable menu with enabled item
                         $this->addChildren(
-                            (new MenuItem('child2', $factory))
-                                ->setUri('#'),
+                            $this->getMenuItem('child2', $factory, '#'),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                new MenuItem('enabled', $factory),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('enabled', $factory),
                             ]
                         ),
                         // unclickable menu with enabled item with ' > ' delimiter
                         $this->addChildren(
-                            (new MenuItem('child2_1', $factory))
-                                ->setUri('#'),
+                            $this->getMenuItem('child2_1', $factory, '#'),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                new MenuItem('enabled', $factory),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('enabled', $factory),
                             ]
                         ),
                         // clickable menu with enabled item
                         $this->addChildren(
-                            new MenuItem('child2_2', $factory),
+                            $this->getMenuItem('child2_2', $factory),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                new MenuItem('enabled', $factory),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('enabled', $factory),
                             ]
                         ),
                         // clickable menu with enabled item with ' > ' delimiter
                         $this->addChildren(
-                            new MenuItem('child2_3', $factory),
+                            $this->getMenuItem('child2_3', $factory),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                new MenuItem('enabled', $factory),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('enabled', $factory),
                             ]
                         ),
                         // unclickable menu without enabled item
                         $this->addChildren(
-                            (new MenuItem('child3', $factory))
-                                ->setUri('#')
-                                ->setDisplay(false),
+                            $this->getMenuItem('child3', $factory, '#', false),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                (new MenuItem('disabled2', $factory))
-                                    ->setDisplay(false),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('disabled2', $factory, null, false),
                             ]
                         ),
                         // unclickable menu without enabled item with ' > ' delimiter
                         $this->addChildren(
-                            (new MenuItem('child3_1', $factory))
-                                ->setUri('#')
-                                ->setDisplay(false),
+                            $this->getMenuItem('child3_1', $factory, '#', false),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                (new MenuItem('disabled2', $factory))
-                                    ->setDisplay(false),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('disabled2', $factory, null, false),
                             ]
                         ),
                         // clickable menu without enabled item
                         $this->addChildren(
-                            new MenuItem('child3_2', $factory),
+                            $this->getMenuItem('child3_2', $factory),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                (new MenuItem('disabled2', $factory))
-                                    ->setDisplay(false),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('disabled2', $factory, null, false),
                             ]
                         ),
                         // clickable menu without enabled item with ' > ' delimiter
                         $this->addChildren(
-                            new MenuItem('child3_3', $factory),
+                            $this->getMenuItem('child3_3', $factory),
                             [
-                                (new MenuItem('disabled', $factory))
-                                    ->setDisplay(false),
-                                (new MenuItem('disabled2', $factory))
-                                    ->setDisplay(false),
+                                $this->getMenuItem('disabled', $factory, null, false),
+                                $this->getMenuItem('disabled2', $factory, null, false),
                             ]
                         )
                     ]
                 )
             ],
         ];
+    }
+
+    private function getMenuItem(
+        string $name,
+        FactoryInterface $factory,
+        ?string $uri = null,
+        bool $display = true
+    ): MenuItem {
+        $item = new MenuItem($name, $factory);
+        if (null !== $uri) {
+            $item->setUri($uri);
+        }
+        $item->setDisplay($display);
+
+        return $item;
     }
 
     private function addChildren(MenuItem $item, array $children): MenuItem

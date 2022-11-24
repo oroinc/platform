@@ -49,13 +49,6 @@ class SmtpSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isEligibleDataProvider
-     *
-     * @param string|null $host
-     * @param string|int|null $port
-     * @param string|null $encryption
-     * @param string|null $user
-     * @param string|null $password
-     * @param bool $expected
      */
     public function testIsEligible(
         ?string $host,

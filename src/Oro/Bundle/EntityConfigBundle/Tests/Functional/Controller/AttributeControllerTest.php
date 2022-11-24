@@ -28,9 +28,6 @@ class AttributeControllerTest extends AbstractConfigControllerTest
         self::assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
-    /**
-     * @return array
-     */
     public function fieldTypesProvider(): array
     {
         return [
@@ -51,7 +48,6 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
     /**
      * @dataProvider fieldTypesProvider
-     * @param string $fieldType
      */
     public function testCreateSimple(string $fieldType): void
     {
@@ -209,9 +205,7 @@ class AttributeControllerTest extends AbstractConfigControllerTest
             'className' => TestActivityTarget::class,
         ]);
 
-        $fieldConfigRepository = $configManager->getRepository(FieldConfigModel::class);
-
-        return $fieldConfigRepository->findOneBy([
+        return $configManager->getRepository(FieldConfigModel::class)->findOneBy([
             'entity' => $entityConfigModel,
             'fieldName' => $name,
         ]);
@@ -219,9 +213,8 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
     private function getFieldConfigByName(string $name, string $scope): ConfigInterface
     {
-        $configManager = self::getContainer()->get('oro_entity_config.config_manager');
-
-        return $configManager->getFieldConfig($scope, TestActivityTarget::class, $name);
+        return self::getContainer()->get('oro_entity_config.config_manager')
+            ->getFieldConfig($scope, TestActivityTarget::class, $name);
     }
 
     /**

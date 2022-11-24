@@ -6,26 +6,14 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
 class PostSerializeHandlerTest extends EntitySerializerTestCase
 {
-    /**
-     * @param array $item
-     * @param array $context
-     *
-     * @return array
-     */
-    public function postSerializeCallback(array $item, array $context)
+    public function postSerializeCallback(array $item, array $context): array
     {
         $item['additional'] = sprintf('%s_additional[%s]', $item['name'] ?? '', $context['key']);
 
         return $item;
     }
 
-    /**
-     * @param array $items
-     * @param array $context
-     *
-     * @return array
-     */
-    public function postSerializeCollectionCallback(array $items, array $context)
+    public function postSerializeCollectionCallback(array $items, array $context): array
     {
         $ids = [];
         foreach ($items as $item) {

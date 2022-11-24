@@ -200,7 +200,7 @@ HU:
 ID:
     format: '%name%\n%organization%\n%street%\n%city% %postal_code%\n%region%\n%country%\n%phone%'
 IE:
-    format: '%name%\n%organization%\n%street%\n%city%\n%region%\n%country%\n%phone%'
+    format: '%name%\n%organization%\n%street%\n%city%\n%region%\n%postal_code%\n%country%\n%phone%'
     region_name_type: county
 IL:
     format: '%name%\n%organization%\n%street%\n%city% %postal_code%\n%country%\n%phone%'

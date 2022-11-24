@@ -74,12 +74,9 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $password
-     * @param string $accessToken
-     *
      * @dataProvider setDataProviderSmtpConfiguredSuccess
      */
-    public function testIsSmtpConfiguredSuccess($password, $accessToken)
+    public function testIsSmtpConfiguredSuccess(string $password, string $accessToken)
     {
         $origin = new UserEmailOrigin();
         $origin->setSmtpHost('host');
@@ -92,10 +89,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($origin->isSmtpConfigured());
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProviderSmtpConfiguredSuccess()
+    public function setDataProviderSmtpConfiguredSuccess(): array
     {
         return [
             'empty token' => [
@@ -130,17 +124,16 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $host
-     * @param int $port
-     * @param string $user
-     * @param string $password
-     * @param string $accessToken
-     * @param bool $expectedResult
-     *
      * @dataProvider setDataProviderImapConfigured
      */
-    public function testIsImapConfigured($host, $port, $user, $password, $accessToken, $expectedResult)
-    {
+    public function testIsImapConfigured(
+        ?string $host,
+        ?int $port,
+        ?string $user,
+        string $password,
+        string $accessToken,
+        bool $expectedResult
+    ) {
         $origin = new UserEmailOrigin();
         $origin->setImapHost($host);
         $origin->setImapPort($port);
@@ -152,10 +145,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $origin->isImapConfigured());
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProviderImapConfigured()
+    public function setDataProviderImapConfigured(): array
     {
         return [
             'empty host' => [

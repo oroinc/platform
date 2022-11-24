@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Functional\Controller\Api;
 
+use Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures\LoadCommentData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class RestApiTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures\LoadCommentData']);
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures([LoadCommentData::class]);
     }
 
     public function testCget()
@@ -82,7 +83,7 @@ class RestApiTest extends WebTestCase
         $this->assertCount(1, $result['data']);
     }
 
-    public function testPost()
+    public function testPost(): array
     {
         $request = [
             'message'       => 'test message',
@@ -124,12 +125,8 @@ class RestApiTest extends WebTestCase
 
     /**
      * @depends testPost
-     *
-     * @param array $request
-     *
-     * @return array $request
      */
-    public function testPut($request)
+    public function testPut(array $request): int
     {
         $request['message'] = 'new message';
 
@@ -156,10 +153,8 @@ class RestApiTest extends WebTestCase
 
     /**
      * @depends testPut
-     *
-     * @param int $id
      */
-    public function testGet($id)
+    public function testGet(int $id): int
     {
         $this->client->request(
             'GET',
@@ -176,10 +171,8 @@ class RestApiTest extends WebTestCase
 
     /**
      * @depends testGet
-     *
-     * @param int $id
      */
-    public function testDelete($id)
+    public function testDelete(int $id)
     {
         $this->client->request(
             'DELETE',
@@ -193,8 +186,6 @@ class RestApiTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        $result   = $this->assertEmptyResponseStatusCodeEquals($response, 204);
-
-        $this->assertEmpty($result);
+        $this->assertEmptyResponseStatusCodeEquals($response, 204);
     }
 }

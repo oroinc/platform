@@ -54,9 +54,6 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /**
-     * Set mapping config parameters
-     */
     public function testSetMappingConfig()
     {
         $query = new Query();
@@ -98,19 +95,13 @@ class QueryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForClearString
-     *
-     * @param string $textToClear
-     * @param string $expected
      */
-    public function testClearString($textToClear, $expected)
+    public function testClearString(string $textToClear, string $expected)
     {
         $this->assertEquals($expected, Query::clearString($textToClear));
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForClearString()
+    public function dataProviderForClearString(): array
     {
         return [
             ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],

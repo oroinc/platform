@@ -65,11 +65,8 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
 
     /**
      * @dataProvider verifyFailures
-     *
-     * @param string $exceptionMessage
-     * @param TransitionEventTrigger $trigger
      */
-    public function testVerifyTriggerException($exceptionMessage, TransitionEventTrigger $trigger)
+    public function testVerifyTriggerException(string $exceptionMessage, TransitionEventTrigger $trigger)
     {
         $this->expectException(TransitionTriggerVerifierException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -77,10 +74,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
         $this->verifier->verifyTrigger($trigger);
     }
 
-    /**
-     * @return array
-     */
-    public function verifyFailures()
+    public function verifyFailures(): array
     {
         return [
             'other' => [
@@ -91,7 +85,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
             'variable' => [
                 'Requirement field: "e.a < a.b" - syntax error: ' .
                 '"Variable "e" is not valid around position 1 for expression `e.a < a.b`. ' .
-                "Did you mean \"wd\"?\". " .
+                'Did you mean "wd"?". ' .
                 'Valid context variables are: ' .
                 'wd [Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition], ' .
                 'wi [Oro\Bundle\WorkflowBundle\Entity\WorkflowItem], ' .
@@ -102,14 +96,11 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
         ];
     }
 
-    /**
-     * @param null|string $require
-     * @param string $entity
-     * @param string $workflowEntity
-     * @return TransitionEventTrigger
-     */
-    private function buildEventTriggerWithExpression($require, $entity, $workflowEntity)
-    {
+    private function buildEventTriggerWithExpression(
+        ?string $require,
+        string $entity,
+        string $workflowEntity
+    ): TransitionEventTrigger {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity($workflowEntity);
 

@@ -44,22 +44,22 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
     public function testExecute()
     {
         $instance = new ActionGroupExecutionArgs('test_action_group', ['arg1' => 'val1']);
-        $mockRegistry = $this->createMock(ActionGroupRegistry::class);
-        $mockActionGroup = $this->createMock(ActionGroup::class);
+        $registry = $this->createMock(ActionGroupRegistry::class);
+        $actionGroup = $this->createMock(ActionGroup::class);
 
-        $mockRegistry->expects($this->once())
+        $registry->expects($this->once())
             ->method('get')
             ->with('test_action_group')
-            ->willReturn($mockActionGroup);
+            ->willReturn($actionGroup);
 
         $errorsCollection = new ArrayCollection();
 
-        $mockActionGroup->expects($this->once())
+        $actionGroup->expects($this->once())
             ->method('execute')
             ->with(new ActionData(['arg1' => 'val1']), $errorsCollection)
             ->willReturn('ok');
 
-        $this->assertEquals('ok', $instance->execute($mockRegistry, $errorsCollection));
+        $this->assertEquals('ok', $instance->execute($registry, $errorsCollection));
     }
 
     public function provideParameters(): array

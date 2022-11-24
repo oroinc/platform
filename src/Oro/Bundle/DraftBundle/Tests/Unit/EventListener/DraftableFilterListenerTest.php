@@ -17,9 +17,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    private DraftableFilterListener $listener;
+    /** @var DraftableFilterListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -151,14 +153,9 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
         return $filters;
     }
 
-    /**
-     * @param int $id
-     * @param FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters
-     * @param DraftableInterface|null $expectedEntity
-     */
     private function mockEntityManager(
         int $id,
-        FilterCollection $filters,
+        FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters,
         DraftableInterface $expectedEntity = null
     ): void {
         $repository = $this->createMock(EntityRepository::class);

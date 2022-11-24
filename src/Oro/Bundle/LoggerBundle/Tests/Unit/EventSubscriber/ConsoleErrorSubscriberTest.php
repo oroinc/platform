@@ -81,9 +81,6 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array|\string[][]
-     */
     public function commandDataProvider(): array
     {
         return [

@@ -15,9 +15,9 @@ class TransitionTriggersUpdateDeciderTest extends \PHPUnit\Framework\TestCase
     {
         $decider = new TransitionTriggersUpdateDecider();
 
-        list($expectedToAdd, $expectedToRemove) = $expected;
+        [$expectedToAdd, $expectedToRemove] = $expected;
 
-        list($retrievedToAdd, $retrievedToRemove) = $decider->decide($existing, $new);
+        [$retrievedToAdd, $retrievedToRemove] = $decider->decide($existing, $new);
 
         $this->assertSame(
             $expectedToAdd,
@@ -31,10 +31,7 @@ class TransitionTriggersUpdateDeciderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function decideData()
+    public function decideData(): array
     {
         $cron1type1 = (new TransitionCronTrigger())->setCron('* * * * *');
         $cron2type2 = (new TransitionCronTrigger())->setCron('1 * * * *');

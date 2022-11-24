@@ -39,8 +39,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getItemsProvider
      */
-    public function testGetItems($type, $config, $expectedValues)
-    {
+    public function testGetItems(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getItems($type);
 
@@ -50,8 +53,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRequiredPropertyValuesProvider
      */
-    public function testGetRequiredPropertyValues($type, $config, $expectedValues)
-    {
+    public function testGetRequiredPropertyValues(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getRequiredPropertyValues($type);
 
@@ -63,8 +69,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNotAuditableValuesProvider
      */
-    public function testGetNotAuditableValues($type, $config, $expectedValues)
-    {
+    public function testGetNotAuditableValues(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getNotAuditableValues($type);
 
@@ -76,8 +85,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTranslatableValuesProvider
      */
-    public function testGetTranslatableValues($type, $config, $expectedValues)
-    {
+    public function testGetTranslatableValues(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getTranslatableValues($type);
 
@@ -89,8 +101,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getIndexedValuesProvider
      */
-    public function testGetIndexedValues($type, $config, $expectedValues)
-    {
+    public function testGetIndexedValues(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getIndexedValues($type);
 
@@ -102,8 +117,12 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormItemsProvider
      */
-    public function testGetFormItems($type, $fieldType, $config, $expectedValues)
-    {
+    public function testGetFormItems(
+        string|EntityConfigId|FieldConfigId $type,
+        ?string $fieldType,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormItems($type, $fieldType);
 
@@ -162,8 +181,12 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasFormProvider
      */
-    public function testHasForm($type, $fieldType, $config, $expectedValue)
-    {
+    public function testHasForm(
+        string|EntityConfigId|FieldConfigId $type,
+        ?string $fieldType,
+        array $config,
+        bool $expectedValue
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->hasForm($type, $fieldType);
 
@@ -175,8 +198,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormConfigProvider
      */
-    public function testGetFormConfig($type, $config, $expectedValues)
-    {
+    public function testGetFormConfig(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormConfig($type);
 
@@ -186,8 +212,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormBlockConfigProvider
      */
-    public function testGetFormBlockConfig($type, $config, $expectedValues)
-    {
+    public function testGetFormBlockConfig(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        ?array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormBlockConfig($type);
 
@@ -197,8 +226,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getGridActionsProvider
      */
-    public function testGetGridActions($type, $config, $expectedValues)
-    {
+    public function testGetGridActions(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getGridActions($type);
 
@@ -208,8 +240,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLayoutActionsProvider
      */
-    public function testGetLayoutActions($type, $config, $expectedValues)
-    {
+    public function testGetLayoutActions(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getLayoutActions($type);
 
@@ -219,8 +254,11 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getJsModulesProvider
      */
-    public function testGetJsModules($type, $config, $expectedValues)
-    {
+    public function testGetJsModules(
+        string|EntityConfigId|FieldConfigId $type,
+        array $config,
+        array $expectedValues
+    ) {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getJsModules($type);
 
@@ -230,7 +268,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSchemaUpdateRequiredProvider
      */
-    public function testIsSchemaUpdateRequired($code, $type, $expected)
+    public function testIsSchemaUpdateRequired(string $code, string $type, bool $expected)
     {
         $config = [
             'entity' => [
@@ -270,7 +308,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getItemsProvider()
+    public function getItemsProvider(): array
     {
         return [
             'no entity config'         => [
@@ -316,41 +354,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function getItemsForDefaultValuesTest(): array
-    {
-        return [
-            'items' => [
-                'item1' => [
-                    'options' => [
-                        'default_value' => 'value1',
-                        'allowed_type'  => ['string']
-                    ]
-                ],
-                'item2' => [
-                    'options' => [
-                        'default_value' => 'value2',
-                    ]
-                ],
-                'item3' => [
-                    'options' => [
-                    ]
-                ],
-                'item4' => [
-                    'options' => [
-                        'default_value' => 'value4',
-                        'allowed_type'  => ['int']
-                    ]
-                ],
-                'item5' => [
-                    'options' => [
-                        'default_value' => 'value5',
-                    ]
-                ],
-            ]
-        ];
-    }
-
-    public function getRequiredPropertyValuesProvider()
+    public function getRequiredPropertyValuesProvider(): array
     {
         return [
             'no entity config'                     => [
@@ -423,7 +427,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getNotAuditableValuesProvider()
+    public function getNotAuditableValuesProvider(): array
     {
         return [
             'no entity config'      => [
@@ -494,7 +498,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getTranslatableValuesProvider()
+    public function getTranslatableValuesProvider(): array
     {
         return [
             'no entity config'      => [
@@ -557,7 +561,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getIndexedValuesProvider()
+    public function getIndexedValuesProvider(): array
     {
         return [
             'no entity config'      => [
@@ -631,7 +635,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFormItemsProvider()
+    public function getFormItemsProvider(): array
     {
         return [
             'no entity config'                        => [
@@ -852,7 +856,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function hasFormProvider()
+    public function hasFormProvider(): array
     {
         return [
             'no entity config'                        => [
@@ -954,7 +958,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFormConfigProvider()
+    public function getFormConfigProvider(): array
     {
         return [
             'no entity config'                     => [
@@ -1052,7 +1056,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFormBlockConfigProvider()
+    public function getFormBlockConfigProvider(): array
     {
         return [
             'no entity config'                        => [
@@ -1158,7 +1162,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getGridActionsProvider()
+    public function getGridActionsProvider(): array
     {
         return [
             'no entity config'                           => [
@@ -1288,7 +1292,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getLayoutActionsProvider()
+    public function getLayoutActionsProvider(): array
     {
         return [
             'no entity config'                      => [
@@ -1418,7 +1422,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getJsModulesProvider()
+    public function getJsModulesProvider(): array
     {
         return [
             'no entity config'                      => [
@@ -1545,7 +1549,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isSchemaUpdateRequiredProvider()
+    public function isSchemaUpdateRequiredProvider(): array
     {
         return [
             ['testAttr1', PropertyConfigContainer::TYPE_ENTITY, true],

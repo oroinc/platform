@@ -31,12 +31,12 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
      */
     public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
     {
-        $mockActionGroup = $this->createMock(ActionGroup::class);
-        $mockActionGroup->expects($this->once())
+        $actionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup->expects($this->once())
             ->method('getParameters')
             ->willReturn($parameters);
 
-        $this->resolver->resolve($data, $mockActionGroup);
+        $this->resolver->resolve($data, $actionGroup);
 
         $this->assertEquals($data, $expected);
     }
@@ -100,28 +100,25 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         array $exception,
         array $expectedErrors
     ) {
-        $mockActionGroup = $this->createMock(ActionGroup::class);
-
-        $mockActionGroup->expects($this->once())
-            ->method('getParameters')
-            ->willReturn($parameters);
-
-        $mockDefinition = $this->createMock(ActionGroupDefinition::class);
-
-        $mockActionGroup->expects($this->once())
-            ->method('getDefinition')
-            ->willReturn($mockDefinition);
-
-        $mockDefinition->expects($this->once())
+        $definition = $this->createMock(ActionGroupDefinition::class);
+        $definition->expects($this->once())
             ->method('getName')
             ->willReturn('testActionGroup');
+
+        $actionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($parameters);
+        $actionGroup->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         [$exceptionType, $exceptionMessage] = $exception;
 
         $errors = new ArrayCollection([]);
 
         try {
-            $this->resolver->resolve($data, $mockActionGroup, $errors);
+            $this->resolver->resolve($data, $actionGroup, $errors);
         } catch (\Exception $exception) {
             $this->assertInstanceOf($exceptionType, $exception);
             $this->assertEquals($exceptionMessage, $exception->getMessage());

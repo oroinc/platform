@@ -8,12 +8,8 @@ class ColorUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider shadeColorProvider
-     *
-     * @param string $color
-     * @param float $shade
-     * @param string $expectedColor
      */
-    public function testShadeColor($color, $shade, $expectedColor)
+    public function testShadeColor(string $color, float $shade, string $expectedColor)
     {
         $this->assertEquals($expectedColor, ColorUtils::shadeColor($color, $shade));
     }
@@ -33,12 +29,8 @@ class ColorUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider insertShadeColorsProvider
-     *
-     * @param mixed $colors
-     * @param int $nbShades
-     * @param string[] $expectedColors
      */
-    public function testInsertShadeColors($colors, $nbShades, $expectedColors)
+    public function testInsertShadeColors(array|string $colors, int $nbShades, array|string $expectedColors)
     {
         $shadeColors = ColorUtils::insertShadeColors($colors, $nbShades, 0.2);
         $this->assertEquals($expectedColors, $shadeColors);

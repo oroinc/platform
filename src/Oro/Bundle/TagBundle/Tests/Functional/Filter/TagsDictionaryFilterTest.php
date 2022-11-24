@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Functional\Filter;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserTags;
+use Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -16,8 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class TagsDictionaryFilterTest extends WebTestCase
 {
-    /** @var DictionaryFilter */
-    private $filter;
+    private TagsDictionaryFilter $filter;
 
     protected function setUp(): void
     {
@@ -31,7 +30,13 @@ class TagsDictionaryFilterTest extends WebTestCase
      */
     public function testFilter(callable $filterFormData, array $expectedResult): void
     {
-        $qb = $this->createQueryBuilder('u');
+        /** @var EntityRepository $repo */
+        $repo = $this->getContainer()->get('doctrine')->getRepository(User::class);
+        $qb = $repo->createQueryBuilder('u')
+            ->select('u.username')
+            ->where('u.username IN (:usernames)')
+            ->setParameter('usernames', ['u1', 'u2', 'u3'])
+            ->orderBy('u.username');
         $ds = new OrmFilterDatasourceAdapter($qb);
 
         $filterForm = $this->filter->getForm();
@@ -48,10 +53,7 @@ class TagsDictionaryFilterTest extends WebTestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'Filter "is any of"' => [
@@ -83,13 +85,7 @@ class TagsDictionaryFilterTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param int $type
-     * @param string $reference
-     *
-     * @return \Closure
-     */
-    private function getFilterFormDataCallback($type, $reference = null): \Closure
+    private function getFilterFormDataCallback(int|string $type, ?string $reference = null): callable
     {
         return function () use ($type, $reference) {
             return [
@@ -97,24 +93,5 @@ class TagsDictionaryFilterTest extends WebTestCase
                 'value' => $reference ? [$this->getReference($reference)->getId()] : null,
             ];
         };
-    }
-
-    /**
-     * @param string $alias
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($alias): QueryBuilder
-    {
-        $doctrine = $this->getContainer()->get('doctrine');
-
-        $qb = $doctrine->getManagerForClass(User::class)
-            ->getRepository(User::class)
-            ->createQueryBuilder($alias);
-
-        return $qb->select($alias . '.username')
-            ->orderBy($alias . '.username')
-            ->andWhere(
-                $qb->expr()->in($alias . '.username', ['u1', 'u2', 'u3'])
-            );
     }
 }

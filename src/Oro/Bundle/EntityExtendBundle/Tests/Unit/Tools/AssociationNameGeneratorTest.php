@@ -17,7 +17,7 @@ class AssociationNameGeneratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function getMethodNamesProvider()
+    public static function getMethodNamesProvider(): array
     {
         return [
             ['generateSupportTargetMethodName', null, 'supportTarget'],

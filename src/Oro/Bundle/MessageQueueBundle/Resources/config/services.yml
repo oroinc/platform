@@ -1,6 +1,5 @@
 parameters:
     oro_message_queue.maintenance.idle_time: 5
-    oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
 
 services:
     oro_message_queue.consumption.extensions:
@@ -45,10 +44,10 @@ services:
     oro_message_queue.consumption.interrupt_consumption_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
         arguments:
-            - '%oro_message_queue.consumption.interrupt_filepath%'
+            - '@oro_message_queue.interrupt_consumption.cache'
             - '@oro_message_queue.consumption.cache_state'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }
 
     oro_message_queue.consumption.consumer_heartbeat_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'
@@ -119,9 +118,9 @@ services:
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
         arguments:
-            - '%oro_message_queue.consumption.interrupt_filepath%'
+            - '@oro_message_queue.interrupt_consumption.cache'
         tags:
-            - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
+            - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'onSchemaUpdate' }
 
     oro_message_queue.consumption.cache_state:
         class: Oro\Bundle\MessageQueueBundle\Consumption\CacheState
@@ -187,4 +186,9 @@ services:
     oro_message_queue.topic.registry:
         class: Oro\Component\MessageQueue\Topic\TopicRegistry
         arguments:
-            - !tagged_locator { tag: oro_message_queue.topic, index_by: topicName, default_index_method: getName }
+            - ~ # Service locator for topics. It sets by Oro\Bundle\MessageQueueBundle\DependencyInjection\BuildTopicMetaRegistryPass
+
+    oro_message_queue.interrupt_consumption.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_message_queue_interrupt_consumption' }

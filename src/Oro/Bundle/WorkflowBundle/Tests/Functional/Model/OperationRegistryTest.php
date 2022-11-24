@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -45,11 +46,7 @@ class OperationRegistryTest extends WebTestCase
     public function testFindWithDisablingFromWorkflows()
     {
         $operations = $this->operationRegistry->find(
-            new OperationFindCriteria(
-                'Oro\Bundle\TestFrameworkBundle\Entity\Item',
-                'test_operation_route',
-                'test_operation_datagrid'
-            )
+            new OperationFindCriteria(Item::class, 'test_operation_route', 'test_operation_datagrid')
         );
 
         $this->assertCount(1, $operations);
@@ -67,10 +64,7 @@ class OperationRegistryTest extends WebTestCase
         $this->getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    /**
-     * @return array
-     */
-    private function getOperationsConfig()
+    private function getOperationsConfig(): array
     {
         $config = Yaml::parse(file_get_contents(__DIR__ . '/../DataFixtures/config/oro/actions.yml')) ?: [];
 

@@ -277,12 +277,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    /**
-     * @param $scope
-     * @param PropertyConfigContainer $propertyConfig
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigProvider
-     */
-    private function configureProvider($scope, PropertyConfigContainer $propertyConfig)
+    private function configureProvider(string $scope, PropertyConfigContainer $propertyConfig): ConfigProvider
     {
         $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())

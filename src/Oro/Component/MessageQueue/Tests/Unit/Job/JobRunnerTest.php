@@ -1301,10 +1301,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($this->jobRunner, $jobRunnerForChildJob);
     }
 
-    /**
-     * @return array
-     */
-    public function resultSuccessDataProvider()
+    public function resultSuccessDataProvider(): array
     {
         return [
             'bool' => [true],
@@ -1316,10 +1313,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function resultFailedDataProvider()
+    public function resultFailedDataProvider(): array
     {
         return [
             'bool' => [false],

@@ -19,18 +19,14 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
  */
 class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    private PropertyAccessor $propertyAccessor;
 
     protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    /**
-     * @return array
-     */
-    public function getPathsWithUnexpectedType()
+    public function getPathsWithUnexpectedType(): array
     {
         return [
             ['', 'foobar'],
@@ -44,10 +40,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getPathsWithMissingProperty()
+    public function getPathsWithMissingProperty(): array
     {
         return [
             [(object)['firstName' => 'John'], 'lastName'],
@@ -66,10 +59,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getPathsWithMissingIndex()
+    public function getPathsWithMissingIndex(): array
     {
         return [
             [['firstName' => 'John'], 'lastName'],
@@ -82,22 +72,16 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
-     * @param object|array $objectOrArray
-     * @param string $path
-     * @param mixed $value
      */
-    public function testGetValue($objectOrArray, $path, $value)
+    public function testGetValue(object|array $objectOrArray, string $path, mixed $value)
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
-     * @param object|array $objectOrArray
-     * @param string $path
-     * @param mixed $value
      */
-    public function testGetValueWhenIndexExceptionsDisabled($objectOrArray, $path, $value)
+    public function testGetValueWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path, mixed $value)
     {
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
@@ -111,10 +95,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
+    public function testGetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
@@ -122,11 +104,11 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
-    {
+    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled(
+        object|array $objectOrArray,
+        string $path
+    ) {
         // When exceptions are disabled, non-existing indices can be read. In this case, null is returned
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path));
@@ -134,10 +116,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testGetValueThrowsExceptionIfIndexNotFound($objectOrArray, $path)
+    public function testGetValueThrowsExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
@@ -192,10 +172,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
+    public function testGetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
@@ -224,10 +202,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testSetValue($objectOrArray, $path)
+    public function testSetValue(object|array $objectOrArray, string $path)
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -244,10 +220,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testSetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
+    public function testSetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
@@ -255,10 +229,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testSetValueThrowsNoExceptionIfIndexNotFound($objectOrArray, $path)
+    public function testSetValueThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -267,11 +239,11 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
-    {
+    public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled(
+        object|array $objectOrArray,
+        string $path
+    ) {
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -333,10 +305,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
+    public function testSetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
@@ -346,10 +316,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValidPropertyPathsForRemove
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testRemove($objectOrArray, $path)
+    public function testRemove(object|array $objectOrArray, string $path)
     {
         $this->propertyAccessor->remove($objectOrArray, $path);
 
@@ -376,10 +344,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testRemoveThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
+    public function testRemoveThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->remove($objectOrArray, $path);
@@ -387,10 +353,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testRemoveThrowsNoExceptionIfIndexNotFound($objectOrArray, $path)
+    public function testRemoveThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
     {
         $clone = unserialize(serialize($objectOrArray));
 
@@ -484,10 +448,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testRemoveThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
+    public function testRemoveThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
@@ -512,20 +474,16 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadable($objectOrArray, $path)
+    public function testIsReadable(object|array $objectOrArray, string $path)
     {
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadableWhenIndexExceptionsDisabled($objectOrArray, $path)
+    public function testIsReadableWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
@@ -533,20 +491,16 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    public function testIsReadableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadableReturnsFalseIfIndexNotFound($objectOrArray, $path)
+    public function testIsReadableReturnsFalseIfIndexNotFound(object|array $objectOrArray, string $path)
     {
         // Non-existing indices cannot be read
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
@@ -554,11 +508,11 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
-    {
+    public function testIsReadableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled(
+        object|array $objectOrArray,
+        string $path
+    ) {
         // When exceptions are disabled, non-existing indices can be read.
         // In this case, null is returned by getValue method
         $this->propertyAccessor = new PropertyAccessor(false, true);
@@ -584,40 +538,32 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsReadableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
+    public function testIsReadableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getValidPropertyPaths
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsWritable($objectOrArray, $path)
+    public function testIsWritable(object|array $objectOrArray, string $path)
     {
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsWritableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    public function testIsWritableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsWritableReturnsTrueIfIndexNotFound($objectOrArray, $path)
+    public function testIsWritableReturnsTrueIfIndexNotFound(object|array $objectOrArray, string $path)
     {
         // Non-existing indices can be written. Arrays are created on-demand.
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
@@ -625,11 +571,11 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
-    {
+    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled(
+        object|array $objectOrArray,
+        string $path
+    ) {
         // Non-existing indices can be written even if exceptions are enabled
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
@@ -654,18 +600,13 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @param object|array $objectOrArray
-     * @param string $path
      */
-    public function testIsWritableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
+    public function testIsWritableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    /**
-     * @return array
-     */
-    public function getValidPropertyPaths()
+    public function getValidPropertyPaths(): array
     {
         return [
             [['John', 'Doo'], '0', 'John'],
@@ -716,10 +657,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getValidPropertyPathsWhenIndexExceptionsDisabled()
+    public function getValidPropertyPathsWhenIndexExceptionsDisabled(): array
     {
         return array_merge(
             $this->getValidPropertyPaths(),
@@ -738,10 +676,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getValidPropertyPathsForRemove()
+    public function getValidPropertyPathsForRemove(): array
     {
         return [
             [['John', 'Doo'], '0'],

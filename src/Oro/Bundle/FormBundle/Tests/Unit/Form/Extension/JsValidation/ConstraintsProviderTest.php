@@ -16,11 +16,14 @@ use Symfony\Component\Validator\Mapping\PropertyMetadata;
 
 class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private MetadataFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $metadataFactory;
+    /** @var MetadataFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadataFactory;
 
-    private ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject $constraintConverter;
+    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintConverter;
 
-    private ConstraintsProvider $constraintsProvider;
+    /** @var ConstraintsProvider */
+    private $constraintsProvider;
 
     protected function setUp(): void
     {
@@ -35,10 +38,6 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getFormConstraintsDataProvider
-     *
-     * @param FormInterface $formView
-     * @param array $expectGetMetadata
-     * @param array $expectedConstraints
      */
     public function testGetFormConstraints(
         FormInterface $formView,
@@ -71,8 +70,6 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function getFormConstraintsDataProvider(): array
     {

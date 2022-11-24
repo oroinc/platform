@@ -10,7 +10,6 @@ use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Container\ContainerInterface;
 
 class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,9 +18,6 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $transformer2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverRegistry */
     private $entityIdResolverRegistry;
@@ -34,7 +30,8 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->transformer1 = $this->createMock(EntityIdTransformerInterface::class);
         $this->transformer2 = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdResolverRegistry = $this->createMock(EntityIdResolverRegistry::class);
-        $this->container = TestContainerBuilder::create()
+
+        $container = TestContainerBuilder::create()
             ->add('transformer1', $this->transformer1)
             ->add('transformer2', $this->transformer2)
             ->getContainer($this);
@@ -44,7 +41,7 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
                 ['transformer1', 'rest&!json_api'],
                 ['transformer2', 'json_api']
             ],
-            $this->container,
+            $container,
             new RequestExpressionMatcher(),
             $this->entityIdResolverRegistry
         );

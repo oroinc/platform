@@ -3,24 +3,21 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Async;
 
 use Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor;
+use Oro\Bundle\AttachmentBundle\Async\Topic\AttachmentRemoveImageTopic;
 use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imageRemovalManager;
+    private FileRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject $imageRemovalManager;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var ImageFileRemovalProcessor */
-    private $processor;
+    private ImageFileRemovalProcessor $processor;
 
     protected function setUp(): void
     {
@@ -38,22 +35,24 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         return $this->createMock(SessionInterface::class);
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
-        $this->assertEquals(['oro_attachment.remove_image'], ImageFileRemovalProcessor::getSubscribedTopics());
+        self::assertEquals([AttachmentRemoveImageTopic::getName()], ImageFileRemovalProcessor::getSubscribedTopics());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $message = new Message();
-        $message->setBody(JSON::encode([
-            [
-                'id' => 1,
-                'fileName' => '12345.jpg',
-                'originalFileName' => 'orig_name.jpg',
-                'parentEntityClass' => 'Test\Entity'
-            ]
-        ]));
+        $message->setBody([
+            'images' => [
+                [
+                    'id' => 1,
+                    'fileName' => '12345.jpg',
+                    'originalFileName' => 'orig_name.jpg',
+                    'parentEntityClass' => 'Test\Entity'
+                ],
+            ],
+        ]);
 
         $file = new FileModel();
         $file->setId(1);
@@ -62,27 +61,29 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass('Test\Entity');
         $file->setExtension('jpg');
 
-        $this->imageRemovalManager->expects($this->once())
+        $this->imageRemovalManager->expects(self::once())
             ->method('removeFiles')
             ->with($file);
 
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::ACK,
             $this->processor->process($message, $this->getSession())
         );
     }
 
-    public function testProcessException()
+    public function testProcessException(): void
     {
         $message = new Message();
-        $message->setBody(JSON::encode([
-            [
-                'id' => 2,
-                'fileName' => '12345.jpg',
-                'originalFileName' => 'orig_name.jpg',
-                'parentEntityClass' => 'Test\Entity'
-            ]
-        ]));
+        $message->setBody([
+            'images' => [
+                [
+                    'id' => 2,
+                    'fileName' => '12345.jpg',
+                    'originalFileName' => 'orig_name.jpg',
+                    'parentEntityClass' => 'Test\Entity'
+                ],
+            ],
+        ]);
 
         $file = new FileModel();
         $file->setId(2);
@@ -92,34 +93,36 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('jpg');
 
         $exception = new \RuntimeException('Error');
-        $this->imageRemovalManager->expects($this->once())
+        $this->imageRemovalManager->expects(self::once())
             ->method('removeFiles')
             ->with($file)
             ->willThrowException($exception);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('warning')
             ->with('Unable to remove image 12345.jpg', ['exception' => $exception]);
 
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::ACK,
             $this->processor->process($message, $this->getSession())
         );
     }
 
-    public function testProcessWithEmptyOriginalFileName()
+    public function testProcessWithEmptyOriginalFileName(): void
     {
         $fileName = '12345.jpg';
 
         $message = new Message();
-        $message->setBody(JSON::encode([
-            [
-                'id' => 2,
-                'fileName' => $fileName,
-                'originalFileName' => null,
-                'parentEntityClass' => 'Test\Entity'
-            ]
-        ]));
+        $message->setBody([
+            'images' => [
+                [
+                    'id' => 2,
+                    'fileName' => $fileName,
+                    'originalFileName' => $fileName,
+                    'parentEntityClass' => 'Test\Entity'
+                ],
+            ],
+        ]);
 
         $file = new FileModel();
         $file->setId(2);
@@ -128,36 +131,13 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass('Test\Entity');
         $file->setExtension('jpg');
 
-        $this->imageRemovalManager->expects($this->once())
+        $this->imageRemovalManager->expects(self::once())
             ->method('removeFiles')
             ->with($file);
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
 
-        $this->assertEquals(
-            MessageProcessorInterface::ACK,
-            $this->processor->process($message, $this->getSession())
-        );
-    }
-
-    public function testProcessWithInvalidMessage()
-    {
-        $message = new Message();
-        $message->setBody(JSON::encode([
-            [
-                'id' => 2,
-                'fileName' => null,
-                'originalFileName' => null,
-                'parentEntityClass' => 'Test\Entity'
-            ]
-        ]));
-
-        $this->imageRemovalManager->expects($this->never())
-            ->method('removeFiles');
-        $this->logger->expects($this->once())
-            ->method('warning');
-
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::ACK,
             $this->processor->process($message, $this->getSession())
         );

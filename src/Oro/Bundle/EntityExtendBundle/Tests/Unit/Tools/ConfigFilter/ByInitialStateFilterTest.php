@@ -34,10 +34,10 @@ class ByInitialStateFilterTest extends \PHPUnit\Framework\TestCase
                 ],
             ]
         );
-        $this->assertEquals($expectedResult, call_user_func($filter, $config));
+        $this->assertEquals($expectedResult, $filter($config));
     }
 
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             'active entity'                                              => [
@@ -133,32 +133,17 @@ class ByInitialStateFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $className
-     * @param mixed  $values
-     *
-     * @return ConfigInterface
-     */
-    protected function getEntityConfig($className, $values)
+    private function getEntityConfig(string $className, mixed $values): ConfigInterface
     {
-        $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
+        $config = new Config(new EntityConfigId('extend', $className));
         $config->setValues($values);
 
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param mixed  $values
-     *
-     * @return ConfigInterface
-     */
-    protected function getFieldConfig($className, $fieldName, $values)
+    private function getFieldConfig(string $className, string $fieldName, mixed $values): ConfigInterface
     {
-        $configId = new FieldConfigId('extend', $className, $fieldName);
-        $config   = new Config($configId);
+        $config = new Config(new FieldConfigId('extend', $className, $fieldName));
         $config->setValues($values);
 
         return $config;

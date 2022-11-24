@@ -12,14 +12,10 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
-    /**
-     * @var Processor
-     */
+    /** @var Processor */
     private $processor;
 
     protected function setUp(): void
@@ -192,57 +188,17 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'default' => [],
                 ],
             ],
-            'valid value conversion' => [
-                'configs' => [
-                    'filters' => [
-                        'columns' => [
-                            'sku' => [
-                                'type' => 'string',
-                                'data_name' => 'test',
-                                'force_like' => true,
-                                'value_conversion' => ['SomeClass', 'someCallbackMethod'],
-                                'min_length' => 3,
-                                'max_length' => 99,
-                            ],
-                        ],
-                    ],
-                ],
-                'expected' => [
-                    'columns' => [
-                        'sku' => [
-                            'type' => 'string',
-                            'data_name' => 'test',
-                            'renderable' => true,
-                            'visible' => true,
-                            'disabled' => false,
-                            'translatable' => true,
-                            'force_like' => true,
-                            'case_insensitive' => true,
-                            'value_conversion' => ['SomeClass', 'someCallbackMethod'],
-                            'min_length' => 3,
-                            'max_length' => 99,
-                        ],
-                    ],
-                    'default' => [],
-                ],
-            ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function processInvalidConfigurationStructure()
+    public function processInvalidConfigurationStructure(): array
     {
         return [
             ['filters' => ['asd' => 'asdaaa']],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function processInvalidConfigurationValues()
+    public function processInvalidConfigurationValues(): array
     {
         return [
             'invalid filter type' => [[

@@ -12,22 +12,22 @@ use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\AbstractType;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
 {
     /** @var NumberRangeFilterType */
     protected $type;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->type = new NumberRangeFilterType($translator);
 
-        $localeSettings = $this->createMockLocaleSettings();
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings->expects(self::any())
+            ->method('getLocale')
+            ->willReturn('en');
         $numberFormatter = new NumberFormatter(
             $localeSettings,
             new IntlNumberFormatterFactory($localeSettings)
@@ -45,23 +45,15 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
 
     /**
-     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
+     * {@inheritDoc}
      */
-    protected function createMockOptionsResolver()
-    {
-        return $this->createMock(OptionsResolver::class);
-    }
-
-    /**
-     * @return array
-     */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             [
@@ -84,10 +76,10 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'empty range' => [
@@ -182,15 +174,5 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
         ];
-    }
-
-    private function createMockLocaleSettings()
-    {
-        $localeSettings = $this->createMock(LocaleSettings::class);
-        $localeSettings->expects(self::any())
-            ->method('getLocale')
-            ->willReturn('en');
-
-        return $localeSettings;
     }
 }

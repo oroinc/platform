@@ -11,16 +11,22 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityManager|MockObject $em;
-    private Connection|MockObject$connection;
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-    private DataFixturesExecutor $dataFixturesExecutor;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    /** @var DataFixturesExecutor */
+    private $dataFixturesExecutor;
 
     protected function setUp(): void
     {
@@ -165,7 +171,6 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /** @covers ::execute() */
     public function testExecuteWithProgressCallback(): void
     {
         $fixtures = [
@@ -184,7 +189,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 
         $this->dataFixturesExecutor->execute($fixtures, 'test', $callback);
 
-        static::assertIsNumeric($resultMemory);
-        static::assertIsNumeric($resultDuration);
+        self::assertIsNumeric($resultMemory);
+        self::assertIsNumeric($resultDuration);
     }
 }

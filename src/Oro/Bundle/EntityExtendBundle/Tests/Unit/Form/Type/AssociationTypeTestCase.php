@@ -16,7 +16,7 @@ abstract class AssociationTypeTestCase extends AbstractConfigTypeTestCase
         parent::setUp();
     }
 
-    protected function setConfigProvidersForSubmitTest(array &$configProviders)
+    protected function setConfigProvidersForSubmitTest(array &$configProviders): void
     {
         parent::setConfigProvidersForSubmitTest($configProviders);
         $configProviders['grouping'] = $this->groupingConfigProvider;

@@ -21,7 +21,7 @@ use Oro\Bundle\FormBundle\Entity\PrimaryItem;
  */
 trait PrimaryAddressTestTrait
 {
-    private function removeAllAddressesExceptPrimary(Collection $addresses)
+    private function removeAllAddressesExceptPrimary(Collection $addresses): void
     {
         $toRemoveAddresses = [];
         /** @var AbstractAddress|PrimaryItem $address */
@@ -38,7 +38,7 @@ trait PrimaryAddressTestTrait
     /**
      * @param string[] $addressIds
      */
-    private function assertOneAndOnlyOneAddressIsPrimary(array $addressIds)
+    private function assertOneAndOnlyOneAddressIsPrimary(array $addressIds): void
     {
         $numberOfPrimaryAddresses = 0;
         /** @var AbstractAddress|PrimaryItem $address */

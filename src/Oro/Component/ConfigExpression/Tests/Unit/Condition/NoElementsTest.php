@@ -30,7 +30,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'not_empty_array' => [
@@ -100,7 +100,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -145,7 +145,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

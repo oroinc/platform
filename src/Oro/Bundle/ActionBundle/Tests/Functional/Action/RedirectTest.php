@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Action;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
@@ -23,9 +24,6 @@ class RedirectTest extends WebTestCase
     /** @var RouterInterface */
     private $router;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -34,22 +32,12 @@ class RedirectTest extends WebTestCase
         $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
         $this->router = $this->getContainer()->get('router');
 
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
-        ]);
+        $this->loadFixtures([LoadItems::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         $this->configModifier->resetCache();
-        unset(
-            $this->configProvider,
-            $this->configModifier,
-            $this->router
-        );
     }
 
     public function testExecuteWithURLConfig()
@@ -112,11 +100,6 @@ class RedirectTest extends WebTestCase
         ], $result);
     }
 
-    /**
-     * @param array $definition
-     *
-     * @throws \JsonException
-     */
     private function executeAction(array $definition): array
     {
         $config = [
@@ -140,7 +123,7 @@ class RedirectTest extends WebTestCase
 
         $item = $this->getReference(LoadItems::ITEM1);
         $operationName = 'oro_action_test_action';
-        $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\Item';
+        $entityClass = Item::class;
         $entityId = $item->getId();
         $this->client->request(
             'POST',

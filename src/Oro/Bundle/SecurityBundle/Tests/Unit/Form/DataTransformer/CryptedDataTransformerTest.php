@@ -13,14 +13,10 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
     private const ENCRYPTED_STRING = 'encryptedSample';
     private const DECRYPTED_STRING = 'sample';
 
-    /**
-     * @var CryptedDataTransformer
-     */
+    /** @var CryptedDataTransformer */
     private $transformer;
 
-    /**
-     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $crypter;
 
     protected function setUp(): void
@@ -33,11 +29,8 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param string|null $value
-     * @param string|null $expected
      */
-    public function testTransform($value, $expected)
+    public function testTransform(?string $value, ?string $expected)
     {
         $this->crypter->expects(self::any())
             ->method('decryptData')
@@ -49,10 +42,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             'when value is null' => [null, null],
@@ -75,11 +65,8 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param string|null $value
-     * @param string|null $expected
      */
-    public function testReverseTransform($value, $expected)
+    public function testReverseTransform(?string $value, ?string $expected)
     {
         $this->crypter->expects(self::any())
             ->method('encryptData')
@@ -91,10 +78,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'when value is null' => [null, null],

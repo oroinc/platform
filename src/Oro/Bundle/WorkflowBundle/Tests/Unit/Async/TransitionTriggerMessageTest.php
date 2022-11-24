@@ -54,12 +54,12 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
 
     private function getEventTrigger(int $id): BaseTransitionTrigger
     {
-        $mock = $this->createMock(BaseTransitionTrigger::class);
-        $mock->expects($this->any())
+        $transitionTrigger = $this->createMock(BaseTransitionTrigger::class);
+        $transitionTrigger->expects($this->any())
             ->method('getId')
             ->willReturn($id);
 
-        return $mock;
+        return $transitionTrigger;
     }
 
     private function getTransitionTriggerMessage(?int $triggerId, mixed $mainEntityId): TransitionTriggerMessage

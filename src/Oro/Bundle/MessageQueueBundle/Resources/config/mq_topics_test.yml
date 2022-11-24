@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic: ~
+    Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageTestTopic: ~
+    Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageDependentJobTestTopic: ~
+    Oro\Component\MessageQueue\Test\Async\Topic\UniqueJobTestTopic: ~
+
+    Oro\Bundle\MessageQueueBundle\Test\Async\Topic\ChangeConfigTestTopic: ~

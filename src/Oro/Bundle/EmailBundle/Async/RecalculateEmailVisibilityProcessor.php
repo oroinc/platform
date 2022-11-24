@@ -4,33 +4,38 @@ namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityChunkTopic;
 use Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
- * MQ processor that recalculates the visibility of email users where the email address is used.
+ * MQ processor that splits the email users ids for that
+ * the visibility of email users should be recalculated where the email address is used.
  */
 class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
+    private const CHUNK_SIZE = 500;
+
     private ManagerRegistry $doctrine;
-    private EmailAddressVisibilityManager $emailAddressVisibilityManager;
-    private ActivityListChainProvider $activityListProvider;
+    private JobRunner $jobRunner;
+    private MessageProducerInterface $producer;
 
     public function __construct(
         ManagerRegistry $doctrine,
-        EmailAddressVisibilityManager $emailAddressVisibilityManager,
-        ActivityListChainProvider $activityListProvider
+        JobRunner $jobRunner,
+        MessageProducerInterface $producer
     ) {
         $this->doctrine = $doctrine;
-        $this->emailAddressVisibilityManager = $emailAddressVisibilityManager;
-        $this->activityListProvider = $activityListProvider;
+        $this->jobRunner = $jobRunner;
+        $this->producer = $producer;
     }
 
     /**
@@ -48,62 +53,73 @@ class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, 
     {
         $data = $message->getBody();
 
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->doctrine->getManagerForClass(Email::class);
-        $publicEmailUserIds = [];
-        /** @var Email[] $emails */
-        $emails = $this->doctrine->getRepository(Email::class)->getEmailsByEmailAddress($data['email']);
-        foreach ($emails as $email) {
-            foreach ($email->getEmailUsers() as $emailUser) {
-                $this->emailAddressVisibilityManager->processEmailUserVisibility($emailUser);
-                if (!$emailUser->isEmailPrivate()) {
-                    $publicEmailUserIds[] = $emailUser->getId();
+        $emailAddress = $data['email'];
+
+        $jobName = sprintf('%s:%s', RecalculateEmailVisibilityTopic::getName(), md5($emailAddress));
+
+        $result = $this->jobRunner->runUnique(
+            $message->getMessageId(),
+            $jobName,
+            function (JobRunner $jobRunner) use ($jobName, $emailAddress) {
+                $chunkNumber = 1;
+                $chunks = $this->getChunks($emailAddress);
+                foreach ($chunks as $ids) {
+                    $this->scheduleRecalculateVisibilities(
+                        $jobRunner,
+                        $jobName,
+                        $ids,
+                        $chunkNumber
+                    );
+                    $chunkNumber++;
                 }
+
+                return true;
             }
-        }
-        $entityManager->flush();
+        );
 
-        if ($publicEmailUserIds) {
-            $this->processPublicEmailUsers($publicEmailUserIds, $entityManager);
-        }
-
-        return self::ACK;
+        return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * Adds activity lists for emails that become public.
-     *
-     * @param int[]                  $publicEmailUserIds
-     * @param EntityManagerInterface $entityManager
-     */
-    private function processPublicEmailUsers(array $publicEmailUserIds, EntityManagerInterface $entityManager): void
+    private function scheduleRecalculateVisibilities(
+        JobRunner $jobRunner,
+        string $jobName,
+        array $ids,
+        int $chunkNumber
+    ): void {
+        $jobRunner->createDelayed(
+            sprintf('%s:%d', $jobName, $chunkNumber),
+            function (JobRunner $jobRunner, Job $childJob) use ($ids) {
+                $this->producer->send(
+                    RecalculateEmailVisibilityChunkTopic::getName(),
+                    [
+                        'jobId' => $childJob->getId(),
+                        'ids'   => $ids
+                    ]
+                );
+            }
+        );
+    }
+
+    private function getChunks(string $emailAddress): iterable
     {
-        $hasChanges = false;
-        foreach ($publicEmailUserIds as $emailUserId) {
-            $emailUser = $entityManager->find(EmailUser::class, $emailUserId);
-            $activityList = $this->activityListProvider->getActivityListByEntity($emailUser, $entityManager);
-            if (null !== $activityList) {
-                continue;
-            }
-
-            $email = $emailUser->getEmail();
-            $activityList = $this->activityListProvider->getNewActivityList($email);
-            if (null === $activityList) {
-                continue;
-            }
-
-            $activityListProvider = $this->activityListProvider->getProviderForEntity($email);
-            $newActivityOwners = $activityListProvider->getActivityOwners($email, $activityList);
-            foreach ($newActivityOwners as $newOwner) {
-                $activityList->addActivityOwner($newOwner);
-            }
-            if ($activityListProvider->isActivityListApplicable($activityList)) {
-                $entityManager->persist($activityList);
-                $hasChanges = true;
+        /** @var EntityManagerInterface $em */
+        $iterator = new BufferedQueryResultIterator(
+            $this->doctrine->getRepository(Email::class)->getEmailUserIdsByEmailAddressQb($emailAddress)
+        );
+        $iterator->setBufferSize(self::CHUNK_SIZE);
+        $rowNumber = 0;
+        $resultIds = [];
+        foreach ($iterator as $row) {
+            $rowNumber++;
+            $resultIds[] = $row['id'];
+            if (($rowNumber % self::CHUNK_SIZE) === 0) {
+                yield $resultIds;
+                $resultIds = [];
             }
         }
-        if ($hasChanges) {
-            $entityManager->flush();
+
+        if (count($resultIds)) {
+            yield $resultIds;
         }
     }
 }

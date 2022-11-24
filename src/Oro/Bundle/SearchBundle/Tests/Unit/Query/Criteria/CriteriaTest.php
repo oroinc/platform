@@ -21,29 +21,24 @@ class CriteriaTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForExplodeFieldType
-     * @param string $field
-     * @param array  $expected
      */
-    public function testExplodeFieldType($field, array $expected)
+    public function testExplodeFieldType(string $field, array $expected)
     {
         $this->assertEquals($expected, Criteria::explodeFieldTypeName($field));
     }
 
     /**
      * @dataProvider dataProviderForSearchOperatorByComparisonOperator
-     * @param string $comparisionOperator
-     * @param string $expectedQueryOperator
      */
-    public function testGetSearchOperatorByComparisonOperator($comparisionOperator, $expectedQueryOperator)
-    {
-        $queryOperator = Criteria::getSearchOperatorByComparisonOperator($comparisionOperator);
+    public function testGetSearchOperatorByComparisonOperator(
+        string $comparisonOperator,
+        string $expectedQueryOperator
+    ) {
+        $queryOperator = Criteria::getSearchOperatorByComparisonOperator($comparisonOperator);
         $this->assertEquals($expectedQueryOperator, strtolower($queryOperator));
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForExplodeFieldType()
+    public function dataProviderForExplodeFieldType(): array
     {
         return [
             'text: contains separator' => [
@@ -61,10 +56,7 @@ class CriteriaTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForSearchOperatorByComparisonOperator()
+    public function dataProviderForSearchOperatorByComparisonOperator(): array
     {
         return [
             [Comparison::LIKE, Query::OPERATOR_LIKE],

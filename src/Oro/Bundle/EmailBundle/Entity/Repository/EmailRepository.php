@@ -299,16 +299,20 @@ class EmailRepository extends EntityRepository
         ];
     }
 
-    public function getEmailsByEmailAddress(string $emailAddress): array
+    public function getEmailUserIdsByEmailAddressQb(string $emailAddress): QueryBuilder
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('eu.id')
+            ->distinct()
+            ->from(EmailUser::class, 'eu')
+            ->join('eu.email', 'e')
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'rea')
             ->join('e.fromEmailAddress', 'fea')
             ->where('fea.email = :email OR rea.email = :email')
-            ->setParameter('email', $emailAddress)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('email', $emailAddress);
+
+        return $qb;
     }
 
     public function isEmailPublic(int $emailId): bool

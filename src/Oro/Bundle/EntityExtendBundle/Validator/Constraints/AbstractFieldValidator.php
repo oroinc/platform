@@ -5,8 +5,10 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * The base class for entity field configuration validators.
+ */
 abstract class AbstractFieldValidator extends ConstraintValidator
 {
     /** @var FieldNameValidationHelper */
@@ -39,13 +41,7 @@ abstract class AbstractFieldValidator extends ConstraintValidator
      */
     protected function addViolation($message, $newFieldName, $existingFieldName)
     {
-        /** @var ExecutionContextInterface $context */
-        $context = $this->context;
-        $context
-            ->buildViolation(
-                $message,
-                ['{{ value }}' => $newFieldName, '{{ field }}' => $existingFieldName]
-            )
+        $this->context->buildViolation($message, ['{{ value }}' => $newFieldName, '{{ field }}' => $existingFieldName])
             ->atPath('fieldName')
             ->addViolation();
     }

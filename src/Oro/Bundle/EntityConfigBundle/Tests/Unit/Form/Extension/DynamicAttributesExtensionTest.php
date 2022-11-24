@@ -142,10 +142,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->extension->buildForm($builder, ['data_class' => self::DATA_CLASS, 'enable_attributes' => true]);
     }
 
-    /**
-     * @return array
-     */
-    public function preSetDataProviderNoAdd()
+    public function preSetDataProviderNoAdd(): array
     {
         return [
             'null entity' => [
@@ -162,9 +159,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider preSetDataProviderNoAdd
-     * @param null|TestActivityTarget $entity
      */
-    public function testOnPreSetDataNoAdd($entity)
+    public function testOnPreSetDataNoAdd(?TestActivityTarget $entity)
     {
         $form = $this->getForm();
         $form->expects($this->never())
@@ -176,10 +172,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->extension->onPreSetData($event);
     }
 
-    /**
-     * @return array
-     */
-    public function preSubmitProviderNoAdd()
+    public function preSubmitProviderNoAdd(): array
     {
         return [
             'has family' => [
@@ -231,11 +224,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider addAttributesDataProvider
-     * @param array $fields
-     * @param array $attributes
-     * @param integer $expectAdds
      */
-    public function testOnPreSetData(array $fields, array $attributes, $expectAdds)
+    public function testOnPreSetData(array $fields, array $attributes, int $expectAdds)
     {
         $entity = $this->getEntityWithFamily();
         $form = $this->getForm();
@@ -258,11 +248,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider addAttributesDataProvider
-     * @param array $fields
-     * @param array $attributes
-     * @param int $expectAdds
      */
-    public function testOnPreSubmit(array $fields, array $attributes, $expectAdds)
+    public function testOnPreSubmit(array $fields, array $attributes, int $expectAdds)
     {
         $attributeFamilyId = 777;
         $entity = $this->getEntityWithFamily();
@@ -294,7 +281,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     public function testFinishView()
     {
-        $formView = $this->getFormView();
+        $formView = $this->createMock(FormView::class);
         $form = $this->getForm();
 
         $this->expectsApplicable();
@@ -337,7 +324,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->extension->finishView($formView, $form, ['data_class' => self::DATA_CLASS, 'enable_attributes' => true]);
     }
 
-    private function expectsApplicable()
+    private function expectsApplicable(): void
     {
         $this->attributeConfigHelper->expects($this->once())
             ->method('isEntityWithAttributes')
@@ -345,10 +332,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->willReturn(true);
     }
 
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getFormConfigProvider()
+    private function getFormConfigProvider(): ConfigProvider
     {
         $formConfigProvider = $this->createMock(ConfigProvider::class);
         $formConfigProvider->expects($this->once())
@@ -381,10 +365,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getForm()
+    private function getForm(): FormInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $form = $this->createMock(FormInterface::class);
         $config = $this->createMock(FormConfigInterface::class);
@@ -399,18 +380,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         return $form;
     }
 
-    /**
-     * @return FormView|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getFormView()
-    {
-        return $this->createMock(FormView::class);
-    }
-
-    /**
-     * @return AttributeFamilyAwareInterface
-     */
-    private function getEntityWithFamily()
+    private function getEntityWithFamily(): AttributeFamilyAwareInterface
     {
         return (new TestActivityTarget())->setAttributeFamily(new AttributeFamily());
     }
