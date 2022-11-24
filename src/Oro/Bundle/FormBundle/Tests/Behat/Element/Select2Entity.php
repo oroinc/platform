@@ -12,7 +12,7 @@ use WebDriver\Key;
 
 /**
  * Select control with autocomplete functionality
- * uses in fields that represent many one relationships.
+ * uses in fields that represent many-to-one relationship.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -27,6 +27,17 @@ class Select2Entity extends Element implements ClearableInterface
      * @var string
      */
     protected $searchInputSelector = '.select2-drop-active .select2-input,.select2-dropdown-open .select2-input';
+
+    /**
+     * Select2 is attached to a hidden input which is not visible.
+     * Use parent container to check element visibility.
+     *
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->getParent()->isVisible();
+    }
 
     /**
      * {@inheritdoc}
@@ -95,10 +106,13 @@ class Select2Entity extends Element implements ClearableInterface
     /**
      * @param string $value
      */
-    public function fillSearchField($value)
+    public function fillSearchField($value, bool $failOnEmpty = true)
     {
         $this->open();
-        $this->getDriver()->typeIntoInput($this->getSearchInput()->getXpath(), $value);
+        $searchInput = $this->getSearchInput($failOnEmpty);
+        if ($searchInput) {
+            $this->getDriver()->typeIntoInput($searchInput->getXpath(), $value);
+        }
     }
 
     /**
@@ -181,7 +195,7 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function getResultSet($failOnEmpty = true, $value = '')
     {
-        $this->fillSearchField($value);
+        $this->fillSearchField($value, $failOnEmpty);
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
@@ -397,9 +411,10 @@ JS;
     }
 
     /**
-     * @return NodeElement
+     * @param bool $failOnEmpty
+     * @return NodeElement|null
      */
-    private function getSearchInput()
+    private function getSearchInput(bool $failOnEmpty = true)
     {
         $inputs = array_filter(
             $this->getPage()->findAll('css', $this->searchInputSelector),
@@ -408,8 +423,14 @@ JS;
             }
         );
 
-        self::assertCount(1, $inputs);
+        if ($failOnEmpty) {
+            self::assertCount(1, $inputs);
+        }
 
-        return array_shift($inputs);
+        if ($inputs) {
+            return array_shift($inputs);
+        }
+
+        return null;
     }
 }
