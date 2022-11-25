@@ -9,16 +9,15 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
 
 class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    private ConsumerState $consumerState;
+    /** @var ConsumerState */
+    private $consumerState;
 
     /** @var TestHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private TestHandler $innerHandler;
+    private $innerHandler;
 
-    private ConsoleErrorHandler $handler;
+    /** @var ConsoleErrorHandler */
+    private $handler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
@@ -37,7 +36,7 @@ class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testReset(): void
     {
-        $this->innerHandler->expects(static::once())
+        $this->innerHandler->expects(self::once())
             ->method('reset');
 
         $this->handler->reset();

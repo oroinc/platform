@@ -18,7 +18,6 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([
             LoadWorkflowDefinitions::class,
             LoadWorkflowDefinitionsWithGroups::class,
@@ -36,16 +35,12 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         /** @var WorkflowDefinition $workflow */
         foreach ($workflows as $workflow) {
-            static::assertStringContainsString($workflow->getName(), $result);
-            static::assertStringContainsString(
-                $translator->trans(
-                    $workflow->getLabel(),
-                    [],
-                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
-                ),
+            self::assertStringContainsString($workflow->getName(), $result);
+            self::assertStringContainsString(
+                $translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
                 $result
             );
-            static::assertStringContainsString($workflow->getRelatedEntity(), $result);
+            self::assertStringContainsString($workflow->getRelatedEntity(), $result);
         }
     }
 
@@ -59,7 +54,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
-        static::assertStringNotContainsString('No workflow definitions found.', $result);
+        self::assertStringNotContainsString('No workflow definitions found.', $result);
 
         $workflowConfiguration = Yaml::parse($result);
         $workflowConfiguration = self::getContainer()
@@ -132,7 +127,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
-        static::assertStringNotContainsString('No workflow definitions found.', $result);
+        self::assertStringNotContainsString('No workflow definitions found.', $result);
 
         $workflowConfiguration = Yaml::parse($result);
         $workflowConfiguration = self::getContainer()
@@ -229,7 +224,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), ['missing_workflow'], false);
 
-        static::assertStringContainsString('No workflow definitions found.', $result);
+        self::assertStringContainsString('No workflow definitions found.', $result);
     }
 
     private function getWorkflowDefinitionRepository(): WorkflowDefinitionRepository

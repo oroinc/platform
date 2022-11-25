@@ -22,18 +22,20 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $fooStepExecution = $this->createStepExecution();
         $fooContext = $this->registry->getByStepExecution($fooStepExecution);
-        static::assertInstanceOf(StepExecutionProxyContext::class, $fooContext);
-        static::assertSame($fooContext, $this->registry->getByStepExecution($fooStepExecution));
+        self::assertInstanceOf(StepExecutionProxyContext::class, $fooContext);
+        self::assertSame($fooContext, $this->registry->getByStepExecution($fooStepExecution));
 
         $barStepExecution = $this->createStepExecution('job2');
         $barContext = $this->registry->getByStepExecution($barStepExecution);
-        static::assertNotSame($barContext, $fooContext);
+        self::assertNotSame($barContext, $fooContext);
 
         $jobInstance = $this->createMock(JobInstance::class);
-        $jobInstance->method('getAlias')->willReturn('job2');
+        $jobInstance->expects(self::once())
+            ->method('getAlias')
+            ->willReturn('job2');
         $this->registry->clear($jobInstance);
         $barContext2 = $this->registry->getByStepExecution($barStepExecution);
-        static::assertNotSame($barContext, $barContext2);
+        self::assertNotSame($barContext, $barContext2);
     }
 
     private function createStepExecution(string $alias = null): StepExecution
@@ -43,9 +45,15 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
         if ($alias) {
             $jobExecution = $this->createMock(JobExecution::class);
             $jobInstance = $this->createMock(JobInstance::class);
-            $jobExecution->method('getJobInstance')->willReturn($jobInstance);
-            $stepExecution->method('getJobExecution')->willReturn($jobExecution);
-            $jobInstance->method('getAlias')->willReturn($alias);
+            $jobExecution->expects(self::atLeastOnce())
+                ->method('getJobInstance')
+                ->willReturn($jobInstance);
+            $stepExecution->expects(self::atLeastOnce())
+                ->method('getJobExecution')
+                ->willReturn($jobExecution);
+            $jobInstance->expects(self::atLeastOnce())
+                ->method('getAlias')
+                ->willReturn($alias);
         }
 
         return $stepExecution;

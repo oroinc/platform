@@ -5,9 +5,8 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Entity;
 use Oro\Bundle\LoggerBundle\Entity\LogEntry;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\TestCase;
 
-class LogEntryTest extends TestCase
+class LogEntryTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
     use EntityTrait;
@@ -24,6 +23,6 @@ class LogEntryTest extends TestCase
             ['extra', [], false],
         ];
 
-        static::assertPropertyAccessors(new LogEntry(), $properties);
+        self::assertPropertyAccessors(new LogEntry(), $properties);
     }
 }

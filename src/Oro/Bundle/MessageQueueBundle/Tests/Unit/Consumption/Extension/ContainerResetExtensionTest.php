@@ -12,15 +12,20 @@ use Psr\Log\LoggerInterface;
 
 class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    private ClearerInterface|\PHPUnit\Framework\MockObject\MockObject $clearer1;
+    /** @var ClearerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $clearer1;
 
-    private ClearerInterface|\PHPUnit\Framework\MockObject\MockObject $clearer2;
+    /** @var ClearerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $clearer2;
 
-    private ChainExtensionAwareClearer|\PHPUnit\Framework\MockObject\MockObject $chainExtensionAwareClearer;
+    /** @var ChainExtensionAwareClearer|\PHPUnit\Framework\MockObject\MockObject */
+    private $chainExtensionAwareClearer;
 
-    private ContainerResetExtension $extension;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    /** @var ContainerResetExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -49,13 +54,19 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setPersistentProcessors(['persistent_processor2']);
 
         // verify that clearers are called only for non-persistent processors
-        $this->clearer1->expects(static::once())->method('clear')->with(static::identicalTo($this->logger));
-        $this->clearer2->expects(static::once())->method('clear')->with(static::identicalTo($this->logger));
+        $this->clearer1->expects(self::once())
+            ->method('clear')
+            ->with(self::identicalTo($this->logger));
+        $this->clearer2->expects(self::once())
+            ->method('clear')
+            ->with(self::identicalTo($this->logger));
 
         $this->extension->onPostReceived($this->createMessageContextForProcessor('non_persistent_processor'));
 
-        $this->clearer1->expects(static::never())->method('clear');
-        $this->clearer2->expects(static::never())->method('clear');
+        $this->clearer1->expects(self::never())
+            ->method('clear');
+        $this->clearer2->expects(self::never())
+            ->method('clear');
 
         // processing in different order to verify that subsequent calls to setPersistentProcessors
         // did not wipe out previously set persistent processors
@@ -67,11 +78,13 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $chainExtension = $this->createMock(ExtensionInterface::class);
 
-        $this->clearer1->expects(static::never())->method('setChainExtension');
-        $this->clearer2->expects(static::never())->method('setChainExtension');
-        $this->chainExtensionAwareClearer->expects(static::once())
+        $this->clearer1->expects(self::never())
+            ->method('setChainExtension');
+        $this->clearer2->expects(self::never())
+            ->method('setChainExtension');
+        $this->chainExtensionAwareClearer->expects(self::once())
             ->method('setChainExtension')
-            ->with(static::identicalTo($chainExtension));
+            ->with(self::identicalTo($chainExtension));
 
         $this->extension->setChainExtension($chainExtension);
     }
