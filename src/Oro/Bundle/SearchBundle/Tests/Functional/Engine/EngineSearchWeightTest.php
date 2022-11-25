@@ -48,9 +48,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
         array $orderings = [],
         ?string $engine = null
     ) {
-        $engineName = static::getContainer()
-            ->get('oro_search.engine.parameters')
-            ->getEngineName();
+        $engineName = self::getContainer()->get('oro_search.engine.parameters')->getEngineName();
         if ($engine && $engineName !== $engine) {
             $this->markTestSkipped('Should be tested only with ' . $engine . ' search engine');
         }

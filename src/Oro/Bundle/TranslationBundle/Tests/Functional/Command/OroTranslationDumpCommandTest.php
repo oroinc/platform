@@ -16,7 +16,6 @@ class OroTranslationDumpCommandTest extends WebTestCase
     private const GAUFRETTE_BASE_PATH = 'translation/';
 
     private string $tempDir;
-
     private static FileManager $fileManager;
 
     protected function setUp(): void
@@ -28,7 +27,7 @@ class OroTranslationDumpCommandTest extends WebTestCase
 
     public static function assertFileExists(string $filename, string $message = ''): void
     {
-        static::assertTrue(self::$fileManager->hasFile($filename), $message);
+        self::assertTrue(self::$fileManager->hasFile($filename), $message);
     }
 
     public static function assertStringEqualsFile(
@@ -36,11 +35,11 @@ class OroTranslationDumpCommandTest extends WebTestCase
         string $actualString,
         string $message = ''
     ): void {
-        static::assertFileExists($expectedFile, $message);
+        self::assertFileExists($expectedFile, $message);
 
         $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
 
-        static::assertThat($actualString, $constraint, $message);
+        self::assertThat($actualString, $constraint, $message);
     }
 
     private function doTest(array $targetFilePaths, array $locales): void

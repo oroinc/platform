@@ -10,16 +10,18 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class OroCacheExtensionTest extends ExtensionTestCase
 {
+    /**
+     * {@inheritDoc}
+     */
     protected function buildContainerMock(): ContainerBuilder
     {
         $containerBuilder = parent::buildContainerMock();
         $warmerServiceDefinition = $this->createMock(Definition::class);
         $warmerServiceDefinition->expects(self::once())
             ->method('replaceArgument')
-            ->with(0, static::isType('array'));
+            ->with(0, self::isType('array'));
 
-        $containerBuilder
-            ->expects(static::any())
+        $containerBuilder->expects(self::any())
             ->method('getDefinition')
             ->willReturnMap([
                 ['oro.cache.serializer.mapping.cache_warmer', $warmerServiceDefinition]

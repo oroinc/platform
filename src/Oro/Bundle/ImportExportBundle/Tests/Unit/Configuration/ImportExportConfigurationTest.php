@@ -3,86 +3,85 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
-use PHPUnit\Framework\TestCase;
 
-class ImportExportConfigurationTest extends TestCase
+class ImportExportConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters()
     {
         $parameters = $this->getConfigurationParameters();
         $configuration = new ImportExportConfiguration($parameters);
 
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_ROUTE_OPTIONS],
             $configuration->getRouteOptions()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_ENTITY_CLASS],
             $configuration->getEntityClass()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_FILE_PREFIX],
             $configuration->getFilePrefix()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_JOB_NAME],
             $configuration->getExportJobName()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_PROCESSOR_ALIAS],
             $configuration->getExportProcessorAlias()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_BUTTON_LABEL],
             $configuration->getExportButtonLabel()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_POPUP_TITLE],
             $configuration->getExportPopupTitle()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_JOB_NAME],
             $configuration->getExportTemplateJobName()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS],
             $configuration->getExportTemplateProcessorAlias()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_JOB_NAME],
             $configuration->getImportJobName()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS],
             $configuration->getImportProcessorAlias()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_VALIDATION_JOB_NAME],
             $configuration->getImportValidationJobName()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL],
             $configuration->getImportValidationButtonLabel()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL],
             $configuration->getImportEntityLabel()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_STRATEGY_TOOLTIP],
             $configuration->getImportStrategyTooltip()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE],
             $configuration->getImportProcessorsToConfirmationMessage()
         );
-        static::assertSame(
+        self::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_ADDITIONAL_NOTICES],
             $configuration->getImportAdditionalNotices()
         );
     }
 
-    protected function getConfigurationParameters(): array
+    private function getConfigurationParameters(): array
     {
         return [
             ImportExportConfiguration::FIELD_ROUTE_OPTIONS => ['option1', 'option2'],
