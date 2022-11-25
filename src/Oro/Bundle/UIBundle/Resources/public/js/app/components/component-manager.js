@@ -87,12 +87,21 @@ define(function(require) {
                     return;
                 }
                 event.preventDefault();
-                $(event.target).find('[data-bound-component]').toArray().forEach(el => {
-                    Object.values(this.components).forEach(item => {
-                        if (item.el === el) {
-                            item.component.dispose();
-                        }
-                    });
+                this.eraseElement($(event.target));
+            });
+        },
+
+        /**
+         * Disposed components initialized for an element
+         *
+         * @param {jQuery} $el
+         */
+        eraseElement($el) {
+            $el.find('[data-bound-component]').each((i, el) => {
+                Object.values(this.components).forEach(item => {
+                    if (item.el === el) {
+                        item.component.dispose();
+                    }
                 });
             });
         },
