@@ -325,7 +325,7 @@ YAML
 
     public function testLoadTranslationsFromArchiveLoadsEnUsAsEn(): void
     {
-        static::markTestSkipped('BAP-21444');
+        self::markTestSkipped('BAP-21444');
 
         $pathToArchiveFile = $this->getTempFile('archive_');
         $expectedPart = DIRECTORY_SEPARATOR . 'extracted_en';

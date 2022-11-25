@@ -79,9 +79,7 @@ class EmailOriginHelper
         } elseif ($emailOwner instanceof Mailbox) {
             $origin = $emailOwner->getOrigin();
         } else {
-            $origin = $this->getEntityManager()
-                ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                ->findOneBy(['internalName' => $originName]);
+            $origin = $this->findOrCreateInternalOrigin($organization, $originName);
         }
 
         return $origin;
@@ -274,10 +272,7 @@ class EmailOriginHelper
      */
     protected function createUserInternalOrigin(User $user, OrganizationInterface $organization = null)
     {
-        $organization = $organization
-            ? $organization
-            : $user->getOrganization();
-
+        $organization = $organization ?: $user->getOrganization();
         $originName = InternalEmailOrigin::BAP . '_User_' . $user->getId();
 
         $outboxFolder = new EmailFolder();
@@ -297,6 +292,33 @@ class EmailOriginHelper
 
         $this->getEntityManager()->persist($origin);
         $this->getEntityManager()->persist($user);
+
+        return $origin;
+    }
+
+    protected function findOrCreateInternalOrigin($organization, $originName)
+    {
+        $origin = $this->getEntityManager()
+            ->getRepository(InternalEmailOrigin::class)
+            ->findOneBy(['internalName' => $originName]);
+
+        if ($origin) {
+            return $origin;
+        }
+
+        $outboxFolder = new EmailFolder();
+        $outboxFolder
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
+
+        $origin = new InternalEmailOrigin();
+        $origin
+            ->setName($originName)
+            ->addFolder($outboxFolder)
+            ->setOrganization($organization);
+
+        $this->getEntityManager()->persist($origin);
 
         return $origin;
     }

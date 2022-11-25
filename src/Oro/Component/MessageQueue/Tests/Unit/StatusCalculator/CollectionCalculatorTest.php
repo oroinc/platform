@@ -8,27 +8,13 @@ use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
 
 class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CollectionCalculator
-     */
+    /** @var CollectionCalculator */
     private $collectionCalculator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $jobStatusChecker = new JobStatusChecker();
         $this->collectionCalculator = new CollectionCalculator();
-        $this->collectionCalculator->setJobStatusChecker($jobStatusChecker);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->collectionCalculator);
+        $this->collectionCalculator->setJobStatusChecker(new JobStatusChecker());
     }
 
     public function calculateProgressProvider(): array
@@ -47,11 +33,8 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider calculateProgressProvider
-     *
-     * @param array   $statuses
-     * @param float  $expectedStatusProgress
      */
-    public function testCalculateRootJobProgress(array $statuses, $expectedStatusProgress)
+    public function testCalculateRootJobProgress(array $statuses, float|int $expectedStatusProgress)
     {
         $rootJob = $this->getRootJobFilledWithChildJobWithGivenStatuses($statuses);
 
@@ -76,11 +59,8 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider statusCalculateProvider
-     *
-     * @param array   $statuses
-     * @param string  $expectedStatus
      */
-    public function testCalculateRootJobStatus(array $statuses, $expectedStatus)
+    public function testCalculateRootJobStatus(array $statuses, string $expectedStatus)
     {
         $rootJob = $this->getRootJobFilledWithChildJobWithGivenStatuses($statuses);
 
@@ -89,12 +69,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedStatus, $status);
     }
 
-    /**
-     * @param array $statuses
-     *
-     * @return Job
-     */
-    private function getRootJobFilledWithChildJobWithGivenStatuses(array $statuses)
+    private function getRootJobFilledWithChildJobWithGivenStatuses(array $statuses): Job
     {
         $rootJob = new Job();
         $rootJob->setId(123);

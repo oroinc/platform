@@ -28,7 +28,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $serviceId1 = 'foo_service';
         $service2 = new \stdClass();
         $serviceId2 = 'bar_service';
-        $this->container->expects(static::exactly(4))
+        $this->container->expects(self::exactly(4))
             ->method('initialized')
             ->withConsecutive(
                 [$serviceId1],
@@ -42,7 +42,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
                 false,
                 false
             );
-        $this->container->expects(static::exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
                 [$serviceId1, Container::EXCEPTION_ON_INVALID_REFERENCE, $service1],
@@ -50,7 +50,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         // expectations
-        $this->container->expects(static::exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('set')
             ->withConsecutive(
                 [$serviceId1, $service1],

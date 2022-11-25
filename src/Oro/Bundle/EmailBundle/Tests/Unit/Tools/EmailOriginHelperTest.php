@@ -112,7 +112,8 @@ class EmailOriginHelperTest extends \PHPUnit\Framework\TestCase
             $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName)
         );
 
-        $this->assertNull(
+        $this->assertInstanceOf(
+            InternalEmailOrigin::class,
             $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, false)
         );
     }
