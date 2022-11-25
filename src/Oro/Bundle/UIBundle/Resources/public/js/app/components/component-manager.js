@@ -66,8 +66,6 @@ define(function(require) {
          * @protected
          */
         _bindContainerChangesEvents: function() {
-            const self = this;
-
             // if the container catches content changed event -- updates its layout
             this.$el.on('content:changed' + this.eventNamespace, (event, onInitialized) => {
                 if (event.isDefaultPrevented()) {
@@ -88,14 +86,7 @@ define(function(require) {
                     return;
                 }
                 event.preventDefault();
-                $(event.target).find('[data-bound-component]').each(function() {
-                    const el = this;
-                    _.each(self.components, function(item) {
-                        if (item.el === el) {
-                            item.component.dispose();
-                        }
-                    });
-                });
+                this.eraseElement($(event.target));
             });
 
             const initOnEvent = event => {
@@ -128,6 +119,21 @@ define(function(require) {
                     {oppositeEventName: opposite},
                     initOnEvent
                 );
+            });
+        },
+
+        /**
+         * Disposed components initialized for an element
+         *
+         * @param {jQuery} $el
+         */
+        eraseElement($el) {
+            $el.find('[data-bound-component]').each((i, el) => {
+                Object.values(this.components).forEach(item => {
+                    if (item.el === el) {
+                        item.component.dispose();
+                    }
+                });
             });
         },
 
